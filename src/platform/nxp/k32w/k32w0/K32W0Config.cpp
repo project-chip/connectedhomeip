@@ -371,6 +371,11 @@ CHIP_ERROR K32WConfig::FactoryResetConfig(void)
     if (err == CHIP_NO_ERROR)
     {
         err = FactoryResetConfigInternal(kMinConfigKey_KVS, kMaxConfigKey_KVS);
+
+        if (err == CHIP_NO_ERROR)
+        {
+            FactoryResetConfigInternal(kMinConfigKey_ChipCounter, kMaxConfigKey_ChipCounter);
+        }
     }
 
     return err;
