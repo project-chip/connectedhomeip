@@ -19,8 +19,23 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <jni.h>
 
 class LowPowerManager
 {
 public:
+    void InitializeWithObjects(jobject managerObject);
+    bool Sleep();
+
+private:
+    friend LowPowerManager & LowPowerMgr();
+
+    static LowPowerManager sInstance;
+    jobject mLowPowerManagerObject = nullptr;
+    jmethodID mSleepMethod          = nullptr;
 };
+
+inline LowPowerManager & LowPowerMgr()
+{
+    return LowPowerManager::sInstance;
+}
