@@ -445,26 +445,6 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace OnOff
 
-namespace SampleMfgSpecificAttribute0x00000x1002 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace SampleMfgSpecificAttribute0x00000x1002
-
-namespace SampleMfgSpecificAttribute0x00000x1049 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace SampleMfgSpecificAttribute0x00000x1049
-
-namespace SampleMfgSpecificAttribute0x00010x1002 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace SampleMfgSpecificAttribute0x00010x1002
-
-namespace SampleMfgSpecificAttribute0x00010x1040 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace SampleMfgSpecificAttribute0x00010x1040
-
 namespace GlobalSceneControl {
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);
@@ -5218,38 +5198,6 @@ namespace Attributes {
 
 } // namespace Attributes
 } // namespace GroupKeyManagement
-
-namespace SampleMfgSpecificCluster {
-namespace Attributes {
-
-namespace EmberSampleAttribute {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace EmberSampleAttribute
-
-namespace EmberSampleAttribute2 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace EmberSampleAttribute2
-
-} // namespace Attributes
-} // namespace SampleMfgSpecificCluster
-
-namespace SampleMfgSpecificCluster2 {
-namespace Attributes {
-
-namespace EmberSampleAttribute3 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace EmberSampleAttribute3
-
-namespace EmberSampleAttribute4 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace EmberSampleAttribute4
-
-} // namespace Attributes
-} // namespace SampleMfgSpecificCluster2
 
 } // namespace Clusters
 } // namespace app

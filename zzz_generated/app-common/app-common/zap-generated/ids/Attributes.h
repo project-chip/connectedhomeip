@@ -416,22 +416,6 @@ namespace OnOff {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace OnOff
 
-namespace SampleMfgSpecificAttribute0x00000x1002 {
-static constexpr AttributeId Id = 0x10020000;
-} // namespace SampleMfgSpecificAttribute0x00000x1002
-
-namespace SampleMfgSpecificAttribute0x00000x1049 {
-static constexpr AttributeId Id = 0x10490000;
-} // namespace SampleMfgSpecificAttribute0x00000x1049
-
-namespace SampleMfgSpecificAttribute0x00010x1002 {
-static constexpr AttributeId Id = 0x10020001;
-} // namespace SampleMfgSpecificAttribute0x00010x1002
-
-namespace SampleMfgSpecificAttribute0x00010x1040 {
-static constexpr AttributeId Id = 0x10490001;
-} // namespace SampleMfgSpecificAttribute0x00010x1040
-
 namespace GlobalSceneControl {
 static constexpr AttributeId Id = 0x00004000;
 } // namespace GlobalSceneControl
@@ -5422,50 +5406,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace GroupKeyManagement
-
-namespace SampleMfgSpecificCluster {
-namespace Attributes {
-
-namespace EmberSampleAttribute {
-static constexpr AttributeId Id = 0x10020000;
-} // namespace EmberSampleAttribute
-
-namespace EmberSampleAttribute2 {
-static constexpr AttributeId Id = 0x10020001;
-} // namespace EmberSampleAttribute2
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace SampleMfgSpecificCluster
-
-namespace SampleMfgSpecificCluster2 {
-namespace Attributes {
-
-namespace EmberSampleAttribute3 {
-static constexpr AttributeId Id = 0x10490000;
-} // namespace EmberSampleAttribute3
-
-namespace EmberSampleAttribute4 {
-static constexpr AttributeId Id = 0x10490001;
-} // namespace EmberSampleAttribute4
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace SampleMfgSpecificCluster2
 
 } // namespace Clusters
 } // namespace app

@@ -4389,26 +4389,4 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPSampleMfgSpecificClusterClusterCommandOneParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _argOne = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPSampleMfgSpecificCluster2ClusterCommandTwoParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _argOne = @(0);
-    }
-    return self;
-}
-@end
-
 NS_ASSUME_NONNULL_END

@@ -137,10 +137,6 @@
 
 // Server attributes
 #define ZCL_ON_OFF_ATTRIBUTE_ID (0x0000)
-#define ZCL_SAMPLE_MFG_SPECIFIC_TRANSITION_TIME_ATTRIBUTE_ID (0x0000)
-#define ZCL_SAMPLE_MFG_SPECIFIC_TRANSITION_TIME_2_ATTRIBUTE_ID (0x0000)
-#define ZCL_SAMPLE_MFG_SPECIFIC_TRANSITION_TIME_3_ATTRIBUTE_ID (0x0001)
-#define ZCL_SAMPLE_MFG_SPECIFIC_TRANSITION_TIME_4_ATTRIBUTE_ID (0x0001)
 #define ZCL_GLOBAL_SCENE_CONTROL_ATTRIBUTE_ID (0x4000)
 #define ZCL_ON_TIME_ATTRIBUTE_ID (0x4001)
 #define ZCL_OFF_WAIT_TIME_ATTRIBUTE_ID (0x4002)
@@ -1651,19 +1647,3 @@
 // Server attributes
 #define ZCL_GROUPS_ATTRIBUTE_ID (0x0000)
 #define ZCL_GROUPKEYS_ATTRIBUTE_ID (0x0001)
-
-// Attribute ids for cluster: Sample Mfg Specific Cluster
-
-// Client attributes
-
-// Server attributes
-#define ZCL_ATTRIBUTE_ONE_ATTRIBUTE_ID (0x0000)
-#define ZCL_ATTRIBUTE_TWO_ATTRIBUTE_ID (0x0001)
-
-// Attribute ids for cluster: Sample Mfg Specific Cluster 2
-
-// Client attributes
-
-// Server attributes
-#define ZCL_ATTRIBUTE_THREE_ATTRIBUTE_ID (0x0000)
-#define ZCL_ATTRIBUTE_FOUR_ATTRIBUTE_ID (0x0001)

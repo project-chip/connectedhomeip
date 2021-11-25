@@ -243,7 +243,3 @@ void __attribute__((weak)) MatterBindingPluginClientInitCallback() {}
 void MatterBindingPluginServerInitCallback();
 void __attribute__((weak)) MatterGroupKeyManagementPluginClientInitCallback() {}
 void MatterGroupKeyManagementPluginServerInitCallback();
-void __attribute__((weak)) MatterSampleMfgSpecificClusterPluginClientInitCallback() {}
-void MatterSampleMfgSpecificClusterPluginServerInitCallback();
-void __attribute__((weak)) MatterSampleMfgSpecificCluster2PluginClientInitCallback() {}
-void MatterSampleMfgSpecificCluster2PluginServerInitCallback();

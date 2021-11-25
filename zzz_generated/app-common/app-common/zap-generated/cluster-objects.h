@@ -2447,40 +2447,15 @@ struct Type;
 struct DecodableType;
 } // namespace Off
 
-namespace SampleMfgSpecificOffWithTransition {
-struct Type;
-struct DecodableType;
-} // namespace SampleMfgSpecificOffWithTransition
-
 namespace On {
 struct Type;
 struct DecodableType;
 } // namespace On
 
-namespace SampleMfgSpecificOnWithTransition {
-struct Type;
-struct DecodableType;
-} // namespace SampleMfgSpecificOnWithTransition
-
-namespace SampleMfgSpecificOnWithTransition2 {
-struct Type;
-struct DecodableType;
-} // namespace SampleMfgSpecificOnWithTransition2
-
 namespace Toggle {
 struct Type;
 struct DecodableType;
 } // namespace Toggle
-
-namespace SampleMfgSpecificToggleWithTransition {
-struct Type;
-struct DecodableType;
-} // namespace SampleMfgSpecificToggleWithTransition
-
-namespace SampleMfgSpecificToggleWithTransition2 {
-struct Type;
-struct DecodableType;
-} // namespace SampleMfgSpecificToggleWithTransition2
 
 namespace OffWithEffect {
 struct Type;
@@ -2526,32 +2501,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Off
-namespace SampleMfgSpecificOffWithTransition {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificOffWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificOffWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SampleMfgSpecificOffWithTransition
 namespace On {
 enum class Fields
 {
@@ -2578,58 +2527,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace On
-namespace SampleMfgSpecificOnWithTransition {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificOnWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificOnWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SampleMfgSpecificOnWithTransition
-namespace SampleMfgSpecificOnWithTransition2 {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificOnWithTransition2::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificOnWithTransition2::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SampleMfgSpecificOnWithTransition2
 namespace Toggle {
 enum class Fields
 {
@@ -2656,58 +2553,6 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Toggle
-namespace SampleMfgSpecificToggleWithTransition {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificToggleWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificToggleWithTransition::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SampleMfgSpecificToggleWithTransition
-namespace SampleMfgSpecificToggleWithTransition2 {
-enum class Fields
-{
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificToggleWithTransition2::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SampleMfgSpecificToggleWithTransition2::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SampleMfgSpecificToggleWithTransition2
 namespace OffWithEffect {
 enum class Fields
 {
@@ -2817,50 +2662,6 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::OnOff::Id; }
 };
 } // namespace OnOff
-namespace SampleMfgSpecificAttribute0x00000x1002 {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00000x1002::Id; }
-};
-} // namespace SampleMfgSpecificAttribute0x00000x1002
-namespace SampleMfgSpecificAttribute0x00000x1049 {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00000x1049::Id; }
-};
-} // namespace SampleMfgSpecificAttribute0x00000x1049
-namespace SampleMfgSpecificAttribute0x00010x1002 {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00010x1002::Id; }
-};
-} // namespace SampleMfgSpecificAttribute0x00010x1002
-namespace SampleMfgSpecificAttribute0x00010x1040 {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SampleMfgSpecificAttribute0x00010x1040::Id; }
-};
-} // namespace SampleMfgSpecificAttribute0x00010x1040
 namespace GlobalSceneControl {
 struct TypeInfo
 {
@@ -32645,190 +32446,6 @@ struct TypeInfo
 } // namespace ClusterRevision
 } // namespace Attributes
 } // namespace GroupKeyManagement
-namespace SampleMfgSpecificCluster {
-
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace CommandOne {
-struct Type;
-struct DecodableType;
-} // namespace CommandOne
-
-} // namespace Commands
-
-namespace Commands {
-namespace CommandOne {
-enum class Fields
-{
-    kArgOne = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::CommandOne::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
-
-    uint8_t argOne;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::CommandOne::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
-
-    uint8_t argOne;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace CommandOne
-} // namespace Commands
-
-namespace Attributes {
-namespace EmberSampleAttribute {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute::Id; }
-};
-} // namespace EmberSampleAttribute
-namespace EmberSampleAttribute2 {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute2::Id; }
-};
-} // namespace EmberSampleAttribute2
-namespace FeatureMap {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-};
-} // namespace ClusterRevision
-} // namespace Attributes
-} // namespace SampleMfgSpecificCluster
-namespace SampleMfgSpecificCluster2 {
-
-namespace Commands {
-// Forward-declarations so we can reference these later.
-
-namespace CommandTwo {
-struct Type;
-struct DecodableType;
-} // namespace CommandTwo
-
-} // namespace Commands
-
-namespace Commands {
-namespace CommandTwo {
-enum class Fields
-{
-    kArgOne = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::CommandTwo::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
-
-    uint8_t argOne;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::CommandTwo::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
-
-    uint8_t argOne;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace CommandTwo
-} // namespace Commands
-
-namespace Attributes {
-namespace EmberSampleAttribute3 {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute3::Id; }
-};
-} // namespace EmberSampleAttribute3
-namespace EmberSampleAttribute4 {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::EmberSampleAttribute4::Id; }
-};
-} // namespace EmberSampleAttribute4
-namespace FeatureMap {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::SampleMfgSpecificCluster2::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-};
-} // namespace ClusterRevision
-} // namespace Attributes
-} // namespace SampleMfgSpecificCluster2
 
 } // namespace Clusters
 } // namespace app
