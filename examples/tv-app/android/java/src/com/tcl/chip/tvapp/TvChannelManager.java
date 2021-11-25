@@ -19,15 +19,15 @@ package com.tcl.chip.tvapp;
 
 public interface TvChannelManager {
 
-    TvChannelInfo[] getChannelList();
+  TvChannelInfo[] getChannelList();
 
-    TvChannelLineupInfo getLineup();
+  TvChannelLineupInfo getLineup();
 
-    TvChannelInfo getCurrentChannel();
+  TvChannelInfo getCurrentChannel();
 
-    TvChannelInfo changeChannel(String match);
+  TvChannelInfo changeChannel(String match);
 
-    boolean changeChannelByNumber(int majorNumber, int minorNumber);
+  boolean changeChannelByNumber(int majorNumber, int minorNumber);
 
-    boolean skipChannel(int count);
+  boolean skipChannel(int count);
 }

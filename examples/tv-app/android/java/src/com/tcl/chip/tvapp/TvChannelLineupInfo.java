@@ -18,31 +18,39 @@
 package com.tcl.chip.tvapp;
 
 public class TvChannelLineupInfo {
-    public static final int LINEUP_INFO_TYPE_MSO = 0x00;
+  public static final int LINEUP_INFO_TYPE_MSO = 0x00;
 
-    public String operatorName;
-    public String lineupName;
-    public String postalCode;
-    public int lineupInfoType;
+  public String operatorName;
+  public String lineupName;
+  public String postalCode;
+  public int lineupInfoType;
 
-    public TvChannelLineupInfo(String operatorName, String lineupName, String postalCode) {
-        this(operatorName, lineupName, postalCode, LINEUP_INFO_TYPE_MSO);
-    }
+  public TvChannelLineupInfo(String operatorName, String lineupName, String postalCode) {
+    this(operatorName, lineupName, postalCode, LINEUP_INFO_TYPE_MSO);
+  }
 
-    public TvChannelLineupInfo(String operatorName, String lineupName, String postalCode, int lineupInfoType) {
-        this.operatorName = operatorName;
-        this.lineupName = lineupName;
-        this.postalCode = postalCode;
-        this.lineupInfoType = lineupInfoType;
-    }
+  public TvChannelLineupInfo(
+      String operatorName, String lineupName, String postalCode, int lineupInfoType) {
+    this.operatorName = operatorName;
+    this.lineupName = lineupName;
+    this.postalCode = postalCode;
+    this.lineupInfoType = lineupInfoType;
+  }
 
-    @Override
-    public String toString() {
-        return "TvChannelLineupInfo{" +
-                "operatorName='" + operatorName + '\'' +
-                ", lineupName='" + lineupName + '\'' +
-                ", postalCode='" + postalCode + '\'' +
-                ", lineupInfoType=" + lineupInfoType +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "TvChannelLineupInfo{"
+        + "operatorName='"
+        + operatorName
+        + '\''
+        + ", lineupName='"
+        + lineupName
+        + '\''
+        + ", postalCode='"
+        + postalCode
+        + '\''
+        + ", lineupInfoType="
+        + lineupInfoType
+        + '}';
+  }
 }

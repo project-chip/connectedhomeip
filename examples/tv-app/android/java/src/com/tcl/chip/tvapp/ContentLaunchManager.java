@@ -21,16 +21,15 @@ package com.tcl.chip.tvapp;
 public interface ContentLaunchManager {
 
   int STREAMING_TYPE_DASH = 0;
-  int STREAMING_TYPE_HLS  = 1;
+  int STREAMING_TYPE_HLS = 1;
 
   /**
-   * @return The list of content types supported by the Video Player or Content App in the form of entries in the HTTP "Accept" request header.
+   * @return The list of content types supported by the Video Player or Content App in the form of
+   *     entries in the HTTP "Accept" request header.
    */
   String[] getAcceptsHeader();
 
-  /**
-   * @return The list information about supported streaming protocols in STREAMING_TYPE_XXX.
-   */
+  /** @return The list information about supported streaming protocols in STREAMING_TYPE_XXX. */
   int[] getSupportedStreamingTypes();
 
   /**
@@ -40,16 +39,21 @@ public interface ContentLaunchManager {
    * @param autoplay whether to automatically start playing content.
    * @param data Optional app-specific data.
    */
-  ContentLaunchResponse launchContent(ContentLaunchSearchParameter[] search, boolean autoplay,String data);
+  ContentLaunchResponse launchContent(
+      ContentLaunchSearchParameter[] search, boolean autoplay, String data);
 
   /**
    * Launch content from the specified URL.
    *
-   * The content types supported include those identified in the AcceptHeader and SupportedStreamingProtocols attributes.
+   * <p>The content types supported include those identified in the AcceptHeader and
+   * SupportedStreamingProtocols attributes.
    *
    * @param url The URL of content to launch.
-   * @param display If present, SHALL provide a string that MAY be used to describe the content being accessed at the given URL.
-   * @param branding If present, SHALL indicate the BrandingInformation that MAY be displayed when playing back the given content.
+   * @param display If present, SHALL provide a string that MAY be used to describe the content
+   *     being accessed at the given URL.
+   * @param branding If present, SHALL indicate the BrandingInformation that MAY be displayed when
+   *     playing back the given content.
    */
-  ContentLaunchResponse launchUrl(String url,String display, ContentLaunchBrandingInformation branding);
+  ContentLaunchResponse launchUrl(
+      String url, String display, ContentLaunchBrandingInformation branding);
 }

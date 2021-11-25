@@ -19,7 +19,6 @@
 package com.tcl.chip.tvapp;
 
 import android.util.Log;
-
 import java.util.Date;
 
 /** Stub implement of MediaPlaybackManager, TV manufacture should have there own implements */

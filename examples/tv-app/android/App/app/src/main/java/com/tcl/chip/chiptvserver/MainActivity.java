@@ -15,15 +15,14 @@ import chip.platform.PreferencesKeyValueStoreManager;
 import chip.setuppayload.DiscoveryCapability;
 import chip.setuppayload.SetupPayload;
 import chip.setuppayload.SetupPayloadParser;
-
 import com.tcl.chip.tvapp.ContentLaunchManagerStub;
 import com.tcl.chip.tvapp.KeypadInputManagerStub;
-import com.tcl.chip.tvapp.MediaInputManagerStub;
-import com.tcl.chip.tvapp.TvApp;
-import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 import com.tcl.chip.tvapp.LowPowerManagerStub;
+import com.tcl.chip.tvapp.MediaInputManagerStub;
 import com.tcl.chip.tvapp.MediaPlaybackManagerStub;
+import com.tcl.chip.tvapp.TvApp;
 import com.tcl.chip.tvapp.TvChannelManagerStub;
+import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
