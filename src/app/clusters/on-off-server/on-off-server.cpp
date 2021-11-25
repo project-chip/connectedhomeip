@@ -383,7 +383,7 @@ bool OnOffServer::OnWithTimedOffCommand(BitFlags<OnOffControl> onOffControl, uin
         return true;
     }
 
-    uint16_t currentOffWaitTime = MAX_TIME_VALUE;
+    uint16_t currentOffWaitTime = max_time_value;
     OnOff::Attributes::OffWaitTime::Get(endpoint, &currentOffWaitTime);
 
     uint16_t currentOnTime = 0;
@@ -410,9 +410,9 @@ bool OnOffServer::OnWithTimedOffCommand(BitFlags<OnOffControl> onOffControl, uin
 
     emberAfOnOffClusterPrintln("On Time:  %d | off wait Time: %d", currentOnTime, currentOffWaitTime);
 
-    if (currentOnTime < MAX_TIME_VALUE && currentOffWaitTime < MAX_TIME_VALUE)
+    if (currentOnTime < max_time_value && currentOffWaitTime < max_time_value)
     {
-        emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
+        emberEventControlSetDelayMS(configureEventControl(endpoint), update_time_ms);
     }
 
     emberAfSendImmediateDefaultResponse(status);
@@ -422,7 +422,7 @@ bool OnOffServer::OnWithTimedOffCommand(BitFlags<OnOffControl> onOffControl, uin
 /**
  * @brief Updates OnOff values after timer is finished
  *
- * @param endpoint
+ * @param[in] endpoint endpoint associated with the finished timer
  */
 void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
 {
@@ -434,10 +434,10 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
     if (isOn) // OnOff On case
     {
         // Restart Timer
-        emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
+        emberEventControlSetDelayMS(configureEventControl(endpoint), update_time_ms);
 
         // Update onTime values
-        uint16_t onTime = MIN_TIME_VALUE;
+        uint16_t onTime = min_time_value;
         OnOff::Attributes::OnTime::Get(endpoint, &onTime);
         emberAfOnOffClusterPrintln("Timer callback - On Time:  %d", onTime);
 
@@ -473,7 +473,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         if (offWaitTime > 0)
         {
             // Restart Timer
-            emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
+            emberEventControlSetDelayMS(configureEventControl(endpoint), update_time_ms);
         }
         else
         {
@@ -512,7 +512,7 @@ bool OnOffServer::areStartUpOnOffServerAttributesTokenized(EndpointId endpoint)
  * @brief event control object for an endpoint
  *
  * @param[in] endpoint
- * @return EmberEventControl*
+ * @return EmberEventControl* configured event control
  */
 EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint)
 {
@@ -523,7 +523,8 @@ EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint)
 /**
  * @brief Configures EnventControl callback when using XY colors
  *
- * @param endpoint
+ * @param[in] endpoint endpoint to start timer for
+ * @return EmberEventControl* configured event control
  */
 EmberEventControl * OnOffServer::configureEventControl(EndpointId endpoint)
 {
