@@ -10692,6 +10692,19 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
+    public void simpleStructEchoRequest(
+        SimpleStructResponseCallback callback,
+        Integer a,
+        Boolean b,
+        Integer c,
+        byte[] d,
+        String e,
+        Integer f,
+        Float g,
+        Double h) {
+      simpleStructEchoRequest(chipClusterPtr, callback, a, b, c, d, e, f, g, h);
+    }
+
     public void test(DefaultClusterCallback callback) {
       test(chipClusterPtr, callback);
     }
@@ -10721,8 +10734,10 @@ public class ChipClusters {
         Integer c,
         byte[] d,
         String e,
-        Integer f) {
-      testListStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f);
+        Integer f,
+        Float g,
+        Double h) {
+      testListStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f, g, h);
     }
 
     public void testNotHandled(DefaultClusterCallback callback) {
@@ -10745,13 +10760,27 @@ public class ChipClusters {
         Integer c,
         byte[] d,
         String e,
-        Integer f) {
-      testStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f);
+        Integer f,
+        Float g,
+        Double h) {
+      testStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f, g, h);
     }
 
     public void testUnknownCommand(DefaultClusterCallback callback) {
       testUnknownCommand(chipClusterPtr, callback);
     }
+
+    private native void simpleStructEchoRequest(
+        long chipClusterPtr,
+        SimpleStructResponseCallback Callback,
+        Integer a,
+        Boolean b,
+        Integer c,
+        byte[] d,
+        String e,
+        Integer f,
+        Float g,
+        Double h);
 
     private native void test(long chipClusterPtr, DefaultClusterCallback Callback);
 
@@ -10775,7 +10804,9 @@ public class ChipClusters {
         Integer c,
         byte[] d,
         String e,
-        Integer f);
+        Integer f,
+        Float g,
+        Double h);
 
     private native void testNotHandled(long chipClusterPtr, DefaultClusterCallback Callback);
 
@@ -10792,12 +10823,22 @@ public class ChipClusters {
         Integer c,
         byte[] d,
         String e,
-        Integer f);
+        Integer f,
+        Float g,
+        Double h);
 
     private native void testUnknownCommand(long chipClusterPtr, DefaultClusterCallback Callback);
 
     public interface BooleanResponseCallback {
       void onSuccess(Boolean value);
+
+      void onError(Exception error);
+    }
+
+    public interface SimpleStructResponseCallback {
+      void onSuccess( // arg1: Struct SimpleStruct
+          // Conversion from this type to Java is not properly implemented yet
+          );
 
       void onError(Exception error);
     }

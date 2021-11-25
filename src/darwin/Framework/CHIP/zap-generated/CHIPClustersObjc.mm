@@ -16259,6 +16259,33 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
+- (void)simpleStructEchoRequestWithParams:(CHIPTestClusterClusterSimpleStructEchoRequestParams *)params
+                        completionHandler:(void (^)(CHIPTestClusterClusterSimpleStructResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    TestCluster::Commands::SimpleStructEchoRequest::Type request;
+    request.arg1.a = params.arg1.a.unsignedCharValue;
+    request.arg1.b = params.arg1.b.boolValue;
+    request.arg1.c = static_cast<std::remove_reference_t<decltype(request.arg1.c)>>(params.arg1.c.unsignedCharValue);
+    request.arg1.d = [self asByteSpan:params.arg1.d];
+    request.arg1.e = [self asCharSpan:params.arg1.e];
+    request.arg1.f = static_cast<std::remove_reference_t<decltype(request.arg1.f)>>(params.arg1.f.unsignedCharValue);
+    request.arg1.g = params.arg1.g.floatValue;
+    request.arg1.h = params.arg1.h.doubleValue;
+
+    new CHIPTestClusterClusterSimpleStructResponseCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPTestClusterClusterSimpleStructResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)testWithCompletionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
@@ -16429,6 +16456,8 @@ using namespace chip::app::Clusters;
                 listHolder_0->mList[i].e = [self asCharSpan:element_0.e];
                 listHolder_0->mList[i].f
                     = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i].f)>>(element_0.f.unsignedCharValue);
+                listHolder_0->mList[i].g = element_0.g.floatValue;
+                listHolder_0->mList[i].h = element_0.h.doubleValue;
             }
             request.arg1 = ListType(listHolder_0->mList, params.arg1.count);
         } else {
@@ -16525,6 +16554,8 @@ using namespace chip::app::Clusters;
     request.arg1.d = [self asByteSpan:params.arg1.d];
     request.arg1.e = [self asCharSpan:params.arg1.e];
     request.arg1.f = static_cast<std::remove_reference_t<decltype(request.arg1.f)>>(params.arg1.f.unsignedCharValue);
+    request.arg1.g = params.arg1.g.floatValue;
+    request.arg1.h = params.arg1.h.doubleValue;
 
     new CHIPTestClusterClusterBooleanResponseCallbackBridge(
         self.callbackQueue,
