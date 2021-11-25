@@ -155,7 +155,7 @@ I: 254 [DL]Device Configuration:
 I: 257 [DL] Serial Number: TEST_SN
 I: 260 [DL] Vendor Id: 9050 (0x235A)
 I: 263 [DL] Product Id: 20043 (0x4E4B)
-I: 267 [DL] Product Revision: 1
+I: 267 [DL] Hardware Version: 1
 I: 270 [DL] Setup Pin Code: 20202021
 I: 273 [DL] Setup Discriminator: 3840 (0xF00)
 I: 278 [DL] Manufacturing Date: (not set)

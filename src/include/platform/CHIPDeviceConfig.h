@@ -185,47 +185,47 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_REVISION_STRING
+ * CHIP_DEVICE_CONFIG_DEVICE_HARDWARE_VERSION_STRING
  *
  * Human readable string identifying version of the product assigned by the device vendor.
  */
-#ifndef CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION_STRING "TEST_VERSION"
+#ifndef CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING "TEST_VERSION"
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION
+ * CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION
  *
- * The default product revision number assigned to the device or product by the device vendor.
+ * The default hardware version number assigned to the device or product by the device vendor.
  *
- * Product revisions are specific to a particular device vendor and product id, and typically
+ * Hardware versions are specific to a particular device vendor and product id, and typically
  * correspond to a revision of the physical device, a change to its packaging, and/or a change
  * to its marketing presentation. This value is generally *not* incremented for device software
  * revisions.
  *
- * This is a default value which is used when a product revision has not been stored in device
+ * This is a default value which is used when a hardware version has not been stored in device
  * persistent storage (e.g. by a factory provisioning process).
  */
-#ifndef CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION
-#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION 0
+#ifndef CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION
+#define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION 0
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
  *
- * A string identifying the firmware revision running on the device.
+ * A string identifying the software version running on the device.
  */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING "prerelease"
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING "prerelease"
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
+ * CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
  *
- * A monothonic number identifying the firmware revision running on the device.
+ * A monothonic number identifying the software version running on the device.
  */
-#ifndef CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION
-#define CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION 0
+#ifndef CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION
+#define CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION 0
 #endif
 
 /**
