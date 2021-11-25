@@ -64,9 +64,6 @@ static constexpr chip::ClusterId ZCL_APPLIANCE_CONTROL_CLUSTER_ID = 0x001B;
 // Definitions for cluster: Descriptor
 static constexpr chip::ClusterId ZCL_DESCRIPTOR_CLUSTER_ID = 0x001D;
 
-// Definitions for cluster: ACL
-static constexpr chip::ClusterId ZCL_ACL_CLUSTER_ID = 0x001F;
-
 // Definitions for cluster: Poll Control
 static constexpr chip::ClusterId ZCL_POLL_CONTROL_CLUSTER_ID = 0x0020;
 
