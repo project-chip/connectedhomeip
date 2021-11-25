@@ -38,7 +38,10 @@ struct EventPathParams
     bool HasEventWildcard() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardEventId(); }
 
     // For event, an event id can only be interpreted if the cluster id is known.
-    bool IsValidEventPath() const { return !((mClusterId == ClusterInfo::kInvalidClusterId) && !(mEventId == ClusterInfo::kInvalidEventId)); }
+    bool IsValidEventPath() const
+    {
+        return !((mClusterId == ClusterInfo::kInvalidClusterId) && !(mEventId == ClusterInfo::kInvalidEventId));
+    }
 
     inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
     inline bool HasWildcardClusterId() const { return mClusterId == ClusterInfo::kInvalidClusterId; }
