@@ -16,6 +16,7 @@
  *
  */
 
+#include "ContentLauncherManager.h"
 #include "KeypadInputManager.h"
 #include "MediaInputManager.h"
 #include "WakeOnLanManager.h"
@@ -49,4 +50,9 @@ JNI_METHOD(void, setWakeOnLanManager)(JNIEnv *, jobject, jobject manager)
 JNI_METHOD(void, setMediaInputManager)(JNIEnv *, jobject, jobject manager)
 {
     MediaInputMgr().InitializeWithObjects(manager);
+}
+
+JNI_METHOD(void, setContentLaunchManager)(JNIEnv *, jobject, jobject manager)
+{
+    ContentLauncherMgr().InitializeWithObjects(manager);
 }
