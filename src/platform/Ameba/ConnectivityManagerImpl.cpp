@@ -48,6 +48,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::TLV;
 using namespace ::chip::DeviceLayer::Internal;
+using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
 namespace chip {
 namespace DeviceLayer {
@@ -796,6 +797,88 @@ void ConnectivityManagerImpl::DHCPProcessThread(void * param)
 void ConnectivityManagerImpl::DHCPProcess(void)
 {
     xTaskCreate(DHCPProcessThread, "DHCPProcess", 4096 / sizeof(StackType_t), this, 1, NULL);
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** netifpp)
+{
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
+    NetworkInterface *head  = NULL;
+    struct ifaddrs * ifaddr = nullptr;
+
+    if (xnetif == NULL)
+    {
+        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+    }
+    else
+    {
+        for (struct netif * ifa = xnetif; ifa != NULL; ifa = ifa->next)
+        {
+            NetworkInterface * ifp = new NetworkInterface();
+
+            strncpy(ifp->Name, ifa->name, Inet::InterfaceId::kMaxIfNameLength);
+            ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
+
+            ifp->name                            = CharSpan(ifp->Name, strlen(ifp->Name));
+            ifp->fabricConnected                 = true;
+            if ((ifa->flags) & NETIF_FLAG_ETHERNET)
+                ifp->type                        = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+            else
+                ifp->type                        = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+            ifp->offPremiseServicesReachableIPv4 = false;
+            ifp->offPremiseServicesReachableIPv6 = false;
+
+            memcpy(ifp->MacAddress, ifa->hwaddr, sizeof(ifa->hwaddr));
+
+            if (0)
+            {
+                ChipLogError(DeviceLayer, "Failed to get network hardware address");
+            }
+            else
+            {
+                // Set 48-bit IEEE MAC Address
+                ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
+            }
+
+            ifp->Next = head;
+            head      = ifp;
+        }
+    }
+
+    *netifpp = head;
+    return CHIP_NO_ERROR;
+}
+
+void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(NetworkInterface *netifp)
+{
+    while (netifp)
+    {
+        NetworkInterface * del = netifp;
+        netifp                 = netifp->Next;
+        delete del;
+    }
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBssid(ByteSpan & value)
+{
+    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
+    static uint8_t ameba_bssid[6];
+
+    if(wifi_get_ap_bssid(ameba_bssid) == 0)
+    {
+        err = CHIP_NO_ERROR;
+        ChipLogProgress(DeviceLayer,"%02x,%02x,%02x,%02x,%02x,%02x\n",ameba_bssid[0],ameba_bssid[1],ameba_bssid[2],ameba_bssid[3],ameba_bssid[4],ameba_bssid[5]);
+    }
+
+    value = ameba_bssid;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_GetWiFiVersion(uint8_t & wifiVersion)
+{
+    // Support 802.11a/n Wi-Fi in AmebaD chipset
+    wifiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ConnectivityManagerImpl::_GetWiFiSecurityType(uint8_t & securityType)
