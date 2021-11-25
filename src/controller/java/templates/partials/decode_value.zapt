@@ -22,7 +22,8 @@ if ({{source}}.Value().IsNull()) {
 {{else}}
 std::string {{target}}ClassName = "java/lang/{{asJavaBasicTypeForZclType type true}}";
 std::string {{target}}CtorSignature = "({{asJniSignature type false}})V";
-chip::JniReferences::GetInstance().CreateBoxedObject<{{chipType}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{>item}}, {{target}});
+{{! Bitmaps should be handled differently -- it's a class which cannot be casted to integer type }}
+chip::JniReferences::GetInstance().CreateBoxedObject<{{chipType}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{>item}}{{~#if ./isBitmap}}.Raw(){{/if~}}, {{target}});
 {{/if}}
 {{#if isOptional}}
 chip::JniReferences::GetInstance().CreateOptional({{target}}, {{target}});
