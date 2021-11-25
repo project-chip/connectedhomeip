@@ -10185,6 +10185,118 @@ class Switch(Cluster):
 
             value: 'uint' = None
 
+    class Events:
+        @dataclass
+        class SwitchLatched(ClusterEventDescriptor):
+            cluster_id: typing.ClassVar[int] = 0x003B
+            event_id: typing.ClassVar[int] = 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="newPosition", Tag=0, Type=uint),
+                    ])
+
+            newPosition: 'uint' = None
+
+        @dataclass
+        class InitialPress(ClusterEventDescriptor):
+            cluster_id: typing.ClassVar[int] = 0x003B
+            event_id: typing.ClassVar[int] = 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="newPosition", Tag=0, Type=uint),
+                    ])
+
+            newPosition: 'uint' = None
+
+        @dataclass
+        class LongPress(ClusterEventDescriptor):
+            cluster_id: typing.ClassVar[int] = 0x003B
+            event_id: typing.ClassVar[int] = 0x00000002
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="newPosition", Tag=0, Type=uint),
+                    ])
+
+            newPosition: 'uint' = None
+
+        @dataclass
+        class ShortRelease(ClusterEventDescriptor):
+            cluster_id: typing.ClassVar[int] = 0x003B
+            event_id: typing.ClassVar[int] = 0x00000003
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="previousPosition", Tag=0, Type=uint),
+                    ])
+
+            previousPosition: 'uint' = None
+
+        @dataclass
+        class LongRelease(ClusterEventDescriptor):
+            cluster_id: typing.ClassVar[int] = 0x003B
+            event_id: typing.ClassVar[int] = 0x00000004
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="previousPosition", Tag=0, Type=uint),
+                    ])
+
+            previousPosition: 'uint' = None
+
+        @dataclass
+        class MultiPressOngoing(ClusterEventDescriptor):
+            cluster_id: typing.ClassVar[int] = 0x003B
+            event_id: typing.ClassVar[int] = 0x00000005
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="newPosition", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="currentNumberOfPressesCounted", Tag=1, Type=uint),
+                    ])
+
+            newPosition: 'uint' = None
+            currentNumberOfPressesCounted: 'uint' = None
+
+        @dataclass
+        class MultiPressComplete(ClusterEventDescriptor):
+            cluster_id: typing.ClassVar[int] = 0x003B
+            event_id: typing.ClassVar[int] = 0x00000006
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="newPosition", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="totalNumberOfPressesCounted", Tag=1, Type=uint),
+                    ])
+
+            newPosition: 'uint' = None
+            totalNumberOfPressesCounted: 'uint' = None
+
 
 @dataclass
 class AdministratorCommissioning(Cluster):
