@@ -209,7 +209,7 @@ extern "C" void ChipTest(void)
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
-    if( RTW_SUCCESS != wifi_is_connected_to_ap())
+    if (RTW_SUCCESS != wifi_is_connected_to_ap())
     {
         std::string qrCodeText = createSetupPayload();
         ChipLogProgress(DeviceLayer, "QR CODE Text: '%s'\r\n", qrCodeText.c_str());
