@@ -36,8 +36,8 @@ class TestGeneratedClusterObjects(unittest.TestCase):
         data.d = b'1234'
         data.e = 'hello'
         data.f = 1
-        data.g = 0;
-        data.h = 0;
+        data.g = 0
+        data.h = 0
 
         self.CheckData(data)
 
