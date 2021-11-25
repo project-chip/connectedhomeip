@@ -383,7 +383,7 @@ bool OnOffServer::OnWithTimedOffCommand(BitFlags<OnOffControl> onOffControl, uin
         return true;
     }
 
-    uint16_t currentOffWaitTime = max_time_value;
+    uint16_t currentOffWaitTime = MAX_TIME_VALUE;
     OnOff::Attributes::OffWaitTime::Get(endpoint, &currentOffWaitTime);
 
     uint16_t currentOnTime = 0;
@@ -410,9 +410,9 @@ bool OnOffServer::OnWithTimedOffCommand(BitFlags<OnOffControl> onOffControl, uin
 
     emberAfOnOffClusterPrintln("On Time:  %d | off wait Time: %d", currentOnTime, currentOffWaitTime);
 
-    if (currentOnTime < max_time_value && currentOffWaitTime < max_time_value)
+    if (currentOnTime < MAX_TIME_VALUE && currentOffWaitTime < MAX_TIME_VALUE)
     {
-        emberEventControlSetDelayMS(configureEventControl(endpoint), update_time_ms);
+        emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
     }
 
     emberAfSendImmediateDefaultResponse(status);
@@ -434,10 +434,10 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
     if (isOn) // OnOff On case
     {
         // Restart Timer
-        emberEventControlSetDelayMS(configureEventControl(endpoint), update_time_ms);
+        emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
 
         // Update onTime values
-        uint16_t onTime = min_time_value;
+        uint16_t onTime = MIN_TIME_VALUE;
         OnOff::Attributes::OnTime::Get(endpoint, &onTime);
         emberAfOnOffClusterPrintln("Timer callback - On Time:  %d", onTime);
 
@@ -473,7 +473,7 @@ void OnOffServer::updateOnOffTimeCommand(chip::EndpointId endpoint)
         if (offWaitTime > 0)
         {
             // Restart Timer
-            emberEventControlSetDelayMS(configureEventControl(endpoint), update_time_ms);
+            emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
         }
         else
         {
