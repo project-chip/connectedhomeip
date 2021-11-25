@@ -37,7 +37,7 @@ public:
 
 private:
     CHIP_ERROR SendResponse(JNIEnv * env, jobject resp, chip::CommandId commandId);
-    CHIP_ERROR SendResponse(EmberAfContentLaunchStatus status, const char* data, size_t length ,chip::CommandId commandId);  
+    CHIP_ERROR SendResponse(EmberAfContentLaunchStatus status, const char* data, size_t length ,chip::CommandId commandId);
     friend ContentLauncherManager & ContentLauncherMgr();
 
     static ContentLauncherManager sInstance;
