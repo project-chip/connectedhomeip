@@ -45,7 +45,7 @@ namespace Internal {
 // CHIP_DEVICE_CONFIG_SETTINGS_KEY subtree so that they get erased when
 // KeyValueStoreManagerImpl::DoFactoryReset() is called.
 #define NAMESPACE_FACTORY CHIP_DEVICE_CONFIG_SETTINGS_KEY "-fct/"
-#define NAMESPACE_CONFIG   CHIP_DEVICE_CONFIG_SETTINGS_KEY "/cfg/"
+#define NAMESPACE_CONFIG CHIP_DEVICE_CONFIG_SETTINGS_KEY "/cfg/"
 #define NAMESPACE_COUNTERS CHIP_DEVICE_CONFIG_SETTINGS_KEY "/ctr/"
 
 // Keys stored in the chip factory nam
