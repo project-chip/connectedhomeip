@@ -250,7 +250,6 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
-    ReturnErrorOnFailure(attributePathIBBuilder.GetError());
 
     attributePathIBBuilder.Endpoint(aPath.mEndpointId)
         .Cluster(aPath.mClusterId)

@@ -111,11 +111,10 @@ class ClusterObjectTests:
             (0, Clusters.Basic.Attributes.ProductID),
             (0, Clusters.Basic.Attributes.HardwareVersion),
         ]
-        await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
-
-        '''
-        Note: The following tests is disabled temporarily due to reports of random failure. However, the CI is still green.
-        Disable these tests to avoid making CI flaky before finding the root cause.
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
+        if (len(res) != 3):
+            raise AssertionError(
+                f"Got back {len(res)} data items instead of 3")
 
         logger.info("2: Reading Ex Cx A*")
         req = [
@@ -146,7 +145,6 @@ class ClusterObjectTests:
             None
         ]
         await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
-        '''
 
     @classmethod
     async def RunTest(cls, devCtrl):

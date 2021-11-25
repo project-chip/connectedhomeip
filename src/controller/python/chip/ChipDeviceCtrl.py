@@ -427,7 +427,7 @@ class ChipDeviceController(object):
             (Clusters.ClusterA.AttributeA):             Endpoint = *,           Cluster = specific,   Attribute = specific
             endpoint:                                   Endpoint = specific,    Cluster = *,          Attribute = *
             Clusters.ClusterA:                          Endpoint = *,           Cluster = specific,   Attribute = *
-            None:                                       Endpoint = *,           Cluster = *,          Attribute = *
+            '*' or ():                                  Endpoint = *,           Cluster = *,          Attribute = *
 
         The cluster and attributes specified above are to be selected from the generated cluster objects.
 
@@ -446,7 +446,7 @@ class ChipDeviceController(object):
             endpoint = None
             cluster = None
             attribute = None
-            if v == None or v == ('*'):
+            if v == ('*') or v == ():
                 # Wildcard
                 pass
             elif type(v) is not tuple:

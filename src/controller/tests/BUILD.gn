@@ -25,6 +25,7 @@ chip_test_suite("tests") {
 
   if (chip_device_platform != "mbed" && chip_device_platform != "efr32") {
     test_sources += [ "TestServerCommandDispatch.cpp" ]
+    test_sources += [ "TestReadChunking.cpp" ]
   }
 
   cflags = [ "-Wconversion" ]
