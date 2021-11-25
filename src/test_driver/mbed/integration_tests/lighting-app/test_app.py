@@ -87,7 +87,10 @@ def test_wifi_provisioning(device, network):
     assert close_ble(devCtrl)
 
 
-def test_light_ctrl(device):
+def test_light_ctrl(device, network):
+    network_ssid = network[0]
+    network_pass = network[1]
+
     devCtrl = ChipDeviceCtrl.ChipDeviceController()
 
     device_details = get_device_details(device)
@@ -102,6 +105,13 @@ def test_light_ctrl(device):
 
     ret = device.wait_for_output("Device completed Rendezvous process")
     assert ret != None and len(ret) > 0
+
+    ret = commissioning_wifi(devCtrl, network_ssid,
+                             network_pass, DEVICE_NODE_ID)
+    assert ret == 0
+
+    ret = resolve_device(devCtrl, DEVICE_NODE_ID)
+    assert ret != None and len(ret) == 2
 
     err, res = send_zcl_command(
         devCtrl, "OnOff On {} 1 0".format(DEVICE_NODE_ID))
@@ -132,6 +142,7 @@ def test_light_ctrl(device):
         "Setting brightness level to {}".format(TEST_BRIGHTNESS_LEVEL), 20)
     assert ret != None and len(ret) > 0
 
+    assert close_connection(devCtrl, DEVICE_NODE_ID)
     assert close_ble(devCtrl)
 
 
