@@ -20,7 +20,6 @@
 #include "application-launcher/ApplicationLauncherManager.h"
 #include "audio-output/AudioOutputManager.h"
 #include "target-navigator/TargetNavigatorManager.h"
-#include "tv-channel/TvChannelManager.h"
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -74,33 +73,6 @@ void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint)
     else
     {
         ChipLogError(Zcl, "Failed to store application for endpoint: %d. Error:%s", endpoint, chip::ErrorStr(err));
-    }
-}
-
-namespace {
-
-TvAttrAccess<TvChannelManager, app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo,
-             &TvChannelManager::proxyGetTvChannelList>
-    gTvChannelAttrAccess;
-
-} // anonymous namespace
-
-/** @brief Tv Channel  Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfTvChannelClusterInitCallback(EndpointId endpoint)
-{
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gTvChannelAttrAccess);
-        attrAccessRegistered = true;
     }
 }
 

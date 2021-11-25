@@ -23,6 +23,7 @@ import com.tcl.chip.tvapp.TvApp;
 import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 import com.tcl.chip.tvapp.LowPowerManagerStub;
 import com.tcl.chip.tvapp.MediaPlaybackManagerStub;
+import com.tcl.chip.tvapp.TvChannelManagerStub;
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     tvApp.setContentLaunchManager(new ContentLaunchManagerStub());
     tvApp.setLowPowerManager(new LowPowerManagerStub());
     tvApp.setMediaPlaybackManager(new MediaPlaybackManagerStub());
+    tvApp.setTvChannelManager(new TvChannelManagerStub());
 
     AndroidChipPlatform chipPlatform =
         new AndroidChipPlatform(
