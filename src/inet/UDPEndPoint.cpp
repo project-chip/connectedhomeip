@@ -30,8 +30,8 @@
 #define __APPLE_USE_RFC_3542
 #include <inet/UDPEndPoint.h>
 
+#include <inet/IPPacketInfo.h>
 #include <inet/InetFaultInjection.h>
-#include <inet/InetLayer.h>
 #include <inet/arpa-inet-compatibility.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -146,8 +146,6 @@ CHIP_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddress & a
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-
-BitMapObjectPool<UDPEndPointImplLwIP, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPointImplLwIP::sPool;
 
 CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
                                          InterfaceId interfaceId)
@@ -539,7 +537,6 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 {
     UDPEndPointImplLwIP * ep       = static_cast<UDPEndPointImplLwIP *>(arg);
-    System::Layer * lSystemLayer   = ep->Layer().SystemLayer();
     IPPacketInfo * pktInfo         = nullptr;
     System::PacketBufferHandle buf = System::PacketBufferHandle::Adopt(p);
     if (buf->HasChainedBuffer())
@@ -588,7 +585,7 @@ void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb
     }
 
     ep->Retain();
-    CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf)] {
+    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf)] {
         ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
         ep->Release();
     });
@@ -702,8 +699,6 @@ IPPacketInfo * UDPEndPointImplLwIP::GetPacketInfo(const System::PacketBufferHand
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-BitMapObjectPool<UDPEndPointImplSockets, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPointImplSockets::sPool;
 
 namespace {
 
@@ -833,7 +828,7 @@ CHIP_ERROR UDPEndPointImplSockets::BindImpl(IPAddressType addressType, const IPA
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = static_cast<System::LayerSocketsLoop *>(Layer().SystemLayer())->GetDispatchQueue();
+    dispatch_queue_t dispatchQueue = static_cast<System::LayerSocketsLoop *>(&GetSystemLayer())->GetDispatchQueue();
     if (dispatchQueue != nullptr)
     {
         unsigned long fd = static_cast<unsigned long>(mSocket);
@@ -905,7 +900,7 @@ uint16_t UDPEndPointImplSockets::GetBoundPort() const
 CHIP_ERROR UDPEndPointImplSockets::ListenImpl()
 {
     // Wait for ability to read on this endpoint.
-    auto * layer = static_cast<System::LayerSockets *>(Layer().SystemLayer());
+    auto * layer = static_cast<System::LayerSockets *>(&GetSystemLayer());
     ReturnErrorOnFailure(layer->SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
     return layer->RequestCallbackOnPendingRead(mWatch);
 }
@@ -1054,7 +1049,7 @@ void UDPEndPointImplSockets::CloseImpl()
 {
     if (mSocket != kInvalidSocketFd)
     {
-        static_cast<System::LayerSockets *>(Layer().SystemLayer())->StopWatchingSocket(&mWatch);
+        static_cast<System::LayerSockets *>(&GetSystemLayer())->StopWatchingSocket(&mWatch);
         close(mSocket);
         mSocket = kInvalidSocketFd;
     }
@@ -1104,7 +1099,7 @@ CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
         {
             return CHIP_ERROR_POSIX(errno);
         }
-        ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->StartWatchingSocket(mSocket, &mWatch));
+        ReturnErrorOnFailure(static_cast<System::LayerSockets *>(&GetSystemLayer())->StartWatchingSocket(mSocket, &mWatch));
 
         mAddrType = addressType;
 
@@ -1448,8 +1443,6 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-
-BitMapObjectPool<UDPEndPointImplNetworkFramework, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPointImplNetworkFramework::sPool;
 
 CHIP_ERROR UDPEndPointImplNetworkFramework::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
                                                      InterfaceId intfId)

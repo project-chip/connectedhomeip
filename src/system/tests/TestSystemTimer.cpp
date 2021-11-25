@@ -107,13 +107,13 @@ void TimerFailed(void * aState)
     sOverflowTestDone = true;
 }
 
-void HandleTimerFailed(Layer * inetLayer, void * aState)
+void HandleTimerFailed(Layer * systemLayer, void * aState)
 {
-    (void) inetLayer;
+    (void) systemLayer;
     TimerFailed(aState);
 }
 
-void HandleTimer10Success(Layer * inetLayer, void * aState)
+void HandleTimer10Success(Layer * systemLayer, void * aState)
 {
     TestContext & lContext = *static_cast<TestContext *>(aState);
     NL_TEST_ASSERT(lContext.mTestSuite, true);
