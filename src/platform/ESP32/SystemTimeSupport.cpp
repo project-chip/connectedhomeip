@@ -48,7 +48,7 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
     return std::chrono::duration_cast<Milliseconds64>(GetMonotonicMicroseconds64());
 }
 
-CHIP_ERROR ClockImpl::GetClock_RealTime(uint64_t & aCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
 {
     struct timeval tv;
     if (gettimeofday(&tv, nullptr) != 0)
@@ -64,11 +64,11 @@ CHIP_ERROR ClockImpl::GetClock_RealTime(uint64_t & aCurTime)
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
-    aCurTime = (static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec);
+    aCurTime = Clock::Microseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000000)) + static_cast<uint64_t>(tv.tv_usec));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClockImpl::GetClock_RealTimeMS(uint64_t & aCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
 {
     struct timeval tv;
     if (gettimeofday(&tv, nullptr) != 0)
@@ -84,15 +84,15 @@ CHIP_ERROR ClockImpl::GetClock_RealTimeMS(uint64_t & aCurTime)
         return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
     }
     static_assert(CHIP_SYSTEM_CONFIG_VALID_REAL_TIME_THRESHOLD >= 0, "We might be letting through negative tv_sec values!");
-    aCurTime = (static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000);
+    aCurTime = Clock::Milliseconds64((static_cast<uint64_t>(tv.tv_sec) * UINT64_C(1000)) + (static_cast<uint64_t>(tv.tv_usec) / 1000));
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ClockImpl::SetClock_RealTime(uint64_t aNewCurTime)
+CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
 {
     struct timeval tv;
-    tv.tv_sec  = static_cast<time_t>(aNewCurTime / UINT64_C(1000000));
-    tv.tv_usec = static_cast<long>(aNewCurTime % UINT64_C(1000000));
+    tv.tv_sec  = static_cast<time_t>(aNewCurTime.Count() / UINT64_C(1000000));
+    tv.tv_usec = static_cast<long>(aNewCurTime.Count() % UINT64_C(1000000));
     if (settimeofday(&tv, nullptr) != 0)
     {
         return (errno == EPERM) ? CHIP_ERROR_ACCESS_DENIED : CHIP_ERROR_POSIX(errno);

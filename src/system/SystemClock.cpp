@@ -82,17 +82,17 @@ ClockBase * gClockBase = &gClockImpl;
 #define MONOTONIC_CLOCK_ID CLOCK_MONOTONIC
 #endif
 
-CHIP_ERROR ClockImpl::GetClock_RealTime(uint64_t & aCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR ClockImpl::GetClock_RealTimeMS(uint64_t & aCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR ClockImpl::SetClock_RealTime(uint64_t aNewCurTime)
+CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -136,17 +136,17 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 
 // -------------------- Default Get/SetClock Functions for LwIP Systems --------------------
 
-CHIP_ERROR ClockImpl::GetClock_RealTime(uint64_t & aCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR ClockImpl::GetClock_RealTimeMS(uint64_t & aCurTime)
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-CHIP_ERROR ClockImpl::SetClock_RealTime(uint64_t aNewCurTime)
+CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

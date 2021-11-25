@@ -90,7 +90,7 @@ struct EventEnvelopeContext
 #if CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS & CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
     Timestamp mDeltaTime = Timestamp::System(System::Clock::kZero);
 #else
-    Timestamp mDeltaTime = Timestamp::Epoch(0);
+    Timestamp mDeltaTime = Timestamp::Epoch(System::Clock::kZero);
 #endif
     PriorityLevel mPriority = PriorityLevel::First;
     NodeId mNodeId          = 0;
@@ -524,7 +524,7 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
 
 #if CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS & CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
     Timestamp timestamp;
-    uint64_t utc_time;
+    System::Clock::Timestamp utc_time;
 
     err = System::SystemClock().GetClock_RealTimeMS(utc_time);
     SuccessOrExit(err);
@@ -885,8 +885,8 @@ void CircularEventBuffer::Init(uint8_t * apBuffer, uint32_t aBufferLength, Circu
     mFirstEventNumber = 1;
     mLastEventNumber  = 0;
 #if CHIP_CONFIG_EVENT_LOGGING_UTC_TIMESTAMPS & CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_TIME
-    mFirstEventTimestamp = Timestamp::Epoch(0);
-    mLastEventTimestamp  = Timestamp::Epoch(0);
+    mFirstEventTimestamp = Timestamp::Epoch(System::Clock::kZero);
+    mLastEventTimestamp  = Timestamp::Epoch(System::Clock::kZero);
 #else
     mFirstEventTimestamp = Timestamp::System(System::Clock::kZero);
     mLastEventTimestamp  = Timestamp::System(System::Clock::kZero);
