@@ -19,7 +19,6 @@
 #pragma once
 
 #include "CommissionedListCommand.h"
-#include "ConfigureFabricCommand.h"
 #include "PairingCommand.h"
 
 #include <app/server/Dnssd.h>
@@ -189,7 +188,6 @@ void registerCommandsPairing(Commands & commands)
         make_unique<OpenCommissioningWindow>(),
         // TODO - enable CommissionedListCommand once DNS Cache is implemented
         //        make_unique<CommissionedListCommand>(),
-        make_unique<ConfigureFabricCommand>(),
         make_unique<StartUdcServerCommand>(),
     };
 
