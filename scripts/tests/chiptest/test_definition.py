@@ -119,10 +119,10 @@ class TestDefinition:
             logging.debug('Server is listening. Can proceed.')
 
             runner.RunSubprocess(tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, 'MT:D8XA0CQM00KA0648G00'],
-                                 name='PAIR')
+                                 name='PAIR', dependencies=[app_process])
 
             runner.RunSubprocess(tool_cmd + ['tests', self.run_name, TEST_NODE_ID],
-                                 name='TEST')
+                                 name='TEST', dependencies=[app_process])
         except:
             logging.error("!!!!!!!!!!!!!!!!!!!! ERROR !!!!!!!!!!!!!!!!!!!!!!")
             runner.capture_delegate.LogContents()

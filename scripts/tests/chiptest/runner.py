@@ -72,7 +72,7 @@ class Runner:
     def __init__(self, capture_delegate=None):
         self.capture_delegate = capture_delegate
 
-    def RunSubprocess(self, cmd, name, wait=True):
+    def RunSubprocess(self, cmd, name, wait=True, dependencies=[]):
         outpipe = LogPipe(
             logging.DEBUG, capture_delegate=self.capture_delegate, name=name + ' OUT')
         errpipe = LogPipe(
@@ -87,6 +87,14 @@ class Runner:
 
         if not wait:
             return s, outpipe, errpipe
+
+        while s.poll() is None:
+            # dependencies MUST NOT be done
+            for dependency in dependencies:
+                if dependency.poll() is not None:
+                    s.kill()
+                    raise Exception("Unexpected return %d for %r",
+                                    dependency.poll(), dependency)
 
         code = s.wait()
         if code != 0:
