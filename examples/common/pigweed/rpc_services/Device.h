@@ -25,6 +25,7 @@
 #include "device_service/device_service.rpc.pb.h"
 #include "platform/ConfigurationManager.h"
 #include "platform/PlatformManager.h"
+#include <platform/DiagnosticDataProvider.h>
 
 namespace chip {
 namespace rpc {
@@ -54,7 +55,7 @@ public:
     virtual pw::Status GetDeviceState(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceState & response)
     {
         uint64_t time_since_boot_sec;
-        DeviceLayer::PlatformMgr().GetUpTime(time_since_boot_sec);
+        DeviceLayer::GetDiagnosticDataProvider().GetUpTime(time_since_boot_sec);
         response.time_since_boot_millis = time_since_boot_sec * 1000;
         size_t count                    = 0;
         for (const FabricInfo & fabricInfo : Server::GetInstance().GetFabricTable())
@@ -72,10 +73,15 @@ public:
 
     virtual pw::Status GetDeviceInfo(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceInfo & response)
     {
+
         uint16_t vendor_id;
         if (DeviceLayer::ConfigurationMgr().GetVendorId(vendor_id) == CHIP_NO_ERROR)
         {
             response.vendor_id = static_cast<uint32_t>(vendor_id);
+        }
+        else
+        {
+            response.vendor_id = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
         }
 
         uint16_t product_id;
@@ -83,11 +89,19 @@ public:
         {
             response.product_id = static_cast<uint32_t>(product_id);
         }
+        else
+        {
+            response.product_id = CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID;
+        }
 
         uint16_t software_version;
-        if (DeviceLayer::ConfigurationMgr().GetFirmwareRevision(software_version) == CHIP_NO_ERROR)
+        if (DeviceLayer::ConfigurationMgr().GetSoftwareVersion(software_version) == CHIP_NO_ERROR)
         {
             response.software_version = software_version;
+        }
+        else
+        {
+            response.software_version = CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION;
         }
 
         uint32_t code;
@@ -104,7 +118,11 @@ public:
             response.has_pairing_info           = true;
         }
 
-        DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number));
+        if (DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number)) !=
+            CHIP_NO_ERROR)
+        {
+            snprintf(response.serial_number, sizeof(response.serial_number), CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
+        }
 
         return pw::OkStatus();
     }

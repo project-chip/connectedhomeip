@@ -79,14 +79,36 @@ public:
     {
         chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
         chip::Inet::IPAddressType addressType;
-        chip::Inet::UDPEndPoint * udp = nullptr;
+        chip::Inet::UDPEndPoint * listen_udp = nullptr;
+#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
+        chip::Inet::UDPEndPoint * unicast_query_udp = nullptr;
+#endif
+    };
+
+    /**
+     * Helps implement a generic broadcast implementation:
+     *    - provides the ability to determine what udp endpoint to use  to broadcast
+     *      a packet for the given endpoint info
+     */
+    class BroadcastSendDelegate
+    {
+    public:
+        virtual ~BroadcastSendDelegate() = default;
+
+        /**
+         * Returns non-null UDPEndpoint IFF a broadcast should be performed for the given EndpointInfo
+         */
+        virtual chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) = 0;
     };
 
     ServerBase(EndpointInfo * endpointStorage, size_t kStorageSize) : mEndpoints(endpointStorage), mEndpointCount(kStorageSize)
     {
         for (size_t i = 0; i < mEndpointCount; i++)
         {
-            mEndpoints[i].udp = nullptr;
+            mEndpoints[i].listen_udp = nullptr;
+#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
+            mEndpoints[i].unicast_query_udp = nullptr;
+#endif
         }
 
         BroadcastIpAddresses::GetIpv6Into(mIpv6BroadcastAddress);
@@ -109,6 +131,16 @@ public:
     /// Send the specified packet to a destination IP address over the specified address
     virtual CHIP_ERROR DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
                                   chip::Inet::InterfaceId interface);
+
+    /// Send out a broadcast query, may use an ephemeral port to receive replies.
+    /// Ephemeral ports will make replies be marked as 'LEGACY' and replies will include a query secion.
+    virtual CHIP_ERROR BroadcastUnicastQuery(chip::System::PacketBufferHandle && data, uint16_t port);
+
+    /// Send a specific packet broadcast to a specific interface using a specific address type
+    /// May use an ephemeral port to receive replies.
+    /// Ephemeral ports will make replies be marked as 'LEGACY' and replies will include a query secion.
+    virtual CHIP_ERROR BroadcastUnicastQuery(chip::System::PacketBufferHandle && data, uint16_t port,
+                                             chip::Inet::InterfaceId interface, chip::Inet::IPAddressType addressType);
 
     /// Send a specific packet broadcast to all interfaces
     virtual CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port);
@@ -139,6 +171,8 @@ public:
     bool IsListening() const;
 
 private:
+    CHIP_ERROR BroadcastImpl(chip::System::PacketBufferHandle && data, uint16_t port, BroadcastSendDelegate * delegate);
+
     static void OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::System::PacketBufferHandle && buffer,
                                     const chip::Inet::IPPacketInfo * info);
 

@@ -49,6 +49,14 @@ class {{filename}}: public TestCommand
     std::atomic_uint16_t mTestIndex;
     const uint16_t mTestCount = {{totalTests}};
 
+    {{#chip_tests_items}}
+    {{#chip_tests_item_response_parameters}}
+    {{#if saveAs}}
+    {{chipType}} {{saveAs}};
+    {{/if}}
+    {{/chip_tests_item_response_parameters}}
+    {{/chip_tests_items}}
+
     {{#*inline "failureCallback"}}mOnFailureCallback_{{index}}{{/inline}}
     {{#*inline "successCallback"}}mOnSuccessCallback_{{index}}{{/inline}}
     {{#*inline "failureResponse"}}OnFailureCallback_{{index}}{{/inline}}
@@ -230,6 +238,10 @@ class {{filename}}: public TestCommand
               {{~#if expectedConstraints.minValue}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", {{>item}}, {{expectedConstraints.minValue}}));{{/if}}
               {{~#if expectedConstraints.maxValue}}VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", {{>item}}, {{expectedConstraints.maxValue}}));{{/if}}
               {{~#if expectedConstraints.notValue}}VerifyOrReturn(CheckConstraintNotValue<{{chipType}}>("{{>item}}", {{>item}}, {{expectedConstraints.notValue}}));{{/if}}
+            {{/if}}
+
+            {{#if saveAs}}
+            {{saveAs}} = {{>item}};
             {{/if}}
           {{/chip_tests_item_response_parameters}}
         {{#unless async}}NextTest();{{/unless}}

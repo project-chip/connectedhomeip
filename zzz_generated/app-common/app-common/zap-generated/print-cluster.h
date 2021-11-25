@@ -234,14 +234,6 @@
 #define CHIP_PRINTCLUSTER_TIME_SYNCHRONIZATION_CLUSTER
 #endif
 
-#if defined(ZCL_USING_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_SERVER) ||                                                          \
-    defined(ZCL_USING_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER                                                                 \
-    { ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_ID, 57, "Bridged Device Basic Information" },
-#else
-#define CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER
-#endif
-
 #if defined(ZCL_USING_BRIDGED_DEVICE_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BRIDGED_DEVICE_BASIC_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_CLUSTER { ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID, 57, "Bridged Device Basic" },
 #else
@@ -826,7 +818,6 @@
     CHIP_PRINTCLUSTER_WIFI_NETWORK_DIAGNOSTICS_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_TIME_SYNCHRONIZATION_CLUSTER                                                                                 \
-    CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER                                                                     \
     CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_SWITCH_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER                                                                          \

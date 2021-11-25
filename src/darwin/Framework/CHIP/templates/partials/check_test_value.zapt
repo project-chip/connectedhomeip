@@ -4,10 +4,9 @@
   {{>check_test_value actual=actual expected=expected cluster=cluster isOptional=false}}
 {{else if isNullable}}
   {{#if (isLiteralNull expected)}}
-    {{! TODO: This should be checking for nil once we fix our responses }}
-    XCTAssertTrue([{{actual}} isKindOfClass:[NSNull class]]);
+    XCTAssertTrue({{actual}} == nil);
   {{else}}
-    XCTAssertFalse([{{actual}} isKindOfClass:[NSNull class]]);
+    XCTAssertFalse({{actual}} == nil);
     {{>check_test_value actual=actual expected=expected cluster=cluster isNullable=false}}
   {{/if}}
 {{else if isArray}}
@@ -38,7 +37,7 @@
     {{else if (isCharString type)}}
       XCTAssertTrue([{{actual}} isEqualToString:@"{{expected}}"]);
     {{else}}
-      XCTAssertEqual([{{actual}} {{asObjectiveCNumberType "" type true}}Value], {{expected}}{{asTypeLiteralSuffix type}});
+      XCTAssertEqual([{{actual}} {{asObjectiveCNumberType "" type true}}Value], {{asTypeLiteralSuffix expected type}});
     {{/if}}
   {{/if_is_struct}}
 {{/if}}

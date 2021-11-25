@@ -23,4 +23,4 @@ FROM connectedhomeip/chip-build:${VERSION}
 
 COPY --from=build /opt/sdk/sdks/ /opt/sdk/sdks/
 
-ENV K32W061_SDK_ROOT=/opt/sdk/sdks
+ENV NXP_K32W061_SDK_ROOT=/opt/sdk/sdks

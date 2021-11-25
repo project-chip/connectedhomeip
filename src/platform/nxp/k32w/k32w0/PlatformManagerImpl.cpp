@@ -28,10 +28,13 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
+#include <platform/nxp/k32w/k32w0/DiagnosticDataProviderImpl.h>
 
 #include <lwip/tcpip.h>
 
 #include <openthread/platform/entropy.h>
+
+#include "K32W061.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -58,7 +61,17 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Initialize the configuration system.
     err = Internal::K32WConfig::Init();
     SuccessOrExit(err);
+
+    if (Chip_GetType() != CHIP_K32W061)
+    {
+        err = CHIP_ERROR_INTERNAL;
+        ChipLogError(DeviceLayer, "Invalid chip type, expected K32W061");
+
+        goto exit;
+    }
+
     SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
 
     // Initialize LwIP.
     tcpip_init(NULL, NULL);
@@ -73,36 +86,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 
 exit:
     return err;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapFree(uint64_t & currentHeapFree)
-{
-    size_t freeHeapSize;
-
-    freeHeapSize    = xPortGetFreeHeapSize();
-    currentHeapFree = static_cast<uint64_t>(freeHeapSize);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapUsed(uint64_t & currentHeapUsed)
-{
-    size_t freeHeapSize;
-    size_t usedHeapSize;
-
-    freeHeapSize = xPortGetFreeHeapSize();
-    usedHeapSize = HEAP_SIZE - freeHeapSize;
-
-    currentHeapUsed = static_cast<uint64_t>(usedHeapSize);
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR PlatformManagerImpl::_GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark)
-{
-    size_t highWatermarkHeapSize;
-
-    highWatermarkHeapSize    = HEAP_SIZE - xPortGetMinimumEverFreeHeapSize();
-    currentHeapHighWatermark = static_cast<uint64_t>(highWatermarkHeapSize);
-    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer

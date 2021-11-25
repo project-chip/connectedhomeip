@@ -14,23 +14,27 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#pragma once
-
-#include <credentials/DeviceAttestationVerifier.h>
-
-namespace chip {
-namespace Credentials {
-namespace Examples {
 
 /**
- * @brief Get implementation of a sample DAC verifier to validate device
- *        attestation procedure.
- *
- * @returns a singleton DeviceAttestationVerifier that relies on no
- *          storage abstractions.
+ *    @file
+ *          Provides an implementation of the DiagnosticDataProvider object
+ *          for cc13x2 platform.
  */
-DeviceAttestationVerifier * GetExampleDACVerifier();
 
-} // namespace Examples
-} // namespace Credentials
+#include <platform/internal/CHIPDeviceLayerInternal.h>
+
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/DiagnosticDataProvider.h>
+#include <platform/android/DiagnosticDataProviderImpl.h>
+
+namespace chip {
+namespace DeviceLayer {
+
+DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
+{
+    static DiagnosticDataProviderImpl sInstance;
+    return sInstance;
+}
+
+} // namespace DeviceLayer
 } // namespace chip

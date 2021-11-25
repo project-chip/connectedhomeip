@@ -153,10 +153,34 @@ function chip_has_clusters(options)
  */
 function chip_server_global_responses(options)
 {
+  return asBlocks.call(this, getServerGlobalAttributeResponses(), options);
+}
+
+async function if_in_global_responses(options)
+{
+  const attribute          = this.response.arguments[0];
+  const globalResponses    = await getServerGlobalAttributeResponses();
+  const responseTypeExists = globalResponses.find(
+      // Some fields of item/attribute here may be undefined.
+      item => item.isList == attribute.isList && item.isStruct == attribute.isStruct && item.chipType == attribute.chipType
+          && item.isNullable == attribute.isNullable && item.isOptional == attribute.isOptional)
+
+  if (responseTypeExists)
+  {
+    return options.fn(this);
+  }
+  else
+  {
+    return options.inverse(this);
+  }
+}
+
+function getServerGlobalAttributeResponses()
+{
   const sorter = (a, b) => a.chipCallback.name.localeCompare(b.chipCallback.name, 'en', { numeric : true });
 
   const reducer = (unique, item) => {
-    const { type, size, isList, chipCallback, chipType } = item.response.arguments[0];
+    const { type, size, isList, isOptional, isNullable, chipCallback, chipType } = item.response.arguments[0];
 
     // List-typed elements have a dedicated callback
     if (isList) {
@@ -167,11 +191,11 @@ function chip_server_global_responses(options)
       return unique;
     }
 
-    return [...unique, { chipCallback, chipType, size } ];
+    return [...unique, { chipCallback, chipType, size, isOptional, isNullable } ];
   };
 
   const filter = attributes => attributes.reduce(reducer, []).sort(sorter);
-  return asBlocks.call(this, Clusters.getAttributesByClusterSide('server').then(filter), options);
+  return Clusters.getAttributesByClusterSide('server').then(filter);
 }
 
 /**
@@ -381,3 +405,4 @@ exports.chip_server_cluster_attributes                       = chip_server_clust
 exports.chip_server_has_list_attributes                      = chip_server_has_list_attributes;
 exports.chip_available_cluster_commands                      = chip_available_cluster_commands;
 exports.if_chip_enum                                         = if_chip_enum;
+exports.if_in_global_responses                               = if_in_global_responses;

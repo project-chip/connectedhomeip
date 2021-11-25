@@ -263,8 +263,9 @@ function asPrintFormat(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asTypeLiteralSuffix(type)
+function asTypeLiteralSuffix(value, type)
 {
+  const valueIsANumber = !isNaN(value);
   function fn(pkgId)
   {
     const options = { 'hash' : {} };
@@ -272,17 +273,17 @@ function asTypeLiteralSuffix(type)
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
       case 'int32_t':
-        return 'L';
+        return value + (valueIsANumber ? 'L' : '');
       case 'int64_t':
-        return 'LL';
+        return value + (valueIsANumber ? 'LL' : '');
       case 'uint16_t':
-        return 'U';
+        return value + (valueIsANumber ? 'U' : '');
       case 'uint32_t':
-        return 'UL';
+        return value + (valueIsANumber ? 'UL' : '');
       case 'uint64_t':
-        return 'ULL';
+        return value + (valueIsANumber ? 'ULL' : '');
       default:
-        return '';
+        return value;
       }
     })
   }

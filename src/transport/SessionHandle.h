@@ -84,7 +84,8 @@ public:
     // torn down, at the very least.
     const Transport::PeerAddress * GetPeerAddress(SessionManager * sessionManager) const;
 
-    CHIP_ERROR GetMRPIntervals(SessionManager * sessionManager, uint32_t & mrpIdleInterval, uint32_t & mrpActiveInterval);
+    const ReliableMessageProtocolConfig & GetMRPConfig(SessionManager * sessionManager) const;
+    void SetMRPConfig(SessionManager * sessionManager, const ReliableMessageProtocolConfig & config);
 
     Transport::UnauthenticatedSessionHandle GetUnauthenticatedSession() const { return mUnauthenticatedSessionHandle.Value(); }
 

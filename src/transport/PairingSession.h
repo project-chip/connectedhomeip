@@ -83,27 +83,21 @@ public:
         return LocalSessionMessageCounter::kInitialValue;
     }
 
+    /**
+     * @brief
+     *   Get the value of peer session counter which is synced during session establishment
+     */
+    virtual const ReliableMessageProtocolConfig & GetMRPConfig() const
+    {
+        // TODO(#6652): This is a stub implementation, should be replaced by the real one when CASE and PASE is completed
+        return gDefaultMRPConfig;
+    }
+
     virtual const char * GetI2RSessionInfo() const = 0;
 
     virtual const char * GetR2ISessionInfo() const = 0;
 
 protected:
-    // TODO - Move EstimateTLVStructOverhead to CHIPTLV header file
-    static constexpr size_t EstimateTLVStructOverhead()
-    {
-        // The struct itself has a control byte and an end-of-struct marker.
-        return 2;
-    }
-
-    template <typename... FieldSizes>
-    static constexpr size_t EstimateTLVStructOverhead(size_t firstFieldSize, FieldSizes... otherFields)
-    {
-        // Estimate 4 bytes of overhead per field.  This can happen for a large
-        // octet string field: 1 byte control, 1 byte context tag, 2 bytes
-        // length.
-        return firstFieldSize + 4 + EstimateTLVStructOverhead(otherFields...);
-    }
-
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
     void SetLocalSessionId(uint16_t id) { mLocalSessionId = id; }

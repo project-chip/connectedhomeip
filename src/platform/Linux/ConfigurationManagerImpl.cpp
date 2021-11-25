@@ -87,7 +87,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_BootReason))
     {
-        err = StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
+        err = StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
         SuccessOrExit(err);
     }
 
@@ -310,14 +310,14 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
     return WriteConfigValue(PosixConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetBootReasons(uint32_t & bootReasons)
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
-    return ReadConfigValue(PosixConfig::kCounterKey_BootReason, bootReasons);
+    return ReadConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::StoreBootReasons(uint32_t bootReasons)
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
 {
-    return WriteConfigValue(PosixConfig::kCounterKey_BootReason, bootReasons);
+    return WriteConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
 }
 
 } // namespace DeviceLayer

@@ -15,7 +15,10 @@ import chip.platform.PreferencesKeyValueStoreManager;
 import chip.setuppayload.DiscoveryCapability;
 import chip.setuppayload.SetupPayload;
 import chip.setuppayload.SetupPayloadParser;
-import com.tcl.tvapp.TvApp;
+import com.tcl.chip.tvapp.KeypadInputManagerStub;
+import com.tcl.chip.tvapp.MediaInputManagerStub;
+import com.tcl.chip.tvapp.TvApp;
+import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,6 +35,10 @@ public class MainActivity extends AppCompatActivity {
     mQrCodeTxt = findViewById(R.id.qrCodeTxt);
     mManualPairingCodeTxt = findViewById(R.id.manualPairingCodeTxt);
     TvApp tvApp = new TvApp();
+    tvApp.setKeypadInputManager(new KeypadInputManagerStub());
+    tvApp.setWakeOnLanManager(new WakeOnLanManagerStub());
+    tvApp.setMediaInputManager(new MediaInputManagerStub());
+
     AndroidChipPlatform chipPlatform =
         new AndroidChipPlatform(
             new AndroidBleManager(),

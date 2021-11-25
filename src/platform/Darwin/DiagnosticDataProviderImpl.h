@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,15 +15,26 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *          Provides an implementation of the DiagnosticDataProvider object.
+ */
+
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
+#include <platform/DiagnosticDataProvider.h>
 
-#include <lib/core/CHIPError.h>
-#include <list>
+namespace chip {
+namespace DeviceLayer {
 
-class KeypadInputManager
+/**
+ * Concrete implementation of the PlatformManager singleton object for Linux platforms.
+ */
+class DiagnosticDataProviderImpl : public DiagnosticDataProvider
 {
 public:
-    CHIP_ERROR Init();
+    static DiagnosticDataProviderImpl & GetDefaultInstance();
 };
+
+} // namespace DeviceLayer
+} // namespace chip

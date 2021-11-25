@@ -48,4 +48,7 @@ limitations under the License.
       <field id="0" name="SoftwareFault" type="SoftwareFault"/>
     </event>    
   </cluster>
+  <bitmap name="SoftwareDiagnosticsFeature" type="BITMAP32">
+    <field name="WaterMarks" mask="0x1"/>
+  </bitmap>   
 </configurator>

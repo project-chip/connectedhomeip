@@ -200,25 +200,14 @@ exit:
 CHIP_ERROR ReadClient::GenerateEventPaths(EventPaths::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
                                           size_t aEventPathParamsListSize)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
+    for (size_t index = 0; index < aEventPathParamsListSize; ++index)
     {
-        EventPathIB::Builder eventPathBuilder = aEventPathsBuilder.CreatePath();
-        EventPathParams eventPath             = apEventPathParamsList[eventIndex];
-        eventPathBuilder.Node(eventPath.mNodeId)
-            .Event(eventPath.mEventId)
-            .Endpoint(eventPath.mEndpointId)
-            .Cluster(eventPath.mClusterId)
-            .EndOfEventPathIB();
-        SuccessOrExit(err = eventPathBuilder.GetError());
+        VerifyOrReturnError(apEventPathParamsList[index].IsValidEventPath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+        ReturnErrorOnFailure(aEventPathsBuilder.CreatePath().Encode(apEventPathParamsList[index]));
     }
 
     aEventPathsBuilder.EndOfEventPaths();
-    SuccessOrExit(err = aEventPathsBuilder.GetError());
-
-exit:
-    return err;
+    return aEventPathsBuilder.GetError();
 }
 
 CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
@@ -228,7 +217,7 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAt
     for (size_t index = 0; index < aAttributePathParamsListSize; index++)
     {
         VerifyOrReturnError(apAttributePathParamsList[index].IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-        ReturnErrorOnFailure(apAttributePathParamsList[index].BuildAttributePath(aAttributePathIBsBuilder.CreateAttributePath()));
+        ReturnErrorOnFailure(aAttributePathIBsBuilder.CreateAttributePath().Encode(apAttributePathParamsList[index]));
     }
     aAttributePathIBsBuilder.EndOfAttributePathIBs();
     return aAttributePathIBsBuilder.GetError();
@@ -391,12 +380,18 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         TLV::TLVReader attributeReportIBsReader;
         attributeReportIBs.GetReader(&attributeReportIBsReader);
 
-        mpCallback->OnReportBegin(this);
+        if (IsInitialReport())
+        {
+            mpCallback->OnReportBegin(this);
+        }
 
         err = ProcessAttributeReportIBs(attributeReportIBsReader);
         SuccessOrExit(err);
 
-        mpCallback->OnReportEnd(this);
+        if (!mPendingMoreChunks)
+        {
+            mpCallback->OnReportEnd(this);
+        }
     }
 
 exit:
@@ -500,6 +495,10 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
 
             ConcreteDataAttributePath attributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId);
 
+            //
+            // TODO: Add support for correctly handling appends/updates whenever list chunking support
+            // on the server side is added.
+            //
             if (dataReader.GetType() == TLV::kTLVType_Array)
             {
                 attributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
@@ -549,10 +548,15 @@ CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsRea
 
 CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     CancelLivenessCheckTimer();
-    ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %d seconds", mMaxIntervalCeilingSeconds);
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        System::Clock::Seconds16(mMaxIntervalCeilingSeconds), OnLivenessTimeoutCallback, this);
+    VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    System::Clock::Timeout timeout = System::Clock::Seconds16(mMaxIntervalCeilingSeconds) + mpExchangeCtx->GetAckTimeout();
+    // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
+    ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %lu milliseconds", static_cast<long unsigned>(timeout.count()));
+    err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+        timeout, OnLivenessTimeoutCallback, this);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -675,6 +679,11 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHandle, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
+    if (mpExchangeCtx->IsBLETransport())
+    {
+        ChipLogError(DataManagement, "IM Subscribe cannot work with BLE");
+        SuccessOrExit(err = CHIP_ERROR_INCORRECT_STATE);
+    }
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));

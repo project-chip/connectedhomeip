@@ -90,7 +90,7 @@ public:
     static constexpr Key kConfigKey_LastUsedEpochKeyId = EFR32ConfigKey(kChipConfig_KeyBase, 0x05);
     static constexpr Key kConfigKey_FailSafeArmed      = EFR32ConfigKey(kChipConfig_KeyBase, 0x06);
     static constexpr Key kConfigKey_GroupKey           = EFR32ConfigKey(kChipConfig_KeyBase, 0x07);
-    static constexpr Key kConfigKey_ProductRevision    = EFR32ConfigKey(kChipConfig_KeyBase, 0x08);
+    static constexpr Key kConfigKey_HardwareVersion    = EFR32ConfigKey(kChipConfig_KeyBase, 0x08);
     static constexpr Key kConfigKey_RegulatoryLocation = EFR32ConfigKey(kChipConfig_KeyBase, 0x09);
     static constexpr Key kConfigKey_CountryCode        = EFR32ConfigKey(kChipConfig_KeyBase, 0x0A);
     static constexpr Key kConfigKey_Breadcrumb         = EFR32ConfigKey(kChipConfig_KeyBase, 0x0B);

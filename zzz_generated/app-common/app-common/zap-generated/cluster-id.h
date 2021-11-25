@@ -124,9 +124,6 @@ static constexpr chip::ClusterId ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID = 0
 // Definitions for cluster: Time Synchronization
 static constexpr chip::ClusterId ZCL_TIME_SYNCHRONIZATION_CLUSTER_ID = 0x0038;
 
-// Definitions for cluster: Bridged Device Basic Information
-static constexpr chip::ClusterId ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_ID = 0x0039;
-
 // Definitions for cluster: Bridged Device Basic
 static constexpr chip::ClusterId ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID = 0x0039;
 

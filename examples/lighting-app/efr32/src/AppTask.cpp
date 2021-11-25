@@ -173,7 +173,7 @@ CHIP_ERROR AppTask::Init()
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
-    EFR32_LOG("Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
+    EFR32_LOG("Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     err = LightMgr().Init();
     if (err != CHIP_NO_ERROR)
     {

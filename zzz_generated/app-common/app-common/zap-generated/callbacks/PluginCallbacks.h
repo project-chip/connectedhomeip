@@ -87,8 +87,6 @@ void __attribute__((weak)) MatterEthernetNetworkDiagnosticsPluginClientInitCallb
 void MatterEthernetNetworkDiagnosticsPluginServerInitCallback();
 void __attribute__((weak)) MatterTimeSynchronizationPluginClientInitCallback() {}
 void MatterTimeSynchronizationPluginServerInitCallback();
-void __attribute__((weak)) MatterBridgedDeviceBasicInformationPluginClientInitCallback() {}
-void MatterBridgedDeviceBasicInformationPluginServerInitCallback();
 void __attribute__((weak)) MatterBridgedDeviceBasicPluginClientInitCallback() {}
 void MatterBridgedDeviceBasicPluginServerInitCallback();
 void __attribute__((weak)) MatterSwitchPluginClientInitCallback() {}

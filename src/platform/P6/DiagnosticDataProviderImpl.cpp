@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,26 +15,26 @@
  *    limitations under the License.
  */
 
-#pragma once
+/**
+ *    @file
+ *          Provides an implementation of the DiagnosticDataProvider object
+ *          for P6 platform.
+ */
 
-#include <app/util/af-types.h>
-#include <lib/core/CHIPError.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include "../endpoint-configuration/EndpointConfigurationStorage.h"
+#include <lib/support/logging/CHIPLogging.h>
+#include <platform/DiagnosticDataProvider.h>
+#include <platform/P6/DiagnosticDataProviderImpl.h>
 
-class WakeOnLanManager
+namespace chip {
+namespace DeviceLayer {
+
+DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
 {
-public:
-    CHIP_ERROR Init();
-    void store(chip::EndpointId endpoint, char macAddress[32]);
-    void setMacAddress(chip::EndpointId endpoint, char * macAddress);
+    static DiagnosticDataProviderImpl sInstance;
+    return sInstance;
+}
 
-    static WakeOnLanManager & GetInstance()
-    {
-        static WakeOnLanManager instance;
-        return instance;
-    }
-
-private:
-    EndpointConfigurationStorage * es = nullptr;
-};
+} // namespace DeviceLayer
+} // namespace chip

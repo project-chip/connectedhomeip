@@ -60,7 +60,12 @@ CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeC
 
     err = ProcessWriteRequest(std::move(aPayload));
     SuccessOrExit(err);
-    err = SendWriteResponse();
+
+    // Do not send response on Group Write
+    if (!apExchangeContext->IsGroupExchangeContext())
+    {
+        err = SendWriteResponse();
+    }
 
 exit:
     Shutdown();
@@ -110,6 +115,8 @@ exit:
 CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeDataIBsReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_INTERNAL);
+
     while (CHIP_NO_ERROR == (err = aAttributeDataIBsReader.Next()))
     {
         chip::TLV::TLVReader dataReader;
@@ -131,9 +138,19 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         {
             err = CHIP_NO_ERROR;
         }
+        if (mpExchangeCtx->IsGroupExchangeContext())
+        {
+            // TODO retrieve Endpoint ID with GroupDataProvider using GroupId and FabricId
+            // Issue 11075
 
-        err = attributePath.GetEndpoint(&(clusterInfo.mEndpointId));
-        SuccessOrExit(err);
+            // Using endpoint 0 for test purposes
+            clusterInfo.mEndpointId = 0;
+        }
+        else
+        {
+            err = attributePath.GetEndpoint(&(clusterInfo.mEndpointId));
+            SuccessOrExit(err);
+        }
 
         err = attributePath.GetCluster(&(clusterInfo.mClusterId));
         SuccessOrExit(err);
@@ -148,7 +165,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         }
 
         // We do not support Wildcard writes for now, reject all wildcard write requests.
-        VerifyOrExit(clusterInfo.IsValidAttributePath() && !clusterInfo.HasWildcard(),
+        VerifyOrExit(clusterInfo.IsValidAttributePath() && !clusterInfo.HasAttributeWildcard(),
                      err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
         err = element.GetData(&dataReader);
@@ -210,18 +227,12 @@ CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayl
 
     err = writeRequestParser.GetWriteRequests(&AttributeDataIBsParser);
     SuccessOrExit(err);
+
     AttributeDataIBsParser.GetReader(&AttributeDataIBsReader);
     err = ProcessAttributeDataIBs(AttributeDataIBsReader);
 
 exit:
     return err;
-}
-
-CHIP_ERROR WriteHandler::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                                AttributeStatusIB::Builder aAttributeStatusIB)
-{
-    AttributePathIB::Builder attributePath = aAttributeStatusIB.CreatePath();
-    return aAttributePathParams.BuildAttributePath(attributePath);
 }
 
 CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathParams,
@@ -234,7 +245,7 @@ CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathPar
     err                                          = attributeStatusIB.GetError();
     SuccessOrExit(err);
 
-    err = ConstructAttributePath(aAttributePathParams, attributeStatusIB);
+    err = attributeStatusIB.CreatePath().Encode(aAttributePathParams);
     SuccessOrExit(err);
 
     statusIB.mStatus = aStatus;

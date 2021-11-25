@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,37 +15,39 @@
  *    limitations under the License.
  */
 
-#include <app/AttributePathParams.h>
-#include <app/MessageDef/AttributePathIB.h>
+/**
+ *    @file
+ *          Implements a getter and setter for a singleton DiagnosticDataProvider object.
+ */
+
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
-namespace app {
+namespace DeviceLayer {
 
-CHIP_ERROR AttributePathParams::BuildAttributePath(AttributePathIB::Builder & aBuilder) const
+class DiagnosticDataProvider;
+
+namespace {
+
+/** Singleton pointer to the DiagnosticDataProvider implementation.
+ */
+DiagnosticDataProvider * gInstance = nullptr;
+
+} // namespace
+
+DiagnosticDataProvider & GetDiagnosticDataProvider()
 {
-    if (!HasWildcardEndpointId())
-    {
-        aBuilder.Endpoint(mEndpointId);
-    }
-
-    if (!HasWildcardClusterId())
-    {
-        aBuilder.Cluster(mClusterId);
-    }
-
-    if (!HasWildcardAttributeId())
-    {
-        aBuilder.Attribute(mAttributeId);
-    }
-
-    if (!HasWildcardListIndex())
-    {
-        aBuilder.ListIndex(mListIndex);
-    }
-
-    aBuilder.EndOfAttributePathIB();
-
-    return aBuilder.GetError();
+    VerifyOrDie(gInstance != nullptr);
+    return *gInstance;
 }
-} // namespace app
+
+void SetDiagnosticDataProvider(DiagnosticDataProvider * diagnosticDataProvider)
+{
+    if (diagnosticDataProvider != nullptr)
+    {
+        gInstance = diagnosticDataProvider;
+    }
+}
+
+} // namespace DeviceLayer
 } // namespace chip
