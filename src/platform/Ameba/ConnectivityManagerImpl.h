@@ -110,7 +110,7 @@ private:
     void _ReleaseNetworkInterfaces(NetworkInterface * netifp);
     CHIP_ERROR _GetWiFiBssid(ByteSpan & Bssid);
     CHIP_ERROR _GetWiFiSecurityType(uint8_t & securityType);
-    CHIP_ERROR _GetWiFiVersion(uint8_t &wifiVersion);
+    CHIP_ERROR _GetWiFiVersion(uint8_t & wifiVersion);
     CHIP_ERROR _GetWiFiChannelNumber(uint16_t & channelNumber);
     CHIP_ERROR _GetWiFiRssi(int8_t & rssi);
     CHIP_ERROR _GetWiFiBeaconLostCount(uint32_t & beaconLostCount);

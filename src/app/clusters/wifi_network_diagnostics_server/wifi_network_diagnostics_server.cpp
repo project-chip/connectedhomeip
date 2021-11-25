@@ -70,22 +70,17 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityMan
     return aEncoder.Encode(data);
 }
 
-CHIP_ERROR WiFiDiagosticsAttrAccess::ReadWiFiBssId(AttributeValueEncoder & aEncoder)
+template <>
+CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(ByteSpan &),
+                                                     AttributeValueEncoder & aEncoder)
 {
-    // TODO: Use Nullable<ByteSpan> after we get darwin converted over to the new APIs.
-    Bssid::TypeInfo::Type bssid;
-
-    if (ConnectivityMgr().GetWiFiBssId(bssid) == CHIP_NO_ERROR)
+    ByteSpan data;
+    CHIP_ERROR err = (DeviceLayer::ConnectivityMgr().*getter)(data);
+    if (err != CHIP_NO_ERROR)
     {
-        ChipLogProgress(Zcl, "Node is currently connected to Wi-Fi network with BSSID:");
-        ChipLogByteSpan(Zcl, bssid);
+        return err;
     }
-    else
-    {
-        ChipLogProgress(Zcl, "Node is not currently connected.");
-    }
-
-    return aEncoder.Encode(bssid);
+    return aEncoder.Encode(data);
 }
 
 WiFiDiagosticsAttrAccess gAttrAccess;
@@ -100,8 +95,8 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPat
 
     switch (aPath.mAttributeId)
     {
-    case Bssid::Id: {
-        return ReadWiFiBssId(aEncoder);
+    case Attributes::Bssid::Id: {
+        return ReadIfSupported(&ConnectivityManager::GetWiFiBssid, aEncoder);
     }
     case Attributes::SecurityType::Id: {
         return ReadIfSupported(&ConnectivityManager::GetWiFiSecurityType, aEncoder);

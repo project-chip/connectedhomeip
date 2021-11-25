@@ -802,7 +802,7 @@ void ConnectivityManagerImpl::DHCPProcess(void)
 CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** netifpp)
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
-    NetworkInterface *head  = NULL;
+    NetworkInterface * head  = NULL;
     struct ifaddrs * ifaddr = nullptr;
 
     if (xnetif == NULL)
@@ -818,12 +818,12 @@ CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** ne
             strncpy(ifp->Name, ifa->name, Inet::InterfaceId::kMaxIfNameLength);
             ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
 
-            ifp->name                            = CharSpan(ifp->Name, strlen(ifp->Name));
-            ifp->fabricConnected                 = true;
+            ifp->name            = CharSpan(ifp->Name, strlen(ifp->Name));
+            ifp->fabricConnected = true;
             if ((ifa->flags) & NETIF_FLAG_ETHERNET)
-                ifp->type                        = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
             else
-                ifp->type                        = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
             ifp->offPremiseServicesReachableIPv4 = false;
             ifp->offPremiseServicesReachableIPv6 = false;
 
@@ -848,7 +848,7 @@ CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** ne
     return CHIP_NO_ERROR;
 }
 
-void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(NetworkInterface *netifp)
+void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(NetworkInterface * netifp)
 {
     while (netifp)
     {
@@ -860,13 +860,14 @@ void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(NetworkInterface *netifp
 
 CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBssid(ByteSpan & value)
 {
-    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
+    CHIP_ERROR err = CHIP_ERROR_READ_FAILED;
     static uint8_t ameba_bssid[6];
 
-    if(wifi_get_ap_bssid(ameba_bssid) == 0)
+    if (wifi_get_ap_bssid(ameba_bssid) == 0)
     {
         err = CHIP_NO_ERROR;
-        ChipLogProgress(DeviceLayer,"%02x,%02x,%02x,%02x,%02x,%02x\n",ameba_bssid[0],ameba_bssid[1],ameba_bssid[2],ameba_bssid[3],ameba_bssid[4],ameba_bssid[5]);
+        ChipLogProgress(DeviceLayer, "%02x,%02x,%02x,%02x,%02x,%02x\n", ameba_bssid[0], ameba_bssid[1], ameba_bssid[2],
+                        ameba_bssid[3],ameba_bssid[4],ameba_bssid[5]);
     }
 
     value = ameba_bssid;
