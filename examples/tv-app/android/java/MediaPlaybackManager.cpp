@@ -16,13 +16,12 @@
  */
 
 #include "MediaPlaybackManager.h"
+#include <app-common/app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <jni.h>
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
-#include <app-common/zap-generated/cluster-objects.h>
-#include <app-common/app-common/zap-generated/attribute-id.h>
-
 
 using namespace chip;
 
@@ -39,46 +38,38 @@ public:
 
         switch (aPath.mAttributeId)
         {
-            case app::Clusters::MediaPlayback::Attributes::PlaybackState::Id:
-            {
-                attrId = ZCL_MEDIA_PLAYBACK_STATE_ATTRIBUTE_ID;
-                break;
-            }
-            case app::Clusters::MediaPlayback::Attributes::StartTime::Id:
-            {
-                attrId = ZCL_MEDIA_PLAYBACK_START_TIME_ATTRIBUTE_ID;
-                break;
-            }
-            case app::Clusters::MediaPlayback::Attributes::Duration::Id:
-            {
-                attrId = ZCL_MEDIA_PLAYBACK_DURATION_ATTRIBUTE_ID;
-                break;
-            }
-            case app::Clusters::MediaPlayback::Attributes::PositionUpdatedAt::Id:
-            {
-                attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_POSITION_UPDATED_AT_ATTRIBUTE_ID;
-                break;
-            }
-            case app::Clusters::MediaPlayback::Attributes::Position::Id:
-            {
-                attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_POSITION_ATTRIBUTE_ID;
-                break;
-            }
-            case app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::Id:
-            {
-                attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_SPEED_ATTRIBUTE_ID;
-                break;
-            }
-            case app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::Id:
-            {
-                attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END_ATTRIBUTE_ID;
-                break;
-            }
-            case app::Clusters::MediaPlayback::Attributes::SeekRangeStart::Id:
-            {
-                attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START_ATTRIBUTE_ID;
-                break;
-            }
+        case app::Clusters::MediaPlayback::Attributes::PlaybackState::Id: {
+            attrId = ZCL_MEDIA_PLAYBACK_STATE_ATTRIBUTE_ID;
+            break;
+        }
+        case app::Clusters::MediaPlayback::Attributes::StartTime::Id: {
+            attrId = ZCL_MEDIA_PLAYBACK_START_TIME_ATTRIBUTE_ID;
+            break;
+        }
+        case app::Clusters::MediaPlayback::Attributes::Duration::Id: {
+            attrId = ZCL_MEDIA_PLAYBACK_DURATION_ATTRIBUTE_ID;
+            break;
+        }
+        case app::Clusters::MediaPlayback::Attributes::PositionUpdatedAt::Id: {
+            attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_POSITION_UPDATED_AT_ATTRIBUTE_ID;
+            break;
+        }
+        case app::Clusters::MediaPlayback::Attributes::Position::Id: {
+            attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_POSITION_ATTRIBUTE_ID;
+            break;
+        }
+        case app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::Id: {
+            attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_SPEED_ATTRIBUTE_ID;
+            break;
+        }
+        case app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::Id: {
+            attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_END_ATTRIBUTE_ID;
+            break;
+        }
+        case app::Clusters::MediaPlayback::Attributes::SeekRangeStart::Id: {
+            attrId = ZCL_MEDIA_PLAYBACK_PLAYBACK_SEEK_RANGE_START_ATTRIBUTE_ID;
+            break;
+        }
         }
 
         if (attrId >= 0)
@@ -114,9 +105,8 @@ void emberAfMediaPlaybackClusterInitCallback(EndpointId endpoint)
 EmberAfMediaPlaybackStatus mediaPlaybackClusterSendMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
                                                                         uint64_t deltaPositionMilliseconds)
 {
-    return  MediaPlaybackMgr().Request(mediaPlaybackRequest, deltaPositionMilliseconds);
+    return MediaPlaybackMgr().Request(mediaPlaybackRequest, deltaPositionMilliseconds);
 }
-
 
 void MediaPlaybackManager::InitializeWithObjects(jobject managerObject)
 {
@@ -147,8 +137,8 @@ void MediaPlaybackManager::InitializeWithObjects(jobject managerObject)
 CHIP_ERROR MediaPlaybackManager::GetAttribute(chip::app::AttributeValueEncoder & aEncoder, int attributeId)
 {
     jlong jAttributeValue = -1;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    CHIP_ERROR err        = CHIP_NO_ERROR;
+    JNIEnv * env          = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received MediaPlaybackManager::GetAttribute:%d", attributeId);
     VerifyOrExit(mMediaPlaybackManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -168,18 +158,16 @@ CHIP_ERROR MediaPlaybackManager::GetAttribute(chip::app::AttributeValueEncoder &
     {
         switch (attributeId)
         {
-            case ZCL_MEDIA_PLAYBACK_PLAYBACK_SPEED_ATTRIBUTE_ID:
-            {
-                // TODO: Convert to single once it is supported
-                // float speed = static_cast<float>(jAttributeValue) / 10000.0f;
-                err = aEncoder.Encode(static_cast<uint64_t>(jAttributeValue));
-                break;
-            }
+        case ZCL_MEDIA_PLAYBACK_PLAYBACK_SPEED_ATTRIBUTE_ID: {
+            // TODO: Convert to single once it is supported
+            // float speed = static_cast<float>(jAttributeValue) / 10000.0f;
+            err = aEncoder.Encode(static_cast<uint64_t>(jAttributeValue));
+            break;
+        }
 
-            default:
-            {
-                err = aEncoder.Encode(static_cast<uint64_t>(jAttributeValue));
-            }
+        default: {
+            err = aEncoder.Encode(static_cast<uint64_t>(jAttributeValue));
+        }
         }
     }
     else
@@ -190,13 +178,14 @@ CHIP_ERROR MediaPlaybackManager::GetAttribute(chip::app::AttributeValueEncoder &
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Zcl, "MediaPlaybackManager::GetAttribute status error: %s",err.AsString());
+        ChipLogError(Zcl, "MediaPlaybackManager::GetAttribute status error: %s", err.AsString());
     }
 
     return err;
 }
 
-EmberAfMediaPlaybackStatus MediaPlaybackManager::Request(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds)
+EmberAfMediaPlaybackStatus MediaPlaybackManager::Request(MediaPlaybackRequest mediaPlaybackRequest,
+                                                         uint64_t deltaPositionMilliseconds)
 {
     jint ret       = -1;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -208,7 +197,8 @@ EmberAfMediaPlaybackStatus MediaPlaybackManager::Request(MediaPlaybackRequest me
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
     env->ExceptionClear();
-    ret = env->CallIntMethod(mMediaPlaybackManagerObject, mRequestMethod, static_cast<jlong>(mediaPlaybackRequest), static_cast<jlong>(deltaPositionMilliseconds));
+    ret = env->CallIntMethod(mMediaPlaybackManagerObject, mRequestMethod, static_cast<jlong>(mediaPlaybackRequest),
+                             static_cast<jlong>(deltaPositionMilliseconds));
     if (env->ExceptionCheck())
     {
         ChipLogError(AppServer, "Java exception in MediaPlaybackManager::GetAttribute");
