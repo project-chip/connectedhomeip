@@ -35,6 +35,7 @@
 #include <messaging/ExchangeMessageDispatch.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageMgr.h>
+#include <protocols/interaction_model/Constants.h>
 #include <protocols/secure_channel/Constants.h>
 
 namespace chip {
@@ -135,6 +136,38 @@ CHIP_ERROR ExchangeMessageDispatch::OnMessageReceived(uint32_t messageCounter, c
     }
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExchangeMessageDispatch::OnGroupMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
+                                                           const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+                                                           ReliableMessageContext * reliableMessageContext)
+{
+    ReturnErrorCodeIf(!GroupMessagePermitted(payloadHeader.GetProtocolID().GetProtocolId(), payloadHeader.GetMessageType()),
+                      CHIP_ERROR_INVALID_ARGUMENT);
+
+    return CHIP_NO_ERROR;
+}
+
+bool ExchangeMessageDispatch::GroupMessagePermitted(uint16_t protocol, uint8_t type)
+{
+    switch (protocol)
+    {
+    case Protocols::InteractionModel::Id.GetProtocolId():
+        switch (type)
+        {
+        case static_cast<uint8_t>(Protocols::InteractionModel::MsgType::WriteRequest):
+        case static_cast<uint8_t>(Protocols::InteractionModel::MsgType::InvokeCommandRequest):
+            return true;
+
+        default:
+            break;
+        }
+        break;
+
+    default:
+        break;
+    }
+    return false;
 }
 
 } // namespace Messaging

@@ -39,7 +39,13 @@ public:
     ExchangeMessageDispatch() {}
     virtual ~ExchangeMessageDispatch() {}
 
-    CHIP_ERROR Init() { return CHIP_NO_ERROR; }
+    CHIP_ERROR Init(SessionManager * sessionManager)
+    {
+        ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+        mSessionManager = sessionManager;
+
+        return CHIP_NO_ERROR;
+    }
 
     virtual bool IsEncryptionRequired() const { return true; }
 
@@ -64,11 +70,18 @@ public:
                                          const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
                                          ReliableMessageContext * reliableMessageContext);
 
+    virtual CHIP_ERROR OnGroupMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
+                                              const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
+                                              ReliableMessageContext * reliableMessageContext);
+
 protected:
     virtual bool MessagePermitted(uint16_t protocol, uint8_t type) = 0;
+    virtual bool GroupMessagePermitted(uint16_t protocol, uint8_t type);
 
     // TODO: remove IsReliableTransmissionAllowed, this function should be provided over session.
     virtual bool IsReliableTransmissionAllowed() const { return true; }
+
+    SessionManager * mSessionManager = nullptr;
 };
 
 } // namespace Messaging

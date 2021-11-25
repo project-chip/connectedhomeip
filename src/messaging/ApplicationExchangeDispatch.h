@@ -38,13 +38,6 @@ public:
 
     virtual ~ApplicationExchangeDispatch() {}
 
-    CHIP_ERROR Init(SessionManager * sessionManager)
-    {
-        ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mSessionManager = sessionManager;
-        return ExchangeMessageDispatch::Init();
-    }
-
     CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
                               EncryptedPacketBufferHandle & preparedMessage) override;
     CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & message) const override;
@@ -55,7 +48,6 @@ protected:
     bool MessagePermitted(uint16_t protocol, uint8_t type) override;
 
 private:
-    SessionManager * mSessionManager = nullptr;
 };
 
 } // namespace Messaging
