@@ -18,11 +18,11 @@
 
 #include "ContentLauncherManager.h"
 #include "KeypadInputManager.h"
+#include "LowPowerManager.h"
 #include "MediaInputManager.h"
 #include "MediaPlaybackManager.h"
-#include "WakeOnLanManager.h"
-#include "LowPowerManager.h"
 #include "TvChannelManager.h"
+#include "WakeOnLanManager.h"
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>

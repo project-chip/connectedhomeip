@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <lib/core/CHIPError.h>
 #include <jni.h>
+#include <lib/core/CHIPError.h>
 
 class LowPowerManager
 {
@@ -32,7 +32,7 @@ private:
 
     static LowPowerManager sInstance;
     jobject mLowPowerManagerObject = nullptr;
-    jmethodID mSleepMethod          = nullptr;
+    jmethodID mSleepMethod         = nullptr;
 };
 
 inline LowPowerManager & LowPowerMgr()

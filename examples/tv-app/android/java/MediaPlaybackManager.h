@@ -21,9 +21,9 @@
 #include <app-common/zap-generated/enums.h>
 #include <app/clusters/media-playback-server/media-playback-server.h>
 #include <app/util/af-types.h>
+#include <app/util/attribute-storage.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
-#include <app/util/attribute-storage.h>
 
 class MediaPlaybackManager
 {
@@ -37,8 +37,8 @@ private:
 
     static MediaPlaybackManager sInstance;
     jobject mMediaPlaybackManagerObject = nullptr;
-    jmethodID mRequestMethod = nullptr;
-    jmethodID mGetAttributeMethod = nullptr;
+    jmethodID mRequestMethod            = nullptr;
+    jmethodID mGetAttributeMethod       = nullptr;
 };
 
 inline MediaPlaybackManager & MediaPlaybackMgr()
