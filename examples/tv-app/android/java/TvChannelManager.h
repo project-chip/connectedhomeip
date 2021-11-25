@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <app/AttributeAccessInterface.h>
 #include <app-common/zap-generated/af-structs.h>
+#include <app/AttributeAccessInterface.h>
 
 #include <jni.h>
 #include <lib/core/CHIPError.h>
@@ -41,14 +41,14 @@ private:
     friend TvChannelManager & TvChannelMgr();
 
     static TvChannelManager sInstance;
-    jobject mTvChannelManagerObject = nullptr;
+    jobject mTvChannelManagerObject    = nullptr;
     jmethodID mGetChannelListMethod    = nullptr;
-    jmethodID mGetLineupMethod    = nullptr;
-    jmethodID mGetCurrentChannelMethod    = nullptr;
+    jmethodID mGetLineupMethod         = nullptr;
+    jmethodID mGetCurrentChannelMethod = nullptr;
 
-    jmethodID mChangeChannelMethod    = nullptr;
-    jmethodID mchangeChannelByNumberMethod    = nullptr;
-    jmethodID mskipChannelMethod    = nullptr;
+    jmethodID mChangeChannelMethod         = nullptr;
+    jmethodID mchangeChannelByNumberMethod = nullptr;
+    jmethodID mskipChannelMethod           = nullptr;
 };
 
 inline class TvChannelManager & TvChannelMgr()
