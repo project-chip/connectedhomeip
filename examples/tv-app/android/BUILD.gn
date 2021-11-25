@@ -38,8 +38,6 @@ shared_library("jni") {
     "include/endpoint-configuration/EndpointConfigurationStorage.h",
     "include/target-navigator/TargetNavigatorManager.cpp",
     "include/target-navigator/TargetNavigatorManager.h",
-    "include/tv-channel/TvChannelManager.cpp",
-    "include/tv-channel/TvChannelManager.h",
     "java/KeypadInputManager.cpp",
     "java/KeypadInputManager.h",
     "java/MediaInputManager.cpp",
@@ -53,6 +51,8 @@ shared_library("jni") {
     "java/LowPowerManager.h",
     "java/MediaPlaybackManager.cpp",
     "java/MediaPlaybackManager.h",
+    "java/TvChannelManager.cpp",
+    "java/TvChannelManager.h",
   ]
 
   deps = [
@@ -100,6 +100,10 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/LowPowerManagerStub.java",
     "java/src/com/tcl/chip/tvapp/MediaPlaybackManager.java",
     "java/src/com/tcl/chip/tvapp/MediaPlaybackManagerStub.java",
+    "java/src/com/tcl/chip/tvapp/TvChannelInfo.java",
+    "java/src/com/tcl/chip/tvapp/TvChannelLineupInfo.java",
+    "java/src/com/tcl/chip/tvapp/TvChannelManager.java",
+    "java/src/com/tcl/chip/tvapp/TvChannelManagerStub.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]
