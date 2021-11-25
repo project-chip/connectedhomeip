@@ -15,6 +15,8 @@ import chip.platform.PreferencesKeyValueStoreManager;
 import chip.setuppayload.DiscoveryCapability;
 import chip.setuppayload.SetupPayload;
 import chip.setuppayload.SetupPayloadParser;
+
+import com.tcl.chip.tvapp.ContentLaunchManagerStub;
 import com.tcl.chip.tvapp.KeypadInputManagerStub;
 import com.tcl.chip.tvapp.MediaInputManagerStub;
 import com.tcl.chip.tvapp.TvApp;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     tvApp.setKeypadInputManager(new KeypadInputManagerStub());
     tvApp.setWakeOnLanManager(new WakeOnLanManagerStub());
     tvApp.setMediaInputManager(new MediaInputManagerStub());
+    tvApp.setContentLaunchManager(new ContentLaunchManagerStub());
 
     AndroidChipPlatform chipPlatform =
         new AndroidChipPlatform(
