@@ -2873,7 +2873,7 @@ CHIP_ERROR ThermostatUserInterfaceConfigurationClusterTest::WriteAttributeCluste
 }
 
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeChannel(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback, uint8_t value)
+                                                                      Callback::Cancelable * onFailureCallback, uint16_t value)
 {
     app::WriteClientHandle handle;
     ReturnErrorOnFailure(

@@ -18819,7 +18819,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeChannel(Callback::Cance
     attributePath.mClusterId   = mClusterId;
     attributePath.mAttributeId = 0x00000000;
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeChannel(Callback::Cancelable * onSuccessCallback,
@@ -18836,7 +18836,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeChannel(Callback::
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeChannel(Callback::Cancelable * onReportCallback)
 {
     return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::Channel::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
+                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRoutingRole(Callback::Cancelable * onSuccessCallback,

@@ -1386,7 +1386,7 @@ public:
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0000,
                                        onReportThreadNetworkDiagnosticsChannelCallback->Cancel(),
-                                       BasicAttributeFilter<Int8uAttributeCallback>);
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0001,
                                        onReportThreadNetworkDiagnosticsRoutingRoleCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
@@ -2413,8 +2413,8 @@ private:
             new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportThermostatUserInterfaceConfigurationClusterRevisionCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThreadNetworkDiagnosticsChannelCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportThreadNetworkDiagnosticsChannelCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportThreadNetworkDiagnosticsRoutingRoleCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<OctetStringAttributeCallback> * onReportThreadNetworkDiagnosticsNetworkNameCallback =
