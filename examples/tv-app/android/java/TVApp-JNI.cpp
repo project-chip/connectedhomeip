@@ -22,6 +22,7 @@
 #include "MediaPlaybackManager.h"
 #include "WakeOnLanManager.h"
 #include "LowPowerManager.h"
+#include "TvChannelManager.h"
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
@@ -67,4 +68,9 @@ JNI_METHOD(void, setLowPowerManager)(JNIEnv *, jobject, jobject manager)
 JNI_METHOD(void, setMediaPlaybackManager)(JNIEnv *, jobject, jobject manager)
 {
     MediaPlaybackMgr().InitializeWithObjects(manager);
+}
+
+JNI_METHOD(void, setTvChannelManager)(JNIEnv *, jobject, jobject manager)
+{
+    TvChannelMgr().InitializeWithObjects(manager);
 }

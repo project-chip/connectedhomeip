@@ -17,23 +17,17 @@
  */
 package com.tcl.chip.tvapp;
 
-public class TvApp {
-  public TvApp() {}
+public interface TvChannelManager {
 
-  public native void setKeypadInputManager(KeypadInputManager manager);
+    TvChannelInfo[] getChannelList();
 
-  public native void setWakeOnLanManager(WakeOnLanManager manager);
+    TvChannelLineupInfo getLineup();
 
-  public native void setMediaInputManager(MediaInputManager manager);
+    TvChannelInfo getCurrentChannel();
 
-  public native void setContentLaunchManager(ContentLaunchManager manager);
+    TvChannelInfo changeChannel(String match);
 
-  public native void setLowPowerManager(LowPowerManager manager);
+    boolean changeChannelByNumber(int majorNumber, int minorNumber);
 
-  public native void setMediaPlaybackManager(MediaPlaybackManager manager);
-
-  public native void setTvChannelManager(TvChannelManager manager);
-  static {
-    System.loadLibrary("TvApp");
-  }
+    boolean skipChannel(int count);
 }
