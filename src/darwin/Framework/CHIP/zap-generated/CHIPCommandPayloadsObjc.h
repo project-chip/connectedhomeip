@@ -1874,6 +1874,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPTestClusterClusterSimpleStructResponseParams : NSObject
+@property (strong, nonatomic) CHIPTestClusterClusterSimpleStruct * _Nonnull arg1;
+- (instancetype)init;
+@end
+
 @interface CHIPTestClusterClusterTestListInt8UArgumentRequestParams : NSObject
 @property (strong, nonatomic) NSArray * _Nonnull arg1;
 - (instancetype)init;
@@ -1918,6 +1923,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSArray * _Nullable nullableList;
 @property (strong, nonatomic) NSArray * _Nullable optionalList;
 @property (strong, nonatomic) NSArray * _Nullable nullableOptionalList;
+- (instancetype)init;
+@end
+
+@interface CHIPTestClusterClusterSimpleStructEchoRequestParams : NSObject
+@property (strong, nonatomic) CHIPTestClusterClusterSimpleStruct * _Nonnull arg1;
 - (instancetype)init;
 @end
 

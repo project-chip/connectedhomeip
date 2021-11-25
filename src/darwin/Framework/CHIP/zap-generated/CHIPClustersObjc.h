@@ -3255,6 +3255,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestCluster : CHIPCluster
 
+- (void)simpleStructEchoRequestWithParams:(CHIPTestClusterClusterSimpleStructEchoRequestParams *)params
+                        completionHandler:(void (^)(CHIPTestClusterClusterSimpleStructResponseParams * _Nullable data,
+                                              NSError * _Nullable error))completionHandler;
 - (void)testWithCompletionHandler:(StatusCompletion)completionHandler;
 - (void)testAddArgumentsWithParams:(CHIPTestClusterClusterTestAddArgumentsParams *)params
                  completionHandler:(void (^)(CHIPTestClusterClusterTestAddArgumentsResponseParams * _Nullable data,

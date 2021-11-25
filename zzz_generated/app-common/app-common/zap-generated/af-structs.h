@@ -37,6 +37,8 @@ typedef struct _SimpleStruct
     chip::ByteSpan d;
     chip::CharSpan e;
     uint8_t f;
+    float g;
+    double h;
 } SimpleStruct;
 
 // Struct for NullablesAndOptionalsStruct

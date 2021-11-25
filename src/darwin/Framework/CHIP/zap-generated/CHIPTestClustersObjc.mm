@@ -6580,6 +6580,8 @@ using namespace chip::app::Clusters;
                             nonNullValue_2.e = [self asCharSpan:element_0.nullableStruct.e];
                             nonNullValue_2.f = static_cast<std::remove_reference_t<decltype(nonNullValue_2.f)>>(
                                 element_0.nullableStruct.f.unsignedCharValue);
+                            nonNullValue_2.g = element_0.nullableStruct.g.floatValue;
+                            nonNullValue_2.h = element_0.nullableStruct.h.doubleValue;
                         }
                         if (element_0.optionalStruct != nil) {
                             auto & definedValue_2 = listHolder_0->mList[i].optionalStruct.Emplace();
@@ -6591,6 +6593,8 @@ using namespace chip::app::Clusters;
                             definedValue_2.e = [self asCharSpan:element_0.optionalStruct.e];
                             definedValue_2.f = static_cast<std::remove_reference_t<decltype(definedValue_2.f)>>(
                                 element_0.optionalStruct.f.unsignedCharValue);
+                            definedValue_2.g = element_0.optionalStruct.g.floatValue;
+                            definedValue_2.h = element_0.optionalStruct.h.doubleValue;
                         }
                         if (element_0.nullableOptionalStruct != nil) {
                             auto & definedValue_2 = listHolder_0->mList[i].nullableOptionalStruct.Emplace();
@@ -6606,6 +6610,8 @@ using namespace chip::app::Clusters;
                                 nonNullValue_3.e = [self asCharSpan:element_0.nullableOptionalStruct.e];
                                 nonNullValue_3.f = static_cast<std::remove_reference_t<decltype(nonNullValue_3.f)>>(
                                     element_0.nullableOptionalStruct.f.unsignedCharValue);
+                                nonNullValue_3.g = element_0.nullableOptionalStruct.g.floatValue;
+                                nonNullValue_3.h = element_0.nullableOptionalStruct.h.doubleValue;
                             }
                         }
                         if (element_0.nullableList == nil) {
