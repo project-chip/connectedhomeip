@@ -30,6 +30,8 @@ public class TvApp {
 
   public native void setLowPowerManager(LowPowerManager manager);
 
+  public native void setMediaPlaybackManager(MediaPlaybackManager manager);
+
   static {
     System.loadLibrary("TvApp");
   }
