@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2021 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <domain name="CHIP"/>
+
+  <enum name="Privilege" type="ENUM8">
+    <cluster code="0x001F"/>
+    <item name="View" value="0x01"/>
+    <item name="ProxyView" value="0x02"/>
+    <item name="Operate" value="0x03"/>
+    <item name="Manage" value="0x04"/>
+    <item name="Administer" value="0x05"/>
+  </enum>
+
+  <enum name="AuthMode" type="ENUM8">
+    <cluster code="0x001F"/>
+    <item name="PASE" value="0x01"/>
+    <item name="CASE" value="0x02"/>
+    <item name="Group" value="0x03"/>
+  </enum>
+
+  <struct name="Target">
+    <cluster code="0x001F"/>
+    <item fieldId="0" name="Cluster" type="INT32U" isNullable="true"/>
+    <item fieldId="1" name="Endpoint" type="INT16U" isNullable="true"/>
+    <item fieldId="2" name="DeviceType" type="INT32U" isNullable="true"/>
+  </struct>
+
+  <struct name="AccessControlEntry">
+    <cluster code="0x001F"/>
+    <item fieldId="0" name="FabricIndex" type="INT8U"/>
+    <item fieldId="1" name="Privilege" type="Privilege"/>
+    <item fieldId="2" name="AuthMode" type="AuthMode"/>
+    <item fieldId="3" name="Subjects" type="INT64U" isNullable="true" array="true"/>
+    <item fieldId="4" name="Targets" type="Target" isNullable="true" array="true"/>
+  </struct>
+
+  <struct name="ExtensionEntry">
+    <cluster code="0x001F"/>
+    <item fieldId="0" name="FabricIndex" type="INT8U"/>
+    <item fieldId="1" name="Data" type="OCTET_STRING" length="254"/>
+  </struct>
+
+  <cluster>
+    <domain>General</domain>
+    <name>Access Control</name>
+    <code>0x001F</code>
+    <define>ACCESS_CONTROL_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <description>The Access Control Cluster exposes a data model view of a
+      Node’s Access Control List (ACL), which codifies the rules used to manage
+      and enforce Access Control for the Node’s endpoints and their associated
+      cluster instances.</description>
+    <!-- Base data types -->
+    <attribute side="server" code="0x0000" define="ACL" type="ARRAY" entryType="AccessControlEntry" length="12" writable="true">ACL</attribute>
+    <attribute side="server" code="0x0001" define="EXTENSION" type="ARRAY" entryType="ExtensionEntry" length="4" writable="true">Extension</attribute>
+  </cluster>
+</configurator>
