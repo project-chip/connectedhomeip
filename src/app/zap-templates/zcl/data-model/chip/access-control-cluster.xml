@@ -75,10 +75,9 @@ limitations under the License.
     </attribute>
     <attribute side="server" code="0x0001" define="EXTENSION" type="ARRAY" entryType="ExtensionEntry" writable="true">
         <description>Extension</description>
-                <description>ACL</description>
-                <access op="read" privilege="administer"/>
-                <access op="write" privilege="administer"/>        
-                <access modifier="fabric-scoped"/>
+        <access op="read" privilege="administer"/>
+        <access op="write" privilege="administer"/>        
+        <access modifier="fabric-scoped"/>
     </attribute>
   </cluster>
 </configurator>
