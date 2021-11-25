@@ -152,23 +152,29 @@ void {{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttribu
 
 {{#chip_client_clusters}}
 {{#chip_cluster_responses}}
-bool emberAf{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback(EndpointId endpoint, app::CommandSender * commandObj{{#chip_cluster_response_arguments}}, {{asUnderlyingZclType type}} {{asSymbol label}}{{/chip_cluster_response_arguments}})
+bool emberAf{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback(EndpointId endpoint, app::CommandSender * commandObj{{#chip_cluster_response_arguments}}, {{#if isArray}}{{asUnderlyingZclType type}}{{else}}{{#if_is_struct type}}{{zapTypeToDecodableClusterObjectType type ns=parent.parent.name}}{{else}}{{asUnderlyingZclType type}}{{/if_is_struct}}{{/if}} {{asSymbol label}}{{/chip_cluster_response_arguments}})
 {
     ChipLogProgress(Zcl, "{{asUpperCamelCase name}}:");
     {{#chip_cluster_response_arguments}}
-    {{#if (isOctetString type)}}
+    {{#if isArray}}
+    ChipLogProgress(Zcl, "  {{asSymbol label}}: {{asPrintFormat type}}", {{asSymbol label}});
+    {{else if (isOctetString type)}}
     ChipLogProgress(Zcl, "  {{asSymbol label}}: %zu", {{asSymbol label}}.size());
     {{else if (isCharString type)}}
     ChipLogProgress(Zcl, "  {{asSymbol label}}: %.*s", static_cast<int>({{asSymbol label}}.size()), {{asSymbol label}}.data());
     {{else}}
-    ChipLogProgress(Zcl, "  {{asSymbol label}}: {{asPrintFormat type}}", {{asSymbol label}});
+      {{#if_is_struct type}}
+      ChipLogProgress(Zcl, "  {{asSymbol label}}: Not sure how to log struct {{type}}");
+      {{else}}
+      ChipLogProgress(Zcl, "  {{asSymbol label}}: {{asPrintFormat type}}", {{asSymbol label}});
+      {{/if_is_struct}}
     {{/if}}
     {{/chip_cluster_response_arguments}}
 
     GET_CLUSTER_RESPONSE_CALLBACKS("{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback");
 
     Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback> * cb = Callback::Callback<{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}Callback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext{{#chip_cluster_response_arguments}}, {{asSymbol label}}{{/chip_cluster_response_arguments}});
+    cb->mCall(cb->mContext{{#chip_cluster_response_arguments}}, {{#if isArray}}{{asSymbol label}}{{else}}{{#if_is_struct type}}{{asUnderlyingZclType type}}(){{else}}{{asSymbol label}}{{/if_is_struct}}{{/if}}{{/chip_cluster_response_arguments}});
     return true;
 }
 

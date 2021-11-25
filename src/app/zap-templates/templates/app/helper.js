@@ -263,7 +263,7 @@ function asPrintFormat(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asTypeLiteralSuffix(value, type)
+function asTypedLiteral(value, type)
 {
   const valueIsANumber = !isNaN(value);
   function fn(pkgId)
@@ -282,6 +282,13 @@ function asTypeLiteralSuffix(value, type)
         return value + (valueIsANumber ? 'UL' : '');
       case 'uint64_t':
         return value + (valueIsANumber ? 'ULL' : '');
+      case 'float':
+        if (!valueIsANumber || value == 0) {
+          // "0f" is not a valid value, so don't output that; just leave it
+          // as "0".
+          return value;
+        }
+        return value + 'f';
       default:
         return value;
       }
@@ -511,7 +518,7 @@ exports.asPrintFormat                       = asPrintFormat;
 exports.asReadType                          = asReadType;
 exports.chip_endpoint_generated_functions   = chip_endpoint_generated_functions
 exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
-exports.asTypeLiteralSuffix                 = asTypeLiteralSuffix;
+exports.asTypedLiteral                      = asTypedLiteral;
 exports.asLowerCamelCase                    = asLowerCamelCase;
 exports.asUpperCamelCase                    = asUpperCamelCase;
 exports.hasSpecificAttributes               = hasSpecificAttributes;

@@ -2810,6 +2810,32 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedSimpleStructResponseCallback
+      implements ChipClusters.TestClusterCluster.SimpleStructResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess( // arg1: Struct SimpleStruct
+        // Conversion from this type to Java is not properly implemented yet
+        ) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      // arg1: Struct SimpleStruct
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedTestAddArgumentsResponseCallback
       implements ChipClusters.TestClusterCluster.TestAddArgumentsResponseCallback,
           DelegatedClusterCallback {
@@ -7725,6 +7751,68 @@ public class ClusterInfoMapping {
         new LinkedHashMap<>();
     commandMap.put("temperatureMeasurement", temperatureMeasurementClusterInteractionInfoMap);
     Map<String, InteractionInfo> testClusterClusterInteractionInfoMap = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> testClustersimpleStructEchoRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo testClustersimpleStructEchoRequestaCommandParameterInfo =
+        new CommandParameterInfo("a", int.class);
+    testClustersimpleStructEchoRequestCommandParams.put(
+        "a", testClustersimpleStructEchoRequestaCommandParameterInfo);
+
+    CommandParameterInfo testClustersimpleStructEchoRequestbCommandParameterInfo =
+        new CommandParameterInfo("b", boolean.class);
+    testClustersimpleStructEchoRequestCommandParams.put(
+        "b", testClustersimpleStructEchoRequestbCommandParameterInfo);
+
+    CommandParameterInfo testClustersimpleStructEchoRequestcCommandParameterInfo =
+        new CommandParameterInfo("c", int.class);
+    testClustersimpleStructEchoRequestCommandParams.put(
+        "c", testClustersimpleStructEchoRequestcCommandParameterInfo);
+
+    CommandParameterInfo testClustersimpleStructEchoRequestdCommandParameterInfo =
+        new CommandParameterInfo("d", byte[].class);
+    testClustersimpleStructEchoRequestCommandParams.put(
+        "d", testClustersimpleStructEchoRequestdCommandParameterInfo);
+
+    CommandParameterInfo testClustersimpleStructEchoRequesteCommandParameterInfo =
+        new CommandParameterInfo("e", String.class);
+    testClustersimpleStructEchoRequestCommandParams.put(
+        "e", testClustersimpleStructEchoRequesteCommandParameterInfo);
+
+    CommandParameterInfo testClustersimpleStructEchoRequestfCommandParameterInfo =
+        new CommandParameterInfo("f", int.class);
+    testClustersimpleStructEchoRequestCommandParams.put(
+        "f", testClustersimpleStructEchoRequestfCommandParameterInfo);
+
+    CommandParameterInfo testClustersimpleStructEchoRequestgCommandParameterInfo =
+        new CommandParameterInfo("g", float.class);
+    testClustersimpleStructEchoRequestCommandParams.put(
+        "g", testClustersimpleStructEchoRequestgCommandParameterInfo);
+
+    CommandParameterInfo testClustersimpleStructEchoRequesthCommandParameterInfo =
+        new CommandParameterInfo("h", double.class);
+    testClustersimpleStructEchoRequestCommandParams.put(
+        "h", testClustersimpleStructEchoRequesthCommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo testClustersimpleStructEchoRequestInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .simpleStructEchoRequest(
+                      (ChipClusters.TestClusterCluster.SimpleStructResponseCallback) callback,
+                      (Integer) commandArguments.get("a"),
+                      (Boolean) commandArguments.get("b"),
+                      (Integer) commandArguments.get("c"),
+                      (byte[]) commandArguments.get("d"),
+                      (String) commandArguments.get("e"),
+                      (Integer) commandArguments.get("f"),
+                      (Float) commandArguments.get("g"),
+                      (Double) commandArguments.get("h"));
+            },
+            () -> new DelegatedSimpleStructResponseCallback(),
+            testClustersimpleStructEchoRequestCommandParams);
+    testClusterClusterInteractionInfoMap.put(
+        "simpleStructEchoRequest", testClustersimpleStructEchoRequestInteractionInfo);
     Map<String, CommandParameterInfo> testClustertestCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     // Populate commands
@@ -7861,6 +7949,16 @@ public class ClusterInfoMapping {
     testClustertestListStructArgumentRequestCommandParams.put(
         "f", testClustertestListStructArgumentRequestfCommandParameterInfo);
 
+    CommandParameterInfo testClustertestListStructArgumentRequestgCommandParameterInfo =
+        new CommandParameterInfo("g", float.class);
+    testClustertestListStructArgumentRequestCommandParams.put(
+        "g", testClustertestListStructArgumentRequestgCommandParameterInfo);
+
+    CommandParameterInfo testClustertestListStructArgumentRequesthCommandParameterInfo =
+        new CommandParameterInfo("h", double.class);
+    testClustertestListStructArgumentRequestCommandParams.put(
+        "h", testClustertestListStructArgumentRequesthCommandParameterInfo);
+
     // Populate commands
     InteractionInfo testClustertestListStructArgumentRequestInteractionInfo =
         new InteractionInfo(
@@ -7873,7 +7971,9 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("c"),
                       (byte[]) commandArguments.get("d"),
                       (String) commandArguments.get("e"),
-                      (Integer) commandArguments.get("f"));
+                      (Integer) commandArguments.get("f"),
+                      (Float) commandArguments.get("g"),
+                      (Double) commandArguments.get("h"));
             },
             () -> new DelegatedBooleanResponseCallback(),
             testClustertestListStructArgumentRequestCommandParams);
@@ -7959,6 +8059,16 @@ public class ClusterInfoMapping {
     testClustertestStructArgumentRequestCommandParams.put(
         "f", testClustertestStructArgumentRequestfCommandParameterInfo);
 
+    CommandParameterInfo testClustertestStructArgumentRequestgCommandParameterInfo =
+        new CommandParameterInfo("g", float.class);
+    testClustertestStructArgumentRequestCommandParams.put(
+        "g", testClustertestStructArgumentRequestgCommandParameterInfo);
+
+    CommandParameterInfo testClustertestStructArgumentRequesthCommandParameterInfo =
+        new CommandParameterInfo("h", double.class);
+    testClustertestStructArgumentRequestCommandParams.put(
+        "h", testClustertestStructArgumentRequesthCommandParameterInfo);
+
     // Populate commands
     InteractionInfo testClustertestStructArgumentRequestInteractionInfo =
         new InteractionInfo(
@@ -7971,7 +8081,9 @@ public class ClusterInfoMapping {
                       (Integer) commandArguments.get("c"),
                       (byte[]) commandArguments.get("d"),
                       (String) commandArguments.get("e"),
-                      (Integer) commandArguments.get("f"));
+                      (Integer) commandArguments.get("f"),
+                      (Float) commandArguments.get("g"),
+                      (Double) commandArguments.get("h"));
             },
             () -> new DelegatedBooleanResponseCallback(),
             testClustertestStructArgumentRequestCommandParams);

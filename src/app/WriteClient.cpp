@@ -254,6 +254,8 @@ exit:
     {
         // Always shutdown on Group communication
         ChipLogDetail(DataManagement, "Closing on group Communication ");
+
+        // onDone is called
         ShutdownInternal();
     }
 

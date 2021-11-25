@@ -884,7 +884,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         case 0x0023: // list_nullables_and_optionals_struct
         {
-            entryLength = 39;
+            entryLength = 75;
             if (((index - 1) * entryLength) > (am->size - entryLength))
             {
                 ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
@@ -1327,7 +1327,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
             break;
         case 0x0023: // list_nullables_and_optionals_struct
             // Struct _NullablesAndOptionalsStruct
-            entryLength = 39;
+            entryLength = 75;
             break;
         }
         break;

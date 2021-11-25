@@ -32,7 +32,7 @@
   "endpointTypes": [
     {
       "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "CHIP-All-Clusters-Server",
+      "deviceTypeName": "MA-all-clusters-app",
       "deviceTypeCode": 0,
       "deviceTypeProfileId": 259,
       "clusters": [
@@ -11577,6 +11577,14 @@
               "source": "client",
               "incoming": 0,
               "outgoing": 1
+            },
+            {
+              "name": "SimpleStructEchoRequest",
+              "code": 17,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
             }
           ],
           "attributes": [
@@ -11648,6 +11656,14 @@
             {
               "name": "BooleanResponse",
               "code": 8,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "SimpleStructResponse",
+              "code": 9,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
