@@ -35,6 +35,8 @@
 // TODO: Use common software update layer to store the image
 #if CHIP_DEVICE_LAYER_TARGET_NRFCONNECT
 #include "DFUManager_nrfconnect.h"
+#elif CHIP_DEVICE_LAYER_TARGET_MBED
+#include "DFUManager_mbed.h"
 #endif
 
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
