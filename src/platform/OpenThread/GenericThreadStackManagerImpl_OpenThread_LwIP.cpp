@@ -353,6 +353,11 @@ exit:
         otMessageFree(pktMsg);
     }
 
+    if (lwipErr == ERR_MEM)
+    {
+        ThreadStackMgrImpl().OverrunErrorTally();
+    }
+
     // Unlock the OpenThread stack.
     ThreadStackMgrImpl().UnlockThreadStack();
 

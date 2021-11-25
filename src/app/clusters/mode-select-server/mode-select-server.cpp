@@ -42,12 +42,12 @@ class ModeSelectAttrAccess : public AttributeAccessInterface
 public:
     ModeSelectAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), ModeSelect::Id) {}
 
-    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 };
 
 ModeSelectAttrAccess gModeSelectAttrAccess;
 
-CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == ModeSelect::Id);
 

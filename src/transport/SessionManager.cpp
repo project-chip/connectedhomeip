@@ -131,6 +131,8 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHe
             {
                 return CHIP_ERROR_INTERNAL;
             }
+            // TODO #11911 Update SecureMessageCodec::Encrypt for Group
+            ReturnErrorOnFailure(payloadHeader.EncodeBeforeData(message));
 
 #if CHIP_PROGRESS_LOGGING
             destination = sessionHandle.GetPeerNodeId();
@@ -287,7 +289,7 @@ CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & p
 
     ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", key %d!!", ChipLogValueX64(peerNodeId),
                   peerSessionId);
-    session = mSecureSessions.CreateNewSecureSession(localSessionId, peerNodeId, peerSessionId, fabric);
+    session = mSecureSessions.CreateNewSecureSession(localSessionId, peerNodeId, peerSessionId, fabric, pairing->GetMRPConfig());
     ReturnErrorCodeIf(session == nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (peerAddr.HasValue() && peerAddr.Value().GetIPAddress() != Inet::IPAddress::Any)
@@ -304,8 +306,6 @@ CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & p
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
-
-    session->SetMRPIntervals(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL, CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
 
     ReturnErrorOnFailure(pairing->DeriveSecureSession(session->GetCryptoContext(), direction));
 
@@ -361,7 +361,8 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
 void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                      System::PacketBufferHandle && msg)
 {
-    Optional<Transport::UnauthenticatedSessionHandle> optionalSession = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
+    Optional<Transport::UnauthenticatedSessionHandle> optionalSession =
+        mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, gDefaultMRPConfig);
     if (!optionalSession.HasValue())
     {
         ChipLogError(Inet, "UnauthenticatedSession exhausted");
@@ -414,7 +415,7 @@ void SessionManager::SecureUnicastMessageDispatch(const PacketHeader & packetHea
 
     if (msg.IsNull())
     {
-        ChipLogError(Inet, "Secure transport received NULL packet, discarding");
+        ChipLogError(Inet, "Secure transport received Unicast NULL packet, discarding");
         return;
     }
 
@@ -485,9 +486,9 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     FabricIndex fabricIndex = 0; // TODO : remove initialization once GroupDataProvider->Decrypt is implemented
     // Credentials::GroupDataProvider * groups = Credentials::GetGroupDataProvider();
 
-    if (!msg.IsNull())
+    if (msg.IsNull())
     {
-        ChipLogError(Inet, "Secure transport received NULL packet, discarding");
+        ChipLogError(Inet, "Secure transport received Groupcast NULL packet, discarding");
         return;
     }
 
@@ -502,6 +503,8 @@ void SessionManager::SecureGroupMessageDispatch(const PacketHeader & packetHeade
     // TODO retrieve also the fabricIndex with the GroupDataProvider.
     // VerifyOrExit(CHIP_NO_ERROR == groups->DecryptMessage(packetHeader, payloadHeader, msg),
     //     ChipLogError(Inet, "Secure transport received group message, but failed to decode it, discarding"));
+
+    ReturnOnFailure(payloadHeader.DecodeAndConsume(msg));
 
     // MCSP check
     if (packetHeader.IsValidMCSPMsg())

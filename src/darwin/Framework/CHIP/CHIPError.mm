@@ -125,4 +125,27 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
         return CHIP_ERROR_INTERNAL;
     }
 }
+
++ (uint8_t)errorToZCLErrorCode:(NSError * _Nullable)error
+{
+    // If this is changed, change CHIPErrorTestUtils' version of
+    // errorToZCLErrorCode too.
+    if (error == nil) {
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+    if (error.domain != CHIPErrorDomain) {
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+
+    switch (error.code) {
+    case CHIPErrorCodeDuplicateExists:
+        return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
+    case CHIPErrorCodeUnsupportedAttribute:
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+    case CHIPSuccess:
+        return EMBER_ZCL_STATUS_SUCCESS;
+    default:
+        return EMBER_ZCL_STATUS_FAILURE;
+    }
+}
 @end

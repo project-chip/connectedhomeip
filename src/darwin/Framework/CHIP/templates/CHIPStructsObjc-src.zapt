@@ -2,10 +2,23 @@
 
 #import "CHIPStructsObjc.h"
 
+NS_ASSUME_NONNULL_BEGIN
+
 {{#zcl_clusters}}
 {{#zcl_structs}}
 @implementation CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}
+- (instancetype)init
+{
+  if (self = [super init]) {
+    {{#zcl_struct_items}}
+    {{>init_struct_member label=label type=type cluster=parent.parent.name}}
+    {{/zcl_struct_items}}
+  }
+  return self;
+}
 @end
 
 {{/zcl_structs}}
 {{/zcl_clusters}}
+
+NS_ASSUME_NONNULL_END

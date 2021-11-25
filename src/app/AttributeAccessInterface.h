@@ -105,7 +105,9 @@ private:
 class AttributeValueDecoder
 {
 public:
-    AttributeValueDecoder(TLV::TLVReader & aReader) : mReader(aReader) {}
+    AttributeValueDecoder(TLV::TLVReader & aReader, FabricIndex aAccessingFabricIndex) :
+        mReader(aReader), mAccessingFabricIndex(aAccessingFabricIndex)
+    {}
 
     template <typename T>
     CHIP_ERROR Decode(T & aArg)
@@ -116,9 +118,15 @@ public:
 
     bool TriedDecode() const { return mTriedDecode; }
 
+    /**
+     * The accessing fabric index for this write interaction.
+     */
+    FabricIndex AccessingFabricIndex() const { return mAccessingFabricIndex; }
+
 private:
     TLV::TLVReader & mReader;
     bool mTriedDecode = false;
+    const FabricIndex mAccessingFabricIndex;
 };
 
 class AttributeAccessInterface
@@ -145,7 +153,7 @@ public:
      *             This may involve reading from the attribute store or external
      *             attribute callbacks.
      */
-    virtual CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) = 0;
+    virtual CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) = 0;
 
     /**
      * Callback for writing attributes.
@@ -159,7 +167,7 @@ public:
      *             This may involve writing to the attribute store or external
      *             attribute callbacks.
      */
-    virtual CHIP_ERROR Write(const ConcreteAttributePath & aPath, AttributeValueDecoder & aDecoder) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) { return CHIP_NO_ERROR; }
 
     /**
      * Mechanism for keeping track of a chain of AttributeAccessInterfaces.

@@ -67,6 +67,9 @@ static constexpr ClusterId Id = 0x0000001B;
 namespace Descriptor {
 static constexpr ClusterId Id = 0x0000001D;
 } // namespace Descriptor
+namespace Acl {
+static constexpr ClusterId Id = 0x0000001F;
+} // namespace Acl
 namespace PollControl {
 static constexpr ClusterId Id = 0x00000020;
 } // namespace PollControl
@@ -82,6 +85,18 @@ static constexpr ClusterId Id = 0x00000029;
 namespace OtaSoftwareUpdateRequestor {
 static constexpr ClusterId Id = 0x0000002A;
 } // namespace OtaSoftwareUpdateRequestor
+namespace LocalizationConfiguration {
+static constexpr ClusterId Id = 0x0000002B;
+} // namespace LocalizationConfiguration
+namespace LocalizationTimeFormat {
+static constexpr ClusterId Id = 0x0000002C;
+} // namespace LocalizationTimeFormat
+namespace LocalizationUnit {
+static constexpr ClusterId Id = 0x0000002D;
+} // namespace LocalizationUnit
+namespace PowerSourceConfiguration {
+static constexpr ClusterId Id = 0x0000002E;
+} // namespace PowerSourceConfiguration
 namespace PowerSource {
 static constexpr ClusterId Id = 0x0000002F;
 } // namespace PowerSource
@@ -109,6 +124,9 @@ static constexpr ClusterId Id = 0x00000036;
 namespace EthernetNetworkDiagnostics {
 static constexpr ClusterId Id = 0x00000037;
 } // namespace EthernetNetworkDiagnostics
+namespace TimeSynchronization {
+static constexpr ClusterId Id = 0x00000038;
+} // namespace TimeSynchronization
 namespace BridgedDeviceBasic {
 static constexpr ClusterId Id = 0x00000039;
 } // namespace BridgedDeviceBasic

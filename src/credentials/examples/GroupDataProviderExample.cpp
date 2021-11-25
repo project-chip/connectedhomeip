@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <algorithm>
 #include <credentials/GroupDataProvider.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
@@ -30,13 +31,20 @@ static constexpr size_t kEndpointEntriesMax = CHIP_CONFIG_MAX_GROUP_ENDPOINTS_PE
 static constexpr size_t kStateEntriesMax    = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC;
 static constexpr size_t kKeyEntriesMax      = CHIP_CONFIG_MAX_GROUPS_PER_FABRIC;
 static constexpr size_t kIteratorsMax       = CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS;
+static constexpr size_t kGroupNameMax       = CHIP_CONFIG_MAX_GROUP_NAME_LENGTH;
 
 class StaticGroupsProvider : public GroupDataProvider
 {
+public:
+    StaticGroupsProvider() { Init(); }
+
 protected:
     struct EndpointEntry : public GroupMapping
     {
         bool in_use = false;
+        char name[kGroupNameMax + 1];
+        size_t nameLength;
+
         void Clear()
         {
             endpoint = 0;
@@ -110,6 +118,7 @@ protected:
         size_t Count() override
         {
             size_t count = 0;
+
             for (size_t i = 0; this->mFabric && i < kEndpointEntriesMax; ++i)
             {
                 const EndpointEntry & entry = this->mFabric->endpoints[i];
@@ -121,14 +130,17 @@ protected:
             return count;
         }
 
-        bool Next(GroupId & outGroup) override
+        bool Next(GroupMapping & mapping) override
         {
             while ((this->mFabric != nullptr) && (this->mIndex < kEndpointEntriesMax))
             {
                 const EndpointEntry & entry = this->mFabric->endpoints[this->mIndex++];
+
                 if (entry.in_use && (entry.endpoint == this->mEndpoint))
                 {
-                    outGroup = entry.group;
+                    mapping.endpoint = entry.endpoint;
+                    mapping.group    = entry.group;
+                    mapping.name     = CharSpan(entry.name, entry.nameLength);
                     return true;
                 }
             }
@@ -337,6 +349,8 @@ public:
     void Finish() override { mInitialized = false; }
 
     // Endpoints
+    bool HasGroupNamesSupport() override { return true; }
+
     bool GroupMappingExists(chip::FabricIndex fabric_index, const GroupMapping & mapping) override
     {
         VerifyOrReturnError(mInitialized, false);
@@ -355,11 +369,9 @@ public:
         return false;
     }
 
-    CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping, const char * name) override
+    CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping) override
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
-
-        (void) name; // Unused!
 
         Fabric * fabric = GetExistingFabricOrAllocateNew(fabric_index);
         VerifyOrReturnError(nullptr != fabric, CHIP_ERROR_NO_MEMORY);
@@ -378,11 +390,24 @@ public:
         for (uint16_t i = 0; i < kEndpointEntriesMax; ++i)
         {
             EndpointEntry & entry = fabric->endpoints[i];
+
             if (!entry.in_use)
             {
                 entry.group    = mapping.group;
                 entry.endpoint = mapping.endpoint;
-                entry.in_use   = true;
+                if (mapping.name.empty())
+                {
+                    entry.nameLength = 0;
+                    entry.name[0]    = 0;
+                }
+                else
+                {
+                    entry.nameLength = std::min(mapping.name.size(), kGroupNameMax);
+                    strncpy(entry.name, mapping.name.data(), entry.nameLength);
+                    entry.name[entry.nameLength] = 0;
+                }
+
+                entry.in_use = true;
                 return CHIP_NO_ERROR;
             }
         }
@@ -411,7 +436,7 @@ public:
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
-    CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index) override
+    CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint) override
     {
         VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
@@ -421,7 +446,10 @@ public:
         // Remove all mappings from fabric
         for (uint16_t i = 0; fabric && i < kEndpointEntriesMax; ++i)
         {
-            fabric->endpoints[i].in_use = false;
+            if (fabric->endpoints[i].endpoint == endpoint)
+            {
+                fabric->endpoints[i].in_use = false;
+            }
         }
         return CHIP_NO_ERROR;
     }

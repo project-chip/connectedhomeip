@@ -242,6 +242,12 @@
 #define ZCL_CLIENT_LIST_ATTRIBUTE_ID (0x0002)
 #define ZCL_PARTS_LIST_ATTRIBUTE_ID (0x0003)
 
+// Attribute ids for cluster: ACL
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Poll Control
 
 // Client attributes
@@ -274,7 +280,7 @@
 #define ZCL_VENDOR_ID_ATTRIBUTE_ID (0x0002)
 #define ZCL_PRODUCT_NAME_ATTRIBUTE_ID (0x0003)
 #define ZCL_PRODUCT_ID_ATTRIBUTE_ID (0x0004)
-#define ZCL_USER_LABEL_ATTRIBUTE_ID (0x0005)
+#define ZCL_NODE_LABEL_ATTRIBUTE_ID (0x0005)
 #define ZCL_LOCATION_ATTRIBUTE_ID (0x0006)
 #define ZCL_HARDWARE_VERSION_ATTRIBUTE_ID (0x0007)
 #define ZCL_HARDWARE_VERSION_STRING_ATTRIBUTE_ID (0x0008)
@@ -287,6 +293,7 @@
 #define ZCL_SERIAL_NUMBER_ATTRIBUTE_ID (0x000F)
 #define ZCL_LOCAL_CONFIG_DISABLED_ATTRIBUTE_ID (0x0010)
 #define ZCL_REACHABLE_ATTRIBUTE_ID (0x0011)
+#define ZCL_UNIQUE_ID_ATTRIBUTE_ID (0x0012)
 
 // Attribute ids for cluster: OTA Software Update Provider
 
@@ -301,6 +308,30 @@
 // Server attributes
 #define ZCL_DEFAULT_OTA_PROVIDER_ATTRIBUTE_ID (0x0001)
 #define ZCL_UPDATE_POSSIBLE_ATTRIBUTE_ID (0x0002)
+
+// Attribute ids for cluster: Localization Configuration
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Localization Time Format
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Localization Unit
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Power Source Configuration
+
+// Client attributes
+
+// Server attributes
 
 // Attribute ids for cluster: Power Source
 
@@ -488,6 +519,12 @@
 #define ZCL_CARRIER_DETECT_ATTRIBUTE_ID (0x0007)
 #define ZCL_TIME_SINCE_RESET_ATTRIBUTE_ID (0x0008)
 
+// Attribute ids for cluster: Time Synchronization
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Bridged Device Basic
 
 // Client attributes
@@ -496,7 +533,7 @@
 #define ZCL_VENDOR_NAME_ATTRIBUTE_ID (0x0001)
 #define ZCL_VENDOR_ID_ATTRIBUTE_ID (0x0002)
 #define ZCL_PRODUCT_NAME_ATTRIBUTE_ID (0x0003)
-#define ZCL_USER_LABEL_ATTRIBUTE_ID (0x0005)
+#define ZCL_NODE_LABEL_ATTRIBUTE_ID (0x0005)
 #define ZCL_HARDWARE_VERSION_ATTRIBUTE_ID (0x0007)
 #define ZCL_HARDWARE_VERSION_STRING_ATTRIBUTE_ID (0x0008)
 #define ZCL_SOFTWARE_VERSION_ATTRIBUTE_ID (0x0009)
@@ -507,6 +544,7 @@
 #define ZCL_PRODUCT_LABEL_ATTRIBUTE_ID (0x000E)
 #define ZCL_SERIAL_NUMBER_ATTRIBUTE_ID (0x000F)
 #define ZCL_REACHABLE_ATTRIBUTE_ID (0x0011)
+#define ZCL_UNIQUE_ID_ATTRIBUTE_ID (0x0012)
 
 // Attribute ids for cluster: Switch
 

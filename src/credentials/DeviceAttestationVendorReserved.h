@@ -40,10 +40,11 @@ class DeviceAttestationVendorReservedDeconstructor
 public:
     DeviceAttestationVendorReservedDeconstructor() {}
 
-    // read TLV until first profile tag
+    // Read TLV until first profile tag
     CHIP_ERROR PrepareToReadVendorReservedElements(const ByteSpan & attestationElements, size_t count)
     {
         mIsInitialized         = false;
+        mIsDone                = false;
         mNumVendorReservedData = count;
         mAttestationData       = attestationElements;
 
@@ -54,12 +55,20 @@ public:
         // position to first ProfileTag
         while (true)
         {
-            ReturnErrorOnFailure(mTlvReader.Next());
-            if (!TLV::IsProfileTag(mTlvReader.GetTag()))
+            CHIP_ERROR err = mTlvReader.Next();
+            if (err == CHIP_END_OF_TLV)
+            {
+                mIsDone = true;
+                break;
+            }
+
+            TLV::Tag tag = mTlvReader.GetTag();
+            if (!TLV::IsContextTag(tag))
                 break;
         }
-        // positioned to first context tag (vendor reserved data)
-        mIsInitialized = true;
+        // positioned to first non-context tag (vendor reserved data)
+        mIsInitialized  = true;
+        mIsAtFirstToken = true;
         return CHIP_NO_ERROR;
     }
 
@@ -72,36 +81,55 @@ public:
      *
      *  @returns   CHIP_NO_ERROR on success
      *             CHIP_ERROR_INCORRECT_STATE if PrepareToReadVendorReservedElements hasn't been called first
+     *             CHIP_ERROR_UNEXPECTED_TLV_ELEMENT if we reach non-profile-specific tags or vendorId is zero
      *             CHIP_END_OF_TLV if not further entries are present
      */
     CHIP_ERROR GetNextVendorReservedElement(struct VendorReservedElement & element)
     {
-        CHIP_ERROR err;
-
         VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
-
-        while ((err = mTlvReader.Next()) == CHIP_NO_ERROR)
+        if (mIsDone)
         {
-            uint64_t tag = mTlvReader.GetTag();
-            if (!TLV::IsProfileTag(tag))
-            {
-                continue;
-            }
-            // tag is profile tag
-            element.vendorId   = TLV::VendorIdFromTag(tag);
-            element.profileNum = TLV::ProfileNumFromTag(tag);
-            element.tagNum     = TLV::TagNumFromTag(tag);
-
-            return mTlvReader.GetByteView(element.vendorReservedData);
+            return CHIP_END_OF_TLV;
         }
 
-        return err;
+        if (mIsAtFirstToken)
+        {
+            // Already had a Next() done for us by PrepareToReadVendorReservedElements
+            // so we don't Next() since we should be pointing at a vendor-reserved.
+            mIsAtFirstToken = false;
+        }
+        else
+        {
+            CHIP_ERROR error = mTlvReader.Next();
+            if (error == CHIP_END_OF_TLV)
+            {
+                mIsDone = true;
+            }
+            ReturnErrorOnFailure(error);
+        }
+
+        TLV::Tag tag = mTlvReader.GetTag();
+        if (!TLV::IsProfileTag(tag))
+        {
+            return CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
+        }
+
+        // tag is profile tag
+        element.vendorId   = TLV::VendorIdFromTag(tag);
+        element.profileNum = TLV::ProfileNumFromTag(tag);
+        element.tagNum     = TLV::TagNumFromTag(tag);
+
+        ReturnErrorOnFailure(mTlvReader.GetByteView(element.vendorReservedData));
+
+        return CHIP_NO_ERROR;
     }
 
 private:
     size_t mNumVendorReservedData; // number of VendorReserved entries (could be 0)
     ByteSpan mAttestationData;
-    bool mIsInitialized = false;
+    bool mIsInitialized  = false;
+    bool mIsAtFirstToken = false;
+    bool mIsDone         = false;
     TLV::ContiguousBufferTLVReader mTlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 };

@@ -71,7 +71,7 @@ void CommissioningWindowManager::OnPlatformEvent(const DeviceLayer::ChipDeviceEv
     }
 }
 
-void CommissioningWindowManager::Cleanup()
+void CommissioningWindowManager::Shutdown()
 {
     StopAdvertisement();
 
@@ -84,6 +84,11 @@ void CommissioningWindowManager::Cleanup()
 
     memset(&mECMPASEVerifier, 0, sizeof(mECMPASEVerifier));
     memset(mECMSalt, 0, sizeof(mECMSalt));
+}
+
+void CommissioningWindowManager::Cleanup()
+{
+    Shutdown();
 
     // reset all advertising
     app::DnssdServer::Instance().StartServer(Dnssd::CommissioningMode::kDisabled);

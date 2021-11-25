@@ -30,6 +30,8 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/DeviceControlServer.h>
 
+#include <app-common/zap-generated/cluster-objects.h>
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -104,10 +106,10 @@ namespace {
 NetworkInfo sNetworks[kMaxNetworks];
 } // namespace
 
-EmberAfNetworkCommissioningError OnAddThreadNetworkCommandCallbackInternal(app::CommandHandler *, EndpointId,
-                                                                           ByteSpan operationalDataset, uint64_t breadcrumb,
-                                                                           uint32_t timeoutMs)
+void OnAddThreadNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler, const app::ConcreteCommandPath & commandPath,
+                                               ByteSpan operationalDataset, uint64_t breadcrumb, uint32_t timeoutMs)
 {
+    Commands::AddThreadNetworkResponse::Type response;
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
 
@@ -145,18 +147,19 @@ exit:
     // TODO: We should encode response command here.
 
     ChipLogDetail(Zcl, "AddThreadNetwork: %" PRIu8, err);
-    return err;
+    response.errorCode = err;
 #else
     // The target does not supports ThreadNetwork. We should not add AddThreadNetwork command in that case then the upper layer will
     // return "Command not found" error.
-    return EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
+    response.errorCode = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
 #endif
+    apCommandHandler->AddResponseData(commandPath, response);
 }
 
-EmberAfNetworkCommissioningError OnAddWiFiNetworkCommandCallbackInternal(app::CommandHandler *, EndpointId, ByteSpan ssid,
-                                                                         ByteSpan credentials, uint64_t breadcrumb,
-                                                                         uint32_t timeoutMs)
+void OnAddWiFiNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler, const app::ConcreteCommandPath & commandPath,
+                                             ByteSpan ssid, ByteSpan credentials, uint64_t breadcrumb, uint32_t timeoutMs)
 {
+    Commands::AddWiFiNetworkResponse::Type response;
 #if defined(CHIP_DEVICE_LAYER_TARGET)
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_BOUNDS_EXCEEDED;
 
@@ -202,12 +205,13 @@ exit:
     // TODO: We should encode response command here.
 
     ChipLogDetail(Zcl, "AddWiFiNetwork: %" PRIu8, err);
-    return err;
+    response.errorCode = err;
 #else
     // The target does not supports WiFiNetwork.
     // return "Command not found" error.
-    return EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
+    response.errorCode = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR;
 #endif
+    apCommandHandler->AddResponseData(commandPath, response);
 }
 
 namespace {
@@ -252,9 +256,10 @@ CHIP_ERROR DoEnableNetwork(NetworkInfo * network)
 }
 } // namespace
 
-EmberAfNetworkCommissioningError OnEnableNetworkCommandCallbackInternal(app::CommandHandler *, EndpointId, ByteSpan networkID,
-                                                                        uint64_t breadcrumb, uint32_t timeoutMs)
+void OnEnableNetworkCommandCallbackInternal(app::CommandHandler * apCommandHandler, const app::ConcreteCommandPath & commandPath,
+                                            ByteSpan networkID, uint64_t breadcrumb, uint32_t timeoutMs)
 {
+    Commands::EnableNetworkResponse::Type response;
     size_t networkSeq;
     EmberAfNetworkCommissioningError err = EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_NETWORK_ID_NOT_FOUND;
 
@@ -277,7 +282,8 @@ exit:
     {
         DeviceLayer::Internal::DeviceControlServer::DeviceControlSvr().EnableNetworkForOperational(networkID);
     }
-    return err;
+    response.errorCode = err;
+    apCommandHandler->AddResponseData(commandPath, response);
 }
 
 } // namespace NetworkCommissioning

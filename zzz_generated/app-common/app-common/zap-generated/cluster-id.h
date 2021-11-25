@@ -64,6 +64,9 @@ static constexpr chip::ClusterId ZCL_APPLIANCE_CONTROL_CLUSTER_ID = 0x001B;
 // Definitions for cluster: Descriptor
 static constexpr chip::ClusterId ZCL_DESCRIPTOR_CLUSTER_ID = 0x001D;
 
+// Definitions for cluster: ACL
+static constexpr chip::ClusterId ZCL_ACL_CLUSTER_ID = 0x001F;
+
 // Definitions for cluster: Poll Control
 static constexpr chip::ClusterId ZCL_POLL_CONTROL_CLUSTER_ID = 0x0020;
 
@@ -78,6 +81,18 @@ static constexpr chip::ClusterId ZCL_OTA_PROVIDER_CLUSTER_ID = 0x0029;
 
 // Definitions for cluster: OTA Software Update Requestor
 static constexpr chip::ClusterId ZCL_OTA_REQUESTOR_CLUSTER_ID = 0x002A;
+
+// Definitions for cluster: Localization Configuration
+static constexpr chip::ClusterId ZCL_LOCALIZATION_CONFIGURATION_CLUSTER_ID = 0x002B;
+
+// Definitions for cluster: Localization Time Format
+static constexpr chip::ClusterId ZCL_LOCALIZATION_TIME_FORMAT_CLUSTER_ID = 0x002C;
+
+// Definitions for cluster: Localization Unit
+static constexpr chip::ClusterId ZCL_LOCALIZATION_UNIT_CLUSTER_ID = 0x002D;
+
+// Definitions for cluster: Power Source Configuration
+static constexpr chip::ClusterId ZCL_POWER_SOURCE_CONFIGURATION_CLUSTER_ID = 0x002E;
 
 // Definitions for cluster: Power Source
 static constexpr chip::ClusterId ZCL_POWER_SOURCE_CLUSTER_ID = 0x002F;
@@ -105,6 +120,9 @@ static constexpr chip::ClusterId ZCL_WIFI_NETWORK_DIAGNOSTICS_CLUSTER_ID = 0x003
 
 // Definitions for cluster: Ethernet Network Diagnostics
 static constexpr chip::ClusterId ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID = 0x0037;
+
+// Definitions for cluster: Time Synchronization
+static constexpr chip::ClusterId ZCL_TIME_SYNCHRONIZATION_CLUSTER_ID = 0x0038;
 
 // Definitions for cluster: Bridged Device Basic
 static constexpr chip::ClusterId ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID = 0x0039;

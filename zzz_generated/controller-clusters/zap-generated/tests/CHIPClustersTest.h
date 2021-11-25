@@ -148,6 +148,8 @@ public:
                                           chip::CharSpan value);
     CHIP_ERROR WriteAttributeReachable(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                        bool value);
+    CHIP_ERROR WriteAttributeUniqueID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                      chip::CharSpan value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
@@ -421,6 +423,8 @@ public:
                                            bool value);
     CHIP_ERROR WriteAttributeTimeSinceReset(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                             uint64_t value);
+    CHIP_ERROR WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint32_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
@@ -872,6 +876,8 @@ public:
                                              uint64_t value);
     CHIP_ERROR WriteAttributeCurrentHeapHighWatermark(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint64_t value);
+    CHIP_ERROR WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint32_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };
@@ -991,7 +997,7 @@ public:
     ~ThreadNetworkDiagnosticsClusterTest() {}
 
     CHIP_ERROR WriteAttributeChannel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint8_t value);
+                                     uint16_t value);
     CHIP_ERROR WriteAttributeRoutingRole(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          uint8_t value);
     CHIP_ERROR WriteAttributeNetworkName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -1153,6 +1159,8 @@ public:
                                             uint64_t value);
     CHIP_ERROR WriteAttributeOverrunCount(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                           uint64_t value);
+    CHIP_ERROR WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint32_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };

@@ -108,8 +108,9 @@ private:
 
 void PacketDataReporter::OnQuery(const QueryData & data)
 {
-    ChipLogError(Discovery, "Unexpected query packet being parsed as a response");
-    mValid = false;
+    // Ignore queries:
+    //   - unicast answers will include the corresponding query in the answer
+    //     packet, however that is not interesting for the resolver.
 }
 
 void PacketDataReporter::OnHeader(ConstHeaderRef & header)
@@ -176,9 +177,9 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     // This code assumes that all entries in the mDNS packet relate to the
     // same entity. This may not be correct if multiple servers are reported
     // (if multi-admin decides to use unique ports for every ecosystem).
-    mNodeData.mAddress[mDiscoveredNodeData.numIPs++] = addr;
-    mNodeData.mInterfaceId                           = mInterfaceId;
-    mHasIP                                           = true;
+    mNodeData.mAddress[mNodeData.mNumIPs++] = addr;
+    mNodeData.mInterfaceId                  = mInterfaceId;
+    mHasIP                                  = true;
 }
 
 void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr)
@@ -402,12 +403,12 @@ CHIP_ERROR MinMdnsResolver::Init(chip::Inet::InetLayer * inetLayer)
 {
     /// Note: we do not double-check the port as we assume the APP will always use
     /// the same inetLayer and port for mDNS.
+    mSystemLayer = inetLayer->SystemLayer();
+
     if (GlobalMinimalMdnsServer::Server().IsListening())
     {
         return CHIP_NO_ERROR;
     }
-
-    mSystemLayer = inetLayer->SystemLayer();
 
     return GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, kMdnsPort);
 }
@@ -433,7 +434,7 @@ CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Mini
 
     ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
 
-    return GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort);
+    return GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort);
 }
 
 CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
@@ -577,7 +578,7 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
 
         ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
 
-        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
+        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
     }
 
     return ScheduleResolveRetries();

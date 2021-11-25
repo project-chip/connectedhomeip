@@ -102,8 +102,8 @@ public:
     virtual CHIP_ERROR StoreRebootCount(uint32_t rebootCount)                          = 0;
     virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours)      = 0;
     virtual CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours)      = 0;
-    virtual CHIP_ERROR GetBootReasons(uint32_t & bootReasons)                          = 0;
-    virtual CHIP_ERROR StoreBootReasons(uint32_t bootReasons)                          = 0;
+    virtual CHIP_ERROR GetBootReason(uint32_t & bootReason)                            = 0;
+    virtual CHIP_ERROR StoreBootReason(uint32_t bootReason)                            = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 

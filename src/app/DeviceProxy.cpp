@@ -81,7 +81,7 @@ CHIP_ERROR DeviceProxy::SendReadAttributeRequest(app::AttributePathParams aPath,
 
     app::ReadClient * readClient = nullptr;
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewReadClient(
-        &readClient, app::ReadClient::InteractionType::Read, GetInteractionModelDelegate()));
+        &readClient, app::ReadClient::InteractionType::Read, &GetInteractionModelDelegate()->GetBufferedCallback()));
 
     if (onSuccessCallback != nullptr || onFailureCallback != nullptr)
     {
@@ -118,7 +118,7 @@ CHIP_ERROR DeviceProxy::SendSubscribeAttributeRequest(app::AttributePathParams a
 
     app::ReadClient * readClient = nullptr;
     ReturnErrorOnFailure(chip::app::InteractionModelEngine::GetInstance()->NewReadClient(
-        &readClient, app::ReadClient::InteractionType::Subscribe, GetInteractionModelDelegate()));
+        &readClient, app::ReadClient::InteractionType::Subscribe, &GetInteractionModelDelegate()->GetBufferedCallback()));
 
     // The application context is used to identify different requests from client application the type of it is intptr_t, here we
     // use the seqNum.

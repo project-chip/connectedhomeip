@@ -19,7 +19,9 @@ public:
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
     delete onReport{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Callback;
+{{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
@@ -31,7 +33,9 @@ public:
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
         callbacksMgr.AddReportCallback(remoteId, endpointId, {{asHex parent.code 4}}, {{asHex code 4}}, onReport{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Callback->Cancel(), BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>);
+{{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
@@ -76,7 +80,9 @@ private:
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
     chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onReport{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Callback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
+{{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}

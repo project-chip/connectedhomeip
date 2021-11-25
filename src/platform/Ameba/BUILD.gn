@@ -34,6 +34,8 @@ static_library("Ameba") {
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",

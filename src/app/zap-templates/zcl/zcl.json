@@ -2,6 +2,7 @@
     "version": "ZCL Test Data",
     "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/"],
     "xmlFile": [
+        "ACL-cluster.xml",
         "account-login-cluster.xml",
         "administrator-commissioning-cluster.xml",
         "application-basic-cluster.xml",
@@ -12,7 +13,7 @@
         "boolean-state-cluster.xml",
         "bridged-actions-cluster.xml",
         "bridged-device-basic.xml",
-        "chip-devices.xml",
+        "bridged-device-basic-information-cluster.xml",
         "chip-ota.xml",
         "chip-types.xml",
         "clusters-extensions.xml",
@@ -30,6 +31,9 @@
         "identify-cluster.xml",
         "illuminance-measurement-cluster.xml",
         "keypad-input-cluster.xml",
+        "localization-configuration-cluster.xml",
+        "localization-time-format-cluster.xml",
+        "localization-unit-cluster.xml",
         "low-power-cluster.xml",
         "media-input-cluster.xml",
         "media-playback-cluster.xml",
@@ -38,9 +42,8 @@
         "operational-credentials-cluster.xml",
         "pressure-measurement-cluster.xml",
         "power-source-cluster.xml",
+        "power-source-configuration-cluster.xml",
         "pump-configuration-and-control-cluster.xml",
-        "pump-controller-device.xml",
-        "pump-device.xml",
         "relative-humidity-measurement-cluster.xml",
         "software-diagnostics-cluster.xml",
         "switch-cluster.xml",
@@ -48,11 +51,12 @@
         "temperature-measurement-cluster.xml",
         "test-cluster.xml",
         "thread-network-diagnostics-cluster.xml",
+        "time-synchronization-cluster.xml",
         "tv-channel-cluster.xml",
-        "tv-device-types.xml",
         "wake-on-lan-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "window-covering.xml",
+        "matter-devices.xml",
         "ami.xml",
         "general.xml",
         "ha-devices.xml",
@@ -78,5 +82,6 @@
         "bool": {
             "commandDiscovery": true
         }
-    }
+    },
+    "defaultReportable": true
 }

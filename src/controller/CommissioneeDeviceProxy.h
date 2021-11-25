@@ -188,13 +188,12 @@ public:
      *   Since the device settings might have been moved from RAM to the persistent storage, the function
      *   will load the device settings first, before making the changes.
      *
-     * @param[in] addr                Address of the device to be set.
-     * @param[in] mrpIdleInterval     MRP idle retransmission interval of the device to be set.
-     * @param[in] mrpActiveInterval   MRP active retransmision interval of the device to be set.
+     * @param[in] addr   Address of the device to be set.
+     * @param[in] config MRP parameters
      *
      * @return CHIP_NO_ERROR if the data has been updated, an error code otherwise.
      */
-    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, uint32_t mrpIdleInterval, uint32_t mrpActiveInterval);
+    CHIP_ERROR UpdateDeviceData(const Transport::PeerAddress & addr, const ReliableMessageProtocolConfig & config);
     /**
      * @brief
      *   Return whether the current device object is actively associated with a paired CHIP

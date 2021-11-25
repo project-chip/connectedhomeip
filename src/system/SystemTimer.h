@@ -36,7 +36,6 @@
 
 #include <system/SystemClock.h>
 #include <system/SystemError.h>
-#include <system/SystemLayer.h>
 #include <system/SystemMutex.h>
 #include <system/SystemStats.h>
 
@@ -50,6 +49,8 @@
 
 namespace chip {
 namespace System {
+
+class Layer;
 
 using TimerCompleteCallback = void (*)(Layer * aLayer, void * appState);
 
@@ -229,7 +230,7 @@ public:
 
 private:
     friend class LayerImplLwIP;
-    static BitMapObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
+    static chip::ObjectPool<Timer, CHIP_SYSTEM_CONFIG_NUM_TIMERS> sPool;
     static Stats::count_t mNumInUse;
     static Stats::count_t mHighWatermark;
 

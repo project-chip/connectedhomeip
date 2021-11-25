@@ -44,22 +44,22 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeBarrierControlInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("barrierControl", writeBarrierControlInteractionInfo);
     Map<String, InteractionInfo> writeBasicInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeBasicUserLabelCommandParams =
+    Map<String, CommandParameterInfo> writeBasicNodeLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo basicuserLabelCommandParameterInfo =
+    CommandParameterInfo basicnodeLabelCommandParameterInfo =
         new CommandParameterInfo("value", String.class);
-    writeBasicUserLabelCommandParams.put("value", basicuserLabelCommandParameterInfo);
-    InteractionInfo writeBasicUserLabelAttributeInteractionInfo =
+    writeBasicNodeLabelCommandParams.put("value", basicnodeLabelCommandParameterInfo);
+    InteractionInfo writeBasicNodeLabelAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicCluster) cluster)
-                  .writeUserLabelAttribute(
+                  .writeNodeLabelAttribute(
                       (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writeBasicUserLabelCommandParams);
+            writeBasicNodeLabelCommandParams);
     writeBasicInteractionInfo.put(
-        "writeUserLabelAttribute", writeBasicUserLabelAttributeInteractionInfo);
+        "writeNodeLabelAttribute", writeBasicNodeLabelAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeBasicLocationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo basiclocationCommandParameterInfo =
@@ -137,23 +137,23 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeBridgedActionsInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("bridgedActions", writeBridgedActionsInteractionInfo);
     Map<String, InteractionInfo> writeBridgedDeviceBasicInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeBridgedDeviceBasicUserLabelCommandParams =
+    Map<String, CommandParameterInfo> writeBridgedDeviceBasicNodeLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedDeviceBasicuserLabelCommandParameterInfo =
+    CommandParameterInfo bridgedDeviceBasicnodeLabelCommandParameterInfo =
         new CommandParameterInfo("value", String.class);
-    writeBridgedDeviceBasicUserLabelCommandParams.put(
-        "value", bridgedDeviceBasicuserLabelCommandParameterInfo);
-    InteractionInfo writeBridgedDeviceBasicUserLabelAttributeInteractionInfo =
+    writeBridgedDeviceBasicNodeLabelCommandParams.put(
+        "value", bridgedDeviceBasicnodeLabelCommandParameterInfo);
+    InteractionInfo writeBridgedDeviceBasicNodeLabelAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicCluster) cluster)
-                  .writeUserLabelAttribute(
+                  .writeNodeLabelAttribute(
                       (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writeBridgedDeviceBasicUserLabelCommandParams);
+            writeBridgedDeviceBasicNodeLabelCommandParams);
     writeBridgedDeviceBasicInteractionInfo.put(
-        "writeUserLabelAttribute", writeBridgedDeviceBasicUserLabelAttributeInteractionInfo);
+        "writeNodeLabelAttribute", writeBridgedDeviceBasicNodeLabelAttributeInteractionInfo);
     writeAttributeMap.put("bridgedDeviceBasic", writeBridgedDeviceBasicInteractionInfo);
     Map<String, InteractionInfo> writeColorControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeColorControlColorControlOptionsCommandParams =
@@ -704,6 +704,42 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("pressureMeasurement", writePressureMeasurementInteractionInfo);
     Map<String, InteractionInfo> writePumpConfigurationAndControlInteractionInfo =
         new LinkedHashMap<>();
+    Map<String, CommandParameterInfo>
+        writePumpConfigurationAndControlLifetimeRunningHoursCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo pumpConfigurationAndControllifetimeRunningHoursCommandParameterInfo =
+        new CommandParameterInfo("value", long.class);
+    writePumpConfigurationAndControlLifetimeRunningHoursCommandParams.put(
+        "value", pumpConfigurationAndControllifetimeRunningHoursCommandParameterInfo);
+    InteractionInfo writePumpConfigurationAndControlLifetimeRunningHoursAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
+                  .writeLifetimeRunningHoursAttribute(
+                      (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writePumpConfigurationAndControlLifetimeRunningHoursCommandParams);
+    writePumpConfigurationAndControlInteractionInfo.put(
+        "writeLifetimeRunningHoursAttribute",
+        writePumpConfigurationAndControlLifetimeRunningHoursAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writePumpConfigurationAndControlPowerCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo pumpConfigurationAndControlpowerCommandParameterInfo =
+        new CommandParameterInfo("value", long.class);
+    writePumpConfigurationAndControlPowerCommandParams.put(
+        "value", pumpConfigurationAndControlpowerCommandParameterInfo);
+    InteractionInfo writePumpConfigurationAndControlPowerAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
+                  .writePowerAttribute(
+                      (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writePumpConfigurationAndControlPowerCommandParams);
+    writePumpConfigurationAndControlInteractionInfo.put(
+        "writePowerAttribute", writePumpConfigurationAndControlPowerAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writePumpConfigurationAndControlOperationModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo pumpConfigurationAndControloperationModeCommandParameterInfo =

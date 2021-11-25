@@ -42,6 +42,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::TLV;
+using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
 namespace chip {
 namespace DeviceLayer {
@@ -69,93 +70,6 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     OnWiFiPlatformEvent(event);
 #endif
 }
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiSecurityType(uint8_t & securityType)
-{
-    securityType = 0;
-    wifi_ap_record_t ap_info;
-    esp_err_t err;
-
-    err = esp_wifi_sta_get_ap_info(&ap_info);
-    if (err == ESP_OK)
-    {
-        securityType = ap_info.authmode;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiChannelNumber(uint16_t & channelNumber)
-{
-    channelNumber = 0;
-    wifi_ap_record_t ap_info;
-    esp_err_t err;
-
-    err = esp_wifi_sta_get_ap_info(&ap_info);
-    if (err == ESP_OK)
-    {
-        channelNumber = ap_info.primary;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiRssi(int8_t & rssi)
-{
-    rssi = 0;
-    wifi_ap_record_t ap_info;
-    esp_err_t err;
-
-    err = esp_wifi_sta_get_ap_info(&ap_info);
-
-    if (err == ESP_OK)
-    {
-        rssi = ap_info.rssi;
-    }
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
-{
-    beaconLostCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
-{
-    currentMaxRate = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
-{
-    packetMulticastRxCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
-{
-    packetMulticastTxCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
-{
-    packetUnicastRxCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
-{
-    packetUnicastTxCount = 0;
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiOverrunCount(uint64_t & overrunCount)
-{
-    overrunCount = 0;
-    return CHIP_NO_ERROR;
-}
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
 
 } // namespace DeviceLayer
 } // namespace chip

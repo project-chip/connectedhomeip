@@ -53,11 +53,20 @@ chip_test_suite("tests") {
     "TestEventPathParams.cpp",
     "TestInteractionModelEngine.cpp",
     "TestMessageDef.cpp",
+    "TestNumericAttributeTraits.cpp",
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
     "TestStatusResponseMessage.cpp",
     "TestWriteInteraction.cpp",
   ]
+
+  #
+  # On NRF platforms, the allocation of a large number of pbufs in this test
+  # to exercise chunking causes it to run out of memory. For now, disable it there.
+  #
+  if (chip_device_platform != "nrfconnect") {
+    test_sources += [ "TestBufferedReadCallback.cpp" ]
+  }
 
   cflags = [ "-Wconversion" ]
 
