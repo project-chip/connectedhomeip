@@ -14921,6 +14921,12 @@ bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::DecodableType & commandData);
 /**
+ * @brief Test Cluster Cluster SimpleStructResponse Command callback (from server)
+ */
+bool emberAfTestClusterClusterSimpleStructResponseCallback(
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+    chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType arg1);
+/**
  * @brief Test Cluster Cluster TestListInt8UArgumentRequest Command callback (from client)
  */
 bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
@@ -14962,6 +14968,12 @@ bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
 bool emberAfTestClusterClusterTestComplexNullableOptionalRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::TestComplexNullableOptionalRequest::DecodableType & commandData);
+/**
+ * @brief Test Cluster Cluster SimpleStructEchoRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterSimpleStructEchoRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::DecodableType & commandData);
 /**
  * @brief Messaging Cluster DisplayMessage Command callback (from server)
  */

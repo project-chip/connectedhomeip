@@ -27461,6 +27461,8 @@ enum class Fields
     kD = 3,
     kE = 4,
     kF = 5,
+    kG = 6,
+    kH = 7,
 };
 
 struct Type
@@ -27472,6 +27474,8 @@ public:
     chip::ByteSpan d;
     chip::CharSpan e;
     chip::BitFlags<SimpleBitmap> f;
+    float g;
+    double h;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -27739,6 +27743,11 @@ struct Type;
 struct DecodableType;
 } // namespace TestListStructArgumentRequest
 
+namespace SimpleStructResponse {
+struct Type;
+struct DecodableType;
+} // namespace SimpleStructResponse
+
 namespace TestListInt8UArgumentRequest {
 struct Type;
 struct DecodableType;
@@ -27773,6 +27782,11 @@ namespace TestComplexNullableOptionalRequest {
 struct Type;
 struct DecodableType;
 } // namespace TestComplexNullableOptionalRequest
+
+namespace SimpleStructEchoRequest {
+struct Type;
+struct DecodableType;
+} // namespace SimpleStructEchoRequest
 
 } // namespace Commands
 
@@ -28457,6 +28471,36 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestListStructArgumentRequest
+namespace SimpleStructResponse {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SimpleStructResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    Structs::SimpleStruct::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SimpleStructResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    Structs::SimpleStruct::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SimpleStructResponse
 namespace TestListInt8UArgumentRequest {
 enum class Fields
 {
@@ -28703,6 +28747,36 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestComplexNullableOptionalRequest
+namespace SimpleStructEchoRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SimpleStructEchoRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    Structs::SimpleStruct::Type arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SimpleStructEchoRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    Structs::SimpleStruct::DecodableType arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SimpleStructEchoRequest
 } // namespace Commands
 
 namespace Attributes {

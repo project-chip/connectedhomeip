@@ -863,6 +863,8 @@ typedef void (*CHIPTemperatureMeasurementClusterClusterRevisionAttributeCallback
     void *, chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterBooleanResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType &);
+typedef void (*CHIPTestClusterClusterSimpleStructResponseCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestAddArgumentsResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestEnumsResponseCallbackType)(

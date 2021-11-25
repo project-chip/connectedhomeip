@@ -173,6 +173,8 @@ typedef void (*CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType)(
     void *, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterBooleanResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType &);
+typedef void (*CHIPTestClusterClusterSimpleStructResponseCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestAddArgumentsResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestEnumsResponseCallbackType)(
@@ -1773,6 +1775,19 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & data);
+};
+
+class CHIPTestClusterClusterSimpleStructResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPTestClusterClusterSimpleStructResponseCallbackType>
+{
+public:
+    CHIPTestClusterClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPTestClusterClusterSimpleStructResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & data);
 };
 
 class CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge

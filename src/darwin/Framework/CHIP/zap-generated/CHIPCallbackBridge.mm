@@ -1002,6 +1002,8 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
                                                                      length:entry_0.nullableStruct.Value().e.size()
                                                                    encoding:NSUTF8StringEncoding];
             newElement_0.nullableStruct.f = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().f.Raw()];
+            newElement_0.nullableStruct.g = [NSNumber numberWithFloat:entry_0.nullableStruct.Value().g];
+            newElement_0.nullableStruct.h = [NSNumber numberWithDouble:entry_0.nullableStruct.Value().h];
         }
         if (entry_0.optionalStruct.HasValue()) {
             newElement_0.optionalStruct = [CHIPTestClusterClusterSimpleStruct new];
@@ -1014,6 +1016,8 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
                                                                      length:entry_0.optionalStruct.Value().e.size()
                                                                    encoding:NSUTF8StringEncoding];
             newElement_0.optionalStruct.f = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().f.Raw()];
+            newElement_0.optionalStruct.g = [NSNumber numberWithFloat:entry_0.optionalStruct.Value().g];
+            newElement_0.optionalStruct.h = [NSNumber numberWithDouble:entry_0.optionalStruct.Value().h];
         } else {
             newElement_0.optionalStruct = nil;
         }
@@ -1036,6 +1040,9 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
                                            encoding:NSUTF8StringEncoding];
                 newElement_0.nullableOptionalStruct.f =
                     [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().f.Raw()];
+                newElement_0.nullableOptionalStruct.g = [NSNumber numberWithFloat:entry_0.nullableOptionalStruct.Value().Value().g];
+                newElement_0.nullableOptionalStruct.h =
+                    [NSNumber numberWithDouble:entry_0.nullableOptionalStruct.Value().Value().h];
             }
         } else {
             newElement_0.nullableOptionalStruct = nil;
@@ -2624,6 +2631,26 @@ void CHIPTestClusterClusterBooleanResponseCallbackBridge::OnSuccessFn(
         NSNumber * value;
         value = [NSNumber numberWithBool:data.value];
         response.value = value;
+    }
+    DispatchSuccess(context, response);
+};
+
+void CHIPTestClusterClusterSimpleStructResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & data)
+{
+    auto * response = [CHIPTestClusterClusterSimpleStructResponseParams new];
+    {
+        CHIPTestClusterClusterSimpleStruct * value;
+        value = [CHIPTestClusterClusterSimpleStruct new];
+        value.a = [NSNumber numberWithUnsignedChar:data.arg1.a];
+        value.b = [NSNumber numberWithBool:data.arg1.b];
+        value.c = [NSNumber numberWithUnsignedChar:data.arg1.c];
+        value.d = [NSData dataWithBytes:data.arg1.d.data() length:data.arg1.d.size()];
+        value.e = [[NSString alloc] initWithBytes:data.arg1.e.data() length:data.arg1.e.size() encoding:NSUTF8StringEncoding];
+        value.f = [NSNumber numberWithUnsignedChar:data.arg1.f.Raw()];
+        value.g = [NSNumber numberWithFloat:data.arg1.g];
+        value.h = [NSNumber numberWithDouble:data.arg1.h];
+        response.arg1 = value;
     }
     DispatchSuccess(context, response);
 };

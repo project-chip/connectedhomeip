@@ -24,6 +24,7 @@
 #include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
 #include <app/tests/suites/pics/PICSBooleanReader.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/UnitTestUtils.h>
 #include <type_traits>
@@ -116,6 +117,12 @@ protected:
         }
 
         return true;
+    }
+
+    template <typename T, typename U>
+    bool CheckValue(const char * itemName, chip::BitFlags<T> current, U expected)
+    {
+        return CheckValue(itemName, current.Raw(), expected);
     }
 
     template <typename T, typename U, typename std::enable_if_t<std::is_enum<T>::value, int> = 0>

@@ -36,6 +36,8 @@ class TestGeneratedClusterObjects(unittest.TestCase):
         data.d = b'1234'
         data.e = 'hello'
         data.f = 1
+        data.g = 0;
+        data.h = 0;
 
         self.CheckData(data)
 
@@ -47,6 +49,8 @@ class TestGeneratedClusterObjects(unittest.TestCase):
         simpleStruct.d = b'1234'
         simpleStruct.e = 'hello'
         simpleStruct.f = 1
+        simpleStruct.g = 0
+        simpleStruct.h = 0
 
         data = Clusters.TestCluster.Structs.NestedStructList()
         data.a = 23
@@ -72,11 +76,11 @@ class TestGeneratedClusterObjects(unittest.TestCase):
         data.optionalString = 'hello2'
         data.nullableOptionalString = 'hello3'
         data.nullableStruct = Clusters.TestCluster.Structs.SimpleStruct(
-            23, True, Clusters.TestCluster.Enums.SimpleEnum.kValueA, b'1234', 'hello', 1)
+            23, True, Clusters.TestCluster.Enums.SimpleEnum.kValueA, b'1234', 'hello', 1, 0, 0)
         data.optionalStruct = Clusters.TestCluster.Structs.SimpleStruct(
-            24, True, Clusters.TestCluster.Enums.SimpleEnum.kValueA, b'1234', 'hello', 1)
+            24, True, Clusters.TestCluster.Enums.SimpleEnum.kValueA, b'1234', 'hello', 1, 0, 0)
         data.nullableOptionalStruct = Clusters.TestCluster.Structs.SimpleStruct(
-            25, True, Clusters.TestCluster.Enums.SimpleEnum.kValueA, b'1234', 'hello', 1)
+            25, True, Clusters.TestCluster.Enums.SimpleEnum.kValueA, b'1234', 'hello', 1, 0, 0)
 
         data.nullableList = [Clusters.TestCluster.Enums.SimpleEnum.kValueA]
         data.optionalList = [Clusters.TestCluster.Enums.SimpleEnum.kValueA]

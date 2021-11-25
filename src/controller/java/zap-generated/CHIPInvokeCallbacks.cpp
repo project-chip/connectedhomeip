@@ -4877,6 +4877,64 @@ void CHIPTestClusterClusterBooleanResponseCallback::CallbackFn(
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, value);
 }
+CHIPTestClusterClusterSimpleStructResponseCallback::CHIPTestClusterClusterSimpleStructResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPTestClusterClusterSimpleStructResponseCallbackType>(CallbackFn, this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPTestClusterClusterSimpleStructResponseCallback::~CHIPTestClusterClusterSimpleStructResponseCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+};
+
+void CHIPTestClusterClusterSimpleStructResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    std::unique_ptr<CHIPTestClusterClusterSimpleStructResponseCallback,
+                    void (*)(CHIPTestClusterClusterSimpleStructResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPTestClusterClusterSimpleStructResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPTestClusterClusterSimpleStructResponseCallback>);
+    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
+
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    // Java callback is allowed to be null, exit early if this is the case.
+    VerifyOrReturn(javaCallbackRef != nullptr);
+
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject arg1;
+
+    arg1 = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, arg1);
+}
 CHIPTestClusterClusterTestAddArgumentsResponseCallback::CHIPTestClusterClusterTestAddArgumentsResponseCallback(
     jobject javaCallback) :
     Callback::Callback<CHIPTestClusterClusterTestAddArgumentsResponseCallbackType>(CallbackFn, this)

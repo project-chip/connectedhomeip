@@ -148,6 +148,16 @@ CHIP_ERROR LogValue(const char * label, size_t indent, X value)
     return CHIP_NO_ERROR;
 }
 
+template <
+    typename X,
+    typename std::enable_if_t<
+        std::is_floating_point<X>::value && !std::is_same<std::remove_cv_t<std::remove_reference_t<X>>, bool>::value, int> = 0>
+CHIP_ERROR LogValue(const char * label, size_t indent, X value)
+{
+    ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, std::to_string(value).c_str());
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR LogValue(const char * label, size_t indent, bool value)
 {
     ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, value ? "TRUE" : "FALSE");
@@ -1698,6 +1708,22 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'F'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("G", indent + 1, value.g);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'G'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("H", indent + 1, value.h);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'H'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -3899,6 +3925,20 @@ OnTestClusterBooleanResponseSuccess(void * context,
     if (err == CHIP_NO_ERROR)
     {
         err = LogValue("value", 1, data.value);
+    }
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+};
+
+static void OnTestClusterSimpleStructResponseSuccess(
+    void * context, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & data)
+{
+    ChipLogProgress(Zcl, "Received SimpleStructResponse:");
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("arg1", 1, data.arg1);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -36259,6 +36299,7 @@ private:
 | Cluster TestCluster                                                 | 0x050F |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * SimpleStructEchoRequest                                           |   0x11 |
 | * Test                                                              |   0x00 |
 | * TestAddArguments                                                  |   0x04 |
 | * TestEnumsRequest                                                  |   0x0E |
@@ -36318,6 +36359,30 @@ private:
 | * NullableCharString                                                | 0x801E |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
+/*
+ * Command SimpleStructEchoRequest
+ */
+class TestClusterSimpleStructEchoRequest : public ModelCommand
+{
+public:
+    TestClusterSimpleStructEchoRequest() : ModelCommand("simple-struct-echo-request")
+    {
+        // arg1 Struct parsing is not supported yet
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000011) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnTestClusterSimpleStructResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::Type mRequest;
+};
 
 /*
  * Command Test
@@ -54151,6 +54216,7 @@ void registerClusterTestCluster(Commands & commands)
     const char * clusterName = "TestCluster";
 
     commands_list clusterCommands = {
+        make_unique<TestClusterSimpleStructEchoRequest>(),             //
         make_unique<TestClusterTest>(),                                //
         make_unique<TestClusterTestAddArguments>(),                    //
         make_unique<TestClusterTestEnumsRequest>(),                    //

@@ -263,7 +263,7 @@ function asPrintFormat(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asTypeLiteralSuffix(type)
+function asTypeLiteralSuffix(type, value)
 {
   function fn(pkgId)
   {
@@ -281,6 +281,13 @@ function asTypeLiteralSuffix(type)
         return 'UL';
       case 'uint64_t':
         return 'ULL';
+      case 'float':
+        if (value == 0) {
+          // "0f" is not a valid value, so don't output that; just leave it
+          // as "0".
+          return '';
+        }
+        return 'f';
       default:
         return '';
       }
@@ -292,6 +299,12 @@ function asTypeLiteralSuffix(type)
     throw err;
   });
   return templateUtil.templatePromise(this.global, promise)
+}
+
+async function asTypedLiteral(type, value)
+{
+  let suffix = await asTypeLiteralSuffix.call(this, type, value);
+  return value + suffix;
 }
 
 function hasSpecificAttributes(options)
@@ -511,6 +524,7 @@ exports.asReadType                          = asReadType;
 exports.chip_endpoint_generated_functions   = chip_endpoint_generated_functions
 exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
 exports.asTypeLiteralSuffix                 = asTypeLiteralSuffix;
+exports.asTypedLiteral                      = asTypedLiteral;
 exports.asLowerCamelCase                    = asLowerCamelCase;
 exports.asUpperCamelCase                    = asUpperCamelCase;
 exports.hasSpecificAttributes               = hasSpecificAttributes;

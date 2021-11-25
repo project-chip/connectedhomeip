@@ -46,6 +46,13 @@ CHIP_ERROR LogValue(const char * label, size_t indent, X value)
     return CHIP_NO_ERROR;
 }
 
+template <typename X, typename std::enable_if_t<std::is_floating_point<X>::value && !std::is_same<std::remove_cv_t<std::remove_reference_t<X>>, bool>::value, int> = 0>
+CHIP_ERROR LogValue(const char * label, size_t indent, X value)
+{
+    ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, std::to_string(value).c_str());
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR LogValue(const char * label, size_t indent, bool value)
 {
     ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, value ? "TRUE" : "FALSE");
