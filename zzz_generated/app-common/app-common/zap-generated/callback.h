@@ -318,14 +318,6 @@ void emberAfEthernetNetworkDiagnosticsClusterInitCallback(chip::EndpointId endpo
  */
 void emberAfTimeSynchronizationClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Bridged Device Basic Information Cluster Init
- *
- * Cluster Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfBridgedDeviceBasicInformationClusterInitCallback(chip::EndpointId endpoint);
-
 /** @brief Bridged Device Basic Cluster Init
  *
  * Cluster Init
@@ -4515,112 +4507,6 @@ void emberAfTimeSynchronizationClusterServerTickCallback(chip::EndpointId endpoi
  * @param endpoint  Endpoint that is being served
  */
 void emberAfTimeSynchronizationClusterClientTickCallback(chip::EndpointId endpoint);
-
-//
-// Bridged Device Basic Information Cluster
-//
-
-/** @brief Bridged Device Basic Information Cluster Server Init
- *
- * Server Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfBridgedDeviceBasicInformationClusterServerInitCallback(chip::EndpointId endpoint);
-
-/** @brief Bridged Device Basic Information Cluster Client Init
- *
- * Client Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfBridgedDeviceBasicInformationClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Bridged Device Basic Information Cluster Server Attribute Changed
- *
- * Server Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterBridgedDeviceBasicInformationClusterServerAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Bridged Device Basic Information Cluster Client Attribute Changed
- *
- * Client Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterBridgedDeviceBasicInformationClusterClientAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Bridged Device Basic Information Cluster Server Message Sent
- *
- * Server Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfBridgedDeviceBasicInformationClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                                          EmberApsFrame * apsFrame, uint16_t msgLen,
-                                                                          uint8_t * message, EmberStatus status);
-
-/** @brief Bridged Device Basic Information Cluster Client Message Sent
- *
- * Client Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfBridgedDeviceBasicInformationClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                                          EmberApsFrame * apsFrame, uint16_t msgLen,
-                                                                          uint8_t * message, EmberStatus status);
-
-/** @brief Bridged Device Basic Information Cluster Server Pre Attribute Changed
- *
- * Server Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status MatterBridgedDeviceBasicInformationClusterServerPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Bridged Device Basic Information Cluster Client Pre Attribute Changed
- *
- * Client Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status MatterBridgedDeviceBasicInformationClusterClientPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Bridged Device Basic Information Cluster Server Tick
- *
- * Server Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfBridgedDeviceBasicInformationClusterServerTickCallback(chip::EndpointId endpoint);
-
-/** @brief Bridged Device Basic Information Cluster Client Tick
- *
- * Client Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfBridgedDeviceBasicInformationClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Bridged Device Basic Cluster

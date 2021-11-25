@@ -110,15 +110,15 @@ CHIP_ERROR AppTask::Init()
     }
 
     // Print the current software version
-    char currentFirmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength + 1] = { 0 };
-    err = ConfigurationMgr().GetFirmwareRevisionString(currentFirmwareRev, sizeof(currentFirmwareRev));
+    char softwareVersionString[ConfigurationManager::kMaxSoftwareVersionLength + 1] = { 0 };
+    err = ConfigurationMgr().GetSoftwareVersionString(softwareVersionString, sizeof(softwareVersionString));
     if (err != CHIP_NO_ERROR)
     {
         K32W_LOG("Get version error");
         assert(err == CHIP_NO_ERROR);
     }
 
-    K32W_LOG("Current Firmware Version: %s", currentFirmwareRev);
+    K32W_LOG("Current Software Version: %s", softwareVersionString);
 
 #if CONFIG_CHIP_NFC_COMMISSIONING
     PlatformMgr().AddEventHandler(ThreadProvisioningHandler, 0);

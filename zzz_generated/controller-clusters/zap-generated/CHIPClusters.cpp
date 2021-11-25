@@ -2643,10 +2643,413 @@ CHIP_ERROR BridgedActionsCluster::ReportAttributeClusterRevision(Callback::Cance
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-// BridgedDeviceBasicInformation Cluster Commands
-// BridgedDeviceBasicInformation Cluster Attributes
-CHIP_ERROR BridgedDeviceBasicInformationCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                              Callback::Cancelable * onFailureCallback)
+// BridgedDeviceBasic Cluster Commands
+// BridgedDeviceBasic Cluster Attributes
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000001;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeVendorName(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                   uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::VendorName::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeVendorName(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::VendorName::Id, onReportCallback,
+                                     BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeVendorID(Callback::Cancelable * onSuccessCallback,
+                                                            Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000002;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeVendorID(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                 uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::VendorID::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeVendorID(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::VendorID::Id, onReportCallback,
+                                     BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeProductName(Callback::Cancelable * onSuccessCallback,
+                                                               Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000003;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeProductName(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                    uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::ProductName::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeProductName(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::ProductName::Id, onReportCallback,
+                                     BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeNodeLabel(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000005;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::WriteAttributeNodeLabel(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback, chip::CharSpan value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, BridgedDeviceBasic::Attributes::NodeLabel::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeNodeLabel(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                  uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::NodeLabel::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeNodeLabel(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::NodeLabel::Id, onReportCallback,
+                                     BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000007;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback,
+                                                                        uint16_t minInterval, uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::HardwareVersion::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeHardwareVersion(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::HardwareVersion::Id, onReportCallback,
+                                     BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
+                                                                         Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000008;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
+                                                                              Callback::Cancelable * onFailureCallback,
+                                                                              uint16_t minInterval, uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::HardwareVersionString::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeHardwareVersionString(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::HardwareVersionString::Id, onReportCallback,
+                                     BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000009;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int32uAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback,
+                                                                        uint16_t minInterval, uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::SoftwareVersion::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeSoftwareVersion(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::SoftwareVersion::Id, onReportCallback,
+                                     BasicAttributeFilter<Int32uAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
+                                                                         Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000000A;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
+                                                                              Callback::Cancelable * onFailureCallback,
+                                                                              uint16_t minInterval, uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::SoftwareVersionString::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeSoftwareVersionString(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::SoftwareVersionString::Id, onReportCallback,
+                                     BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000000B;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback,
+                                                                          uint16_t minInterval, uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::ManufacturingDate::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeManufacturingDate(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::ManufacturingDate::Id, onReportCallback,
+                                     BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributePartNumber(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000000C;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributePartNumber(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                   uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::PartNumber::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributePartNumber(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::PartNumber::Id, onReportCallback,
+                                     BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeProductURL(Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000000D;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeProductURL(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                   uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::ProductURL::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeProductURL(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::ProductURL::Id, onReportCallback,
+                                     BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeProductLabel(Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000000E;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeProductLabel(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                     uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::ProductLabel::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeProductLabel(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::ProductLabel::Id, onReportCallback,
+                                     BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeSerialNumber(Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000000F;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeSerialNumber(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                     uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::SerialNumber::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeSerialNumber(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::SerialNumber::Id, onReportCallback,
+                                     BasicAttributeFilter<CharStringAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeReachable(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000011;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<BooleanAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeReachable(Callback::Cancelable * onSuccessCallback,
+                                                                  Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                  uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = BridgedDeviceBasic::Attributes::Reachable::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeReachable(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(BridgedDeviceBasic::Attributes::Reachable::Id, onReportCallback,
+                                     BasicAttributeFilter<BooleanAttributeCallback>);
+}
+
+CHIP_ERROR BridgedDeviceBasicCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
     attributePath.mEndpointId  = mEndpoint;
@@ -2656,9 +3059,9 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::ReadAttributeClusterRevision(Ca
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-CHIP_ERROR BridgedDeviceBasicInformationCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                                   Callback::Cancelable * onFailureCallback,
-                                                                                   uint16_t minInterval, uint16_t maxInterval)
+CHIP_ERROR BridgedDeviceBasicCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                        Callback::Cancelable * onFailureCallback,
+                                                                        uint16_t minInterval, uint16_t maxInterval)
 {
     chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId  = mEndpoint;
@@ -2667,7 +3070,7 @@ CHIP_ERROR BridgedDeviceBasicInformationCluster::SubscribeAttributeClusterRevisi
     return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR BridgedDeviceBasicInformationCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
+CHIP_ERROR BridgedDeviceBasicCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
 {
     return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
                                      BasicAttributeFilter<Int16uAttributeCallback>);
@@ -18416,7 +18819,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeChannel(Callback::Cance
     attributePath.mClusterId   = mClusterId;
     attributePath.mAttributeId = 0x00000000;
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
+                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeChannel(Callback::Cancelable * onSuccessCallback,
@@ -18433,7 +18836,7 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::SubscribeAttributeChannel(Callback::
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReportAttributeChannel(Callback::Cancelable * onReportCallback)
 {
     return RequestAttributeReporting(ThreadNetworkDiagnostics::Attributes::Channel::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
+                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeRoutingRole(Callback::Cancelable * onSuccessCallback,

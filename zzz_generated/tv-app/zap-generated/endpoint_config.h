@@ -1108,7 +1108,7 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                        \
-            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* channel */               \
+            { 0x0000, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                                   /* channel */               \
             { 0x0001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* RoutingRole */           \
             { 0x0002, ZAP_TYPE(OCTET_STRING), 17, 0, ZAP_LONG_DEFAULTS_INDEX(314) },                   /* NetworkName */           \
             { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                            /* PanId */                 \
@@ -1443,7 +1443,7 @@
                 0x0034, ZAP_ATTRIBUTE_INDEX(42), 6, 30, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                           \
             {                                                                                                                      \
-                0x0035, ZAP_ATTRIBUTE_INDEX(48), 64, 242, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+                0x0035, ZAP_ATTRIBUTE_INDEX(48), 64, 243, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                     \
             {                                                                                                                      \
                 0x0036, ZAP_ATTRIBUTE_INDEX(112), 15, 58, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
@@ -1557,7 +1557,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 19, 1898 }, { ZAP_CLUSTER_INDEX(19), 10, 1645 }, { ZAP_CLUSTER_INDEX(29), 4, 283 },                \
+        { ZAP_CLUSTER_INDEX(0), 19, 1899 }, { ZAP_CLUSTER_INDEX(19), 10, 1645 }, { ZAP_CLUSTER_INDEX(29), 4, 283 },                \
             { ZAP_CLUSTER_INDEX(33), 5, 679 }, { ZAP_CLUSTER_INDEX(38), 3, 618 }, { ZAP_CLUSTER_INDEX(41), 2, 108 },               \
     }
 
@@ -1568,7 +1568,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (686)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (5231)
+#define ATTRIBUTE_MAX_SIZE (5232)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (6)

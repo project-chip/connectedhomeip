@@ -525,12 +525,6 @@
 
 // Server attributes
 
-// Attribute ids for cluster: Bridged Device Basic Information
-
-// Client attributes
-
-// Server attributes
-
 // Attribute ids for cluster: Bridged Device Basic
 
 // Client attributes

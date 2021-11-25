@@ -200,25 +200,14 @@ exit:
 CHIP_ERROR ReadClient::GenerateEventPaths(EventPaths::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
                                           size_t aEventPathParamsListSize)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
+    for (size_t index = 0; index < aEventPathParamsListSize; ++index)
     {
-        EventPathIB::Builder eventPathBuilder = aEventPathsBuilder.CreatePath();
-        EventPathParams eventPath             = apEventPathParamsList[eventIndex];
-        eventPathBuilder.Node(eventPath.mNodeId)
-            .Event(eventPath.mEventId)
-            .Endpoint(eventPath.mEndpointId)
-            .Cluster(eventPath.mClusterId)
-            .EndOfEventPathIB();
-        SuccessOrExit(err = eventPathBuilder.GetError());
+        VerifyOrReturnError(apEventPathParamsList[index].IsValidEventPath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+        ReturnErrorOnFailure(aEventPathsBuilder.CreatePath().Encode(apEventPathParamsList[index]));
     }
 
     aEventPathsBuilder.EndOfEventPaths();
-    SuccessOrExit(err = aEventPathsBuilder.GetError());
-
-exit:
-    return err;
+    return aEventPathsBuilder.GetError();
 }
 
 CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
@@ -228,7 +217,7 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAt
     for (size_t index = 0; index < aAttributePathParamsListSize; index++)
     {
         VerifyOrReturnError(apAttributePathParamsList[index].IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-        ReturnErrorOnFailure(apAttributePathParamsList[index].BuildAttributePath(aAttributePathIBsBuilder.CreateAttributePath()));
+        ReturnErrorOnFailure(aAttributePathIBsBuilder.CreateAttributePath().Encode(apAttributePathParamsList[index]));
     }
     aAttributePathIBsBuilder.EndOfAttributePathIBs();
     return aAttributePathIBsBuilder.GetError();

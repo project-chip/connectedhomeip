@@ -44,6 +44,7 @@ const kResponseName      = 'response';
 const kDisabledName      = 'disabled';
 const kResponseErrorName = 'error';
 const kPICSName          = 'PICS';
+const kSaveAsName        = 'saveAs';
 
 class NullObject {
   toString()
@@ -198,6 +199,9 @@ function setDefaultResponse(test)
   const defaultResponseConstraints = {};
   setDefault(test[kResponseName], kConstraintsName, defaultResponseConstraints);
 
+  const defaultResponseSaveAs = '';
+  setDefault(test[kResponseName], kSaveAsName, defaultResponseSaveAs);
+
   const hasResponseValue              = 'value' in test[kResponseName];
   const hasResponseError              = 'error' in test[kResponseName];
   const hasResponseConstraints        = 'constraints' in test[kResponseName] && Object.keys(test[kResponseName].constraints).length;
@@ -242,11 +246,13 @@ function setDefaultResponse(test)
   }
 
   if (hasResponseValue) {
-    test[kResponseName].values.push({ name : test.attribute, value : test[kResponseName].value });
+    test[kResponseName].values.push(
+        { name : test.attribute, value : test[kResponseName].value, saveAs : test[kResponseName].saveAs });
   }
 
   if (hasResponseConstraints) {
-    test[kResponseName].values.push({ name : test.attribute, constraints : test[kResponseName].constraints });
+    test[kResponseName].values.push(
+        { name : test.attribute, constraints : test[kResponseName].constraints, saveAs : test[kResponseName].saveAs });
   }
 
   delete test[kResponseName].value;
@@ -570,6 +576,10 @@ function chip_tests_item_response_parameters(options)
         if ('constraints' in expected) {
           responseArg.hasExpectedConstraints = true;
           responseArg.expectedConstraints    = expected.constraints;
+        }
+
+        if ('saveAs' in expected) {
+          responseArg.saveAs = expected.saveAs;
         }
       }
 
