@@ -110,7 +110,7 @@ struct DeviceInfoForAttestation
 class PaaRootStore
 {
 public:
-    PaaRootStore() = default;
+    PaaRootStore()          = default;
     virtual ~PaaRootStore() = default;
 
     // Not copyable
@@ -140,7 +140,7 @@ public:
 class ArrayPaaRootStore : public PaaRootStore
 {
 public:
-    explicit ArrayPaaRootStore(const ByteSpan *derCerts, size_t numCerts) : mDerCerts(derCerts), mNumCerts(numCerts) {}
+    explicit ArrayPaaRootStore(const ByteSpan * derCerts, size_t numCerts) : mDerCerts(derCerts), mNumCerts(numCerts) {}
 
     CHIP_ERROR GetProductAttestationAuthorityCert(const ByteSpan & skid, MutableByteSpan & outPaaDerBuffer) const override
     {
@@ -153,9 +153,10 @@ public:
         for (paaIdx = 0; paaIdx < mNumCerts; ++paaIdx)
         {
             uint8_t skidBuf[Crypto::kSubjectKeyIdentifierLength] = { 0 };
-            candidate = mDerCerts[paaIdx];
-            MutableByteSpan candidateSkidSpan{skidBuf};
-            VerifyOrReturnError(CHIP_NO_ERROR == Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan), CHIP_ERROR_INTERNAL);
+            candidate                                            = mDerCerts[paaIdx];
+            MutableByteSpan candidateSkidSpan{ skidBuf };
+            VerifyOrReturnError(CHIP_NO_ERROR == Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan),
+                                CHIP_ERROR_INTERNAL);
 
             printf("data: %p, size: %zu\n", skid.data(), skid.size());
             if (skid.data_equal(candidateSkidSpan))
