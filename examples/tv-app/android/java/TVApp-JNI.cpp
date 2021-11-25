@@ -20,6 +20,7 @@
 #include "KeypadInputManager.h"
 #include "MediaInputManager.h"
 #include "WakeOnLanManager.h"
+#include "LowPowerManager.h"
 #include <app/server/java/AndroidAppServerWrapper.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
@@ -55,4 +56,9 @@ JNI_METHOD(void, setMediaInputManager)(JNIEnv *, jobject, jobject manager)
 JNI_METHOD(void, setContentLaunchManager)(JNIEnv *, jobject, jobject manager)
 {
     ContentLauncherMgr().InitializeWithObjects(manager);
+}
+
+JNI_METHOD(void, setLowPowerManager)(JNIEnv *, jobject, jobject manager)
+{
+    LowPowerMgr().InitializeWithObjects(manager);
 }

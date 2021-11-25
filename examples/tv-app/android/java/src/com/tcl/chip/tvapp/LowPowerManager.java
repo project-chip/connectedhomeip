@@ -17,20 +17,6 @@
  */
 package com.tcl.chip.tvapp;
 
-public class TvApp {
-  public TvApp() {}
-
-  public native void setKeypadInputManager(KeypadInputManager manager);
-
-  public native void setWakeOnLanManager(WakeOnLanManager manager);
-
-  public native void setMediaInputManager(MediaInputManager manager);
-
-  public native void setContentLaunchManager(ContentLaunchManager manager);
-
-  public native void setLowPowerManager(LowPowerManager manager);
-
-  static {
-    System.loadLibrary("TvApp");
-  }
+public interface LowPowerManager {
+    boolean sleep();
 }
