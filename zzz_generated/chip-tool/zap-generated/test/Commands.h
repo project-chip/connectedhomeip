@@ -43511,6 +43511,8 @@ private:
 
     void OnSuccessResponse_0() { NextTest(); }
 
+    void OnDoneResponse_0() { NextTest(); }
+
     CHIP_ERROR TestReadBackAttribute_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
@@ -43526,6 +43528,7 @@ private:
     void OnSuccessResponse_1(chip::CharSpan location)
     {
         VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("us", 2)));
+
         NextTest();
     }
 
@@ -43539,12 +43542,14 @@ private:
         locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
         return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+            locationArgument, this, OnSuccessCallback_2, OnFailureCallback_2, OnDoneCallback_2);
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_2() { NextTest(); }
+
+    void OnDoneResponse_2() { NextTest(); }
 
     CHIP_ERROR TestReadBackAttribute_3()
     {
@@ -43561,6 +43566,7 @@ private:
     void OnSuccessResponse_3(chip::CharSpan location)
     {
         VerifyOrReturn(CheckValueAsString("location", location, chip::CharSpan("", 0)));
+
         NextTest();
     }
 };
