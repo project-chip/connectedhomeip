@@ -96,7 +96,7 @@ public:
     CHIP_ERROR WriteAttribute(const AttrType & requestData, void * context, ClusterId clusterId, AttributeId attributeId,
                               WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
     {
-        return WriteAttribute(requestData, context, clusterId, attributeId, successCb, failureCb, nullptr);
+        return WriteAttribute(requestData, context, clusterId, attributeId, successCb, failureCb, nullptr /* doneCb */);
     }
 
     template <typename AttrType>

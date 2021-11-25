@@ -73,7 +73,9 @@ public:
     void OnDone(app::WriteClient * apWriteClient) override
     {
         if (mOnDone != nullptr)
+        {
             mOnDone(apWriteClient);
+        }
 
         // Always needs to be the last call
         chip::Platform::Delete(this);
