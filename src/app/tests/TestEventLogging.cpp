@@ -44,10 +44,10 @@
 namespace {
 
 static const chip::NodeId kTestDeviceNodeId1      = 0x18B4300000000001ULL;
-static const chip::NodeId kTestDeviceNodeId2      = 0x18B4300000000002ULL;
 static const chip::ClusterId kLivenessClusterId   = 0x00000022;
 static const uint32_t kLivenessChangeEvent        = 1;
-static const chip::EndpointId kTestEndpointId     = 2;
+static const chip::EndpointId kTestEndpointId1    = 2;
+static const chip::EndpointId kTestEndpointId2    = 3;
 static const chip::TLV::Tag kLivenessDeviceStatus = chip::TLV::ContextTag(1);
 
 static uint8_t gDebugEventBuffer[128];
@@ -171,9 +171,9 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2, eid3, eid4, eid5, eid6;
-    chip::app::EventSchema schema1 = { kTestDeviceNodeId1, kTestEndpointId, kLivenessClusterId, kLivenessChangeEvent,
+    chip::app::EventSchema schema1 = { kTestDeviceNodeId1, kTestEndpointId1, kLivenessClusterId, kLivenessChangeEvent,
                                        chip::app::PriorityLevel::Info };
-    chip::app::EventSchema schema2 = { kTestDeviceNodeId2, kTestEndpointId, kLivenessClusterId, kLivenessChangeEvent,
+    chip::app::EventSchema schema2 = { kTestDeviceNodeId1, kTestEndpointId2, kLivenessClusterId, kLivenessChangeEvent,
                                        chip::app::PriorityLevel::Info };
     chip::app::EventOptions options1;
     chip::app::EventOptions options2;
@@ -220,12 +220,11 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
 
     chip::app::ClusterInfo testClusterInfo1;
     testClusterInfo1.mNodeId     = kTestDeviceNodeId1;
-    testClusterInfo1.mEndpointId = kTestEndpointId;
+    testClusterInfo1.mEndpointId = kTestEndpointId1;
     testClusterInfo1.mClusterId  = kLivenessClusterId;
-    testClusterInfo1.mEventId    = kLivenessChangeEvent;
     chip::app::ClusterInfo testClusterInfo2;
-    testClusterInfo2.mNodeId     = kTestDeviceNodeId2;
-    testClusterInfo2.mEndpointId = kTestEndpointId;
+    testClusterInfo2.mNodeId     = kTestDeviceNodeId1;
+    testClusterInfo2.mEndpointId = kTestEndpointId2;
     testClusterInfo2.mClusterId  = kLivenessClusterId;
     testClusterInfo2.mEventId    = kLivenessChangeEvent;
 
@@ -241,7 +240,7 @@ static void CheckLogEventWithDiscardLowEvent(nlTestSuite * apSuite, void * apCon
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2, eid3, eid4, eid5, eid6;
-    chip::app::EventSchema schema = { kTestDeviceNodeId1, kTestEndpointId, kLivenessClusterId, kLivenessChangeEvent,
+    chip::app::EventSchema schema = { kTestDeviceNodeId1, kTestEndpointId1, kLivenessClusterId, kLivenessChangeEvent,
                                       chip::app::PriorityLevel::Debug };
     chip::app::EventOptions options;
     TestEventGenerator testEventGenerator;

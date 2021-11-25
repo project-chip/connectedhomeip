@@ -15,11 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines EventPath parser and builder in CHIP interaction model
- *
- */
 
 #include "EventPathIB.h"
 
@@ -222,5 +217,25 @@ EventPathIB::Builder & EventPathIB::Builder::EndOfEventPathIB()
     return *this;
 }
 
-}; // namespace app
-}; // namespace chip
+CHIP_ERROR EventPathIB::Builder::Encode(const EventPathParams & aEventPathParams)
+{
+    if (!(aEventPathParams.HasWildcardEndpointId()))
+    {
+        Endpoint(aEventPathParams.mEndpointId);
+    }
+
+    if (!(aEventPathParams.HasWildcardClusterId()))
+    {
+        Cluster(aEventPathParams.mClusterId);
+    }
+
+    if (!(aEventPathParams.HasWildcardEventId()))
+    {
+        Event(aEventPathParams.mEventId);
+    }
+
+    EndOfEventPathIB();
+    return GetError();
+}
+} // namespace app
+} // namespace chip

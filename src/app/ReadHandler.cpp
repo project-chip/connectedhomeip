@@ -417,26 +417,45 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPaths::Parser & aEventPathsParser
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrExit(TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
-        VerifyOrExit(TLV::kTLVType_List == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+        VerifyOrReturnError(TLV::AnonymousTag == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         ClusterInfo clusterInfo;
         EventPathIB::Parser path;
-        err = path.Init(reader);
-        SuccessOrExit(err);
-        err = path.GetNode(&(clusterInfo.mNodeId));
-        SuccessOrExit(err);
+        ReturnErrorOnFailure(path.Init(reader));
+
         err = path.GetEndpoint(&(clusterInfo.mEndpointId));
-        SuccessOrExit(err);
+        if (err == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(!clusterInfo.HasWildcardEndpointId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+        }
+        else if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+
         err = path.GetCluster(&(clusterInfo.mClusterId));
-        SuccessOrExit(err);
+        if (err == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(!clusterInfo.HasWildcardClusterId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+        }
+        else if (err == CHIP_END_OF_TLV)
+        {
+            err = CHIP_NO_ERROR;
+        }
+        ReturnErrorOnFailure(err);
+
         err = path.GetEvent(&(clusterInfo.mEventId));
         if (CHIP_END_OF_TLV == err)
         {
             err = CHIP_NO_ERROR;
         }
-        SuccessOrExit(err);
-        err = InteractionModelEngine::GetInstance()->PushFront(mpEventClusterInfoList, clusterInfo);
-        SuccessOrExit(err);
+        else if (err == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(!clusterInfo.HasWildcardEventId(), err = CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+        }
+        ReturnErrorOnFailure(err);
+
+        ReturnErrorOnFailure(InteractionModelEngine::GetInstance()->PushFront(mpEventClusterInfoList, clusterInfo));
     }
 
     // if we have exhausted this container
@@ -444,8 +463,6 @@ CHIP_ERROR ReadHandler::ProcessEventPaths(EventPaths::Parser & aEventPathsParser
     {
         err = CHIP_NO_ERROR;
     }
-
-exit:
     return err;
 }
 
