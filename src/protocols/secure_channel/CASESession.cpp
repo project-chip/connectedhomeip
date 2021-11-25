@@ -339,9 +339,6 @@ CHIP_ERROR CASESession::SendSigma1()
     uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
 
     // Generate an ephemeral keypair
-#ifdef ENABLE_HSM_CASE_EPHEMERAL_KEY
-    mEphemeralKey.SetKeyId(CASE_EPHEMERAL_KEY);
-#endif
     ReturnErrorOnFailure(mEphemeralKey.Initialize());
 
     // Fill in the random value
