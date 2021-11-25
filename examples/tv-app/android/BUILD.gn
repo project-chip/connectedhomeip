@@ -36,8 +36,6 @@ shared_library("jni") {
     "include/cluster-init.cpp",
     "include/endpoint-configuration/EndpointConfigurationStorage.cpp",
     "include/endpoint-configuration/EndpointConfigurationStorage.h",
-    "include/low-power/LowPowerManager.cpp",
-    "include/low-power/LowPowerManager.h",
     "include/media-playback/MediaPlaybackManager.cpp",
     "include/media-playback/MediaPlaybackManager.h",
     "include/target-navigator/TargetNavigatorManager.cpp",
@@ -53,6 +51,8 @@ shared_library("jni") {
     "java/WakeOnLanManager.h",
     "java/ContentLauncherManager.h",
     "java/ContentLauncherManager.cpp",
+    "java/LowPowerManager.cpp",
+    "java/LowPowerManager.h",
   ]
 
   deps = [
@@ -96,6 +96,8 @@ android_library("java") {
     "java/src/com/tcl/chip/tvapp/ContentLaunchManagerStub.java",
     "java/src/com/tcl/chip/tvapp/ContentLaunchResponse.java",
     "java/src/com/tcl/chip/tvapp/ContentLaunchSearchParameter.java",
+    "java/src/com/tcl/chip/tvapp/LowPowerManager.java",
+    "java/src/com/tcl/chip/tvapp/LowPowerManagerStub.java",
   ]
 
   javac_flags = [ "-Xlint:deprecation" ]

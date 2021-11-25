@@ -21,6 +21,7 @@ import com.tcl.chip.tvapp.KeypadInputManagerStub;
 import com.tcl.chip.tvapp.MediaInputManagerStub;
 import com.tcl.chip.tvapp.TvApp;
 import com.tcl.chip.tvapp.WakeOnLanManagerStub;
+import com.tcl.chip.tvapp.LowPowerManagerStub;
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     tvApp.setWakeOnLanManager(new WakeOnLanManagerStub());
     tvApp.setMediaInputManager(new MediaInputManagerStub());
     tvApp.setContentLaunchManager(new ContentLaunchManagerStub());
+    tvApp.setLowPowerManager(new LowPowerManagerStub());
 
     AndroidChipPlatform chipPlatform =
         new AndroidChipPlatform(
