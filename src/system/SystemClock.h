@@ -222,7 +222,7 @@ public:
      *                                      If the calling application does not have the privilege to set the
      *                                      current time.
      */
-    virtual CHIP_ERROR SetClock_RealTime(uint64_t newCurTime)  = 0;
+    virtual CHIP_ERROR SetClock_RealTime(uint64_t newCurTime) = 0;
 };
 
 // Currently we have a single implementation class, ClockImpl, whose members are implemented in build-specific files.
