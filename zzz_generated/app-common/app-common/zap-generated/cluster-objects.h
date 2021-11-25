@@ -1481,8 +1481,9 @@ namespace Structs {
 namespace SceneExtensionFieldSet {
 enum class Fields
 {
-    kClusterId =
-        , kLength =, kValue =,
+    kClusterId = 1,
+    kLength    = 2,
+    kValue     = 3,
 };
 
 struct Type
@@ -4039,8 +4040,10 @@ namespace Structs {
 namespace PowerProfileRecord {
 enum class Fields
 {
-    kPowerProfileId =
-        , kEnergyPhaseId =, kPowerProfileRemoteControl =, kPowerProfileState =,
+    kPowerProfileId            = 1,
+    kEnergyPhaseId             = 2,
+    kPowerProfileRemoteControl = 3,
+    kPowerProfileState         = 4,
 };
 
 struct Type
@@ -4061,8 +4064,8 @@ using DecodableType = Type;
 namespace ScheduledPhase {
 enum class Fields
 {
-    kEnergyPhaseId =,
-    kScheduledTime =,
+    kEnergyPhaseId = 1,
+    kScheduledTime = 2,
 };
 
 struct Type
@@ -4081,8 +4084,12 @@ using DecodableType = Type;
 namespace TransferredPhase {
 enum class Fields
 {
-    kEnergyPhaseId =
-        , kMacroPhaseId =, kExpectedDuration =, kPeakPower =, kEnergy =, kMaxActivationDelay =,
+    kEnergyPhaseId      = 1,
+    kMacroPhaseId       = 2,
+    kExpectedDuration   = 3,
+    kPeakPower          = 4,
+    kEnergy             = 5,
+    kMaxActivationDelay = 6,
 };
 
 struct Type
@@ -5437,8 +5444,8 @@ namespace Structs {
 namespace DeviceType {
 enum class Fields
 {
-    kType     =,
-    kRevision =,
+    kType     = 1,
+    kRevision = 2,
 };
 
 struct Type
@@ -5913,8 +5920,12 @@ namespace Structs {
 namespace ActionStruct {
 enum class Fields
 {
-    kActionID =
-        , kName =, kType =, kEndpointListID =, kSupportedCommands =, kStatus =,
+    kActionID          = 1,
+    kName              = 2,
+    kType              = 3,
+    kEndpointListID    = 4,
+    kSupportedCommands = 5,
+    kStatus            = 6,
 };
 
 struct Type
@@ -5937,8 +5948,10 @@ using DecodableType = Type;
 namespace EndpointListStruct {
 enum class Fields
 {
-    kEndpointListID =
-        , kName =, kType =, kEndpoints =,
+    kEndpointListID = 1,
+    kName           = 2,
+    kType           = 3,
+    kEndpoints      = 4,
 };
 
 struct Type
@@ -8073,7 +8086,7 @@ namespace Structs {
 namespace BasicCommissioningInfoType {
 enum class Fields
 {
-    kFailSafeExpiryLengthMs =,
+    kFailSafeExpiryLengthMs = 1,
 };
 
 struct Type
@@ -8433,7 +8446,7 @@ namespace Structs {
 namespace ThreadInterfaceScanResult {
 enum class Fields
 {
-    kDiscoveryResponse =,
+    kDiscoveryResponse = 1,
 };
 
 struct Type
@@ -8451,8 +8464,11 @@ using DecodableType = Type;
 namespace WiFiInterfaceScanResult {
 enum class Fields
 {
-    kSecurity =
-        , kSsid =, kBssid =, kChannel =, kFrequencyBand =,
+    kSecurity      = 1,
+    kSsid          = 2,
+    kBssid         = 3,
+    kChannel       = 4,
+    kFrequencyBand = 5,
 };
 
 struct Type
@@ -9400,8 +9416,12 @@ namespace Structs {
 namespace NetworkInterfaceType {
 enum class Fields
 {
-    kName =
-        , kFabricConnected =, kOffPremiseServicesReachableIPv4 =, kOffPremiseServicesReachableIPv6 =, kHardwareAddress =, kType =,
+    kName                            = 1,
+    kFabricConnected                 = 2,
+    kOffPremiseServicesReachableIPv4 = 3,
+    kOffPremiseServicesReachableIPv6 = 4,
+    kHardwareAddress                 = 5,
+    kType                            = 6,
 };
 
 struct Type
@@ -9685,8 +9705,9 @@ namespace Structs {
 namespace SoftwareFault {
 enum class Fields
 {
-    kId =
-        , kName =, kFaultRecording =,
+    kId             = 1,
+    kName           = 2,
+    kFaultRecording = 3,
 };
 
 struct Type
@@ -9706,8 +9727,11 @@ using DecodableType = Type;
 namespace ThreadMetrics {
 enum class Fields
 {
-    kId =
-        , kName =, kStackFreeCurrent =, kStackFreeMinimum =, kStackSize =,
+    kId               = 1,
+    kName             = 2,
+    kStackFreeCurrent = 3,
+    kStackFreeMinimum = 4,
+    kStackSize        = 5,
 };
 
 struct Type
@@ -9920,14 +9944,20 @@ namespace Structs {
 namespace NeighborTable {
 enum class Fields
 {
-    kExtAddress       =,
-    kAge              =,
-    kRloc16           =,
-    kLinkFrameCounter =,
-    kMleFrameCounter  =,
-    kLqi              =,
-    kAverageRssi =
-        , kLastRssi =, kFrameErrorRate =, kMessageErrorRate =, kRxOnWhenIdle =, kFullThreadDevice =, kFullNetworkData =, kIsChild =,
+    kExtAddress       = 1,
+    kAge              = 2,
+    kRloc16           = 3,
+    kLinkFrameCounter = 4,
+    kMleFrameCounter  = 5,
+    kLqi              = 6,
+    kAverageRssi      = 7,
+    kLastRssi         = 8,
+    kFrameErrorRate   = 9,
+    kMessageErrorRate = 10,
+    kRxOnWhenIdle     = 11,
+    kFullThreadDevice = 12,
+    kFullNetworkData  = 13,
+    kIsChild          = 14,
 };
 
 struct Type
@@ -9958,13 +9988,18 @@ using DecodableType = Type;
 namespace OperationalDatasetComponents {
 enum class Fields
 {
-    kActiveTimestampPresent  =,
-    kPendingTimestampPresent =,
-    kMasterKeyPresent        =,
-    kNetworkNamePresent      =,
-    kExtendedPanIdPresent    =,
-    kMeshLocalPrefixPresent =
-        , kDelayPresent =, kPanIdPresent =, kChannelPresent =, kPskcPresent =, kSecurityPolicyPresent =, kChannelMaskPresent =,
+    kActiveTimestampPresent  = 1,
+    kPendingTimestampPresent = 2,
+    kMasterKeyPresent        = 3,
+    kNetworkNamePresent      = 4,
+    kExtendedPanIdPresent    = 5,
+    kMeshLocalPrefixPresent  = 6,
+    kDelayPresent            = 7,
+    kPanIdPresent            = 8,
+    kChannelPresent          = 9,
+    kPskcPresent             = 10,
+    kSecurityPolicyPresent   = 11,
+    kChannelMaskPresent      = 12,
 };
 
 struct Type
@@ -9993,8 +10028,16 @@ using DecodableType = Type;
 namespace RouteTable {
 enum class Fields
 {
-    kExtAddress =
-        , kRloc16 =, kRouterId =, kNextHop =, kPathCost =, kLQIIn =, kLQIOut =, kAge =, kAllocated =, kLinkEstablished =,
+    kExtAddress      = 1,
+    kRloc16          = 2,
+    kRouterId        = 3,
+    kNextHop         = 4,
+    kPathCost        = 5,
+    kLQIIn           = 6,
+    kLQIOut          = 7,
+    kAge             = 8,
+    kAllocated       = 9,
+    kLinkEstablished = 10,
 };
 
 struct Type
@@ -10021,8 +10064,8 @@ using DecodableType = Type;
 namespace SecurityPolicy {
 enum class Fields
 {
-    kRotationTime =,
-    kFlags        =,
+    kRotationTime = 1,
+    kFlags        = 2,
 };
 
 struct Type
@@ -12228,8 +12271,12 @@ namespace Structs {
 namespace FabricDescriptor {
 enum class Fields
 {
-    kFabricIndex =
-        , kRootPublicKey =, kVendorId =, kFabricId =, kNodeId =, kLabel =,
+    kFabricIndex   = 1,
+    kRootPublicKey = 2,
+    kVendorId      = 3,
+    kFabricId      = 4,
+    kNodeId        = 5,
+    kLabel         = 6,
 };
 
 struct Type
@@ -12252,8 +12299,8 @@ using DecodableType = Type;
 namespace NOCStruct {
 enum class Fields
 {
-    kFabricIndex =,
-    kNoc         =,
+    kFabricIndex = 1,
+    kNoc         = 2,
 };
 
 struct Type
@@ -12847,8 +12894,8 @@ namespace Structs {
 namespace LabelStruct {
 enum class Fields
 {
-    kLabel =,
-    kValue =,
+    kLabel = 1,
+    kValue = 2,
 };
 
 struct Type
@@ -12981,8 +13028,9 @@ namespace Structs {
 namespace ModeOptionStruct {
 enum class Fields
 {
-    kLabel =
-        , kMode =, kSemanticTag =,
+    kLabel       = 1,
+    kMode        = 2,
+    kSemanticTag = 3,
 };
 
 struct Type
@@ -13002,8 +13050,8 @@ using DecodableType = Type;
 namespace SemanticTag {
 enum class Fields
 {
-    kMfgCode =,
-    kValue   =,
+    kMfgCode = 1,
+    kValue   = 2,
 };
 
 struct Type
@@ -23690,8 +23738,8 @@ namespace Structs {
 namespace IasAceZoneStatusResult {
 enum class Fields
 {
-    kZoneId     =,
-    kZoneStatus =,
+    kZoneId     = 1,
+    kZoneStatus = 2,
 };
 
 struct Type
@@ -24705,8 +24753,11 @@ namespace Structs {
 namespace TvChannelInfo {
 enum class Fields
 {
-    kMajorNumber =
-        , kMinorNumber =, kName =, kCallSign =, kAffiliateCallSign =,
+    kMajorNumber       = 1,
+    kMinorNumber       = 2,
+    kName              = 3,
+    kCallSign          = 4,
+    kAffiliateCallSign = 5,
 };
 
 struct Type
@@ -24728,8 +24779,10 @@ using DecodableType = Type;
 namespace TvChannelLineupInfo {
 enum class Fields
 {
-    kOperatorName =
-        , kLineupName =, kPostalCode =, kLineupInfoType =,
+    kOperatorName   = 1,
+    kLineupName     = 2,
+    kPostalCode     = 3,
+    kLineupInfoType = 4,
 };
 
 struct Type
@@ -24980,8 +25033,8 @@ namespace Structs {
 namespace NavigateTargetTargetInfo {
 enum class Fields
 {
-    kIdentifier =,
-    kName       =,
+    kIdentifier = 1,
+    kName       = 2,
 };
 
 struct Type
@@ -25166,8 +25219,8 @@ namespace Structs {
 namespace MediaPlaybackPosition {
 enum class Fields
 {
-    kUpdatedAt =,
-    kPosition  =,
+    kUpdatedAt = 1,
+    kPosition  = 2,
 };
 
 struct Type
@@ -26072,8 +26125,10 @@ namespace Structs {
 namespace MediaInputInfo {
 enum class Fields
 {
-    kIndex =
-        , kInputType =, kName =, kDescription =,
+    kIndex       = 1,
+    kInputType   = 2,
+    kName        = 3,
+    kDescription = 4,
 };
 
 struct Type
@@ -26627,8 +26682,8 @@ namespace Structs {
 namespace ContentLaunchAdditionalInfo {
 enum class Fields
 {
-    kName  =,
-    kValue =,
+    kName  = 1,
+    kValue = 2,
 };
 
 struct Type
@@ -26647,8 +26702,9 @@ using DecodableType = Type;
 namespace ContentLaunchParamater {
 enum class Fields
 {
-    kType =
-        , kValue =, kExternalIDList =,
+    kType           = 1,
+    kValue          = 2,
+    kExternalIDList = 3,
 };
 
 struct Type
@@ -26674,8 +26730,12 @@ public:
 namespace ContentLaunchBrandingInformation {
 enum class Fields
 {
-    kProviderName =
-        , kBackground =, kLogo =, kProgressBar =, kSplash =, kWaterMark =,
+    kProviderName = 1,
+    kBackground   = 2,
+    kLogo         = 3,
+    kProgressBar  = 4,
+    kSplash       = 5,
+    kWaterMark    = 6,
 };
 
 struct Type
@@ -26698,8 +26758,9 @@ using DecodableType = Type;
 namespace ContentLaunchDimension {
 enum class Fields
 {
-    kWidth =
-        , kHeight =, kMetric =,
+    kWidth  = 1,
+    kHeight = 2,
+    kMetric = 3,
 };
 
 struct Type
@@ -26719,8 +26780,9 @@ using DecodableType = Type;
 namespace ContentLaunchStyleInformation {
 enum class Fields
 {
-    kImageUrl =
-        , kColor =, kSize =,
+    kImageUrl = 1,
+    kColor    = 2,
+    kSize     = 3,
 };
 
 struct Type
@@ -26968,8 +27030,9 @@ namespace Structs {
 namespace AudioOutputInfo {
 enum class Fields
 {
-    kIndex =
-        , kOutputType =, kName =,
+    kIndex      = 1,
+    kOutputType = 2,
+    kName       = 3,
 };
 
 struct Type
@@ -27135,8 +27198,8 @@ namespace Structs {
 namespace ApplicationLauncherApp {
 enum class Fields
 {
-    kCatalogVendorId =,
-    kApplicationId   =,
+    kCatalogVendorId = 1,
+    kApplicationId   = 2,
 };
 
 struct Type
@@ -27631,8 +27694,14 @@ namespace Structs {
 namespace SimpleStruct {
 enum class Fields
 {
-    kA =
-        , kB =, kC =, kD =, kE =, kF =, kG =, kH =,
+    kA = 1,
+    kB = 2,
+    kC = 3,
+    kD = 4,
+    kE = 5,
+    kF = 6,
+    kG = 7,
+    kH = 8,
 };
 
 struct Type
@@ -27657,14 +27726,18 @@ using DecodableType = Type;
 namespace NullablesAndOptionalsStruct {
 enum class Fields
 {
-    kNullableInt            =,
-    kOptionalInt            =,
-    kNullableOptionalInt    =,
-    kNullableString         =,
-    kOptionalString         =,
-    kNullableOptionalString =,
-    kNullableStruct =
-        , kOptionalStruct =, kNullableOptionalStruct =, kNullableList =, kOptionalList =, kNullableOptionalList =,
+    kNullableInt            = 1,
+    kOptionalInt            = 2,
+    kNullableOptionalInt    = 3,
+    kNullableString         = 4,
+    kOptionalString         = 5,
+    kNullableOptionalString = 6,
+    kNullableStruct         = 7,
+    kOptionalStruct         = 8,
+    kNullableOptionalStruct = 9,
+    kNullableList           = 10,
+    kOptionalList           = 11,
+    kNullableOptionalList   = 12,
 };
 
 struct Type
@@ -27708,8 +27781,9 @@ public:
 namespace NestedStruct {
 enum class Fields
 {
-    kA =
-        , kB =, kC =,
+    kA = 1,
+    kB = 2,
+    kC = 3,
 };
 
 struct Type
@@ -27729,8 +27803,13 @@ using DecodableType = Type;
 namespace NestedStructList {
 enum class Fields
 {
-    kA =
-        , kB =, kC =, kD =, kE =, kF =, kG =,
+    kA = 1,
+    kB = 2,
+    kC = 3,
+    kD = 4,
+    kE = 5,
+    kF = 6,
+    kG = 7,
 };
 
 struct Type
@@ -27764,7 +27843,7 @@ public:
 namespace DoubleNestedStructList {
 enum class Fields
 {
-    kA =,
+    kA = 1,
 };
 
 struct Type
@@ -27786,8 +27865,8 @@ public:
 namespace TestListStructOctet {
 enum class Fields
 {
-    kFabricIndex     =,
-    kOperationalCert =,
+    kFabricIndex     = 1,
+    kOperationalCert = 2,
 };
 
 struct Type
@@ -32546,8 +32625,11 @@ namespace Structs {
 namespace GroupKey {
 enum class Fields
 {
-    kVendorId =
-        , kGroupKeyIndex =, kGroupKeyRoot =, kGroupKeyEpochStartTime =, kGroupKeySecurityPolicy =,
+    kVendorId               = 1,
+    kGroupKeyIndex          = 2,
+    kGroupKeyRoot           = 3,
+    kGroupKeyEpochStartTime = 4,
+    kGroupKeySecurityPolicy = 5,
 };
 
 struct Type
@@ -32569,8 +32651,9 @@ using DecodableType = Type;
 namespace GroupState {
 enum class Fields
 {
-    kVendorId =
-        , kVendorGroupId =, kGroupKeySetIndex =,
+    kVendorId         = 1,
+    kVendorGroupId    = 2,
+    kGroupKeySetIndex = 3,
 };
 
 struct Type
