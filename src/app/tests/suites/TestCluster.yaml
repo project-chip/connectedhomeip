@@ -874,6 +874,8 @@ tests:
                         d: "octet_string",
                         e: "char_string",
                         f: 1,
+                        g: 0,
+                        h: 0,
                     }
       response:
           values:
@@ -893,6 +895,8 @@ tests:
                         d: "octet_string",
                         e: "char_string",
                         f: 1,
+                        g: 0,
+                        h: 0,
                     }
       response:
           values:
@@ -918,6 +922,8 @@ tests:
                                 d: "octet_string",
                                 e: "char_string",
                                 f: 1,
+                                g: 0,
+                                h: 0,
                             },
                     }
       response:
@@ -943,6 +949,8 @@ tests:
                                 d: "octet_string",
                                 e: "char_string",
                                 f: 1,
+                                g: 0,
+                                h: 0,
                             },
                     }
       response:
@@ -970,6 +978,8 @@ tests:
                                 d: "octet_string",
                                 e: "char_string",
                                 f: 1,
+                                g: 0,
+                                h: 0,
                             },
                         d:
                             [
@@ -980,6 +990,8 @@ tests:
                                     d: "nested_octet_string",
                                     e: "nested_char_string",
                                     f: 1,
+                                    g: 0,
+                                    h: 0,
                                 },
                                 {
                                     a: 2,
@@ -988,6 +1000,8 @@ tests:
                                     d: "nested_octet_string",
                                     e: "nested_char_string",
                                     f: 1,
+                                    g: 0,
+                                    h: 0,
                                 },
                             ],
                         e: [1, 2, 3],
@@ -1024,6 +1038,8 @@ tests:
                                 d: "octet_string",
                                 e: "char_string",
                                 f: 1,
+                                g: 0,
+                                h: 0,
                             },
                         d:
                             [
@@ -1034,6 +1050,8 @@ tests:
                                     d: "nested_octet_string",
                                     e: "nested_char_string",
                                     f: 1,
+                                    g: 0,
+                                    h: 0,
                                 },
                                 {
                                     a: 2,
@@ -1042,6 +1060,8 @@ tests:
                                     d: "nested_octet_string",
                                     e: "nested_char_string",
                                     f: 1,
+                                    g: 0,
+                                    h: 0,
                                 },
                             ],
                         e: [1, 2, 3],
@@ -1057,6 +1077,37 @@ tests:
           values:
               - name: "value"
                 value: false
+
+    - label: "Send Test Command With Struct Argument and see what we get back"
+      command: "SimpleStructEchoRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 17,
+                        b: false,
+                        c: 2,
+                        d: "octet_string",
+                        e: "char_string",
+                        f: 1,
+                        g: 0.1,
+                        h: 0.1,
+                    }
+      response:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 17,
+                        b: false,
+                        c: 2,
+                        d: "octet_string",
+                        e: "char_string",
+                        f: 1,
+                        g: 0.1,
+                        h: 0.1,
+                    }
 
     # Tests for List
 
@@ -1121,6 +1172,8 @@ tests:
                             d: "first_octet_string",
                             e: "first_char_string",
                             f: 1,
+                            g: 0,
+                            h: 0,
                         },
                         {
                             a: 1,
@@ -1129,6 +1182,8 @@ tests:
                             d: "second_octet_string",
                             e: "second_char_string",
                             f: 1,
+                            g: 0,
+                            h: 0,
                         },
                     ]
       response:
@@ -1152,6 +1207,8 @@ tests:
                             d: "second_octet_string",
                             e: "second_char_string",
                             f: 1,
+                            g: 0,
+                            h: 0,
                         },
                         {
                             a: 0,
@@ -1160,6 +1217,8 @@ tests:
                             d: "first_octet_string",
                             e: "first_char_string",
                             f: 1,
+                            g: 0,
+                            h: 0,
                         },
                     ]
       response:
@@ -1188,6 +1247,8 @@ tests:
                                     d: "octet_string",
                                     e: "char_string",
                                     f: 1,
+                                    g: 0,
+                                    h: 0,
                                 },
                             d:
                                 [
@@ -1198,6 +1259,8 @@ tests:
                                         d: "nested_octet_string",
                                         e: "nested_char_string",
                                         f: 1,
+                                        g: 0,
+                                        h: 0,
                                     },
                                     {
                                         a: 2,
@@ -1206,6 +1269,8 @@ tests:
                                         d: "nested_octet_string",
                                         e: "nested_char_string",
                                         f: 1,
+                                        g: 0,
+                                        h: 0,
                                     },
                                 ],
                             e: [1, 2, 3],
@@ -1244,6 +1309,8 @@ tests:
                                     d: "octet_string",
                                     e: "char_string",
                                     f: 1,
+                                    g: 0,
+                                    h: 0,
                                 },
                             d:
                                 [
@@ -1254,6 +1321,8 @@ tests:
                                         d: "nested_octet_string",
                                         e: "nested_char_string",
                                         f: 1,
+                                        g: 0,
+                                        h: 0,
                                     },
                                     {
                                         a: 2,
@@ -1262,6 +1331,8 @@ tests:
                                         d: "nested_octet_string",
                                         e: "nested_char_string",
                                         f: 1,
+                                        g: 0,
+                                        h: 0,
                                     },
                                 ],
                             e: [1, 2, 3],

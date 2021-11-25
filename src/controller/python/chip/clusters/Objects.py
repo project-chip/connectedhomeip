@@ -24334,6 +24334,10 @@ class TestCluster(Cluster):
                             Label="e", Tag=4, Type=str),
                         ClusterObjectFieldDescriptor(
                             Label="f", Tag=5, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="g", Tag=6, Type=float),
+                        ClusterObjectFieldDescriptor(
+                            Label="h", Tag=7, Type=float),
                     ])
 
             a: 'uint' = None
@@ -24342,6 +24346,8 @@ class TestCluster(Cluster):
             d: 'bytes' = None
             e: 'str' = None
             f: 'uint' = None
+            g: 'float' = None
+            h: 'float' = None
 
         @dataclass
         class NullablesAndOptionalsStruct(ClusterObject):
@@ -24879,6 +24885,22 @@ class TestCluster(Cluster):
             arg1: 'typing.List[TestCluster.Structs.SimpleStruct]' = None
 
         @dataclass
+        class SimpleStructResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0009
+            is_client: typing.ClassVar[bool] = False
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="arg1", Tag=0, Type=TestCluster.Structs.SimpleStruct),
+                    ])
+
+            arg1: 'TestCluster.Structs.SimpleStruct' = None
+
+        @dataclass
         class TestListInt8UArgumentRequest(ClusterCommand):
             cluster_id: typing.ClassVar[int] = 0x050F
             command_id: typing.ClassVar[int] = 0x000A
@@ -25025,6 +25047,22 @@ class TestCluster(Cluster):
             nullableList: 'typing.Union[Nullable, typing.List[TestCluster.Enums.SimpleEnum]]' = None
             optionalList: 'typing.Optional[typing.List[TestCluster.Enums.SimpleEnum]]' = None
             nullableOptionalList: 'typing.Union[None, Nullable, typing.List[TestCluster.Enums.SimpleEnum]]' = None
+
+        @dataclass
+        class SimpleStructEchoRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0011
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="arg1", Tag=0, Type=TestCluster.Structs.SimpleStruct),
+                    ])
+
+            arg1: 'TestCluster.Structs.SimpleStruct' = None
 
     class Attributes:
         @dataclass

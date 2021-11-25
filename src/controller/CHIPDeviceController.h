@@ -107,7 +107,8 @@ struct ControllerInitParams
 
     uint16_t controllerVendorId;
 
-    FabricId fabricId = kUndefinedFabricId;
+    FabricIndex fabricIndex = kMinValidFabricIndex;
+    FabricId fabricId       = kUndefinedFabricId;
 };
 
 enum CommissioningStage : uint8_t

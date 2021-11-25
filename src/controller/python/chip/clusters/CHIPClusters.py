@@ -3637,6 +3637,20 @@ class ChipClusters:
         "clusterName": "TestCluster",
         "clusterId": 0x0000050F,
         "commands": {
+            0x00000011: {
+                "commandId": 0x00000011,
+                "commandName": "SimpleStructEchoRequest",
+                "args": {
+                    "a": "int",
+                    "b": "bool",
+                    "c": "int",
+                    "d": "bytes",
+                    "e": "str",
+                    "f": "int",
+                    "g": "",
+                    "h": "",
+                },
+            },
             0x00000000: {
                 "commandId": 0x00000000,
                 "commandName": "Test",
@@ -3683,6 +3697,8 @@ class ChipClusters:
                     "d": "bytes",
                     "e": "str",
                     "f": "int",
+                    "g": "",
+                    "h": "",
                 },
             },
             0x00000001: {
@@ -3714,6 +3730,8 @@ class ChipClusters:
                     "d": "bytes",
                     "e": "str",
                     "f": "int",
+                    "g": "",
+                    "h": "",
                 },
             },
             0x00000003: {

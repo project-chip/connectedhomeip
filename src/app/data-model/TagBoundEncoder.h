@@ -39,7 +39,7 @@ public:
     TagBoundEncoder(TLV::TLVWriter * aWriter, TLV::Tag aTag) : mWriter(aWriter), mTag(aTag) {}
 
     template <typename... Ts>
-    CHIP_ERROR Encode(Ts... aArgs) const
+    CHIP_ERROR Encode(Ts &&... aArgs) const
     {
         VerifyOrReturnError(mWriter != nullptr, CHIP_ERROR_INCORRECT_STATE);
         return DataModel::Encode(*mWriter, mTag, std::forward<Ts>(aArgs)...);

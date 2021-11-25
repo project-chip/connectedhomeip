@@ -99,6 +99,10 @@ function asObjectiveCNumberType(label, type, asLowerCased)
             return 'Int';
           case 'int64_t':
             return 'LongLong';
+          case 'float':
+            return 'Float';
+          case 'double':
+            return 'Double';
           default:
             error = label + ': Unhandled underlying type ' + zclType + ' for original type ' + type;
             throw error;

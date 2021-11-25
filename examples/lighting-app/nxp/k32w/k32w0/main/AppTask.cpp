@@ -39,6 +39,13 @@
 #include "TimersManager.h"
 #include "app_config.h"
 
+#if CHIP_CRYPTO_HSM
+#include <crypto/hsm/CHIPCryptoPALHsm.h>
+#endif
+#ifdef ENABLE_HSM_DEVICE_ATTESTATION
+#include "DeviceAttestationSe05xCredsExample.h"
+#endif
+
 #define FACTORY_RESET_TRIGGER_TIMEOUT 6000
 #define FACTORY_RESET_CANCEL_WINDOW_TIMEOUT 3000
 #define APP_TASK_STACK_SIZE (4096)
@@ -90,7 +97,11 @@ CHIP_ERROR AppTask::Init()
     chip::Server::GetInstance().Init();
 
     // Initialize device attestation config
+#ifdef ENABLE_HSM_DEVICE_ATTESTATION
+    SetDeviceAttestationCredentialsProvider(Examples::GetExampleSe05xDACProvider());
+#else
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
+#endif
 
     // QR code will be used with CHIP Tool
     PrintOnboardingCodes(chip::RendezvousInformationFlags(chip::RendezvousInformationFlag::kBLE));

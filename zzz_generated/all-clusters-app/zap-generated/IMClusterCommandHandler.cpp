@@ -1627,6 +1627,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
+        case Commands::SimpleStructEchoRequest::Id: {
+            Commands::SimpleStructEchoRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfTestClusterClusterSimpleStructEchoRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::Test::Id: {
             Commands::Test::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);

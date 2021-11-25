@@ -218,7 +218,7 @@ bool emberAfOnOffClusterOffWithEffectCallback(app::CommandHandler * commandObj, 
         // If the application handled the effect, the endpoint shall enter its
         // "off" state, update the OnOff attribute accordingly, and set the OnTime
         // attribute to 0x0000.
-        status = emberAfOnOffClusterSetValueCallback(endpoint, ZCL_OFF_COMMAND_ID, false);
+        status = OnOffServer::Instance().setOnOffValue(endpoint, ZCL_OFF_COMMAND_ID, false);
         if (status == EMBER_ZCL_STATUS_SUCCESS)
         {
             status = writeOnTime(endpoint, 0x0000);
