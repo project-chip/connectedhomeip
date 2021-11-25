@@ -264,7 +264,7 @@
             "configFiles": ["${input:mbedTarget}.tcl"],
             "overrideLaunchCommands": [
                 "monitor reset halt",
-                "monitor program {./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-unit-tests}",
+                "monitor program {./build-${input:mbedTarget}/${input:mbedFlashProfile}/chip-mbed-unit-tests.hex}",
                 "monitor reset run",
                 "quit"
             ],
@@ -315,7 +315,8 @@
                 "lighting-app",
                 "pigweed-app",
                 "all-clusters-app",
-                "shell"
+                "shell",
+                "ota-requestor-app"
             ],
             "default": "lock-app"
         },

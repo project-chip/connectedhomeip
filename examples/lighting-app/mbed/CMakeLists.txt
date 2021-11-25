@@ -109,11 +109,6 @@ if(MBED_TARGET STREQUAL "CY8CPROTO_062_4343W")
     target_link_libraries(${APP_TARGET} mbed-cy-psoc6-common-network)
 endif()
 
-if("capsense" IN_LIST MBED_TARGET_LABELS)
-    add_subdirectory(${CHIP_ROOT}/third_party/mbed-os-cypress-capsense-button/repo ./capsense_build)
-    target_link_libraries(${APP_TARGET} capsense)
-endif()
-
 mbed_set_post_build(${APP_TARGET})
 
 option(VERBOSE_BUILD "Have a verbose build process")
