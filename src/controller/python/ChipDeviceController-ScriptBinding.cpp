@@ -182,7 +182,9 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     }
 
     // Initialize device attestation verifier
-    SetDeviceAttestationVerifier(GetDefaultDACVerifier());
+    // TODO: Replace testingRootStore with a PaaRootStore that has the necessary official PAA roots available
+    const chip::Credentials::PaaRootStore * testingRootStore = chip::Credentials::GetTestPaaRootStore();
+    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
     CHIP_ERROR err = sOperationalCredentialsIssuer.Initialize(sStorageDelegate);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());

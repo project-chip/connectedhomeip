@@ -45,7 +45,10 @@ CHIP_ERROR CHIPCommand::Run()
     chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
 
     chip::Credentials::SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
-    chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier());
+
+    // TODO: Replace testingRootStore with a PaaRootStore that has the necessary official PAA roots available
+    const chip::Credentials::PaaRootStore * testingRootStore = chip::Credentials::GetTestPaaRootStore();
+    chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
     VerifyOrReturnError(noc.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);
     VerifyOrReturnError(icac.Alloc(chip::Controller::kMaxCHIPDERCertLength), CHIP_ERROR_NO_MEMORY);

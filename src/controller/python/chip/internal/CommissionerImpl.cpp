@@ -117,7 +117,9 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         commissionerParams.storageDelegate = &gServerStorage;
 
         // Initialize device attestation verifier
-        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier());
+        // TODO: Replace testingRootStore with a PaaRootStore that has the necessary official PAA roots available
+        const chip::Credentials::PaaRootStore * testingRootStore = chip::Credentials::GetTestPaaRootStore();
+        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
         err = ephemeralKey.Initialize();
         SuccessOrExit(err);
