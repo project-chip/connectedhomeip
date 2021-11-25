@@ -251,17 +251,7 @@ CHIP_ERROR AmebaConfig::ClearConfigValue(Key key)
 
 bool AmebaConfig::ConfigValueExists(Key key)
 {
-    int32_t exist;
-    CHIP_ERROR err;
-
-    exist = checkExist(key.Namespace, key.Name);
-
-    if (exist == 1)
-        err = CHIP_NO_ERROR;
-    else
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-
-    return (err == CHIP_NO_ERROR);
+    return checkExist(key.Namespace, key.Name);
 }
 
 CHIP_ERROR AmebaConfig::EnsureNamespace(const char * ns)
