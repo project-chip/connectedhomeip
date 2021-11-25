@@ -33,6 +33,7 @@ public class TvApp {
   public native void setMediaPlaybackManager(MediaPlaybackManager manager);
 
   public native void setTvChannelManager(TvChannelManager manager);
+
   static {
     System.loadLibrary("TvApp");
   }

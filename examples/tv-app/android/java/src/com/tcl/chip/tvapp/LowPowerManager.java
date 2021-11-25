@@ -18,5 +18,5 @@
 package com.tcl.chip.tvapp;
 
 public interface LowPowerManager {
-    boolean sleep();
+  boolean sleep();
 }

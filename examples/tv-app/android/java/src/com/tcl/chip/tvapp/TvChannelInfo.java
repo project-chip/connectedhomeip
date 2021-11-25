@@ -18,31 +18,39 @@
 package com.tcl.chip.tvapp;
 
 public class TvChannelInfo {
-    public int majorNumber;
-    public int minorNumber;
-    public String name;
-    public String callSign;
-    public String affiliateCallSign;
+  public int majorNumber;
+  public int minorNumber;
+  public String name;
+  public String callSign;
+  public String affiliateCallSign;
 
-    public TvChannelInfo() {
-    }
+  public TvChannelInfo() {}
 
-    public TvChannelInfo(int majorNumber, int minorNumber, String name, String callSign, String affiliateCallSign) {
-        this.majorNumber = majorNumber;
-        this.minorNumber = minorNumber;
-        this.name = name;
-        this.callSign = callSign;
-        this.affiliateCallSign = affiliateCallSign;
-    }
+  public TvChannelInfo(
+      int majorNumber, int minorNumber, String name, String callSign, String affiliateCallSign) {
+    this.majorNumber = majorNumber;
+    this.minorNumber = minorNumber;
+    this.name = name;
+    this.callSign = callSign;
+    this.affiliateCallSign = affiliateCallSign;
+  }
 
-    @Override
-    public String toString() {
-        return "TvChannelInfo{" +
-                "majorNumber=" + majorNumber +
-                ", minorNumber=" + minorNumber +
-                ", name='" + name + '\'' +
-                ", callSign='" + callSign + '\'' +
-                ", affiliateCallSign='" + affiliateCallSign + '\'' +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "TvChannelInfo{"
+        + "majorNumber="
+        + majorNumber
+        + ", minorNumber="
+        + minorNumber
+        + ", name='"
+        + name
+        + '\''
+        + ", callSign='"
+        + callSign
+        + '\''
+        + ", affiliateCallSign='"
+        + affiliateCallSign
+        + '\''
+        + '}';
+  }
 }
