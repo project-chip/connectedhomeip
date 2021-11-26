@@ -74,7 +74,7 @@ class AsyncCommandTransaction:
             self._future.set_result(None)
         else:
             # If a type hasn't been assigned, let's auto-deduce it.
-            if (self._expect_type is None):
+            if (self._expect_type == None):
                 self._expect_type = FindCommandClusterObject(False, path)
 
             if self._expect_type:

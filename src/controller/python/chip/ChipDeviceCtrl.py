@@ -346,11 +346,11 @@ class ChipDeviceController(object):
 
         # The callback might have been received synchronously (during self._ChipStack.Call()).
         # Check if the device is already set before waiting for the callback.
-        if returnDevice.value is None:
+        if returnDevice.value == None:
             with deviceAvailableCV:
                 deviceAvailableCV.wait()
 
-        if returnDevice.value is None:
+        if returnDevice.value == None:
             raise self._ChipStack.ErrorToException(CHIP_ERROR_INTERNAL)
         return returnDevice
 
