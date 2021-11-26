@@ -42,7 +42,7 @@ def AllTests(chip_tool: str):
             continue
 
         name = m.group(1)
-        
+
         if name.startswith('TV_'):
             target = TestTarget.TV
         else:
