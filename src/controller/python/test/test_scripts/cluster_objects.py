@@ -113,6 +113,10 @@ class ClusterObjectTests:
         ]
         await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
 
+        '''
+        Note: The following tests is disabled temporarily due to reports of random failure. However, the CI is still green.
+        Disable these tests to avoid making CI flaky before finding the root cause.
+
         logger.info("2: Reading Ex Cx A*")
         req = [
             (0, Clusters.Basic),
@@ -142,6 +146,7 @@ class ClusterObjectTests:
             None
         ]
         await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
+        '''
 
     @classmethod
     async def RunTest(cls, devCtrl):
