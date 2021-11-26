@@ -15,8 +15,9 @@
  *    limitations under the License.
  */
 #include <credentials/GroupDataProviderImpl.h>
-#include <credentials/PersistentStorageKey.h>
+#include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/DefaultStorageKeyAllocator.h>
 #include <lib/support/Pool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,78 +25,81 @@
 namespace chip {
 namespace Credentials {
 
-static constexpr uint16_t kPersistentBufferMax = 128;
+static constexpr size_t kPersistentBufferMax = 128;
 
-template <size_t S>
+template <size_t kMaxSerializedSize>
 struct PersistentData
 {
 public:
     virtual ~PersistentData() = default;
 
-    virtual void UpdateKey()                                    = 0;
+    virtual void UpdateKey(DefaultStorageKeyAllocator & key)    = 0;
     virtual void Clear()                                        = 0;
     virtual CHIP_ERROR Serialize(TLV::TLVWriter & writer) const = 0;
     virtual CHIP_ERROR Deserialize(TLV::TLVReader & reader)     = 0;
 
     CHIP_ERROR Save(chip::PersistentStorageDelegate & storage)
     {
+        uint8_t buffer[kMaxSerializedSize] = { 0 };
+        DefaultStorageKeyAllocator key;
+        // Update storage key
+        UpdateKey(key);
+
         // Serialize the data
         TLV::TLVWriter writer;
-        writer.Init(mBuffer, sizeof(mBuffer));
+        writer.Init(buffer, sizeof(buffer));
         ReturnErrorOnFailure(Serialize(writer));
 
-        // Update storage key
-        UpdateKey();
         // Save serialized data
-        ReturnErrorOnFailure(storage.SyncSetKeyValue(mKey.Value(), mBuffer, static_cast<uint16_t>(writer.GetLengthWritten())));
+        ReturnErrorOnFailure(storage.SyncSetKeyValue(key.KeyName(), buffer, static_cast<uint16_t>(writer.GetLengthWritten())));
 
         // WARNING: This read-back is a walkaround for a bug in the Darwing implementation of KeyValueStoreMgr
         //          See https://github.com/project-chip/connectedhomeip/issues/12174.
-        uint16_t size = static_cast<uint16_t>(sizeof(mBuffer));
-        ReturnErrorOnFailure(storage.SyncGetKeyValue(mKey.Value(), mBuffer, size));
-
-        return CHIP_NO_ERROR;
+        uint16_t size = static_cast<uint16_t>(sizeof(buffer));
+        return storage.SyncGetKeyValue(key.KeyName(), buffer, size);
     }
 
     CHIP_ERROR Load(chip::PersistentStorageDelegate & storage)
     {
+        uint8_t buffer[kMaxSerializedSize] = { 0 };
+        DefaultStorageKeyAllocator key;
+
+        // Set data to defaults
+        Clear();
+
         // Update storage key
-        UpdateKey();
+        UpdateKey(key);
+
         // Load the serialized data
-        uint16_t size = static_cast<uint16_t>(sizeof(mBuffer));
-        ReturnErrorOnFailure(storage.SyncGetKeyValue(mKey.Value(), mBuffer, size));
+        uint16_t size = static_cast<uint16_t>(sizeof(buffer));
+        ReturnErrorOnFailure(storage.SyncGetKeyValue(key.KeyName(), buffer, size));
 
         // Decode serialized data
-        Clear();
         TLV::TLVReader reader;
-        reader.Init(mBuffer, size);
-        ReturnErrorOnFailure(Deserialize(reader));
+        reader.Init(buffer, size);
 
-        return CHIP_NO_ERROR;
+        return Deserialize(reader);
     }
 
     CHIP_ERROR Delete(chip::PersistentStorageDelegate & storage)
     {
-        // Update storage key
-        UpdateKey();
-        // Delete stored data
-        return storage.SyncDeleteKeyValue(mKey.Value());
-    }
+        DefaultStorageKeyAllocator key;
 
-protected:
-    PersistentStorageKey mKey;
-    uint8_t mBuffer[S] = { 0 };
-    char mDebug[512];
+        // Update storage key
+        UpdateKey(key);
+        // Delete stored data
+        return storage.SyncDeleteKeyValue(key.KeyName());
+    }
 };
 
 struct FabricData : public PersistentData<kPersistentBufferMax>
 {
-    static const TLV::Tag kFirstEndpoint = 1;
-    static const TLV::Tag kEndpointCount = 2;
-    static const TLV::Tag kFirstKeyset   = 3;
-    static const TLV::Tag kKeysetCount   = 4;
+    static const TLV::Tag kTagFirstEndpoint = TLV::ContextTag(1);
+    static const TLV::Tag kTagEndpointCount = TLV::ContextTag(2);
+    static const TLV::Tag kTagFirstKeySet   = TLV::ContextTag(3);
+    static const TLV::Tag kTagKeySetCount   = TLV::ContextTag(4);
 
-    chip::FabricIndex fabric        = 0;
+    chip::FabricIndex fabric        = kUndefinedFabricIndex;
     chip::EndpointId first_endpoint = kInvalidEndpointId;
     uint16_t endpoint_count         = 0;
     uint16_t first_keyset           = 0;
@@ -103,62 +107,72 @@ struct FabricData : public PersistentData<kPersistentBufferMax>
 
     FabricData(chip::FabricIndex fabric_index) : fabric(fabric_index) {}
 
-    void UpdateKey() override { this->mKey.FabricGroups(this->fabric); }
+    void UpdateKey(DefaultStorageKeyAllocator & key) override { key.FabricGroups(this->fabric); }
 
     void Clear() override
     {
         first_endpoint = kInvalidEndpointId;
+        endpoint_count = 0;
         first_keyset   = 0;
         keyset_count   = 0;
     }
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
-        ReturnErrorOnFailure(writer.Put(kFirstEndpoint, static_cast<uint16_t>(first_endpoint)));
-        ReturnErrorOnFailure(writer.Put(kEndpointCount, static_cast<uint16_t>(endpoint_count)));
-        ReturnErrorOnFailure(writer.Put(kFirstKeyset, static_cast<uint16_t>(first_keyset)));
-        ReturnErrorOnFailure(writer.Put(kKeysetCount, static_cast<uint16_t>(keyset_count)));
+        TLV::TLVType container;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, container));
 
-        return CHIP_NO_ERROR;
+        ReturnErrorOnFailure(writer.Put(kTagFirstEndpoint, static_cast<uint16_t>(first_endpoint)));
+        ReturnErrorOnFailure(writer.Put(kTagEndpointCount, static_cast<uint16_t>(endpoint_count)));
+        ReturnErrorOnFailure(writer.Put(kTagFirstKeySet, static_cast<uint16_t>(first_keyset)));
+        ReturnErrorOnFailure(writer.Put(kTagKeySetCount, static_cast<uint16_t>(keyset_count)));
+
+        return writer.EndContainer(container);
     }
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
+        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag));
+        VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
+
+        TLV::TLVType container;
+        ReturnErrorOnFailure(reader.EnterContainer(container));
+
         // first_endpoint
-        ReturnErrorOnFailure(reader.Next(kFirstEndpoint));
+        ReturnErrorOnFailure(reader.Next(kTagFirstEndpoint));
         ReturnErrorOnFailure(reader.Get(first_endpoint));
         // endpoint_count
-        ReturnErrorOnFailure(reader.Next(kEndpointCount));
+        ReturnErrorOnFailure(reader.Next(kTagEndpointCount));
         ReturnErrorOnFailure(reader.Get(endpoint_count));
         // first_keyset
-        ReturnErrorOnFailure(reader.Next(kFirstKeyset));
+        ReturnErrorOnFailure(reader.Next(kTagFirstKeySet));
         ReturnErrorOnFailure(reader.Get(first_keyset));
         // keyset_count
-        ReturnErrorOnFailure(reader.Next(kKeysetCount));
+        ReturnErrorOnFailure(reader.Next(kTagKeySetCount));
         ReturnErrorOnFailure(reader.Get(keyset_count));
 
-        return CHIP_NO_ERROR;
+        return reader.ExitContainer(container);
     }
 };
 
 struct EndpointData : public PersistentData<kPersistentBufferMax>
 {
-    static const TLV::Tag kFirstGroup   = 1;
-    static const TLV::Tag kNextEndpoint = 2;
+    static const TLV::Tag kTagFirstGroup   = TLV::ContextTag(1);
+    static const TLV::Tag kTagNextEndpoint = TLV::ContextTag(2);
 
-    chip::FabricIndex fabric  = 0;
-    chip::EndpointId id       = 0;
-    chip::GroupId first_group = kUndefinedGroupId;
-    chip::EndpointId next     = kInvalidEndpointId;
+    chip::FabricIndex fabric     = kUndefinedFabricIndex;
+    chip::EndpointId endpoint_id = 0;
+    chip::GroupId first_group    = kUndefinedGroupId;
+    chip::EndpointId next        = kInvalidEndpointId;
 
     EndpointData() = default;
 
-    EndpointData(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id = kInvalidEndpointId,
+    EndpointData(chip::FabricIndex fabric_index, chip::EndpointId endpoint = kInvalidEndpointId,
                  chip::GroupId first = kUndefinedGroupId, chip::EndpointId next_endpoint = kInvalidEndpointId) :
         fabric(fabric_index),
-        id(endpoint_id), first_group(first), next(next_endpoint)
+        endpoint_id(endpoint), first_group(first), next(next_endpoint)
     {}
 
-    void UpdateKey() override { this->mKey.FabricEndpoint(this->fabric, this->id); }
+    void UpdateKey(DefaultStorageKeyAllocator & key) override { key.FabricEndpoint(this->fabric, this->endpoint_id); }
 
     void Clear() override
     {
@@ -168,29 +182,40 @@ struct EndpointData : public PersistentData<kPersistentBufferMax>
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
-        ReturnErrorOnFailure(writer.Put(kFirstGroup, static_cast<uint16_t>(first_group)));
-        ReturnErrorOnFailure(writer.Put(kNextEndpoint, static_cast<uint16_t>(next)));
-        return CHIP_NO_ERROR;
+        TLV::TLVType container;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, container));
+
+        ReturnErrorOnFailure(writer.Put(kTagFirstGroup, static_cast<uint16_t>(first_group)));
+        ReturnErrorOnFailure(writer.Put(kTagNextEndpoint, static_cast<uint16_t>(next)));
+
+        return writer.EndContainer(container);
     }
 
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
+        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag));
+        VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
+
+        TLV::TLVType container;
+        ReturnErrorOnFailure(reader.EnterContainer(container));
+
         // first_group
-        ReturnErrorOnFailure(reader.Next(kFirstGroup));
+        ReturnErrorOnFailure(reader.Next(kTagFirstGroup));
         ReturnErrorOnFailure(reader.Get(first_group));
         // next
-        ReturnErrorOnFailure(reader.Next(kNextEndpoint));
+        ReturnErrorOnFailure(reader.Next(kTagNextEndpoint));
         ReturnErrorOnFailure(reader.Get(next));
-        return CHIP_NO_ERROR;
+
+        return reader.ExitContainer(container);
     }
 };
 
 struct GroupData : public GroupDataProvider::GroupMapping, PersistentData<kPersistentBufferMax>
 {
-    static const TLV::Tag kTagName = 1;
-    static const TLV::Tag kTagNext = 2;
+    static const TLV::Tag kTagName = TLV::ContextTag(1);
+    static const TLV::Tag kTagNext = TLV::ContextTag(2);
 
-    chip::FabricIndex fabric = 0;
+    chip::FabricIndex fabric = kUndefinedFabricIndex;
     chip::GroupId next       = 0;
 
     GroupData(chip::FabricIndex fabric_index, chip::EndpointId endpoint_id, chip::GroupId group_id,
@@ -205,7 +230,10 @@ struct GroupData : public GroupDataProvider::GroupMapping, PersistentData<kPersi
         fabric(fabric_index), next(next_group)
     {}
 
-    void UpdateKey() override { this->mKey.FabricEndpointGroup(this->fabric, this->endpoint, this->group); }
+    void UpdateKey(DefaultStorageKeyAllocator & key) override
+    {
+        key.FabricEndpointGroup(this->fabric, this->endpoint, this->group);
+    }
 
     void Clear() override
     {
@@ -215,32 +243,45 @@ struct GroupData : public GroupDataProvider::GroupMapping, PersistentData<kPersi
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
+        TLV::TLVType container;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, container));
+
         size_t name_size = strnlen(this->name, GroupDataProvider::GroupMapping::kGroupNameMax);
         ReturnErrorOnFailure(writer.PutString(kTagName, this->name, static_cast<uint32_t>(name_size)));
         ReturnErrorOnFailure(writer.Put(kTagNext, static_cast<uint16_t>(this->next)));
-        return CHIP_NO_ERROR;
+
+        return writer.EndContainer(container);
     }
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
+        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag));
+        VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
+
+        TLV::TLVType container;
+        ReturnErrorOnFailure(reader.EnterContainer(container));
+
         // name
         ReturnErrorOnFailure(reader.Next(kTagName));
         ReturnErrorOnFailure(reader.GetString(this->name, sizeof(this->name)));
+        size_t size      = strnlen(this->name, kGroupNameMax);
+        this->name[size] = 0;
         // next
         ReturnErrorOnFailure(reader.Next(kTagNext));
         ReturnErrorOnFailure(reader.Get(this->next));
-        return CHIP_NO_ERROR;
+
+        return reader.ExitContainer(container);
     }
 };
 
 struct StateListData : public PersistentData<kPersistentBufferMax>
 {
-    static const TLV::Tag kTagFirst = 1;
-    static const TLV::Tag kTagCount = 2;
+    static const TLV::Tag kTagFirst = TLV::ContextTag(1);
+    static const TLV::Tag kTagCount = TLV::ContextTag(2);
 
     uint16_t first = 0;
     uint16_t count = 0;
 
-    void UpdateKey() override { this->mKey.GroupStates(); }
+    void UpdateKey(DefaultStorageKeyAllocator & key) override { key.GroupStates(); }
 
     void Clear() override
     {
@@ -250,42 +291,53 @@ struct StateListData : public PersistentData<kPersistentBufferMax>
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
+        TLV::TLVType container;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, container));
+
         ReturnErrorOnFailure(writer.Put(kTagFirst, static_cast<uint16_t>(first)));
         ReturnErrorOnFailure(writer.Put(kTagCount, static_cast<uint16_t>(count)));
-        return CHIP_NO_ERROR;
+
+        return writer.EndContainer(container);
     }
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
+        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag));
+        VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
+
+        TLV::TLVType container;
+        ReturnErrorOnFailure(reader.EnterContainer(container));
+
         // first
         ReturnErrorOnFailure(reader.Next(kTagFirst));
         ReturnErrorOnFailure(reader.Get(first));
         // count
         ReturnErrorOnFailure(reader.Next(kTagCount));
         ReturnErrorOnFailure(reader.Get(count));
-        return CHIP_NO_ERROR;
+
+        return reader.ExitContainer(container);
     }
 };
 
 struct StateData : public GroupDataProvider::GroupState, PersistentData<kPersistentBufferMax>
 {
-    static const TLV::Tag kTagFabric = 1;
-    static const TLV::Tag kTagGroup  = 2;
-    static const TLV::Tag kTagKeyset = 3;
-    static const TLV::Tag kTagNext   = 4;
+    static const TLV::Tag kTagFabric = TLV::ContextTag(1);
+    static const TLV::Tag kTagGroup  = TLV::ContextTag(2);
+    static const TLV::Tag kTagKeySet = TLV::ContextTag(3);
+    static const TLV::Tag kTagNext   = TLV::ContextTag(4);
 
-    // Linked-list index. May be different to state_index
-    uint16_t index;
+    // Linked-list entry id. May be different to state_index
+    uint16_t id = 0;
     // Index of the next element of the linked-list
     uint16_t next = 0;
 
     StateData() = default;
-    StateData(uint16_t state_index, chip::FabricIndex fabric = 0, chip::GroupId group_id = kUndefinedGroupId,
+    StateData(uint16_t state_id, chip::FabricIndex fabric = kUndefinedFabricIndex, chip::GroupId group_id = kUndefinedGroupId,
               uint16_t key_set = 0) :
         GroupState(fabric, group_id, key_set),
-        index(state_index)
+        id(state_id)
     {}
 
-    void UpdateKey() override { this->mKey.GroupState(this->index); }
+    void UpdateKey(DefaultStorageKeyAllocator & key) override { key.GroupState(this->id); }
 
     void Clear() override
     {
@@ -297,15 +349,24 @@ struct StateData : public GroupDataProvider::GroupState, PersistentData<kPersist
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
+        TLV::TLVType container;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, container));
+
         ReturnErrorOnFailure(writer.Put(kTagFabric, static_cast<uint8_t>(fabric_index)));
         ReturnErrorOnFailure(writer.Put(kTagGroup, static_cast<uint16_t>(group)));
-        ReturnErrorOnFailure(writer.Put(kTagKeyset, static_cast<uint16_t>(keyset_index)));
+        ReturnErrorOnFailure(writer.Put(kTagKeySet, static_cast<uint16_t>(keyset_index)));
         ReturnErrorOnFailure(writer.Put(kTagNext, static_cast<uint16_t>(next)));
 
-        return CHIP_NO_ERROR;
+        return writer.EndContainer(container);
     }
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
+        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag));
+        VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
+
+        TLV::TLVType container;
+        ReturnErrorOnFailure(reader.EnterContainer(container));
+
         // fabric_index
         ReturnErrorOnFailure(reader.Next(kTagFabric));
         ReturnErrorOnFailure(reader.Get(fabric_index));
@@ -313,41 +374,40 @@ struct StateData : public GroupDataProvider::GroupState, PersistentData<kPersist
         ReturnErrorOnFailure(reader.Next(kTagGroup));
         ReturnErrorOnFailure(reader.Get(group));
         // keyset_index
-        ReturnErrorOnFailure(reader.Next(kTagKeyset));
+        ReturnErrorOnFailure(reader.Next(kTagKeySet));
         ReturnErrorOnFailure(reader.Get(keyset_index));
         // next
         ReturnErrorOnFailure(reader.Next(kTagNext));
         ReturnErrorOnFailure(reader.Get(next));
 
-        return CHIP_NO_ERROR;
+        return reader.ExitContainer(container);
     }
 };
 
-struct KeysetData : public GroupDataProvider::Keyset, PersistentData<kPersistentBufferMax>
+struct KeySetData : public GroupDataProvider::KeySet, PersistentData<kPersistentBufferMax>
 {
-    static const TLV::Tag kTagKeysetId  = 1;
-    static const TLV::Tag kTagPolicy    = 2;
-    static const TLV::Tag kTagNumKeys   = 3;
-    static const TLV::Tag kTagEpochKeys = 4;
-    static const TLV::Tag kTagStartTime = 5;
-    static const TLV::Tag kTagKey       = 6;
-    static const TLV::Tag kTagNext      = 7;
+    static const TLV::Tag kTagKeySetId  = TLV::ContextTag(1);
+    static const TLV::Tag kTagPolicy    = TLV::ContextTag(2);
+    static const TLV::Tag kTagNumKeys   = TLV::ContextTag(3);
+    static const TLV::Tag kTagEpochKeys = TLV::ContextTag(4);
+    static const TLV::Tag kTagStartTime = TLV::ContextTag(5);
+    static const TLV::Tag kTagKey       = TLV::ContextTag(6);
+    static const TLV::Tag kTagNext      = TLV::ContextTag(7);
 
-    chip::FabricIndex fabric = 0;
+    chip::FabricIndex fabric = kUndefinedFabricIndex;
     uint16_t next            = 0;
 
-    // KeysetData() = default;
-    KeysetData(chip::FabricIndex fabric_index, uint16_t id) : Keyset(id), fabric(fabric_index) {}
-    KeysetData(chip::FabricIndex fabric_index, uint16_t id, SecurityPolicy policy_id, uint8_t num_keys) :
-        Keyset(id, policy_id, num_keys), fabric(fabric_index)
+    KeySetData() = default;
+    KeySetData(chip::FabricIndex fabric_index, uint16_t id) : KeySet(id), fabric(fabric_index) {}
+    KeySetData(chip::FabricIndex fabric_index, uint16_t id, SecurityPolicy policy_id, uint8_t num_keys) :
+        KeySet(id, policy_id, num_keys), fabric(fabric_index)
     {}
 
-    void UpdateKey() override { this->mKey.FabricKeyset(this->fabric, this->keyset_id); }
+    void UpdateKey(DefaultStorageKeyAllocator & key) override { key.FabricKeySet(this->fabric, this->keyset_id); }
 
     void Clear() override
     {
-        keyset_id     = 0;
-        policy        = Keyset::SecurityPolicy::kStandard;
+        policy        = KeySet::SecurityPolicy::kStandard;
         num_keys_used = 0;
         next          = 0;
         memset(epoch_keys, 0x00, sizeof(epoch_keys));
@@ -355,8 +415,11 @@ struct KeysetData : public GroupDataProvider::Keyset, PersistentData<kPersistent
 
     CHIP_ERROR Serialize(TLV::TLVWriter & writer) const override
     {
+        TLV::TLVType container;
+        ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, container));
+
         // keyset_id
-        ReturnErrorOnFailure(writer.Put(kTagKeysetId, static_cast<uint16_t>(keyset_id)));
+        ReturnErrorOnFailure(writer.Put(kTagKeySetId, static_cast<uint16_t>(keyset_id)));
         // policy
         ReturnErrorOnFailure(writer.Put(kTagPolicy, static_cast<uint16_t>(policy)));
         // num_keys_used
@@ -364,27 +427,32 @@ struct KeysetData : public GroupDataProvider::Keyset, PersistentData<kPersistent
         // epoch_keys
         {
             TLV::TLVType array, item;
-            writer.StartContainer(kTagEpochKeys, TLV::kTLVType_Array, array);
+            ReturnErrorOnFailure(writer.StartContainer(kTagEpochKeys, TLV::kTLVType_Array, array));
             for (auto & epoch : this->epoch_keys)
             {
-                writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, item);
-                ReturnErrorOnFailure(writer.Put(TLV::ContextTag(kTagStartTime), static_cast<uint64_t>(epoch.start_time)));
-                ReturnErrorOnFailure(
-                    writer.PutBytes(TLV::ContextTag(kTagKey), epoch.key, GroupDataProvider::EpochKey::kLengthBytes));
-                writer.EndContainer(item);
+                ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, item));
+                ReturnErrorOnFailure(writer.Put(kTagStartTime, static_cast<uint64_t>(epoch.start_time)));
+                ReturnErrorOnFailure(writer.Put(kTagKey, ByteSpan(epoch.key, GroupDataProvider::EpochKey::kLengthBytes)));
+                ReturnErrorOnFailure(writer.EndContainer(item));
             }
-            writer.EndContainer(array);
+            ReturnErrorOnFailure(writer.EndContainer(array));
         }
         // next keyset
         ReturnErrorOnFailure(writer.Put(kTagNext, static_cast<uint16_t>(next)));
 
-        return CHIP_NO_ERROR;
+        return writer.EndContainer(container);
     }
 
     CHIP_ERROR Deserialize(TLV::TLVReader & reader) override
     {
+        ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag));
+        VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
+
+        TLV::TLVType container;
+        ReturnErrorOnFailure(reader.EnterContainer(container));
+
         // keyset_id
-        ReturnErrorOnFailure(reader.Next(kTagKeysetId));
+        ReturnErrorOnFailure(reader.Next(kTagKeySetId));
         ReturnErrorOnFailure(reader.Get(keyset_id));
         // policy
         ReturnErrorOnFailure(reader.Next(kTagPolicy));
@@ -398,27 +466,31 @@ struct KeysetData : public GroupDataProvider::Keyset, PersistentData<kPersistent
             VerifyOrReturnError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_INTERNAL);
 
             TLV::TLVType array, item;
-            reader.EnterContainer(array);
+            ReturnErrorOnFailure(reader.EnterContainer(array));
             for (auto & epoch : this->epoch_keys)
             {
                 ReturnErrorOnFailure(reader.Next(TLV::AnonymousTag));
                 VerifyOrReturnError(TLV::kTLVType_Structure == reader.GetType(), CHIP_ERROR_INTERNAL);
 
-                reader.EnterContainer(item);
+                ReturnErrorOnFailure(reader.EnterContainer(item));
                 // start_time
-                ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagStartTime)));
+                ReturnErrorOnFailure(reader.Next(kTagStartTime));
                 ReturnErrorOnFailure(reader.Get(epoch.start_time));
                 // key
-                ReturnErrorOnFailure(reader.Next(TLV::ContextTag(kTagKey)));
-                ReturnErrorOnFailure(reader.GetBytes(epoch.key, GroupDataProvider::EpochKey::kLengthBytes));
-                reader.ExitContainer(item);
+                ByteSpan key; // epoch.key,
+                ReturnErrorOnFailure(reader.Next(kTagKey));
+                ReturnErrorOnFailure(reader.Get(key));
+                VerifyOrReturnError(GroupDataProvider::EpochKey::kLengthBytes == key.size(), CHIP_ERROR_INTERNAL);
+                memcpy(epoch.key, key.data(), GroupDataProvider::EpochKey::kLengthBytes);
+                ReturnErrorOnFailure(reader.ExitContainer(item));
             }
-            reader.ExitContainer(array);
+            ReturnErrorOnFailure(reader.ExitContainer(array));
         }
         // next keyset
         ReturnErrorOnFailure(reader.Next(kTagNext));
         ReturnErrorOnFailure(reader.Get(next));
-        return CHIP_NO_ERROR;
+
+        return reader.ExitContainer(container);
     }
 };
 
@@ -440,6 +512,8 @@ void GroupDataProviderImpl::Finish()
 //
 // Group Mappings
 //
+
+constexpr size_t GroupDataProvider::GroupMapping::kGroupNameMax;
 
 bool GroupDataProviderImpl::HasGroupNamesSupport()
 {
@@ -464,14 +538,14 @@ bool GroupDataProviderImpl::GroupMappingExists(chip::FabricIndex fabric_index, c
     do
     {
         VerifyOrReturnError(CHIP_NO_ERROR == endpoint.Load(mStorage), false);
-        if (endpoint.id == mapping.endpoint)
+        if (endpoint.endpoint_id == mapping.endpoint)
         {
             // Target endpoint found
             break;
         }
-        endpoint.id = endpoint.next;
-    } while ((++endpoint_count < fabric.endpoint_count) && (kInvalidEndpointId != endpoint.id));
-    VerifyOrReturnError(endpoint.id == mapping.endpoint, false);
+        endpoint.endpoint_id = endpoint.next;
+    } while ((++endpoint_count < fabric.endpoint_count) && (kInvalidEndpointId != endpoint.endpoint_id));
+    VerifyOrReturnError(endpoint.endpoint_id == mapping.endpoint, false);
 
     // Target endpoint found
 
@@ -500,16 +574,34 @@ CHIP_ERROR GroupDataProviderImpl::AddGroupMapping(chip::FabricIndex fabric_index
     VerifyOrReturnError(kInvalidEndpointId != mapping.endpoint, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(IsFabricGroupId(mapping.group), CHIP_ERROR_INVALID_ARGUMENT);
 
+    CHIP_ERROR err = CHIP_NO_ERROR;
     FabricData fabric(fabric_index);
 
     if (CHIP_NO_ERROR != fabric.Load(mStorage) || kInvalidEndpointId == fabric.first_endpoint)
     {
         // New fabric, or new endpoint
-        GroupData(fabric_index, mapping.endpoint, mapping.group, mapping.name).Save(mStorage);
-        EndpointData(fabric_index, mapping.endpoint, mapping.group).Save(mStorage);
+        GroupData group(fabric_index, mapping.endpoint, mapping.group, mapping.name);
+        ReturnErrorOnFailure(group.Save(mStorage));
+
+        EndpointData endpoint(fabric_index, mapping.endpoint, mapping.group);
+        err = endpoint.Save(mStorage);
+        if (CHIP_NO_ERROR != err)
+        {
+            // Clean-up the orphan group
+            group.Delete(mStorage);
+            return err;
+        }
+
         fabric.first_endpoint = mapping.endpoint;
         fabric.endpoint_count = 1;
-        return fabric.Save(mStorage);
+        err                   = fabric.Save(mStorage);
+        if (CHIP_NO_ERROR != err)
+        {
+            // Clean-up the orphan entries
+            group.Delete(mStorage);
+            endpoint.Delete(mStorage);
+        }
+        return err;
     }
 
     // Existing fabric
@@ -525,19 +617,31 @@ CHIP_ERROR GroupDataProviderImpl::AddGroupMapping(chip::FabricIndex fabric_index
             // Endpoint info not found
             break;
         }
-        if (endpoint.id == mapping.endpoint)
+        if (endpoint.endpoint_id == mapping.endpoint)
         {
             // Target endpoint info found
             break;
         }
-        endpoint.id = endpoint.next;
-    } while ((++endpoint_count < fabric.endpoint_count) && (kInvalidEndpointId != endpoint.id));
+        endpoint.endpoint_id = endpoint.next;
+    } while ((++endpoint_count < fabric.endpoint_count) && (kInvalidEndpointId != endpoint.endpoint_id));
 
-    if (endpoint.id != mapping.endpoint)
+    if (endpoint.endpoint_id != mapping.endpoint)
     {
         // Endpoint not found, create new, and insert first
-        GroupData(fabric_index, mapping.endpoint, mapping.group, mapping.name).Save(mStorage);
-        EndpointData(fabric_index, mapping.endpoint, mapping.group, fabric.first_endpoint).Save(mStorage);
+        GroupData group(fabric_index, mapping.endpoint, mapping.group, mapping.name);
+        ReturnErrorOnFailure(group.Save(mStorage));
+
+        endpoint.endpoint_id = mapping.endpoint;
+        endpoint.first_group = mapping.group;
+        endpoint.next        = fabric.first_endpoint;
+        err                  = endpoint.Save(mStorage);
+        if (CHIP_NO_ERROR != err)
+        {
+            // Clean-up the orphan group
+            group.Delete(mStorage);
+            return err;
+        }
+
         fabric.first_endpoint = mapping.endpoint;
         fabric.endpoint_count++;
         return fabric.Save(mStorage);
@@ -545,7 +649,7 @@ CHIP_ERROR GroupDataProviderImpl::AddGroupMapping(chip::FabricIndex fabric_index
 
     // Endpoint info found, loop endpoints
 
-    GroupData group(fabric_index, endpoint.id, endpoint.first_group);
+    GroupData group(fabric_index, endpoint.endpoint_id, endpoint.first_group);
 
     do
     {
@@ -562,7 +666,8 @@ CHIP_ERROR GroupDataProviderImpl::AddGroupMapping(chip::FabricIndex fabric_index
     } while (kUndefinedGroupId != group.group);
 
     // Insert group first, update endpoint
-    GroupData(fabric_index, mapping.endpoint, mapping.group, mapping.name, endpoint.first_group).Save(mStorage);
+    ReturnErrorOnFailure(
+        GroupData(fabric_index, mapping.endpoint, mapping.group, mapping.name, endpoint.first_group).Save(mStorage));
     endpoint.first_group = mapping.group;
     return endpoint.Save(mStorage);
 }
@@ -587,18 +692,18 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupMapping(chip::FabricIndex fabric_in
     do
     {
         VerifyOrReturnError(CHIP_NO_ERROR == endpoint.Load(mStorage), CHIP_ERROR_KEY_NOT_FOUND);
-        if (endpoint.id == mapping.endpoint)
+        if (endpoint.endpoint_id == mapping.endpoint)
         {
             // Target endpoint info found
             break;
         }
-        endpoint.id = endpoint.next;
-    } while ((++endpoint_count < fabric.endpoint_count) && (kInvalidEndpointId != endpoint.id));
-    VerifyOrReturnError(endpoint.id == mapping.endpoint, CHIP_ERROR_KEY_NOT_FOUND);
+        endpoint.endpoint_id = endpoint.next;
+    } while ((++endpoint_count < fabric.endpoint_count) && (kInvalidEndpointId != endpoint.endpoint_id));
+    VerifyOrReturnError(endpoint.endpoint_id == mapping.endpoint, CHIP_ERROR_KEY_NOT_FOUND);
 
     // Target endpoint found
 
-    GroupData group(fabric_index, endpoint.id, endpoint.first_group);
+    GroupData group(fabric_index, endpoint.endpoint_id, endpoint.first_group);
     chip::GroupId prev_gid = kUndefinedGroupId;
 
     do
@@ -616,7 +721,7 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupMapping(chip::FabricIndex fabric_in
     VerifyOrReturnError(group.group == mapping.group, CHIP_ERROR_KEY_NOT_FOUND);
 
     // Target group found, remove
-    group.Delete(mStorage);
+    ReturnErrorOnFailure(group.Delete(mStorage));
 
     if (prev_gid == kUndefinedGroupId)
     {
@@ -627,13 +732,11 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupMapping(chip::FabricIndex fabric_in
 
     // Removing intermediate group, update previous
 
-    GroupData prev_group(fabric_index, endpoint.id, prev_gid);
+    GroupData prev_group(fabric_index, endpoint.endpoint_id, prev_gid);
     ReturnErrorOnFailure(prev_group.Load(mStorage));
 
     prev_group.next = group.next;
     return prev_group.Save(mStorage);
-
-    return CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR GroupDataProviderImpl::RemoveAllGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint_id)
@@ -656,18 +759,18 @@ CHIP_ERROR GroupDataProviderImpl::RemoveAllGroupMappings(chip::FabricIndex fabri
     do
     {
         VerifyOrReturnError(CHIP_NO_ERROR == endpoint.Load(mStorage), CHIP_ERROR_KEY_NOT_FOUND);
-        if (endpoint.id == endpoint_id)
+        if (endpoint.endpoint_id == endpoint_id)
         {
             // Target endpoint info found
             break;
         }
-        prev_eid    = endpoint.id;
-        endpoint.id = endpoint.next;
-    } while ((++endpoint_count < fabric.endpoint_count) && (kInvalidEndpointId != endpoint.id));
-    VerifyOrReturnError(endpoint.id == endpoint_id, CHIP_ERROR_KEY_NOT_FOUND);
+        prev_eid             = endpoint.endpoint_id;
+        endpoint.endpoint_id = endpoint.next;
+    } while ((++endpoint_count < fabric.endpoint_count) && (kInvalidEndpointId != endpoint.endpoint_id));
+    VerifyOrReturnError(endpoint.endpoint_id == endpoint_id, CHIP_ERROR_KEY_NOT_FOUND);
 
     // Target endpoint found
-    GroupData group(fabric_index, endpoint.id, endpoint.first_group);
+    GroupData group(fabric_index, endpoint.endpoint_id, endpoint.first_group);
 
     // Remove endpoint's groups
     do
@@ -678,23 +781,22 @@ CHIP_ERROR GroupDataProviderImpl::RemoveAllGroupMappings(chip::FabricIndex fabri
     } while (kUndefinedGroupId != group.group);
 
     // Remove endpoint
+    ReturnErrorOnFailure(endpoint.Delete(mStorage));
 
     if (kInvalidEndpointId == prev_eid)
     {
         // First endpoint, update fabric info
         fabric.first_endpoint = endpoint.next;
-        fabric.Save(mStorage);
+        return fabric.Save(mStorage);
     }
     else
     {
         // Mid endpoint, update previous endpoint's info
         EndpointData prev_endpoint(fabric_index, prev_eid);
-        prev_endpoint.Load(mStorage);
+        ReturnErrorOnFailure(prev_endpoint.Load(mStorage));
         prev_endpoint.next = endpoint.next;
-        prev_endpoint.Save(mStorage);
+        return prev_endpoint.Save(mStorage);
     }
-
-    return endpoint.Delete(mStorage);
 }
 
 GroupDataProvider::GroupMappingIterator * GroupDataProviderImpl::IterateGroupMappings(chip::FabricIndex fabric_index,
@@ -722,13 +824,13 @@ GroupDataProviderImpl::GroupMappingIteratorImpl::GroupMappingIteratorImpl(GroupD
     do
     {
         ReturnOnFailure(endpoint.Load(provider.mStorage));
-        if (endpoint.id == endpoint_id)
+        if (endpoint.endpoint_id == endpoint_id)
         {
             // Target endpoint found
             mGroup = endpoint.first_group;
             break;
         }
-        endpoint.id = endpoint.next;
+        endpoint.endpoint_id = endpoint.next;
     } while (++count < fabric.endpoint_count);
 }
 
@@ -762,8 +864,10 @@ bool GroupDataProviderImpl::GroupMappingIteratorImpl::Next(GroupMapping & item)
     }
     item.endpoint = mEndpoint;
     item.group    = mGroup;
-    strncpy(item.name, group.name, GroupData::kGroupNameMax);
-    mGroup = group.next;
+    size_t size   = strnlen(group.name, GroupData::kGroupNameMax);
+    strncpy(item.name, group.name, size);
+    item.name[size] = 0;
+    mGroup          = group.next;
     return true;
 }
 
@@ -787,21 +891,19 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupState(size_t state_index, const GroupS
     {
         // First state
         VerifyOrReturnError(0 == state_index, CHIP_ERROR_INVALID_ARGUMENT);
-        states.first = 1; // Arbitrary index > 0
+        states.first = 0;
         states.count = 1;
         ReturnLogErrorOnFailure(
             StateData(states.first, in_state.fabric_index, in_state.group, in_state.keyset_index).Save(mStorage));
         return states.Save(mStorage);
     }
 
-    // Pseudo-index > 0
-
     StateData state(states.first);
     StateData prev_state;
-    uint16_t actual_index = 0;
-    uint16_t new_index    = 1;
-    uint16_t prev_index   = 0;
-    bool found            = false;
+    uint16_t index  = 0;
+    uint16_t new_id = 0;
+    bool found      = false;
+    bool previous   = false;
 
     // Loop until the desired index
     do
@@ -810,23 +912,23 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupState(size_t state_index, const GroupS
         {
             break;
         }
-        if (new_index == state.index)
+        if (new_id == state.id)
         {
             // Used index, keep looking
-            new_index++;
+            new_id++;
         }
-        if (actual_index == state_index)
+        if (index == state_index)
         {
             // Target index found
             found = true;
             break;
         }
-        prev_index  = state.index;
-        prev_state  = state;
-        state.index = state.next;
-    } while (++actual_index < states.count);
+        previous   = true;
+        prev_state = state;
+        state.id   = state.next;
+    } while (++index < states.count);
 
-    VerifyOrReturnError(state_index <= actual_index, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(state_index <= index, CHIP_ERROR_INVALID_ARGUMENT);
 
     if (found)
     {
@@ -844,21 +946,21 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupState(size_t state_index, const GroupS
     }
 
     // New state
-    ReturnErrorOnFailure(StateData(new_index, in_state.fabric_index, in_state.group, in_state.keyset_index).Save(mStorage));
+    ReturnErrorOnFailure(StateData(new_id, in_state.fabric_index, in_state.group, in_state.keyset_index).Save(mStorage));
 
-    if (prev_index > 0)
+    if (previous)
     {
         // New middle state, update previous
-        prev_state.next = new_index;
+        prev_state.next = new_id;
         ReturnErrorOnFailure(prev_state.Save(mStorage));
     }
     else
     {
         // New first state
-        states.first = new_index;
+        states.first = new_id;
     }
     // Update main list
-    states.count = static_cast<uint16_t>(actual_index + 1);
+    states.count = static_cast<uint16_t>(index + 1);
     return states.Save(mStorage);
 
     return CHIP_ERROR_INTERNAL;
@@ -872,19 +974,18 @@ CHIP_ERROR GroupDataProviderImpl::GetGroupState(size_t state_index, GroupState &
     VerifyOrReturnError(CHIP_NO_ERROR == states.Load(mStorage), CHIP_ERROR_KEY_NOT_FOUND);
 
     // Fabric info found
-    // VerifyOrReturnError(state_index <= fabric.state_count, CHIP_ERROR_INVALID_ARGUMENT);
 
     StateData state(states.first);
-    size_t actual_index = 0;
+    size_t index = 0;
 
     // Loop until the desired index
-    while (actual_index < states.count)
+    while (index < states.count)
     {
         if (CHIP_NO_ERROR != state.Load(mStorage))
         {
             break;
         }
-        if (actual_index == state_index)
+        if (index == state_index)
         {
             // Target index found
             out_state.fabric_index = state.fabric_index;
@@ -892,8 +993,8 @@ CHIP_ERROR GroupDataProviderImpl::GetGroupState(size_t state_index, GroupState &
             out_state.keyset_index = state.keyset_index;
             return CHIP_NO_ERROR;
         }
-        state.index = state.next;
-        actual_index++;
+        state.id = state.next;
+        index++;
     }
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
@@ -908,33 +1009,27 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupState(size_t state_index)
 
     StateData state(states.first);
     StateData prev_state;
-    size_t actual_index = 0;
-    size_t new_index    = 1;
-    size_t prev_index   = 0;
-    bool found          = false;
+    size_t index  = 0;
+    bool found    = false;
+    bool previous = false;
 
     // Loop until the desired index
-    while (actual_index < states.count)
+    while (index < states.count)
     {
         if (CHIP_NO_ERROR != state.Load(mStorage))
         {
             break;
         }
-        if (new_index == state.index)
-        {
-            // Used index, keep looking
-            new_index++;
-        }
-        if (actual_index == state_index)
+        if (index == state_index)
         {
             // Target index found
             found = true;
             break;
         }
-        prev_index  = state.index;
-        prev_state  = state;
-        state.index = state.next;
-        actual_index++;
+        previous   = true;
+        prev_state = state;
+        state.id   = state.next;
+        index++;
     }
 
     VerifyOrReturnError(found, CHIP_ERROR_KEY_NOT_FOUND);
@@ -945,16 +1040,16 @@ CHIP_ERROR GroupDataProviderImpl::RemoveGroupState(size_t state_index)
     }
 
     ReturnErrorOnFailure(state.Delete(mStorage));
-    if (0 == prev_index)
-    {
-        // Remove first state
-        states.first = state.next;
-    }
-    else
+    if (previous)
     {
         // Remove intermediate state
         prev_state.next = state.next;
         ReturnErrorOnFailure(prev_state.Save(mStorage));
+    }
+    else
+    {
+        // Remove first state
+        states.first = state.next;
     }
     ReturnErrorOnFailure(states.Save(mStorage));
     if (nullptr != mListener)
@@ -1026,11 +1121,11 @@ GroupDataProviderImpl::FabricStatesIterator::FabricStatesIterator(GroupDataProvi
 
 size_t GroupDataProviderImpl::FabricStatesIterator::Count()
 {
-    size_t count        = 0;
-    size_t actual_index = 0;
+    size_t count = 0;
+    size_t index = 0;
     StateData state(mIndex);
 
-    while (actual_index++ < mTotalCount)
+    while (index++ < mTotalCount)
     {
         if (CHIP_NO_ERROR != state.Load(mProvider.mStorage))
         {
@@ -1040,7 +1135,7 @@ size_t GroupDataProviderImpl::FabricStatesIterator::Count()
         {
             count++;
         }
-        state.index = state.next;
+        state.id = state.next;
     }
     return count;
 }
@@ -1056,13 +1151,13 @@ bool GroupDataProviderImpl::FabricStatesIterator::Next(GroupState & item)
             mCount = mTotalCount;
             break;
         }
-        state.index = state.next;
+        state.id = state.next;
         if (state.fabric_index == mFabric)
         {
             item.fabric_index = state.fabric_index;
             item.group        = state.group;
             item.keyset_index = state.keyset_index;
-            mIndex            = state.index;
+            mIndex            = state.id;
             return true;
         }
     }
@@ -1078,7 +1173,9 @@ void GroupDataProviderImpl::FabricStatesIterator::Release()
 // Key Sets
 //
 
-CHIP_ERROR GroupDataProviderImpl::SetKeyset(chip::FabricIndex fabric_index, uint16_t target_id, const Keyset & in_keyset)
+constexpr size_t GroupDataProvider::EpochKey::kLengthBytes;
+
+CHIP_ERROR GroupDataProviderImpl::SetKeySet(chip::FabricIndex fabric_index, uint16_t target_id, const KeySet & in_keyset)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
@@ -1088,15 +1185,13 @@ CHIP_ERROR GroupDataProviderImpl::SetKeyset(chip::FabricIndex fabric_index, uint
         // First in_keyset
         fabric.keyset_count = 1;
         fabric.first_keyset = target_id;
-        KeysetData keyset(fabric_index, target_id, in_keyset.policy, in_keyset.num_keys_used);
+        KeySetData keyset(fabric_index, target_id, in_keyset.policy, in_keyset.num_keys_used);
         memcpy(keyset.epoch_keys, in_keyset.epoch_keys, sizeof(in_keyset.epoch_keys));
         ReturnLogErrorOnFailure(keyset.Save(mStorage));
         return fabric.Save(mStorage);
     }
 
-    // Pseudo-index > 0
-
-    KeysetData keyset(fabric_index, fabric.first_keyset);
+    KeySetData keyset(fabric_index, fabric.first_keyset);
     size_t keyset_count = 0;
     bool found          = false;
 
@@ -1137,14 +1232,14 @@ CHIP_ERROR GroupDataProviderImpl::SetKeyset(chip::FabricIndex fabric_index, uint
     return fabric.Save(mStorage);
 }
 
-CHIP_ERROR GroupDataProviderImpl::GetKeyset(chip::FabricIndex fabric_index, uint16_t target_id, Keyset & out_keyset)
+CHIP_ERROR GroupDataProviderImpl::GetKeySet(chip::FabricIndex fabric_index, uint16_t target_id, KeySet & out_keyset)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_INVALID_FABRIC_ID);
 
-    KeysetData keyset(fabric_index, fabric.first_keyset);
+    KeySetData keyset(fabric_index, fabric.first_keyset);
     size_t keyset_count = 0;
 
     // Loop until the desired index
@@ -1170,14 +1265,14 @@ CHIP_ERROR GroupDataProviderImpl::GetKeyset(chip::FabricIndex fabric_index, uint
     return CHIP_ERROR_KEY_NOT_FOUND;
 }
 
-CHIP_ERROR GroupDataProviderImpl::RemoveKeyset(chip::FabricIndex fabric_index, uint16_t target_id)
+CHIP_ERROR GroupDataProviderImpl::RemoveKeySet(chip::FabricIndex fabric_index, uint16_t target_id)
 {
     VerifyOrReturnError(mInitialized, CHIP_ERROR_INTERNAL);
 
     FabricData fabric(fabric_index);
     VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_KEY_NOT_FOUND);
 
-    KeysetData keyset(fabric_index, fabric.first_keyset);
+    KeySetData keyset(fabric_index, fabric.first_keyset);
     uint16_t prev_id    = 0;
     size_t keyset_count = 0;
 
@@ -1200,11 +1295,11 @@ CHIP_ERROR GroupDataProviderImpl::RemoveKeyset(chip::FabricIndex fabric_index, u
 
     VerifyOrReturnError(keyset.keyset_id == target_id, CHIP_ERROR_KEY_NOT_FOUND);
 
-    keyset.Delete(mStorage);
+    ReturnErrorOnFailure(keyset.Delete(mStorage));
     if (keyset_count > 0)
     {
         // Remove intermediate keyset, update previous
-        KeysetData prev_data(fabric_index, prev_id);
+        KeySetData prev_data(fabric_index, prev_id);
         ReturnErrorOnFailure(prev_data.Load(mStorage));
         prev_data.next = keyset.next;
         ReturnErrorOnFailure(prev_data.Save(mStorage));
@@ -1222,13 +1317,13 @@ CHIP_ERROR GroupDataProviderImpl::RemoveKeyset(chip::FabricIndex fabric_index, u
     return fabric.Save(mStorage);
 }
 
-GroupDataProvider::KeysetIterator * GroupDataProviderImpl::IterateKeysets(chip::FabricIndex fabric_index)
+GroupDataProvider::KeySetIterator * GroupDataProviderImpl::IterateKeySets(chip::FabricIndex fabric_index)
 {
     VerifyOrReturnError(mInitialized, nullptr);
-    return mKeysetIterators.CreateObject(*this, fabric_index);
+    return mKeySetIterators.CreateObject(*this, fabric_index);
 }
 
-GroupDataProviderImpl::KeysetIteratorImpl::KeysetIteratorImpl(GroupDataProviderImpl & provider, chip::FabricIndex fabric_index) :
+GroupDataProviderImpl::KeySetIteratorImpl::KeySetIteratorImpl(GroupDataProviderImpl & provider, chip::FabricIndex fabric_index) :
     mProvider(provider), mFabric(fabric_index)
 {
     FabricData fabric(fabric_index);
@@ -1240,16 +1335,16 @@ GroupDataProviderImpl::KeysetIteratorImpl::KeysetIteratorImpl(GroupDataProviderI
     }
 }
 
-size_t GroupDataProviderImpl::KeysetIteratorImpl::Count()
+size_t GroupDataProviderImpl::KeySetIteratorImpl::Count()
 {
     return mCount;
 }
 
-bool GroupDataProviderImpl::KeysetIteratorImpl::Next(Keyset & item)
+bool GroupDataProviderImpl::KeySetIteratorImpl::Next(KeySet & item)
 {
     VerifyOrReturnError(mIndex < mCount, false);
 
-    KeysetData keyset(mFabric, mNextId);
+    KeySetData keyset(mFabric, mNextId);
     VerifyOrReturnError(CHIP_NO_ERROR == keyset.Load(mProvider.mStorage), false);
 
     mIndex++;
@@ -1261,9 +1356,9 @@ bool GroupDataProviderImpl::KeysetIteratorImpl::Next(Keyset & item)
     return true;
 }
 
-void GroupDataProviderImpl::KeysetIteratorImpl::Release()
+void GroupDataProviderImpl::KeySetIteratorImpl::Release()
 {
-    mProvider.mKeysetIterators.ReleaseObject(this);
+    mProvider.mKeySetIterators.ReleaseObject(this);
 }
 
 //
@@ -1273,7 +1368,10 @@ void GroupDataProviderImpl::KeysetIteratorImpl::Release()
 CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
 {
     FabricData fabric(fabric_index);
-    VerifyOrReturnError(CHIP_NO_ERROR == fabric.Load(mStorage), CHIP_ERROR_KEY_NOT_FOUND);
+
+    // Fabric data defaults to zero, so if not entry is found, no mappings, or keys are removed
+    // However, states has a separate list, and needs to be removed regardless
+    fabric.Load(mStorage);
 
     // Remove Group Mappings
 
@@ -1286,21 +1384,22 @@ CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
         {
             break;
         }
-        RemoveAllGroupMappings(fabric_index, endpoint.id);
-        endpoint.id = endpoint.next;
-    } while ((++endpoint_count < fabric.endpoint_count) && (kInvalidEndpointId != endpoint.id));
+        RemoveAllGroupMappings(fabric_index, endpoint.endpoint_id);
+        endpoint.endpoint_id = endpoint.next;
+    } while ((++endpoint_count < fabric.endpoint_count) && (kInvalidEndpointId != endpoint.endpoint_id));
 
     // Remove States
 
     StateListData states;
 
-    // Load state list info
+    // Load state list info. No error check needed: If the list is not found,
+    // the number of states defaults to zero, so the following loop is skipped.
     states.Load(mStorage);
 
     StateData state(states.first);
-    size_t state_index = 0;
+    size_t index = 0;
 
-    while (state_index < states.count)
+    while (index < states.count)
     {
         if (CHIP_NO_ERROR != state.Load(mStorage))
         {
@@ -1308,29 +1407,29 @@ CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
         }
         if (state.fabric_index == fabric_index)
         {
-            // Removing the state shifts down the upper states
-            RemoveGroupState(state_index);
+            // Remove the N state from the array. State N+1 becomes N
+            RemoveGroupState(index);
         }
         else
         {
-            state_index++;
+            index++;
         }
-        state.index = state.next;
+        state.id = state.next;
     }
 
     // Remove Keysets
 
-    KeysetData keyset(fabric_index, fabric.first_keyset);
+    KeySetData keyset(fabric_index, fabric.first_keyset);
     size_t keyset_count = 0;
 
-    // Loop until the desired index
+    // Loop the keysets associated with the target fabric
     while (keyset_count < fabric.keyset_count)
     {
         if (CHIP_NO_ERROR != keyset.Load(mStorage))
         {
             break;
         }
-        RemoveKeyset(fabric_index, keyset.keyset_id);
+        RemoveKeySet(fabric_index, keyset.keyset_id);
         keyset.keyset_id = keyset.next;
         keyset_count++;
     }
@@ -1344,8 +1443,11 @@ CHIP_ERROR GroupDataProviderImpl::RemoveFabric(chip::FabricIndex fabric_index)
 //
 
 CHIP_ERROR GroupDataProviderImpl::Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader,
-                                          System::PacketBufferHandle && msg)
+                                          System::PacketBufferHandle & msg)
 {
+    (void) packetHeader;
+    (void) payloadHeader;
+    (void) msg;
     return CHIP_NO_ERROR;
 }
 
