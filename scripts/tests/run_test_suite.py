@@ -110,18 +110,31 @@ def main(context, log_level, target, target_glob, target_skip_glob, no_log_times
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     # Figures out selected test that match the given name(s)
-    tests = [test for test in chiptest.AllTests(root)]
+    all_tests = [test for test in chiptest.AllTests(root)]
+    tests = all_tests
     if 'all' not in target:
-        target = set([name.lower() for name in target])
-        tests = [test for test in tests if test.name in target]
+        tests = []
+        for name in target:
+            targeted = [test for test in all_tests if test.name.lower()
+                        == name.lower()]
+            if len(targeted) == 0:
+                logging.error("Unknown target: %s" % name)
+            tests.extend(targeted)
 
     if target_glob:
         matcher = GlobMatcher(target_glob)
-        tests = [test for test in tests if matcher.matches(test.name)]
+        tests = [test for test in tests if matcher.matches(test.name.lower())]
+
+    if len(tests) == 0:
+        logging.error("No targets match, exiting.")
+        logging.error("Valid targets are (case-insensitive): %s" %
+                      (", ".join(test.name for test in all_tests)))
+        exit(1)
 
     if target_skip_glob:
         matcher = GlobMatcher(target_skip_glob)
-        tests = [test for test in tests if not matcher.matches(test.name)]
+        tests = [test for test in tests if not matcher.matches(
+            test.name.lower())]
 
     tests.sort(key=lambda x: x.name)
 
