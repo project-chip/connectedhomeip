@@ -31,6 +31,7 @@
 #include <platform/nxp/k32w/k32w0/K32W0Config.h>
 
 #include "fsl_reset.h"
+#include "fsl_power.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -49,6 +50,34 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
     bool failSafeArmed;
+    uint32_t rebootCount = 0;
+
+    if (K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_RebootCount))
+    {
+        err = GetRebootCount(rebootCount);
+        SuccessOrExit(err);
+
+        err = StoreRebootCount(rebootCount + 1);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        // The first boot after factory reset of the Node.
+        err = StoreRebootCount(1);
+        SuccessOrExit(err);
+    }
+
+    if (!K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_TotalOperationalHours))
+    {
+        err = StoreTotalOperationalHours(0);
+        SuccessOrExit(err);
+    }
+
+    if (!K32WConfig::ConfigValueExists(K32WConfig::kCounterKey_BootReason))
+    {
+        err = StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
+        SuccessOrExit(err);
+    }
 
     // Initialize the generic implementation base class.
     err = Internal::GenericConfigurationManagerImpl<K32WConfig>::Init();
@@ -66,6 +95,62 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
 exit:
     return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return ReadConfigValue(K32WConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return WriteConfigValue(K32WConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    return ReadConfigValue(K32WConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return WriteConfigValue(K32WConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
+{
+    bootReason = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+    uint8_t reason;
+    reason = POWER_GetResetCause();
+
+    if (reason == RESET_UNDEFINED)
+    {
+        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+    }
+    else if ((reason == RESET_POR) || (reason == RESET_EXT_PIN))
+    {
+        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT;
+    }
+    else if (reason == RESET_BOR)
+    {
+        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET;
+    }
+    else if (reason == RESET_SW_REQ)
+    {
+        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET;
+    }
+	else if (reason == RESET_WDT)
+    {
+        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET;
+        /* Reboot can be due to hardware or software watchdog */
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
+{
+    return WriteConfigValue(K32WConfig::kCounterKey_BootReason, bootReason);
 }
 
 bool ConfigurationManagerImpl::CanFactoryReset()
