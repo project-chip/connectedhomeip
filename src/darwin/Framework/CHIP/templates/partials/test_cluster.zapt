@@ -106,6 +106,18 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
           XCTAssertGreaterThanOrEqual([actualValue length], {{expectedConstraints.minLength}});
         }
         {{/if}}
+        {{#if expectedConstraints.startsWith}}
+        {
+          {{> actualValue}}
+          XCTAssertTrue([actualValue hasPrefix:@"{{expectedConstraints.startsWith}}"]);
+        }
+        {{/if}}
+        {{#if expectedConstraints.endsWith}}
+        {
+          {{> actualValue}}
+          XCTAssertTrue([actualValue hasSuffix:@"{{expectedConstraints.endsWith}}"]);
+        }
+        {{/if}}
         {{#if expectedConstraints.maxLength}}
         {
           {{> actualValue}}
