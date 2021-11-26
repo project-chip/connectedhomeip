@@ -15,16 +15,20 @@
  *    limitations under the License.
  */
 
+#include "AppTask.h"
+
+#ifdef CHIP_PW_RPC
+#include "Rpc.h"
+#endif
+
 #include "mbedtls/platform.h"
-#include <lib/core/CHIPCore.h>
-#include <lib/shell/Engine.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/mbed/Logging.h>
 
 using namespace ::chip;
-using namespace ::chip::Shell;
+using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging::Platform;
 
@@ -34,6 +38,16 @@ int main()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mbed_logging_init();
+
+#if CHIP_PW_RPC
+    auto rpcThread = chip::rpc::Init();
+    if (rpcThread == NULL)
+    {
+        ChipLogError(NotSpecified, "RPC service initialization and run failed");
+        ret = EXIT_FAILURE;
+        goto exit;
+    }
+#endif
 
     ChipLogProgress(SoftwareUpdate, "Mbed OTA Requestor example application start");
 
@@ -60,25 +74,25 @@ int main()
         goto exit;
     }
 
+#ifdef MBED_CONF_APP_BLE_DEVICE_NAME
+    err = ConnectivityMgr().SetBLEDeviceName(MBED_CONF_APP_BLE_DEVICE_NAME);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Set BLE device name failed: %s", err.AsString());
+        ret = EXIT_FAILURE;
+        goto exit;
+    }
+#endif
+
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(SoftwareUpdate, "Chip stack start failed: %s", err.AsString());
+        ChipLogError(NotSpecified, "Chip stack start failed: %s", err.AsString());
         ret = EXIT_FAILURE;
         goto exit;
     }
 
-    // Initialize the default streamer that was linked.
-    ret = streamer_init(streamer_get());
-    if (ret)
-    {
-        ChipLogError(SoftwareUpdate, "Streamer initialization failed [%d]", ret);
-        goto exit;
-    }
-
-    ChipLogProgress(SoftwareUpdate, "Mbed OTA Requestor application run");
-
-    Engine::Root().RunMainLoop();
+    ret = GetAppTask().StartApp();
 
 exit:
     ChipLogProgress(SoftwareUpdate, "Exited with code %d", ret);
