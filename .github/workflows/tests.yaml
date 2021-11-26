@@ -87,9 +87,10 @@ jobs:
               timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
-                  "./scripts/tests/run_test_suite.py run \
-                     --iterations 2 \
+                  "./scripts/tests/run_test_suite.py 
                      --chip-tool ./out/debug/standalone/chip-tool \
+                     run \
+                     --iterations 2 \
                      --all-clusters-app ./out/debug/standalone/chip-all-clusters-app \
                      --tv-app ./out/debug/standalone/chip-tv-app \
                   "
@@ -174,10 +175,10 @@ jobs:
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
+                     --chip-tool ./out/debug/standalone/chip-tool \
                      --target-skip-glob 'TV_*' \
                      run \
                      --iterations 2 \
-                     --chip-tool ./out/debug/standalone/chip-tool \
                      --all-clusters-app ./out/debug/standalone/chip-all-clusters-app \
                      --tv-app ./out/debug/standalone/chip-tv-app \
                   "

@@ -61,6 +61,7 @@ class RunContext:
     root: str
     tests: typing.List[chiptest.TestDefinition]
     in_unshare: bool
+    chip_tool: str
 
 
 @click.group(chain=True)
@@ -143,7 +144,8 @@ def main(context, log_level, target, target_glob, target_skip_glob, no_log_times
     tests.sort(key=lambda x: x.name)
 
     context.obj = RunContext(root=root, tests=tests,
-                             in_unshare=internal_inside_unshare)
+                             in_unshare=internal_inside_unshare,
+                             chip_tool=chip_tool)
 
 
 @main.command(
@@ -169,12 +171,12 @@ def cmd_generate(context):
     default=FindBinaryPath('chip-tv-app'),
     help='what tv app to use')
 @click.pass_context
-def cmd_run(context, iterations, chip_tool, all_clusters_app, tv_app):
+def cmd_run(context, iterations, all_clusters_app, tv_app):
     runner = chiptest.runner.Runner()
 
     # Command execution requires an array
     paths = chiptest.ApplicationPaths(
-        chip_tool=[chip_tool],
+        chip_tool=[context.obj.chip_tool],
         all_clusters_app=[all_clusters_app],
         tv_app=[tv_app]
     )
