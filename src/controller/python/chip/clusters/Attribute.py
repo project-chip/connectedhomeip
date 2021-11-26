@@ -18,8 +18,8 @@
 from asyncio.futures import Future
 import ctypes
 from dataclasses import dataclass
-from typing import Type, Union, List, Any
-from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint32,  c_uint16, py_object
+from typing import Union, List, Any
+from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_uint32,  c_uint16, py_object
 
 from .ClusterObjects import ClusterAttributeDescriptor
 import chip.exceptions

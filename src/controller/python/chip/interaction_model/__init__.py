@@ -26,7 +26,7 @@ from .delegate import OnSubscriptionReport, SetAttributeReportCallback, Attribut
 
 from chip.exceptions import ChipStackException
 
-__all__ = ["IMDelegate", "Status", "InteractionModelError"]
+__all__ = ["Status", "InteractionModelError"]
 
 
 class Status(enum.IntEnum):
