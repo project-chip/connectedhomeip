@@ -26,10 +26,8 @@ const path              = require('path');
 // Import helpers from zap core
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
-const { DelayCommands }                 = require('./simulated-clusters/TestDelayCommands.js');
-const { LogCommands }                   = require('./simulated-clusters/TestLogCommands.js');
-const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
-const { asUpperCamelCase }              = require(basePath + 'src/app/zap-templates/templates/app/helper.js');
+const { getClusters, getCommands, getAttributes, isTestOnlyCluster } = require('./simulated-clusters/SimulatedClusters.js');
+const { asBlocks }                                                   = require('./ClustersHelper.js');
 
 const kClusterName       = 'cluster';
 const kEndpointName      = 'endpoint';
@@ -341,37 +339,6 @@ function printErrorAndExit(context, msg)
   process.exit(1);
 }
 
-function getClusters()
-{
-  // Create a new array to merge the configured clusters list and test
-  // simulated clusters.
-  return Clusters.getClusters().then(clusters => clusters.concat(DelayCommands, LogCommands));
-}
-
-function getCommands(clusterName)
-{
-  switch (clusterName) {
-  case DelayCommands.name:
-    return Promise.resolve(DelayCommands.commands);
-  case LogCommands.name:
-    return Promise.resolve(LogCommands.commands);
-  default:
-    return Clusters.getClientCommands(clusterName);
-  }
-}
-
-function getAttributes(clusterName)
-{
-  switch (clusterName) {
-  case DelayCommands.name:
-    return Promise.resolve(DelayCommands.attributes);
-  case LogCommands.name:
-    return Promise.resolve(LogCommands.attributes);
-  default:
-    return Clusters.getServerAttributes(clusterName);
-  }
-}
-
 function assertCommandOrAttribute(context)
 {
   const clusterName = context.cluster;
@@ -467,15 +434,6 @@ async function chip_tests(list, options)
 function chip_tests_items(options)
 {
   return templateUtil.collectBlocks(this.tests, options, this);
-}
-
-function isTestOnlyCluster(name)
-{
-  const testOnlyClusters = [
-    DelayCommands.name,
-    LogCommands.name,
-  ];
-  return testOnlyClusters.includes(name);
 }
 
 // test_cluster_command_value and test_cluster_value-equals are recursive partials using #each. At some point the |global|
