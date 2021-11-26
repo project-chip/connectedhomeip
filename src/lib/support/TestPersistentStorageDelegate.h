@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@
 #include <lib/core/CHIPPersistentStorageDelegate.h>
 #include <lib/support/DLLUtil.h>
 #include <map>
-#include <string>
+#include <vector>
 
 namespace chip {
 
@@ -37,18 +37,19 @@ public:
         bool contains = mStorage.find(key) != mStorage.end();
         VerifyOrReturnError(contains, CHIP_ERROR_PERSISTED_STORAGE_VALUE_NOT_FOUND);
 
-        std::string & value = mStorage[key];
-        uint16_t value_size = static_cast<uint16_t>(value.size());
+        std::vector<uint8_t> & value = mStorage[key];
+        uint16_t value_size          = static_cast<uint16_t>(value.size());
         VerifyOrReturnError(value_size <= size, CHIP_ERROR_BUFFER_TOO_SMALL);
 
         size = std::min(value_size, size);
-        memcpy(buffer, value.c_str(), size);
+        memcpy(buffer, value.data(), size);
         return CHIP_NO_ERROR;
     }
 
     CHIP_ERROR SyncSetKeyValue(const char * key, const void * value, uint16_t size) override
     {
-        mStorage[key] = std::string(static_cast<const char *>(value), static_cast<size_t>(size));
+        const uint8_t * bytes = static_cast<const uint8_t *>(value);
+        mStorage[key]         = std::vector<uint8_t>(bytes, bytes + size);
         return CHIP_NO_ERROR;
     }
 
@@ -58,8 +59,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
-private:
-    std::map<std::string, std::string> mStorage;
+protected:
+    std::map<std::string, std::vector<uint8_t>> mStorage;
 };
 
 } // namespace chip

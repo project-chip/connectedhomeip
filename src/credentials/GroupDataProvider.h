@@ -35,7 +35,7 @@ public:
         static constexpr size_t kLengthBytes = Crypto::CHIP_CRYPTO_SYMMETRIC_KEY_LENGTH_BYTES;
         // Validity start time in microseconds since 2000-01-01T00:00:00 UTC ("the Epoch")
         uint64_t start_time;
-        // Actual key bits. Depending on context, it may be a raw epoch key (as seen within `SetKeyset` calls)
+        // Actual key bits. Depending on context, it may be a raw epoch key (as seen within `SetKeySet` calls)
         // or it may be the derived operational group key (as seen in any other usage).
         uint8_t key[kLengthBytes];
     };
@@ -50,7 +50,7 @@ public:
         // The endpoint to which a GroupId is mapped.
         EndpointId endpoint = kInvalidEndpointId;
         // The GroupId, which, when received in a message will map to the `endpoint`.
-        GroupId group = kInvalidEndpointId;
+        GroupId group = kUndefinedGroupId;
         // Group name
         char name[kGroupNameMax + 1] = { 0 };
 
@@ -64,7 +64,9 @@ public:
             }
             else
             {
-                strncpy(name, groupName, kGroupNameMax);
+                size_t size = strnlen(groupName, kGroupNameMax);
+                strncpy(name, groupName, size);
+                name[size] = 0;
             }
         }
         GroupMapping(EndpointId eid, GroupId gid, const CharSpan & groupName) : endpoint(eid), group(gid)
@@ -75,10 +77,11 @@ public:
             }
             else
             {
-                strncpy(name, groupName.data(), groupName.size());
+                size_t size = std::min(groupName.size(), kGroupNameMax);
+                strncpy(name, groupName.data(), size);
+                name[size] = 0;
             }
         }
-
         bool operator==(const GroupMapping & other)
         {
             return (this->endpoint == other.endpoint) && (this->group == other.group) &&
@@ -94,7 +97,7 @@ public:
             fabric_index(fabric), group(group_id), keyset_index(key_set)
         {}
         // Fabric Index associated with the group state entry's fabric scoping
-        chip::FabricIndex fabric_index = 0;
+        chip::FabricIndex fabric_index = kUndefinedFabricIndex;
         // Identifies the group within the scope of the given fabric
         chip::GroupId group = kUndefinedGroupId;
         // References the set of group keys that generate operationa group keys for use with the given group
@@ -107,7 +110,7 @@ public:
     };
 
     // A operational group key set, usable by many GroupState mappings
-    struct Keyset
+    struct KeySet
     {
         enum class SecurityPolicy : uint8_t
         {
@@ -115,11 +118,11 @@ public:
             kLowLatency = 1
         };
 
-        Keyset() = default;
-        Keyset(uint16_t id) : keyset_id(id) {}
-        Keyset(uint16_t id, SecurityPolicy policy_id, uint8_t num_keys) : keyset_id(id), policy(policy_id), num_keys_used(num_keys)
+        KeySet() = default;
+        KeySet(uint16_t id) : keyset_id(id) {}
+        KeySet(uint16_t id, SecurityPolicy policy_id, uint8_t num_keys) : keyset_id(id), policy(policy_id), num_keys_used(num_keys)
         {}
-        Keyset(SecurityPolicy policy_id, uint8_t num_keys) : keyset_id(0), policy(policy_id), num_keys_used(num_keys) {}
+        KeySet(SecurityPolicy policy_id, uint8_t num_keys) : keyset_id(0), policy(policy_id), num_keys_used(num_keys) {}
 
         // The actual keys for the group key set
         EpochKey epoch_keys[3];
@@ -130,7 +133,7 @@ public:
         // Number of keys present
         uint8_t num_keys_used = 0;
 
-        bool operator==(const Keyset & other)
+        bool operator==(const KeySet & other)
         {
             if (this->policy == other.policy && this->num_keys_used == other.num_keys_used)
             {
@@ -170,7 +173,7 @@ public:
 
     using GroupMappingIterator = Iterator<GroupMapping>;
     using GroupStateIterator   = Iterator<GroupState>;
-    using KeysetIterator       = Iterator<Keyset>;
+    using KeySetIterator       = Iterator<KeySet>;
 
     /**
      *  Interface for a listener of changes in any Group configuration. Necessary
@@ -259,23 +262,23 @@ public:
     // Key Sets
     //
 
-    virtual CHIP_ERROR SetKeyset(chip::FabricIndex fabric_index, uint16_t keyset_id, const Keyset & keys) = 0;
-    virtual CHIP_ERROR GetKeyset(chip::FabricIndex fabric_index, uint16_t keyset_id, Keyset & keys)       = 0;
-    virtual CHIP_ERROR RemoveKeyset(chip::FabricIndex fabric_index, uint16_t keyset_id)                   = 0;
+    virtual CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id, const KeySet & keys) = 0;
+    virtual CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id, KeySet & keys)       = 0;
+    virtual CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id)                   = 0;
     /**
      *  Creates an iterator that may be used to obtain the list of key sets associated with the given fabric.
      *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
      *  the iterator's Release() method must be called after the iteration is finished.
-     *  @retval An instance of KeysetIterator on success
+     *  @retval An instance of KeySetIterator on success
      *  @retval nullptr if no iterator instances are available.
      */
-    virtual KeysetIterator * IterateKeysets(chip::FabricIndex fabric_index) = 0;
+    virtual KeySetIterator * IterateKeySets(chip::FabricIndex fabric_index) = 0;
 
     // Fabrics
     virtual CHIP_ERROR RemoveFabric(chip::FabricIndex fabric_index) = 0;
 
     // General
-    virtual CHIP_ERROR Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader, System::PacketBufferHandle && msg) = 0;
+    virtual CHIP_ERROR Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader, System::PacketBufferHandle & msg) = 0;
 
     // Listener
     void SetListener(GroupListener * listener) { mListener = listener; };

@@ -18,7 +18,7 @@
 
 #include <credentials/GroupDataProvider.h>
 #include <lib/core/CHIPPersistentStorageDelegate.h>
-#include <lib/core/CHIPTLV.h>
+#include <lib/support/Pool.h>
 
 namespace chip {
 namespace Credentials {
@@ -59,16 +59,16 @@ public:
     // Key Sets
     //
 
-    CHIP_ERROR SetKeyset(chip::FabricIndex fabric_index, uint16_t keyset_id, const Keyset & keys) override;
-    CHIP_ERROR GetKeyset(chip::FabricIndex fabric_index, uint16_t keyset_id, Keyset & keys) override;
-    CHIP_ERROR RemoveKeyset(chip::FabricIndex fabric_index, uint16_t keyset_id) override;
-    KeysetIterator * IterateKeysets(chip::FabricIndex fabric_index) override;
+    CHIP_ERROR SetKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id, const KeySet & keys) override;
+    CHIP_ERROR GetKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id, KeySet & keys) override;
+    CHIP_ERROR RemoveKeySet(chip::FabricIndex fabric_index, uint16_t keyset_id) override;
+    KeySetIterator * IterateKeySets(chip::FabricIndex fabric_index) override;
 
     // Fabrics
     CHIP_ERROR RemoveFabric(chip::FabricIndex fabric_index) override;
 
     // General
-    CHIP_ERROR Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader, System::PacketBufferHandle && msg) override;
+    CHIP_ERROR Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader, System::PacketBufferHandle & msg) override;
 
 private:
     class GroupMappingIteratorImpl : public GroupMappingIterator
@@ -117,12 +117,12 @@ private:
         size_t mTotalCount        = 0;
     };
 
-    class KeysetIteratorImpl : public KeysetIterator
+    class KeySetIteratorImpl : public KeySetIterator
     {
     public:
-        KeysetIteratorImpl(GroupDataProviderImpl & provider, chip::FabricIndex fabric_index);
+        KeySetIteratorImpl(GroupDataProviderImpl & provider, chip::FabricIndex fabric_index);
         size_t Count() override;
-        bool Next(Keyset & item) override;
+        bool Next(KeySet & item) override;
         void Release() override;
 
     private:
@@ -138,7 +138,7 @@ private:
     BitMapObjectPool<GroupMappingIteratorImpl, kIteratorsMax> mEndpointIterators;
     BitMapObjectPool<AllStatesIterator, kIteratorsMax> mAllStatesIterators;
     BitMapObjectPool<FabricStatesIterator, kIteratorsMax> mFabricStatesIterators;
-    BitMapObjectPool<KeysetIteratorImpl, kIteratorsMax> mKeysetIterators;
+    BitMapObjectPool<KeySetIteratorImpl, kIteratorsMax> mKeySetIterators;
 };
 
 } // namespace Credentials

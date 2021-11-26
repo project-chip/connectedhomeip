@@ -20,27 +20,34 @@
 #include <string.h>
 
 namespace chip {
-namespace Credentials {
 
-class PersistentStorageKey
+/**
+ * This is the common key allocation policy for all classes using PersistentStorageDelegate storage
+ */
+class DefaultStorageKeyAllocator
 {
 public:
-    PersistentStorageKey() = default;
+    DefaultStorageKeyAllocator() = default;
 
-    const char * FabricTable(chip::FabricIndex fabric) { return Format("f/%u/t", fabric); }
-    const char * FabricGroups(chip::FabricIndex fabric) { return Format("f/%u/g", fabric); }
+    // Fabric Table
+
+    const char * FabricTable(chip::FabricIndex fabric) { return Format("f/%x/t", fabric); }
+
+    // Group Data Provider
+
+    const char * FabricGroups(chip::FabricIndex fabric) { return Format("f/%x/g", fabric); }
     const char * FabricEndpoint(chip::FabricIndex fabric, chip::EndpointId endpoint)
     {
-        return Format("f/%u/e/%u", fabric, endpoint);
+        return Format("f/%x/e/%x", fabric, endpoint);
     }
     const char * FabricEndpointGroup(chip::FabricIndex fabric, chip::EndpointId endpoint, chip::GroupId group)
     {
-        return Format("f/%u/e/%u/g/%u", fabric, endpoint, group);
+        return Format("f/%x/e/%x/g/%x", fabric, endpoint, group);
     }
     const char * GroupStates() { return Format("g/s"); }
-    const char * GroupState(uint16_t state_index) { return Format("g/s/%u", state_index); }
-    const char * FabricKeyset(chip::FabricIndex fabric, uint16_t keyset_id) { return Format("f/%u/k/%u", fabric, keyset_id); }
-    const char * Value() { return mValue; }
+    const char * GroupState(uint16_t state_id) { return Format("g/s/%x", state_id); }
+    const char * FabricKeySet(chip::FabricIndex fabric, uint16_t keyset_id) { return Format("f/%x/k/%x", fabric, keyset_id); }
+    const char * KeyName() { return mKeyName; }
 
 private:
     static const size_t kKeyLengthMax = 32;
@@ -49,13 +56,12 @@ private:
     {
         va_list args;
         va_start(args, format);
-        vsnprintf(mValue, sizeof(mValue), format, args);
+        vsnprintf(mKeyName, sizeof(mKeyName), format, args);
         va_end(args);
-        return mValue;
+        return mKeyName;
     }
 
-    char mValue[kKeyLengthMax] = { 0 };
+    char mKeyName[kKeyLengthMax + 1] = { 0 };
 };
 
-} // namespace Credentials
 } // namespace chip
