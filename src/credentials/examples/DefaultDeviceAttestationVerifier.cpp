@@ -23,11 +23,9 @@
 #include <crypto/CHIPCryptoPAL.h>
 
 #include <lib/core/CHIPError.h>
-#include <lib/support/BytesToHex.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/Span.h>
-#include <lib/support/logging/CHIPLogging.h>
 
 using namespace chip::Crypto;
 
@@ -274,12 +272,6 @@ AttestationVerificationResult DefaultDACVerifier::VerifyAttestationInformation(c
 
     CHIP_ERROR status = DeconstructAttestationElements(attestationInfoBuffer, certificationDeclarationSpan, attestationNonceSpan,
                                                        timestampDeconstructed, firmwareInfoSpan, vendorReserved);
-    ChipLogProgress(Crypto, "DeconstructAttestationElements error: %" CHIP_ERROR_FORMAT, status.Format());
-    char dumpedHex[1024 * 2 + 1] = { 0 };
-    Encoding::BytesToUppercaseHexString(attestationInfoBuffer.data(), attestationInfoBuffer.size(), &dumpedHex[0],
-                                        sizeof(dumpedHex));
-    ChipLogProgress(Crypto, "attestationInfoBuffer %s", dumpedHex);
-
     VerifyOrReturnError(status == CHIP_NO_ERROR, AttestationVerificationResult::kAttestationElementsMalformed);
 
     // Verify that Nonce matches with what we sent
