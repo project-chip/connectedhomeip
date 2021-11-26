@@ -37,8 +37,10 @@
 #include "DFUManager_nrfconnect.h"
 #endif
 
+#if CHIP_DEVICE_LAYER_TARGET_ESP32
+#include "DFUManager_esp32.h"
+#endif
 #include <controller-clusters/zap-generated/CHIPClientCallbacks.h>
-#include <controller-clusters/zap-generated/CHIPClusters.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -167,7 +169,16 @@ void OnQueryImageFailure(void * /* context */, EmberAfStatus status)
     ChipLogError(SoftwareUpdate, "QueryImage failed: %" PRIu16, static_cast<uint16_t>(status));
 }
 
-void OnQueryImageConnection(void * /* context */, DeviceProxy * deviceProxy)
+} // namespace
+} // namespace Shell
+} // namespace chip
+
+#include <controller-clusters/zap-generated/CHIPClusters.h>
+namespace chip {
+namespace Shell {
+namespace {
+
+void OnQueryImageConnection(void * /* context */, OperationalDeviceProxy * deviceProxy)
 {
     // Initialize cluster object
     Controller::OtaSoftwareUpdateProviderCluster cluster;
@@ -187,8 +198,8 @@ void OnQueryImageConnection(void * /* context */, DeviceProxy * deviceProxy)
 
     DeviceLayer::ConfigurationMgr().GetVendorId(vendorId);
     DeviceLayer::ConfigurationMgr().GetProductId(productId);
-    DeviceLayer::ConfigurationMgr().GetProductRevision(hardwareVersion);
-    DeviceLayer::ConfigurationMgr().GetFirmwareRevision(softwareVersion);
+    DeviceLayer::ConfigurationMgr().GetHardwareVersion(hardwareVersion);
+    DeviceLayer::ConfigurationMgr().GetSoftwareVersion(softwareVersion);
 
     QueryImage::Type request;
     request.vendorId           = static_cast<VendorId>(vendorId);
@@ -238,7 +249,7 @@ void OnApplyUpdateFailure(void * /* context */, EmberAfStatus status)
     ChipLogError(SoftwareUpdate, "ApplyUpdate failed: %" PRIu16, static_cast<uint16_t>(status));
 }
 
-void OnApplyUpdateConnection(void * /* context */, DeviceProxy * deviceProxy)
+void OnApplyUpdateConnection(void * /* context */, OperationalDeviceProxy * deviceProxy)
 {
     // Initialize cluster object
     Controller::OtaSoftwareUpdateProviderCluster cluster;
@@ -258,8 +269,8 @@ void OnApplyUpdateConnection(void * /* context */, DeviceProxy * deviceProxy)
 
     DeviceLayer::ConfigurationMgr().GetVendorId(vendorId);
     DeviceLayer::ConfigurationMgr().GetProductId(productId);
-    DeviceLayer::ConfigurationMgr().GetProductRevision(hardwareVersion);
-    DeviceLayer::ConfigurationMgr().GetFirmwareRevision(softwareVersion);
+    DeviceLayer::ConfigurationMgr().GetHardwareVersion(hardwareVersion);
+    DeviceLayer::ConfigurationMgr().GetSoftwareVersion(softwareVersion);
 
     ApplyUpdateRequest::Type request;
     request.updateToken = ByteSpan(sOtaContext.updateToken, sOtaContext.updateTokenLen);
