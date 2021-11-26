@@ -117,8 +117,8 @@ struct Transitions
         }
         else if (state.Is<State2>() && event.Is<Event4>())
         {
-            // illegal - Returned Transition will cause events
-            // dispatched from the transitions table to be ignored.
+            // Potentially unintended behavior - dispatches an event,
+            // but terminates in State1 anyway.
             mCtx.Dispatch(Event::Create<Event2>());
             return mFactory.CreateState1();
         }
@@ -176,7 +176,7 @@ void TestTransitions(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State1>());
 }
 
-void TestTransitionsDispatch(nlTestSuite * inSuite, void * inContext)
+void TestDispatchFromTransitionsTable(nlTestSuite * inSuite, void * inContext)
 {
     // in State1
     SimpleStateMachine fsm;
@@ -186,7 +186,7 @@ void TestTransitionsDispatch(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State2>());
 }
 
-void TestIllegalDispatch(nlTestSuite * inSuite, void * inContext)
+void TestDispatchAndTransitioinFromTransitionTable(nlTestSuite * inSuite, void * inContext)
 {
     // in State1
     SimpleStateMachine fsm;
@@ -194,9 +194,8 @@ void TestIllegalDispatch(nlTestSuite * inSuite, void * inContext)
     fsm.mStateMachine.Dispatch(Event::Create<Event2>());
     NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State2>());
     // Dispatch Event4, which dispatches Event2 and transitions to State1.
-    // The transition is processed first.  If a transition has occurred,
-    // subsequent events are ignored.  In this case, this means we remain
-    // in State1.  Dispatching Event2 will not have an effect.
+    // Transition to State1 occurs after dispatch of Event2, and so this
+    // is where we ultimately arrive.
     fsm.mStateMachine.Dispatch(Event::Create<Event4>());
     NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State1>());
 }
@@ -247,8 +246,8 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("TestInit", TestInit),
     NL_TEST_DEF("TestIgnoredEvents", TestIgnoredEvents),
     NL_TEST_DEF("TestTransitions", TestTransitions),
-    NL_TEST_DEF("TestTransitionsDispatch", TestTransitionsDispatch),
-    NL_TEST_DEF("TestIllegalDispatch", TestIllegalDispatch),
+    NL_TEST_DEF("TestDispatchFromTransitionsTable", TestDispatchFromTransitionsTable),
+    NL_TEST_DEF("TestDispatchAndTransitioinFromTransitionTable", TestDispatchAndTransitioinFromTransitionTable),
     NL_TEST_DEF("TestMethodExec", TestMethodExec),
     NL_TEST_SENTINEL(),
 };

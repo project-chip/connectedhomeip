@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <deque>
 #include <lib/core/Optional.h>
 #include <lib/support/Variant.h>
 
@@ -128,8 +127,6 @@ public:
 
     /**
      * Dispatch an event to the current state.
-     * @note This call can result in the current state being deleted.  Do not
-     * access current state memory after calling this method.
      * @param evt a variant holding an Event for the State Machine.
      */
     virtual void Dispatch(const TEvent & evt) = 0;
@@ -167,8 +164,6 @@ public:
  *     const char *GetName() { return ""; }
  *   }
  * @endcode
- * @note The State::Enter() method is allowed to Dispatch events.  However, dispatch calls
- * from State::Exit() are ignored.
  *
  * The TTransitions table type is implemented with an overloaded callable operator method
  * to match the combinations of State / Event variants that may produce a new-state return.
@@ -195,8 +190,6 @@ public:
  *     }
  *   }
  * @endcode
- * @note The Transition table is allowed to Dispatch events.  However,
- * dispatched events will be ignored if a new state transition is returned.
  *
  * @tparam TState a variant holding the States.
  * @tparam TEvent a variant holding the Events.
@@ -210,41 +203,19 @@ public:
     ~StateMachine() override = default;
     void Dispatch(const TEvent & evt) override
     {
-        auto inProcess = !events.empty();
-        events.push_back(evt);
-        if (!inProcess)
+        auto newState = mTransitions(mCurrentState, evt);
+        if (newState.HasValue())
         {
-            HandleEvents();
+            auto oldState = mCurrentState;
+            oldState.Exit();
+            mCurrentState = newState.Value();
+            mCurrentState.LogTransition(oldState.GetName());
+            mCurrentState.Enter();
         }
     }
 
     TState mCurrentState;
-
-private:
-    void HandleEvents()
-    {
-        while (!events.empty())
-        {
-            auto count    = events.size();
-            auto optState = mTransitions(mCurrentState, events.front());
-            if (optState.HasValue())
-            {
-                auto newState = optState.Value();
-                newState.LogTransition(mCurrentState.GetName());
-                mCurrentState.Exit();
-                mCurrentState = newState;
-                while (events.size() > count)
-                {
-                    events.pop_back(); // events discarded per design
-                }
-                mCurrentState.Enter();
-            }
-            events.pop_front();
-        }
-    }
-
     TTransitions & mTransitions;
-    std::deque<TEvent> events{};
 };
 
 } // namespace StateMachine
