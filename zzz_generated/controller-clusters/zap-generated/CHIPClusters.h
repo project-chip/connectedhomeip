@@ -30,6 +30,18 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT AccessControlCluster : public ClusterBase
+{
+public:
+    AccessControlCluster() : ClusterBase(app::Clusters::AccessControl::Id) {}
+    ~AccessControlCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR ReadAttributeAcl(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeExtension(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
+
 class DLL_EXPORT AccountLoginCluster : public ClusterBase
 {
 public:

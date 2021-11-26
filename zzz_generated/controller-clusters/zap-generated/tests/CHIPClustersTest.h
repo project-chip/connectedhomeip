@@ -24,6 +24,16 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT AccessControlClusterTest : public AccessControlCluster
+{
+public:
+    AccessControlClusterTest() : AccessControlCluster() {}
+    ~AccessControlClusterTest() {}
+
+    CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t value);
+};
+
 class DLL_EXPORT AccountLoginClusterTest : public AccountLoginCluster
 {
 public:

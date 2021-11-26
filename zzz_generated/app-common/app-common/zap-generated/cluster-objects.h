@@ -5333,6 +5333,162 @@ struct TypeInfo
 } // namespace ClusterRevision
 } // namespace Attributes
 } // namespace Descriptor
+namespace AccessControl {
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for AuthMode
+enum class AuthMode : uint8_t
+{
+    kPase  = 0x01,
+    kCase  = 0x02,
+    kGroup = 0x03,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using AuthMode                             = EmberAfAuthMode;
+#endif
+// Need to convert consumers to using the new enum classes, so we
+// don't just have casts all over.
+#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+// Enum for Privilege
+enum class Privilege : uint8_t
+{
+    kView       = 0x01,
+    kProxyView  = 0x02,
+    kOperate    = 0x03,
+    kManage     = 0x04,
+    kAdminister = 0x05,
+};
+#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+using Privilege                            = EmberAfPrivilege;
+#endif
+
+namespace Structs {
+namespace Target {
+enum class Fields
+{
+    kCluster    = 0,
+    kEndpoint   = 1,
+    kDeviceType = 2,
+};
+
+struct Type
+{
+public:
+    DataModel::Nullable<uint32_t> cluster;
+    DataModel::Nullable<uint16_t> endpoint;
+    DataModel::Nullable<uint32_t> deviceType;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace Target
+namespace AccessControlEntry {
+enum class Fields
+{
+    kFabricIndex = 0,
+    kPrivilege   = 1,
+    kAuthMode    = 2,
+    kSubjects    = 3,
+    kTargets     = 4,
+};
+
+struct Type
+{
+public:
+    chip::FabricIndex fabricIndex;
+    Privilege privilege;
+    AuthMode authMode;
+    DataModel::Nullable<DataModel::List<const uint64_t>> subjects;
+    DataModel::Nullable<DataModel::List<const Structs::Target::Type>> targets;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    chip::FabricIndex fabricIndex;
+    Privilege privilege;
+    AuthMode authMode;
+    DataModel::Nullable<DataModel::DecodableList<uint64_t>> subjects;
+    DataModel::Nullable<DataModel::DecodableList<Structs::Target::DecodableType>> targets;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace AccessControlEntry
+namespace ExtensionEntry {
+enum class Fields
+{
+    kFabricIndex = 0,
+    kData        = 1,
+};
+
+struct Type
+{
+public:
+    chip::FabricIndex fabricIndex;
+    chip::ByteSpan data;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace ExtensionEntry
+} // namespace Structs
+
+namespace Attributes {
+namespace Acl {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<DataModel::List<const Structs::AccessControlEntry::Type>>;
+    using DecodableType    = DataModel::Nullable<DataModel::DecodableList<Structs::AccessControlEntry::DecodableType>>;
+    using DecodableArgType = const DataModel::Nullable<DataModel::DecodableList<Structs::AccessControlEntry::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Acl::Id; }
+};
+} // namespace Acl
+namespace Extension {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<DataModel::List<const Structs::ExtensionEntry::Type>>;
+    using DecodableType    = DataModel::Nullable<DataModel::DecodableList<Structs::ExtensionEntry::DecodableType>>;
+    using DecodableArgType = const DataModel::Nullable<DataModel::DecodableList<Structs::ExtensionEntry::DecodableType>> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Extension::Id; }
+};
+} // namespace Extension
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace AccessControl
 namespace PollControl {
 
 namespace Commands {

@@ -161,6 +161,14 @@ enum EmberAfAudioOutputType : uint8_t
     EMBER_ZCL_AUDIO_OUTPUT_TYPE_OTHER     = 5,
 };
 
+// Enum for AuthMode
+enum EmberAfAuthMode : uint8_t
+{
+    EMBER_ZCL_AUTH_MODE_PASE  = 1,
+    EMBER_ZCL_AUTH_MODE_CASE  = 2,
+    EMBER_ZCL_AUTH_MODE_GROUP = 3,
+};
+
 // Enum for BarrierControlBarrierPosition
 enum EmberAfBarrierControlBarrierPosition : uint8_t
 {
@@ -1315,6 +1323,16 @@ enum EmberAfPowerSourceStatus : uint8_t
     EMBER_ZCL_POWER_SOURCE_STATUS_ACTIVE      = 1,
     EMBER_ZCL_POWER_SOURCE_STATUS_STANDBY     = 2,
     EMBER_ZCL_POWER_SOURCE_STATUS_UNAVAILABLE = 3,
+};
+
+// Enum for Privilege
+enum EmberAfPrivilege : uint8_t
+{
+    EMBER_ZCL_PRIVILEGE_VIEW       = 1,
+    EMBER_ZCL_PRIVILEGE_PROXY_VIEW = 2,
+    EMBER_ZCL_PRIVILEGE_OPERATE    = 3,
+    EMBER_ZCL_PRIVILEGE_MANAGE     = 4,
+    EMBER_ZCL_PRIVILEGE_ADMINISTER = 5,
 };
 
 // Enum for ProductCode
