@@ -32,7 +32,7 @@
     {{#if_chip_enum type}}
       static_cast<{{zapTypeToEncodableClusterObjectType type ns=ns}}>({{definedValue}});
     {{else if (isCharString type)}}
-      chip::Span<const char>("{{definedValue}}garbage: not in length on purpose", {{definedValue.length}});
+      chip::Span<const char>("{{definedValue}}garbage: not in length on purpose", {{utf8StringLength definedValue}});
     {{else if (isOctetString type)}}
       chip::ByteSpan(chip::Uint8::from_const_char("{{octetStringEscapedForCLiteral definedValue}}garbage: not in length on purpose"), {{definedValue.length}});
     {{else}}

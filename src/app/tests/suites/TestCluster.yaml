@@ -681,7 +681,6 @@ tests:
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
       attribute: "char_string"
-      disabled: true
       response:
           value: "☉T☉"
 
@@ -696,9 +695,8 @@ tests:
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
       attribute: "char_string"
-      disabled: true
       response:
-          value: "☉TestVal"
+          value: "☉T☉"
 
     - label: "Write attribute CHAR_STRING - Empty"
       command: "writeAttribute"
