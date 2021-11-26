@@ -48,12 +48,12 @@ struct VariantState : Variant<Ts...>
 {
 
 private:
-    template <typename T, typename E>
-    void Enter(Optional<E> & event)
+    template <typename T>
+    void Enter()
     {
         if (chip::Variant<Ts...>::template Is<T>())
         {
-            event = chip::Variant<Ts...>::template Get<T>().Enter();
+            chip::Variant<Ts...>::template Get<T>().Enter();
         }
     }
 
@@ -93,12 +93,9 @@ public:
         return instance;
     }
 
-    template <typename E>
-    Optional<E> Enter()
+    void Enter()
     {
-        Optional<E> event;
-        [](...) {}((this->template Enter<Ts, E>(event), 0)...);
-        return event;
+        [](...) {}((this->template Enter<Ts>(), 0)...);
     }
 
     void Exit()
@@ -117,6 +114,25 @@ public:
     {
         [](...) {}((this->template LogTransition<Ts>(previous), 0)...);
     }
+};
+
+/**
+ * The interface for dispatching events into the State Machine.
+ * @tparam TEvent a variant holding the Events for the State Machine.
+ */
+template <typename TEvent>
+class Context
+{
+public:
+    virtual ~Context() = default;
+
+    /**
+     * Dispatch an event to the current state.
+     * @note This call can result in the current state being deleted.  Do not
+     * access current state memory after calling this method.
+     * @param evt a variant holding an Event for the State Machine.
+     */
+    virtual void Dispatch(const TEvent & evt) = 0;
 };
 
 /**
@@ -187,27 +203,48 @@ public:
  * @tparam TTransitions an object that implements the () operator for transitions.
  */
 template <typename TState, typename TEvent, typename TTransitions>
-class StateMachine
+class StateMachine : public Context<TEvent>
 {
 public:
     StateMachine(TTransitions & tr) : mCurrentState(tr.GetInitState()), mTransitions(tr) {}
-
-    void Dispatch(const TEvent & evt)
+    ~StateMachine() override = default;
+    void Dispatch(const TEvent & evt) override
     {
-        Optional<TEvent> optEvent(evt);
-        Optional<TState> optState;
-        while (optEvent.HasValue() && (optState = mTransitions(mCurrentState, evt)).HasValue())
+        auto inProcess = !events.empty();
+        events.push_back(evt);
+        if (!inProcess)
         {
-            auto newState = optState.Value();
-            newState.LogTransition(mCurrentState.GetName());
-            mCurrentState.Exit();
-            mCurrentState = newState;
-            optEvent = mCurrentState.template Enter<TEvent>();
+            HandleEvents();
         }
     }
 
     TState mCurrentState;
+
+private:
+    void HandleEvents()
+    {
+        while (!events.empty())
+        {
+            auto count    = events.size();
+            auto optState = mTransitions(mCurrentState, events.front());
+            if (optState.HasValue())
+            {
+                auto newState = optState.Value();
+                newState.LogTransition(mCurrentState.GetName());
+                mCurrentState.Exit();
+                mCurrentState = newState;
+                while (events.size() > count)
+                {
+                    events.pop_back(); // events discarded per design
+                }
+                mCurrentState.Enter();
+            }
+            events.pop_front();
+        }
+    }
+
     TTransitions & mTransitions;
+    std::deque<TEvent> events{};
 };
 
 } // namespace StateMachine
