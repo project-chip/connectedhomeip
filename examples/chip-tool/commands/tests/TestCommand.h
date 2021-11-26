@@ -70,6 +70,8 @@ protected:
     bool CheckConstraintFormat(const char * itemName, const char * current, const char * expected);
     bool CheckConstraintMinLength(const char * itemName, uint64_t current, uint64_t expected);
     bool CheckConstraintMaxLength(const char * itemName, uint64_t current, uint64_t expected);
+    bool CheckConstraintStartsWith(const char * itemName, const chip::Span<const char> current, const char * expected);
+    bool CheckConstraintEndsWith(const char * itemName, const chip::Span<const char> current, const char * expected);
     template <typename T>
     bool CheckConstraintMinValue(const char * itemName, T current, T expected)
     {

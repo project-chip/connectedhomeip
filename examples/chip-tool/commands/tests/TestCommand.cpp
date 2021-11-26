@@ -92,6 +92,30 @@ bool TestCommand::CheckConstraintFormat(const char * itemName, const char * curr
     return true;
 }
 
+bool TestCommand::CheckConstraintStartsWith(const char * itemName, const chip::Span<const char> current, const char * expected)
+{
+    std::string value(current.data(), current.size());
+    if (value.rfind(expected, 0) != 0)
+    {
+        Exit(std::string(itemName) + " (\"" + value + "\") does not starts with: \"" + std::string(expected) + "\"");
+        return false;
+    }
+
+    return true;
+}
+
+bool TestCommand::CheckConstraintEndsWith(const char * itemName, const chip::Span<const char> current, const char * expected)
+{
+    std::string value(current.data(), current.size());
+    if (value.find(expected, value.size() - strlen(expected)) == std::string::npos)
+    {
+        Exit(std::string(itemName) + " (\"" + value + "\") does not ends with: \"" + std::string(expected) + "\"");
+        return false;
+    }
+
+    return true;
+}
+
 bool TestCommand::CheckConstraintMinLength(const char * itemName, uint64_t current, uint64_t expected)
 {
     if (current < expected)
