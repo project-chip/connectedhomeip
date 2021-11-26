@@ -133,7 +133,7 @@ def HostTargets():
         HostBuildVariant(name="ipv6only", enable_ipv4=False),
         HostBuildVariant(name="no-ble", enable_ble=False),
         HostBuildVariant(name="tsan", use_tsan=True),
-        HostBuildVariant(name="single-event-loop", use_single_event_loop=True),
+        HostBuildVariant(name="separate-event-loop", separate_event_loop=True),
     ]
 
     glob_whitelist = set(['ipv6only'])
