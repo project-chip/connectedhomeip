@@ -94,14 +94,15 @@ void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 
 bool emberAfContentLauncherClusterLaunchContentCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
 {
     ContentLauncherMgr().LaunchContent(commandObj, commandPath, commandData);
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchURLCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
+bool emberAfContentLauncherClusterLaunchURLCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
 {
     ContentLauncherMgr().LaunchUrl(commandObj, commandPath, commandData);
     return true;
@@ -245,13 +246,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR ContentLauncherManager::LaunchContent(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
+CHIP_ERROR ContentLauncherManager::LaunchContent(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err  = CHIP_NO_ERROR;
     auto & autoplay = commandData.autoPlay;
     auto & data     = commandData.data;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env    = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContent");
     VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -305,13 +307,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR ContentLauncherManager::LaunchUrl(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
+CHIP_ERROR
+ContentLauncherManager::LaunchUrl(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+                                  const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
     auto & contentUrl    = commandData.contentURL;
     auto & displayString = commandData.displayString;
-    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContent");
     VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
