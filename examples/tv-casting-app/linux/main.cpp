@@ -196,8 +196,8 @@ int main(int argc, char * argv[])
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     // Initialize device attestation verifier
-    // TODO: Replace testingRootStore with a PaaRootStore that has the necessary official PAA roots available
-    const chip::Credentials::PaaRootStore * testingRootStore = chip::Credentials::GetTestPaaRootStore();
+    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
     SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
     if (!chip::ArgParser::ParseArgs(argv[0], argc, argv, allOptions))

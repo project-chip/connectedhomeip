@@ -113,7 +113,7 @@ const ByteSpan kTestPaaRoots[] = {
     ByteSpan{ kChipTestPaaFff2 },
 };
 
-const ArrayPaaRootStore kTestPaaRootStore{ &kTestPaaRoots[0], ArraySize(kTestPaaRoots) };
+const ArrayAttestationTrustStore kTestAttestationTrustStore{ &kTestPaaRoots[0], ArraySize(kTestPaaRoots) };
 
 /**
  * @brief Look-up of well-known keys used for CD signing by CSA.
@@ -175,7 +175,7 @@ CHIP_ERROR GetCertificationDeclarationCertificate(const ByteSpan & skid, Mutable
 class DefaultDACVerifier : public DeviceAttestationVerifier
 {
 public:
-    DefaultDACVerifier(const PaaRootStore * paaRootStore) : mPaaRootStore(paaRootStore) {}
+    DefaultDACVerifier(const AttestationTrustStore * paaRootStore) : mAttestationTrustStore(paaRootStore) {}
 
     AttestationVerificationResult VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
                                                                const ByteSpan & attestationChallengeBuffer,
@@ -193,7 +193,7 @@ public:
 protected:
     DefaultDACVerifier() {}
 
-    const PaaRootStore * mPaaRootStore;
+    const AttestationTrustStore * mAttestationTrustStore;
 };
 
 AttestationVerificationResult DefaultDACVerifier::VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
@@ -245,7 +245,7 @@ AttestationVerificationResult DefaultDACVerifier::VerifyAttestationInformation(c
     chip::Platform::ScopedMemoryBuffer<uint8_t> paaCert;
     VerifyOrReturnError(paaCert.Alloc(paaCertAllocatedLen), AttestationVerificationResult::kNoMemory);
     MutableByteSpan paa(paaCert.Get(), paaCertAllocatedLen);
-    VerifyOrReturnError(mPaaRootStore->GetProductAttestationAuthorityCert(akid, paa) == CHIP_NO_ERROR,
+    VerifyOrReturnError(mAttestationTrustStore->GetProductAttestationAuthorityCert(akid, paa) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kPaaNotFound);
 
     VerifyOrReturnError(ValidateCertificateChain(paa.data(), paa.size(), paiCertDerBuffer.data(), paiCertDerBuffer.size(),
@@ -388,12 +388,12 @@ AttestationVerificationResult DefaultDACVerifier::ValidateCertificateDeclaration
 
 } // namespace
 
-const PaaRootStore * GetTestPaaRootStore()
+const AttestationTrustStore * GetTestAttestationTrustStore()
 {
-    return &kTestPaaRootStore;
+    return &kTestAttestationTrustStore;
 }
 
-DeviceAttestationVerifier * GetDefaultDACVerifier(const PaaRootStore * paaRootStore)
+DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore)
 {
     static DefaultDACVerifier defaultDACVerifier{ paaRootStore };
 

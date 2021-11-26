@@ -195,7 +195,7 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
         default_verifier->VerifyAttestationInformation(ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan());
     NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kNotImplemented);
 
-    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestPaaRootStore());
+    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
     NL_TEST_ASSERT(inSuite, example_dac_verifier != nullptr);
     NL_TEST_ASSERT(inSuite, default_verifier != example_dac_verifier);
 
@@ -251,7 +251,7 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Replace default verifier with example verifier
-    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestPaaRootStore());
+    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
     NL_TEST_ASSERT(inSuite, example_dac_verifier != nullptr);
 
     SetDeviceAttestationVerifier(example_dac_verifier);
@@ -294,7 +294,7 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
 }
 
-static void TestPaaRootStore(nlTestSuite * inSuite, void * inContext)
+static void TestAttestationTrustStore(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t kPaaFff1Start[] = { 0x30, 0x82, 0x01, 0x99, 0x30, 0x82, 0x01, 0x3F, 0xA0, 0x03, 0x02, 0x01, 0x02,
                                 0x02, 0x08, 0x68, 0x38, 0x4F, 0xAB, 0xB9, 0x19, 0xFC, 0xDF, 0x30, 0x0A, 0x06,
@@ -338,8 +338,8 @@ static void TestPaaRootStore(nlTestSuite * inSuite, void * inContext)
         { .skidSpan = ByteSpan{ kPaaGoodSkidNotPresent }, .startSpan = ByteSpan{}, .expectedResult = CHIP_ERROR_CA_CERT_NOT_FOUND },
     };
 
-    const PaaRootStore * testPaaRootStore = GetTestPaaRootStore();
-    NL_TEST_ASSERT(inSuite, testPaaRootStore != nullptr);
+    const AttestationTrustStore * testAttestationTrustStore = GetTestAttestationTrustStore();
+    NL_TEST_ASSERT(inSuite, testAttestationTrustStore != nullptr);
 
     size_t testCaseIdx = 0;
     for (const auto & testCase : kTestCases)
@@ -353,7 +353,7 @@ static void TestPaaRootStore(nlTestSuite * inSuite, void * inContext)
         }
 
         // Try to obtain cert
-        CHIP_ERROR result = testPaaRootStore->GetProductAttestationAuthorityCert(testCase.skidSpan, paaCertSpan);
+        CHIP_ERROR result = testAttestationTrustStore->GetProductAttestationAuthorityCert(testCase.skidSpan, paaCertSpan);
         NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
 
         // In success cases, make sure the start of the cert matches expectation. Not using full certs
@@ -399,7 +399,7 @@ int TestDeviceAttestation_Teardown(void * inContext)
 static const nlTest sTests[] = {
     NL_TEST_DEF("Test Example Device Attestation Credentials Providers", TestDACProvidersExample_Providers),
     NL_TEST_DEF("Test Example Device Attestation Signature", TestDACProvidersExample_Signature),
-    NL_TEST_DEF("Test the 'for testing' Paa Root Store", TestPaaRootStore),
+    NL_TEST_DEF("Test the 'for testing' Paa Root Store", TestAttestationTrustStore),
     NL_TEST_DEF("Test Example Device Attestation Information Verification", TestDACVerifierExample_AttestationInfoVerification),
     NL_TEST_DEF("Test Example Device Attestation Certification Declaration Verification", TestDACVerifierExample_CertDeclarationVerification),
     NL_TEST_SENTINEL()

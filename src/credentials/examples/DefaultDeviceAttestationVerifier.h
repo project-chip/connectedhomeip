@@ -30,21 +30,21 @@ namespace Credentials {
  *          to support tests and examples, not to be used by real commissioners, as it
  *          contains several test roots which are not trustworthy for certified product usage.
  *
- * @returns a singleton PaaRootStore that contains some well-known PAA test root certs.
+ * @returns a singleton AttestationTrustStore that contains some well-known PAA test root certs.
  */
-const PaaRootStore * GetTestPaaRootStore();
+const AttestationTrustStore * GetTestAttestationTrustStore();
 
 /**
  * @brief Get implementation of a sample DAC verifier to validate device
  *        attestation procedure.
  *
- * @param[in] paaRootStore Pointer to the PaaRootStore instance to be used by implementation
+ * @param[in] paaRootStore Pointer to the AttestationTrustStore instance to be used by implementation
  *                         of default DeviceAttestationVerifier. Caller must ensure storage is
  *                         always available while the DeviceAttestationVerifier could be used.
  *
  * @returns a singleton DeviceAttestationVerifier that satisfies basic device attestation procedure requirements.
  */
-DeviceAttestationVerifier * GetDefaultDACVerifier(const PaaRootStore * paaRootStore);
+DeviceAttestationVerifier * GetDefaultDACVerifier(const AttestationTrustStore * paaRootStore);
 
 } // namespace Credentials
 } // namespace chip
