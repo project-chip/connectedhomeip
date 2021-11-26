@@ -92,13 +92,14 @@ void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
     }
 }
 
-ContentLaunchResponse contentLauncherClusterLaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay, const chip::CharSpan & data)
+ContentLaunchResponse contentLauncherClusterLaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
+                                                          const chip::CharSpan & data)
 {
     return ContentLauncherMgr().LaunchContent(parameterList, autoplay, data);
 }
 
 ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                         ContentLaunchBrandingInformation & brandingInformation)
+                                                      ContentLaunchBrandingInformation & brandingInformation)
 {
     return ContentLauncherMgr().LaunchUrl(contentUrl, displayString, brandingInformation);
 }
@@ -241,11 +242,12 @@ exit:
     return err;
 }
 
-ContentLaunchResponse ContentLauncherManager::LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay, const chip::CharSpan & data)
+ContentLaunchResponse ContentLauncherManager::LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
+                                                            const chip::CharSpan & data)
 {
     ContentLaunchResponse response;
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    JNIEnv * env    = JniReferences::GetInstance().GetEnvForCurrentThread();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContent");
     VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -281,7 +283,7 @@ ContentLaunchResponse ContentLauncherManager::LaunchContent(std::list<ContentLau
         JniUtfString dataStr(env, jdataStr);
 
         response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(status);
-        response.data                = dataStr.charSpan();
+        response.data   = dataStr.charSpan();
     }
 
 exit:
@@ -294,13 +296,12 @@ exit:
     return response;
 }
 
-ContentLaunchResponse
-ContentLauncherManager::LaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                         ContentLaunchBrandingInformation & brandingInformation)
+ContentLaunchResponse ContentLauncherManager::LaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                                        ContentLaunchBrandingInformation & brandingInformation)
 {
     ContentLaunchResponse response;
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContent");
     VerifyOrExit(mContentLauncherManagerObject != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -337,7 +338,7 @@ ContentLauncherManager::LaunchUrl(const chip::CharSpan & contentUrl, const chip:
         JniUtfString dataStr(env, jdataStr);
 
         response.status = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(status);
-        response.data                = dataStr.charSpan();
+        response.data   = dataStr.charSpan();
     }
 
 exit:

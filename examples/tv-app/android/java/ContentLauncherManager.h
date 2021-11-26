@@ -32,9 +32,10 @@ public:
     void InitializeWithObjects(jobject managerObject);
     CHIP_ERROR GetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder);
     CHIP_ERROR GetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder);
-    ContentLaunchResponse LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay, const chip::CharSpan & data);
+    ContentLaunchResponse LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
+                                        const chip::CharSpan & data);
     ContentLaunchResponse LaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                         ContentLaunchBrandingInformation & brandingInformation);
+                                    ContentLaunchBrandingInformation & brandingInformation);
 
 private:
     friend ContentLauncherManager & ContentLauncherMgr();

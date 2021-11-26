@@ -46,15 +46,16 @@
 
 using namespace chip;
 
-ContentLaunchResponse contentLauncherClusterLaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay, const chip::CharSpan & data);
+ContentLaunchResponse contentLauncherClusterLaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
+                                                          const chip::CharSpan & data);
 ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                         ContentLaunchBrandingInformation & brandingInformation);
+                                                      ContentLaunchBrandingInformation & brandingInformation);
 
 bool emberAfContentLauncherClusterLaunchContentCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::Type response;
 
     auto & autoplay = commandData.autoPlay;
@@ -85,7 +86,7 @@ bool emberAfContentLauncherClusterLaunchURLCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::Type response;
 
     auto & contentUrl    = commandData.contentURL;
