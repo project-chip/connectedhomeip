@@ -588,8 +588,8 @@ static bool verifyPin(const ByteSpan & pin, uint8_t * userId)
 bool emberAfDoorLockClusterLockDoorCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                             const Commands::LockDoor::DecodableType & commandData)
 {
-    // NOTE: PIN code is optional for Lock commands in the Matter spec (5.2.4.1). 
-    // Don't care that it is optional for now, this should be properly addressed in the upcoming door lock 
+    // NOTE: PIN code is optional for Lock commands in the Matter spec (5.2.4.1).
+    // Don't care that it is optional for now, this should be properly addressed in the upcoming door lock
     // cluster implementation. For now we assume that the PIN code is always present.
     auto & PIN = commandData.pinCode.Value();
 
@@ -655,8 +655,8 @@ exit:
 bool emberAfDoorLockClusterUnlockDoorCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                               const Commands::UnlockDoor::DecodableType & commandData)
 {
-    // NOTE: PIN code is optional for Unlock command in the Matter spec (5.2.4.2). 
-    // Don't care that it is optional for now, this should be properly addressed in the upcoming door lock 
+    // NOTE: PIN code is optional for Unlock command in the Matter spec (5.2.4.2).
+    // Don't care that it is optional for now, this should be properly addressed in the upcoming door lock
     // cluster implementation. For now we assume that the PIN code is always present.
     auto & pin = commandData.pinCode.Value();
 
@@ -846,8 +846,8 @@ void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttr
 bool emberAfDoorLockClusterUnlockWithTimeoutCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                      const Commands::UnlockWithTimeout::DecodableType & commandData)
 {
-    // NOTE: PIN code is optional for Lock With Timeout commands in the Matter spec (5.2.4.3). 
-    // Don't care that it is optional for now, this should be properly addressed in the upcoming door lock 
+    // NOTE: PIN code is optional for Lock With Timeout commands in the Matter spec (5.2.4.3).
+    // Don't care that it is optional for now, this should be properly addressed in the upcoming door lock
     // cluster implementation. For now we assume that the PIN code is always present.
     auto & timeoutS = commandData.timeout;
     auto & pin      = commandData.pinCode.Value();
