@@ -38695,6 +38695,30 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Write attribute INT32U Value Back to Default Value\n");
             err = TestWriteAttributeInt32uValueBackToDefaultValue_4();
             break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Write attribute CHAR_STRING Value\n");
+            err = TestWriteAttributeCharStringValue_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Read attribute CHAR_STRING Value MinLength Constraints\n");
+            err = TestReadAttributeCharStringValueMinLengthConstraints_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read attribute CHAR_STRING Value MaxLength Constraints\n");
+            err = TestReadAttributeCharStringValueMaxLengthConstraints_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Read attribute CHAR_STRING Value StartsWith Constraints\n");
+            err = TestReadAttributeCharStringValueStartsWithConstraints_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Read attribute CHAR_STRING Value EndsWith Constraints\n");
+            err = TestReadAttributeCharStringValueEndsWithConstraints_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Write attribute CHAR_STRING Value Back to Default Value\n");
+            err = TestWriteAttributeCharStringValueBackToDefaultValue_10();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -38706,7 +38730,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 11;
 
     static void OnFailureCallback_0(void * context, EmberAfStatus status)
     {
@@ -38751,6 +38775,60 @@ private:
     }
 
     static void OnSuccessCallback_4(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_4(); }
+
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_5(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_5(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_5(); }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_6(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_6(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_6(charString);
+    }
+
+    static void OnFailureCallback_7(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_7(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_7(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_7(charString);
+    }
+
+    static void OnFailureCallback_8(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_8(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_8(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_8(charString);
+    }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_9(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_9(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestConstraints *>(context))->OnSuccessResponse_9(charString);
+    }
+
+    static void OnFailureCallback_10(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestConstraints *>(context))->OnFailureResponse_10(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_10(void * context) { (static_cast<TestConstraints *>(context))->OnSuccessResponse_10(); }
 
     //
     // Tests methods
@@ -38846,6 +38924,116 @@ private:
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_4() { NextTest(); }
+
+    CHIP_ERROR TestWriteAttributeCharStringValue_5()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("** Test **garbage: not in length on purpose", 10);
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_5, OnFailureCallback_5);
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeCharStringValueMinLengthConstraints_6()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(this, OnSuccessCallback_6,
+                                                                                                         OnFailureCallback_6);
+    }
+
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintMinLength("charString", charString.size(), 5));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeCharStringValueMaxLengthConstraints_7()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(this, OnSuccessCallback_7,
+                                                                                                         OnFailureCallback_7);
+    }
+
+    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintMaxLength("charString", charString.size(), 20));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeCharStringValueStartsWithConstraints_8()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(this, OnSuccessCallback_8,
+                                                                                                         OnFailureCallback_8);
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintStartsWith("charString", charString, "**"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeCharStringValueEndsWithConstraints_9()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(this, OnSuccessCallback_9,
+                                                                                                         OnFailureCallback_9);
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(chip::CharSpan charString)
+    {
+        VerifyOrReturn(CheckConstraintEndsWith("charString", charString, "**"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeCharStringValueBackToDefaultValue_10()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        chip::CharSpan charStringArgument;
+        charStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_10, OnFailureCallback_10);
+    }
+
+    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_10() { NextTest(); }
 };
 
 class TestDelayCommands : public TestCommand
