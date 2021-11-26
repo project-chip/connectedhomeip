@@ -106,9 +106,11 @@ def HostTargets():
 
     app_targets = []
 
-    # RPC console compilation only for native
+    # Don't cross  compile some builds
     app_targets.append(
         targets[0].Extend('rpc-console', app=HostApp.RPC_CONSOLE))
+    app_targets.append(
+        targets[0].Extend('tv-app', app=HostApp.TV_APP))
 
     for target in targets:
         app_targets.append(target.Extend(

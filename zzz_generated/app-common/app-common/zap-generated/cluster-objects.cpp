@@ -3720,15 +3720,6 @@ namespace Events {
 } // namespace Events
 
 } // namespace Descriptor
-namespace Acl {
-
-namespace Commands {
-} // namespace Commands
-
-namespace Events {
-} // namespace Events
-
-} // namespace Acl
 namespace PollControl {
 
 namespace Commands {
