@@ -629,20 +629,20 @@ public:
 
     /**
      * @brief
+     *   Return the UDC Server instance
+     *
+     */
+    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+    /**
+     * @brief
      *   Overrides method from AbstractDnssdDiscoveryController
      *
      * @param nodeData DNS-SD node information
      *
      */
     void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
-
-    /**
-     * @brief
-     *   Return the UDC Server instance
-     *
-     */
-    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
