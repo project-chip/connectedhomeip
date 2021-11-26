@@ -38,22 +38,77 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include "content-launch-server.h"
+#include <app-common/zap-generated/af-structs.h>
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
+#include <list>
 
 using namespace chip;
 
-bool emberAfContentLauncherClusterLaunchContentCallback(app::CommandHandler * commandObj)
+ContentLaunchResponse contentLauncherClusterLaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay, const chip::CharSpan & data);
+ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                         ContentLaunchBrandingInformation & brandingInformation);
+
+bool emberAfContentLauncherClusterLaunchContentCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    emberAfSendImmediateDefaultResponse(status);
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::Type response;
+
+    auto & autoplay = commandData.autoPlay;
+    auto & data     = commandData.data;
+    std::list<ContentLaunchParamater> parameterList;
+
+    ContentLaunchResponse resp = contentLauncherClusterLaunchContent(parameterList, autoplay, data);
+    VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
+
+    response.contentLaunchStatus = resp.status;
+    response.data                = resp.data;
+
+    err = commandObj->AddResponseData(commandPath, response);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfContentLauncherClusterLaunchContentCallback error: %s", err.AsString());
+
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchURLCallback(app::CommandHandler * commandObj)
+bool emberAfContentLauncherClusterLaunchURLCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
 {
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-    emberAfSendImmediateDefaultResponse(status);
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::Type response;
+
+    auto & contentUrl    = commandData.contentURL;
+    auto & displayString = commandData.displayString;
+    ContentLaunchBrandingInformation brandingInformation;
+
+    ContentLaunchResponse resp = contentLauncherClusterLaunchUrl(contentUrl, displayString, brandingInformation);
+    VerifyOrExit(resp.err == CHIP_NO_ERROR, err = resp.err);
+
+    response.contentLaunchStatus = resp.status;
+    response.data                = resp.data;
+
+    err = commandObj->AddResponseData(commandPath, response);
+    SuccessOrExit(err);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Zcl, "emberAfContentLauncherClusterLaunchURLCallback error: %s", err.AsString());
+
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+
     return true;
 }
 
