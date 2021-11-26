@@ -108,12 +108,6 @@
 #define CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER
 #endif
 
-#if defined(ZCL_USING_ACL_CLUSTER_SERVER) || defined(ZCL_USING_ACL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_ACL_CLUSTER { ZCL_ACL_CLUSTER_ID, 31, "ACL" },
-#else
-#define CHIP_PRINTCLUSTER_ACL_CLUSTER
-#endif
-
 #if defined(ZCL_USING_POLL_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_POLL_CONTROL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER { ZCL_POLL_CONTROL_CLUSTER_ID, 32, "Poll Control" },
 #else
@@ -798,7 +792,6 @@
     CHIP_PRINTCLUSTER_POWER_PROFILE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER                                                                                           \
-    CHIP_PRINTCLUSTER_ACL_CLUSTER                                                                                                  \
     CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \

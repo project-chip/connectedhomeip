@@ -258,11 +258,13 @@ class {{filename}}: public TestCommand
               {{/if}}
               {{#if expectedConstraints.type}}VerifyOrReturn(CheckConstraintType("{{>item}}", "", "{{expectedConstraints.type}}"));{{/if}}
               {{~#if expectedConstraints.format}}VerifyOrReturn(CheckConstraintFormat("{{>item}}", "", "{{expectedConstraints.format}}"));{{/if}}
+              {{~#if expectedConstraints.startsWith}}VerifyOrReturn(CheckConstraintStartsWith("{{>item}}", {{>item}}, "{{expectedConstraints.startsWith}}"));{{/if}}
+              {{~#if expectedConstraints.endsWith}}VerifyOrReturn(CheckConstraintEndsWith("{{>item}}", {{>item}}, "{{expectedConstraints.endsWith}}"));{{/if}}
               {{~#if expectedConstraints.minLength}}VerifyOrReturn(CheckConstraintMinLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.minLength}}));{{/if}}
               {{~#if expectedConstraints.maxLength}}VerifyOrReturn(CheckConstraintMaxLength("{{>item}}", {{>item}}.size(), {{expectedConstraints.maxLength}}));{{/if}}
               {{~#if expectedConstraints.minValue}}VerifyOrReturn(CheckConstraintMinValue<{{chipType}}>("{{>item}}", {{>item}}, {{expectedConstraints.minValue}}));{{/if}}
               {{~#if expectedConstraints.maxValue}}VerifyOrReturn(CheckConstraintMaxValue<{{chipType}}>("{{>item}}", {{>item}}, {{expectedConstraints.maxValue}}));{{/if}}
-              {{~#if expectedConstraints.notValue}}VerifyOrReturn(CheckConstraintNotValue<{{chipType}}>("{{>item}}", {{>item}}, {{expectedConstraints.notValue}}));{{/if}}
+              {{~#if expectedConstraints.notValue}}VerifyOrReturn(CheckConstraintNotValue("{{>item}}", {{>item}}, {{asTypedLiteral expectedConstraints.notValue type}}));{{/if}}
             {{/if}}
 
             {{#if saveAs}}

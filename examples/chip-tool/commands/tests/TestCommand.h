@@ -70,6 +70,8 @@ protected:
     bool CheckConstraintFormat(const char * itemName, const char * current, const char * expected);
     bool CheckConstraintMinLength(const char * itemName, uint64_t current, uint64_t expected);
     bool CheckConstraintMaxLength(const char * itemName, uint64_t current, uint64_t expected);
+    bool CheckConstraintStartsWith(const char * itemName, const chip::Span<const char> current, const char * expected);
+    bool CheckConstraintEndsWith(const char * itemName, const chip::Span<const char> current, const char * expected);
     template <typename T>
     bool CheckConstraintMinValue(const char * itemName, T current, T expected)
     {
@@ -92,19 +94,34 @@ protected:
 
         return true;
     }
-    template <typename T>
-    bool CheckConstraintNotValue(const char * itemName, T current, T expected)
+    template <typename T, typename U>
+    bool CheckConstraintNotValue(const char * itemName, T current, U expected)
     {
         if (current == expected)
         {
-            if (std::is_same<T, const chip::Span<const uint8_t>>::value || std::is_same<T, const chip::Span<const char>>::value)
-            {
-                Exit(std::string(itemName) + " value == notValue");
-            }
-            else
-            {
-                Exit(std::string(itemName) + " value == notValue: " + std::to_string(current) + " == " + std::to_string(expected));
-            }
+            Exit(std::string(itemName) + " got unexpected value: " + std::to_string(current));
+            return false;
+        }
+
+        return true;
+    }
+
+    bool CheckConstraintNotValue(const char * itemName, chip::CharSpan current, chip::CharSpan expected)
+    {
+        if (current.data_equal(expected))
+        {
+            Exit(std::string(itemName) + " got unexpected value: " + std::string(current.data(), current.size()));
+            return false;
+        }
+
+        return true;
+    }
+
+    bool CheckConstraintNotValue(const char * itemName, chip::ByteSpan current, chip::ByteSpan expected)
+    {
+        if (current.data_equal(expected))
+        {
+            Exit(std::string(itemName) + " got unexpected value of size: " + std::to_string(current.size()));
             return false;
         }
 

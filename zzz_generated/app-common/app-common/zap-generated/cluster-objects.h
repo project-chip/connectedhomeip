@@ -5532,33 +5532,6 @@ struct TypeInfo
 } // namespace ClusterRevision
 } // namespace Attributes
 } // namespace Descriptor
-namespace Acl {
-
-namespace Attributes {
-namespace FeatureMap {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::Acl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::Acl::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-};
-} // namespace ClusterRevision
-} // namespace Attributes
-} // namespace Acl
 namespace PollControl {
 
 namespace Commands {

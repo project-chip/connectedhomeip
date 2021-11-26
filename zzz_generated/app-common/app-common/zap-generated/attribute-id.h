@@ -242,12 +242,6 @@
 #define ZCL_CLIENT_LIST_ATTRIBUTE_ID (0x0002)
 #define ZCL_PARTS_LIST_ATTRIBUTE_ID (0x0003)
 
-// Attribute ids for cluster: ACL
-
-// Client attributes
-
-// Server attributes
-
 // Attribute ids for cluster: Poll Control
 
 // Client attributes
