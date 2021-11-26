@@ -122,7 +122,7 @@ def main(context, log_level, target, target_glob, target_skip_glob, no_log_times
             tests.extend(targeted)
 
     if target_glob:
-        matcher = GlobMatcher(target_glob)
+        matcher = GlobMatcher(target_glob.lower())
         tests = [test for test in tests if matcher.matches(test.name.lower())]
 
     if len(tests) == 0:
@@ -132,7 +132,7 @@ def main(context, log_level, target, target_glob, target_skip_glob, no_log_times
         exit(1)
 
     if target_skip_glob:
-        matcher = GlobMatcher(target_skip_glob)
+        matcher = GlobMatcher(target_skip_glob.lower())
         tests = [test for test in tests if not matcher.matches(
             test.name.lower())]
 
