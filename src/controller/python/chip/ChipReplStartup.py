@@ -8,6 +8,7 @@ from chip import ChipDeviceCtrl
 import chip.clusters as Clusters
 import coloredlogs
 import chip.logging
+import argparse
 import builtins
 
 
@@ -40,7 +41,7 @@ def ReplInit():
 
 
 def matterhelp(classOrObj=None):
-    if (classOrObj is None):
+    if (classOrObj == None):
         inspect(builtins.devCtrl, methods=True, help=True, private=False)
     else:
         inspect(classOrObj, methods=True, help=True, private=False)
