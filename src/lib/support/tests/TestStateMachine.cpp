@@ -36,7 +36,6 @@ struct Event4
 };
 
 using Event   = chip::Variant<Event1, Event2, Event3, Event4>;
-using Context = chip::StateMachine::Context<Event>;
 
 struct MockState
 {
@@ -45,7 +44,7 @@ struct MockState
     unsigned mLogged;
     const char * mPrevious;
 
-    void Enter() { ++mEntered; }
+    chip::StateMachine::Optional<Event> Enter() { ++mEntered; return {}; }
     void Exit() { ++mExited; }
     void LogTransition(const char * previous)
     {
@@ -56,46 +55,40 @@ struct MockState
 
 struct BaseState
 {
-    void Enter() { mMock.Enter(); }
+    chip::StateMachine::Optional<Event> Enter() { return mMock.Enter(); }
     void Exit() { mMock.Exit(); }
     void LogTransition(const char * previous) { mMock.LogTransition(previous); }
     const char * GetName() { return mName; }
 
-    chip::StateMachine::Context<Event> & mCtx;
     const char * mName;
     MockState & mMock;
 };
 
 struct State1 : public BaseState
 {
-    State1(Context & ctx, const char * name, MockState & mock) : BaseState{ ctx, name, mock } {}
+    State1(MockState & mock) : BaseState{ "State2", mock } {}
 };
 
 struct State2 : public BaseState
 {
-    State2(Context & ctx, const char * name, MockState & mock) : BaseState{ ctx, name, mock } {}
+    State2(MockState & mock) : BaseState{ "State2", mock } {}
 };
 
 using State = chip::StateMachine::VariantState<State1, State2>;
 
 struct StateFactory
 {
-    Context & mCtx;
     MockState ms1{ 0, 0, 0, nullptr };
     MockState ms2{ 0, 0, 0, nullptr };
 
-    StateFactory(Context & ctx) : mCtx(ctx) {}
+    auto CreateState1() { return State::Create<State1>(ms1); }
 
-    auto CreateState1() { return State::Create<State1>(mCtx, "State1", ms1); }
-
-    auto CreateState2() { return State::Create<State2>(mCtx, "State2", ms2); }
+    auto CreateState2() { return State::Create<State2>(ms2); }
 };
 
 struct Transitions
 {
-    Context & mCtx;
     StateFactory mFactory;
-    Transitions(Context & ctx) : mCtx(ctx), mFactory(ctx) {}
 
     using OptState = chip::StateMachine::Optional<State>;
     State GetInitState() { return mFactory.CreateState1(); }
@@ -111,15 +104,10 @@ struct Transitions
         }
         else if (state.Is<State1>() && event.Is<Event4>())
         {
-            // legal - Dispatches event without transition
-            mCtx.Dispatch(Event::Create<Event2>());
-            return {};
+            return mFactory.CreateState2();
         }
         else if (state.Is<State2>() && event.Is<Event4>())
         {
-            // illegal - Returned Transition will cause events
-            // dispatched from the transitions table to be ignored.
-            mCtx.Dispatch(Event::Create<Event2>());
             return mFactory.CreateState1();
         }
         else
@@ -135,7 +123,7 @@ public:
     Transitions mTransitions;
     chip::StateMachine::StateMachine<State, Event, Transitions> mStateMachine;
 
-    SimpleStateMachine() : mTransitions(mStateMachine), mStateMachine(mTransitions) {}
+    SimpleStateMachine() : mStateMachine(mTransitions) {}
     ~SimpleStateMachine() {}
 };
 
