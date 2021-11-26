@@ -30,8 +30,6 @@ import time
 import ctypes
 import chip.clusters as Clusters
 
-from controller.python.chip.clusters.Attribute import AttributePath
-
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
 
@@ -323,7 +321,7 @@ class BaseTestHelper:
         updateLock = threading.Lock()
         updateCv = threading.Condition(updateLock)
 
-        def OnValueChangeData(path: AttributePath, data: typing.Any) -> None:
+        def OnValueChange(path: Clusters.Attribute.AttributePath, data: typing.Any) -> None:
             nonlocal desiredPath, updateCv, updateLock, receivedUpdate
             if path != desiredPath:
                 return
@@ -347,11 +345,12 @@ class BaseTestHelper:
                         "OnOff", "Toggle", self.nodeid, self.endpoint, 0, {})
 
         try:
-            subscribedPath = IM.AttributePath(
-                nodeId=nodeid, endpointId=endpoint, clusterId=6, attributeId=0)
+            desiredPath = Clusters.Attribute.AttributePath(
+                EndpointId=1, ClusterId=6, AttributeId=0)
             # OnOff Cluster, OnOff Attribute
-            self.devCtrl.ZCLSubscribeAttribute(
+            subscription = self.devCtrl.ZCLSubscribeAttribute(
                 "OnOff", "OnOff", nodeid, endpoint, 1, 10)
+            subscription.SetAttributeUpdateCallback(OnValueChange)
             changeThread = _conductAttributeChange(
                 self.devCtrl, nodeid, endpoint)
             # Reset the number of subscriptions received as subscribing causes a callback.

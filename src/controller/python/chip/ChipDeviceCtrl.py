@@ -29,6 +29,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 import asyncio
 from ctypes import *
+
 from .ChipStack import *
 from .interaction_model import InteractionModelError, delegate as im
 from .exceptions import *
@@ -110,7 +111,6 @@ class ChipDeviceController(object):
                     err)
             else:
                 print("Secure Session to Device Established")
-                self._ChipStack.callbackRes = True
             self.state = DCState.IDLE
             self._ChipStack.completeEvent.set()
 
@@ -500,7 +500,10 @@ class ChipDeviceController(object):
         except:
             raise UnknownAttribute(cluster, attribute)
 
-        return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)]))
+        result = asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)]))
+        path = ClusterAttribute.AttributePath(
+            EndpointId=endpoint, Attribute=req)
+        return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[path].Data.value)
 
     def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, blocking=True):
         req = None
