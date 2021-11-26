@@ -90,6 +90,11 @@ void OnAttributeResponse<bool>(void * /* context */, bool value)
 {{#if isList}}
 static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeResponse(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
 {
+#if 0
+    // TODO this code is not really used right now, doesn't work with nullable lists,
+    // and is blocking new clusters from using nullable lists. Disable for now to unblock,
+    // until it can be fixed or removed entirely.
+
     size_t count = 0;
     CHIP_ERROR err = list.ComputeSize(&count);
     if (err != CHIP_NO_ERROR)
@@ -170,6 +175,7 @@ static void On{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttri
 
     if (count > 0)
         ChipLogProgress(Zcl, "  ]");
+#endif
 
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
