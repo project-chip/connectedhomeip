@@ -763,20 +763,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace Descriptor
 
-namespace Acl {
-namespace Attributes {
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace Acl
-
 namespace PollControl {
 namespace Attributes {
 

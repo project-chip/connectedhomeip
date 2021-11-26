@@ -67,9 +67,6 @@ static constexpr ClusterId Id = 0x0000001B;
 namespace Descriptor {
 static constexpr ClusterId Id = 0x0000001D;
 } // namespace Descriptor
-namespace Acl {
-static constexpr ClusterId Id = 0x0000001F;
-} // namespace Acl
 namespace PollControl {
 static constexpr ClusterId Id = 0x00000020;
 } // namespace PollControl
