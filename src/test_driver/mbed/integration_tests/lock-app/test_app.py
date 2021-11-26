@@ -89,7 +89,7 @@ def test_wifi_provisioning(device, network):
 def test_lock_ctrl(device, network):
     network_ssid = network[0]
     network_pass = network[1]
-    
+
     devCtrl = ChipDeviceCtrl.ChipDeviceController()
 
     device_details = get_device_details(device)
