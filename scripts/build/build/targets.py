@@ -14,6 +14,9 @@
 
 import os
 
+from typing import Any
+from itertools import combinations
+
 from builders.android import AndroidBoard, AndroidApp, AndroidBuilder
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
 from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
@@ -92,6 +95,11 @@ class Target:
     def GlobBlacklistReason(self):
         return self.glob_blacklist_reason
 
+class HostBuildVariant:
+    def __init__(self, name:str, **buildargs):
+        self.name = name
+        self.buildargs = buildargs
+
 
 def HostTargets():
     target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
@@ -119,10 +127,35 @@ def HostTargets():
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
 
+    # Possible build variantes. Note that number of potential
+    # builds is exponential here
+    variants = [
+        HostBuildVariant(name="ipv6only", enable_ipv4=False),
+        HostBuildVariant(name="no-ble", enable_ble=False),
+        HostBuildVariant(name="tsan", use_tsan=True),
+        HostBuildVariant(name="single-event-loop", use_single_event_loop=True),
+    ]
+
+    glob_whitelist = set(['ipv6only'])
+
     for target in app_targets:
         yield target
-        if ('rpc-console' not in target.name):
-            yield target.Extend('ipv6only', enable_ipv4=False)
+
+        if 'rpc-console' in target.name:
+            # rpc console  has only one build variant right now
+            continue
+
+        # Build every possible variant
+        for variant_count in range(1, len(variants) + 1):
+            for subgroup in combinations(variants, variant_count):
+                variant_target = target.Clone()
+                for option in subgroup:
+                    variant_target = variant_target.Extend(option.name, **option.buildargs)
+
+                if '-'.join([o.name for o in subgroup]) not in glob_whitelist:
+                    variant_target = variant_target.GlobBlacklist('Reduce default build variants')
+
+                yield variant_target
 
 
 def Esp32Targets():
