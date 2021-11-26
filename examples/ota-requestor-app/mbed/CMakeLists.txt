@@ -5,8 +5,7 @@ cmake_minimum_required(VERSION 3.19.0)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
-get_filename_component(APP_UTIL ${CHIP_ROOT}/src/app/util REALPATH)
-get_filename_component(APP_CLUSTERS ${CHIP_ROOT}/src/app/clusters REALPATH)
+get_filename_component(MBED_COMMON ${CHIP_ROOT}/examples/platform/mbed REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(NLIO_DIR ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
 
@@ -18,7 +17,7 @@ configure_file(
 
 set(MBED_PATH ${MBED_OS_PATH} CACHE INTERNAL "")
 set(MBED_CONFIG_PATH ${CMAKE_CURRENT_BINARY_DIR} CACHE INTERNAL "")
-set(APP_TARGET chip-mbed-shell-example)
+set(APP_TARGET chip-mbed-ota-requestor-app-example)
 
 include(${MBED_PATH}/tools/cmake/app.cmake)
 include(${CHIP_ROOT}/src/app/chip_data_model.cmake)
@@ -42,11 +41,14 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/ota-requestor-app
                            ${APP_ROOT}/ota-requestor-common
+                           ${MBED_COMMON}/util/include
 )
 
 target_sources(${APP_TARGET} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
+    ${MBED_COMMON}/util/LEDWidget.cpp
 
     ${GEN_DIR}/ota-requestor-app/zap-generated/attribute-size.cpp
     ${GEN_DIR}/ota-requestor-app/zap-generated/callback-stub.cpp
