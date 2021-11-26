@@ -21,6 +21,10 @@
 
 #import "CHIPDevice.h"
 
+@interface CHIPAccessControl ()
+@property (readonly) chip::Controller::AccessControlCluster cppCluster;
+@end
+
 @interface CHIPAccountLogin ()
 @property (readonly) chip::Controller::AccountLoginCluster cppCluster;
 @end

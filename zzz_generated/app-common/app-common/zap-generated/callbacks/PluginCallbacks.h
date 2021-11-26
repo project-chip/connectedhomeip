@@ -47,6 +47,8 @@ void __attribute__((weak)) MatterApplianceControlPluginClientInitCallback() {}
 void MatterApplianceControlPluginServerInitCallback();
 void __attribute__((weak)) MatterDescriptorPluginClientInitCallback() {}
 void MatterDescriptorPluginServerInitCallback();
+void __attribute__((weak)) MatterAccessControlPluginClientInitCallback() {}
+void MatterAccessControlPluginServerInitCallback();
 void __attribute__((weak)) MatterPollControlPluginClientInitCallback() {}
 void MatterPollControlPluginServerInitCallback();
 void __attribute__((weak)) MatterBridgedActionsPluginClientInitCallback() {}

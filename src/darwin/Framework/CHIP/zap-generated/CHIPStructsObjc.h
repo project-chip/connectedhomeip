@@ -61,6 +61,28 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPAccessControlClusterTarget : NSObject
+@property (strong, nonatomic) NSNumber * _Nullable cluster;
+@property (strong, nonatomic) NSNumber * _Nullable endpoint;
+@property (strong, nonatomic) NSNumber * _Nullable deviceType;
+- (instancetype)init;
+@end
+
+@interface CHIPAccessControlClusterAccessControlEntry : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull privilege;
+@property (strong, nonatomic) NSNumber * _Nonnull authMode;
+@property (strong, nonatomic) NSArray * _Nullable subjects;
+@property (strong, nonatomic) NSArray * _Nullable targets;
+- (instancetype)init;
+@end
+
+@interface CHIPAccessControlClusterExtensionEntry : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
+@property (strong, nonatomic) NSData * _Nonnull data;
+- (instancetype)init;
+@end
+
 @interface CHIPBridgedActionsClusterActionStruct : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull actionID;
 @property (strong, nonatomic) NSString * _Nonnull name;
