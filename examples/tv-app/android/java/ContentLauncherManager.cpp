@@ -60,8 +60,7 @@ public:
         {
             return ContentLauncherMgr().GetAcceptsHeader(aEncoder);
         }
-
-        if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::Id)
+        else if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::Id)
         {
             return ContentLauncherMgr().GetSupportedStreamingTypes(aEncoder);
         }
@@ -94,39 +93,17 @@ void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
 }
 
 bool emberAfContentLauncherClusterLaunchContentCallback(
-    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
 {
-    auto & autoplay = commandData.autoPlay;
-    auto & data     = commandData.data;
-    list<ContentLaunchParamater> parameterList;
-
-    CHIP_ERROR err = ContentLauncherMgr().LaunchContent(parameterList, autoplay, data);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
+    ContentLauncherMgr().LaunchContent(commandObj, commandPath, commandData);
     return true;
 }
 
-bool emberAfContentLauncherClusterLaunchURLCallback(
-    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
+bool emberAfContentLauncherClusterLaunchURLCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
 {
-    auto & contentUrl    = commandData.contentURL;
-    auto & displayString = commandData.displayString;
-
-    ContentLaunchBrandingInformation brandingInformation;
-
-    CHIP_ERROR err = ContentLauncherMgr().LaunchUrl(contentUrl, displayString, brandingInformation);
-
-    if (err != CHIP_NO_ERROR)
-    {
-        return false;
-    }
-
+    ContentLauncherMgr().LaunchUrl(commandObj, commandPath, commandData);
     return true;
 }
 
@@ -268,10 +245,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR ContentLauncherManager::LaunchContent(list<ContentLaunchParamater> parameterList, bool autoplay,
-                                                 const chip::CharSpan & data)
+CHIP_ERROR ContentLauncherManager::LaunchContent(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    auto & autoplay = commandData.autoPlay;
+    auto & data     = commandData.data;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContent");
@@ -289,14 +268,30 @@ CHIP_ERROR ContentLauncherManager::LaunchContent(list<ContentLaunchParamater> pa
             env->CallObjectMethod(mContentLauncherManagerObject, mLaunchContentMethod, parameterArray, autoplay, jData.jniValue());
         if (env->ExceptionCheck())
         {
-            ChipLogError(AppServer, "Java exception in ContentLauncherManager::LaunchContent");
+            ChipLogError(Zcl, "Java exception in ContentLauncherManager::LaunchContent");
             env->ExceptionDescribe();
             env->ExceptionClear();
             err = CHIP_ERROR_INCORRECT_STATE;
             goto exit;
         }
 
-        return SendResponse(env, resp, ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID);
+        VerifyOrExit(resp != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+        jclass respCls     = env->GetObjectClass(resp);
+        jfieldID statusFid = env->GetFieldID(respCls, "status", "I");
+        VerifyOrExit(statusFid != nullptr, err = CHIP_JNI_ERROR_FIELD_NOT_FOUND);
+        jint status = env->GetIntField(resp, statusFid);
+
+        jfieldID dataFid = env->GetFieldID(respCls, "data", "Ljava/lang/String;");
+        VerifyOrExit(dataFid != nullptr, err = CHIP_JNI_ERROR_FIELD_NOT_FOUND);
+        jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
+        JniUtfString dataStr(env, jdataStr);
+
+        chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::Type response;
+        response.contentLaunchStatus = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(status);
+        response.data                = dataStr.charSpan();
+
+        err = commandObj->AddResponseData(commandPath, response);
+        SuccessOrExit(err);
     }
 
 exit:
@@ -304,18 +299,18 @@ exit:
     {
         ChipLogError(Zcl, "MediaInputManager::GetCurrentInput status error: %s", err.AsString());
 
-        const char * errMsg = "inner error";
-        return SendResponse(EMBER_ZCL_CONTENT_LAUNCH_STATUS_URL_NOT_AVAILABLE, errMsg, strlen(errMsg),
-                            ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
     return err;
 }
 
-CHIP_ERROR ContentLauncherManager::LaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                                             ContentLaunchBrandingInformation & brandingInformation)
+CHIP_ERROR ContentLauncherManager::LaunchUrl(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    auto & contentUrl    = commandData.contentURL;
+    auto & displayString = commandData.displayString;
     JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
 
     ChipLogProgress(Zcl, "Received ContentLauncherManager::LaunchContent");
@@ -334,14 +329,30 @@ CHIP_ERROR ContentLauncherManager::LaunchUrl(const chip::CharSpan & contentUrl, 
                                              jDisplayString.jniValue(), branding);
         if (env->ExceptionCheck())
         {
-            ChipLogError(AppServer, "Java exception in ContentLauncherManager::LaunchUrl");
+            ChipLogError(Zcl, "Java exception in ContentLauncherManager::LaunchUrl");
             env->ExceptionDescribe();
             env->ExceptionClear();
             err = CHIP_ERROR_INCORRECT_STATE;
             goto exit;
         }
 
-        return SendResponse(env, resp, ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID);
+        VerifyOrExit(resp != nullptr, err = CHIP_JNI_ERROR_NULL_OBJECT);
+        jclass respCls     = env->GetObjectClass(resp);
+        jfieldID statusFid = env->GetFieldID(respCls, "status", "I");
+        VerifyOrExit(statusFid != nullptr, err = CHIP_JNI_ERROR_FIELD_NOT_FOUND);
+        jint status = env->GetIntField(resp, statusFid);
+
+        jfieldID dataFid = env->GetFieldID(respCls, "data", "Ljava/lang/String;");
+        VerifyOrExit(dataFid != nullptr, err = CHIP_JNI_ERROR_FIELD_NOT_FOUND);
+        jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
+        JniUtfString dataStr(env, jdataStr);
+
+        chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::Type response;
+        response.contentLaunchStatus = static_cast<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(status);
+        response.data                = dataStr.charSpan();
+
+        err = commandObj->AddResponseData(commandPath, response);
+        SuccessOrExit(err);
     }
 
 exit:
@@ -349,46 +360,8 @@ exit:
     {
         ChipLogError(Zcl, "MediaInputManager::GetCurrentInput status error: %s", err.AsString());
 
-        const char * errMsg = "inner error";
-        return SendResponse(EMBER_ZCL_CONTENT_LAUNCH_STATUS_URL_NOT_AVAILABLE, errMsg, strlen(errMsg),
-                            ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID);
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
 
     return err;
-}
-
-CHIP_ERROR ContentLauncherManager::SendResponse(JNIEnv * env, jobject resp, chip::CommandId commandId)
-{
-    VerifyOrReturnError(resp != nullptr, CHIP_JNI_ERROR_NULL_OBJECT);
-    jclass respCls     = env->GetObjectClass(resp);
-    jfieldID statusFid = env->GetFieldID(respCls, "status", "I");
-    VerifyOrReturnError(statusFid != nullptr, CHIP_JNI_ERROR_FIELD_NOT_FOUND);
-    jint status = env->GetIntField(resp, statusFid);
-
-    jfieldID dataFid = env->GetFieldID(respCls, "data", "Ljava/lang/String;");
-    VerifyOrReturnError(dataFid != nullptr, CHIP_JNI_ERROR_FIELD_NOT_FOUND);
-    jstring jdataStr = (jstring) env->GetObjectField(resp, dataFid);
-    JniUtfString dataStr(env, jdataStr);
-
-    return SendResponse(static_cast<EmberAfContentLaunchStatus>(status), dataStr.c_str(), static_cast<size_t>(dataStr.size()),
-                        commandId);
-}
-
-CHIP_ERROR ContentLauncherManager::SendResponse(EmberAfContentLaunchStatus status, const char * data, size_t length,
-                                                chip::CommandId commandId)
-{
-    // todo: send struct response once it is supported
-    // emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_CONTENT_LAUNCH_CLUSTER_ID,
-    //                           commandId, "uS", status, data, length);
-
-    // EmberStatus ret = emberAfSendResponse();
-    // if (ret != EMBER_SUCCESS)
-    // {
-    //     ChipLogError(Zcl, "Failed to send ContentLauncherManager response Error:%d", static_cast<int>(status));
-    //     return CHIP_ERROR_INCORRECT_STATE;
-    // }
-
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-
-    return CHIP_NO_ERROR;
 }
