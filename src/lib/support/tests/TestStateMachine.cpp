@@ -68,12 +68,12 @@ struct BaseState
 
 struct State1 : public BaseState
 {
-    State1(Context & ctx, const char * name, MockState & mock) : BaseState{ ctx, name, mock } {}
+    State1(Context & ctx, MockState & mock) : BaseState{ ctx, "State1", mock } {}
 };
 
 struct State2 : public BaseState
 {
-    State2(Context & ctx, const char * name, MockState & mock) : BaseState{ ctx, name, mock } {}
+    State2(Context & ctx, MockState & mock) : BaseState{ ctx, "State2", mock } {}
 };
 
 using State = chip::StateMachine::VariantState<State1, State2>;
@@ -86,9 +86,9 @@ struct StateFactory
 
     StateFactory(Context & ctx) : mCtx(ctx) {}
 
-    auto CreateState1() { return State::Create<State1>(mCtx, "State1", ms1); }
+    auto CreateState1() { return State::Create<State1>(mCtx, ms1); }
 
-    auto CreateState2() { return State::Create<State2>(mCtx, "State2", ms2); }
+    auto CreateState2() { return State::Create<State2>(mCtx, ms2); }
 };
 
 struct Transitions
