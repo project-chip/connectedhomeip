@@ -315,7 +315,8 @@
                 "lighting-app",
                 "pigweed-app",
                 "all-clusters-app",
-                "shell"
+                "shell",
+                "ota-requestor-app"
             ],
             "default": "lock-app"
         },

@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2019 Google LLC.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,20 +17,22 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          This is a place to put application or project-specific overrides
- *          to the default configuration values for general CHIP features.
- *
- */
-
 #pragma once
 
-#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 1
-#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
+class AppTask
+{
+public:
+    int StartApp();
 
-#define CHIP_SHELL_MAX_MODULES 30
+private:
+    friend AppTask & GetAppTask(void);
 
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+    int Init();
+
+    static AppTask sAppTask;
+};
+
+inline AppTask & GetAppTask(void)
+{
+    return AppTask::sAppTask;
+}
