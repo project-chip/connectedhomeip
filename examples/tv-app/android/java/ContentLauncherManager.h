@@ -38,9 +38,9 @@ public:
     CHIP_ERROR GetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder);
     CHIP_ERROR GetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder);
     CHIP_ERROR LaunchContent(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData);
+                             const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData);
     CHIP_ERROR LaunchUrl(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData);
+                         const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData);
 
 private:
     friend ContentLauncherManager & ContentLauncherMgr();
