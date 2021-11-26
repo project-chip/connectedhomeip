@@ -18,8 +18,15 @@
 
 #pragma once
 
-#include <app-common/zap-generated/af-structs.h>
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app-common/zap-generated/command-id.h>
+#include <app/util/attribute-storage.h>
+
 #include <app/AttributeAccessInterface.h>
+#include <app/CommandHandler.h>
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <list>
@@ -30,13 +37,12 @@ public:
     void InitializeWithObjects(jobject managerObject);
     CHIP_ERROR GetAcceptsHeader(chip::app::AttributeValueEncoder & aEncoder);
     CHIP_ERROR GetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder);
-    CHIP_ERROR LaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay, const chip::CharSpan & data);
-    CHIP_ERROR LaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
-                         ContentLaunchBrandingInformation & brandingInformation);
+    CHIP_ERROR LaunchContent(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData);
+    CHIP_ERROR LaunchUrl(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+        const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData);
 
 private:
-    CHIP_ERROR SendResponse(JNIEnv * env, jobject resp, chip::CommandId commandId);
-    CHIP_ERROR SendResponse(EmberAfContentLaunchStatus status, const char * data, size_t length, chip::CommandId commandId);
     friend ContentLauncherManager & ContentLauncherMgr();
 
     static ContentLauncherManager sInstance;
