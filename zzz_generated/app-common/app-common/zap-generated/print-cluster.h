@@ -764,19 +764,6 @@
 #define CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_SERVER) || defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER { ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID, 64512, "Sample Mfg Specific Cluster" },
-#else
-#define CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER
-#endif
-
-#if defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_2_SERVER) || defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_2_CLIENT)
-#define CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER_2                                                                            \
-    { ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_2_ID, 64512, "Sample Mfg Specific Cluster 2" },
-#else
-#define CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER_2
-#endif
-
 #define CLUSTER_IDS_TO_NAMES                                                                                                       \
     CHIP_PRINTCLUSTER_POWER_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DEVICE_TEMP_CLUSTER                                                                                          \
@@ -888,8 +875,6 @@
     CHIP_PRINTCLUSTER_APPLIANCE_STATISTICS_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_BINDING_CLUSTER                                                                                              \
-    CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER                                                                                 \
-    CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER                                                                                  \
-    CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER_2
+    CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER
 
 #define MAX_CLUSTER_NAME_LENGTH 52

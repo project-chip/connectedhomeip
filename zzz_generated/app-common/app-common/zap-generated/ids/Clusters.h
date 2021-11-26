@@ -358,12 +358,6 @@ static constexpr ClusterId Id = 0x0000F000;
 namespace GroupKeyManagement {
 static constexpr ClusterId Id = 0x0000F004;
 } // namespace GroupKeyManagement
-namespace SampleMfgSpecificCluster {
-static constexpr ClusterId Id = 0x1002FC00;
-} // namespace SampleMfgSpecificCluster
-namespace SampleMfgSpecificCluster2 {
-static constexpr ClusterId Id = 0x1049FC00;
-} // namespace SampleMfgSpecificCluster2
 
 } // namespace Clusters
 } // namespace app
