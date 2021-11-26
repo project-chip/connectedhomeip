@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include <lib/support/Span.h>
 #include <app-common/zap-generated/cluster-objects.h>
+#include <lib/support/Span.h>
 
 struct ContentLaunchResponse
 {
