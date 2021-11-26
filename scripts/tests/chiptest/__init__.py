@@ -17,6 +17,8 @@
 from pathlib import Path
 import os
 import logging
+import subprocess
+import re
 
 import chiptest.linux
 import chiptest.runner
@@ -24,27 +26,29 @@ import chiptest.runner
 from .test_definition import TestTarget, TestDefinition, ApplicationPaths
 
 
-def AllTests(root: str):
-    """Gets all the tests that can be found in the ROOT directory based on
-       yaml file names.
+def AllTests(chip_tool: str):
+    """Executes `chip_tool` binary to see what tests are available.
     """
-    for path in Path(os.path.join(root, 'src', 'app',  'tests', 'suites')).rglob("*.yaml"):
-        logging.debug('Found YAML: %s' % path)
 
-        # grab the name without the extension
-        name = path.stem
+    result = subprocess.run([chip_tool, 'tests'], capture_output=True)
 
-        if 'Simulated' in name:
+    # Unfortunately there is no 'LIST' command and result return code is 1 (i.e. error)
+    # however the above will return tests in stderr
+    test_re = re.compile('^  \\| \\* ([^ ]*) *\\|$')
+
+    for line in result.stderr.decode('utf8').split('\n'):
+        m = test_re.match(line)
+        if not m:
             continue
 
+        name = m.group(1)
+        
         if name.startswith('TV_'):
             target = TestTarget.TV
-        elif name.startswith('Test'):
-            target = TestTarget.ALL_CLUSTERS
         else:
-            continue
+            target = TestTarget.ALL_CLUSTERS
 
-        yield TestDefinition(yaml_file=path, run_name=path.stem, name=name, target=target)
+        yield TestDefinition(run_name=name, name=name, target=target)
 
 
 __all__ = ['TestTarget', 'TestDefinition', 'AllTests', 'ApplicationPaths']

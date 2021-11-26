@@ -93,7 +93,7 @@ class RunContext:
 @click.option(
     '--root',
     default=DEFAULT_CHIP_ROOT,
-    help='Default directory path for CHIP. Used to determine what tests exist')
+    help='Default directory path for CHIP. Used to copy run configurations')
 @click.option(
     '--internal-inside-unshare',
     hidden=True,
@@ -101,8 +101,12 @@ class RunContext:
     default=False,
     help='Internal flag for running inside a unshared environment'
 )
+@click.option(
+    '--chip-tool',
+    default=FindBinaryPath('chip-tool'),
+    help='What chip tool app to use to run the test')
 @click.pass_context
-def main(context, log_level, target, target_glob, target_skip_glob, no_log_timestamps, root, internal_inside_unshare):
+def main(context, log_level, target, target_glob, target_skip_glob, no_log_timestamps, root, internal_inside_unshare, chip_tool):
     # Ensures somewhat pretty logging of what is going on
     log_fmt = '%(asctime)s.%(msecs)03d %(levelname)-7s %(message)s'
     if no_log_timestamps:
@@ -110,7 +114,7 @@ def main(context, log_level, target, target_glob, target_skip_glob, no_log_times
     coloredlogs.install(level=__LOG_LEVELS__[log_level], fmt=log_fmt)
 
     # Figures out selected test that match the given name(s)
-    all_tests = [test for test in chiptest.AllTests(root)]
+    all_tests = [test for test in chiptest.AllTests(chip_tool)]
     tests = all_tests
     if 'all' not in target:
         tests = []
@@ -156,10 +160,6 @@ def cmd_generate(context):
     '--iterations',
     default=1,
     help='Number of iterations to run')
-@click.option(
-    '--chip-tool',
-    default=FindBinaryPath('chip-tool'),
-    help='What chip tool app to use to run the test')
 @click.option(
     '--all-clusters-app',
     default=FindBinaryPath('chip-all-clusters-app'),
