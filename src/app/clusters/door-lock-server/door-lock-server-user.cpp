@@ -262,8 +262,8 @@ bool emberAfDoorLockClusterSetUserTypeCallback(app::CommandHandler * commandObj,
 
     // TODO: Need to validate userType.  https://github.com/project-chip/connectedhomeip/issues/3580
     EmberAfStatus status = (emAfPluginDoorLockServerSetPinUserType(userId, static_cast<EmberAfDoorLockUserType>(userType))
-                          ? EMBER_ZCL_STATUS_SUCCESS   // success (per 7.3.2.17.21)
-                          : EMBER_ZCL_STATUS_FAILURE); // failure (per 7.3.2.17.21)
+                                ? EMBER_ZCL_STATUS_SUCCESS   // success (per 7.3.2.17.21)
+                                : EMBER_ZCL_STATUS_FAILURE); // failure (per 7.3.2.17.21)
 
     if (EMBER_ZCL_STATUS_SUCCESS != emberAfSendImmediateDefaultResponse(status))
     {
@@ -298,7 +298,8 @@ bool emberAfDoorLockClusterSetPINCodeCallback(app::CommandHandler * commandObj, 
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     // send response
-    EmberAfStatus status = setUser(userId, userStatus, userType, pin, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
+    EmberAfStatus status =
+        setUser(userId, userStatus, userType, pin, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
     uint16_t rfProgrammingEventMask = 0xffff; // send event by default
 
     VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == emberAfSendImmediateDefaultResponse(status), err = CHIP_ERROR_INCORRECT_STATE);
@@ -349,8 +350,8 @@ bool emberAfDoorLockClusterGetPINCodeCallback(app::CommandHandler * commandObj, 
     if (getUser(userId, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE, &user))
     {
         {
-            app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
-                                                 Commands::GetPINCodeResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
+            app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id, Commands::GetPINCodeResponse::Id,
+                                                 (app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -390,7 +391,7 @@ bool emberAfDoorLockClusterClearPINCodeCallback(app::CommandHandler * commandObj
 {
     auto & userId = commandData.pinSlotIndex;
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err       = CHIP_NO_ERROR;
     EmberAfStatus status = clearUserPinOrRfid(userId, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
     // get bitmask so we can check if we should send event notification
     uint16_t rfProgrammingEventMask = 0xffff; // event sent by default
