@@ -20,7 +20,9 @@ public:
 {{#chip_server_cluster_attributes}}
 {{#if isReportableAttribute}}
 {{#unless isList}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
     delete onReport{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Callback;
+{{/unless}}
 {{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
@@ -34,7 +36,9 @@ public:
 {{#chip_server_cluster_attributes}}
 {{#if isReportableAttribute}}
 {{#unless isList}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
         callbacksMgr.AddReportCallback(remoteId, endpointId, {{asHex parent.code 4}}, {{asHex code 4}}, onReport{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Callback->Cancel(), BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>);
+{{/unless}}
 {{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
@@ -81,7 +85,9 @@ private:
 {{#chip_server_cluster_attributes}}
 {{#if isReportableAttribute}}
 {{#unless isList}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
     chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onReport{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Callback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
+{{/unless}}
 {{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}

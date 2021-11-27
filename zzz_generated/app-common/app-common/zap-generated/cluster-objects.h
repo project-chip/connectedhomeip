@@ -28691,6 +28691,17 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::Int16u::Id; }
 };
 } // namespace Int16u
+namespace Int24u {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int24u::Id; }
+};
+} // namespace Int24u
 namespace Int32u {
 struct TypeInfo
 {
@@ -28702,6 +28713,39 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::Int32u::Id; }
 };
 } // namespace Int32u
+namespace Int40u {
+struct TypeInfo
+{
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int40u::Id; }
+};
+} // namespace Int40u
+namespace Int48u {
+struct TypeInfo
+{
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int48u::Id; }
+};
+} // namespace Int48u
+namespace Int56u {
+struct TypeInfo
+{
+    using Type             = uint64_t;
+    using DecodableType    = uint64_t;
+    using DecodableArgType = uint64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int56u::Id; }
+};
+} // namespace Int56u
 namespace Int64u {
 struct TypeInfo
 {
@@ -28735,6 +28779,17 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::Int16s::Id; }
 };
 } // namespace Int16s
+namespace Int24s {
+struct TypeInfo
+{
+    using Type             = int32_t;
+    using DecodableType    = int32_t;
+    using DecodableArgType = int32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int24s::Id; }
+};
+} // namespace Int24s
 namespace Int32s {
 struct TypeInfo
 {
@@ -28746,6 +28801,39 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::Int32s::Id; }
 };
 } // namespace Int32s
+namespace Int40s {
+struct TypeInfo
+{
+    using Type             = int64_t;
+    using DecodableType    = int64_t;
+    using DecodableArgType = int64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int40s::Id; }
+};
+} // namespace Int40s
+namespace Int48s {
+struct TypeInfo
+{
+    using Type             = int64_t;
+    using DecodableType    = int64_t;
+    using DecodableArgType = int64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int48s::Id; }
+};
+} // namespace Int48s
+namespace Int56s {
+struct TypeInfo
+{
+    using Type             = int64_t;
+    using DecodableType    = int64_t;
+    using DecodableArgType = int64_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Int56s::Id; }
+};
+} // namespace Int56s
 namespace Int64s {
 struct TypeInfo
 {
@@ -28779,6 +28867,28 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::Enum16::Id; }
 };
 } // namespace Enum16
+namespace FloatSingle {
+struct TypeInfo
+{
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FloatSingle::Id; }
+};
+} // namespace FloatSingle
+namespace FloatDouble {
+struct TypeInfo
+{
+    using Type             = double;
+    using DecodableType    = double;
+    using DecodableArgType = double;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FloatDouble::Id; }
+};
+} // namespace FloatDouble
 namespace OctetString {
 struct TypeInfo
 {
@@ -28900,6 +29010,72 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::ListNullablesAndOptionalsStruct::Id; }
 };
 } // namespace ListNullablesAndOptionalsStruct
+namespace EnumAttr {
+struct TypeInfo
+{
+    using Type             = SimpleEnum;
+    using DecodableType    = SimpleEnum;
+    using DecodableArgType = SimpleEnum;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EnumAttr::Id; }
+};
+} // namespace EnumAttr
+namespace Struct {
+struct TypeInfo
+{
+    using Type             = Structs::SimpleStruct::Type;
+    using DecodableType    = Structs::SimpleStruct::DecodableType;
+    using DecodableArgType = const Structs::SimpleStruct::DecodableType &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Struct::Id; }
+};
+} // namespace Struct
+namespace RangeRestrictedInt8u {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RangeRestrictedInt8u::Id; }
+};
+} // namespace RangeRestrictedInt8u
+namespace RangeRestrictedInt8s {
+struct TypeInfo
+{
+    using Type             = int8_t;
+    using DecodableType    = int8_t;
+    using DecodableArgType = int8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RangeRestrictedInt8s::Id; }
+};
+} // namespace RangeRestrictedInt8s
+namespace RangeRestrictedInt16u {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RangeRestrictedInt16u::Id; }
+};
+} // namespace RangeRestrictedInt16u
+namespace RangeRestrictedInt16s {
+struct TypeInfo
+{
+    using Type             = int16_t;
+    using DecodableType    = int16_t;
+    using DecodableArgType = int16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RangeRestrictedInt16s::Id; }
+};
+} // namespace RangeRestrictedInt16s
 namespace Unsupported {
 struct TypeInfo
 {
@@ -28988,6 +29164,17 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt16u::Id; }
 };
 } // namespace NullableInt16u
+namespace NullableInt24u {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint32_t>;
+    using DecodableType    = DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const DataModel::Nullable<uint32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt24u::Id; }
+};
+} // namespace NullableInt24u
 namespace NullableInt32u {
 struct TypeInfo
 {
@@ -28999,6 +29186,39 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt32u::Id; }
 };
 } // namespace NullableInt32u
+namespace NullableInt40u {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint64_t>;
+    using DecodableType    = DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt40u::Id; }
+};
+} // namespace NullableInt40u
+namespace NullableInt48u {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint64_t>;
+    using DecodableType    = DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt48u::Id; }
+};
+} // namespace NullableInt48u
+namespace NullableInt56u {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint64_t>;
+    using DecodableType    = DataModel::Nullable<uint64_t>;
+    using DecodableArgType = const DataModel::Nullable<uint64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt56u::Id; }
+};
+} // namespace NullableInt56u
 namespace NullableInt64u {
 struct TypeInfo
 {
@@ -29032,6 +29252,17 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt16s::Id; }
 };
 } // namespace NullableInt16s
+namespace NullableInt24s {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<int32_t>;
+    using DecodableType    = DataModel::Nullable<int32_t>;
+    using DecodableArgType = const DataModel::Nullable<int32_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt24s::Id; }
+};
+} // namespace NullableInt24s
 namespace NullableInt32s {
 struct TypeInfo
 {
@@ -29043,6 +29274,39 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt32s::Id; }
 };
 } // namespace NullableInt32s
+namespace NullableInt40s {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<int64_t>;
+    using DecodableType    = DataModel::Nullable<int64_t>;
+    using DecodableArgType = const DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt40s::Id; }
+};
+} // namespace NullableInt40s
+namespace NullableInt48s {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<int64_t>;
+    using DecodableType    = DataModel::Nullable<int64_t>;
+    using DecodableArgType = const DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt48s::Id; }
+};
+} // namespace NullableInt48s
+namespace NullableInt56s {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<int64_t>;
+    using DecodableType    = DataModel::Nullable<int64_t>;
+    using DecodableArgType = const DataModel::Nullable<int64_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt56s::Id; }
+};
+} // namespace NullableInt56s
 namespace NullableInt64s {
 struct TypeInfo
 {
@@ -29076,6 +29340,28 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableEnum16::Id; }
 };
 } // namespace NullableEnum16
+namespace NullableFloatSingle {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<float>;
+    using DecodableType    = DataModel::Nullable<float>;
+    using DecodableArgType = const DataModel::Nullable<float> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableFloatSingle::Id; }
+};
+} // namespace NullableFloatSingle
+namespace NullableFloatDouble {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<double>;
+    using DecodableType    = DataModel::Nullable<double>;
+    using DecodableArgType = const DataModel::Nullable<double> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableFloatDouble::Id; }
+};
+} // namespace NullableFloatDouble
 namespace NullableOctetString {
 struct TypeInfo
 {
@@ -29098,6 +29384,72 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableCharString::Id; }
 };
 } // namespace NullableCharString
+namespace NullableEnumAttr {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<SimpleEnum>;
+    using DecodableType    = DataModel::Nullable<SimpleEnum>;
+    using DecodableArgType = const DataModel::Nullable<SimpleEnum> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableEnumAttr::Id; }
+};
+} // namespace NullableEnumAttr
+namespace NullableStruct {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<Structs::SimpleStruct::Type>;
+    using DecodableType    = DataModel::Nullable<Structs::SimpleStruct::DecodableType>;
+    using DecodableArgType = const DataModel::Nullable<Structs::SimpleStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableStruct::Id; }
+};
+} // namespace NullableStruct
+namespace NullableRangeRestrictedInt8u {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint8_t>;
+    using DecodableType    = DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableRangeRestrictedInt8u::Id; }
+};
+} // namespace NullableRangeRestrictedInt8u
+namespace NullableRangeRestrictedInt8s {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<int8_t>;
+    using DecodableType    = DataModel::Nullable<int8_t>;
+    using DecodableArgType = const DataModel::Nullable<int8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableRangeRestrictedInt8s::Id; }
+};
+} // namespace NullableRangeRestrictedInt8s
+namespace NullableRangeRestrictedInt16u {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<uint16_t>;
+    using DecodableType    = DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableRangeRestrictedInt16u::Id; }
+};
+} // namespace NullableRangeRestrictedInt16u
+namespace NullableRangeRestrictedInt16s {
+struct TypeInfo
+{
+    using Type             = DataModel::Nullable<int16_t>;
+    using DecodableType    = DataModel::Nullable<int16_t>;
+    using DecodableArgType = const DataModel::Nullable<int16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NullableRangeRestrictedInt16s::Id; }
+};
+} // namespace NullableRangeRestrictedInt16s
 namespace FeatureMap {
 struct TypeInfo
 {

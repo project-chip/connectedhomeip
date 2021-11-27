@@ -16,6 +16,8 @@ public class ClusterReadMapping {
     {{#chip_client_clusters}}
        Map<String, InteractionInfo> read{{asUpperCamelCase name}}InteractionInfo = new LinkedHashMap<>();
         {{#chip_server_cluster_attributes}}
+        {{! TODO: Add support for struct-typed attributes }}
+        {{#unless (isStrEqual chipCallback.name "Unsupported")}}
         Map<String, CommandParameterInfo> read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams = new LinkedHashMap<String, CommandParameterInfo>();
         InteractionInfo read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo = new InteractionInfo(
           (cluster, callback, commandArguments) -> {
@@ -35,6 +37,7 @@ public class ClusterReadMapping {
           read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}CommandParams
         );
         read{{asUpperCamelCase ../name}}InteractionInfo.put("read{{asUpperCamelCase name}}Attribute", read{{asUpperCamelCase ../name}}{{asUpperCamelCase name}}AttributeInteractionInfo);
+        {{/unless}}
         {{/chip_server_cluster_attributes}}
         readAttributeMap.put("{{asLowerCamelCase name}}", read{{asUpperCamelCase name}}InteractionInfo);
         {{/chip_client_clusters}}

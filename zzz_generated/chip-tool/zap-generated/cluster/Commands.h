@@ -36320,14 +36320,24 @@ private:
 | * Bitmap64                                                          | 0x0004 |
 | * Int8u                                                             | 0x0005 |
 | * Int16u                                                            | 0x0006 |
+| * Int24u                                                            | 0x0007 |
 | * Int32u                                                            | 0x0008 |
+| * Int40u                                                            | 0x0009 |
+| * Int48u                                                            | 0x000A |
+| * Int56u                                                            | 0x000B |
 | * Int64u                                                            | 0x000C |
 | * Int8s                                                             | 0x000D |
 | * Int16s                                                            | 0x000E |
+| * Int24s                                                            | 0x000F |
 | * Int32s                                                            | 0x0010 |
+| * Int40s                                                            | 0x0011 |
+| * Int48s                                                            | 0x0012 |
+| * Int56s                                                            | 0x0013 |
 | * Int64s                                                            | 0x0014 |
 | * Enum8                                                             | 0x0015 |
 | * Enum16                                                            | 0x0016 |
+| * FloatSingle                                                       | 0x0017 |
+| * FloatDouble                                                       | 0x0018 |
 | * OctetString                                                       | 0x0019 |
 | * ListInt8u                                                         | 0x001A |
 | * ListOctetString                                                   | 0x001B |
@@ -36339,6 +36349,12 @@ private:
 | * EpochS                                                            | 0x0021 |
 | * VendorId                                                          | 0x0022 |
 | * ListNullablesAndOptionalsStruct                                   | 0x0023 |
+| * EnumAttr                                                          | 0x0024 |
+| * Struct                                                            | 0x0025 |
+| * RangeRestrictedInt8u                                              | 0x0026 |
+| * RangeRestrictedInt8s                                              | 0x0027 |
+| * RangeRestrictedInt16u                                             | 0x0028 |
+| * RangeRestrictedInt16s                                             | 0x0029 |
 | * Unsupported                                                       | 0x00FF |
 | * NullableBoolean                                                   | 0x8000 |
 | * NullableBitmap8                                                   | 0x8001 |
@@ -36347,16 +36363,32 @@ private:
 | * NullableBitmap64                                                  | 0x8004 |
 | * NullableInt8u                                                     | 0x8005 |
 | * NullableInt16u                                                    | 0x8006 |
+| * NullableInt24u                                                    | 0x8007 |
 | * NullableInt32u                                                    | 0x8008 |
+| * NullableInt40u                                                    | 0x8009 |
+| * NullableInt48u                                                    | 0x800A |
+| * NullableInt56u                                                    | 0x800B |
 | * NullableInt64u                                                    | 0x800C |
 | * NullableInt8s                                                     | 0x800D |
 | * NullableInt16s                                                    | 0x800E |
+| * NullableInt24s                                                    | 0x800F |
 | * NullableInt32s                                                    | 0x8010 |
+| * NullableInt40s                                                    | 0x8011 |
+| * NullableInt48s                                                    | 0x8012 |
+| * NullableInt56s                                                    | 0x8013 |
 | * NullableInt64s                                                    | 0x8014 |
 | * NullableEnum8                                                     | 0x8015 |
 | * NullableEnum16                                                    | 0x8016 |
+| * NullableFloatSingle                                               | 0x8017 |
+| * NullableFloatDouble                                               | 0x8018 |
 | * NullableOctetString                                               | 0x8019 |
 | * NullableCharString                                                | 0x801E |
+| * NullableEnumAttr                                                  | 0x8024 |
+| * NullableStruct                                                    | 0x8025 |
+| * NullableRangeRestrictedInt8u                                      | 0x8026 |
+| * NullableRangeRestrictedInt8s                                      | 0x8027 |
+| * NullableRangeRestrictedInt16u                                     | 0x8028 |
+| * NullableRangeRestrictedInt16s                                     | 0x8029 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -37537,6 +37569,125 @@ private:
 };
 
 /*
+ * Attribute Int24u
+ */
+class ReadTestClusterInt24u : public ModelCommand
+{
+public:
+    ReadTestClusterInt24u() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "int24u");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterInt24u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeInt24u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterInt24u : public ModelCommand
+{
+public:
+    WriteTestClusterInt24u() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "int24u");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterInt24u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeInt24u(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint32_t mValue;
+};
+
+class ReportTestClusterInt24u : public ModelCommand
+{
+public:
+    ReportTestClusterInt24u() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "int24u");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterInt24u()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeInt24u(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeInt24u(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int32uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
  * Attribute Int32u
  */
 class ReadTestClusterInt32u : public ModelCommand
@@ -37650,6 +37801,363 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int32uAttributeCallback> * onReportCallback =
         new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute Int40u
+ */
+class ReadTestClusterInt40u : public ModelCommand
+{
+public:
+    ReadTestClusterInt40u() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "int40u");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterInt40u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeInt40u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterInt40u : public ModelCommand
+{
+public:
+    WriteTestClusterInt40u() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "int40u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterInt40u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeInt40u(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint64_t mValue;
+};
+
+class ReportTestClusterInt40u : public ModelCommand
+{
+public:
+    ReportTestClusterInt40u() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "int40u");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterInt40u()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeInt40u(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeInt40u(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int64uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute Int48u
+ */
+class ReadTestClusterInt48u : public ModelCommand
+{
+public:
+    ReadTestClusterInt48u() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "int48u");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterInt48u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeInt48u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterInt48u : public ModelCommand
+{
+public:
+    WriteTestClusterInt48u() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "int48u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterInt48u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeInt48u(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint64_t mValue;
+};
+
+class ReportTestClusterInt48u : public ModelCommand
+{
+public:
+    ReportTestClusterInt48u() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "int48u");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterInt48u()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeInt48u(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeInt48u(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int64uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute Int56u
+ */
+class ReadTestClusterInt56u : public ModelCommand
+{
+public:
+    ReadTestClusterInt56u() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "int56u");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterInt56u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeInt56u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterInt56u : public ModelCommand
+{
+public:
+    WriteTestClusterInt56u() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "int56u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterInt56u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeInt56u(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint64_t mValue;
+};
+
+class ReportTestClusterInt56u : public ModelCommand
+{
+public:
+    ReportTestClusterInt56u() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "int56u");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterInt56u()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeInt56u(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeInt56u(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int64uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -38013,6 +38521,125 @@ private:
 };
 
 /*
+ * Attribute Int24s
+ */
+class ReadTestClusterInt24s : public ModelCommand
+{
+public:
+    ReadTestClusterInt24s() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "int24s");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterInt24s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeInt24s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterInt24s : public ModelCommand
+{
+public:
+    WriteTestClusterInt24s() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "int24s");
+        AddArgument("attr-value", INT32_MIN, INT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterInt24s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeInt24s(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int32_t mValue;
+};
+
+class ReportTestClusterInt24s : public ModelCommand
+{
+public:
+    ReportTestClusterInt24s() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "int24s");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterInt24s()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeInt24s(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeInt24s(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int32sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
  * Attribute Int32s
  */
 class ReadTestClusterInt32s : public ModelCommand
@@ -38126,6 +38753,363 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int32sAttributeCallback> * onReportCallback =
         new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute Int40s
+ */
+class ReadTestClusterInt40s : public ModelCommand
+{
+public:
+    ReadTestClusterInt40s() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "int40s");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterInt40s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeInt40s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterInt40s : public ModelCommand
+{
+public:
+    WriteTestClusterInt40s() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "int40s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterInt40s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeInt40s(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int64_t mValue;
+};
+
+class ReportTestClusterInt40s : public ModelCommand
+{
+public:
+    ReportTestClusterInt40s() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "int40s");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterInt40s()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeInt40s(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeInt40s(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int64sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute Int48s
+ */
+class ReadTestClusterInt48s : public ModelCommand
+{
+public:
+    ReadTestClusterInt48s() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "int48s");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterInt48s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeInt48s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterInt48s : public ModelCommand
+{
+public:
+    WriteTestClusterInt48s() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "int48s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterInt48s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeInt48s(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int64_t mValue;
+};
+
+class ReportTestClusterInt48s : public ModelCommand
+{
+public:
+    ReportTestClusterInt48s() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "int48s");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterInt48s()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeInt48s(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeInt48s(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int64sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute Int56s
+ */
+class ReadTestClusterInt56s : public ModelCommand
+{
+public:
+    ReadTestClusterInt56s() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "int56s");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterInt56s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeInt56s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterInt56s : public ModelCommand
+{
+public:
+    WriteTestClusterInt56s() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "int56s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterInt56s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeInt56s(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int64_t mValue;
+};
+
+class ReportTestClusterInt56s : public ModelCommand
+{
+public:
+    ReportTestClusterInt56s() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "int56s");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterInt56s()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeInt56s(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeInt56s(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int64sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -39461,6 +40445,486 @@ private:
 };
 
 /*
+ * Attribute RangeRestrictedInt8u
+ */
+class ReadTestClusterRangeRestrictedInt8u : public ModelCommand
+{
+public:
+    ReadTestClusterRangeRestrictedInt8u() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "range-restricted-int8u");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterRangeRestrictedInt8u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeRangeRestrictedInt8u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterRangeRestrictedInt8u : public ModelCommand
+{
+public:
+    WriteTestClusterRangeRestrictedInt8u() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "range-restricted-int8u");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterRangeRestrictedInt8u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeRangeRestrictedInt8u(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mValue;
+};
+
+class ReportTestClusterRangeRestrictedInt8u : public ModelCommand
+{
+public:
+    ReportTestClusterRangeRestrictedInt8u() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "range-restricted-int8u");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterRangeRestrictedInt8u()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeRangeRestrictedInt8u(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeRangeRestrictedInt8u(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                              mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute RangeRestrictedInt8s
+ */
+class ReadTestClusterRangeRestrictedInt8s : public ModelCommand
+{
+public:
+    ReadTestClusterRangeRestrictedInt8s() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "range-restricted-int8s");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterRangeRestrictedInt8s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeRangeRestrictedInt8s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterRangeRestrictedInt8s : public ModelCommand
+{
+public:
+    WriteTestClusterRangeRestrictedInt8s() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "range-restricted-int8s");
+        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterRangeRestrictedInt8s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeRangeRestrictedInt8s(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int8_t mValue;
+};
+
+class ReportTestClusterRangeRestrictedInt8s : public ModelCommand
+{
+public:
+    ReportTestClusterRangeRestrictedInt8s() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "range-restricted-int8s");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterRangeRestrictedInt8s()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeRangeRestrictedInt8s(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeRangeRestrictedInt8s(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                              mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute RangeRestrictedInt16u
+ */
+class ReadTestClusterRangeRestrictedInt16u : public ModelCommand
+{
+public:
+    ReadTestClusterRangeRestrictedInt16u() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "range-restricted-int16u");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterRangeRestrictedInt16u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeRangeRestrictedInt16u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterRangeRestrictedInt16u : public ModelCommand
+{
+public:
+    WriteTestClusterRangeRestrictedInt16u() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "range-restricted-int16u");
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterRangeRestrictedInt16u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeRangeRestrictedInt16u(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint16_t mValue;
+};
+
+class ReportTestClusterRangeRestrictedInt16u : public ModelCommand
+{
+public:
+    ReportTestClusterRangeRestrictedInt16u() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "range-restricted-int16u");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterRangeRestrictedInt16u()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeRangeRestrictedInt16u(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeRangeRestrictedInt16u(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                               mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute RangeRestrictedInt16s
+ */
+class ReadTestClusterRangeRestrictedInt16s : public ModelCommand
+{
+public:
+    ReadTestClusterRangeRestrictedInt16s() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "range-restricted-int16s");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterRangeRestrictedInt16s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeRangeRestrictedInt16s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterRangeRestrictedInt16s : public ModelCommand
+{
+public:
+    WriteTestClusterRangeRestrictedInt16s() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "range-restricted-int16s");
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterRangeRestrictedInt16s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeRangeRestrictedInt16s(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int16_t mValue;
+};
+
+class ReportTestClusterRangeRestrictedInt16s : public ModelCommand
+{
+public:
+    ReportTestClusterRangeRestrictedInt16s() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "range-restricted-int16s");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterRangeRestrictedInt16s()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeRangeRestrictedInt16s(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeRangeRestrictedInt16s(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                               mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int16sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
  * Attribute Unsupported
  */
 class ReadTestClusterUnsupported : public ModelCommand
@@ -40413,6 +41877,125 @@ private:
 };
 
 /*
+ * Attribute NullableInt24u
+ */
+class ReadTestClusterNullableInt24u : public ModelCommand
+{
+public:
+    ReadTestClusterNullableInt24u() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nullable-int24u");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterNullableInt24u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNullableInt24u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterNullableInt24u : public ModelCommand
+{
+public:
+    WriteTestClusterNullableInt24u() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "nullable-int24u");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt24u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeNullableInt24u(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint32_t mValue;
+};
+
+class ReportTestClusterNullableInt24u : public ModelCommand
+{
+public:
+    ReportTestClusterNullableInt24u() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nullable-int24u");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterNullableInt24u()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeNullableInt24u(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeNullableInt24u(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int32uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
  * Attribute NullableInt32u
  */
 class ReadTestClusterNullableInt32u : public ModelCommand
@@ -40526,6 +42109,363 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int32uAttributeCallback> * onReportCallback =
         new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NullableInt40u
+ */
+class ReadTestClusterNullableInt40u : public ModelCommand
+{
+public:
+    ReadTestClusterNullableInt40u() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nullable-int40u");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterNullableInt40u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNullableInt40u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterNullableInt40u : public ModelCommand
+{
+public:
+    WriteTestClusterNullableInt40u() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "nullable-int40u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt40u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeNullableInt40u(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint64_t mValue;
+};
+
+class ReportTestClusterNullableInt40u : public ModelCommand
+{
+public:
+    ReportTestClusterNullableInt40u() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nullable-int40u");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterNullableInt40u()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeNullableInt40u(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeNullableInt40u(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int64uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NullableInt48u
+ */
+class ReadTestClusterNullableInt48u : public ModelCommand
+{
+public:
+    ReadTestClusterNullableInt48u() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nullable-int48u");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterNullableInt48u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNullableInt48u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterNullableInt48u : public ModelCommand
+{
+public:
+    WriteTestClusterNullableInt48u() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "nullable-int48u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt48u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeNullableInt48u(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint64_t mValue;
+};
+
+class ReportTestClusterNullableInt48u : public ModelCommand
+{
+public:
+    ReportTestClusterNullableInt48u() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nullable-int48u");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterNullableInt48u()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeNullableInt48u(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeNullableInt48u(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int64uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NullableInt56u
+ */
+class ReadTestClusterNullableInt56u : public ModelCommand
+{
+public:
+    ReadTestClusterNullableInt56u() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nullable-int56u");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterNullableInt56u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNullableInt56u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterNullableInt56u : public ModelCommand
+{
+public:
+    WriteTestClusterNullableInt56u() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "nullable-int56u");
+        AddArgument("attr-value", 0, UINT64_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt56u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeNullableInt56u(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint64_t mValue;
+};
+
+class ReportTestClusterNullableInt56u : public ModelCommand
+{
+public:
+    ReportTestClusterNullableInt56u() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nullable-int56u");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterNullableInt56u()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeNullableInt56u(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeNullableInt56u(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int64uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -40889,6 +42829,125 @@ private:
 };
 
 /*
+ * Attribute NullableInt24s
+ */
+class ReadTestClusterNullableInt24s : public ModelCommand
+{
+public:
+    ReadTestClusterNullableInt24s() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nullable-int24s");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterNullableInt24s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNullableInt24s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterNullableInt24s : public ModelCommand
+{
+public:
+    WriteTestClusterNullableInt24s() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "nullable-int24s");
+        AddArgument("attr-value", INT32_MIN, INT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt24s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeNullableInt24s(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int32_t mValue;
+};
+
+class ReportTestClusterNullableInt24s : public ModelCommand
+{
+public:
+    ReportTestClusterNullableInt24s() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nullable-int24s");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterNullableInt24s()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeNullableInt24s(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeNullableInt24s(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int32sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
  * Attribute NullableInt32s
  */
 class ReadTestClusterNullableInt32s : public ModelCommand
@@ -41002,6 +43061,363 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<Int32sAttributeCallback> * onReportCallback =
         new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NullableInt40s
+ */
+class ReadTestClusterNullableInt40s : public ModelCommand
+{
+public:
+    ReadTestClusterNullableInt40s() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nullable-int40s");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterNullableInt40s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNullableInt40s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterNullableInt40s : public ModelCommand
+{
+public:
+    WriteTestClusterNullableInt40s() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "nullable-int40s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt40s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeNullableInt40s(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int64_t mValue;
+};
+
+class ReportTestClusterNullableInt40s : public ModelCommand
+{
+public:
+    ReportTestClusterNullableInt40s() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nullable-int40s");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterNullableInt40s()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeNullableInt40s(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeNullableInt40s(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int64sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NullableInt48s
+ */
+class ReadTestClusterNullableInt48s : public ModelCommand
+{
+public:
+    ReadTestClusterNullableInt48s() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nullable-int48s");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterNullableInt48s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNullableInt48s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterNullableInt48s : public ModelCommand
+{
+public:
+    WriteTestClusterNullableInt48s() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "nullable-int48s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt48s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeNullableInt48s(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int64_t mValue;
+};
+
+class ReportTestClusterNullableInt48s : public ModelCommand
+{
+public:
+    ReportTestClusterNullableInt48s() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nullable-int48s");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterNullableInt48s()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeNullableInt48s(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeNullableInt48s(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int64sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NullableInt56s
+ */
+class ReadTestClusterNullableInt56s : public ModelCommand
+{
+public:
+    ReadTestClusterNullableInt56s() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nullable-int56s");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterNullableInt56s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNullableInt56s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterNullableInt56s : public ModelCommand
+{
+public:
+    WriteTestClusterNullableInt56s() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "nullable-int56s");
+        AddArgument("attr-value", INT64_MIN, INT64_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterNullableInt56s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeNullableInt56s(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int64_t mValue;
+};
+
+class ReportTestClusterNullableInt56s : public ModelCommand
+{
+public:
+    ReportTestClusterNullableInt56s() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nullable-int56s");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterNullableInt56s()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeNullableInt56s(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeNullableInt56s(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int64sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -41599,6 +44015,488 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
     chip::Callback::Callback<CharStringAttributeCallback> * onReportCallback =
         new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NullableRangeRestrictedInt8u
+ */
+class ReadTestClusterNullableRangeRestrictedInt8u : public ModelCommand
+{
+public:
+    ReadTestClusterNullableRangeRestrictedInt8u() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int8u");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterNullableRangeRestrictedInt8u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNullableRangeRestrictedInt8u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterNullableRangeRestrictedInt8u : public ModelCommand
+{
+public:
+    WriteTestClusterNullableRangeRestrictedInt8u() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int8u");
+        AddArgument("attr-value", 0, UINT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterNullableRangeRestrictedInt8u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeNullableRangeRestrictedInt8u(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint8_t mValue;
+};
+
+class ReportTestClusterNullableRangeRestrictedInt8u : public ModelCommand
+{
+public:
+    ReportTestClusterNullableRangeRestrictedInt8u() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int8u");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterNullableRangeRestrictedInt8u()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeNullableRangeRestrictedInt8u(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeNullableRangeRestrictedInt8u(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                                      mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NullableRangeRestrictedInt8s
+ */
+class ReadTestClusterNullableRangeRestrictedInt8s : public ModelCommand
+{
+public:
+    ReadTestClusterNullableRangeRestrictedInt8s() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int8s");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterNullableRangeRestrictedInt8s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNullableRangeRestrictedInt8s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterNullableRangeRestrictedInt8s : public ModelCommand
+{
+public:
+    WriteTestClusterNullableRangeRestrictedInt8s() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int8s");
+        AddArgument("attr-value", INT8_MIN, INT8_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterNullableRangeRestrictedInt8s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeNullableRangeRestrictedInt8s(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int8_t mValue;
+};
+
+class ReportTestClusterNullableRangeRestrictedInt8s : public ModelCommand
+{
+public:
+    ReportTestClusterNullableRangeRestrictedInt8s() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int8s");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterNullableRangeRestrictedInt8s()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeNullableRangeRestrictedInt8s(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeNullableRangeRestrictedInt8s(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                                      mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int8sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NullableRangeRestrictedInt16u
+ */
+class ReadTestClusterNullableRangeRestrictedInt16u : public ModelCommand
+{
+public:
+    ReadTestClusterNullableRangeRestrictedInt16u() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int16u");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterNullableRangeRestrictedInt16u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNullableRangeRestrictedInt16u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterNullableRangeRestrictedInt16u : public ModelCommand
+{
+public:
+    WriteTestClusterNullableRangeRestrictedInt16u() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int16u");
+        AddArgument("attr-value", 0, UINT16_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterNullableRangeRestrictedInt16u()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeNullableRangeRestrictedInt16u(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                   mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint16_t mValue;
+};
+
+class ReportTestClusterNullableRangeRestrictedInt16u : public ModelCommand
+{
+public:
+    ReportTestClusterNullableRangeRestrictedInt16u() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int16u");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterNullableRangeRestrictedInt16u()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeNullableRangeRestrictedInt16u(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeNullableRangeRestrictedInt16u(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                                       mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute NullableRangeRestrictedInt16s
+ */
+class ReadTestClusterNullableRangeRestrictedInt16s : public ModelCommand
+{
+public:
+    ReadTestClusterNullableRangeRestrictedInt16s() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int16s");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterNullableRangeRestrictedInt16s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeNullableRangeRestrictedInt16s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterNullableRangeRestrictedInt16s : public ModelCommand
+{
+public:
+    WriteTestClusterNullableRangeRestrictedInt16s() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int16s");
+        AddArgument("attr-value", INT16_MIN, INT16_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterNullableRangeRestrictedInt16s()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeNullableRangeRestrictedInt16s(onSuccessCallback->Cancel(), onFailureCallback->Cancel(),
+                                                                   mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    int16_t mValue;
+};
+
+class ReportTestClusterNullableRangeRestrictedInt16s : public ModelCommand
+{
+public:
+    ReportTestClusterNullableRangeRestrictedInt16s() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "nullable-range-restricted-int16s");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportTestClusterNullableRangeRestrictedInt16s()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeNullableRangeRestrictedInt16s(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeNullableRangeRestrictedInt16s(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                                       mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int16sAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeReport, this);
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
@@ -54324,9 +57222,21 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterInt16u>(),                              //
         make_unique<WriteTestClusterInt16u>(),                             //
         make_unique<ReportTestClusterInt16u>(),                            //
+        make_unique<ReadTestClusterInt24u>(),                              //
+        make_unique<WriteTestClusterInt24u>(),                             //
+        make_unique<ReportTestClusterInt24u>(),                            //
         make_unique<ReadTestClusterInt32u>(),                              //
         make_unique<WriteTestClusterInt32u>(),                             //
         make_unique<ReportTestClusterInt32u>(),                            //
+        make_unique<ReadTestClusterInt40u>(),                              //
+        make_unique<WriteTestClusterInt40u>(),                             //
+        make_unique<ReportTestClusterInt40u>(),                            //
+        make_unique<ReadTestClusterInt48u>(),                              //
+        make_unique<WriteTestClusterInt48u>(),                             //
+        make_unique<ReportTestClusterInt48u>(),                            //
+        make_unique<ReadTestClusterInt56u>(),                              //
+        make_unique<WriteTestClusterInt56u>(),                             //
+        make_unique<ReportTestClusterInt56u>(),                            //
         make_unique<ReadTestClusterInt64u>(),                              //
         make_unique<WriteTestClusterInt64u>(),                             //
         make_unique<ReportTestClusterInt64u>(),                            //
@@ -54336,9 +57246,21 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterInt16s>(),                              //
         make_unique<WriteTestClusterInt16s>(),                             //
         make_unique<ReportTestClusterInt16s>(),                            //
+        make_unique<ReadTestClusterInt24s>(),                              //
+        make_unique<WriteTestClusterInt24s>(),                             //
+        make_unique<ReportTestClusterInt24s>(),                            //
         make_unique<ReadTestClusterInt32s>(),                              //
         make_unique<WriteTestClusterInt32s>(),                             //
         make_unique<ReportTestClusterInt32s>(),                            //
+        make_unique<ReadTestClusterInt40s>(),                              //
+        make_unique<WriteTestClusterInt40s>(),                             //
+        make_unique<ReportTestClusterInt40s>(),                            //
+        make_unique<ReadTestClusterInt48s>(),                              //
+        make_unique<WriteTestClusterInt48s>(),                             //
+        make_unique<ReportTestClusterInt48s>(),                            //
+        make_unique<ReadTestClusterInt56s>(),                              //
+        make_unique<WriteTestClusterInt56s>(),                             //
+        make_unique<ReportTestClusterInt56s>(),                            //
         make_unique<ReadTestClusterInt64s>(),                              //
         make_unique<WriteTestClusterInt64s>(),                             //
         make_unique<ReportTestClusterInt64s>(),                            //
@@ -54373,6 +57295,18 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<WriteTestClusterVendorId>(),                           //
         make_unique<ReportTestClusterVendorId>(),                          //
         make_unique<ReadTestClusterListNullablesAndOptionalsStruct>(),     //
+        make_unique<ReadTestClusterRangeRestrictedInt8u>(),                //
+        make_unique<WriteTestClusterRangeRestrictedInt8u>(),               //
+        make_unique<ReportTestClusterRangeRestrictedInt8u>(),              //
+        make_unique<ReadTestClusterRangeRestrictedInt8s>(),                //
+        make_unique<WriteTestClusterRangeRestrictedInt8s>(),               //
+        make_unique<ReportTestClusterRangeRestrictedInt8s>(),              //
+        make_unique<ReadTestClusterRangeRestrictedInt16u>(),               //
+        make_unique<WriteTestClusterRangeRestrictedInt16u>(),              //
+        make_unique<ReportTestClusterRangeRestrictedInt16u>(),             //
+        make_unique<ReadTestClusterRangeRestrictedInt16s>(),               //
+        make_unique<WriteTestClusterRangeRestrictedInt16s>(),              //
+        make_unique<ReportTestClusterRangeRestrictedInt16s>(),             //
         make_unique<ReadTestClusterUnsupported>(),                         //
         make_unique<WriteTestClusterUnsupported>(),                        //
         make_unique<ReportTestClusterUnsupported>(),                       //
@@ -54397,9 +57331,21 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterNullableInt16u>(),                      //
         make_unique<WriteTestClusterNullableInt16u>(),                     //
         make_unique<ReportTestClusterNullableInt16u>(),                    //
+        make_unique<ReadTestClusterNullableInt24u>(),                      //
+        make_unique<WriteTestClusterNullableInt24u>(),                     //
+        make_unique<ReportTestClusterNullableInt24u>(),                    //
         make_unique<ReadTestClusterNullableInt32u>(),                      //
         make_unique<WriteTestClusterNullableInt32u>(),                     //
         make_unique<ReportTestClusterNullableInt32u>(),                    //
+        make_unique<ReadTestClusterNullableInt40u>(),                      //
+        make_unique<WriteTestClusterNullableInt40u>(),                     //
+        make_unique<ReportTestClusterNullableInt40u>(),                    //
+        make_unique<ReadTestClusterNullableInt48u>(),                      //
+        make_unique<WriteTestClusterNullableInt48u>(),                     //
+        make_unique<ReportTestClusterNullableInt48u>(),                    //
+        make_unique<ReadTestClusterNullableInt56u>(),                      //
+        make_unique<WriteTestClusterNullableInt56u>(),                     //
+        make_unique<ReportTestClusterNullableInt56u>(),                    //
         make_unique<ReadTestClusterNullableInt64u>(),                      //
         make_unique<WriteTestClusterNullableInt64u>(),                     //
         make_unique<ReportTestClusterNullableInt64u>(),                    //
@@ -54409,9 +57355,21 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterNullableInt16s>(),                      //
         make_unique<WriteTestClusterNullableInt16s>(),                     //
         make_unique<ReportTestClusterNullableInt16s>(),                    //
+        make_unique<ReadTestClusterNullableInt24s>(),                      //
+        make_unique<WriteTestClusterNullableInt24s>(),                     //
+        make_unique<ReportTestClusterNullableInt24s>(),                    //
         make_unique<ReadTestClusterNullableInt32s>(),                      //
         make_unique<WriteTestClusterNullableInt32s>(),                     //
         make_unique<ReportTestClusterNullableInt32s>(),                    //
+        make_unique<ReadTestClusterNullableInt40s>(),                      //
+        make_unique<WriteTestClusterNullableInt40s>(),                     //
+        make_unique<ReportTestClusterNullableInt40s>(),                    //
+        make_unique<ReadTestClusterNullableInt48s>(),                      //
+        make_unique<WriteTestClusterNullableInt48s>(),                     //
+        make_unique<ReportTestClusterNullableInt48s>(),                    //
+        make_unique<ReadTestClusterNullableInt56s>(),                      //
+        make_unique<WriteTestClusterNullableInt56s>(),                     //
+        make_unique<ReportTestClusterNullableInt56s>(),                    //
         make_unique<ReadTestClusterNullableInt64s>(),                      //
         make_unique<WriteTestClusterNullableInt64s>(),                     //
         make_unique<ReportTestClusterNullableInt64s>(),                    //
@@ -54427,6 +57385,18 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterNullableCharString>(),                  //
         make_unique<WriteTestClusterNullableCharString>(),                 //
         make_unique<ReportTestClusterNullableCharString>(),                //
+        make_unique<ReadTestClusterNullableRangeRestrictedInt8u>(),        //
+        make_unique<WriteTestClusterNullableRangeRestrictedInt8u>(),       //
+        make_unique<ReportTestClusterNullableRangeRestrictedInt8u>(),      //
+        make_unique<ReadTestClusterNullableRangeRestrictedInt8s>(),        //
+        make_unique<WriteTestClusterNullableRangeRestrictedInt8s>(),       //
+        make_unique<ReportTestClusterNullableRangeRestrictedInt8s>(),      //
+        make_unique<ReadTestClusterNullableRangeRestrictedInt16u>(),       //
+        make_unique<WriteTestClusterNullableRangeRestrictedInt16u>(),      //
+        make_unique<ReportTestClusterNullableRangeRestrictedInt16u>(),     //
+        make_unique<ReadTestClusterNullableRangeRestrictedInt16s>(),       //
+        make_unique<WriteTestClusterNullableRangeRestrictedInt16s>(),      //
+        make_unique<ReportTestClusterNullableRangeRestrictedInt16s>(),     //
         make_unique<ReadTestClusterClusterRevision>(),                     //
         make_unique<ReportTestClusterClusterRevision>(),                   //
     };
