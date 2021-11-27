@@ -922,39 +922,12 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
-        case Commands::OffWithEffect::Id: {
-            Commands::OffWithEffect::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfOnOffClusterOffWithEffectCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
         case Commands::On::Id: {
             Commands::On::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfOnOffClusterOnCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::OnWithRecallGlobalScene::Id: {
-            Commands::OnWithRecallGlobalScene::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfOnOffClusterOnWithRecallGlobalSceneCallback(apCommandObj, aCommandPath, commandData);
-            }
-            break;
-        }
-        case Commands::OnWithTimedOff::Id: {
-            Commands::OnWithTimedOff::DecodableType commandData;
-            TLVError = DataModel::Decode(aDataTlv, commandData);
-            if (TLVError == CHIP_NO_ERROR)
-            {
-                wasHandled = emberAfOnOffClusterOnWithTimedOffCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }
