@@ -50,38 +50,43 @@ PowerSourceConfigurationAttrAccess gAttrAccess;
 
 CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
-    VerifyOrDie(aPath.mClusterId == PowerSourceConfiguration::Id);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (aPath.mAttributeId == Sources::Id)
+    if (aPath.mClusterId != PowerSourceConfiguration::Id && aPath.mEndpointId != 0x00)
     {
-        if (aPath.mEndpointId == 0x00)
-        {
-            err = aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
-                uint16_t clusterCount = 0;
-
-                for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
-                {
-                    clusterCount = emberAfClusterCount(index, true);
-
-                    for (uint8_t clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++)
-                    {
-                        EmberAfCluster * cluster = emberAfGetNthCluster(index, clusterIndex, true);
-
-                        if (cluster->clusterId == PowerSource::Id)
-                        {
-                            ReturnErrorOnFailure(encoder.Encode(index));
-                            break; // There is only 1 server cluster per endpoint
-                        }
-                    }
-                }
-
-                return CHIP_NO_ERROR;
-            });
-        }
+        return CHIP_ERROR_INVALID_PATH_LIST;
     }
 
-    return CHIP_NO_ERROR;
+    switch (aPath.mAttributeId)
+    {
+    case Sources::Id:
+        err = aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+            uint16_t clusterCount = 0;
+
+            for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+            {
+                clusterCount = emberAfClusterCount(index, true);
+
+                for (uint8_t clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++)
+                {
+                    EmberAfCluster * cluster = emberAfGetNthCluster(index, clusterIndex, true);
+
+                    if (cluster->clusterId == PowerSource::Id)
+                    {
+                        ReturnErrorOnFailure(encoder.Encode(index));
+                        break; // There is only 1 server cluster per endpoint
+                    }
+                }
+            }
+
+            return CHIP_NO_ERROR;
+        });
+        break;
+    default:
+        break;
+    }
+
+    return err;
 }
 
 } // anonymous namespace
