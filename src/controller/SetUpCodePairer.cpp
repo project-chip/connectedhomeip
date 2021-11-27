@@ -64,7 +64,8 @@ CHIP_ERROR SetUpCodePairer::Connect(RendezvousInformationFlag rendezvousInformat
 
     if (searchOverAll || rendezvousInformation == RendezvousInformationFlag::kOnNetwork)
     {
-        if (CHIP_NO_ERROR == (err = StartDiscoverOverIP(discriminator, isShort)))
+        if (CHIP_NO_ERROR ==
+            (err = StartDiscoverOverIP(isShort ? static_cast<uint16_t>(discriminator >> 8) : discriminator, isShort)))
         {
             isRunning = true;
         }
