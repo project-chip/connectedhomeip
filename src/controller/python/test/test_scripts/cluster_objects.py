@@ -142,7 +142,7 @@ class ClusterObjectTests:
 
         logger.info("6: Reading E* C* A*")
         req = [
-            None
+            '*'
         ]
         await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
 
