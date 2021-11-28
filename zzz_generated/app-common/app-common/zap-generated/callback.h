@@ -934,22 +934,6 @@ void emberAfBindingClusterInitCallback(chip::EndpointId endpoint);
  */
 void emberAfGroupKeyManagementClusterInitCallback(chip::EndpointId endpoint);
 
-/** @brief Sample Mfg Specific Cluster Cluster Init
- *
- * Cluster Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfSampleMfgSpecificClusterClusterInitCallback(chip::EndpointId endpoint);
-
-/** @brief Sample Mfg Specific Cluster 2 Cluster Init
- *
- * Cluster Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfSampleMfgSpecificCluster2ClusterInitCallback(chip::EndpointId endpoint);
-
 // Cluster Server/Client Init Functions
 
 //
@@ -12596,214 +12580,6 @@ void emberAfGroupKeyManagementClusterServerTickCallback(chip::EndpointId endpoin
  */
 void emberAfGroupKeyManagementClusterClientTickCallback(chip::EndpointId endpoint);
 
-//
-// Sample Mfg Specific Cluster Cluster
-//
-
-/** @brief Sample Mfg Specific Cluster Cluster Server Init
- *
- * Server Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfSampleMfgSpecificClusterClusterServerInitCallback(chip::EndpointId endpoint);
-
-/** @brief Sample Mfg Specific Cluster Cluster Client Init
- *
- * Client Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfSampleMfgSpecificClusterClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Sample Mfg Specific Cluster Cluster Server Attribute Changed
- *
- * Server Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterSampleMfgSpecificClusterClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Sample Mfg Specific Cluster Cluster Client Attribute Changed
- *
- * Client Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterSampleMfgSpecificClusterClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Sample Mfg Specific Cluster Cluster Server Message Sent
- *
- * Server Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfSampleMfgSpecificClusterClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                     EmberStatus status);
-
-/** @brief Sample Mfg Specific Cluster Cluster Client Message Sent
- *
- * Client Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfSampleMfgSpecificClusterClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                     EmberStatus status);
-
-/** @brief Sample Mfg Specific Cluster Cluster Server Pre Attribute Changed
- *
- * Server Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status MatterSampleMfgSpecificClusterClusterServerPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Sample Mfg Specific Cluster Cluster Client Pre Attribute Changed
- *
- * Client Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status MatterSampleMfgSpecificClusterClusterClientPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Sample Mfg Specific Cluster Cluster Server Tick
- *
- * Server Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfSampleMfgSpecificClusterClusterServerTickCallback(chip::EndpointId endpoint);
-
-/** @brief Sample Mfg Specific Cluster Cluster Client Tick
- *
- * Client Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfSampleMfgSpecificClusterClusterClientTickCallback(chip::EndpointId endpoint);
-
-//
-// Sample Mfg Specific Cluster 2 Cluster
-//
-
-/** @brief Sample Mfg Specific Cluster 2 Cluster Server Init
- *
- * Server Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfSampleMfgSpecificCluster2ClusterServerInitCallback(chip::EndpointId endpoint);
-
-/** @brief Sample Mfg Specific Cluster 2 Cluster Client Init
- *
- * Client Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfSampleMfgSpecificCluster2ClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Sample Mfg Specific Cluster 2 Cluster Server Attribute Changed
- *
- * Server Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterSampleMfgSpecificCluster2ClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Sample Mfg Specific Cluster 2 Cluster Client Attribute Changed
- *
- * Client Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterSampleMfgSpecificCluster2ClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Sample Mfg Specific Cluster 2 Cluster Server Message Sent
- *
- * Server Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfSampleMfgSpecificCluster2ClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                      EmberStatus status);
-
-/** @brief Sample Mfg Specific Cluster 2 Cluster Client Message Sent
- *
- * Client Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfSampleMfgSpecificCluster2ClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                      EmberStatus status);
-
-/** @brief Sample Mfg Specific Cluster 2 Cluster Server Pre Attribute Changed
- *
- * Server Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status MatterSampleMfgSpecificCluster2ClusterServerPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Sample Mfg Specific Cluster 2 Cluster Client Pre Attribute Changed
- *
- * Client Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status MatterSampleMfgSpecificCluster2ClusterClientPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Sample Mfg Specific Cluster 2 Cluster Server Tick
- *
- * Server Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfSampleMfgSpecificCluster2ClusterServerTickCallback(chip::EndpointId endpoint);
-
-/** @brief Sample Mfg Specific Cluster 2 Cluster Client Tick
- *
- * Client Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfSampleMfgSpecificCluster2ClusterClientTickCallback(chip::EndpointId endpoint);
-
 // Cluster Commands Callback
 
 /**
@@ -13001,45 +12777,15 @@ bool emberAfScenesClusterCopySceneResponseCallback(chip::EndpointId endpoint, ch
 bool emberAfOnOffClusterOffCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                     const chip::app::Clusters::OnOff::Commands::Off::DecodableType & commandData);
 /**
- * @brief On/Off Cluster SampleMfgSpecificOffWithTransition Command callback (from client)
- */
-bool emberAfOnOffClusterSampleMfgSpecificOffWithTransitionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OnOff::Commands::SampleMfgSpecificOffWithTransition::DecodableType & commandData);
-/**
  * @brief On/Off Cluster On Command callback (from client)
  */
 bool emberAfOnOffClusterOnCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                    const chip::app::Clusters::OnOff::Commands::On::DecodableType & commandData);
 /**
- * @brief On/Off Cluster SampleMfgSpecificOnWithTransition Command callback (from client)
- */
-bool emberAfOnOffClusterSampleMfgSpecificOnWithTransitionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OnOff::Commands::SampleMfgSpecificOnWithTransition::DecodableType & commandData);
-/**
- * @brief On/Off Cluster SampleMfgSpecificOnWithTransition2 Command callback (from client)
- */
-bool emberAfOnOffClusterSampleMfgSpecificOnWithTransition2Callback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OnOff::Commands::SampleMfgSpecificOnWithTransition2::DecodableType & commandData);
-/**
  * @brief On/Off Cluster Toggle Command callback (from client)
  */
 bool emberAfOnOffClusterToggleCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                        const chip::app::Clusters::OnOff::Commands::Toggle::DecodableType & commandData);
-/**
- * @brief On/Off Cluster SampleMfgSpecificToggleWithTransition Command callback (from client)
- */
-bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransitionCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OnOff::Commands::SampleMfgSpecificToggleWithTransition::DecodableType & commandData);
-/**
- * @brief On/Off Cluster SampleMfgSpecificToggleWithTransition2 Command callback (from client)
- */
-bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransition2Callback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OnOff::Commands::SampleMfgSpecificToggleWithTransition2::DecodableType & commandData);
 /**
  * @brief On/Off Cluster OffWithEffect Command callback (from client)
  */
@@ -14999,18 +14745,6 @@ bool emberAfBindingClusterBindCallback(chip::app::CommandHandler * commandObj, c
  */
 bool emberAfBindingClusterUnbindCallback(chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
                                          const chip::app::Clusters::Binding::Commands::Unbind::DecodableType & commandData);
-/**
- * @brief Sample Mfg Specific Cluster Cluster CommandOne Command callback (from client)
- */
-bool emberAfSampleMfgSpecificClusterClusterCommandOneCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::SampleMfgSpecificCluster::Commands::CommandOne::DecodableType & commandData);
-/**
- * @brief Sample Mfg Specific Cluster 2 Cluster CommandTwo Command callback (from client)
- */
-bool emberAfSampleMfgSpecificCluster2ClusterCommandTwoCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::SampleMfgSpecificCluster2::Commands::CommandTwo::DecodableType & commandData);
 
 /** @brief Add To Current App Tasks
  *

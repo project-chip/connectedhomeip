@@ -184,33 +184,13 @@ namespace Off {
 static constexpr CommandId Id = 0x00000000;
 } // namespace Off
 
-namespace SampleMfgSpecificOffWithTransition {
-static constexpr CommandId Id = 0x10020000;
-} // namespace SampleMfgSpecificOffWithTransition
-
 namespace On {
 static constexpr CommandId Id = 0x00000001;
 } // namespace On
 
-namespace SampleMfgSpecificOnWithTransition {
-static constexpr CommandId Id = 0x10020001;
-} // namespace SampleMfgSpecificOnWithTransition
-
-namespace SampleMfgSpecificOnWithTransition2 {
-static constexpr CommandId Id = 0x10490001;
-} // namespace SampleMfgSpecificOnWithTransition2
-
 namespace Toggle {
 static constexpr CommandId Id = 0x00000002;
 } // namespace Toggle
-
-namespace SampleMfgSpecificToggleWithTransition {
-static constexpr CommandId Id = 0x10020002;
-} // namespace SampleMfgSpecificToggleWithTransition
-
-namespace SampleMfgSpecificToggleWithTransition2 {
-static constexpr CommandId Id = 0x10490002;
-} // namespace SampleMfgSpecificToggleWithTransition2
 
 namespace OffWithEffect {
 static constexpr CommandId Id = 0x00000040;
@@ -1832,26 +1812,6 @@ static constexpr CommandId Id = 0x00000001;
 
 } // namespace Commands
 } // namespace Binding
-
-namespace SampleMfgSpecificCluster {
-namespace Commands {
-
-namespace CommandOne {
-static constexpr CommandId Id = 0x10020000;
-} // namespace CommandOne
-
-} // namespace Commands
-} // namespace SampleMfgSpecificCluster
-
-namespace SampleMfgSpecificCluster2 {
-namespace Commands {
-
-namespace CommandTwo {
-static constexpr CommandId Id = 0x10490000;
-} // namespace CommandTwo
-
-} // namespace Commands
-} // namespace SampleMfgSpecificCluster2
 
 } // namespace Clusters
 } // namespace app

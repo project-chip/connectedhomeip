@@ -190,7 +190,9 @@ static NSString * const kErrorSetupCodeGen = @"Generating Manual Pairing Code fa
         }
 
         // Initialize device attestation verifier
-        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier());
+        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
 
         params.fabricStorage = _fabricStorage;
         commissionerParams.storageDelegate = _persistentStorageDelegateBridge;

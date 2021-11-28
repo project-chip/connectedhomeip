@@ -20,7 +20,7 @@ import("${chip_root}/src/platform/nxp/k32w/k32w0/args.gni")
 
 declare_args() {
   # Location of the k32w0 SDK.
-  k32w0_sdk_root = getenv("K32W_SDK_ROOT")
+  k32w0_sdk_root = getenv("NXP_K32W061_SDK_ROOT")
   chip_with_OM15082 = 0
   chip_with_ot_cli = 0
   chip_with_low_power = 0

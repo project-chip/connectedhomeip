@@ -32,17 +32,15 @@ def AllTests(root: str):
         logging.debug('Found YAML: %s' % path)
 
         # grab the name without the extension
-        name = path.stem.lower()
+        name = path.stem
 
-        if 'simulated' in name:
+        if 'Simulated' in name:
             continue
 
-        if name.startswith('tv_'):
+        if name.startswith('TV_'):
             target = TestTarget.TV
-            name = 'tv-' + name[3:]
-        elif name.startswith('test_'):
+        elif name.startswith('Test'):
             target = TestTarget.ALL_CLUSTERS
-            name = 'app-' + name[5:]
         else:
             continue
 

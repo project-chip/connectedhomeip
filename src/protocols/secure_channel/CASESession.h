@@ -47,7 +47,7 @@
 namespace chip {
 
 constexpr uint16_t kSigmaParamRandomNumberSize = 32;
-constexpr uint16_t kTrustedRootIdSize          = Credentials::kKeyIdentifierLength;
+constexpr uint16_t kTrustedRootIdSize          = Crypto::kSubjectKeyIdentifierLength;
 constexpr uint16_t kMaxTrustedRootIds          = 5;
 
 constexpr uint16_t kIPKSize = 16;

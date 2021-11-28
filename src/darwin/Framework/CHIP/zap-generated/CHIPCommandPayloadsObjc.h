@@ -2067,16 +2067,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPSampleMfgSpecificClusterClusterCommandOneParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull argOne;
-- (instancetype)init;
-@end
-
-@interface CHIPSampleMfgSpecificCluster2ClusterCommandTwoParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull argOne;
-- (instancetype)init;
-@end
-
 NS_ASSUME_NONNULL_END
 
 #endif /* CHIP_COMMAND_PAYLOADS_H */
