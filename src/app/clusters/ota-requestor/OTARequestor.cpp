@@ -53,6 +53,7 @@ using chip::Transport::PeerAddress;
 // using namespace chip::ArgParser;
 using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
+using chip::Inet::IPAddress;
 
 // Global instance of the OTARequestorInterface.
 OTARequestorInterface * globalOTARequestorInstance = nullptr;
@@ -108,75 +109,43 @@ void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableTyp
 void OTARequestor::mOnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response)
 {
     ChipLogDetail(SoftwareUpdate, "QueryImageResponse responded with action %" PRIu8, response.status);
-    ChipLogDetail(SoftwareUpdate, "  status: %" PRIu8 "", response.status);
-    if (response.delayedActionTime.HasValue())
-    {
-        ChipLogDetail(SoftwareUpdate, "  delayedActionTime: %" PRIu32 "", response.delayedActionTime.Value());
-    }
-    if (response.imageURI.HasValue())
-    {
-        ChipLogDetail(SoftwareUpdate, "  imageURI: %.*s", static_cast<int>(response.imageURI.Value().size()),
-                      response.imageURI.Value().data());
-    }
-    if (response.softwareVersion.HasValue())
-    {
-        ChipLogDetail(SoftwareUpdate, "  softwareVersion: %" PRIu32 "", response.softwareVersion.Value());
-    }
-    if (response.softwareVersionString.HasValue())
-    {
-        ChipLogDetail(SoftwareUpdate, "  softwareVersionString: %.*s",
-                      static_cast<int>(response.softwareVersionString.Value().size()),
-                      response.softwareVersionString.Value().data());
-    }
-    if (response.updateToken.HasValue())
-    {
-        ChipLogDetail(SoftwareUpdate, "  updateToken: %zu", response.updateToken.Value().size());
-    }
-    if (response.userConsentNeeded.HasValue())
-    {
-        ChipLogDetail(SoftwareUpdate, "  userConsentNeeded: %d", response.userConsentNeeded.Value());
-    }
-    if (response.metadataForRequestor.HasValue())
-    {
-        ChipLogDetail(SoftwareUpdate, "  metadataForRequestor: %zu", response.metadataForRequestor.Value().size());
-    }
 
-    // Parse out the provider node ID from the ImageURI
-    NodeId nodeId = chip::kUndefinedNodeId;
-    if (response.imageURI.HasValue())
-    {
-        CharSpan nodeIdString = response.imageURI.Value().SubSpan(6, kNodeIdHexStringMaxLen);
+    TransferSession::TransferInitData initOptions;
+    initOptions.TransferCtlFlags = chip::bdx::TransferControlFlags::kReceiverDrive;
+    initOptions.MaxBlockSize     = 1024;
+    char testFileDes[9]          = { "test.txt" };
+    initOptions.FileDesLength    = static_cast<uint16_t>(strlen(testFileDes));
+    initOptions.FileDesignator   = reinterpret_cast<uint8_t *>(testFileDes);
 
-        uint8_t buffer[kNodeIdHexStringMaxLen];
-        if (chip::Encoding::HexToBytes(nodeIdString.data(), nodeIdString.size(), buffer, kNodeIdHexStringMaxLen) == 0)
+    chip::OperationalDeviceProxy * operationalDeviceProxy = Server::GetInstance().GetOperationalDeviceProxy();
+    if (operationalDeviceProxy != nullptr)
+    {
+        chip::Messaging::ExchangeManager * exchangeMgr = operationalDeviceProxy->GetExchangeManager();
+        chip::Optional<chip::SessionHandle> session    = operationalDeviceProxy->GetSecureSession();
+        if (exchangeMgr != nullptr && session.HasValue())
         {
-            ChipLogError(SoftwareUpdate, "Cannot convert provider Node ID: %.*s", static_cast<int>(nodeIdString.size()),
-                         nodeIdString.data());
+            exchangeCtx = exchangeMgr->NewContext(session.Value(), &bdxDownloader);
+        }
+
+        if (exchangeCtx == nullptr)
+        {
+            ChipLogError(BDX, "unable to allocate ec: exchangeMgr=%p sessionExists? %u", exchangeMgr, session.HasValue());
             return;
         }
-
-        nodeId = chip::Encoding::BigEndian::Get64(buffer);
     }
 
-    // Use the same CSM from sending of QueryImage based on the assumption that the provider node ID that will supply the OTA image
-    // is on the same fabric as the sender of the QueryImageResponse
-    if (mCASESessionManager != nullptr)
-    {
-        // Establish a CASE session with the parsed node ID to obtain exchange context and session handle for BDX transfer
-        onConnectedState = kStartBDX;
-        CHIP_ERROR err = mCASESessionManager->FindOrEstablishSession(nodeId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(SoftwareUpdate, "Cannot establish connection to peer device: %" CHIP_ERROR_FORMAT, err.Format());
-        }
-    }
+    bdxDownloader.SetInitialExchange(exchangeCtx);
+
+    // This will kick of a timer which will regularly check for updates to the bdx::TransferSession state machine.
+    bdxDownloader.InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions,
+                                   chip::System::Clock::Seconds16(20));
 }
 
 EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
 {
-    auto & providerLocation   = commandData.providerLocation;
+  auto & providerLocation   = commandData.providerLocation;
     auto & announcementReason = commandData.announcementReason;
 
     if (commandObj == nullptr || commandObj->GetExchangeContext() == nullptr)
@@ -275,39 +244,52 @@ CHIP_ERROR OTARequestor::SetupCASESessionManager(chip::FabricIndex fabricIndex)
     return CHIP_NO_ERROR;
 }
 
-// Converted from SendQueryImageCommand(). Uses code from https://github.com/project-chip/connectedhomeip/pull/12013
+// Converted from SendQueryImageCommand()
 void OTARequestor::ConnectToProvider()
 {
     chip::NodeId peerNodeId           = mProviderNodeId;
     chip::FabricIndex peerFabricIndex = mProviderFabricIndex;
 
-    CHIP_ERROR err = SetupCASESessionManager(peerFabricIndex);
-    if (err != CHIP_NO_ERROR)
+   Server * server           = &(Server::GetInstance());
+    chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(peerFabricIndex);
+    if (fabric == nullptr)
     {
-        ChipLogError(SoftwareUpdate, "Cannot send QueryImage command without CASESessionManager: %" CHIP_ERROR_FORMAT,
-                     err.Format());
+        ChipLogError(SoftwareUpdate, "Did not find fabric for index %d", peerFabricIndex);
+        return;
     }
 
-    onConnectedState = kQueryImage;
-    err = mCASESessionManager->FindOrEstablishSession(peerNodeId, &mOnConnectedCallback, &mOnConnectionFailureCallback);
+    chip::DeviceProxyInitParams initParams = {
+        .sessionManager = &(server->GetSecureSessionManager()),
+        .exchangeMgr    = &(server->GetExchangeManager()),
+        .idAllocator    = &(server->GetSessionIDAllocator()),
+        .fabricInfo     = fabric,
+        // TODO: Determine where this should be instantiated
+        .imDelegate = chip::Platform::New<chip::Controller::DeviceControllerInteractionModelDelegate>(),
+    };
+
+    chip::OperationalDeviceProxy * operationalDeviceProxy =
+        chip::Platform::New<chip::OperationalDeviceProxy>(initParams, fabric->GetPeerIdForNode(peerNodeId));
+    if (operationalDeviceProxy == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "Failed in creating an instance of OperationalDeviceProxy");
+        return;
+    }
+
+    server->SetOperationalDeviceProxy(operationalDeviceProxy);
+
+    // Explicitly calling UpdateDeviceData() should not be needed once OperationalDeviceProxy can resolve IP address from node ID
+    // and fabric index
+    PeerAddress addr = PeerAddress::UDP(mIpAddress, CHIP_PORT);
+    uint32_t idleInterval;
+    uint32_t activeInterval;
+    operationalDeviceProxy->GetMRPIntervals(idleInterval, activeInterval);
+    operationalDeviceProxy->UpdateDeviceData(addr, idleInterval, activeInterval);
+
+    CHIP_ERROR err = operationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Cannot establish connection to peer device: %" CHIP_ERROR_FORMAT, err.Format());
     }
-
-    // Old ConnectToProvider(). Delete
-
-    // if (mConnectToProviderCallback != nullptr)
-    // {
-    //     ChipLogProgress(SoftwareUpdate, "Attempting to connect to 0x" ChipLogFormatX64 " on FabricIndex 0x%" PRIu8,
-    //                     ChipLogValueX64(mProviderNodeId), mProviderFabricIndex);
-
-    //     mConnectToProviderCallback(mProviderNodeId, mProviderFabricIndex);
-    // }
-    // else
-    // {
-    //     ChipLogError(SoftwareUpdate, "ConnectToProviderCallback is not set");
-    // }
 }
 
 // Called whenever FindOrEstablishSession is successful. Finds the Requestor instance

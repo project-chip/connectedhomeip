@@ -59,6 +59,9 @@ public:
         void * context,
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & response);
 
+    // Temporary until IP address resolution is implemented in the Exchange Layer
+    void SetIpAddress(chip::Inet::IPAddress IpAddress) { mIpAddress = IpAddress; }
+
 private:
     // Enums
     // Various cases for when OnConnected callback could be called
@@ -77,6 +80,10 @@ private:
     OnConnectedState onConnectedState              = kQueryImage;
     chip::Messaging::ExchangeContext * exchangeCtx = nullptr;
     BdxDownloader bdxDownloader;
+
+    // Temporary until IP address resolution is implemented in the Exchange layer
+    chip::Inet::IPAddress mIpAddress;
+
     // Functions
     CHIP_ERROR SetupCASESessionManager(chip::FabricIndex fabricIndex);
 };

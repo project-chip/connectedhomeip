@@ -226,6 +226,14 @@ int main(int argc, char * argv[])
     // Connect the two objects
     downloaderCore->SetImageProcessorDelegate(downloaderUser);
 
+    {
+        // Pass the IP Address to the OTARequestor object
+        // Use of explicit IP address is temporary until the Exchange Layer implements address resolution
+        IPAddress ipAddr;
+        IPAddress::FromString(ipAddress, ipAddr);
+        requestorCore->SetIpAddress(ipAddr);
+    }
+
     // If a delay is provided, QueryImage after the timer expires REFACTOR DELETE THIS ??
     // if (delayQueryTimeInSec > 0)
     // {
