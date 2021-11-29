@@ -36,14 +36,21 @@ namespace Credentials {
 
 static constexpr uint32_t kMaxProductIdsCountPerCD = 100;
 static constexpr uint32_t kCertificateIdLength     = 19;
-
-// TODO: share code with EstimateTLVStructOverhead to estimate TLV structure size.
-static constexpr uint32_t kCertificationElements_TLVEncodedMaxLength = (1 + 1) + // Length of header and end of outer TLV structure.
-    (3 + kCertificateIdLength) +                                                 // Encoded length of CertificateId string.
-    (1 + sizeof(uint16_t)) * kMaxProductIdsCountPerCD + 3 + // Max encoding length of an array of 100 uint16_t elements.
-    (2 + sizeof(uint8_t)) * 2 +                             // Encoding length of two uint8_t element.
-    (2 + sizeof(uint16_t)) * 7;                             // Max total encoding length of seven uint16_t elements.
-
+static constexpr uint32_t kCertificationElements_TLVEncodedMaxLength =
+    TLV::EstimateStructOverhead(sizeof(uint16_t), // FormatVersion
+                                sizeof(uint16_t), // VendorId
+                                // ProductIds. Formally, the following extression should be used here:
+                                //     ( TLV::EstimateStructOverhead(sizeof(uint16_t)) * kMaxProductIdsCountPerCD ),
+                                // Because exact stracture of the elements of this array is known, more accurate estimate is used.
+                                (1 + sizeof(uint16_t)) * kMaxProductIdsCountPerCD,
+                                sizeof(uint32_t),     // DeviceTypeId
+                                kCertificateIdLength, // CertificateId
+                                sizeof(uint8_t),      // SecurityLevel
+                                sizeof(uint16_t),     // SecurityInformation
+                                sizeof(uint16_t),     // VersionNumber
+                                sizeof(uint8_t),      // CertificationType
+                                sizeof(uint16_t),     // DACOriginVendorId
+                                sizeof(uint16_t));    // DACOriginProductId
 static constexpr uint32_t kMaxCMSSignedCDMessage = 183 + kCertificationElements_TLVEncodedMaxLength;
 
 struct CertificationElements
