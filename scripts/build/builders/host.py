@@ -106,8 +106,8 @@ class HostBoard(Enum):
 class HostBuilder(GnBuilder):
 
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
-        enable_ble=True, use_tsan=False, separate_event_loop=False
-    ):
+                 enable_ble=True, use_tsan=False, separate_event_loop=False
+                 ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)

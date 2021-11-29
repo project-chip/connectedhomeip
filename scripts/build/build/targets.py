@@ -95,10 +95,25 @@ class Target:
     def GlobBlacklistReason(self):
         return self.glob_blacklist_reason
 
+
+class AcceptAnyName:
+    def Accept(self, name: str):
+        return True
+
+
+class AcceptNameWithSubstring:
+    def __init__(self, substr: str):
+        self.substr = substr
+
+    def Accept(self, name: str):
+        return self.substr in name
+
+
 class HostBuildVariant:
-    def __init__(self, name:str, **buildargs):
+    def __init__(self, name: str, validator=AcceptAnyName(), **buildargs):
         self.name = name
         self.buildargs = buildargs
+        self.validator = validator
 
 
 def HostTargets():
@@ -133,7 +148,8 @@ def HostTargets():
         HostBuildVariant(name="ipv6only", enable_ipv4=False),
         HostBuildVariant(name="no-ble", enable_ble=False),
         HostBuildVariant(name="tsan", use_tsan=True),
-        HostBuildVariant(name="separate-event-loop", separate_event_loop=True),
+        HostBuildVariant(name="separate-event-loop",
+                         validator=AcceptNameWithSubstring('-chip-tool'), separate_event_loop=True),
     ]
 
     glob_whitelist = set(['ipv6only'])
@@ -145,15 +161,20 @@ def HostTargets():
             # rpc console  has only one build variant right now
             continue
 
+        # skip variants that do not work for  this target
+        ok_variants = [v for v in variants if v.validator.Accept(target.name)]
+
         # Build every possible variant
-        for variant_count in range(1, len(variants) + 1):
-            for subgroup in combinations(variants, variant_count):
+        for variant_count in range(1, len(ok_variants) + 1):
+            for subgroup in combinations(ok_variants, variant_count):
                 variant_target = target.Clone()
                 for option in subgroup:
-                    variant_target = variant_target.Extend(option.name, **option.buildargs)
+                    variant_target = variant_target.Extend(
+                        option.name, **option.buildargs)
 
                 if '-'.join([o.name for o in subgroup]) not in glob_whitelist:
-                    variant_target = variant_target.GlobBlacklist('Reduce default build variants')
+                    variant_target = variant_target.GlobBlacklist(
+                        'Reduce default build variants')
 
                 yield variant_target
 
