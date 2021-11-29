@@ -1024,7 +1024,7 @@
     }
 #define ZAP_MIN_MAX_DEFAULTS_INDEX(index)                                                                                          \
     {                                                                                                                              \
-        (uint8_t *) (&minMaxDefault[index])                                                                                        \
+        (uint8_t *) (&minMaxDefaults[index])                                                                                       \
     }
 #define ZAP_EMPTY_DEFAULT()                                                                                                        \
     {                                                                                                                              \
@@ -1036,9 +1036,38 @@
     }
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
-#define GENERATED_MIN_MAX_DEFAULT_COUNT 0
+#define GENERATED_MIN_MAX_DEFAULT_COUNT 15
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
     {                                                                                                                              \
+                                                                                                                                   \
+        /* Endpoint: 1, Cluster: Identify (server) */                                                                              \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFE }, /* identify time */                                                   \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Level Control (server) */                                                                     \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x3 }, /* options */                                                      \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Binary Input (Basic) (server) */                                                              \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0x1 }, /* out of service */                                               \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Window Covering (server) */                                                                   \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xF }, /* Mode */                                                         \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Thermostat (server) */                                                                        \
+            { (uint16_t) 0x4, (uint16_t) 0x0, (uint16_t) 0x5 }, /* control sequence of operation */                                \
+            { (uint16_t) 0x1, (uint16_t) 0x0, (uint16_t) 0x7 }, /* system mode */                                                  \
+                                                                                                                                   \
+            /* Endpoint: 1, Cluster: Color Control (server) */                                                                     \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* white point x */                                             \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* white point y */                                             \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* color point r x */                                           \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* color point r y */                                           \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* color point g x */                                           \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* color point g y */                                           \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* color point b x */                                           \
+            { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF }, /* color point b y */                                           \
+        {                                                                                                                          \
+            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFEFF                                                                      \
+        } /* start up color temperature mireds */                                                                                  \
     }
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
@@ -1239,8 +1268,9 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },    /* ClusterRevision */                               \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Identify (server) */                                                                          \
-            { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x0000) }, /* identify time */         \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) },                                 /* ClusterRevision */       \
+            { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                             \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(0) },                         /* identify time */                                         \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(2) }, /* ClusterRevision */                                       \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Groups (server) */                                                                            \
             { 0x0000, ZAP_TYPE(BITMAP8), 1, 0, ZAP_EMPTY_DEFAULT() },  /* name support */                                          \
@@ -1264,28 +1294,34 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(4) },                                 /* ClusterRevision */       \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Level Control (server) */                                                                     \
-            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                              /* current level */          \
-            { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                           /* remaining time */         \
-            { 0x0002, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                              /* min level */              \
-            { 0x0003, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0xFF) },                              /* max level */              \
-            { 0x0004, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                           /* current frequency */      \
-            { 0x0005, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                           /* min frequency */          \
-            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                           /* max frequency */          \
-            { 0x000F, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x00) }, /* options */                \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* current level */                                    \
+            { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* remaining time */                                   \
+            { 0x0002, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },    /* min level */                                        \
+            { 0x0003, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0xFF) },    /* max level */                                        \
+            { 0x0004, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* current frequency */                                \
+            { 0x0005, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* min frequency */                                    \
+            { 0x0006, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* max frequency */                                    \
+            { 0x000F, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                            \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(1) }, /* options */                                                                       \
             { 0x0010, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
-              ZAP_SIMPLE_DEFAULT(0x0000) },                                                         /* on off transition time */   \
-            { 0x0011, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0xFE) }, /* on level */                 \
-            { 0x0012, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },     /* on transition time */       \
-            { 0x0013, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },     /* off transition time */      \
-            { 0x0014, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },      /* default move rate */        \
-            { 0x4000, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },      /* start up current level */   \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },                              /* ClusterRevision */          \
+              ZAP_SIMPLE_DEFAULT(0x0000) }, /* on off transition time */                                                           \
+            { 0x0011, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                             \
+              ZAP_SIMPLE_DEFAULT(0xFE) }, /* on level */                                                                           \
+            { 0x0012, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                            \
+              ZAP_EMPTY_DEFAULT() }, /* on transition time */                                                                      \
+            { 0x0013, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                            \
+              ZAP_EMPTY_DEFAULT() }, /* off transition time */                                                                     \
+            { 0x0014, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                             \
+              ZAP_EMPTY_DEFAULT() },                                                           /* default move rate */             \
+            { 0x4000, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* start up current level */        \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },                         /* ClusterRevision */               \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Binary Input (Basic) (server) */                                                              \
-            { 0x0051, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x00) }, /* out of service */         \
-            { 0x0055, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },      /* present value */          \
-            { 0x006F, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                            /* status flags */           \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                           /* ClusterRevision */        \
+            { 0x0051, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                            \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(2) },                                                   /* out of service */              \
+            { 0x0055, ZAP_TYPE(BOOLEAN), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* present value */               \
+            { 0x006F, ZAP_TYPE(BITMAP8), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                       /* status flags */                \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                      /* ClusterRevision */             \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Descriptor (server) */                                                                        \
             { 0x0000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* device list */           \
@@ -1345,9 +1381,10 @@
             { 0x0011, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitLift */                         \
             { 0x0012, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) }, /* InstalledOpenLimitTilt */                           \
             { 0x0013, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFFFF) }, /* InstalledClosedLimitTilt */                         \
-            { 0x0017, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x00) }, /* Mode */                   \
-            { 0x001A, ZAP_TYPE(BITMAP16), 2, 0, ZAP_SIMPLE_DEFAULT(0x00) },                           /* SafetyStatus */           \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },                                /* ClusterRevision */        \
+            { 0x0017, ZAP_TYPE(BITMAP8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                            \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(3) },                              /* Mode */                                             \
+            { 0x001A, ZAP_TYPE(BITMAP16), 2, 0, ZAP_SIMPLE_DEFAULT(0x00) }, /* SafetyStatus */                                     \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) },      /* ClusterRevision */                                  \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Barrier Control (server) */                                                                   \
             { 0x0001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },         /* barrier moving state */                             \
@@ -1362,10 +1399,11 @@
               ZAP_SIMPLE_DEFAULT(0x0A28) }, /* occupied cooling setpoint */                                                        \
             { 0x0012, ZAP_TYPE(INT16S), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
               ZAP_SIMPLE_DEFAULT(0x07D0) }, /* occupied heating setpoint */                                                        \
-            { 0x001B, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                            \
-              ZAP_SIMPLE_DEFAULT(0x04) }, /* control sequence of operation */                                                      \
-            { 0x001C, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x01) }, /* system mode */              \
-            { 0x0020, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },                               /* start of week */            \
+            { 0x001B, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                              \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(4) }, /* control sequence of operation */                                                 \
+            { 0x001C, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                              \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(5) },                                   /* system mode */                                 \
+            { 0x0020, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0) },            /* start of week */                               \
             { 0x0021, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(7) },            /* number of weekly transitions */                \
             { 0x0022, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(4) },            /* number of daily transitions */                 \
             { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(1382) }, /* FeatureMap */                                  \
@@ -1401,28 +1439,36 @@
             { 0x0028, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                                  /* primary 6 x */            \
             { 0x0029, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                                  /* primary 6 y */            \
             { 0x002A, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                   /* primary 6 intensity */    \
-            { 0x0030, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },       /* white point x */          \
-            { 0x0031, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },       /* white point y */          \
-            { 0x0032, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },       /* color point r x */        \
-            { 0x0033, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },       /* color point r y */        \
-            { 0x0034, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },  /* color point r intensity */      \
-            { 0x0036, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* color point g x */              \
-            { 0x0037, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* color point g y */              \
-            { 0x0038, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },  /* color point g intensity */      \
-            { 0x003A, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* color point b x */              \
-            { 0x003B, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* color point b y */              \
-            { 0x003C, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() },  /* color point b intensity */      \
-            { 0x4000, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                     /* enhanced current hue */         \
-            { 0x4001, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },                        /* enhanced color mode */          \
-            { 0x4002, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                        /* color loop active */            \
-            { 0x4003, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                        /* color loop direction */         \
-            { 0x4004, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0019) },                     /* color loop time */              \
-            { 0x400A, ZAP_TYPE(BITMAP16), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                   /* color capabilities */           \
-            { 0x400B, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                     /* color temp physical min */      \
-            { 0x400C, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFEFF) },                     /* color temp physical max */      \
+            { 0x0030, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                             \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(6) }, /* white point x */                                                                 \
+            { 0x0031, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                             \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(7) }, /* white point y */                                                                 \
+            { 0x0032, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                             \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(8) }, /* color point r x */                                                               \
+            { 0x0033, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                             \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(9) },                                                 /* color point r y */               \
+            { 0x0034, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* color point r intensity */       \
+            { 0x0036, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                             \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(10) }, /* color point g x */                                                              \
+            { 0x0037, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                             \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(11) },                                                /* color point g y */               \
+            { 0x0038, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* color point g intensity */       \
+            { 0x003A, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                             \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(12) }, /* color point b x */                                                              \
+            { 0x003B, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                             \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(13) },                                                /* color point b y */               \
+            { 0x003C, ZAP_TYPE(INT8U), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_EMPTY_DEFAULT() }, /* color point b intensity */       \
+            { 0x4000, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                    /* enhanced current hue */          \
+            { 0x4001, ZAP_TYPE(ENUM8), 1, 0, ZAP_SIMPLE_DEFAULT(0x01) },                       /* enhanced color mode */           \
+            { 0x4002, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                       /* color loop active */             \
+            { 0x4003, ZAP_TYPE(INT8U), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },                       /* color loop direction */          \
+            { 0x4004, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0019) },                    /* color loop time */               \
+            { 0x400A, ZAP_TYPE(BITMAP16), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                  /* color capabilities */            \
+            { 0x400B, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                    /* color temp physical min */       \
+            { 0x400C, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0xFEFF) },                    /* color temp physical max */       \
             { 0x400D, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() }, /* couple color temp to level min-mireds */                   \
-            { 0x4010, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
-              ZAP_EMPTY_DEFAULT() },                                   /* start up color temperature mireds */                     \
+            { 0x4010, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                             \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(14) },                        /* start up color temperature mireds */                     \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */                                       \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                           \

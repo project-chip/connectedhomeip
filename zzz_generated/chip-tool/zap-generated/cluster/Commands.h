@@ -32597,39 +32597,6 @@ private:
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
-class WritePumpConfigurationAndControlPower : public ModelCommand
-{
-public:
-    WritePumpConfigurationAndControlPower() : ModelCommand("write")
-    {
-        AddArgument("attr-name", "power");
-        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
-        ModelCommand::AddArguments();
-    }
-
-    ~WritePumpConfigurationAndControlPower()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x01) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::PumpConfigurationAndControlCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.WriteAttributePower(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    uint32_t mValue;
-};
-
 class ReportPumpConfigurationAndControlPower : public ModelCommand
 {
 public:
@@ -32714,6 +32681,39 @@ private:
         new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WritePumpConfigurationAndControlLifetimeEnergyConsumed : public ModelCommand
+{
+public:
+    WritePumpConfigurationAndControlLifetimeEnergyConsumed() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "lifetime-energy-consumed");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WritePumpConfigurationAndControlLifetimeEnergyConsumed()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0200) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::PumpConfigurationAndControlCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeLifetimeEnergyConsumed(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    uint32_t mValue;
 };
 
 class ReportPumpConfigurationAndControlLifetimeEnergyConsumed : public ModelCommand
@@ -54051,9 +54051,9 @@ void registerClusterPumpConfigurationAndControl(Commands & commands)
         make_unique<WritePumpConfigurationAndControlLifetimeRunningHours>(),    //
         make_unique<ReportPumpConfigurationAndControlLifetimeRunningHours>(),   //
         make_unique<ReadPumpConfigurationAndControlPower>(),                    //
-        make_unique<WritePumpConfigurationAndControlPower>(),                   //
         make_unique<ReportPumpConfigurationAndControlPower>(),                  //
         make_unique<ReadPumpConfigurationAndControlLifetimeEnergyConsumed>(),   //
+        make_unique<WritePumpConfigurationAndControlLifetimeEnergyConsumed>(),  //
         make_unique<ReportPumpConfigurationAndControlLifetimeEnergyConsumed>(), //
         make_unique<ReadPumpConfigurationAndControlOperationMode>(),            //
         make_unique<WritePumpConfigurationAndControlOperationMode>(),           //

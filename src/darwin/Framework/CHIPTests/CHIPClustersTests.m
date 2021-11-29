@@ -9932,6 +9932,7 @@ CHIPDevice * GetConnectedDevice()
 
         {
             id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
             XCTAssertEqual([actualValue unsignedCharValue], 20);
         }
 
@@ -29457,7 +29458,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSNumber * _Nonnull value = @(0x00);
+    NSNumber * _Nonnull value = @(0);
     [cluster writeAttributeColorControlOptionsWithValue:value
                                       completionHandler:^(NSError * _Nullable err) {
                                           NSLog(@"ColorControl ColorControlOptions Error: %@", err);
@@ -29996,7 +29997,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSNumber * _Nonnull value = @(0x00);
+    NSNumber * _Nonnull value = @(0);
     [cluster writeAttributeColorPointRIntensityWithValue:value
                                        completionHandler:^(NSError * _Nullable err) {
                                            NSLog(@"ColorControl ColorPointRIntensity Error: %@", err);
@@ -30110,7 +30111,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSNumber * _Nonnull value = @(0x00);
+    NSNumber * _Nonnull value = @(0);
     [cluster writeAttributeColorPointGIntensityWithValue:value
                                        completionHandler:^(NSError * _Nullable err) {
                                            NSLog(@"ColorControl ColorPointGIntensity Error: %@", err);
@@ -30224,7 +30225,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPColorControl * cluster = [[CHIPColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSNumber * _Nonnull value = @(0x00);
+    NSNumber * _Nonnull value = @(0);
     [cluster writeAttributeColorPointBIntensityWithValue:value
                                        completionHandler:^(NSError * _Nullable err) {
                                            NSLog(@"ColorControl ColorPointBIntensity Error: %@", err);
@@ -31344,7 +31345,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPGeneralCommissioning * cluster = [[CHIPGeneralCommissioning alloc] initWithDevice:device endpoint:0 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSNumber * _Nonnull value = @(0x0000000000000000);
+    NSNumber * _Nonnull value = @(0);
     [cluster writeAttributeBreadcrumbWithValue:value
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"GeneralCommissioning Breadcrumb Error: %@", err);
@@ -32059,7 +32060,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSNumber * _Nonnull value = @(0x0000);
+    NSNumber * _Nonnull value = @(0);
     [cluster writeAttributeOnOffTransitionTimeWithValue:value
                                       completionHandler:^(NSError * _Nullable err) {
                                           NSLog(@"LevelControl OnOffTransitionTime Error: %@", err);
@@ -32096,7 +32097,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSNumber * _Nonnull value = @(0x00);
+    NSNumber * _Nullable value = @(0);
     [cluster writeAttributeOnLevelWithValue:value
                           completionHandler:^(NSError * _Nullable err) {
                               NSLog(@"LevelControl OnLevel Error: %@", err);
@@ -32134,7 +32135,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSNumber * _Nonnull value = @(0x0000);
+    NSNumber * _Nullable value = @(0);
     [cluster writeAttributeOnTransitionTimeWithValue:value
                                    completionHandler:^(NSError * _Nullable err) {
                                        NSLog(@"LevelControl OnTransitionTime Error: %@", err);
@@ -32172,7 +32173,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSNumber * _Nonnull value = @(0x0000);
+    NSNumber * _Nullable value = @(0);
     [cluster writeAttributeOffTransitionTimeWithValue:value
                                     completionHandler:^(NSError * _Nullable err) {
                                         NSLog(@"LevelControl OffTransitionTime Error: %@", err);
@@ -32210,7 +32211,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSNumber * _Nonnull value = @(0x00);
+    NSNumber * _Nullable value = @(0);
     [cluster writeAttributeDefaultMoveRateWithValue:value
                                   completionHandler:^(NSError * _Nullable err) {
                                       NSLog(@"LevelControl DefaultMoveRate Error: %@", err);
@@ -32248,7 +32249,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPLevelControl * cluster = [[CHIPLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSNumber * _Nonnull value = @(0x01);
+    NSNumber * _Nonnull value = @(0);
     [cluster writeAttributeStartUpCurrentLevelWithValue:value
                                       completionHandler:^(NSError * _Nullable err) {
                                           NSLog(@"LevelControl StartUpCurrentLevel Error: %@", err);
@@ -33935,7 +33936,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
                                                                                                   queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSNumber * _Nonnull value = @(0x000000);
+    NSNumber * _Nullable value = @(0);
     [cluster writeAttributeLifetimeRunningHoursWithValue:value
                                        completionHandler:^(NSError * _Nullable err) {
                                            NSLog(@"PumpConfigurationAndControl LifetimeRunningHours Error: %@", err);
@@ -33966,27 +33967,6 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterPumpConfigurationAndControlWriteAttributePowerWithValue
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"PumpConfigurationAndControlWriteAttributePowerWithValue"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
-                                                                                               endpoint:1
-                                                                                                  queue:queue];
-    XCTAssertNotNil(cluster);
-
-    NSNumber * _Nonnull value = @(0x000000);
-    [cluster writeAttributePowerWithValue:value
-                        completionHandler:^(NSError * _Nullable err) {
-                            NSLog(@"PumpConfigurationAndControl Power Error: %@", err);
-                            XCTAssertEqual(err.code, 0);
-                            [expectation fulfill];
-                        }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
 - (void)testSendClusterPumpConfigurationAndControlReadAttributeLifetimeEnergyConsumedWithCompletionHandler
 {
     XCTestExpectation * expectation =
@@ -34008,6 +33988,28 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterPumpConfigurationAndControlWriteAttributeLifetimeEnergyConsumedWithValue
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"PumpConfigurationAndControlWriteAttributeLifetimeEnergyConsumedWithValue"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPPumpConfigurationAndControl * cluster = [[CHIPPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                               endpoint:1
+                                                                                                  queue:queue];
+    XCTAssertNotNil(cluster);
+
+    NSNumber * _Nullable value = @(0);
+    [cluster writeAttributeLifetimeEnergyConsumedWithValue:value
+                                         completionHandler:^(NSError * _Nullable err) {
+                                             NSLog(@"PumpConfigurationAndControl LifetimeEnergyConsumed Error: %@", err);
+                                             XCTAssertEqual(err.code, 0);
+                                             [expectation fulfill];
+                                         }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 - (void)testSendClusterPumpConfigurationAndControlReadAttributeOperationModeWithCompletionHandler
 {
     XCTestExpectation * expectation =

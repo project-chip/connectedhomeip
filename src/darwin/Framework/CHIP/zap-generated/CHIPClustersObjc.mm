@@ -9966,20 +9966,20 @@ using namespace chip::app::Clusters;
 
 - (void)readAttributeOnLevelWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(
+    new CHIPNullableInt8uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = LevelControl::Attributes::OnLevel::TypeInfo;
-            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt8uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeOnLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeOnLevelWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -9990,7 +9990,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = LevelControl::Attributes::OnLevel::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedCharValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -10001,14 +10006,15 @@ using namespace chip::app::Clusters;
                                      maxInterval:(uint16_t)maxInterval
                                  responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeOnLevel(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeOnLevel(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeOnLevelWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(
+    new CHIPNullableInt8uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -10022,20 +10028,20 @@ using namespace chip::app::Clusters;
 - (void)readAttributeOnTransitionTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = LevelControl::Attributes::OnTransitionTime::TypeInfo;
-            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeOnTransitionTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeOnTransitionTimeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10046,7 +10052,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = LevelControl::Attributes::OnTransitionTime::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -10057,15 +10068,16 @@ using namespace chip::app::Clusters;
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeOnTransitionTime(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeOnTransitionTime(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeOnTransitionTimeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -10079,20 +10091,20 @@ using namespace chip::app::Clusters;
 - (void)readAttributeOffTransitionTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = LevelControl::Attributes::OffTransitionTime::TypeInfo;
-            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt16uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeOffTransitionTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeOffTransitionTimeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10103,7 +10115,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = LevelControl::Attributes::OffTransitionTime::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedShortValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedShortValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -10114,15 +10131,16 @@ using namespace chip::app::Clusters;
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeOffTransitionTime(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt16uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeOffTransitionTime(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeOffTransitionTimeWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))responseHandler
 {
-    new CHIPInt16uAttributeCallbackBridge(
+    new CHIPNullableInt16uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -10136,20 +10154,20 @@ using namespace chip::app::Clusters;
 - (void)readAttributeDefaultMoveRateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(
+    new CHIPNullableInt8uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = LevelControl::Attributes::DefaultMoveRate::TypeInfo;
-            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt8uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeDefaultMoveRateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeDefaultMoveRateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -10160,7 +10178,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = LevelControl::Attributes::DefaultMoveRate::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedCharValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedCharValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -10171,15 +10194,16 @@ using namespace chip::app::Clusters;
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeDefaultMoveRate(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt8uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeDefaultMoveRate(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeDefaultMoveRateWithResponseHandler:(void (^)(
                                                               NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
 {
-    new CHIPInt8uAttributeCallbackBridge(
+    new CHIPNullableInt8uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -14350,20 +14374,21 @@ using namespace chip::app::Clusters;
 - (void)readAttributeLifetimeRunningHoursWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(
+    new CHIPNullableInt32uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo;
-            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt32uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)writeAttributeLifetimeRunningHoursWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeLifetimeRunningHoursWithValue:(NSNumber * _Nullable)value
+                                  completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -14374,7 +14399,12 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo;
             TypeInfo::Type cppValue;
-            cppValue = value.unsignedIntValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedIntValue;
+            }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
@@ -14385,15 +14415,16 @@ using namespace chip::app::Clusters;
                                                   maxInterval:(uint16_t)maxInterval
                                               responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeLifetimeRunningHours(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeLifetimeRunningHours(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeLifetimeRunningHoursWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))responseHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(
+    new CHIPNullableInt32uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);
@@ -14416,24 +14447,6 @@ using namespace chip::app::Clusters;
             auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributePowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = PumpConfigurationAndControl::Attributes::Power::TypeInfo;
-            TypeInfo::Type cppValue;
-            cppValue = value.unsignedIntValue;
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14462,16 +14475,40 @@ using namespace chip::app::Clusters;
 - (void)readAttributeLifetimeEnergyConsumedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(
+    new CHIPNullableInt32uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo;
-            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto successFn = Callback<NullableInt32uAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeLifetimeEnergyConsumedWithValue:(NSNumber * _Nullable)value
+                                    completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable ignored) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo;
+            TypeInfo::Type cppValue;
+            if (value == nil) {
+                cppValue.SetNull();
+            } else {
+                auto & nonNullValue_0 = cppValue.SetNonNull();
+                nonNullValue_0 = value.unsignedIntValue;
+            }
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
@@ -14479,15 +14516,16 @@ using namespace chip::app::Clusters;
                                                     maxInterval:(uint16_t)maxInterval
                                                 responseHandler:(ResponseHandler)responseHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeLifetimeEnergyConsumed(success, failure, minInterval, maxInterval);
-    });
+    new CHIPNullableInt32uAttributeCallbackBridge(
+        self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
+            return self.cppCluster.SubscribeAttributeLifetimeEnergyConsumed(success, failure, minInterval, maxInterval);
+        });
 }
 
 - (void)reportAttributeLifetimeEnergyConsumedWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))responseHandler
 {
-    new CHIPInt32uAttributeCallbackBridge(
+    new CHIPNullableInt32uAttributeCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             responseHandler(value, error);

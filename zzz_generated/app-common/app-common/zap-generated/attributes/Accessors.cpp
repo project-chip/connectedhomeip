@@ -2742,22 +2742,25 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 namespace OnLevel {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     NumericAttributeTraits<uint8_t>::StorageType temp;
     uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    if (NumericAttributeTraits<uint8_t>::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 {
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -2765,28 +2768,49 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
     uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    NumericAttributeTraits<uint8_t>::StorageType value;
+    NumericAttributeTraits<uint8_t>::SetNull(value);
+    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OnLevel
 
 namespace OnTransitionTime {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
 {
     NumericAttributeTraits<uint16_t>::StorageType temp;
     uint8_t * readable   = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    if (NumericAttributeTraits<uint16_t>::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = NumericAttributeTraits<uint16_t>::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = NumericAttributeTraits<uint16_t>::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 {
-    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, value))
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -2794,28 +2818,49 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     NumericAttributeTraits<uint16_t>::WorkingToStorage(value, storageValue);
     uint8_t * writable = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    NumericAttributeTraits<uint16_t>::StorageType value;
+    NumericAttributeTraits<uint16_t>::SetNull(value);
+    uint8_t * writable = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint16_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace OnTransitionTime
 
 namespace OffTransitionTime {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value)
 {
     NumericAttributeTraits<uint16_t>::StorageType temp;
     uint8_t * readable   = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    if (NumericAttributeTraits<uint16_t>::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = NumericAttributeTraits<uint16_t>::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = NumericAttributeTraits<uint16_t>::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 {
-    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, value))
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -2825,26 +2870,47 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    NumericAttributeTraits<uint16_t>::StorageType value;
+    NumericAttributeTraits<uint16_t>::SetNull(value);
+    uint8_t * writable = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint16_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
+}
+
 } // namespace OffTransitionTime
 
 namespace DefaultMoveRate {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     NumericAttributeTraits<uint8_t>::StorageType temp;
     uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::LevelControl::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    if (NumericAttributeTraits<uint8_t>::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 {
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -2852,6 +2918,24 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
     uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    NumericAttributeTraits<uint8_t>::StorageType value;
+    NumericAttributeTraits<uint8_t>::SetNull(value);
+    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::LevelControl::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace DefaultMoveRate
@@ -11911,23 +11995,26 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 namespace LifetimeRunningHours {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     NumericAttributeTraits<OddSizedInteger<3, false>>::StorageType temp;
     uint8_t * readable = NumericAttributeTraits<OddSizedInteger<3, false>>::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
         emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<OddSizedInteger<3, false>>::CanRepresentValue(/* isNullable = */ false, temp))
+    if (NumericAttributeTraits<OddSizedInteger<3, false>>::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = NumericAttributeTraits<OddSizedInteger<3, false>>::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = NumericAttributeTraits<OddSizedInteger<3, false>>::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
 {
-    if (!NumericAttributeTraits<OddSizedInteger<3, false>>::CanRepresentValue(/* isNullable = */ false, value))
+    if (!NumericAttributeTraits<OddSizedInteger<3, false>>::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -11936,6 +12023,25 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     uint8_t * writable = NumericAttributeTraits<OddSizedInteger<3, false>>::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable,
                                        ZCL_INT24U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    NumericAttributeTraits<OddSizedInteger<3, false>>::StorageType value;
+    NumericAttributeTraits<OddSizedInteger<3, false>>::SetNull(value);
+    uint8_t * writable = NumericAttributeTraits<OddSizedInteger<3, false>>::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable,
+                                       ZCL_INT24U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint32_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LifetimeRunningHours
@@ -11973,23 +12079,26 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
 
 namespace LifetimeEnergyConsumed {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value)
 {
     NumericAttributeTraits<uint32_t>::StorageType temp;
     uint8_t * readable = NumericAttributeTraits<uint32_t>::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status =
         emberAfReadServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<uint32_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    if (NumericAttributeTraits<uint32_t>::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = NumericAttributeTraits<uint32_t>::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = NumericAttributeTraits<uint32_t>::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
 {
-    if (!NumericAttributeTraits<uint32_t>::CanRepresentValue(/* isNullable = */ false, value))
+    if (!NumericAttributeTraits<uint32_t>::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -11998,6 +12107,25 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     uint8_t * writable = NumericAttributeTraits<uint32_t>::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable,
                                        ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    NumericAttributeTraits<uint32_t>::StorageType value;
+    NumericAttributeTraits<uint32_t>::SetNull(value);
+    uint8_t * writable = NumericAttributeTraits<uint32_t>::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::PumpConfigurationAndControl::Id, Id, writable,
+                                       ZCL_INT32U_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint32_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LifetimeEnergyConsumed

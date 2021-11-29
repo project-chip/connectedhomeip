@@ -2381,16 +2381,14 @@ CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeSpeed(Callback:
         chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::Speed::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
-CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeLifetimeEnergyConsumed(Callback::Cancelable * onSuccessCallback,
-                                                                                        Callback::Cancelable * onFailureCallback,
-                                                                                        uint32_t value)
+CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributePower(Callback::Cancelable * onSuccessCallback,
+                                                                       Callback::Cancelable * onFailureCallback, uint32_t value)
 {
     app::WriteClientHandle handle;
     ReturnErrorOnFailure(
         app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
     ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
-        chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::Id),
-        value));
+        chip::app::AttributePathParams(mEndpoint, mClusterId, PumpConfigurationAndControl::Attributes::Power::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 CHIP_ERROR PumpConfigurationAndControlClusterTest::WriteAttributeAlarmMask(Callback::Cancelable * onSuccessCallback,

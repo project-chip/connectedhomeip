@@ -38,7 +38,7 @@ limitations under the License.
     <code>0x0030</code>
     <define>GENERAL_COMMISSIONING_CLUSTER</define>
     <description>This cluster is used to set, remove and update fabric information on a commissionee.</description>
-    <attribute side="server" code="0x00" define="BREADCRUMB" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="true" default="0x0000000000000000" optional="false">Breadcrumb</attribute>
+    <attribute side="server" code="0x00" define="BREADCRUMB" type="INT64U" writable="true" default="0x0000000000000000" optional="false">Breadcrumb</attribute>
     <attribute side="server" code="0x01" define="BASICCOMMISSIONINGINFO_LIST" type="ARRAY" entryType="BasicCommissioningInfoType" length="254" writable="false" optional="false">BasicCommissioningInfoList</attribute>
     <attribute side="server" code="0x02" define="REGULATORYCONFIG_LIST" type="ARRAY" entryType="RegulatoryLocationType" length="254" writable="false" optional="true">RegulatoryConfigList</attribute>
     <attribute side="server" code="0x03" define="LOCATIONCAPABILITY_LIST" type="ARRAY" entryType="RegulatoryLocationType" length="254" writable="false" optional="true">LocationCapabilityList</attribute>

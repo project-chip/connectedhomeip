@@ -3237,9 +3237,9 @@ struct TypeInfo
 namespace OnLevel {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = DataModel::Nullable<uint8_t>;
+    using DecodableType    = DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnLevel::Id; }
@@ -3248,9 +3248,9 @@ struct TypeInfo
 namespace OnTransitionTime {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = DataModel::Nullable<uint16_t>;
+    using DecodableType    = DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnTransitionTime::Id; }
@@ -3259,9 +3259,9 @@ struct TypeInfo
 namespace OffTransitionTime {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = DataModel::Nullable<uint16_t>;
+    using DecodableType    = DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OffTransitionTime::Id; }
@@ -3270,9 +3270,9 @@ struct TypeInfo
 namespace DefaultMoveRate {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = DataModel::Nullable<uint8_t>;
+    using DecodableType    = DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DefaultMoveRate::Id; }
@@ -16810,9 +16810,9 @@ struct TypeInfo
 namespace LifetimeRunningHours {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = DataModel::Nullable<uint32_t>;
+    using DecodableType    = DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeRunningHours::Id; }
@@ -16832,9 +16832,9 @@ struct TypeInfo
 namespace LifetimeEnergyConsumed {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = DataModel::Nullable<uint32_t>;
+    using DecodableType    = DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeEnergyConsumed::Id; }
