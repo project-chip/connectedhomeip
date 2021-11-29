@@ -68,8 +68,8 @@ jobs:
               timeout-minutes: 5
               run: |
                   EVENT_LOOP_VARIANT=""; \
-                  if "$USE_SEPARATE_EVENTLOOP" -eq "true"; then \
-                    EVENT_LOOP_VARIANT="-separate-event-loop"; \
+                  if "$USE_SEPARATE_EVENTLOOP" -ne "true"; then \
+                    EVENT_LOOP_VARIANT="-same-event-loop"; \
                   fi; \
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
