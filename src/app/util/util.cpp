@@ -899,7 +899,7 @@ void emberAfCopyLongString(uint8_t * dest, const uint8_t * src, size_t size)
 // You can pass in val1 as NULL, which will assume that it is
 // pointing to an array of all zeroes. This is used so that
 // default value of NULL is treated as all zeroes.
-int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint16_t len, bool signedNumber)
+int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t len, bool signedNumber)
 {
     uint8_t i, j, k;
     if (signedNumber)
