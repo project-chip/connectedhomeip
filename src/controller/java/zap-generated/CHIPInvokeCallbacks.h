@@ -1061,6 +1061,21 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPTestClusterClusterSimpleStructResponseCallback
+    : public Callback::Callback<CHIPTestClusterClusterSimpleStructResponseCallbackType>
+{
+public:
+    CHIPTestClusterClusterSimpleStructResponseCallback(jobject javaCallback);
+
+    ~CHIPTestClusterClusterSimpleStructResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPTestClusterClusterTestAddArgumentsResponseCallback
     : public Callback::Callback<CHIPTestClusterClusterTestAddArgumentsResponseCallbackType>
 {

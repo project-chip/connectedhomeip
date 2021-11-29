@@ -81,17 +81,12 @@ public:
     const chip::ByteSpan GetMac() const { return chip::ByteSpan(mMacStorage, mMacLength); }
 
     // Common Flags
-    Derived & SetMRPRetryIntervals(Optional<uint32_t> intervalIdle, Optional<uint32_t> intervalActive)
+    Derived & SetMRPConfig(const ReliableMessageProtocolConfig & config)
     {
-        mMrpRetryIntervalIdle   = intervalIdle;
-        mMrpRetryIntervalActive = intervalActive;
+        mMRPConfig.SetValue(config);
         return *reinterpret_cast<Derived *>(this);
     }
-    void GetMRPRetryIntervals(Optional<uint32_t> & intervalIdle, Optional<uint32_t> & intervalActive) const
-    {
-        intervalIdle   = mMrpRetryIntervalIdle;
-        intervalActive = mMrpRetryIntervalActive;
-    }
+    const Optional<ReliableMessageProtocolConfig> & GetMRPConfig() const { return mMRPConfig; }
     Derived & SetTcpSupported(Optional<bool> tcpSupported)
     {
         mTcpSupported = tcpSupported;
@@ -104,8 +99,7 @@ private:
     bool mEnableIPv4                 = true;
     uint8_t mMacStorage[kMaxMacSize] = {};
     size_t mMacLength                = 0;
-    Optional<uint32_t> mMrpRetryIntervalIdle;
-    Optional<uint32_t> mMrpRetryIntervalActive;
+    Optional<ReliableMessageProtocolConfig> mMRPConfig;
     Optional<bool> mTcpSupported;
 };
 

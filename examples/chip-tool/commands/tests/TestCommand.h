@@ -24,6 +24,7 @@
 #include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
 #include <app/tests/suites/pics/PICSBooleanReader.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
+#include <lib/support/BitFlags.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/UnitTestUtils.h>
 #include <type_traits>
@@ -57,7 +58,7 @@ protected:
     ChipDevice * mDevice;
     chip::NodeId mNodeId;
 
-    static void OnDeviceConnectedFn(void * context, chip::DeviceProxy * device);
+    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
     static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context);
 
@@ -69,6 +70,8 @@ protected:
     bool CheckConstraintFormat(const char * itemName, const char * current, const char * expected);
     bool CheckConstraintMinLength(const char * itemName, uint64_t current, uint64_t expected);
     bool CheckConstraintMaxLength(const char * itemName, uint64_t current, uint64_t expected);
+    bool CheckConstraintStartsWith(const char * itemName, const chip::Span<const char> current, const char * expected);
+    bool CheckConstraintEndsWith(const char * itemName, const chip::Span<const char> current, const char * expected);
     template <typename T>
     bool CheckConstraintMinValue(const char * itemName, T current, T expected)
     {
@@ -91,12 +94,34 @@ protected:
 
         return true;
     }
-    template <typename T>
-    bool CheckConstraintNotValue(const char * itemName, T current, T expected)
+    template <typename T, typename U>
+    bool CheckConstraintNotValue(const char * itemName, T current, U expected)
     {
         if (current == expected)
         {
-            Exit(std::string(itemName) + " value == notValue: " + std::to_string(current) + " == " + std::to_string(expected));
+            Exit(std::string(itemName) + " got unexpected value: " + std::to_string(current));
+            return false;
+        }
+
+        return true;
+    }
+
+    bool CheckConstraintNotValue(const char * itemName, chip::CharSpan current, chip::CharSpan expected)
+    {
+        if (current.data_equal(expected))
+        {
+            Exit(std::string(itemName) + " got unexpected value: " + std::string(current.data(), current.size()));
+            return false;
+        }
+
+        return true;
+    }
+
+    bool CheckConstraintNotValue(const char * itemName, chip::ByteSpan current, chip::ByteSpan expected)
+    {
+        if (current.data_equal(expected))
+        {
+            Exit(std::string(itemName) + " got unexpected value of size: " + std::to_string(current.size()));
             return false;
         }
 
@@ -116,6 +141,12 @@ protected:
         }
 
         return true;
+    }
+
+    template <typename T, typename U>
+    bool CheckValue(const char * itemName, chip::BitFlags<T> current, U expected)
+    {
+        return CheckValue(itemName, current.Raw(), expected);
     }
 
     template <typename T, typename U, typename std::enable_if_t<std::is_enum<T>::value, int> = 0>

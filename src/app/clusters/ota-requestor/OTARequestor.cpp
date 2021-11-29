@@ -65,7 +65,7 @@ constexpr uint32_t kImmediateStartDelayMs = 1; // Start the timer with this valu
 
 constexpr uint8_t kNodeIdHexStringMaxLen = 16;
 // Callbacks for connection management
-void OnConnected(void * context, chip::DeviceProxy * deviceProxy);
+void OnConnected(void * context, chip::OperationalDeviceProxy * deviceProxy);
 Callback<OnDeviceConnected> mOnConnectedCallback(OnConnected, nullptr);
 
 void OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error);
@@ -154,7 +154,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(
     if (commandObj == nullptr || commandObj->GetExchangeContext() == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Cannot access ExchangeContext for FabricIndex");
-        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+        return EMBER_ZCL_STATUS_FAILURE;
     }
 
     mProviderNodeId      = providerLocation;
@@ -184,7 +184,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(
         break;
     default:
         ChipLogError(SoftwareUpdate, "Unexpected announcementReason: %" PRIu8, static_cast<uint8_t>(announcementReason));
-        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+        return EMBER_ZCL_STATUS_FAILURE;
     }
 
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(msToStart), StartDelayTimerHandler, this);
@@ -283,10 +283,7 @@ void OTARequestor::ConnectToProvider()
     // Explicitly calling UpdateDeviceData() should not be needed once OperationalDeviceProxy can resolve IP address from node ID
     // and fabric index
     PeerAddress addr = PeerAddress::UDP(mIpAddress, CHIP_PORT);
-    uint32_t idleInterval;
-    uint32_t activeInterval;
-    operationalDeviceProxy->GetMRPIntervals(idleInterval, activeInterval);
-    operationalDeviceProxy->UpdateDeviceData(addr, idleInterval, activeInterval);
+    operationalDeviceProxy->UpdateDeviceData(addr, operationalDeviceProxy->GetMRPConfig());
 
     CHIP_ERROR err = operationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
@@ -297,7 +294,7 @@ void OTARequestor::ConnectToProvider()
 
 // Called whenever FindOrEstablishSession is successful. Finds the Requestor instance
 // and calls the corresponding OTARequestor member function
-void OnConnected(void * context, chip::DeviceProxy * deviceProxy)
+void OnConnected(void * context, chip::OperationalDeviceProxy * deviceProxy)
 {
     OTARequestor * requestorCore = static_cast<OTARequestor *>(GetRequestorInstance());
 

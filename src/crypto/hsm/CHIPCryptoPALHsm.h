@@ -89,6 +89,16 @@ public:
     operator uint8_t *() override { return bytes; }
     operator const uint8_t *() const override { return bytes; }
 
+    const uint8_t * ConstBytes() const override { return &bytes[0]; }
+    uint8_t * Bytes() override { return &bytes[0]; }
+    bool IsUncompressed() const override
+    {
+        constexpr uint8_t kUncompressedPointMarker = 0x04;
+        // SEC1 definition of an uncompressed point is (0x04 || X || Y) where X and Y are
+        // raw zero-padded big-endian large integers of the group size.
+        return (Length() == ((kP256_FE_Length * 2) + 1)) && (ConstBytes()[0] == kUncompressedPointMarker);
+    }
+
     void SetPublicKeyId(uint32_t id) { PublicKeyid = id; }
 
     CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, size_t msg_length,

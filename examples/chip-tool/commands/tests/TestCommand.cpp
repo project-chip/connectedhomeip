@@ -23,7 +23,7 @@ CHIP_ERROR TestCommand::RunCommand()
     return mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
-void TestCommand::OnDeviceConnectedFn(void * context, chip::DeviceProxy * device)
+void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
 {
     ChipLogProgress(chipTool, " **** Test Setup: Device Connected\n");
     auto * command = static_cast<TestCommand *>(context);
@@ -89,6 +89,30 @@ bool TestCommand::CheckConstraintType(const char * itemName, const char * curren
 bool TestCommand::CheckConstraintFormat(const char * itemName, const char * current, const char * expected)
 {
     ChipLogError(chipTool, "Warning: %s format checking is not implemented yet. Expected format: '%s'", itemName, expected);
+    return true;
+}
+
+bool TestCommand::CheckConstraintStartsWith(const char * itemName, const chip::Span<const char> current, const char * expected)
+{
+    std::string value(current.data(), current.size());
+    if (value.rfind(expected, 0) != 0)
+    {
+        Exit(std::string(itemName) + " (\"" + value + "\") does not starts with: \"" + std::string(expected) + "\"");
+        return false;
+    }
+
+    return true;
+}
+
+bool TestCommand::CheckConstraintEndsWith(const char * itemName, const chip::Span<const char> current, const char * expected)
+{
+    std::string value(current.data(), current.size());
+    if (value.find(expected, value.size() - strlen(expected)) == std::string::npos)
+    {
+        Exit(std::string(itemName) + " (\"" + value + "\") does not ends with: \"" + std::string(expected) + "\"");
+        return false;
+    }
+
     return true;
 }
 

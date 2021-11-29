@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 {{#chip_server_cluster_attributes}}
 {{#unless isWritableAttribute}}
-- (void)writeAttribute{{asUpperCamelCase name}}WithValue:({{asObjectiveCType type parent.name}})value responseHandler:(ResponseHandler)responseHandler;
+- (void)writeAttribute{{asUpperCamelCase name}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler;
 {{/unless}}
 {{/chip_server_cluster_attributes}}
 

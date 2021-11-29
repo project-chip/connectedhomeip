@@ -133,10 +133,17 @@ class AsyncReadTransaction:
             if attributeType is None:
                 attributeValue = chip.tlv.TLVReader(data).get().get("Any", {})
             else:
-                attributeValue = attributeType.FromTLV(data)
+                try:
+                    attributeValue = attributeType.FromTLV(data)
+                except:
+                    logging.error(
+                        f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Attribute = {path.AttributeId}")
+                    logging.error(
+                        f"Failed Cluster Object: {str(attributeType)}")
+                    raise
 
             self._res.append(AttributeReadResult(
-                Path=path, Status=imStatus, Data=attributeValue))
+                Path=path, Status=imStatus, Data=attributeType(attributeValue)))
         except Exception as ex:
             logging.exception(ex)
 
@@ -196,7 +203,7 @@ class AsyncWriteTransaction:
 
 
 _OnReadAttributeDataCallbackFunct = CFUNCTYPE(
-    None, py_object, c_uint16, c_uint32, c_uint32, c_uint16, c_void_p, c_size_t)
+    None, py_object, c_uint16, c_uint32, c_uint32, c_uint32, c_void_p, c_size_t)
 _OnReadErrorCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32)
 _OnReadDoneCallbackFunct = CFUNCTYPE(

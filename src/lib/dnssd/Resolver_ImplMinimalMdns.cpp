@@ -108,8 +108,9 @@ private:
 
 void PacketDataReporter::OnQuery(const QueryData & data)
 {
-    ChipLogError(Discovery, "Unexpected query packet being parsed as a response");
-    mValid = false;
+    // Ignore queries:
+    //   - unicast answers will include the corresponding query in the answer
+    //     packet, however that is not interesting for the resolver.
 }
 
 void PacketDataReporter::OnHeader(ConstHeaderRef & header)
@@ -433,7 +434,7 @@ CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Mini
 
     ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
 
-    return GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort);
+    return GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort);
 }
 
 CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
@@ -577,7 +578,7 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
 
         ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
 
-        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
+        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
     }
 
     return ScheduleResolveRetries();

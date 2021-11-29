@@ -41,6 +41,10 @@ function convertBasicCTypeToJavaType(cType)
     return 'long';
   case 'bool':
     return 'boolean';
+  case 'float':
+    return 'float';
+  case 'double':
+    return 'double';
   default:
     error = 'Unhandled type ' + cType;
     throw error;
@@ -56,6 +60,10 @@ function convertBasicCTypeToJniType(cType)
     return 'jlong';
   case 'boolean':
     return 'jboolean';
+  case 'float':
+    return 'jfloat';
+  case 'double':
+    return 'jdouble';
   default:
     error = 'Unhandled type ' + cType;
     throw error;
@@ -71,6 +79,10 @@ function convertBasicCTypeToJavaBoxedType(cType)
     return 'Long';
   case 'boolean':
     return 'Boolean';
+  case 'float':
+    return 'Float';
+  case 'double':
+    return 'Double';
   default:
     error = 'Unhandled type ' + cType;
     throw error;

@@ -247,7 +247,7 @@ static void TestCD_CMSSignAndVerify(nlTestSuite * inSuite, void * inContext)
 {
     ByteSpan cdContentIn(sTestCMS_CDContent01);
     ByteSpan cdContentOut;
-    uint8_t signerKeyIdBuf[kKeyIdentifierLength];
+    uint8_t signerKeyIdBuf[Crypto::kSubjectKeyIdentifierLength];
     MutableByteSpan signerKeyId(signerKeyIdBuf);
     uint8_t signedMessageBuf[kMaxCMSSignedCDMessage];
     MutableByteSpan signedMessage(signedMessageBuf);
@@ -297,7 +297,7 @@ static void TestCD_CMSVerifyAndExtract(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, testCase.cdContent.data_equal(cdContentOut));
 
         // Test CMS_ExtractKeyId()
-        uint8_t signerKeyIdBuf[kKeyIdentifierLength];
+        uint8_t signerKeyIdBuf[Crypto::kSubjectKeyIdentifierLength];
         MutableByteSpan signerKeyId(signerKeyIdBuf);
         NL_TEST_ASSERT(inSuite, ExtractSKIDFromX509Cert(testCase.signerCert, signerKeyId) == CHIP_NO_ERROR);
 
@@ -307,12 +307,58 @@ static void TestCD_CMSVerifyAndExtract(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static void TestCD_CertificationElementsDecoder(nlTestSuite * inSuite, void * inContext)
+{
+    for (size_t i = 0; i < sNumTestCases; i++)
+    {
+        const TestCase & testCase = sTestCases[i];
+
+        uint8_t encodedCertElemBuf[kCertificationElements_TLVEncodedMaxLength];
+        MutableByteSpan encodedCDPayload(encodedCertElemBuf);
+
+        NL_TEST_ASSERT(inSuite, EncodeCertificationElements(testCase.cdElements, encodedCDPayload) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, testCase.cdContent.data_equal(encodedCDPayload));
+
+        CertificationElementsWithoutPIDs certificationDeclarationContent;
+        CertificationElementsDecoder certificationElementsDecoder;
+        NL_TEST_ASSERT(inSuite, DecodeCertificationElements(encodedCDPayload, certificationDeclarationContent) == CHIP_NO_ERROR);
+
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.formatVersion == testCase.cdElements.FormatVersion);
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.vendorId == testCase.cdElements.VendorId);
+        for (uint8_t j = 0; j < testCase.cdElements.ProductIdsCount; j++)
+        {
+            NL_TEST_ASSERT(inSuite,
+                           certificationElementsDecoder.IsProductIdIn(encodedCDPayload, testCase.cdElements.ProductIds[j]));
+            // now test for an unexistent ProductId
+            NL_TEST_ASSERT(inSuite, certificationElementsDecoder.IsProductIdIn(encodedCDPayload, 0x9000) == false);
+        }
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.deviceTypeId == testCase.cdElements.DeviceTypeId);
+        NL_TEST_ASSERT(
+            inSuite,
+            memcmp(certificationDeclarationContent.certificateId, testCase.cdElements.CertificateId, kCertificateIdLength) == 0);
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.securityLevel == testCase.cdElements.SecurityLevel);
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.securityInformation == testCase.cdElements.SecurityInformation);
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.versionNumber == testCase.cdElements.VersionNumber);
+        NL_TEST_ASSERT(inSuite, certificationDeclarationContent.certificationType == testCase.cdElements.CertificationType);
+        NL_TEST_ASSERT(inSuite,
+                       certificationDeclarationContent.dacOriginVIDandPIDPresent == testCase.cdElements.DACOriginVIDandPIDPresent);
+        if (certificationDeclarationContent.dacOriginVIDandPIDPresent)
+        {
+            NL_TEST_ASSERT(inSuite, certificationDeclarationContent.dacOriginVendorId == testCase.cdElements.DACOriginVendorId);
+            NL_TEST_ASSERT(inSuite, certificationDeclarationContent.dacOriginProductId == testCase.cdElements.DACOriginProductId);
+        }
+    }
+}
+
 #define NL_TEST_DEF_FN(fn) NL_TEST_DEF("Test " #fn, fn)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCD_EncodeDecode), NL_TEST_DEF_FN(TestCD_EncodeDecode_Errors),
-                                 NL_TEST_DEF_FN(TestCD_CMSSignAndVerify), NL_TEST_DEF_FN(TestCD_CMSVerifyAndExtract),
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestCD_EncodeDecode),
+                                 NL_TEST_DEF_FN(TestCD_EncodeDecode_Errors),
+                                 NL_TEST_DEF_FN(TestCD_CMSSignAndVerify),
+                                 NL_TEST_DEF_FN(TestCD_CMSVerifyAndExtract),
+                                 NL_TEST_DEF_FN(TestCD_CertificationElementsDecoder),
                                  NL_TEST_SENTINEL() };
 
 int TestCertificationDeclaration(void)

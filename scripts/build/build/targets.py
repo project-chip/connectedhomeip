@@ -106,9 +106,11 @@ def HostTargets():
 
     app_targets = []
 
-    # RPC console compilation only for native
+    # Don't cross  compile some builds
     app_targets.append(
         targets[0].Extend('rpc-console', app=HostApp.RPC_CONSOLE))
+    app_targets.append(
+        targets[0].Extend('tv-app', app=HostApp.TV_APP))
 
     for target in targets:
         app_targets.append(target.Extend(
@@ -148,11 +150,11 @@ def Efr32Targets():
                         board=Efr32Board.BRD4161A)
 
     yield efr_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
-    yield efr_target.Extend('lock', app=Efr32App.LOCK)
     yield efr_target.Extend('unit-test', app=Efr32App.UNIT_TEST)
 
     rpc_aware_targets = [
         efr_target.Extend('light', app=Efr32App.LIGHT),
+        efr_target.Extend('lock', app=Efr32App.LOCK)
     ]
 
     for target in rpc_aware_targets:

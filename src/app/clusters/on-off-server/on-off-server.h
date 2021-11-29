@@ -17,19 +17,83 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/af-types.h>
 #include <app/util/basic-types.h>
 
-/** @brief On/off Cluster Set Value
+/**********************************************************
+ * Defines and Macros
+ *********************************************************/
+
+static constexpr uint8_t UPDATE_TIME_MS      = 100;
+static constexpr uint16_t TRANSITION_TIME_1S = 10;
+
+static constexpr uint16_t MAX_TIME_VALUE = 0xFFFF;
+static constexpr uint8_t MIN_TIME_VALUE  = 1;
+
+/**
+ * @brief
  *
- * This function is called when the on/off value needs to be set, either through
- * normal channels or as a result of a level change.
- *
- * @param endpoint   Ver.: always
- * @param command   Ver.: always
- * @param initiatedByLevelChange   Ver.: always
  */
-EmberAfStatus emberAfOnOffClusterSetValueCallback(chip::EndpointId endpoint, uint8_t command, bool initiatedByLevelChange);
+class OnOffServer
+{
+public:
+    /**********************************************************
+     * Functions Definitions
+     *********************************************************/
+
+    static OnOffServer & Instance();
+
+    bool offCommand();
+    bool onCommand();
+    bool toggleCommand();
+    void initOnOffServer(chip::EndpointId endpoint);
+    bool offWithEffectCommand(uint8_t effectId, uint8_t effectVariant);
+    bool OnWithRecallGlobalSceneCommand();
+    bool OnWithTimedOffCommand(chip::BitFlags<chip::app::Clusters::OnOff::OnOffControl> onOffControl, uint16_t onTime,
+                               uint16_t offWaitTime);
+    void updateOnOffTimeCommand(chip::EndpointId endpoint);
+    EmberAfStatus setOnOffValue(chip::EndpointId endpoint, uint8_t command, bool initiatedByLevelChange);
+
+private:
+    /**********************************************************
+     * Functions Definitions
+     *********************************************************/
+
+#ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+    bool areStartUpOnOffServerAttributesTokenized(chip::EndpointId endpoint);
+#endif // ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
+    EmberEventControl * getEventControl(chip::EndpointId endpoint);
+    EmberEventControl * configureEventControl(chip::EndpointId endpoint);
+
+    /**********************************************************
+     * Attributes Decleration
+     *********************************************************/
+
+    static OnOffServer instance;
+    EmberEventControl eventControls[EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT];
+};
+
+struct OnOffEffect
+{
+    using OffWithEffectTriggerCommand = void (*)(OnOffEffect *);
+
+    chip::EndpointId mEndpoint;
+    OffWithEffectTriggerCommand mOffWithEffectTrigger = nullptr;
+    uint8_t mEffectIdentifier;
+    uint8_t mEffectVariant;
+    bool mActive = false;
+
+    OnOffEffect(
+        chip::EndpointId endpoint, OffWithEffectTriggerCommand offWithEffectTrigger,
+        uint8_t effectIdentifier = static_cast<uint8_t>(EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DELAYED_ALL_OFF),
+        uint8_t effectVariant = static_cast<uint8_t>(EMBER_ZCL_ON_OFF_DELAYED_ALL_OFF_EFFECT_VARIANT_FADE_TO_OFF_IN_0P8_SECONDS));
+    ~OnOffEffect();
+};
+
+/**********************************************************
+ * Global
+ *********************************************************/
 
 /** @brief On/off Cluster Level Control Effect
  *
@@ -42,6 +106,10 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(chip::EndpointId endpoint, uin
  */
 void emberAfOnOffClusterLevelControlEffectCallback(chip::EndpointId endpoint, bool newValue);
 
+/**********************************************************
+ * Callbacks
+ *********************************************************/
+
 /** @brief On/off Cluster Server Post Init
  *
  * Following resolution of the On/Off state at startup for this endpoint,
@@ -51,3 +119,5 @@ void emberAfOnOffClusterLevelControlEffectCallback(chip::EndpointId endpoint, bo
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
 void emberAfPluginOnOffClusterServerPostInitCallback(chip::EndpointId endpoint);
+
+void onOffWaitTimeOffEventHandler(chip::EndpointId endpoint);

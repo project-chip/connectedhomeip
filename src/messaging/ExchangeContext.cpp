@@ -200,7 +200,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     // needs to clear the MRP retransmission table immediately.
     if (clearRetransTable)
     {
-        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(static_cast<ReliableMessageContext *>(this));
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
     }
 
     // Cancel the response timer.
@@ -539,5 +539,11 @@ System::Clock::Milliseconds32 ExchangeContext::GetAckTimeout()
     }
     return timeout;
 }
+
+const ReliableMessageProtocolConfig & ExchangeContext::GetMRPConfig() const
+{
+    return GetSessionHandle().GetMRPConfig(GetExchangeMgr()->GetSessionManager());
+}
+
 } // namespace Messaging
 } // namespace chip

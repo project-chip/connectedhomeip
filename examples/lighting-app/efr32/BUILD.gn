@@ -22,7 +22,6 @@ import("${efr32_sdk_build_root}/efr32_executable.gni")
 import("${efr32_sdk_build_root}/efr32_sdk.gni")
 
 import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
-
 if (chip_enable_pw_rpc) {
   import("//build_overrides/pigweed.gni")
   import("$dir_pw_build/target_types.gni")
@@ -71,10 +70,7 @@ efr32_sdk("sdk") {
   ]
 
   if (chip_enable_pw_rpc) {
-    defines += [
-      "HAL_VCOM_ENABLE=1",
-      "PW_RPC_ENABLED",
-    ]
+    defines += [ "HAL_VCOM_ENABLE=1" ]
   }
 }
 
@@ -114,21 +110,24 @@ efr32_executable("lighting_app") {
   }
 
   if (chip_enable_pw_rpc) {
-    defines += [ "PW_RPC_ENABLED" ]
+    defines += [
+      "PW_RPC_ENABLED",
+      "PW_RPC_ATTRIBUTE_SERVICE=1",
+      "PW_RPC_BUTTON_SERVICE=1",
+      "PW_RPC_DEVICE_SERVICE=1",
+      "PW_RPC_LIGHTING_SERVICE=1",
+    ]
+
     sources += [
       "${chip_root}/examples/common/pigweed/RpcService.cpp",
       "${chip_root}/examples/common/pigweed/efr32/PigweedLoggerMutex.cpp",
       "${examples_plat_dir}/PigweedLogger.cpp",
-      "src/Rpc.cpp",
+      "${examples_plat_dir}/Rpc.cpp",
     ]
 
     deps += [
-      "$dir_pw_assert",
-      "$dir_pw_checksum",
       "$dir_pw_hdlc:rpc_channel_output",
-      "$dir_pw_stream",
       "$dir_pw_stream:sys_io_stream",
-      "$dir_pw_sys_io",
       "${chip_root}/config/efr32/lib/pw_rpc:pw_rpc",
       "${chip_root}/examples/common/pigweed:attributes_service.nanopb_rpc",
       "${chip_root}/examples/common/pigweed:button_service.nanopb_rpc",

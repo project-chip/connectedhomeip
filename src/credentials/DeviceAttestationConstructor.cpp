@@ -152,7 +152,7 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
     VerifyOrReturnError(!certificationDeclaration.empty() && !attestationNonce.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(attestationNonce.size() == 32, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(attestationNonce.size() == kExpectedAttestationNonceSize, CHIP_ERROR_INVALID_ARGUMENT);
 
     tlvWriter.Init(attestationElements.data(), static_cast<uint32_t>(attestationElements.size()));
     outerContainerType = TLV::kTLVType_NotSpecified;
@@ -175,6 +175,41 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize());
     attestationElements = attestationElements.SubSpan(0, tlvWriter.GetLengthWritten());
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConstructNOCSRElements(const ByteSpan & csr, const ByteSpan & csrNonce, const ByteSpan & vendor_reserved1,
+                                  const ByteSpan & vendor_reserved2, const ByteSpan & vendor_reserved3,
+                                  MutableByteSpan & nocsrElements)
+{
+    TLV::TLVWriter tlvWriter;
+    TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
+
+    VerifyOrReturnError(!csr.empty() && !csrNonce.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(csrNonce.size() == kExpectedAttestationNonceSize, CHIP_ERROR_INVALID_ARGUMENT);
+
+    tlvWriter.Init(nocsrElements.data(), static_cast<uint32_t>(nocsrElements.size()));
+    outerContainerType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), csr));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), csrNonce));
+    if (!vendor_reserved1.empty())
+    {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), vendor_reserved1));
+    }
+    if (!vendor_reserved2.empty())
+    {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(4), vendor_reserved2));
+    }
+    if (!vendor_reserved3.empty())
+    {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(5), vendor_reserved3));
+    }
+
+    ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.Finalize());
+    nocsrElements = nocsrElements.SubSpan(0, tlvWriter.GetLengthWritten());
 
     return CHIP_NO_ERROR;
 }

@@ -48,6 +48,10 @@
 #include "lcd.h"
 #endif
 
+#if PW_RPC_ENABLED
+#include "Rpc.h"
+#endif
+
 #if CHIP_ENABLE_OPENTHREAD
 #include <mbedtls/platform.h>
 #include <openthread/cli.h>
@@ -103,6 +107,10 @@ int main(void)
 {
     init_efrPlatform();
     mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+
+#if PW_RPC_ENABLED
+    chip::rpc::Init();
+#endif
 
     EFR32_LOG("==================================================");
     EFR32_LOG("chip-efr32-lock-example starting");

@@ -170,8 +170,13 @@ public class ClusterInfoMapping {
                // {{asSymbol label}}: {{asUnderlyingZclType type}}
                // Conversion from this type to Java is not properly implemented yet
              {{else}}
-           CommandResponseInfo {{asSymbol label}}ResponseValue = new CommandResponseInfo("{{asSymbol label}}", "{{asJavaBasicType type}}");
-           responseValues.put({{asSymbol label}}ResponseValue, {{asSymbol label}});
+             {{#if_is_struct type}}
+               // {{asSymbol label}}: Struct {{type}}
+               // Conversion from this type to Java is not properly implemented yet
+             {{else}}
+               CommandResponseInfo {{asSymbol label}}ResponseValue = new CommandResponseInfo("{{asSymbol label}}", "{{asJavaBasicType type}}");
+               responseValues.put({{asSymbol label}}ResponseValue, {{asSymbol label}});
+             {{/if_is_struct}}
              {{/if}}
            {{/chip_cluster_response_arguments}}
            callback.onSuccess(responseValues);
