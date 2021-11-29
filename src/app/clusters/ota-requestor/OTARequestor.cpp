@@ -16,8 +16,8 @@
  *    limitations under the License.
  */
 
-/* This file contains the implementation of the OTARequestor class. All the core 
- * OTA Requestor logic is contained in this class. 
+/* This file contains the implementation of the OTARequestor class. All the core
+ * OTA Requestor logic is contained in this class.
  */
 #include "OTARequestor.h"
 
@@ -391,5 +391,3 @@ void OTARequestor::TriggerImmediateQuery()
     // Perhaps we don't need a separate function ConnectToProvider, revisit this
     ConnectToProvider();
 }
-
-

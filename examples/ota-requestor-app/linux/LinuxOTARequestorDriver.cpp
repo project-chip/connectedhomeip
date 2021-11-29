@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-/* This file contains the Linux implementation of the  OTAImageProcessorDriver 
+/* This file contains the Linux implementation of the  OTAImageProcessorDriver
  * interface class
  */
 

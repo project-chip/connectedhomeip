@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-/* This file contains the decalarions for the Linux implementation of the 
+/* This file contains the decalarions for the Linux implementation of the
  * the OTAImageProcessorDriver interface class
  */
 

@@ -214,7 +214,7 @@ int main(int argc, char * argv[])
     downloaderCore->SetImageProcessorDelegate(downloaderUser);
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 
-    // Pass the IP Address to the OTARequestor object: Use of explicit IP address is temporary 
+    // Pass the IP Address to the OTARequestor object: Use of explicit IP address is temporary
     // until the Exchange Layer implements address resolution
     {
         IPAddress ipAddr;
@@ -242,4 +242,3 @@ void OnStartDelayTimerHandler(Layer * systemLayer, void * appState)
 {
     static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
 }
-
