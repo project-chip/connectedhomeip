@@ -383,6 +383,13 @@ void OTARequestor::mOnConnected(void * context, chip::DeviceProxy * deviceProxy)
     }
 }
 
+void OTARequestor::TriggerImmediateQuery()
+{
+    // Perhaps we don't need a separate function ConnectToProvider, revisit this
+    ConnectToProvider();
+}
+
+
 #if 0 // LISS for now !!!!!!!!!!!!!!!!!!!!!!!
 
 

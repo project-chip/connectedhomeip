@@ -59,6 +59,10 @@ public:
         void * context,
         const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & response);
 
+    // When the Requestor is used as a test tool (Tesm Mode) the Provider parameters may be supplied explicitly
+    void TestModeSetProviderParameters(chip::NodeId NodeId, chip::FabricIndex FabIndex) { mProviderNodeId = NodeId;
+                                            mProviderFabricIndex = FabIndex;}
+
     // Temporary until IP address resolution is implemented in the Exchange Layer
     void SetIpAddress(chip::Inet::IPAddress IpAddress) { mIpAddress = IpAddress; }
 
@@ -72,14 +76,14 @@ private:
     };
 
     // Variables
-    OTARequestorDriver * mOtaRequestorDriver;
-    chip::NodeId mProviderNodeId;
-    chip::FabricIndex mProviderFabricIndex;
-    uint32_t mOtaStartDelayMs                      = 0;
-    chip::CASESessionManager * mCASESessionManager = nullptr;
-    OnConnectedState onConnectedState              = kQueryImage;
+    OTARequestorDriver          *mOtaRequestorDriver;
+    chip::NodeId                 mProviderNodeId;
+    chip::FabricIndex            mProviderFabricIndex;
+    uint32_t                     mOtaStartDelayMs                      = 0;
+    chip::CASESessionManager    *mCASESessionManager = nullptr;
+    OnConnectedState            onConnectedState              = kQueryImage;
     chip::Messaging::ExchangeContext * exchangeCtx = nullptr;
-    BdxDownloader bdxDownloader;
+    BdxDownloader               bdxDownloader;
 
     // Temporary until IP address resolution is implemented in the Exchange layer
     chip::Inet::IPAddress mIpAddress;

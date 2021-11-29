@@ -61,6 +61,7 @@ using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
+void OnStartDelayTimerHandler(Layer * systemLayer, void * appState);
 
 constexpr uint16_t kOptionProviderNodeId      = 'n';
 constexpr uint16_t kOptionProviderFabricIndex = 'f';
@@ -234,17 +235,27 @@ int main(int argc, char * argv[])
         requestorCore->SetIpAddress(ipAddr);
     }
 
-    // If a delay is provided, QueryImage after the timer expires REFACTOR DELETE THIS ??
-    // if (delayQueryTimeInSec > 0)
-    // {
-    //   chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
-    //                                                 OnStartDelayTimerHandler, nullptr);
-    // }
+    // Test Mode operation: If a delay is provided, QueryImage after the timer expires
+    if (delayQueryTimeInSec > 0)
+    {
+        // In this mode Provider node ID and fabric idx must be supplied explicitly from program args
+        requestorCore->TestModeSetProviderParameters(providerNodeId, providerFabricIndex);
+
+        chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
+                                                    OnStartDelayTimerHandler, nullptr);
+    }
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
     return 0;
 }
+
+// Test mode operation
+void OnStartDelayTimerHandler(Layer * systemLayer, void * appState)
+{
+    static_cast<OTARequestor *>(GetRequestorInstance())->TriggerImmediateQuery();
+}
+
 
 #if 0 // LISS
 
