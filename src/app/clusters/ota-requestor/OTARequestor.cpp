@@ -148,7 +148,7 @@ EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
 {
-  auto & providerLocation   = commandData.providerLocation;
+    auto & providerLocation   = commandData.providerLocation;
     auto & announcementReason = commandData.announcementReason;
 
     if (commandObj == nullptr || commandObj->GetExchangeContext() == nullptr)
@@ -253,7 +253,7 @@ void OTARequestor::ConnectToProvider()
     chip::NodeId peerNodeId           = mProviderNodeId;
     chip::FabricIndex peerFabricIndex = mProviderFabricIndex;
 
-   Server * server           = &(Server::GetInstance());
+    Server * server           = &(Server::GetInstance());
     chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(peerFabricIndex);
     if (fabric == nullptr)
     {

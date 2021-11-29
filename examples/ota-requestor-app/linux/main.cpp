@@ -23,10 +23,10 @@
 #include <lib/support/CHIPArgParser.hpp>
 #include <platform/CHIPDeviceLayer.h>
 
-#include "app/clusters/ota-requestor/OTADownloader.h"
-#include "app/clusters/ota-requestor/OTARequestor.h"
 #include "LinuxOTAImageProcessor.h"
 #include "LinuxOTARequestorDriver.h"
+#include "app/clusters/ota-requestor/OTADownloader.h"
+#include "app/clusters/ota-requestor/OTARequestor.h"
 
 using chip::ByteSpan;
 using chip::CharSpan;
