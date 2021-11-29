@@ -23,7 +23,7 @@
  * must include this file
  */
 
-#include "ota-image-processor.h"
+#include "OTAImageProcessor.h"
 
 #pragma once
 

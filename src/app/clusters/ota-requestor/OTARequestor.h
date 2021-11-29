@@ -21,8 +21,8 @@
  */
 
 #include "BDXDownloader.h"
-#include "ota-requestor-driver.h"
-#include "ota-requestor-interface.h"
+#include "OTARequestorDriver.h"
+#include "OTARequestorInterface.h"
 #include <app/CASESessionManager.h>
 #pragma once
 

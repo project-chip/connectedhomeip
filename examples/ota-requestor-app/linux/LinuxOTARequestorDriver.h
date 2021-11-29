@@ -19,7 +19,7 @@
 /* This file contains the decalarions for the Linux implementation of the 
  * the OTARequestorDriver interface class
  */
-#include "app/clusters/ota-requestor/ota-requestor-driver.h"
+#include "app/clusters/ota-requestor/OTARequestorDriver.h"
 
 class LinuxOTARequestorDriver : public OTARequestorDriver
 {

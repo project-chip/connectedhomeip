@@ -20,7 +20,7 @@
  * interface class
  */
 
-#include "linux-ota-requestor-driver.h"
+#include "LinuxOTARequestorDriver.h"
 
 // A call into the application logic to give it a chance to allow or stop the Requestor
 // from proceeding with actual image download. Returning TRUE will allow the download

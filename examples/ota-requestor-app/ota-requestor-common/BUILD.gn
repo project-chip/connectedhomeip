@@ -34,7 +34,7 @@ chip_data_model("ota-requestor-common") {
     "${chip_root}/src/app/clusters/ota-requestor/BDXDownloader.cpp",
     "${chip_root}/src/app/clusters/ota-requestor/BDXDownloader.h",
     "${chip_root}/src/app/clusters/ota-requestor/OTARequestor.cpp",
-    "${chip_root}/src/app/clusters/ota-requestor/cluster-interface.cpp",
+    "${chip_root}/src/app/clusters/ota-requestor/ClusterInterface.cpp",
   ]
 
   is_server = true

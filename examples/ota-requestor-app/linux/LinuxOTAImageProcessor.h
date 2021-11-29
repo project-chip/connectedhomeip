@@ -20,7 +20,7 @@
  * the OTAImageProcessorDriver interface class
  */
 
-#include "app/clusters/ota-requestor/ota-image-processor.h"
+#include "app/clusters/ota-requestor/OTAImageProcessor.h"
 
 class LinuxOTAImageProcessor : public OTAImageProcessorDriver
 {
