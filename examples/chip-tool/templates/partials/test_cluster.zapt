@@ -226,17 +226,23 @@ class {{filename}}: public TestCommand
 
     void {{>failureResponse}}({{>failureArguments}})
     {
-        {{~#unless response.error}}
-        {{#if optional}}(status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : {{/if}}ThrowFailureResponse();
+        {{#if response.error}}
+          VerifyOrReturn(CheckValue("status", status, {{response.error}}));
+          {{#unless async}}NextTest();{{/unless}}
+        {{else if response.errorWrongValue}}
+          VerifyOrReturn(CheckConstraintNotValue("status", status, 0));
+          {{#unless async}}NextTest();{{/unless}}
         {{else}}
-        {{#unless async}}NextTest();{{/unless}}
-        {{/unless}}
+          {{#if optional}}(status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : {{/if}}ThrowFailureResponse();
+        {{/if}}
     }
 
     void {{>successResponse}}({{>successArguments}})
     {
         {{~#if response.error}}
-        ThrowSuccessResponse();
+          ThrowSuccessResponse();
+        {{else if response.errorWrongValue}}
+          ThrowSuccessResponse();
         {{else}}
           {{! This block can be removed if there is a mechanism to remove the report handler}}
           {{#if isWaitForReport}}

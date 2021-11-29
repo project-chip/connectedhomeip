@@ -32,7 +32,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: 0x88 # UNSUPPORTED_WRITE
 
     - label: "reads back mandatory attribute: OnOff"
       command: "readAttribute"
@@ -71,7 +71,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: 0x88 # UNSUPPORTED_WRITE
 
     - label: "write the default value to LT attribute: OnTime"
       command: "writeAttribute"
