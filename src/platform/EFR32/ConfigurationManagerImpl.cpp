@@ -29,6 +29,8 @@
 #include <platform/ConfigurationManager.h>
 #include <platform/EFR32/EFR32Config.h>
 
+#include "em_rmu.h"
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -51,6 +53,11 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     // TODO: Initialize the global GroupKeyStore object here (#1626)
 
+    IncreaseBootCount();
+    //RMU_ResetControl(,rmuResetModeFull);
+    rebootCause = RMU_ResetCauseGet();
+    RMU_ResetCauseClear();
+
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
     if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
@@ -72,6 +79,45 @@ bool ConfigurationManagerImpl::CanFactoryReset()
 void ConfigurationManagerImpl::InitiateFactoryReset()
 {
     PlatformMgr().ScheduleWork(DoFactoryReset);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_BootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
+{
+    uint32_t bootCount = 0;
+
+    if (EFR32Config::ConfigValueExists(EFR32Config::kConfigKey_BootCount))
+    {
+        GetRebootCount(bootCount);
+    }
+
+    return EFR32Config::WriteConfigValue(EFR32Config::kConfigKey_BootCount, bootCount+1);
+}
+
+uint32_t ConfigurationManagerImpl::GetBootReason(void)
+{
+    // rebootCause is obtained at bootup.
+    return rebootCause;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    if (!EFR32Config::ConfigValueExists(EFR32Config::kConfigKey_TotalOperationalHours))
+    {
+        totalOperationalHours = 0;
+        return CHIP_NO_ERROR;
+    }
+     
+    return EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_TotalOperationalHours, totalOperationalHours);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOperationalHours)
+{
+    return EFR32Config::WriteConfigValue(EFR32Config::kConfigKey_TotalOperationalHours, totalOperationalHours);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,

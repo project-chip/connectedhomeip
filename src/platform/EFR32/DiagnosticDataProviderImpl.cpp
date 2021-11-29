@@ -40,6 +40,7 @@ DiagnosticDataProviderImpl & DiagnosticDataProviderImpl::GetDefaultInstance()
     return sInstance;
 }
 
+// Software Diagnostics Getters
 /*
  * The following Heap stats are compiled values done by the FreeRTOS Heap4 implementation.
  * See /examples/platform/efr32/heap_4_silabs.c
@@ -73,6 +74,107 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
     // Something went wrong, this should not happen
     VerifyOrReturnError(HighestHeapUsageRecorded >= 0, CHIP_ERROR_INVALID_INTEGER_VALUE);
     currentHeapHighWatermark = static_cast<uint64_t>(HighestHeapUsageRecorded);
+
+    return CHIP_NO_ERROR;
+}
+
+// General Diagnostics Getters
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
+{
+    uint32_t count = 0;
+    CHIP_ERROR err = ConfigurationMgr().GetRebootCount(count);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(count <= UINT16_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        rebootCount = static_cast<uint16_t>(count);
+    }
+
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
+{
+    uint32_t reason = 0; 
+    CHIP_ERROR err = ConfigurationMgr().GetBootReason(reason);
+    
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        bootReason = static_cast<uint8_t>(reason);
+    }
+
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetUpTime(uint64_t & upTime)
+{
+    System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
+    System::Clock::Timestamp startTime   = PlatformMgrImpl().GetStartTime();
+
+    if (currentTime >= startTime)
+    {
+        upTime = std::chrono::duration_cast<System::Clock::Seconds64>(currentTime - startTime).count();
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_INVALID_TIME;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
+{
+    uint64_t upTime = 0;
+
+    if (GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalHours = 0;
+        if (ConfigurationMgr().GetTotalOperationalHours(totalHours) == CHIP_NO_ERROR)
+        {
+            VerifyOrReturnError(upTime / 3600 <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+            totalOperationalHours = totalHours + static_cast<uint32_t>(upTime / 3600);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_INVALID_TIME;
+}
+
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
+{
+#if CHIP_CONFIG_TEST
+    // On Linux Simulation, set following hardware faults statically.
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+    ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
+#endif
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults)
+{
+#if CHIP_CONFIG_TEST
+    // On Linux Simulation, set following radio faults statically.
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
+#endif
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
+{
+#if CHIP_CONFIG_TEST
+    // On Linux Simulation, set following radio faults statically.
+    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
+    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+    ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
+#endif
 
     return CHIP_NO_ERROR;
 }
