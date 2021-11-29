@@ -24,11 +24,9 @@
 
 #include <app-common/zap-generated/enums.h>
 #include <app/util/attribute-storage.h>
-
+#include <functional>
 #include <stdbool.h>
 #include <stdint.h>
-
-#include <functional>
 
 namespace chip {
 namespace AppPlatform {

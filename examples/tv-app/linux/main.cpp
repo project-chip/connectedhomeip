@@ -18,12 +18,12 @@
 
 #include "AppImpl.h"
 #include "AppMain.h"
-#include "AppPlatform.h"
 #include "AppPlatformShellCommands.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/Command.h>
+#include <app/util/ContentAppPlatform.h>
 #include <app/util/af.h>
 
 #include <iostream>

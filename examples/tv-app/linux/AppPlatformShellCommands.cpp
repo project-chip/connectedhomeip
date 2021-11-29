@@ -20,9 +20,9 @@
  */
 
 #include "AppPlatformShellCommands.h"
-#include "AppPlatform.h"
 #include "ControllerShellCommands.h"
 #include <AppMain.h>
+#include <app/util/ContentAppPlatform.h>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/shell/Commands.h>

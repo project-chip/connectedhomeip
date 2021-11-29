@@ -147,6 +147,12 @@ template("chip_data_model") {
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
           "${_app_root}/clusters/${cluster}/supported-modes-manager.h",
         ]
+      } else if (cluster == "application-launcher-server") {
+        sources += [ 
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/util/ContentApp.cpp",
+          "${_app_root}/util/ContentAppPlatform.cpp",
+        ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
       }

@@ -19,9 +19,15 @@
  * @file Contains shell commands for a commissionee (eg. end device) related to commissioning.
  */
 
-#include "AppPlatform.h"
+#include <app-common/zap-generated/attribute-id.h>
+#include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/ids/Attributes.h>
+#include <app-common/zap-generated/ids/Clusters.h>
+#include <app/Command.h>
 #include <app/server/Dnssd.h>
 #include <app/server/Server.h>
+#include <app/util/ContentAppPlatform.h>
+#include <cstdio>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
@@ -33,24 +39,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ZclString.h>
 #include <platform/CHIPDeviceLayer.h>
-
-// #include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
-
-#include <app-common/zap-generated/ids/Attributes.h>
-#include <app-common/zap-generated/ids/Clusters.h>
-#include <app/Command.h>
-#include <app/util/af.h>
-
-#include "AppPlatform.h"
-
-#include <cstdio>
-#include <platform/CHIPDeviceLayer.h>
-
-// #include <app-common/zap-generated/af-structs.h>
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/cluster-id.h>
 
 using namespace chip;
 using namespace chip::AppPlatform;
