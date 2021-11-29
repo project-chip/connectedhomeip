@@ -125,7 +125,7 @@ class HostBuilder(GnBuilder):
         if use_tsan:
             self.extra_gn_options.append('is_tsan=true')
 
-        if separate_event_loop:
+        if not separate_event_loop:
             self.extra_gn_options.append('config_use_separate_eventloop=false')
 
     def GnBuildArgs(self):
