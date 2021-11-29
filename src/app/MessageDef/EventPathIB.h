@@ -15,11 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines EventPath parser and builder in CHIP interaction model
- *
- */
 
 #pragma once
 
@@ -27,6 +22,7 @@
 #include "ListParser.h"
 
 #include <app/AppBuildConfig.h>
+#include <app/EventPathParams.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -175,6 +171,8 @@ public:
      *  @return A reference to *this
      */
     EventPathIB::Builder & EndOfEventPathIB();
+
+    CHIP_ERROR Encode(const EventPathParams & aEventPathParams);
 };
 } // namespace EventPathIB
 } // namespace app

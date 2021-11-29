@@ -79,8 +79,10 @@ public:
     {
         chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
         chip::Inet::IPAddressType addressType;
-        chip::Inet::UDPEndPoint * listen_udp        = nullptr;
+        chip::Inet::UDPEndPoint * listen_udp = nullptr;
+#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
         chip::Inet::UDPEndPoint * unicast_query_udp = nullptr;
+#endif
     };
 
     /**
@@ -103,8 +105,10 @@ public:
     {
         for (size_t i = 0; i < mEndpointCount; i++)
         {
-            mEndpoints[i].listen_udp        = nullptr;
+            mEndpoints[i].listen_udp = nullptr;
+#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
             mEndpoints[i].unicast_query_udp = nullptr;
+#endif
         }
 
         BroadcastIpAddresses::GetIpv6Into(mIpv6BroadcastAddress);

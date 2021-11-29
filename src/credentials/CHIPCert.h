@@ -42,7 +42,7 @@
 namespace chip {
 namespace Credentials {
 
-static constexpr uint32_t kKeyIdentifierLength                 = 20;
+static constexpr uint32_t kKeyIdentifierLength                 = static_cast<uint32_t>(Crypto::kSubjectKeyIdentifierLength);
 static constexpr uint32_t kChip32bitAttrUTF8Length             = 8;
 static constexpr uint32_t kChip64bitAttrUTF8Length             = 16;
 static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;

@@ -57,6 +57,8 @@ public:
     chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override { return info->listen_udp; }
 };
 
+#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
+
 /**
  * Extracts the Querying UDP Endpoint from an underlying ServerBase::EndpointInfo
  */
@@ -65,6 +67,12 @@ class QuerySocketPickerDelegate : public ServerBase::BroadcastSendDelegate
 public:
     chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) override { return info->unicast_query_udp; }
 };
+
+#else
+
+using QuerySocketPickerDelegate = ListenSocketPickerDelegate;
+
+#endif
 
 /**
  * Validates that an endpoint belongs to a specific interface/ip address type before forwarding the
@@ -180,11 +188,13 @@ void ShutdownEndpoint(mdns::Minimal::ServerBase::EndpointInfo & aEndpoint)
         aEndpoint.listen_udp = nullptr;
     }
 
+#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
     if (aEndpoint.unicast_query_udp != nullptr)
     {
         aEndpoint.unicast_query_udp->Free();
         aEndpoint.unicast_query_udp = nullptr;
     }
+#endif
 }
 
 } // namespace
@@ -254,6 +264,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
             endpointIndex++;
         }
 
+#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
         // Separate UDP endpoint for unicast queries, bound to 0 (i.e. pick random ephemeral port)
         //   - helps in not having conflicts on port 5353, will receive unicast replies directly
         //   - has a *DRAWBACK* of unicast queries being considered LEGACY by mdns since they do
@@ -261,6 +272,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
         ReturnErrorOnFailure(inetLayer->NewUDPEndPoint(&info->unicast_query_udp));
         ReturnErrorOnFailure(info->unicast_query_udp->Bind(addressType, chip::Inet::IPAddress::Any, 0, interfaceId));
         ReturnErrorOnFailure(info->unicast_query_udp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
+#endif
     }
 
     return autoShutdown.ReturnSuccess();

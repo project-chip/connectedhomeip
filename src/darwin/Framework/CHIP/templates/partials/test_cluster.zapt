@@ -3,6 +3,11 @@
 {{#if async}}
 bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}_Fulfilled = false;
 {{/if}}
+{{#chip_tests_item_response_parameters}}
+{{#if saveAs}}
+{{asBasicType chipType}} {{saveAs}};
+{{/if}}
+{{/chip_tests_item_response_parameters}}
 - (void)testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}
 {
     {{#unless async}}
@@ -45,7 +50,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
     NSString * {{asLowerCamelCase name}}Argument= @"{{definedValue}}";
     {{/if}}
     {{else}}
-    {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{definedValue}}{{asTypeLiteralSuffix type}};
+    {{asObjectiveCBasicType type}} {{asLowerCamelCase name}}Argument = {{asTypedLiteral definedValue type}};
     {{/if}}
     {{/chip_tests_item_parameters}}
     [cluster subscribeAttribute{{asUpperCamelCase attribute}}WithMinInterval:minIntervalArgument
@@ -89,6 +94,9 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         {
           {{> actualValue}}
           {{>check_test_value actual="actualValue" expected=expectedValue cluster=../cluster}}
+          {{#if saveAs}}
+          {{saveAs}} = [actualValue {{asObjectiveCNumberType "" type true}}Value];
+          {{/if}}
         }
         {{/if}}
         {{#if hasExpectedConstraints}}
@@ -96,6 +104,18 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         {
           {{> actualValue}}
           XCTAssertGreaterThanOrEqual([actualValue length], {{expectedConstraints.minLength}});
+        }
+        {{/if}}
+        {{#if expectedConstraints.startsWith}}
+        {
+          {{> actualValue}}
+          XCTAssertTrue([actualValue hasPrefix:@"{{expectedConstraints.startsWith}}"]);
+        }
+        {{/if}}
+        {{#if expectedConstraints.endsWith}}
+        {
+          {{> actualValue}}
+          XCTAssertTrue([actualValue hasSuffix:@"{{expectedConstraints.endsWith}}"]);
         }
         {{/if}}
         {{#if expectedConstraints.maxLength}}

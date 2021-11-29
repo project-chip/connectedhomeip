@@ -204,7 +204,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
 
     // Initialize device attestation verifier
-    SetDeviceAttestationVerifier(GetDefaultDACVerifier());
+    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
     chip::Controller::FactoryInitParams initParams;
     chip::Controller::SetupParams setupParams;

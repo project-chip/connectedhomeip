@@ -98,6 +98,7 @@ pw_proto_library(locking_service
 )
 
 target_link_libraries(${COMPONENT_LIB} PUBLIC
+  attributes_service.nanopb_rpc
   device_service.nanopb_rpc
   button_service.nanopb_rpc
   locking_service.nanopb_rpc
@@ -106,6 +107,12 @@ target_link_libraries(${COMPONENT_LIB} PUBLIC
   pw_log
   pw_rpc.server
 )
+
+target_compile_options(${COMPONENT_LIB} PRIVATE
+                       "-DPW_RPC_ATTRIBUTE_SERVICE=2"
+                       "-DPW_RPC_BUTTON_SERVICE=1"
+                       "-DPW_RPC_DEVICE_SERVICE=1"
+                       "-DPW_RPC_LOCKING_SERVICE=1")
 
 else (CONFIG_ENABLE_PW_RPC)
 idf_component_register(PRIV_INCLUDE_DIRS

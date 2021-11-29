@@ -263,8 +263,9 @@ function asPrintFormat(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asTypeLiteralSuffix(type)
+function asTypedLiteral(value, type)
 {
+  const valueIsANumber = !isNaN(value);
   function fn(pkgId)
   {
     const options = { 'hash' : {} };
@@ -272,17 +273,24 @@ function asTypeLiteralSuffix(type)
       const basicType = ChipTypesHelper.asBasicType(zclType);
       switch (basicType) {
       case 'int32_t':
-        return 'L';
+        return value + (valueIsANumber ? 'L' : '');
       case 'int64_t':
-        return 'LL';
+        return value + (valueIsANumber ? 'LL' : '');
       case 'uint16_t':
-        return 'U';
+        return value + (valueIsANumber ? 'U' : '');
       case 'uint32_t':
-        return 'UL';
+        return value + (valueIsANumber ? 'UL' : '');
       case 'uint64_t':
-        return 'ULL';
+        return value + (valueIsANumber ? 'ULL' : '');
+      case 'float':
+        if (!valueIsANumber || value == 0) {
+          // "0f" is not a valid value, so don't output that; just leave it
+          // as "0".
+          return value;
+        }
+        return value + 'f';
       default:
-        return '';
+        return value;
       }
     })
   }
@@ -510,7 +518,7 @@ exports.asPrintFormat                       = asPrintFormat;
 exports.asReadType                          = asReadType;
 exports.chip_endpoint_generated_functions   = chip_endpoint_generated_functions
 exports.chip_endpoint_cluster_list          = chip_endpoint_cluster_list
-exports.asTypeLiteralSuffix                 = asTypeLiteralSuffix;
+exports.asTypedLiteral                      = asTypedLiteral;
 exports.asLowerCamelCase                    = asLowerCamelCase;
 exports.asUpperCamelCase                    = asUpperCamelCase;
 exports.hasSpecificAttributes               = hasSpecificAttributes;

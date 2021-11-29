@@ -308,6 +308,35 @@ CHIP_ERROR ConnectivityManagerImpl::OnStationConnected()
                 ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
                 ChipLogProgress(DeviceLayer, "New Ip4 address set: %s", address.get_ip_address());
             }
+
+            error = mWifiInterface->get_ipv6_link_local_address(&address);
+            if (error)
+            {
+                if (mIp6Address != IPAddress::Any)
+                {
+                    // Unnexpected change, forward to the application
+                    mIp6Address = IPAddress::Any;
+                    ChipDeviceEvent event;
+                    event.Type                            = DeviceEventType::kInternetConnectivityChange;
+                    event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
+                    event.InternetConnectivityChange.IPv6 = kConnectivity_Lost;
+                    ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
+                    ChipLogError(DeviceLayer, "Unnexpected loss of Ip6 address");
+                }
+            }
+            else
+            {
+                if (IPAddress::FromString(address.get_ip_address(), addr) && addr != mIp6Address)
+                {
+                    mIp6Address = addr;
+                    ChipDeviceEvent event;
+                    event.Type                            = DeviceEventType::kInternetConnectivityChange;
+                    event.InternetConnectivityChange.IPv4 = kConnectivity_NoChange;
+                    event.InternetConnectivityChange.IPv6 = kConnectivity_Established;
+                    ReturnErrorOnFailure(PlatformMgr().PostEvent(&event));
+                    ChipLogProgress(DeviceLayer, "New Ip6 address set %s", address.get_ip_address());
+                }
+            }
         }
         else
         {

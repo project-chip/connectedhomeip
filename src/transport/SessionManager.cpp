@@ -114,6 +114,7 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHe
 
 #if CHIP_PROGRESS_LOGGING
     NodeId destination;
+    FabricIndex fabricIndex;
 #endif // CHIP_PROGRESS_LOGGING
     if (sessionHandle.IsSecure())
     {
@@ -136,6 +137,7 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHe
 
 #if CHIP_PROGRESS_LOGGING
             destination = sessionHandle.GetPeerNodeId();
+            fabricIndex = sessionHandle.GetFabricIndex();
 #endif // CHIP_PROGRESS_LOGGING
         }
         else
@@ -150,6 +152,7 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHe
 
 #if CHIP_PROGRESS_LOGGING
             destination = session->GetPeerNodeId();
+            fabricIndex = session->GetFabricIndex();
 #endif // CHIP_PROGRESS_LOGGING
         }
     }
@@ -165,15 +168,16 @@ CHIP_ERROR SessionManager::PrepareMessage(SessionHandle sessionHandle, PayloadHe
 
 #if CHIP_PROGRESS_LOGGING
         destination = kUndefinedNodeId;
+        fabricIndex = kUndefinedFabricIndex;
 #endif // CHIP_PROGRESS_LOGGING
     }
 
     ChipLogProgress(Inet,
-                    "Prepared %s message %p to 0x" ChipLogFormatX64 " of type " ChipLogFormatMessageType
+                    "Prepared %s message %p to 0x" ChipLogFormatX64 " (%u)  of type " ChipLogFormatMessageType
                     " and protocolId " ChipLogFormatProtocolId " on exchange " ChipLogFormatExchangeId
                     " with MessageCounter:" ChipLogFormatMessageCounter ".",
                     sessionHandle.IsSecure() ? "encrypted" : "plaintext", &preparedMessage, ChipLogValueX64(destination),
-                    payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()),
+                    fabricIndex, payloadHeader.GetMessageType(), ChipLogValueProtocolId(payloadHeader.GetProtocolID()),
                     ChipLogValueExchangeIdFromSentHeader(payloadHeader), packetHeader.GetMessageCounter());
 
     ReturnErrorOnFailure(packetHeader.EncodeBeforeData(message));
@@ -206,9 +210,10 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle sessionHandle, cons
 
         ChipLogProgress(Inet,
                         "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
-                        " at monotonic time: %" PRId64 " msec",
+                        " (%u) at monotonic time: %" PRId64 " msec",
                         "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(),
-                        ChipLogValueX64(session->GetPeerNodeId()), System::SystemClock().GetMonotonicMilliseconds64().count());
+                        ChipLogValueX64(session->GetPeerNodeId()), session->GetFabricIndex(),
+                        System::SystemClock().GetMonotonicMilliseconds64().count());
     }
     else
     {

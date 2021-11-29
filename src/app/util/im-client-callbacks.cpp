@@ -134,6 +134,9 @@ void LogStatus(uint8_t status)
     case EMBER_ZCL_STATUS_LIMIT_REACHED:
         ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_LIMIT_REACHED (0x%02x)", status);
         break;
+    case EMBER_ZCL_STATUS_NEEDS_TIMED_INTERACTION:
+        ChipLogProgress(Zcl, "  status: EMBER_ZCL_STATUS_NEEDS_TIMED_INTERACTION (0x%02x)", status);
+        break;
     default:
         ChipLogError(Zcl, "Unknow status: 0x%02x", status);
         break;
@@ -264,8 +267,8 @@ static void LogIMStatus(Protocols::InteractionModel::Status status)
     case Protocols::InteractionModel::Status::NoUpstreamSubscription:
         ChipLogProgress(Zcl, "  status: NoUpstreamSubscription (0x%04" PRIx16 ")", to_underlying(status));
         break;
-    case Protocols::InteractionModel::Status::InvalidArgument:
-        ChipLogProgress(Zcl, "  status: InvalidArgument        (0x%04" PRIx16 ")", to_underlying(status));
+    case Protocols::InteractionModel::Status::NeedsTimedInteraction:
+        ChipLogProgress(Zcl, "  status: NeedsTimedInteraction  (0x%04" PRIx16 ")", to_underlying(status));
         break;
     default:
         ChipLogError(Zcl, "Unknown status: 0x%04" PRIx16, to_underlying(status));

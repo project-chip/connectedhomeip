@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,38 +14,23 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#pragma once
 
-#include <app/AttributePathParams.h>
-#include <app/MessageDef/AttributePathIB.h>
+#include <credentials/DeviceAttestationCredsProvider.h>
 
 namespace chip {
-namespace app {
+namespace Credentials {
+namespace Examples {
 
-CHIP_ERROR AttributePathParams::BuildAttributePath(AttributePathIB::Builder & aBuilder) const
-{
-    if (!HasWildcardEndpointId())
-    {
-        aBuilder.Endpoint(mEndpointId);
-    }
+/**
+ * @brief Get implementation of a sample DAC provider to validate device
+ *        attestation procedure.
+ *
+ * @returns a singleton DeviceAttestationCredentialsProvider that relies on no
+ *          storage abstractions.
+ */
+DeviceAttestationCredentialsProvider * GetExampleSe05xDACProvider();
 
-    if (!HasWildcardClusterId())
-    {
-        aBuilder.Cluster(mClusterId);
-    }
-
-    if (!HasWildcardAttributeId())
-    {
-        aBuilder.Attribute(mAttributeId);
-    }
-
-    if (!HasWildcardListIndex())
-    {
-        aBuilder.ListIndex(mListIndex);
-    }
-
-    aBuilder.EndOfAttributePathIB();
-
-    return aBuilder.GetError();
-}
-} // namespace app
+} // namespace Examples
+} // namespace Credentials
 } // namespace chip

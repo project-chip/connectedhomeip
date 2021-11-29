@@ -195,8 +195,7 @@ static void TestDACVerifierExample_AttestationInfoVerification(nlTestSuite * inS
         default_verifier->VerifyAttestationInformation(ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan(), ByteSpan());
     NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kNotImplemented);
 
-    // Replace default verifier with example verifier
-    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier();
+    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
     NL_TEST_ASSERT(inSuite, example_dac_verifier != nullptr);
     NL_TEST_ASSERT(inSuite, default_verifier != example_dac_verifier);
 
@@ -252,7 +251,7 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Replace default verifier with example verifier
-    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier();
+    DeviceAttestationVerifier * example_dac_verifier = GetDefaultDACVerifier(GetTestAttestationTrustStore());
     NL_TEST_ASSERT(inSuite, example_dac_verifier != nullptr);
 
     SetDeviceAttestationVerifier(example_dac_verifier);
@@ -295,6 +294,80 @@ static void TestDACVerifierExample_CertDeclarationVerification(nlTestSuite * inS
     NL_TEST_ASSERT(inSuite, attestation_result == AttestationVerificationResult::kSuccess);
 }
 
+static void TestAttestationTrustStore(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t kPaaFff1Start[] = { 0x30, 0x82, 0x01, 0x99, 0x30, 0x82, 0x01, 0x3F, 0xA0, 0x03, 0x02, 0x01, 0x02,
+                                0x02, 0x08, 0x68, 0x38, 0x4F, 0xAB, 0xB9, 0x19, 0xFC, 0xDF, 0x30, 0x0A, 0x06,
+                                0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x04, 0x03, 0x02, 0x30, 0x1F, 0x31 };
+    uint8_t kPaaFff1Skid[]  = { 0xEF, 0x18, 0xE0, 0xEC, 0xD4, 0x66, 0x04, 0x34, 0xDF, 0x0D,
+                               0xBC, 0x91, 0x1E, 0xD4, 0x52, 0x16, 0x99, 0x66, 0x83, 0x9F };
+
+    uint8_t kPaaFff2Start[] = { 0x30, 0x82, 0x01, 0x9D, 0x30, 0x82, 0x01, 0x42, 0xA0, 0x03, 0x02, 0x01, 0x02,
+                                0x02, 0x08, 0x03, 0x92, 0xA7, 0x65, 0x5A, 0x3E, 0x6C, 0x77, 0x30, 0x0A, 0x06,
+                                0x08, 0x2A, 0x86, 0x48, 0xCE, 0x3D, 0x04, 0x03, 0x02, 0x30, 0x1F, 0x31 };
+    uint8_t kPaaFff2Skid[]  = { 0xE7, 0xEF, 0xEA, 0xC3, 0x33, 0x5C, 0x5F, 0xD0, 0xC3, 0xE6,
+                               0x34, 0x52, 0x9F, 0x16, 0x70, 0x46, 0xC4, 0xBC, 0xA5, 0x5C };
+
+    // SKID to trigger CHIP_ERROR_INVALID_ARGUMENT
+    uint8_t kPaaBadSkid1[] = { 0xE7, 0xEF, 0xEA, 0xC3, 0x33, 0x5C, 0xD0, 0xC3, 0xE6, 0x34,
+                               0x52, 0x9F, 0x16, 0x70, 0x46, 0xC4, 0xBC, 0xA5, 0x5C };
+    ByteSpan kPaaBadSkidSpan1{ kPaaBadSkid1 };
+
+    // SKID to trigger CHIP_ERROR_INVALID_ARGUMENT
+    ByteSpan kPaaBadSkidSpan2{ nullptr, sizeof(kPaaFff2Skid) };
+
+    // SKID to trigger CHIP_ERROR_CA_CERT_NOT_FOUND
+    uint8_t kPaaGoodSkidNotPresent[] = { 0xE7, 0xEF, 0xEA, 0xC3, 0x33, 0x5C, 0x5F, 0xD0, 0xC3, 0xE6,
+                                         0x34, 0x52, 0x9F, 0x16, 0x70, 0xFF, 0xFF, 0xBC, 0xA5, 0x5C };
+
+    struct TestCase
+    {
+        ByteSpan skidSpan;
+        ByteSpan startSpan;
+        CHIP_ERROR expectedResult;
+    };
+
+    const TestCase kTestCases[] = {
+        { .skidSpan = ByteSpan{ kPaaFff1Skid }, .startSpan = ByteSpan{ kPaaFff1Start }, .expectedResult = CHIP_NO_ERROR },
+        { .skidSpan = ByteSpan{ kPaaFff2Skid }, .startSpan = ByteSpan{ kPaaFff2Start }, .expectedResult = CHIP_NO_ERROR },
+        { .skidSpan       = ByteSpan{ kPaaFff2Skid },
+          .startSpan      = ByteSpan{ kPaaFff2Start },
+          .expectedResult = CHIP_ERROR_BUFFER_TOO_SMALL },
+        { .skidSpan = kPaaBadSkidSpan1, .startSpan = ByteSpan{}, .expectedResult = CHIP_ERROR_INVALID_ARGUMENT },
+        { .skidSpan = kPaaBadSkidSpan2, .startSpan = ByteSpan{}, .expectedResult = CHIP_ERROR_INVALID_ARGUMENT },
+        { .skidSpan = ByteSpan{ kPaaGoodSkidNotPresent }, .startSpan = ByteSpan{}, .expectedResult = CHIP_ERROR_CA_CERT_NOT_FOUND },
+    };
+
+    const AttestationTrustStore * testAttestationTrustStore = GetTestAttestationTrustStore();
+    NL_TEST_ASSERT(inSuite, testAttestationTrustStore != nullptr);
+
+    size_t testCaseIdx = 0;
+    for (const auto & testCase : kTestCases)
+    {
+        uint8_t buf[kMaxDERCertLength];
+        MutableByteSpan paaCertSpan{ buf };
+        if (testCase.expectedResult == CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            // Make the output much too small if checking for size handling
+            paaCertSpan = paaCertSpan.SubSpan(0, 16);
+        }
+
+        // Try to obtain cert
+        CHIP_ERROR result = testAttestationTrustStore->GetProductAttestationAuthorityCert(testCase.skidSpan, paaCertSpan);
+        NL_TEST_ASSERT(inSuite, result == testCase.expectedResult);
+
+        // In success cases, make sure the start of the cert matches expectation. Not using full certs
+        // to avoid repeating the known constants here.
+        if (testCase.expectedResult == CHIP_NO_ERROR)
+        {
+            NL_TEST_ASSERT(inSuite, paaCertSpan.size() > testCase.startSpan.size());
+            paaCertSpan = paaCertSpan.SubSpan(0, testCase.startSpan.size());
+            NL_TEST_ASSERT(inSuite, paaCertSpan.data_equal(testCase.startSpan) == true);
+        }
+        ++testCaseIdx;
+    }
+}
+
 /**
  *  Set up the test suite.
  */
@@ -326,6 +399,7 @@ int TestDeviceAttestation_Teardown(void * inContext)
 static const nlTest sTests[] = {
     NL_TEST_DEF("Test Example Device Attestation Credentials Providers", TestDACProvidersExample_Providers),
     NL_TEST_DEF("Test Example Device Attestation Signature", TestDACProvidersExample_Signature),
+    NL_TEST_DEF("Test the 'for testing' Paa Root Store", TestAttestationTrustStore),
     NL_TEST_DEF("Test Example Device Attestation Information Verification", TestDACVerifierExample_AttestationInfoVerification),
     NL_TEST_DEF("Test Example Device Attestation Certification Declaration Verification", TestDACVerifierExample_CertDeclarationVerification),
     NL_TEST_SENTINEL()

@@ -96,8 +96,8 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
     VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
-    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(commissioningTimeout) ==
-                     CHIP_NO_ERROR,
+    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
+                     commissioningTimeout, CommissioningWindowAdvertisement::kDnssdOnly) == CHIP_NO_ERROR,
                  status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     ChipLogProgress(Zcl, "Commissioning window is now open");
 

@@ -74,7 +74,7 @@ public:
     static constexpr Key kConfigKey_ManufacturingDate   = K32WConfigKey(kPDMId_ChipFactory, 0x04);
     static constexpr Key kConfigKey_SetupPinCode        = K32WConfigKey(kPDMId_ChipFactory, 0x05);
     static constexpr Key kConfigKey_MfrDeviceICACerts   = K32WConfigKey(kPDMId_ChipFactory, 0x06);
-    static constexpr Key kConfigKey_ProductRevision     = K32WConfigKey(kPDMId_ChipFactory, 0x07);
+    static constexpr Key kConfigKey_HardwareVersion     = K32WConfigKey(kPDMId_ChipFactory, 0x07);
     static constexpr Key kConfigKey_SetupDiscriminator  = K32WConfigKey(kPDMId_ChipFactory, 0x08);
     // CHIP Config Keys
     static constexpr Key kConfigKey_FabricId           = K32WConfigKey(kPDMId_ChipConfig, 0x00);
