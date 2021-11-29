@@ -111,6 +111,32 @@ CHIP_ERROR BytesCircularBuffer::Push(const ByteSpan & payload)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR BytesCircularBuffer::Push(const ByteSpan & payload1, const ByteSpan & payload2)
+{
+    size_t length = payload1.size() + payload2.size();
+    if (length > std::numeric_limits<SizeType>::max())
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    static_assert(std::numeric_limits<SizeType>::max() < std::numeric_limits<size_t>::max() - (sizeof(SizeType) + 1),
+                  "SizeType too large, may cause overflow");
+    size_t storageNeed = length + sizeof(SizeType) + 1;
+    if (storageNeed > mCapacity)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    // Free up space until there is enough space.
+    while (storageNeed > StorageAvailable())
+    {
+        VerifyOrDie(Pop() == CHIP_NO_ERROR);
+    }
+
+    SizeType size = static_cast<SizeType>(length);
+    Write(reinterpret_cast<uint8_t *>(&size), sizeof(size));
+    Write(payload1.data(), payload1.size());
+    Write(payload2.data(), payload2.size());
+
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR BytesCircularBuffer::Pop()
 {
     if (IsEmpty())
