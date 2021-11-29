@@ -30,9 +30,9 @@ jobs:
 
         strategy:
           matrix:
-             eventloop: [eventloop_same, eventloop_separate]
+             chip_tool: [no-ble-tsan, no-ble-tsan-same-event-loop]
         env:
-            USE_SEPARATE_EVENTLOOP: ${{ matrix.eventloop == 'eventloop_separate' }}
+            CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
@@ -67,13 +67,9 @@ jobs:
             - name: Build Apps
               timeout-minutes: 20
               run: |
-                  EVENT_LOOP_VARIANT=""; \
-                  if "$USE_SEPARATE_EVENTLOOP" -ne "true"; then \
-                    EVENT_LOOP_VARIANT="-same-event-loop"; \
-                  fi; \
                   ./scripts/run_in_build_env.sh \
                      "./scripts/build/build_examples.py \
-                        --target \"linux-x64-chip-tool-no-ble-tsan${EVENT_LOOP_VARIANT}\" \
+                        --target linux-x64-chip-tool-${CHIP_TOOL_VARIANT} \
                         --target linux-x64-all-clusters-no-ble-tsan \
                         --target linux-x64-tv-app-no-ble-tsan \
                         build \
@@ -89,7 +85,7 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py run \
                      --iterations 2 \
-                     --chip-tool ./out/linux-x64-chip-tool-no-ble-tsan${EVENT_LOOP_VARIANT}/chip-tool \
+                     --chip-tool ./out/linux-x64-chip-tool-{CHIP_TOOL_VARIANT}/chip-tool \
                      --all-clusters-app ./out/linux-x64-all-clusters-no-ble-tsan/chip-all-clusters-app \
                      --tv-app ./out/linux-x64-tv-app-no-ble-tsan/chip-tv-app \
                   "
