@@ -1,7 +1,6 @@
 package com.tcl.chip.chiptvserver.service;
 
 import android.content.Context;
-
 import androidx.annotation.NonNull;
 
 import com.tcl.chip.tvapp.ContentLaunchManagerStub;
@@ -20,6 +19,10 @@ import chip.platform.ChipMdnsCallbackImpl;
 import chip.platform.NsdManagerServiceResolver;
 import chip.platform.PreferencesConfigurationManager;
 import chip.platform.PreferencesKeyValueStoreManager;
+import com.tcl.chip.tvapp.KeypadInputManagerStub;
+import com.tcl.chip.tvapp.MediaInputManagerStub;
+import com.tcl.chip.tvapp.TvApp;
+import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 
 public class MatterServant {
 
