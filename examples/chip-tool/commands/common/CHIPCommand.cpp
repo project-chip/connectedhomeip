@@ -18,8 +18,8 @@
 
 #include "CHIPCommand.h"
 
-#include <controller/CHIPDeviceControllerFactory.h>
 #include "controller/ExampleOperationalCredentialsIssuer.h"
+#include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DefaultDeviceAttestationVerifier.h>
@@ -68,7 +68,7 @@ CHIP_ERROR CHIPCommand::Run()
     //        store the credentials in persistent storage, and
     //        generate when not available in the storage.
     ReturnLogErrorOnFailure(opCredsIssuer.GenerateNOCChainAfterValidation(mStorage.GetLocalNodeId(), mStorage.GetFabricId(),
-                                                                           ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+                                                                          ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     chip::Controller::FactoryInitParams factoryInitParams;
     factoryInitParams.fabricStorage = &mFabricStorage;
