@@ -93,6 +93,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/basic/basic.cpp
                ${APP_CLUSTERS}/bindings/bindings.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
+               ${APP_CLUSTERS}/access-control-server/access-control-server.cpp
                ${APP_CLUSTERS}/account-login-server/account-login-server.cpp
                ${APP_CLUSTERS}/application-launcher-server/application-launcher-server.cpp
                ${APP_CLUSTERS}/audio-output-server/audio-output-server.cpp   
