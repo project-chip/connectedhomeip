@@ -1,6 +1,6 @@
 /*
+ *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2018-2019 Google LLC.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,19 +15,6 @@
  *    limitations under the License.
  */
 
-/*
- *
- *    Description:
- *      This file defines processor-architecture-specific constants,
- *      interfaces and types required for LwIP performance
- *      measurement.
- *
- */
+#include "Globals.h"
 
-#ifndef CHIP_LWIP_FREERTOS_ARCH_PERF_H
-#define CHIP_LWIP_FREERTOS_ARCH_PERF_H
-
-#define PERF_START
-#define PERF_STOP(s)
-
-#endif /* CHIP_LWIP_FREERTOS_ARCH_PERF_H */
+LEDWidget statusLED1;

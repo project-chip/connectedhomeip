@@ -354,9 +354,3 @@ static constexpr chip::ClusterId ZCL_BINDING_CLUSTER_ID = 0xF000;
 
 // Definitions for cluster: Group Key Management
 static constexpr chip::ClusterId ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID = 0xF004;
-
-// Definitions for cluster: Sample Mfg Specific Cluster
-static constexpr chip::ClusterId ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID = 0xFC00;
-
-// Definitions for cluster: Sample Mfg Specific Cluster 2
-static constexpr chip::ClusterId ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_2_ID = 0xFC00;

@@ -15,5 +15,5 @@
 declare_args() {
   # Root directory for k32w SDK.
   k32w0_sdk_build_root =
-      "//third_party/connectedhomeip/third_party/k32w_sdk/nxp/k32w/k32w0"
+      "//third_party/connectedhomeip/third_party/nxp/k32w0_sdk"
 }

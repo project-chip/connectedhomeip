@@ -61,7 +61,6 @@
         "ha-devices.xml",
         "ha.xml",
         "lo-devices.xml",
-        "sample-extensions.xml",
         "types.xml",
         "zll-devices.xml",
         "zll.xml"

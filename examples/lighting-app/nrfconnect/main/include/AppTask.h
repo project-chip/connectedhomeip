@@ -21,9 +21,12 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
-#include "Rpc.h"
 
 #include <platform/CHIPDeviceLayer.h>
+
+#ifdef CONFIG_CHIP_PW_RPC
+#include "Rpc.h"
+#endif
 
 #ifdef CONFIG_MCUMGR_SMP_BT
 #include "DFUOverSMP.h"
@@ -43,9 +46,11 @@ public:
     void UpdateClusterState();
 
 private:
+#ifdef CONFIG_CHIP_PW_RPC
     friend class chip::rpc::NrfButton;
-    friend AppTask & GetAppTask(void);
+#endif
 
+    friend AppTask & GetAppTask(void);
     int Init();
 
     static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);

@@ -339,6 +339,13 @@ class ChipDeviceController(object):
                 print("Failed in getting the connected device: {}".format(err))
                 raise self._ChipStack.ErrorToException(err)
 
+        res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetDeviceBeingCommissioned(
+            self.devCtrl, nodeid, byref(returnDevice)))
+        if res == 0:
+            # TODO: give users more contrtol over whether they want to send this command over a PASE established connection
+            print('Using PASE connection')
+            return returnDevice
+
         res = self._ChipStack.Call(lambda: self._dmLib.pychip_GetConnectedDeviceByNodeId(
             self.devCtrl, nodeid, _DeviceAvailableFunct(DeviceAvailableCallback)))
         if res != 0:
@@ -422,15 +429,19 @@ class ChipDeviceController(object):
 
         nodeId: Target's Node ID
         attributes: A list of tuples of varying types depending on the type of read being requested:
-            ():                                         Endpoint = *,           Cluster = *,          Attribute = *
-            (Clusters.ClusterA):                        Endpoint = *,           Cluster = specific,   Attribute = *
-            (Clusters.ClusterA.AttributeA):             Endpoint = *,           Cluster = specific,   Attribute = specific
-            (endpoint, Clusters.ClusterA):              Endpoint = specific,    Cluster = specific,   Attribute = *
             (endpoint, Clusters.ClusterA.AttributeA):   Endpoint = specific,    Cluster = specific,   Attribute = specific
+            (endpoint, Clusters.ClusterA):              Endpoint = specific,    Cluster = specific,   Attribute = *
+            (Clusters.ClusterA.AttributeA):             Endpoint = *,           Cluster = specific,   Attribute = specific
+            endpoint:                                   Endpoint = specific,    Cluster = *,          Attribute = *
+            Clusters.ClusterA:                          Endpoint = *,           Cluster = specific,   Attribute = *
+            '*' or ():                                  Endpoint = *,           Cluster = *,          Attribute = *
 
         The cluster and attributes specified above are to be selected from the generated cluster objects.
 
-        NOTE: Only the last variant is currently supported.
+        e.g 
+            ReadAttribute(1, [ 1 ] ) -- case 4 above.
+            ReadAttribute(1, [ Clusters.Basic ] ) -- case 5 above.
+            ReadAttribute(1, [ (1, Clusters.Basic.Attributes.Location ] ) -- case 1 above.
         '''
 
         eventLoop = asyncio.get_running_loop()
@@ -442,19 +453,20 @@ class ChipDeviceController(object):
             endpoint = None
             cluster = None
             attribute = None
-            if v == () or v == ('*'):
+            if v == ('*') or v == ():
                 # Wildcard
                 pass
-            elif len(v) == 1:
-                if v[0] is int:
-                    endpoint = v[0]
-                elif issubclass(v[0], ClusterObjects.Cluster):
-                    cluster = v[0]
-                elif issubclass(v[0], ClusterObjects.ClusterAttributeDescriptor):
-                    attribute = v[0]
+            elif type(v) is not tuple:
+                print(type(v))
+                if type(v) is int:
+                    endpoint = v
+                elif issubclass(v, ClusterObjects.Cluster):
+                    cluster = v
+                elif issubclass(v, ClusterObjects.ClusterAttributeDescriptor):
+                    attribute = v
                 else:
                     raise ValueError("Unsupported Attribute Path")
-            elif len(v) == 2:
+            else:
                 # endpoint + (cluster) attribute / endpoint + cluster
                 endpoint = v[0]
                 if issubclass(v[1], ClusterObjects.Cluster):
@@ -624,6 +636,10 @@ class ChipDeviceController(object):
             self._dmLib.pychip_GetConnectedDeviceByNodeId.argtypes = [
                 c_void_p, c_uint64, _DeviceAvailableFunct]
             self._dmLib.pychip_GetConnectedDeviceByNodeId.restype = c_uint32
+
+            self._dmLib.pychip_GetDeviceBeingCommissioned.argtypes = [
+                c_void_p, c_uint64, c_void_p]
+            self._dmLib.pychip_GetDeviceBeingCommissioned.restype = c_uint32
 
             self._dmLib.pychip_DeviceCommissioner_CloseBleConnection.argtypes = [
                 c_void_p]
