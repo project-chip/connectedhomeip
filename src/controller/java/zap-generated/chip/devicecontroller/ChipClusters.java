@@ -10727,6 +10727,11 @@ public class ChipClusters {
       testListInt8UReverseRequest(chipClusterPtr, callback, arg1);
     }
 
+    public void testListNestedStructListArgumentRequest(
+        BooleanResponseCallback callback, Integer a, Boolean b, Long e, byte[] f, Integer g) {
+      testListNestedStructListArgumentRequest(chipClusterPtr, callback, a, b, e, f, g);
+    }
+
     public void testListStructArgumentRequest(
         BooleanResponseCallback callback,
         Integer a,
@@ -10738,6 +10743,16 @@ public class ChipClusters {
         Float g,
         Double h) {
       testListStructArgumentRequest(chipClusterPtr, callback, a, b, c, d, e, f, g, h);
+    }
+
+    public void testNestedStructArgumentRequest(
+        BooleanResponseCallback callback, Integer a, Boolean b) {
+      testNestedStructArgumentRequest(chipClusterPtr, callback, a, b);
+    }
+
+    public void testNestedStructListArgumentRequest(
+        BooleanResponseCallback callback, Integer a, Boolean b, Long e, byte[] f, Integer g) {
+      testNestedStructListArgumentRequest(chipClusterPtr, callback, a, b, e, f, g);
     }
 
     public void testNotHandled(DefaultClusterCallback callback) {
@@ -10796,6 +10811,15 @@ public class ChipClusters {
     private native void testListInt8UReverseRequest(
         long chipClusterPtr, TestListInt8UReverseResponseCallback Callback, Integer arg1);
 
+    private native void testListNestedStructListArgumentRequest(
+        long chipClusterPtr,
+        BooleanResponseCallback Callback,
+        Integer a,
+        Boolean b,
+        Long e,
+        byte[] f,
+        Integer g);
+
     private native void testListStructArgumentRequest(
         long chipClusterPtr,
         BooleanResponseCallback Callback,
@@ -10807,6 +10831,18 @@ public class ChipClusters {
         Integer f,
         Float g,
         Double h);
+
+    private native void testNestedStructArgumentRequest(
+        long chipClusterPtr, BooleanResponseCallback Callback, Integer a, Boolean b);
+
+    private native void testNestedStructListArgumentRequest(
+        long chipClusterPtr,
+        BooleanResponseCallback Callback,
+        Integer a,
+        Boolean b,
+        Long e,
+        byte[] f,
+        Integer g);
 
     private native void testNotHandled(long chipClusterPtr, DefaultClusterCallback Callback);
 

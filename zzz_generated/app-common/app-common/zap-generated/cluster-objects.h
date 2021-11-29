@@ -28411,7 +28411,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 };
 
 struct DecodableType

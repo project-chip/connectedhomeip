@@ -912,7 +912,6 @@ tests:
 
     - label:
           "Send Test Command With Nested Struct Argument and arg1.c.b is true"
-      disabled: true
       command: "testNestedStructArgumentRequest"
       arguments:
           values:
@@ -939,7 +938,6 @@ tests:
                 value: true
 
     - label: "Send Test Command With Nested Struct Argument arg1.c.b is false"
-      disabled: true
       command: "testNestedStructArgumentRequest"
       arguments:
           values:
@@ -968,7 +966,6 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and all fields b
           of arg1.d are true"
-      disabled: true
       command: "testNestedStructListArgumentRequest"
       arguments:
           values:
@@ -1023,12 +1020,11 @@ tests:
       response:
           values:
               - name: "value"
-                value: false
+                value: true
 
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
           of arg1.d are false"
-      disabled: true
       command: "testNestedStructListArgumentRequest"
       arguments:
           values:
@@ -1236,7 +1232,6 @@ tests:
     - label:
           "Send Test Command With List of Nested Struct List Argument and all
           fields b of elements of arg1.d are true"
-      disabled: true
       command: "testListNestedStructListArgumentRequest"
       arguments:
           values:
@@ -1298,7 +1293,6 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
           of elements of arg1.d are false"
-      disabled: true
       command: "testListNestedStructListArgumentRequest"
       arguments:
           values:
@@ -2084,7 +2078,6 @@ tests:
     - label: "Read attribute NULLABLE_CHAR_STRING"
       command: "readAttribute"
       attribute: "nullable_char_string"
-      disabled: true
       response:
           value: "☉T☉"
 
