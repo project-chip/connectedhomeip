@@ -58,7 +58,7 @@ protected:
     ChipDevice * mDevice;
     chip::NodeId mNodeId;
 
-    static void OnDeviceConnectedFn(void * context, chip::DeviceProxy * device);
+    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
     static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context);
 

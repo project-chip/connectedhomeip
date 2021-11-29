@@ -96,7 +96,7 @@ class {{asUpperCamelCase name}}(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return {{ asHex code 4 }}
+                return {{ asMEI manufacturerCode code }}
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:

@@ -29,7 +29,7 @@
 
 #ifndef VERHOEFF16_NO_MULTIPLY_TABLE
 
-uint8_t Verhoeff16::sMultiplyTable[] = {
+const uint8_t Verhoeff16::sMultiplyTable[] = {
     0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 1,  2,  3,  4,  5,  6,  7,  0,  9,  10, 11, 12, 13, 14, 15, 8,
     2,  3,  4,  5,  6,  7,  0,  1,  10, 11, 12, 13, 14, 15, 8,  9,  3,  4,  5,  6,  7,  0,  1,  2,  11, 12, 13, 14, 15, 8,  9,  10,
     4,  5,  6,  7,  0,  1,  2,  3,  12, 13, 14, 15, 8,  9,  10, 11, 5,  6,  7,  0,  1,  2,  3,  4,  13, 14, 15, 8,  9,  10, 11, 12,
@@ -42,7 +42,7 @@ uint8_t Verhoeff16::sMultiplyTable[] = {
 
 #endif // VERHOEFF16_NO_MULTIPLY_TABLE
 
-uint8_t Verhoeff16::sPermTable[] = { 4, 7, 5, 14, 8, 12, 15, 0, 2, 11, 3, 13, 10, 6, 9, 1 };
+const uint8_t Verhoeff16::sPermTable[] = { 4, 7, 5, 14, 8, 12, 15, 0, 2, 11, 3, 13, 10, 6, 9, 1 };
 
 char Verhoeff16::ComputeCheckChar(const char * str)
 {
