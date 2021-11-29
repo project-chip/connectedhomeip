@@ -54,7 +54,7 @@ tests:
               - name: "applicationId"
                 value: "NonAvailableApp"
       response:
-          error: 1
+          error: 0x88 # UNSUPPORTED_WRITE
 
     # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"

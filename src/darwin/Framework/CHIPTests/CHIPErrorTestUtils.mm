@@ -40,8 +40,20 @@ NS_ASSUME_NONNULL_BEGIN
     switch (error.code) {
     case CHIPErrorCodeDuplicateExists:
         return EMBER_ZCL_STATUS_DUPLICATE_EXISTS;
+    case CHIPErrorCodeUnsupportedEndpoint:
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
+    case CHIPErrorCodeUnsupportedCommand:
+        return EMBER_ZCL_STATUS_UNSUPPORTED_COMMAND;
+    case CHIPErrorCodeInvalidCommand:
+        return EMBER_ZCL_STATUS_INVALID_COMMAND;
     case CHIPErrorCodeUnsupportedAttribute:
         return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE;
+    case CHIPErrorCodeConstraintError:
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    case CHIPErrorCodeUnsupportedWrite:
+        return EMBER_ZCL_STATUS_UNSUPPORTED_WRITE;
+    case CHIPErrorCodeUnsupportedCluster:
+        return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
     case CHIPSuccess:
         return EMBER_ZCL_STATUS_SUCCESS;
     default:
