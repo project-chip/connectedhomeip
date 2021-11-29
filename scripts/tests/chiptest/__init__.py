@@ -33,6 +33,9 @@ def AllTests(chip_tool: str):
     result = subprocess.run([chip_tool, 'tests', 'list'], capture_output=True)
 
     for name in result.stdout.decode('utf8').split('\n'):
+        if not name:
+            continue
+
         if name.startswith('TV_'):
             target = TestTarget.TV
         else:
