@@ -90,7 +90,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back the mandatory non-global attribute: StatusFlags"
       command: "readAttribute"
@@ -214,7 +214,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back the optional non-global attribute: Polarity"
       disabled: true
@@ -273,7 +273,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back the optional non-global attribute: ApplicationType"
       disabled: true

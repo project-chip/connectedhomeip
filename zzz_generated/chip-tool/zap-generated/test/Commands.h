@@ -270,7 +270,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -674,7 +674,7 @@ private:
 
     void OnFailureResponse_9(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -1133,7 +1133,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -1313,7 +1313,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -1413,7 +1413,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -3443,7 +3443,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -3522,7 +3522,7 @@ private:
 
     void OnFailureResponse_6(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -3601,7 +3601,7 @@ private:
 
     void OnFailureResponse_10(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -3680,7 +3680,7 @@ private:
 
     void OnFailureResponse_14(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -3872,7 +3872,7 @@ private:
 
     void OnFailureResponse_24(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -3969,7 +3969,7 @@ private:
 
     void OnFailureResponse_29(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -4047,7 +4047,7 @@ private:
 
     void OnFailureResponse_33(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -4125,7 +4125,7 @@ private:
 
     void OnFailureResponse_37(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -4203,7 +4203,7 @@ private:
 
     void OnFailureResponse_41(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -4281,7 +4281,7 @@ private:
 
     void OnFailureResponse_45(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -4360,7 +4360,7 @@ private:
 
     void OnFailureResponse_49(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -4439,7 +4439,7 @@ private:
 
     void OnFailureResponse_53(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -4518,7 +4518,7 @@ private:
 
     void OnFailureResponse_57(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -4577,7 +4577,7 @@ private:
 
     void OnFailureResponse_60(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -4712,7 +4712,7 @@ private:
 
     void OnFailureResponse_67(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -4772,7 +4772,7 @@ private:
 
     void OnFailureResponse_70(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -4852,7 +4852,7 @@ private:
 
     void OnFailureResponse_74(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -4912,7 +4912,7 @@ private:
 
     void OnFailureResponse_77(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -4972,7 +4972,7 @@ private:
 
     void OnFailureResponse_80(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -5051,7 +5051,7 @@ private:
 
     void OnFailureResponse_84(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -5111,7 +5111,7 @@ private:
 
     void OnFailureResponse_87(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -5190,7 +5190,7 @@ private:
 
     void OnFailureResponse_91(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -5250,7 +5250,7 @@ private:
 
     void OnFailureResponse_94(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -5329,7 +5329,7 @@ private:
 
     void OnFailureResponse_98(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -5389,7 +5389,7 @@ private:
 
     void OnFailureResponse_101(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -5468,7 +5468,7 @@ private:
 
     void OnFailureResponse_105(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -5528,7 +5528,7 @@ private:
 
     void OnFailureResponse_108(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -5607,7 +5607,7 @@ private:
 
     void OnFailureResponse_112(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -5667,7 +5667,7 @@ private:
 
     void OnFailureResponse_115(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -14043,7 +14043,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -14143,7 +14143,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -14375,7 +14375,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -14396,7 +14396,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -14695,7 +14695,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -14795,7 +14795,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -16176,7 +16176,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -16893,7 +16893,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -17103,7 +17103,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -17163,7 +17163,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -17224,7 +17224,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -17524,7 +17524,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -17583,7 +17583,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -20085,7 +20085,7 @@ private:
 
     void OnFailureResponse_2(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -20309,7 +20309,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -20368,7 +20368,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -20427,7 +20427,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -20527,7 +20527,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -21164,7 +21164,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -21521,7 +21521,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -21816,7 +21816,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -22782,7 +22782,7 @@ private:
 
     void OnFailureResponse_3(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -22862,7 +22862,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -22942,7 +22942,7 @@ private:
 
     void OnFailureResponse_11(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -23022,7 +23022,7 @@ private:
 
     void OnFailureResponse_15(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -23763,7 +23763,7 @@ private:
 
     void OnFailureResponse_54(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -23822,7 +23822,7 @@ private:
 
     void OnFailureResponse_57(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -23862,7 +23862,7 @@ private:
 
     void OnFailureResponse_59(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -25501,7 +25501,7 @@ private:
 
     void OnFailureResponse_0(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -26512,7 +26512,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -26701,7 +26701,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -26762,7 +26762,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -27606,7 +27606,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -27667,7 +27667,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -27728,7 +27728,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -27789,7 +27789,7 @@ private:
 
     void OnFailureResponse_10(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -27907,7 +27907,7 @@ private:
 
     void OnFailureResponse_16(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -27969,7 +27969,7 @@ private:
 
     void OnFailureResponse_19(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -28031,7 +28031,7 @@ private:
 
     void OnFailureResponse_22(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -28093,7 +28093,7 @@ private:
 
     void OnFailureResponse_25(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -28154,7 +28154,7 @@ private:
 
     void OnFailureResponse_28(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -28215,7 +28215,7 @@ private:
 
     void OnFailureResponse_31(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -28276,7 +28276,7 @@ private:
 
     void OnFailureResponse_34(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -28337,7 +28337,7 @@ private:
 
     void OnFailureResponse_37(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -28398,7 +28398,7 @@ private:
 
     void OnFailureResponse_40(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -28459,7 +28459,7 @@ private:
 
     void OnFailureResponse_43(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -28520,7 +28520,7 @@ private:
 
     void OnFailureResponse_46(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -28581,7 +28581,7 @@ private:
 
     void OnFailureResponse_49(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -28642,7 +28642,7 @@ private:
 
     void OnFailureResponse_52(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 136));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
@@ -34215,7 +34215,7 @@ private:
 
     void OnFailureResponse_1(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 133));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_INVALID_COMMAND));
         NextTest();
     }
 
@@ -34302,7 +34302,7 @@ private:
 
     void OnFailureResponse_4(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 133));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_INVALID_COMMAND));
         NextTest();
     }
 
@@ -35926,7 +35926,7 @@ private:
 
     void OnFailureResponse_93(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -36123,7 +36123,7 @@ private:
 
     void OnFailureResponse_103(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -37394,7 +37394,7 @@ private:
 
     void OnFailureResponse_152(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -37508,7 +37508,7 @@ private:
 
     void OnFailureResponse_158(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -37622,7 +37622,7 @@ private:
 
     void OnFailureResponse_164(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -37736,7 +37736,7 @@ private:
 
     void OnFailureResponse_170(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -37850,7 +37850,7 @@ private:
 
     void OnFailureResponse_176(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -37964,7 +37964,7 @@ private:
 
     void OnFailureResponse_182(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -38078,7 +38078,7 @@ private:
 
     void OnFailureResponse_188(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -38192,7 +38192,7 @@ private:
 
     void OnFailureResponse_194(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -38306,7 +38306,7 @@ private:
 
     void OnFailureResponse_200(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -38420,7 +38420,7 @@ private:
 
     void OnFailureResponse_206(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -38534,7 +38534,7 @@ private:
 
     void OnFailureResponse_212(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -38648,7 +38648,7 @@ private:
 
     void OnFailureResponse_218(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -38762,7 +38762,7 @@ private:
 
     void OnFailureResponse_224(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -38876,7 +38876,7 @@ private:
 
     void OnFailureResponse_230(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
@@ -44302,7 +44302,7 @@ private:
 
     void OnFailureResponse_7(uint8_t status)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 

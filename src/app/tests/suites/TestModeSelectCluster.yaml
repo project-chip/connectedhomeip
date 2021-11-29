@@ -64,8 +64,6 @@ tests:
           values:
               - name: "NewMode"
                 value: 4
-      response:
-          error: 0
 
     - label: "Verify Current Mode Change"
       command: "readAttribute"
@@ -80,4 +78,4 @@ tests:
               - name: "NewMode"
                 value: 2
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR

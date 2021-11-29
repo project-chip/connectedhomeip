@@ -25,7 +25,7 @@ tests:
     - label: "Send Test Not Handled Command"
       command: "testNotHandled"
       response:
-          error: 0x85 # INVALID_COMMAND
+          error: INVALID_COMMAND
 
     - label: "Send Test Specific Command"
       command: "testSpecific"
@@ -56,7 +56,7 @@ tests:
               - name: "arg2"
                 value: 6
       response:
-          error: 0x85 # INVALID_COMMAND
+          error: INVALID_COMMAND
 
     # Tests for Boolean attribute
 
@@ -624,7 +624,7 @@ tests:
       arguments:
           value: "TestValueLongerThan10"
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute OCTET_STRING"
       command: "readAttribute"
@@ -690,7 +690,7 @@ tests:
       arguments:
           value: "☉TestValueLongerThan10☉"
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
@@ -816,7 +816,7 @@ tests:
       response:
           # No such endpoint, so expect an error.
           # SDK returning wrong error code here so far.
-          errorWrongValue: 0x7F # UNSUPPORTED_ENDPOINT
+          errorWrongValue: UNSUPPORTED_ENDPOINT
 
     - label: "Send Test Command to unsupported cluster"
       command: "test"
@@ -824,7 +824,7 @@ tests:
       response:
           # No TestCluster on that, so expect an error.
           # SDK returning wrong error code here so far.
-          errorWrongValue: 0xC3 # UNSUPPORTED_CLUSTER
+          errorWrongValue: UNSUPPORTED_CLUSTER
 
     # Tests for vendor id
 
@@ -1480,7 +1480,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP8 unchanged Value"
       command: "readAttribute"
@@ -1520,7 +1520,7 @@ tests:
       arguments:
           value: 65535
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP16 unchanged Value"
       command: "readAttribute"
@@ -1560,7 +1560,7 @@ tests:
       arguments:
           value: 4294967295
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP32 unchanged Value"
       command: "readAttribute"
@@ -1600,7 +1600,7 @@ tests:
       arguments:
           value: "18446744073709551615"
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP64 unchanged Value"
       command: "readAttribute"
@@ -1640,7 +1640,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT8U unchanged Value"
       command: "readAttribute"
@@ -1680,7 +1680,7 @@ tests:
       arguments:
           value: 65535
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT16U unchanged Value"
       command: "readAttribute"
@@ -1720,7 +1720,7 @@ tests:
       arguments:
           value: 4294967295
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT32U unchanged Value"
       command: "readAttribute"
@@ -1760,7 +1760,7 @@ tests:
       arguments:
           value: "18446744073709551615"
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT64U unchanged Value"
       command: "readAttribute"
@@ -1800,7 +1800,7 @@ tests:
       arguments:
           value: -128
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT8S unchanged Value"
       command: "readAttribute"
@@ -1840,7 +1840,7 @@ tests:
       arguments:
           value: -32768
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT16S unchanged Value"
       command: "readAttribute"
@@ -1880,7 +1880,7 @@ tests:
       arguments:
           value: -2147483648
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT32S unchanged Value"
       command: "readAttribute"
@@ -1923,7 +1923,7 @@ tests:
           # work around that.
           value: "-9223372036854775807LL - 1"
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT64S unchanged Value"
       command: "readAttribute"
@@ -1963,7 +1963,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_ENUM8 unchanged Value"
       command: "readAttribute"
@@ -2003,7 +2003,7 @@ tests:
       arguments:
           value: 65535
       response:
-          error: 0x87 # CONSTRAINT_ERROR
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_ENUM16 unchanged Value"
       command: "readAttribute"
@@ -2118,7 +2118,7 @@ tests:
       attribute: "list_int8u"
       response:
           # SDK returning wrong error code here so far.
-          errorWrongValue: 0x7F # UNSUPPORTED_ENDPOINT
+          errorWrongValue: UNSUPPORTED_ENDPOINT
 
     - label: "Read attribute from nonexistent cluster."
       endpoint: 0
@@ -2126,4 +2126,4 @@ tests:
       attribute: "list_int8u"
       response:
           # SDK returning wrong error code here so far.
-          errorWrongValue: 0xC3 # UNSUPPORTED_CLUSTER
+          errorWrongValue: UNSUPPORTED_CLUSTER
