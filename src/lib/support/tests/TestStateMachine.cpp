@@ -117,9 +117,7 @@ struct Transitions
         }
         else if (state.Is<State2>() && event.Is<Event4>())
         {
-            // Potentially unintended behavior - dispatches an event,
-            // but terminates in State1 anyway.
-            mCtx.Dispatch(Event::Create<Event2>());
+            // mCtx.Dispatch(Event::Create<Event2>()); // dsipatching an event and returning a transition would be illegal
             return mFactory.CreateState1();
         }
         else
@@ -168,15 +166,21 @@ void TestTransitions(nlTestSuite * inSuite, void * inContext)
 {
     // in State1
     SimpleStateMachine fsm;
-    // transition to State2
+    // dispatch Event2 to transition to State2
     fsm.mStateMachine.Dispatch(Event::Create<Event2>());
     NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State2>());
-    // transition back to State1
+    // dispatch Event1 to transition back to State1
     fsm.mStateMachine.Dispatch(Event::Create<Event1>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State1>());
+    // dispatch Event2 to transition to State2
+    fsm.mStateMachine.Dispatch(Event::Create<Event2>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State2>());
+    // dispatch Event4 to transitions to State1.
+    fsm.mStateMachine.Dispatch(Event::Create<Event4>());
     NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State1>());
 }
 
-void TestDispatchFromTransitionsTable(nlTestSuite * inSuite, void * inContext)
+void TestTransitionsDispatch(nlTestSuite * inSuite, void * inContext)
 {
     // in State1
     SimpleStateMachine fsm;
@@ -184,20 +188,6 @@ void TestDispatchFromTransitionsTable(nlTestSuite * inSuite, void * inContext)
     // table and ultimately places us in State2.
     fsm.mStateMachine.Dispatch(Event::Create<Event4>());
     NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State2>());
-}
-
-void TestDispatchAndTransitioinFromTransitionTable(nlTestSuite * inSuite, void * inContext)
-{
-    // in State1
-    SimpleStateMachine fsm;
-    // transition to State2
-    fsm.mStateMachine.Dispatch(Event::Create<Event2>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State2>());
-    // Dispatch Event4, which dispatches Event2 and transitions to State1.
-    // Transition to State1 occurs after dispatch of Event2, and so this
-    // is where we ultimately arrive.
-    fsm.mStateMachine.Dispatch(Event::Create<Event4>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State1>());
 }
 
 void TestMethodExec(nlTestSuite * inSuite, void * inContext)
@@ -246,8 +236,7 @@ static const nlTest sTests[] = {
     NL_TEST_DEF("TestInit", TestInit),
     NL_TEST_DEF("TestIgnoredEvents", TestIgnoredEvents),
     NL_TEST_DEF("TestTransitions", TestTransitions),
-    NL_TEST_DEF("TestDispatchFromTransitionsTable", TestDispatchFromTransitionsTable),
-    NL_TEST_DEF("TestDispatchAndTransitioinFromTransitionTable", TestDispatchAndTransitioinFromTransitionTable),
+    NL_TEST_DEF("TestTransitionsDispatch", TestTransitionsDispatch),
     NL_TEST_DEF("TestMethodExec", TestMethodExec),
     NL_TEST_SENTINEL(),
 };

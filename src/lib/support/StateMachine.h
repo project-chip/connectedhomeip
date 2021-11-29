@@ -191,6 +191,13 @@ public:
  *   }
  * @endcode
  *
+ * The rules for calling Dispatch from within the state machien are as follows:
+ *
+ * (1) Only the State::Enter method should call Dispatch.  Calls from Exit or
+ *     LogTransition will cause an abort.
+ * (2) The transitions table may return a new state OR call Dispatch, but must
+ *     never do both.  Doing both will cause an abort.
+ *
  * @tparam TState a variant holding the States.
  * @tparam TEvent a variant holding the Events.
  * @tparam TTransitions an object that implements the () operator for transitions.
@@ -199,10 +206,12 @@ template <typename TState, typename TEvent, typename TTransitions>
 class StateMachine : public Context<TEvent>
 {
 public:
-    StateMachine(TTransitions & tr) : mCurrentState(tr.GetInitState()), mTransitions(tr) {}
+    StateMachine(TTransitions & tr) : mCurrentState(tr.GetInitState()), mTransitions(tr), mSequence(0) {}
     ~StateMachine() override = default;
     void Dispatch(const TEvent & evt) override
     {
+        ++mSequence;
+        auto prev     = mSequence;
         auto newState = mTransitions(mCurrentState, evt);
         if (newState.HasValue())
         {
@@ -210,12 +219,17 @@ public:
             oldState.Exit();
             mCurrentState = newState.Value();
             mCurrentState.LogTransition(oldState.GetName());
+            // It is impermissible to dispatch events from Exit() or
+            // LogTransition(), or from the transitions table when a transition
+            // has also been returned.  Verify that this hasn't occured.
+            VerifyOrDie(prev == mSequence);
             mCurrentState.Enter();
         }
     }
 
     TState mCurrentState;
     TTransitions & mTransitions;
+    unsigned mSequence;
 };
 
 } // namespace StateMachine
