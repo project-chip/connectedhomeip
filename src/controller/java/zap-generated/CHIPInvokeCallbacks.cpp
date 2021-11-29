@@ -145,8 +145,8 @@ void CHIPApplicationLauncherClusterLaunchAppResponseCallback::CallbackFn(
 
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus>(
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
     jobject data;
 
     data = chip::UtfString(env, dataResponse.data).jniValue();
@@ -214,9 +214,9 @@ void CHIPContentLauncherClusterLaunchContentResponseCallback::CallbackFn(
 
     std::string contentLaunchStatusClassName     = "java/lang/Integer";
     std::string contentLaunchStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(contentLaunchStatusClassName.c_str(),
-                                                                  contentLaunchStatusCtorSignature.c_str(),
-                                                                  dataResponse.contentLaunchStatus, contentLaunchStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(
+        contentLaunchStatusClassName.c_str(), contentLaunchStatusCtorSignature.c_str(), dataResponse.contentLaunchStatus,
+        contentLaunchStatus);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, data, contentLaunchStatus);
 }
@@ -280,9 +280,9 @@ void CHIPContentLauncherClusterLaunchURLResponseCallback::CallbackFn(
 
     std::string contentLaunchStatusClassName     = "java/lang/Integer";
     std::string contentLaunchStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(contentLaunchStatusClassName.c_str(),
-                                                                  contentLaunchStatusCtorSignature.c_str(),
-                                                                  dataResponse.contentLaunchStatus, contentLaunchStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(
+        contentLaunchStatusClassName.c_str(), contentLaunchStatusCtorSignature.c_str(), dataResponse.contentLaunchStatus,
+        contentLaunchStatus);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, data, contentLaunchStatus);
 }
@@ -343,8 +343,8 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback::CallbackFn(
 
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DiagnosticLogs::LogsStatus>(
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
     jobject content;
 
     content = chip::ByteArray(env, dataResponse.content).jniValue();
@@ -1036,14 +1036,14 @@ void CHIPDoorLockClusterGetPinResponseCallback::CallbackFn(
 
     std::string userStatusClassName     = "java/lang/Integer";
     std::string userStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(userStatusClassName.c_str(), userStatusCtorSignature.c_str(),
-                                                                  dataResponse.userStatus, userStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DoorLockUserStatus>(
+        userStatusClassName.c_str(), userStatusCtorSignature.c_str(), dataResponse.userStatus, userStatus);
     jobject userType;
 
     std::string userTypeClassName     = "java/lang/Integer";
     std::string userTypeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(userTypeClassName.c_str(), userTypeCtorSignature.c_str(),
-                                                                  dataResponse.userType, userType);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DoorLockUserType>(
+        userTypeClassName.c_str(), userTypeCtorSignature.c_str(), dataResponse.userType, userType);
     jobject pin;
 
     pin = chip::ByteArray(env, dataResponse.pin).jniValue();
@@ -1112,14 +1112,14 @@ void CHIPDoorLockClusterGetRfidResponseCallback::CallbackFn(
 
     std::string userStatusClassName     = "java/lang/Integer";
     std::string userStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(userStatusClassName.c_str(), userStatusCtorSignature.c_str(),
-                                                                  dataResponse.userStatus, userStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DoorLockUserStatus>(
+        userStatusClassName.c_str(), userStatusCtorSignature.c_str(), dataResponse.userStatus, userStatus);
     jobject userType;
 
     std::string userTypeClassName     = "java/lang/Integer";
     std::string userTypeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(userTypeClassName.c_str(), userTypeCtorSignature.c_str(),
-                                                                  dataResponse.userType, userType);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DoorLockUserType>(
+        userTypeClassName.c_str(), userTypeCtorSignature.c_str(), dataResponse.userType, userType);
     jobject rfid;
 
     rfid = chip::ByteArray(env, dataResponse.rfid).jniValue();
@@ -1188,8 +1188,8 @@ void CHIPDoorLockClusterGetUserTypeResponseCallback::CallbackFn(
 
     std::string userTypeClassName     = "java/lang/Integer";
     std::string userTypeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(userTypeClassName.c_str(), userTypeCtorSignature.c_str(),
-                                                                  dataResponse.userType, userType);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DoorLockUserType>(
+        userTypeClassName.c_str(), userTypeCtorSignature.c_str(), dataResponse.userType, userType);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, userId, userType);
 }
@@ -1564,8 +1564,8 @@ void CHIPDoorLockClusterSetPinResponseCallback::CallbackFn(
 
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus>(
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status);
 }
@@ -1624,8 +1624,8 @@ void CHIPDoorLockClusterSetRfidResponseCallback::CallbackFn(
 
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::DoorLock::DoorLockSetPinOrIdStatus>(
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status);
 }
@@ -1990,8 +1990,8 @@ void CHIPGeneralCommissioningClusterArmFailSafeResponseCallback::CallbackFn(
 
     std::string errorCodeClassName     = "java/lang/Integer";
     std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  dataResponse.errorCode, errorCode);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError>(
+        errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(), dataResponse.errorCode, errorCode);
     jobject debugText;
 
     debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
@@ -2058,8 +2058,8 @@ void CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback::Callb
 
     std::string errorCodeClassName     = "java/lang/Integer";
     std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  dataResponse.errorCode, errorCode);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError>(
+        errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(), dataResponse.errorCode, errorCode);
     jobject debugText;
 
     debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
@@ -2126,8 +2126,8 @@ void CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback::Callbac
 
     std::string errorCodeClassName     = "java/lang/Integer";
     std::string errorCodeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(),
-                                                                  dataResponse.errorCode, errorCode);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::GeneralCommissioning::GeneralCommissioningError>(
+        errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(), dataResponse.errorCode, errorCode);
     jobject debugText;
 
     debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
@@ -2517,8 +2517,8 @@ void CHIPKeypadInputClusterSendKeyResponseCallback::CallbackFn(
 
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::KeypadInput::KeypadInputStatus>(
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status);
 }
@@ -2579,9 +2579,9 @@ void CHIPMediaPlaybackClusterMediaFastForwardResponseCallback::CallbackFn(
 
     std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
     std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(mediaPlaybackStatusClassName.c_str(),
-                                                                  mediaPlaybackStatusCtorSignature.c_str(),
-                                                                  dataResponse.mediaPlaybackStatus, mediaPlaybackStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
+        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
+        mediaPlaybackStatus);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
 }
@@ -2641,9 +2641,9 @@ void CHIPMediaPlaybackClusterMediaNextResponseCallback::CallbackFn(
 
     std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
     std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(mediaPlaybackStatusClassName.c_str(),
-                                                                  mediaPlaybackStatusCtorSignature.c_str(),
-                                                                  dataResponse.mediaPlaybackStatus, mediaPlaybackStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
+        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
+        mediaPlaybackStatus);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
 }
@@ -2703,9 +2703,9 @@ void CHIPMediaPlaybackClusterMediaPauseResponseCallback::CallbackFn(
 
     std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
     std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(mediaPlaybackStatusClassName.c_str(),
-                                                                  mediaPlaybackStatusCtorSignature.c_str(),
-                                                                  dataResponse.mediaPlaybackStatus, mediaPlaybackStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
+        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
+        mediaPlaybackStatus);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
 }
@@ -2765,9 +2765,9 @@ void CHIPMediaPlaybackClusterMediaPlayResponseCallback::CallbackFn(
 
     std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
     std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(mediaPlaybackStatusClassName.c_str(),
-                                                                  mediaPlaybackStatusCtorSignature.c_str(),
-                                                                  dataResponse.mediaPlaybackStatus, mediaPlaybackStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
+        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
+        mediaPlaybackStatus);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
 }
@@ -2827,9 +2827,9 @@ void CHIPMediaPlaybackClusterMediaPreviousResponseCallback::CallbackFn(
 
     std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
     std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(mediaPlaybackStatusClassName.c_str(),
-                                                                  mediaPlaybackStatusCtorSignature.c_str(),
-                                                                  dataResponse.mediaPlaybackStatus, mediaPlaybackStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
+        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
+        mediaPlaybackStatus);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
 }
@@ -2889,9 +2889,9 @@ void CHIPMediaPlaybackClusterMediaRewindResponseCallback::CallbackFn(
 
     std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
     std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(mediaPlaybackStatusClassName.c_str(),
-                                                                  mediaPlaybackStatusCtorSignature.c_str(),
-                                                                  dataResponse.mediaPlaybackStatus, mediaPlaybackStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
+        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
+        mediaPlaybackStatus);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
 }
@@ -2951,9 +2951,9 @@ void CHIPMediaPlaybackClusterMediaSeekResponseCallback::CallbackFn(
 
     std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
     std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(mediaPlaybackStatusClassName.c_str(),
-                                                                  mediaPlaybackStatusCtorSignature.c_str(),
-                                                                  dataResponse.mediaPlaybackStatus, mediaPlaybackStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
+        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
+        mediaPlaybackStatus);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
 }
@@ -3014,9 +3014,9 @@ void CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallback::CallbackFn(
 
     std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
     std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(mediaPlaybackStatusClassName.c_str(),
-                                                                  mediaPlaybackStatusCtorSignature.c_str(),
-                                                                  dataResponse.mediaPlaybackStatus, mediaPlaybackStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
+        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
+        mediaPlaybackStatus);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
 }
@@ -3077,9 +3077,9 @@ void CHIPMediaPlaybackClusterMediaSkipForwardResponseCallback::CallbackFn(
 
     std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
     std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(mediaPlaybackStatusClassName.c_str(),
-                                                                  mediaPlaybackStatusCtorSignature.c_str(),
-                                                                  dataResponse.mediaPlaybackStatus, mediaPlaybackStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
+        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
+        mediaPlaybackStatus);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
 }
@@ -3140,9 +3140,9 @@ void CHIPMediaPlaybackClusterMediaStartOverResponseCallback::CallbackFn(
 
     std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
     std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(mediaPlaybackStatusClassName.c_str(),
-                                                                  mediaPlaybackStatusCtorSignature.c_str(),
-                                                                  dataResponse.mediaPlaybackStatus, mediaPlaybackStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
+        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
+        mediaPlaybackStatus);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
 }
@@ -3202,9 +3202,9 @@ void CHIPMediaPlaybackClusterMediaStopResponseCallback::CallbackFn(
 
     std::string mediaPlaybackStatusClassName     = "java/lang/Integer";
     std::string mediaPlaybackStatusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(mediaPlaybackStatusClassName.c_str(),
-                                                                  mediaPlaybackStatusCtorSignature.c_str(),
-                                                                  dataResponse.mediaPlaybackStatus, mediaPlaybackStatus);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::MediaPlayback::MediaPlaybackStatus>(
+        mediaPlaybackStatusClassName.c_str(), mediaPlaybackStatusCtorSignature.c_str(), dataResponse.mediaPlaybackStatus,
+        mediaPlaybackStatus);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, mediaPlaybackStatus);
 }
@@ -3806,8 +3806,8 @@ void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback::CallbackFn
 
     std::string actionClassName     = "java/lang/Integer";
     std::string actionCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(actionClassName.c_str(), actionCtorSignature.c_str(),
-                                                                  dataResponse.action, action);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAApplyUpdateAction>(
+        actionClassName.c_str(), actionCtorSignature.c_str(), dataResponse.action, action);
     jobject delayedActionTime;
 
     std::string delayedActionTimeClassName     = "java/lang/Long";
@@ -3880,8 +3880,8 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
 
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::OtaSoftwareUpdateProvider::OTAQueryStatus>(
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
     jobject delayedActionTime;
     if (!dataResponse.delayedActionTime.HasValue())
     {
@@ -4746,8 +4746,8 @@ void CHIPTvChannelClusterChangeChannelResponseCallback::CallbackFn(
 
     std::string ErrorTypeClassName     = "java/lang/Integer";
     std::string ErrorTypeCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(ErrorTypeClassName.c_str(), ErrorTypeCtorSignature.c_str(),
-                                                                  dataResponse.errorType, ErrorType);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::TvChannel::TvChannelErrorType>(
+        ErrorTypeClassName.c_str(), ErrorTypeCtorSignature.c_str(), dataResponse.errorType, ErrorType);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, ChannelMatch, ErrorType);
 }
@@ -4809,8 +4809,8 @@ void CHIPTargetNavigatorClusterNavigateTargetResponseCallback::CallbackFn(
 
     std::string statusClassName     = "java/lang/Integer";
     std::string statusCtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(statusClassName.c_str(), statusCtorSignature.c_str(),
-                                                                  dataResponse.status, status);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::TargetNavigator::NavigateTargetStatus>(
+        statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
     jobject data;
 
     data = chip::UtfString(env, dataResponse.data).jniValue();
@@ -5059,8 +5059,8 @@ void CHIPTestClusterClusterTestEnumsResponseCallback::CallbackFn(
 
     std::string arg2ClassName     = "java/lang/Integer";
     std::string arg2CtorSignature = "(I)V";
-    chip::JniReferences::GetInstance().CreateBoxedObject<uint8_t>(arg2ClassName.c_str(), arg2CtorSignature.c_str(),
-                                                                  dataResponse.arg2, arg2);
+    chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::TestCluster::SimpleEnum>(
+        arg2ClassName.c_str(), arg2CtorSignature.c_str(), dataResponse.arg2, arg2);
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, arg1, arg2);
 }

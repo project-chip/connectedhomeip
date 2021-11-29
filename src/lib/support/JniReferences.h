@@ -20,6 +20,7 @@
 #include <jni.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <lib/support/TypeTraits.h>
 #include <string>
 
 namespace chip {
@@ -105,7 +106,7 @@ public:
      * Creates a boxed type (e.g. java.lang.Integer) based on the the class name ("java/lang/Integer"), constructor JNI signature
      * ("(I)V"), and value.
      */
-    template <class T>
+    template <class T, typename std::enable_if_t<!std::is_enum<T>::value, int> = 0>
     CHIP_ERROR CreateBoxedObject(std::string boxedTypeClsName, std::string constructorSignature, T value, jobject & outObj)
     {
         JNIEnv * env   = GetEnvForCurrentThread();
@@ -119,6 +120,15 @@ public:
         env->DeleteGlobalRef(boxedTypeCls);
 
         return err;
+    }
+
+    /**
+     * Handling for strongly-typed enums.
+     */
+    template <class T, typename std::enable_if_t<std::is_enum<T>::value, int> = 0>
+    CHIP_ERROR CreateBoxedObject(std::string boxedTypeClsName, std::string constructorSignature, T value, jobject & outObj)
+    {
+        return CreateBoxedObject(boxedTypeClsName, constructorSignature, chip::to_underlying(value), outObj);
     }
 
 private:
