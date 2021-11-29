@@ -31,7 +31,7 @@
 
 #ifndef VERHOEFF36_NO_MULTIPLY_TABLE
 
-uint8_t Verhoeff36::sMultiplyTable[] = {
+const uint8_t Verhoeff36::sMultiplyTable[] = {
     0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
     32, 33, 34, 35, 1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 0,  19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
     29, 30, 31, 32, 33, 34, 35, 18, 2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12, 13, 14, 15, 16, 17, 0,  1,  20, 21, 22, 23, 24, 25,
@@ -77,17 +77,17 @@ uint8_t Verhoeff36::sMultiplyTable[] = {
 
 #endif // VERHOEFF36_NO_MULTIPLY_TABLE
 
-uint8_t Verhoeff36::sPermTable[] = { 29, 0,  32, 11, 35, 20, 7,  27, 2,  4,  19, 28, 30, 1,  5,  12, 3,  9,
-                                     16, 22, 6,  33, 8,  24, 26, 21, 14, 10, 34, 31, 15, 25, 17, 13, 23, 18 };
+const uint8_t Verhoeff36::sPermTable[] = { 29, 0,  32, 11, 35, 20, 7,  27, 2,  4,  19, 28, 30, 1,  5,  12, 3,  9,
+                                           16, 22, 6,  33, 8,  24, 26, 21, 14, 10, 34, 31, 15, 25, 17, 13, 23, 18 };
 
-int8_t Verhoeff36::sCharToValTable[] = {
+const int8_t Verhoeff36::sCharToValTable[] = {
     // NOTE: table starts at ASCII 30h
     0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  -1, -1, -1, -1, -1, -1, -1, 10, 11, 12, 13, 14, 15, 16, 17,
     18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, -1, -1, -1, -1, -1, -1, 10,
     11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35
 };
 
-char Verhoeff36::sValToCharTable[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const char Verhoeff36::sValToCharTable[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 char Verhoeff36::ComputeCheckChar(const char * str)
 {
