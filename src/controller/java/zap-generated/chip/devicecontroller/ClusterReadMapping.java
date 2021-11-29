@@ -85,6 +85,48 @@ public class ClusterReadMapping {
     readAttributeMap.put("accountLogin", readAccountLoginInteractionInfo);
     Map<String, InteractionInfo> readAdministratorCommissioningInteractionInfo =
         new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readAdministratorCommissioningWindowStatusCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAdministratorCommissioningWindowStatusAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AdministratorCommissioningCluster) cluster)
+                  .readWindowStatusAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readAdministratorCommissioningWindowStatusCommandParams);
+    readAdministratorCommissioningInteractionInfo.put(
+        "readWindowStatusAttribute",
+        readAdministratorCommissioningWindowStatusAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAdministratorCommissioningAdminFabricIndexCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAdministratorCommissioningAdminFabricIndexAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AdministratorCommissioningCluster) cluster)
+                  .readAdminFabricIndexAttribute(
+                      (ChipClusters.AdministratorCommissioningCluster
+                              .AdminFabricIndexAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readAdministratorCommissioningAdminFabricIndexCommandParams);
+    readAdministratorCommissioningInteractionInfo.put(
+        "readAdminFabricIndexAttribute",
+        readAdministratorCommissioningAdminFabricIndexAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAdministratorCommissioningAdminVendorIdCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAdministratorCommissioningAdminVendorIdAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AdministratorCommissioningCluster) cluster)
+                  .readAdminVendorIdAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readAdministratorCommissioningAdminVendorIdCommandParams);
+    readAdministratorCommissioningInteractionInfo.put(
+        "readAdminVendorIdAttribute",
+        readAdministratorCommissioningAdminVendorIdAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readAdministratorCommissioningClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readAdministratorCommissioningClusterRevisionAttributeInteractionInfo =

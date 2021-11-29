@@ -400,6 +400,54 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)readAttributeWindowStatusWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = AdministratorCommissioning::Attributes::WindowStatus::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)readAttributeAdminFabricIndexWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler
+{
+    new CHIPInt8uAttributeCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = AdministratorCommissioning::Attributes::AdminFabricIndex::TypeInfo;
+            auto successFn = Callback<Int8uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)readAttributeAdminVendorIdWithCompletionHandler:(void (^)(
+                                                            NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt16uAttributeCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = AdministratorCommissioning::Attributes::AdminVendorId::TypeInfo;
+            auto successFn = Callback<Int16uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler
 {

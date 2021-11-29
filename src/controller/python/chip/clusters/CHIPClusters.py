@@ -116,6 +116,21 @@ class ChipClusters:
                 },
             },
             "attributes": {
+                0x00000000: {
+                    "attributeName": "WindowStatus",
+                    "attributeId": 0x00000000,
+                    "type": "int",
+                },
+                0x00000001: {
+                    "attributeName": "AdminFabricIndex",
+                    "attributeId": 0x00000001,
+                    "type": "int",
+                },
+                0x00000002: {
+                    "attributeName": "AdminVendorId",
+                    "attributeId": 0x00000002,
+                    "type": "int",
+                },
                 0x0000FFFD: {
                     "attributeName": "ClusterRevision",
                     "attributeId": 0x0000FFFD,

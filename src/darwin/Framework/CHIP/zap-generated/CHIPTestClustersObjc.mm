@@ -106,6 +106,60 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
+- (void)writeAttributeWindowStatusWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable ignored) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = AdministratorCommissioning::Attributes::WindowStatus::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedCharValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeAdminFabricIndexWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable ignored) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = AdministratorCommissioning::Attributes::AdminFabricIndex::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedCharValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeAdminVendorIdWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable ignored) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = AdministratorCommissioning::Attributes::AdminVendorId::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.unsignedShortValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(

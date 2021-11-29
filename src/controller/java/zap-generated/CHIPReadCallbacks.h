@@ -361,6 +361,30 @@ private:
     bool keepAlive;
 };
 
+class CHIPAdministratorCommissioningAdminFabricIndexAttributeCallback
+    : public chip::Callback::Callback<CHIPAdministratorCommissioningClusterAdminFabricIndexAttributeCallbackType>
+{
+public:
+    CHIPAdministratorCommissioningAdminFabricIndexAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPAdministratorCommissioningAdminFabricIndexAttributeCallback();
+
+    static void maybeDestroy(CHIPAdministratorCommissioningAdminFabricIndexAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPAdministratorCommissioningAdminFabricIndexAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, chip::FabricIndex value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPApplicationLauncherApplicationLauncherListAttributeCallback
     : public chip::Callback::Callback<CHIPApplicationLauncherClusterApplicationLauncherListAttributeCallbackType>
 {
