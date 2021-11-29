@@ -41,6 +41,19 @@
 
 #define NOT_APPLICABLE_STRING @"N/A"
 
+@implementation NSData (HexRepresentation)
+
+- (NSString *)hexString {
+    const unsigned char *bytes = (const unsigned char *)self.bytes;
+    NSMutableString *hex = [NSMutableString new];
+    for (NSInteger i = 0; i < self.length; i++) {
+        [hex appendFormat:@"%02x", bytes[i]];
+    }
+    return [hex copy];
+}
+
+@end
+
 @interface QRCodeViewController ()
 
 @property (nonatomic, strong) AVCaptureSession * captureSession;
@@ -57,6 +70,7 @@
 @property (strong, nonatomic) UIView * setupPayloadView;
 @property (strong, nonatomic) UILabel * manualCodeLabel;
 @property (strong, nonatomic) UIButton * resetButton;
+@property (strong, nonatomic) UISwitch * networkTypeSwitch;
 @property (strong, nonatomic) UILabel * versionLabel;
 @property (strong, nonatomic) UILabel * discriminatorLabel;
 @property (strong, nonatomic) UILabel * setupPinCodeLabel;
@@ -74,6 +88,8 @@
 @property (strong, nonatomic) NFCNDEFReaderSession * session;
 @property (strong, nonatomic) CHIPSetupPayload * setupPayload;
 @property (strong, nonatomic) DeviceSelector * deviceList;
+
+@property (readwrite) BOOL useWiFi;
 @end
 
 @implementation QRCodeViewController {
@@ -113,14 +129,26 @@
     stackView.axis = UILayoutConstraintAxisVertical;
     stackView.distribution = UIStackViewDistributionFill;
     stackView.alignment = UIStackViewAlignmentLeading;
-    stackView.spacing = 15;
+    stackView.spacing = 30;
     [self.view addSubview:stackView];
 
     stackView.translatesAutoresizingMaskIntoConstraints = false;
-    [stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
+    [stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:40].active = YES;
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
 
+    // Network Type Switch
+    UILabel * networkTypeLabel = [UILabel new];
+    networkTypeLabel.text = @"Select network type";
+    _networkTypeSwitch = [UISwitch new];
+    [_networkTypeSwitch setOn:YES];
+    _useWiFi = YES;
+    UIView * selectNetworkTypeView = [CHIPUIViewUtils viewWithLabel:networkTypeLabel toggle:_networkTypeSwitch];
+    [_networkTypeSwitch addTarget:self action:@selector(networkTypeChanged:) forControlEvents:UIControlEventTouchUpInside];
+    [stackView addArrangedSubview:selectNetworkTypeView];
+    selectNetworkTypeView.translatesAutoresizingMaskIntoConstraints = false;
+    [selectNetworkTypeView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
+    
     // Manual entry view
     _manualCodeTextField = [UITextField new];
     _doneManualCodeButton = [UIButton new];
@@ -134,7 +162,7 @@
     manualEntryView.translatesAutoresizingMaskIntoConstraints = false;
     [manualEntryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [manualEntryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    [manualEntryView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
+    [manualEntryView.topAnchor constraintEqualToAnchor:selectNetworkTypeView.bottomAnchor constant:30].active = YES;
 
     _nfcScanButton = [UIButton new];
     [_nfcScanButton setTitle:@"Scan NFC Tag" forState:UIControlStateNormal];
@@ -385,10 +413,17 @@
     if (error.code != CHIPSuccess) {
         NSLog(@"Got pairing error back %@", error);
     } else {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self->_deviceList refreshDeviceList];
-            [self retrieveAndSendWifiCredentials];
-        });
+        if (_useWiFi) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self->_deviceList refreshDeviceList];
+                [self retrieveAndSendWifiCredentials];
+            });
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self->_deviceList refreshDeviceList];
+                [self retrieveAndSendThreadCredentials];
+            });
+        }
     }
 }
 
@@ -534,6 +569,44 @@
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
+- (NSData *)convertString:(NSString *)string
+{
+    NSMutableData *data= [[NSMutableData alloc] init];
+    unsigned char whole_byte;
+    char byte_chars[3] = {0,0,0};
+    for (int i = 0; i < ([string length] / 2); i++) {
+        byte_chars[0] = [string characterAtIndex:i*2];
+        byte_chars[1] = [string characterAtIndex:i*2+1];
+        whole_byte = strtol(byte_chars, NULL, 16);
+        [data appendBytes:&whole_byte length:1];
+    }
+
+    return data;
+}
+
+- (void)retrieveAndSendThreadCredentials
+{
+    NSString *PanID;
+    NSString *ExtPanID;
+    NSString *MasterKey;
+    NSString *Channel;
+    
+    PanID = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kThreadNetworkPanIDDefaultsKey);
+    ExtPanID = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kThreadNetworkExtPanIDDefaultsKey);
+    MasterKey = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kThreadNetworkKeyDefaultsKey);
+    Channel = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kThreadNetworkChannelDefaultsKey);
+
+    CHIPThreadOperationalDataset *threadDataSet = [[CHIPThreadOperationalDataset alloc]
+        initWithNetworkName:nil
+              extendedPANID:[self convertString:ExtPanID]
+                  masterKey:[self convertString:MasterKey]
+                       PSKc:nil
+                    channel:[Channel intValue]
+                      panID:[self convertString:PanID]];
+    
+    [self addThreadNetwork:threadDataSet.asData];
+}
+
 - (void)addWiFiNetwork:(NSString *)ssid password:(NSString *)password
 {
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
@@ -603,7 +676,7 @@
 {
     if (error != nil) {
         NSLog(@"Error adding network: %@", error);
-        return;
+        //return;
     }
 
     __auto_type * params = [[CHIPNetworkCommissioningClusterEnableNetworkParams alloc] init];
@@ -884,6 +957,15 @@
         [self displayManualCodeInSetupPayloadView:self->_setupPayload decimalString:decimalString withError:error];
     });
     [_manualCodeTextField resignFirstResponder];
+}
+
+- (IBAction)networkTypeChanged:(id)sendder
+{
+    if ([_networkTypeSwitch isOn]) {
+        _useWiFi = YES;
+    } else {
+        _useWiFi = NO;
+    }
 }
 
 @synthesize description;

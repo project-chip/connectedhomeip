@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0CA0E0CE248599BB009087B9 /* OnOffViewController.m */; };
+		1204B663274BA78D009B8174 /* ThreadViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1204B662274BA78D009B8174 /* ThreadViewController.m */; };
 		2C21071525D1A8F200DDA4AD /* MultiAdminViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C21071325D1A8F200DDA4AD /* MultiAdminViewController.m */; };
 		2C460C2425D7594B000512D6 /* DeviceSelector.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C460C2325D7594B000512D6 /* DeviceSelector.m */; };
 		2C460C3225D97CB3000512D6 /* UnpairDevicesViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2C460C3025D97CB3000512D6 /* UnpairDevicesViewController.m */; };
@@ -56,6 +57,8 @@
 /* Begin PBXFileReference section */
 		0CA0E0CD248599BB009087B9 /* OnOffViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OnOffViewController.h; sourceTree = "<group>"; };
 		0CA0E0CE248599BB009087B9 /* OnOffViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnOffViewController.m; sourceTree = "<group>"; };
+		1204B661274BA789009B8174 /* ThreadViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThreadViewController.h; sourceTree = "<group>"; };
+		1204B662274BA78D009B8174 /* ThreadViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThreadViewController.m; sourceTree = "<group>"; };
 		2C21071325D1A8F200DDA4AD /* MultiAdminViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MultiAdminViewController.m; sourceTree = "<group>"; };
 		2C21071425D1A8F200DDA4AD /* MultiAdminViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MultiAdminViewController.h; sourceTree = "<group>"; };
 		2C460C2225D7594B000512D6 /* DeviceSelector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceSelector.h; sourceTree = "<group>"; };
@@ -141,6 +144,15 @@
 			path = OnOffCluster;
 			sourceTree = "<group>";
 		};
+		1204B660274BA773009B8174 /* Thread */ = {
+			isa = PBXGroup;
+			children = (
+				1204B661274BA789009B8174 /* ThreadViewController.h */,
+				1204B662274BA78D009B8174 /* ThreadViewController.m */,
+			);
+			path = Thread;
+			sourceTree = "<group>";
+		};
 		2C21071225D1A8F200DDA4AD /* MultiAdmin */ = {
 			isa = PBXGroup;
 			children = (
@@ -221,6 +233,7 @@
 		B232D8BF251A0EC500792CB4 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				1204B660274BA773009B8174 /* Thread */,
 				2C460C2F25D97CB3000512D6 /* UnpairDevices */,
 				2C460C2225D7594B000512D6 /* DeviceSelector.h */,
 				2C460C2325D7594B000512D6 /* DeviceSelector.m */,
@@ -395,6 +408,7 @@
 				B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */,
 				991DC091247747F500C13860 /* EchoViewController.m in Sources */,
 				B2C2267526289324009DAB8B /* FabricUIViewController.m in Sources */,
+				1204B663274BA78D009B8174 /* ThreadViewController.m in Sources */,
 				B2B0209225C9C1AC00A4C220 /* BindingsViewController.m in Sources */,
 				B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */,
 				B2F51E99252DCDC000911FA5 /* TemperatureSensorViewController.m in Sources */,
@@ -488,7 +502,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -546,7 +560,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.4;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -561,7 +575,7 @@
 				CODE_SIGN_ENTITLEMENTS = CHIPTool/CHIPTool.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = YMVVJ2L29T;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = CHIPTool/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -584,7 +598,7 @@
 				CODE_SIGN_ENTITLEMENTS = CHIPTool/CHIPTool.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = YMVVJ2L29T;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = CHIPTool/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

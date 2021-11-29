@@ -59,8 +59,9 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
 - (BOOL)_populateCppOperationalDataset
 {
     _cppThreadOperationalDataset.Clear();
+#if 0
     _cppThreadOperationalDataset.SetNetworkName([self.networkName cStringUsingEncoding:NSUTF8StringEncoding]);
-
+#endif
     if (![self _checkDataLength:self.extendedPANID expectedLength:chip::Thread::kSizeExtendedPanId]) {
         CHIP_LOG_ERROR("Invalid ExtendedPANID");
         return NO;
@@ -77,6 +78,7 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
     [self.masterKey getBytes:&masterKey length:chip::Thread::kSizeMasterKey];
     _cppThreadOperationalDataset.SetMasterKey(masterKey);
 
+#if 0
     if (![self _checkDataLength:self.PSKc expectedLength:chip::Thread::kSizePSKc]) {
         CHIP_LOG_ERROR("Invalid PKSc");
         return NO;
@@ -84,6 +86,7 @@ size_t const CHIPSizeThreadPSKc = chip::Thread::kSizePSKc;
     uint8_t PSKc[chip::Thread::kSizePSKc];
     [self.PSKc getBytes:&PSKc length:chip::Thread::kSizePSKc];
     _cppThreadOperationalDataset.SetPSKc(PSKc);
+#endif
 
     _cppThreadOperationalDataset.SetChannel(self.channel);
 

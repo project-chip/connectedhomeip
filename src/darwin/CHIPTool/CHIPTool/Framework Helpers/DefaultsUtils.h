@@ -24,6 +24,10 @@ extern NSString * const kCHIPToolDefaultsDomain;
 extern NSString * const kNetworkSSIDDefaultsKey;
 extern NSString * const kNetworkPasswordDefaultsKey;
 extern NSString * const kFabricIdKey;
+extern NSString * const kThreadNetworkPanIDDefaultsKey;
+extern NSString * const kThreadNetworkExtPanIDDefaultsKey;
+extern NSString * const kThreadNetworkKeyDefaultsKey;
+extern NSString * const kThreadNetworkChannelDefaultsKey;
 
 CHIPDeviceController * InitializeCHIP(void);
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key);

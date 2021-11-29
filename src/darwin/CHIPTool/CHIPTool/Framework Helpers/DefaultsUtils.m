@@ -22,6 +22,10 @@ NSString * const kNetworkSSIDDefaultsKey = @"networkSSID";
 NSString * const kNetworkPasswordDefaultsKey = @"networkPassword";
 NSString * const kCHIPNextAvailableDeviceIDKey = @"nextDeviceID";
 NSString * const kFabricIdKey = @"fabricId";
+NSString * const kThreadNetworkPanIDDefaultsKey = @"threadNetworkPanID";
+NSString * const kThreadNetworkExtPanIDDefaultsKey = @"threadNetworkExtPanID";
+NSString * const kThreadNetworkKeyDefaultsKey = @"threadNetworkKey";
+NSString * const kThreadNetworkChannelDefaultsKey = @"threadNetworkChannel";
 
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
 {
