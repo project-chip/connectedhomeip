@@ -70,7 +70,6 @@ private:
     static void RunQueuedCommand(intptr_t commandArg);
 
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
     CHIP_ERROR StartWaiting(chip::System::Clock::Timeout seconds);
     void StopWaiting();

@@ -19,6 +19,7 @@
 #include "CHIPCommand.h"
 
 #include <controller/CHIPDeviceControllerFactory.h>
+#include "controller/ExampleOperationalCredentialsIssuer.h"
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DefaultDeviceAttestationVerifier.h>
@@ -31,13 +32,15 @@ using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
 CHIP_ERROR CHIPCommand::Run()
 {
+    chip::Controller::ExampleOperationalCredentialsIssuer opCredsIssuer;
+
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
     ReturnLogErrorOnFailure(chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(0, true));
 #endif
 
     ReturnLogErrorOnFailure(mStorage.Init());
-    ReturnLogErrorOnFailure(mOpCredsIssuer.Initialize(mStorage));
+    ReturnLogErrorOnFailure(opCredsIssuer.Initialize(mStorage));
     ReturnLogErrorOnFailure(mFabricStorage.Initialize(&mStorage));
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> noc;
@@ -64,7 +67,7 @@ CHIP_ERROR CHIPCommand::Run()
     // TODO - OpCreds should only be generated for pairing command
     //        store the credentials in persistent storage, and
     //        generate when not available in the storage.
-    ReturnLogErrorOnFailure(mOpCredsIssuer.GenerateNOCChainAfterValidation(mStorage.GetLocalNodeId(), mStorage.GetFabricId(),
+    ReturnLogErrorOnFailure(opCredsIssuer.GenerateNOCChainAfterValidation(mStorage.GetLocalNodeId(), mStorage.GetFabricId(),
                                                                            ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     chip::Controller::FactoryInitParams factoryInitParams;
@@ -73,7 +76,7 @@ CHIP_ERROR CHIPCommand::Run()
 
     chip::Controller::SetupParams commissionerParams;
     commissionerParams.storageDelegate                = &mStorage;
-    commissionerParams.operationalCredentialsDelegate = &mOpCredsIssuer;
+    commissionerParams.operationalCredentialsDelegate = &opCredsIssuer;
     commissionerParams.ephemeralKeypair               = &ephemeralKey;
     commissionerParams.controllerRCAC                 = rcacSpan;
     commissionerParams.controllerICAC                 = icacSpan;
