@@ -108,7 +108,7 @@ class HostBuilder(GnBuilder):
     def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
                  enable_ble=True, use_tsan=False, separate_event_loop=True
                  ):
-        super(HostBuilderTrue self).__init__(
+        super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
 
