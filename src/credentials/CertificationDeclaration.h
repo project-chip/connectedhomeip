@@ -41,7 +41,7 @@ static constexpr uint32_t kCertificationElements_TLVEncodedMaxLength =
                                 sizeof(uint16_t), // VendorId
                                 // ProductIds. Formally, the following extression should be used here:
                                 //     ( TLV::EstimateStructOverhead(sizeof(uint16_t)) * kMaxProductIdsCountPerCD ),
-                                // Because exact stracture of the elements of this array is known, more accurate estimate is used.
+                                // Because exact structure of the elements of this array is known, more accurate estimate is used.
                                 (1 + sizeof(uint16_t)) * kMaxProductIdsCountPerCD,
                                 sizeof(uint32_t),     // DeviceTypeId
                                 kCertificateIdLength, // CertificateId
