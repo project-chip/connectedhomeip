@@ -30,9 +30,11 @@ jobs:
 
         strategy:
           matrix:
-             eventloop: [eventloop_same, eventloop_separate]
+            type: [tsan]
+            eventloop: [eventloop_same, eventloop_separate]
         env:
             USE_SEPARATE_EVENTLOOP: ${{ matrix.eventloop == 'eventloop_separate' }}
+            USE_TSAN: ${{ matrix.type == 'tsan' }}
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
@@ -64,30 +66,32 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build Apps
-              timeout-minutes: 20
+            - name: Build all clusters app
+              timeout-minutes: 5
               run: |
-                  EVENT_LOOP_VARIANT=""; \
-                  if "$USE_SEPARATE_EVENTLOOP" -ne "true"; then \
-                    EVENT_LOOP_VARIANT="-same-event-loop"; \
-                  fi; \
-                  ./scripts/run_in_build_env.sh \
-                     "./scripts/build/build_examples.py \
-                        --target \"linux-x64-chip-tool-no-ble-tsan${EVENT_LOOP_VARIANT}\" \
-                        --target linux-x64-all-clusters-no-ble-tsan \
-                        --target linux-x64-tv-app-no-ble-tsan \
-                        build \
-                        --copy-artifacts-to objdir-clone \
-                     "
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
+            - name: Build TV app
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/gn_build_example.sh examples/tv-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
+            - name: Build chip-tool
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
+            - name: Copy objdir
+              run: |
+                  # The idea is to not upload our objdir unless builds have
+                  # actually succeeded, because that just wastes space.
+                  rsync -a out/debug/standalone/ objdir-clone || true
             - name: Run Tests
               timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py run \
                      --iterations 2 \
-                     --chip-tool ./out/linux-x64-chip-tool-no-ble-tsan${EVENT_LOOP_VARIANT}/chip-tool \
-                     --all-clusters-app ./out/linux-x64-all-clusters-no-ble-tsan/chip-all-clusters-app \
-                     --tv-app ./out/linux-x64-tv-app-no-ble-tsan/chip-tv-app \
+                     --chip-tool ./out/debug/standalone/chip-tool \
+                     --all-clusters-app ./out/debug/standalone/chip-all-clusters-app \
+                     --tv-app ./out/debug/standalone/chip-tv-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v2
@@ -111,9 +115,11 @@ jobs:
 
         strategy:
           matrix:
+            type: [tsan]
             eventloop: [eventloop_same, eventloop_separate]
         env:
             USE_SEPARATE_EVENTLOOP: ${{ matrix.eventloop == 'eventloop_separate' }}
+            USE_TSAN: ${{ matrix.type == 'tsan' }}
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -153,11 +159,11 @@ jobs:
             - name: Run Build Test Server
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=true
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
             - name: Build chip-tool
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=true config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
             - name: Copy objdir
               run: |
                   # The idea is to not upload our objdir unless builds have
