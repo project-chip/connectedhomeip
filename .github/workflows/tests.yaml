@@ -30,9 +30,7 @@ jobs:
 
         strategy:
           matrix:
-             # eventloop: [eventloop_same, eventloop_separate]
-             eventloop: [eventloop_separate]
-             # eventloop: [eventloop_same]
+             eventloop: [eventloop_same, eventloop_separate]
         env:
             USE_SEPARATE_EVENTLOOP: ${{ matrix.eventloop == 'eventloop_separate' }}
 
