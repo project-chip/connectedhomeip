@@ -226,7 +226,9 @@ public:
             mCurrentState.Enter();
         }
     }
+    TState GetState() { return mCurrentState; }
 
+private:
     TState mCurrentState;
     TTransitions & mTransitions;
     unsigned mSequence;

@@ -141,7 +141,7 @@ void TestInit(nlTestSuite * inSuite, void * inContext)
 {
     // state machine initializes to State1
     SimpleStateMachine fsm;
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State1>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State1>());
 }
 
 void TestIgnoredEvents(nlTestSuite * inSuite, void * inContext)
@@ -149,17 +149,17 @@ void TestIgnoredEvents(nlTestSuite * inSuite, void * inContext)
     // in State1 - ignore Event1 and Event3
     SimpleStateMachine fsm;
     fsm.mStateMachine.Dispatch(Event::Create<Event1>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State1>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State1>());
     fsm.mStateMachine.Dispatch(Event::Create<Event3>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State1>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State1>());
     // transition to State2
     fsm.mStateMachine.Dispatch(Event::Create<Event2>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State2>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
     // in State2 - ignore Event2 and Event3
     fsm.mStateMachine.Dispatch(Event::Create<Event2>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State2>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
     fsm.mStateMachine.Dispatch(Event::Create<Event3>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State2>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
 }
 
 void TestTransitions(nlTestSuite * inSuite, void * inContext)
@@ -168,16 +168,16 @@ void TestTransitions(nlTestSuite * inSuite, void * inContext)
     SimpleStateMachine fsm;
     // dispatch Event2 to transition to State2
     fsm.mStateMachine.Dispatch(Event::Create<Event2>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State2>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
     // dispatch Event1 to transition back to State1
     fsm.mStateMachine.Dispatch(Event::Create<Event1>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State1>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State1>());
     // dispatch Event2 to transition to State2
     fsm.mStateMachine.Dispatch(Event::Create<Event2>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State2>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
     // dispatch Event4 to transitions to State1.
     fsm.mStateMachine.Dispatch(Event::Create<Event4>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State1>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State1>());
 }
 
 void TestTransitionsDispatch(nlTestSuite * inSuite, void * inContext)
@@ -187,7 +187,7 @@ void TestTransitionsDispatch(nlTestSuite * inSuite, void * inContext)
     // Dispatch Event4, which in turn dispatches Event2 from the transitions
     // table and ultimately places us in State2.
     fsm.mStateMachine.Dispatch(Event::Create<Event4>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State2>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
 }
 
 void TestMethodExec(nlTestSuite * inSuite, void * inContext)
@@ -196,7 +196,7 @@ void TestMethodExec(nlTestSuite * inSuite, void * inContext)
     SimpleStateMachine fsm;
     // transition to State2
     fsm.mStateMachine.Dispatch(Event::Create<Event2>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State2>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State2>());
     // verify expected method calls
     NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mEntered == 0);
     NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mExited == 1);
@@ -208,7 +208,7 @@ void TestMethodExec(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, strcmp(fsm.mTransitions.mFactory.ms2.mPrevious, "State1") == 0);
     // transition back to State1
     fsm.mStateMachine.Dispatch(Event::Create<Event1>());
-    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.mCurrentState.Is<State1>());
+    NL_TEST_ASSERT(inSuite, fsm.mStateMachine.GetState().Is<State1>());
     // verify expected method calls
     NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mEntered == 1);
     NL_TEST_ASSERT(inSuite, fsm.mTransitions.mFactory.ms1.mExited == 1);
