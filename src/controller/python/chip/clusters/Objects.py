@@ -4466,7 +4466,7 @@ class AccessControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x0000
+                return 0x00000000
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -4482,7 +4482,7 @@ class AccessControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x0001
+                return 0x00000001
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -4498,7 +4498,7 @@ class AccessControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0xFFFC
+                return 0x0000FFFC
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
@@ -4514,7 +4514,7 @@ class AccessControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0xFFFD
+                return 0x0000FFFD
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
