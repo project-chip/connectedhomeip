@@ -76,10 +76,14 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         }
         {{/if}}
 
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], {{response.error}});
-        {{#unless (isStrEqual "0" response.error)}}
-        [expectation fulfill];
+        {{#if response.error}}
+          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], {{response.error}});
+          [expectation fulfill];
+        {{else if response.errorWrongValue}}
+          XCTAssertNotEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+          [expectation fulfill];
         {{else}}
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
         {{#unless isSubscribeAttribute}}
 
         {{#chip_tests_item_response_parameters}}
@@ -153,7 +157,7 @@ bool testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase
         {{else}}
         testSendCluster{{parent.filename}}_{{asTestIndex index}}_{{asUpperCamelCase command}}_Fulfilled = true;
         {{/unless}}
-        {{/unless}}
+        {{/if}}
     }];
 
 {{/if}}

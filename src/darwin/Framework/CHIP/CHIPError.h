@@ -31,7 +31,13 @@ typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode){
     CHIPErrorCodeWrongAddressType     = 7,
     CHIPErrorCodeIntegrityCheckFailed = 8,
     CHIPErrorCodeDuplicateExists      = 9,
-    CHIPErrorCodeUnsupportedAttribute = 10,
+    CHIPErrorCodeUnsupportedEndpoint  = 0x7F,
+    CHIPErrorCodeUnsupportedCommand   = 0x81,
+    CHIPErrorCodeInvalidCommand       = 0x85,
+    CHIPErrorCodeUnsupportedAttribute = 0x86,
+    CHIPErrorCodeConstraintError      = 0x87,
+    CHIPErrorCodeUnsupportedWrite     = 0x88,
+    CHIPErrorCodeUnsupportedCluster   = 0xC3,
 };
 
 NS_ASSUME_NONNULL_END
