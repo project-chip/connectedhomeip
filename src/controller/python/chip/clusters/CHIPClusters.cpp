@@ -103,8 +103,8 @@ void OnAttributeResponse<bool>(void * /* context */, bool value)
 
 static void OnAccessControlAclListAttributeResponse(
     void * context,
-    const chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+        list)
 {
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
@@ -114,8 +114,7 @@ chip::Callback::Callback<AccessControlAclListAttributeCallback> gAccessControlAc
 };
 static void OnAccessControlExtensionListAttributeResponse(
     void * context,
-    const chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType>> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & list)
 {
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();

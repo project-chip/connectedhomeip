@@ -56,7 +56,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeAclWithValue:(NSArray * _Nullable)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeAclWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -67,108 +67,103 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = AccessControl::Attributes::Acl::TypeInfo;
             TypeInfo::Type cppValue;
-            if (value == nil) {
-                cppValue.SetNull();
-            } else {
-                auto & nonNullValue_0 = cppValue.SetNonNull();
-                {
-                    using ListType = std::remove_reference_t<decltype(nonNullValue_0)>;
-                    using ListMemberType = ListMemberTypeGetter<ListType>::Type;
-                    if (value.count != 0) {
-                        auto * listHolder_1 = new ListHolder<ListMemberType>(value.count);
-                        if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+            {
+                using ListType = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i = 0; i < value.count; ++i) {
+                        if (![value[i] isKindOfClass:[CHIPAccessControlClusterAccessControlEntry class]]) {
+                            // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        listFreer.add(listHolder_1);
-                        for (size_t i = 0; i < value.count; ++i) {
-                            if (![value[i] isKindOfClass:[CHIPAccessControlClusterAccessControlEntry class]]) {
-                                // Wrong kind of value.
-                                return CHIP_ERROR_INVALID_ARGUMENT;
-                            }
-                            auto element_1 = (CHIPAccessControlClusterAccessControlEntry *) value[i];
-                            listHolder_1->mList[i].fabricIndex = element_1.fabricIndex.unsignedCharValue;
-                            listHolder_1->mList[i].privilege
-                                = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i].privilege)>>(
-                                    element_1.privilege.unsignedCharValue);
-                            listHolder_1->mList[i].authMode
-                                = static_cast<std::remove_reference_t<decltype(listHolder_1->mList[i].authMode)>>(
-                                    element_1.authMode.unsignedCharValue);
-                            if (element_1.subjects == nil) {
-                                listHolder_1->mList[i].subjects.SetNull();
-                            } else {
-                                auto & nonNullValue_3 = listHolder_1->mList[i].subjects.SetNonNull();
-                                {
-                                    using ListType = std::remove_reference_t<decltype(nonNullValue_3)>;
-                                    using ListMemberType = ListMemberTypeGetter<ListType>::Type;
-                                    if (element_1.subjects.count != 0) {
-                                        auto * listHolder_4 = new ListHolder<ListMemberType>(element_1.subjects.count);
-                                        if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
+                        auto element_0 = (CHIPAccessControlClusterAccessControlEntry *) value[i];
+                        listHolder_0->mList[i].fabricIndex = element_0.fabricIndex.unsignedCharValue;
+                        listHolder_0->mList[i].privilege
+                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i].privilege)>>(
+                                element_0.privilege.unsignedCharValue);
+                        listHolder_0->mList[i].authMode
+                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i].authMode)>>(
+                                element_0.authMode.unsignedCharValue);
+                        if (element_0.subjects == nil) {
+                            listHolder_0->mList[i].subjects.SetNull();
+                        } else {
+                            auto & nonNullValue_2 = listHolder_0->mList[i].subjects.SetNonNull();
+                            {
+                                using ListType = std::remove_reference_t<decltype(nonNullValue_2)>;
+                                using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+                                if (element_0.subjects.count != 0) {
+                                    auto * listHolder_3 = new ListHolder<ListMemberType>(element_0.subjects.count);
+                                    if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    listFreer.add(listHolder_3);
+                                    for (size_t i = 0; i < element_0.subjects.count; ++i) {
+                                        if (![element_0.subjects[i] isKindOfClass:[NSNumber class]]) {
+                                            // Wrong kind of value.
                                             return CHIP_ERROR_INVALID_ARGUMENT;
                                         }
-                                        listFreer.add(listHolder_4);
-                                        for (size_t i = 0; i < element_1.subjects.count; ++i) {
-                                            if (![element_1.subjects[i] isKindOfClass:[NSNumber class]]) {
-                                                // Wrong kind of value.
-                                                return CHIP_ERROR_INVALID_ARGUMENT;
-                                            }
-                                            auto element_4 = (NSNumber *) element_1.subjects[i];
-                                            listHolder_4->mList[i] = element_4.unsignedLongLongValue;
-                                        }
-                                        nonNullValue_3 = ListType(listHolder_4->mList, element_1.subjects.count);
-                                    } else {
-                                        nonNullValue_3 = ListType();
+                                        auto element_3 = (NSNumber *) element_0.subjects[i];
+                                        listHolder_3->mList[i] = element_3.unsignedLongLongValue;
                                     }
-                                }
-                            }
-                            if (element_1.targets == nil) {
-                                listHolder_1->mList[i].targets.SetNull();
-                            } else {
-                                auto & nonNullValue_3 = listHolder_1->mList[i].targets.SetNonNull();
-                                {
-                                    using ListType = std::remove_reference_t<decltype(nonNullValue_3)>;
-                                    using ListMemberType = ListMemberTypeGetter<ListType>::Type;
-                                    if (element_1.targets.count != 0) {
-                                        auto * listHolder_4 = new ListHolder<ListMemberType>(element_1.targets.count);
-                                        if (listHolder_4 == nullptr || listHolder_4->mList == nullptr) {
-                                            return CHIP_ERROR_INVALID_ARGUMENT;
-                                        }
-                                        listFreer.add(listHolder_4);
-                                        for (size_t i = 0; i < element_1.targets.count; ++i) {
-                                            if (![element_1.targets[i] isKindOfClass:[CHIPAccessControlClusterTarget class]]) {
-                                                // Wrong kind of value.
-                                                return CHIP_ERROR_INVALID_ARGUMENT;
-                                            }
-                                            auto element_4 = (CHIPAccessControlClusterTarget *) element_1.targets[i];
-                                            if (element_4.cluster == nil) {
-                                                listHolder_4->mList[i].cluster.SetNull();
-                                            } else {
-                                                auto & nonNullValue_6 = listHolder_4->mList[i].cluster.SetNonNull();
-                                                nonNullValue_6 = element_4.cluster.unsignedIntValue;
-                                            }
-                                            if (element_4.endpoint == nil) {
-                                                listHolder_4->mList[i].endpoint.SetNull();
-                                            } else {
-                                                auto & nonNullValue_6 = listHolder_4->mList[i].endpoint.SetNonNull();
-                                                nonNullValue_6 = element_4.endpoint.unsignedShortValue;
-                                            }
-                                            if (element_4.deviceType == nil) {
-                                                listHolder_4->mList[i].deviceType.SetNull();
-                                            } else {
-                                                auto & nonNullValue_6 = listHolder_4->mList[i].deviceType.SetNonNull();
-                                                nonNullValue_6 = element_4.deviceType.unsignedIntValue;
-                                            }
-                                        }
-                                        nonNullValue_3 = ListType(listHolder_4->mList, element_1.targets.count);
-                                    } else {
-                                        nonNullValue_3 = ListType();
-                                    }
+                                    nonNullValue_2 = ListType(listHolder_3->mList, element_0.subjects.count);
+                                } else {
+                                    nonNullValue_2 = ListType();
                                 }
                             }
                         }
-                        nonNullValue_0 = ListType(listHolder_1->mList, value.count);
-                    } else {
-                        nonNullValue_0 = ListType();
+                        if (element_0.targets == nil) {
+                            listHolder_0->mList[i].targets.SetNull();
+                        } else {
+                            auto & nonNullValue_2 = listHolder_0->mList[i].targets.SetNonNull();
+                            {
+                                using ListType = std::remove_reference_t<decltype(nonNullValue_2)>;
+                                using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+                                if (element_0.targets.count != 0) {
+                                    auto * listHolder_3 = new ListHolder<ListMemberType>(element_0.targets.count);
+                                    if (listHolder_3 == nullptr || listHolder_3->mList == nullptr) {
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    listFreer.add(listHolder_3);
+                                    for (size_t i = 0; i < element_0.targets.count; ++i) {
+                                        if (![element_0.targets[i] isKindOfClass:[CHIPAccessControlClusterTarget class]]) {
+                                            // Wrong kind of value.
+                                            return CHIP_ERROR_INVALID_ARGUMENT;
+                                        }
+                                        auto element_3 = (CHIPAccessControlClusterTarget *) element_0.targets[i];
+                                        if (element_3.cluster == nil) {
+                                            listHolder_3->mList[i].cluster.SetNull();
+                                        } else {
+                                            auto & nonNullValue_5 = listHolder_3->mList[i].cluster.SetNonNull();
+                                            nonNullValue_5 = element_3.cluster.unsignedIntValue;
+                                        }
+                                        if (element_3.endpoint == nil) {
+                                            listHolder_3->mList[i].endpoint.SetNull();
+                                        } else {
+                                            auto & nonNullValue_5 = listHolder_3->mList[i].endpoint.SetNonNull();
+                                            nonNullValue_5 = element_3.endpoint.unsignedShortValue;
+                                        }
+                                        if (element_3.deviceType == nil) {
+                                            listHolder_3->mList[i].deviceType.SetNull();
+                                        } else {
+                                            auto & nonNullValue_5 = listHolder_3->mList[i].deviceType.SetNonNull();
+                                            nonNullValue_5 = element_3.deviceType.unsignedIntValue;
+                                        }
+                                    }
+                                    nonNullValue_2 = ListType(listHolder_3->mList, element_0.targets.count);
+                                } else {
+                                    nonNullValue_2 = ListType();
+                                }
+                            }
+                        }
                     }
+                    cppValue = ListType(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType();
                 }
             }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
@@ -193,7 +188,7 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)writeAttributeExtensionWithValue:(NSArray * _Nullable)value completionHandler:(StatusCompletion)completionHandler
+- (void)writeAttributeExtensionWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
 {
     new CHIPDefaultSuccessCallbackBridge(
         self.callbackQueue,
@@ -204,32 +199,27 @@ using namespace chip::app::Clusters;
             ListFreer listFreer;
             using TypeInfo = AccessControl::Attributes::Extension::TypeInfo;
             TypeInfo::Type cppValue;
-            if (value == nil) {
-                cppValue.SetNull();
-            } else {
-                auto & nonNullValue_0 = cppValue.SetNonNull();
-                {
-                    using ListType = std::remove_reference_t<decltype(nonNullValue_0)>;
-                    using ListMemberType = ListMemberTypeGetter<ListType>::Type;
-                    if (value.count != 0) {
-                        auto * listHolder_1 = new ListHolder<ListMemberType>(value.count);
-                        if (listHolder_1 == nullptr || listHolder_1->mList == nullptr) {
+            {
+                using ListType = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+                if (value.count != 0) {
+                    auto * listHolder_0 = new ListHolder<ListMemberType>(value.count);
+                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                        return CHIP_ERROR_INVALID_ARGUMENT;
+                    }
+                    listFreer.add(listHolder_0);
+                    for (size_t i = 0; i < value.count; ++i) {
+                        if (![value[i] isKindOfClass:[CHIPAccessControlClusterExtensionEntry class]]) {
+                            // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        listFreer.add(listHolder_1);
-                        for (size_t i = 0; i < value.count; ++i) {
-                            if (![value[i] isKindOfClass:[CHIPAccessControlClusterExtensionEntry class]]) {
-                                // Wrong kind of value.
-                                return CHIP_ERROR_INVALID_ARGUMENT;
-                            }
-                            auto element_1 = (CHIPAccessControlClusterExtensionEntry *) value[i];
-                            listHolder_1->mList[i].fabricIndex = element_1.fabricIndex.unsignedCharValue;
-                            listHolder_1->mList[i].data = [self asByteSpan:element_1.data];
-                        }
-                        nonNullValue_0 = ListType(listHolder_1->mList, value.count);
-                    } else {
-                        nonNullValue_0 = ListType();
+                        auto element_0 = (CHIPAccessControlClusterExtensionEntry *) value[i];
+                        listHolder_0->mList[i].fabricIndex = element_0.fabricIndex.unsignedCharValue;
+                        listHolder_0->mList[i].data = [self asByteSpan:element_0.data];
                     }
+                    cppValue = ListType(listHolder_0->mList, value.count);
+                } else {
+                    cppValue = ListType();
                 }
             }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);

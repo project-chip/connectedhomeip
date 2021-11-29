@@ -248,103 +248,93 @@ void CHIPNullableVendorIdAttributeCallbackBridge::OnSuccessFn(
 };
 
 void CHIPAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>> &
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
         value)
 {
-    NSArray * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        auto * array_1 = [NSMutableArray new];
-        auto iter_1 = value.Value().begin();
-        while (iter_1.Next()) {
-            auto & entry_1 = iter_1.GetValue();
-            CHIPAccessControlClusterAccessControlEntry * newElement_1;
-            newElement_1 = [CHIPAccessControlClusterAccessControlEntry new];
-            newElement_1.fabricIndex = [NSNumber numberWithUnsignedChar:entry_1.fabricIndex];
-            newElement_1.privilege = [NSNumber numberWithUnsignedChar:entry_1.privilege];
-            newElement_1.authMode = [NSNumber numberWithUnsignedChar:entry_1.authMode];
-            if (entry_1.subjects.IsNull()) {
-                newElement_1.subjects = nil;
-            } else {
-                auto * array_NaN = [NSMutableArray new];
-                auto iter_NaN = entry_1.subjects.Value().begin();
-                while (iter_NaN.Next()) {
-                    auto & entry_NaN = iter_NaN.GetValue();
-                    NSNumber * newElement_NaN;
-                    newElement_NaN = [NSNumber numberWithUnsignedLongLong:entry_NaN];
-                    [array_NaN addObject:newElement_NaN];
-                }
-                if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
-                }
-                newElement_1.subjects = array_NaN;
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPAccessControlClusterAccessControlEntry * newElement_0;
+        newElement_0 = [CHIPAccessControlClusterAccessControlEntry new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+        newElement_0.privilege = [NSNumber numberWithUnsignedChar:entry_0.privilege];
+        newElement_0.authMode = [NSNumber numberWithUnsignedChar:entry_0.authMode];
+        if (entry_0.subjects.IsNull()) {
+            newElement_0.subjects = nil;
+        } else {
+            auto * array_NaN = [NSMutableArray new];
+            auto iter_NaN = entry_0.subjects.Value().begin();
+            while (iter_NaN.Next()) {
+                auto & entry_NaN = iter_NaN.GetValue();
+                NSNumber * newElement_NaN;
+                newElement_NaN = [NSNumber numberWithUnsignedLongLong:entry_NaN];
+                [array_NaN addObject:newElement_NaN];
             }
-            if (entry_1.targets.IsNull()) {
-                newElement_1.targets = nil;
-            } else {
-                auto * array_NaN = [NSMutableArray new];
-                auto iter_NaN = entry_1.targets.Value().begin();
-                while (iter_NaN.Next()) {
-                    auto & entry_NaN = iter_NaN.GetValue();
-                    CHIPAccessControlClusterTarget * newElement_NaN;
-                    newElement_NaN = [CHIPAccessControlClusterTarget new];
-                    if (entry_NaN.cluster.IsNull()) {
-                        newElement_NaN.cluster = nil;
-                    } else {
-                        newElement_NaN.cluster = [NSNumber numberWithUnsignedInt:entry_NaN.cluster.Value()];
-                    }
-                    if (entry_NaN.endpoint.IsNull()) {
-                        newElement_NaN.endpoint = nil;
-                    } else {
-                        newElement_NaN.endpoint = [NSNumber numberWithUnsignedShort:entry_NaN.endpoint.Value()];
-                    }
-                    if (entry_NaN.deviceType.IsNull()) {
-                        newElement_NaN.deviceType = nil;
-                    } else {
-                        newElement_NaN.deviceType = [NSNumber numberWithUnsignedInt:entry_NaN.deviceType.Value()];
-                    }
-                    [array_NaN addObject:newElement_NaN];
-                }
-                if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
-                }
-                newElement_1.targets = array_NaN;
+            if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
             }
-            [array_1 addObject:newElement_1];
+            newElement_0.subjects = array_NaN;
         }
-        if (iter_1.GetStatus() != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-            return;
+        if (entry_0.targets.IsNull()) {
+            newElement_0.targets = nil;
+        } else {
+            auto * array_NaN = [NSMutableArray new];
+            auto iter_NaN = entry_0.targets.Value().begin();
+            while (iter_NaN.Next()) {
+                auto & entry_NaN = iter_NaN.GetValue();
+                CHIPAccessControlClusterTarget * newElement_NaN;
+                newElement_NaN = [CHIPAccessControlClusterTarget new];
+                if (entry_NaN.cluster.IsNull()) {
+                    newElement_NaN.cluster = nil;
+                } else {
+                    newElement_NaN.cluster = [NSNumber numberWithUnsignedInt:entry_NaN.cluster.Value()];
+                }
+                if (entry_NaN.endpoint.IsNull()) {
+                    newElement_NaN.endpoint = nil;
+                } else {
+                    newElement_NaN.endpoint = [NSNumber numberWithUnsignedShort:entry_NaN.endpoint.Value()];
+                }
+                if (entry_NaN.deviceType.IsNull()) {
+                    newElement_NaN.deviceType = nil;
+                } else {
+                    newElement_NaN.deviceType = [NSNumber numberWithUnsignedInt:entry_NaN.deviceType.Value()];
+                }
+                [array_NaN addObject:newElement_NaN];
+            }
+            if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+            }
+            newElement_0.targets = array_NaN;
         }
-        objCValue = array_1;
+        [array_0 addObject:newElement_0];
     }
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+    objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
 
 void CHIPAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType>> & value)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & value)
 {
-    NSArray * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        auto * array_1 = [NSMutableArray new];
-        auto iter_1 = value.Value().begin();
-        while (iter_1.Next()) {
-            auto & entry_1 = iter_1.GetValue();
-            CHIPAccessControlClusterExtensionEntry * newElement_1;
-            newElement_1 = [CHIPAccessControlClusterExtensionEntry new];
-            newElement_1.fabricIndex = [NSNumber numberWithUnsignedChar:entry_1.fabricIndex];
-            newElement_1.data = [NSData dataWithBytes:entry_1.data.data() length:entry_1.data.size()];
-            [array_1 addObject:newElement_1];
-        }
-        if (iter_1.GetStatus() != CHIP_NO_ERROR) {
-            OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-            return;
-        }
-        objCValue = array_1;
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPAccessControlClusterExtensionEntry * newElement_0;
+        newElement_0 = [CHIPAccessControlClusterExtensionEntry new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+        newElement_0.data = [NSData dataWithBytes:entry_0.data.data() length:entry_0.data.size()];
+        [array_0 addObject:newElement_0];
     }
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+    objCValue = array_0;
     DispatchSuccess(context, objCValue);
 };
 

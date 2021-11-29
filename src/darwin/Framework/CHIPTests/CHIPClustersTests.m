@@ -28321,7 +28321,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSArray * _Nullable value = @(0);
+    NSArray * _Nonnull value = @(0);
     [cluster writeAttributeAclWithValue:value
                       completionHandler:^(NSError * _Nullable err) {
                           NSLog(@"AccessControl Acl Error: %@", err);
@@ -28358,7 +28358,7 @@ bool testSendClusterTestSubscribe_OnOff_000001_WaitForReport_Fulfilled = false;
     CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
-    NSArray * _Nullable value = @(0);
+    NSArray * _Nonnull value = @(0);
     [cluster writeAttributeExtensionWithValue:value
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"AccessControl Extension Error: %@", err);

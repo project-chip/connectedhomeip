@@ -2348,8 +2348,8 @@ static void OnCharStringAttributeResponse(void * context, const chip::CharSpan v
 
 static void OnAccessControlAclListAttributeResponse(
     void * context,
-    const chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+        list)
 {
     CHIP_ERROR err = LogValue("OnAccessControlAclListAttributeResponse", 0, list);
 
@@ -2359,8 +2359,7 @@ static void OnAccessControlAclListAttributeResponse(
 
 static void OnAccessControlExtensionListAttributeResponse(
     void * context,
-    const chip::app::DataModel::Nullable<
-        chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType>> & list)
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & list)
 {
     CHIP_ERROR err = LogValue("OnAccessControlExtensionListAttributeResponse", 0, list);
 

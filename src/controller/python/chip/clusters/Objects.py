@@ -4470,9 +4470,9 @@ class AccessControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[AccessControl.Structs.AccessControlEntry]])
+                return ClusterObjectFieldDescriptor(Type=typing.List[AccessControl.Structs.AccessControlEntry])
 
-            value: 'typing.Union[Nullable, typing.List[AccessControl.Structs.AccessControlEntry]]' = None
+            value: 'typing.List[AccessControl.Structs.AccessControlEntry]' = None
 
         @dataclass
         class Extension(ClusterAttributeDescriptor):
@@ -4486,9 +4486,9 @@ class AccessControl(Cluster):
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, typing.List[AccessControl.Structs.ExtensionEntry]])
+                return ClusterObjectFieldDescriptor(Type=typing.List[AccessControl.Structs.ExtensionEntry])
 
-            value: 'typing.Union[Nullable, typing.List[AccessControl.Structs.ExtensionEntry]]' = None
+            value: 'typing.List[AccessControl.Structs.ExtensionEntry]' = None
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):

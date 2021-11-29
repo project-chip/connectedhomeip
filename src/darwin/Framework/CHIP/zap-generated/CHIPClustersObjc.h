@@ -37,11 +37,11 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPAccessControl : CHIPCluster
 
 - (void)readAttributeAclWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)writeAttributeAclWithValue:(NSArray * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeAclWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeExtensionWithCompletionHandler:(void (^)(
                                                         NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)writeAttributeExtensionWithValue:(NSArray * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeExtensionWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;

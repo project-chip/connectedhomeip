@@ -280,9 +280,10 @@ public:
         }
     }
 
-    static void CallbackFn(void * context,
-                           const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-                               chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>> & list);
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            list);
 
 private:
     jobject javaCallbackRef;
@@ -306,9 +307,10 @@ public:
         }
     }
 
-    static void CallbackFn(void * context,
-                           const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-                               chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType>> & list);
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> &
+            list);
 
 private:
     jobject javaCallbackRef;

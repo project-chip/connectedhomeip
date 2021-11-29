@@ -5446,9 +5446,9 @@ namespace Attributes {
 namespace Acl {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<DataModel::List<const Structs::AccessControlEntry::Type>>;
-    using DecodableType    = DataModel::Nullable<DataModel::DecodableList<Structs::AccessControlEntry::DecodableType>>;
-    using DecodableArgType = const DataModel::Nullable<DataModel::DecodableList<Structs::AccessControlEntry::DecodableType>> &;
+    using Type             = DataModel::List<const Structs::AccessControlEntry::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::AccessControlEntry::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::AccessControlEntry::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Acl::Id; }
@@ -5457,9 +5457,9 @@ struct TypeInfo
 namespace Extension {
 struct TypeInfo
 {
-    using Type             = DataModel::Nullable<DataModel::List<const Structs::ExtensionEntry::Type>>;
-    using DecodableType    = DataModel::Nullable<DataModel::DecodableList<Structs::ExtensionEntry::DecodableType>>;
-    using DecodableArgType = const DataModel::Nullable<DataModel::DecodableList<Structs::ExtensionEntry::DecodableType>> &;
+    using Type             = DataModel::List<const Structs::ExtensionEntry::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::ExtensionEntry::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::ExtensionEntry::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccessControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Extension::Id; }

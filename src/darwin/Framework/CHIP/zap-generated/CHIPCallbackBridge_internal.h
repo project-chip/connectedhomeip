@@ -453,9 +453,10 @@ public:
                                                     bool keepAlive = false) :
         CHIPCallbackBridge<AccessControlAclListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType>> & value);
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            value);
 };
 
 class CHIPAccessControlExtensionListAttributeCallbackBridge : public CHIPCallbackBridge<AccessControlExtensionListAttributeCallback>
@@ -465,9 +466,10 @@ public:
                                                           bool keepAlive = false) :
         CHIPCallbackBridge<AccessControlExtensionListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context,
-                            const chip::app::DataModel::Nullable<chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType>> & value);
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> &
+            value);
 };
 
 class CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge
