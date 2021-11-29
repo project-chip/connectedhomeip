@@ -56,7 +56,7 @@ using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
 
 void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableType & response);
 void OnQueryImageFailure(void * context, EmberAfStatus status);
-void OnConnected(void * context, chip::DeviceProxy * deviceProxy);
+void OnConnected(void * context, chip::OperationalDeviceProxy * deviceProxy);
 void OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error);
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 
@@ -153,7 +153,7 @@ void OnQueryImageFailure(void * context, EmberAfStatus status)
     ChipLogDetail(SoftwareUpdate, "QueryImage failure response %" PRIu8, status);
 }
 
-void OnConnected(void * context, chip::DeviceProxy * deviceProxy)
+void OnConnected(void * context, chip::OperationalDeviceProxy * deviceProxy)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Controller::OtaSoftwareUpdateProviderCluster cluster;

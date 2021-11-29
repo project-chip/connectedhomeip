@@ -27,7 +27,7 @@
 class ModelCommand : public CHIPCommand
 {
 public:
-    using ChipDevice = ::chip::DeviceProxy;
+    using ChipDevice = ::chip::OperationalDeviceProxy;
 
     ModelCommand(const char * commandName) :
         CHIPCommand(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),

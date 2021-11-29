@@ -96,7 +96,7 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     return err;
 }
 
-void PairingCommand::OnDeviceConnectedFn(void * context, chip::DeviceProxy * device)
+void PairingCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
 {
     PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
     command->OpenCommissioningWindow();

@@ -163,6 +163,8 @@ void pychip_Stack_SetLogFunct(LogMessageFunct logFunct);
 
 ChipError::StorageType pychip_GetConnectedDeviceByNodeId(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
                                                          DeviceAvailableFunc callback);
+ChipError::StorageType pychip_GetDeviceBeingCommissioned(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
+                                                         CommissioneeDeviceProxy ** proxy);
 uint64_t pychip_GetCommandSenderHandle(chip::DeviceProxy * device);
 // CHIP Stack objects
 ChipError::StorageType pychip_BLEMgrImpl_ConfigureBle(uint32_t bluetoothAdapterId);
@@ -534,7 +536,7 @@ struct GetDeviceCallbacks
         mOnSuccess(OnDeviceConnectedFn, this), mOnFailure(OnConnectionFailureFn, this), mCallback(callback)
     {}
 
-    static void OnDeviceConnectedFn(void * context, DeviceProxy * device)
+    static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
     {
         auto * self = static_cast<GetDeviceCallbacks *>(context);
         self->mCallback(device, CHIP_NO_ERROR.AsInteger());
@@ -560,6 +562,12 @@ ChipError::StorageType pychip_GetConnectedDeviceByNodeId(chip::Controller::Devic
     VerifyOrReturnError(devCtrl != nullptr, CHIP_ERROR_INVALID_ARGUMENT.AsInteger());
     auto * callbacks = new GetDeviceCallbacks(callback);
     return devCtrl->GetConnectedDevice(nodeId, &callbacks->mOnSuccess, &callbacks->mOnFailure).AsInteger();
+}
+
+ChipError::StorageType pychip_GetDeviceBeingCommissioned(chip::Controller::DeviceCommissioner * devCtrl, chip::NodeId nodeId,
+                                                         CommissioneeDeviceProxy ** proxy)
+{
+    return devCtrl->GetDeviceBeingCommissioned(nodeId, proxy).AsInteger();
 }
 
 ChipError::StorageType pychip_DeviceCommissioner_CloseBleConnection(chip::Controller::DeviceCommissioner * devCtrl)
