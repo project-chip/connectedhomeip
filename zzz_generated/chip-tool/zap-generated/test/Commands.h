@@ -22,6 +22,133 @@
 #include <commands/common/CommandInvoker.h>
 #include <commands/tests/TestCommand.h>
 
+class TestList : public Command
+{
+public:
+    TestList() : Command("list"){};
+    CHIP_ERROR Run() override
+    {
+        printf("Test_TC_BI_1_1\n");
+        printf("Test_TC_BI_2_1\n");
+        printf("Test_TC_BI_2_2\n");
+        printf("Test_TC_BOOL_1_1\n");
+        printf("Test_TC_BOOL_2_1\n");
+        printf("Test_TC_CC_1_1\n");
+        printf("Test_TC_CC_2_1\n");
+        printf("Test_TC_CC_3_1\n");
+        printf("Test_TC_CC_3_2\n");
+        printf("Test_TC_CC_3_3\n");
+        printf("Test_TC_CC_4_1\n");
+        printf("Test_TC_CC_4_2\n");
+        printf("Test_TC_CC_4_3\n");
+        printf("Test_TC_CC_4_4\n");
+        printf("Test_TC_CC_5_1\n");
+        printf("Test_TC_CC_5_2\n");
+        printf("Test_TC_CC_5_3\n");
+        printf("Test_TC_CC_6_1\n");
+        printf("Test_TC_CC_6_2\n");
+        printf("Test_TC_CC_6_3\n");
+        printf("Test_TC_CC_7_1\n");
+        printf("Test_TC_CC_7_2\n");
+        printf("Test_TC_CC_7_3\n");
+        printf("Test_TC_CC_7_4\n");
+        printf("Test_TC_CC_8_1\n");
+        printf("Test_TC_CC_9_1\n");
+        printf("Test_TC_CC_9_2\n");
+        printf("Test_TC_CC_9_3\n");
+        printf("Test_TC_DM_1_1\n");
+        printf("Test_TC_DM_3_1\n");
+        printf("Test_TC_DM_2_2\n");
+        printf("Test_TC_EMR_1_1\n");
+        printf("Test_TC_FLW_1_1\n");
+        printf("Test_TC_FLW_2_1\n");
+        printf("Test_TC_FLW_2_2\n");
+        printf("Test_TC_ILL_1_1\n");
+        printf("Test_TC_LVL_1_1\n");
+        printf("Test_TC_LVL_2_1\n");
+        printf("Test_TC_LVL_3_1\n");
+        printf("Test_TC_LVL_4_1\n");
+        printf("Test_TC_LVL_5_1\n");
+        printf("Test_TC_MC_1_1\n");
+        printf("Test_TC_MC_2_1\n");
+        printf("Test_TC_MC_3_1\n");
+        printf("Test_TC_MC_3_2\n");
+        printf("Test_TC_MC_3_3\n");
+        printf("Test_TC_MC_3_4\n");
+        printf("Test_TC_MC_3_5\n");
+        printf("Test_TC_MC_3_6\n");
+        printf("Test_TC_MC_3_7\n");
+        printf("Test_TC_MC_3_8\n");
+        printf("Test_TC_MC_3_9\n");
+        printf("Test_TC_MC_3_10\n");
+        printf("Test_TC_MC_3_11\n");
+        printf("Test_TC_OCC_1_1\n");
+        printf("Test_TC_OCC_2_1\n");
+        printf("Test_TC_OCC_2_2\n");
+        printf("Test_TC_OO_1_1\n");
+        printf("Test_TC_OO_2_1\n");
+        printf("Test_TC_OO_2_2\n");
+        printf("Test_TC_OO_2_3\n");
+        printf("Test_TC_PRS_1_1\n");
+        printf("Test_TC_PRS_2_1\n");
+        printf("Test_TC_PCC_1_1\n");
+        printf("Test_TC_PCC_2_1\n");
+        printf("Test_TC_PCC_2_2\n");
+        printf("Test_TC_PCC_2_3\n");
+        printf("Test_TC_RH_1_1\n");
+        printf("Test_TC_RH_2_1\n");
+        printf("Test_TC_RH_2_2\n");
+        printf("Test_TC_TM_1_1\n");
+        printf("Test_TC_TM_2_1\n");
+        printf("Test_TC_TM_2_2\n");
+        printf("Test_TC_TSTAT_1_1\n");
+        printf("Test_TC_TSTAT_2_1\n");
+        printf("Test_TC_TSTAT_2_2\n");
+        printf("Test_TC_TSUIC_1_1\n");
+        printf("Test_TC_TSUIC_2_1\n");
+        printf("Test_TC_TSUIC_2_2\n");
+        printf("Test_TC_DIAGTH_1_1\n");
+        printf("Test_TC_WNCV_1_1\n");
+        printf("Test_TC_WNCV_2_1\n");
+        printf("Test_TC_WNCV_2_2\n");
+        printf("Test_TC_WNCV_2_4\n");
+        printf("Test_TC_WNCV_2_5\n");
+        printf("Test_TC_WNCV_3_1\n");
+        printf("Test_TC_WNCV_3_2\n");
+        printf("Test_TC_WNCV_3_3\n");
+        printf("TV_TargetNavigatorCluster\n");
+        printf("TV_AudioOutputCluster\n");
+        printf("TV_ApplicationLauncherCluster\n");
+        printf("TV_KeypadInputCluster\n");
+        printf("TV_AccountLoginCluster\n");
+        printf("TV_WakeOnLanCluster\n");
+        printf("TV_ApplicationBasicCluster\n");
+        printf("TV_MediaPlaybackCluster\n");
+        printf("TV_TvChannelCluster\n");
+        printf("TV_LowPowerCluster\n");
+        printf("TV_MediaInputCluster\n");
+        printf("TestCluster\n");
+        printf("TestClusterComplexTypes\n");
+        printf("TestConstraints\n");
+        printf("TestDelayCommands\n");
+        printf("TestLogCommands\n");
+        printf("TestSaveAs\n");
+        printf("TestDescriptorCluster\n");
+        printf("TestBasicInformation\n");
+        printf("TestIdentifyCluster\n");
+        printf("TestGroupsCluster\n");
+        printf("TestOperationalCredentialsCluster\n");
+        printf("TestModeSelectCluster\n");
+        printf("TestGroupMessaging\n");
+        printf("Test_TC_DIAGSW_1_1\n");
+        printf("Test_TC_DIAGSW_2_1\n");
+        printf("Test_TC_DIAGSW_3_2\n");
+        printf("TestSubscribe_OnOff\n");
+
+        return CHIP_NO_ERROR;
+    }
+};
+
 class Test_TC_BI_1_1 : public TestCommand
 {
 public:
@@ -44425,6 +44552,7 @@ void registerCommandsTests(Commands & commands)
     const char * clusterName = "Tests";
 
     commands_list clusterCommands = {
+        make_unique<TestList>(),
         make_unique<Test_TC_BI_1_1>(),
         make_unique<Test_TC_BI_2_1>(),
         make_unique<Test_TC_BI_2_2>(),
