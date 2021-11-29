@@ -47,14 +47,14 @@ EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value)
       value.SetNull();
       return EMBER_ZCL_STATUS_SUCCESS;
       {{else}}
-      return EMBER_ZCL_STATUS_INVALID_VALUE;
+      return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
       {{/if}}
     }
     {{#if isNullable}}
     auto & span = value.SetNonNull();
     {{/if}}
     {{~#*inline "value"}}{{#if isNullable}}span{{else}}value{{/if}}{{/inline}}
-    VerifyOrReturnError({{>value}}.size() == {{maxLength}}, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    VerifyOrReturnError({{>value}}.size() == {{maxLength}}, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
     memcpy({{>value}}.data(), &zclString[{{>sizingBytes}}], {{maxLength}});
     {{>value}}.reduce_size(length);
     return status;
@@ -75,7 +75,7 @@ EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value)
     {{else}}
     if (!NumericAttributeTraits<{{accessorTraitType type}}>::CanRepresentValue(/* isNullable = */ {{isNullable}}, temp))
     {
-        return EMBER_ZCL_STATUS_INVALID_VALUE;
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
     *value = NumericAttributeTraits<{{accessorTraitType type}}>::StorageToWorking(temp);
     {{/if}}
@@ -88,7 +88,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, {{asUnderlyingZclType type}} value)
     {{~#*inline "lengthType"}}uint{{#if (isShortString type)}}8{{else}}16{{/if}}_t{{/inline}}
     static_assert({{maxLength}} < NumericAttributeTraits<{{>lengthType}}>::kNullValue,
                   "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= {{maxLength}}, EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+    VerifyOrReturnError(value.size() <= {{maxLength}}, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
     uint8_t zclString[{{maxLength}} + {{>sizingBytes}}];
     emberAfCopyInt{{#if (isShortString type)}}8{{else}}16{{/if}}u(zclString, 0, static_cast<{{>lengthType}}>(value.size()));
     memcpy(&zclString[{{>sizingBytes}}], value.data(), value.size());
@@ -96,7 +96,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, {{asUnderlyingZclType type}} value)
     {{else}}
     if (!NumericAttributeTraits<{{accessorTraitType type}}>::CanRepresentValue(/* isNullable = */ {{isNullable}}, value))
     {
-        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
     NumericAttributeTraits<{{accessorTraitType type}}>::StorageType storageValue;
     NumericAttributeTraits<{{accessorTraitType type}}>::WorkingToStorage(value, storageValue);

@@ -165,7 +165,7 @@ CHIP_ERROR WriteHandler::ProcessAttributeDataIBs(TLV::TLVReader & aAttributeData
         }
 
         // We do not support Wildcard writes for now, reject all wildcard write requests.
-        VerifyOrExit(clusterInfo.IsValidAttributePath() && !clusterInfo.HasWildcard(),
+        VerifyOrExit(clusterInfo.IsValidAttributePath() && !clusterInfo.HasAttributeWildcard(),
                      err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
         err = element.GetData(&dataReader);
@@ -235,13 +235,6 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteHandler::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                                AttributeStatusIB::Builder aAttributeStatusIB)
-{
-    AttributePathIB::Builder attributePath = aAttributeStatusIB.CreatePath();
-    return aAttributePathParams.BuildAttributePath(attributePath);
-}
-
 CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathParams,
                                    const Protocols::InteractionModel::Status aStatus)
 {
@@ -252,7 +245,7 @@ CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathPar
     err                                          = attributeStatusIB.GetError();
     SuccessOrExit(err);
 
-    err = ConstructAttributePath(aAttributePathParams, attributeStatusIB);
+    err = attributeStatusIB.CreatePath().Encode(aAttributePathParams);
     SuccessOrExit(err);
 
     statusIB.mStatus = aStatus;

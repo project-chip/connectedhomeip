@@ -710,7 +710,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
 // mask = CLUSTER_MASK_CLIENT -> find client
 // mask = CLUSTER_MASK_SERVER -> find server
 EmberAfCluster * emberAfFindClusterInTypeWithMfgCode(EmberAfEndpointType * endpointType, ClusterId clusterId,
-                                                     EmberAfClusterMask mask, uint16_t manufacturerCode)
+                                                     EmberAfClusterMask mask, uint16_t manufacturerCode, uint8_t * index)
 {
     uint8_t i;
     for (i = 0; i < endpointType->clusterCount; i++)
@@ -725,6 +725,11 @@ EmberAfCluster * emberAfFindClusterInTypeWithMfgCode(EmberAfEndpointType * endpo
              // if the manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE
              || manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE))
         {
+            if (index)
+            {
+                *index = i;
+            }
+
             return cluster;
         }
     }
@@ -740,7 +745,7 @@ EmberAfCluster * emberAfFindClusterInType(EmberAfEndpointType * endpointType, Cl
 
 // This code is used during unit tests for clusters that do not involve manufacturer code.
 // Should this code be used in other locations, manufacturerCode should be added.
-uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
+uint8_t emberAfClusterIndexInMatchingEndpoints(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
 {
     uint8_t ep;
     uint8_t index = 0xFF;
@@ -750,6 +755,24 @@ uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClu
         if (emberAfFindClusterInTypeWithMfgCode(endpointType, clusterId, mask, EMBER_AF_NULL_MANUFACTURER_CODE) != NULL)
         {
             index++;
+            if (emAfEndpoints[ep].endpoint == endpoint)
+            {
+                return index;
+            }
+        }
+    }
+    return 0xFF;
+}
+
+uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
+{
+    uint8_t ep;
+    uint8_t index = 0xFF;
+    for (ep = 0; ep < emberAfEndpointCount(); ep++)
+    {
+        EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
+        if (emberAfFindClusterInTypeWithMfgCode(endpointType, clusterId, mask, EMBER_AF_NULL_MANUFACTURER_CODE, &index) != NULL)
+        {
             if (emAfEndpoints[ep].endpoint == endpoint)
             {
                 return index;

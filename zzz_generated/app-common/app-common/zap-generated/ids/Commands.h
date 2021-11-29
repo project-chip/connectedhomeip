@@ -184,33 +184,13 @@ namespace Off {
 static constexpr CommandId Id = 0x00000000;
 } // namespace Off
 
-namespace SampleMfgSpecificOffWithTransition {
-static constexpr CommandId Id = 0x10020000;
-} // namespace SampleMfgSpecificOffWithTransition
-
 namespace On {
 static constexpr CommandId Id = 0x00000001;
 } // namespace On
 
-namespace SampleMfgSpecificOnWithTransition {
-static constexpr CommandId Id = 0x10020001;
-} // namespace SampleMfgSpecificOnWithTransition
-
-namespace SampleMfgSpecificOnWithTransition2 {
-static constexpr CommandId Id = 0x10490001;
-} // namespace SampleMfgSpecificOnWithTransition2
-
 namespace Toggle {
 static constexpr CommandId Id = 0x00000002;
 } // namespace Toggle
-
-namespace SampleMfgSpecificToggleWithTransition {
-static constexpr CommandId Id = 0x10020002;
-} // namespace SampleMfgSpecificToggleWithTransition
-
-namespace SampleMfgSpecificToggleWithTransition2 {
-static constexpr CommandId Id = 0x10490002;
-} // namespace SampleMfgSpecificToggleWithTransition2
 
 namespace OffWithEffect {
 static constexpr CommandId Id = 0x00000040;
@@ -1672,6 +1652,10 @@ namespace TestListStructArgumentRequest {
 static constexpr CommandId Id = 0x00000009;
 } // namespace TestListStructArgumentRequest
 
+namespace SimpleStructResponse {
+static constexpr CommandId Id = 0x00000009;
+} // namespace SimpleStructResponse
+
 namespace TestListInt8UArgumentRequest {
 static constexpr CommandId Id = 0x0000000A;
 } // namespace TestListInt8UArgumentRequest
@@ -1699,6 +1683,10 @@ static constexpr CommandId Id = 0x0000000F;
 namespace TestComplexNullableOptionalRequest {
 static constexpr CommandId Id = 0x00000010;
 } // namespace TestComplexNullableOptionalRequest
+
+namespace SimpleStructEchoRequest {
+static constexpr CommandId Id = 0x00000011;
+} // namespace SimpleStructEchoRequest
 
 } // namespace Commands
 } // namespace TestCluster
@@ -1824,26 +1812,6 @@ static constexpr CommandId Id = 0x00000001;
 
 } // namespace Commands
 } // namespace Binding
-
-namespace SampleMfgSpecificCluster {
-namespace Commands {
-
-namespace CommandOne {
-static constexpr CommandId Id = 0x10020000;
-} // namespace CommandOne
-
-} // namespace Commands
-} // namespace SampleMfgSpecificCluster
-
-namespace SampleMfgSpecificCluster2 {
-namespace Commands {
-
-namespace CommandTwo {
-static constexpr CommandId Id = 0x10490000;
-} // namespace CommandTwo
-
-} // namespace Commands
-} // namespace SampleMfgSpecificCluster2
 
 } // namespace Clusters
 } // namespace app

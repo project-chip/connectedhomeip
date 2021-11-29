@@ -54,7 +54,7 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DeviceAttestationVerifierExample.h>
+#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
 #include <inet/IPAddress.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/BytesToHex.h>
@@ -182,7 +182,9 @@ ChipError::StorageType pychip_DeviceController_NewDeviceController(chip::Control
     }
 
     // Initialize device attestation verifier
-    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
+    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
     CHIP_ERROR err = sOperationalCredentialsIssuer.Initialize(sStorageDelegate);
     VerifyOrReturnError(err == CHIP_NO_ERROR, err.AsInteger());

@@ -220,4 +220,11 @@ target_link_options(${COMPONENT_LIB}
     "-T${PIGWEED_ROOT}/pw_tokenizer/pw_tokenizer_linker_sections.ld"
 )
 
+target_compile_options(${COMPONENT_LIB} PRIVATE
+                       "-DPW_RPC_ATTRIBUTE_SERVICE=1"
+                       "-DPW_RPC_BUTTON_SERVICE=1"
+                       "-DPW_RPC_DEVICE_SERVICE=1"
+                       "-DPW_RPC_LIGHTING_SERVICE=1"
+                       "-DPW_RPC_LOCKING_SERVICE=1")
+
 endif (CONFIG_ENABLE_PW_RPC)

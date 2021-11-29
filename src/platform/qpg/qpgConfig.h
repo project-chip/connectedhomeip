@@ -81,7 +81,7 @@ public:
     static constexpr Key kConfigKey_LastUsedEpochKeyId = QorvoConfigKey(kFileId_ChipConfig, 0x05);
     static constexpr Key kConfigKey_FailSafeArmed      = QorvoConfigKey(kFileId_ChipConfig, 0x06);
     static constexpr Key kConfigKey_GroupKey           = QorvoConfigKey(kFileId_ChipConfig, 0x07);
-    static constexpr Key kConfigKey_ProductRevision    = QorvoConfigKey(kFileId_ChipConfig, 0x08);
+    static constexpr Key kConfigKey_HardwareVersion    = QorvoConfigKey(kFileId_ChipConfig, 0x08);
     static constexpr Key kConfigKey_RegulatoryLocation = QorvoConfigKey(kFileId_ChipConfig, 0x09);
     static constexpr Key kConfigKey_CountryCode        = QorvoConfigKey(kFileId_ChipConfig, 0x0A);
     static constexpr Key kConfigKey_Breadcrumb         = QorvoConfigKey(kFileId_ChipConfig, 0x0B);

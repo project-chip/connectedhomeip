@@ -20,7 +20,7 @@ import("${chip_root}/src/platform/nxp/k32w/k32w0/args.gni")
 
 declare_args() {
   # Location of the k32w0 SDK.
-  k32w0_sdk_root = getenv("K32W_SDK_ROOT")
+  k32w0_sdk_root = getenv("NXP_K32W061_SDK_ROOT")
   chip_with_OM15082 = 0
   chip_with_ot_cli = 0
   chip_with_low_power = 0
@@ -154,7 +154,7 @@ template("k32w0_sdk") {
       "gTimestamp_Enabled_d=0",
       "K32W_LOG_ENABLED=1",
       "CHIP_ENABLE_OPENTHREAD=1",
-      "PoolsDetails_c=_block_size_ 32 _number_of_blocks_ 6 _pool_id_(0) _eol_ _block_size_ 512 _number_of_blocks_ 2 _pool_id_(0) _eol_ _block_size_ 768 _number_of_blocks_ 1 _pool_id_(0) _eol_",
+      "PoolsDetails_c=_block_size_ 32 _number_of_blocks_ 6 _pool_id_(0) _eol_ _block_size_ 256 _number_of_blocks_ 3 _pool_id_(0) _eol_ _block_size_ 512 _number_of_blocks_ 2 _pool_id_(0) _eol_ _block_size_ 768 _number_of_blocks_ 1 _pool_id_(0) _eol_",
       "SUPPORT_FOR_15_4=1",
       "gAppMaxConnections_c=1",
       "gAppUseBonding_d=0",
@@ -175,6 +175,8 @@ template("k32w0_sdk") {
       defines += [
         "OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE=1",
         "OPENTHREAD_CONFIG_ECDSA_ENABLE=1",
+        "OPENTHREAD_CONFIG_DNS_CLIENT_SERVICE_DISCOVERY_ENABLE=1",
+        "OPENTHREAD_CONFIG_DNS_CLIENT_ENABLE=1",
       ]
     }
 

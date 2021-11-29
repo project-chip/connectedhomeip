@@ -692,7 +692,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
                             else
                             {
                                 ChipLogError(Zcl, "Error: Could Not adjust heating setpoint to maintain dead band!");
-                                status = EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+                                status = EMBER_ZCL_STATUS_INVALID_COMMAND;
                             }
                         }
                         else
@@ -710,7 +710,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
                 ChipLogError(Zcl, "Error: GetOccupiedCoolingSetpoint failed!");
         }
         else
-            status = EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+            status = EMBER_ZCL_STATUS_INVALID_COMMAND;
         break;
 
     case EMBER_ZCL_SETPOINT_ADJUST_MODE_HEAT_SETPOINT:
@@ -745,7 +745,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
                             else
                             {
                                 ChipLogError(Zcl, "Error: Could Not adjust cooling setpoint to maintain dead band!");
-                                status = EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+                                status = EMBER_ZCL_STATUS_INVALID_COMMAND;
                             }
                         }
                         else
@@ -763,11 +763,11 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(app::CommandHandler * co
                 ChipLogError(Zcl, "Error: GetOccupiedHeatingSetpoint failed!");
         }
         else
-            status = EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+            status = EMBER_ZCL_STATUS_INVALID_COMMAND;
         break;
 
     default:
-        status = EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+        status = EMBER_ZCL_STATUS_INVALID_COMMAND;
         break;
     }
 

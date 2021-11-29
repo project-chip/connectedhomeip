@@ -54,7 +54,7 @@ namespace Structs {
 namespace {{asUpperCamelCase name}} {
     enum class Fields {
     {{#zcl_struct_items}}
-    k{{asUpperCamelCase label}} = {{index}},
+    k{{asUpperCamelCase label}} = {{fieldIdentifier}},
     {{/zcl_struct_items}}
     };
 

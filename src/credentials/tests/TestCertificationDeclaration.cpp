@@ -247,7 +247,7 @@ static void TestCD_CMSSignAndVerify(nlTestSuite * inSuite, void * inContext)
 {
     ByteSpan cdContentIn(sTestCMS_CDContent01);
     ByteSpan cdContentOut;
-    uint8_t signerKeyIdBuf[kKeyIdentifierLength];
+    uint8_t signerKeyIdBuf[Crypto::kSubjectKeyIdentifierLength];
     MutableByteSpan signerKeyId(signerKeyIdBuf);
     uint8_t signedMessageBuf[kMaxCMSSignedCDMessage];
     MutableByteSpan signedMessage(signedMessageBuf);
@@ -297,7 +297,7 @@ static void TestCD_CMSVerifyAndExtract(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, testCase.cdContent.data_equal(cdContentOut));
 
         // Test CMS_ExtractKeyId()
-        uint8_t signerKeyIdBuf[kKeyIdentifierLength];
+        uint8_t signerKeyIdBuf[Crypto::kSubjectKeyIdentifierLength];
         MutableByteSpan signerKeyId(signerKeyIdBuf);
         NL_TEST_ASSERT(inSuite, ExtractSKIDFromX509Cert(testCase.signerCert, signerKeyId) == CHIP_NO_ERROR);
 

@@ -636,6 +636,10 @@ NS_ASSUME_NONNULL_BEGIN
         _e = @"";
 
         _f = @(0);
+
+        _g = @(0);
+
+        _h = @(0);
     }
     return self;
 }

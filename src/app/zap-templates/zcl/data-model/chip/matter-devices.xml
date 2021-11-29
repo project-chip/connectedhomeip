@@ -23,6 +23,10 @@ limitations under the License.
         <profileId editable="false">0x0103</profileId>
         <deviceId editable="false">0x0016</deviceId>
         <clusters lockOthers="true">
+            <include cluster="Access Control" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireAttribute>ACL</requireAttribute>
+                <requireAttribute>EXTENSION</requireAttribute>
+            </include>
             <include cluster="Basic" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>INTERACTION_MODEL_VERSION</requireAttribute>
                 <requireAttribute>VENDOR_NAME</requireAttribute>
@@ -42,7 +46,6 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
-            <include cluster="ACL" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Power Source Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Time Synchronization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Group Key Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>

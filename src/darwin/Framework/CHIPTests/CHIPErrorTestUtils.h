@@ -1,7 +1,6 @@
-/*
+/**
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,26 +15,12 @@
  *    limitations under the License.
  */
 
-#pragma once
+#import <Foundation/Foundation.h>
 
-#include <app/util/af-types.h>
-#include <lib/core/CHIPError.h>
+NS_ASSUME_NONNULL_BEGIN
 
-#include "../endpoint-configuration/EndpointConfigurationStorage.h"
+@interface CHIPErrorTestUtils : NSObject
++ (uint8_t)errorToZCLErrorCode:(NSError * _Nullable)error;
+@end
 
-class WakeOnLanManager
-{
-public:
-    CHIP_ERROR Init();
-    void store(chip::EndpointId endpoint, char macAddress[32]);
-    void setMacAddress(chip::EndpointId endpoint, char * macAddress);
-
-    static WakeOnLanManager & GetInstance()
-    {
-        static WakeOnLanManager instance;
-        return instance;
-    }
-
-private:
-    EndpointConfigurationStorage * es = nullptr;
-};
+NS_ASSUME_NONNULL_END

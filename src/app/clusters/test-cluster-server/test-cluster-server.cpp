@@ -293,7 +293,7 @@ bool emberAfTestClusterClusterTestAddArgumentsCallback(CommandHandler * apComman
 {
     if (commandData.arg1 > UINT8_MAX - commandData.arg2)
     {
-        return emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_ARGUMENT);
+        return emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_INVALID_COMMAND);
     }
 
     TestAddArgumentsResponse::Type responseData;
@@ -496,6 +496,27 @@ bool emberAfTestClusterClusterTestNullableOptionalRequestCallback(
 
         response.originalValue.Emplace(commandData.arg1.Value());
     }
+
+    CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
+    if (err != CHIP_NO_ERROR)
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
+    }
+    return true;
+}
+
+bool emberAfTestClusterClusterSimpleStructEchoRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                              const Commands::SimpleStructEchoRequest::DecodableType & commandData)
+{
+    Commands::SimpleStructResponse::Type response;
+    response.arg1.a = commandData.arg1.a;
+    response.arg1.b = commandData.arg1.b;
+    response.arg1.c = commandData.arg1.c;
+    response.arg1.d = commandData.arg1.d;
+    response.arg1.e = commandData.arg1.e;
+    response.arg1.f = commandData.arg1.f;
+    response.arg1.g = commandData.arg1.g;
+    response.arg1.h = commandData.arg1.h;
 
     CHIP_ERROR err = commandObj->AddResponseData(commandPath, response);
     if (err != CHIP_NO_ERROR)

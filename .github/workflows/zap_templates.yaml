@@ -39,7 +39,7 @@ jobs:
               uses: actions/setup-node@v1
               with:
                 node-version: '14.x'
-            - name: Use Java 
+            - name: Use Java
               uses: actions/setup-java@v2
               with:
                 distribution: 'zulu'
@@ -56,7 +56,7 @@ jobs:
                 npm rebuild canvas --update-binary
                 npm run build-spa
             - name: Generate all
-              timeout-minutes: 5
+              timeout-minutes: 15
               run: scripts/tools/zap_regen_all.py
             - name: Check for uncommited changes
               run: |

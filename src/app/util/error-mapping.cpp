@@ -105,8 +105,8 @@ EmberAfStatus ToEmberAfStatus(Protocols::InteractionModel::Status code)
         return EMBER_ZCL_STATUS_SUCCESS;
     case imcode::NoUpstreamSubscription: // 0xc5
         return EMBER_ZCL_STATUS_FAILURE;
-    case imcode::InvalidArgument: // 0xc6
-        return EMBER_ZCL_STATUS_INVALID_ARGUMENT;
+    case imcode::NeedsTimedInteraction: // 0xc6
+        return EMBER_ZCL_STATUS_NEEDS_TIMED_INTERACTION;
         // Default case is omitted intentionally so we can guarantee that we exhaust all of the error codes.
     }
     return EMBER_ZCL_STATUS_FAILURE;
@@ -183,8 +183,8 @@ Protocols::InteractionModel::Status ToInteractionModelStatus(EmberAfStatus code)
         return imcode::UnsupportedCluster;
     case EMBER_ZCL_STATUS_LIMIT_REACHED: // 0xC4
         return imcode::Success;
-    case EMBER_ZCL_STATUS_INVALID_ARGUMENT: // 0xC6
-        return imcode::InvalidArgument;
+    case EMBER_ZCL_STATUS_NEEDS_TIMED_INTERACTION: // 0xC6
+        return imcode::NeedsTimedInteraction;
     default:
         return imcode::Failure;
     }

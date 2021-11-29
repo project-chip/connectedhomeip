@@ -1403,6 +1403,8 @@
  *  @note
  *    WARNING: This option makes it possible to circumvent basic chip security functionality,
  *    including message encryption. Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
+ *
+ *    To build with this flag, pass 'treat_warnings_as_errors=false' to gn/ninja.
  */
 #ifndef CHIP_CONFIG_SECURITY_TEST_MODE
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
@@ -2490,6 +2492,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_WRITE_CLIENT
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 4
+#endif
+
+/**
+ * @def CONFIG_IM_BUILD_FOR_UNIT_TEST
+ *
+ * @brief Defines whether we're currently building the IM for unit testing, which enables a set of features
+ *        that are only utilized in those tests.
+ */
+#ifndef CONFIG_IM_BUILD_FOR_UNIT_TEST
+#define CONFIG_IM_BUILD_FOR_UNIT_TEST 0
 #endif
 
 /**

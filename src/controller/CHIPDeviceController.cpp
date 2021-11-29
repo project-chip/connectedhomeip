@@ -143,6 +143,7 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
 
+    mFabricIndex = params.fabricIndex;
     ReturnErrorOnFailure(ProcessControllerNOCChain(params));
 
     DeviceProxyInitParams deviceInitParams = {
