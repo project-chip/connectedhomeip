@@ -214,7 +214,7 @@ private:
     chip::Controller::NetworkCommissioningCluster mCluster;
     chip::EndpointId mEndpointId = 0;
 
-    static void OnDeviceConnectedFn(void * context, chip::DeviceProxy * device);
+    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
     static void OnOpenCommissioningWindowResponse(void * context, NodeId deviceId, CHIP_ERROR status, chip::SetupPayload payload);
 

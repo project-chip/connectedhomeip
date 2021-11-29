@@ -22,7 +22,7 @@ if ({{source}}.Value().IsNull()) {
 {{else}}
 std::string {{target}}ClassName = "java/lang/{{asJavaBasicTypeForZclType type true}}";
 std::string {{target}}CtorSignature = "({{asJniSignature type false}})V";
-chip::JniReferences::GetInstance().CreateBoxedObject<{{chipType}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{>item}}, {{target}});
+chip::JniReferences::GetInstance().CreateBoxedObject<{{zapTypeToDecodableClusterObjectType type ns=parent.parent.name forceNotNullable=true forceNotOptional=true}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{>item}}, {{target}});
 {{/if}}
 {{#if isOptional}}
 chip::JniReferences::GetInstance().CreateOptional({{target}}, {{target}});

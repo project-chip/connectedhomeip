@@ -591,7 +591,7 @@ private:
     DevicePairingDelegate * mPairingDelegate;
 
     CommissioneeDeviceProxy * mDeviceBeingCommissioned = nullptr;
-    DeviceProxy * mDeviceOperational                   = nullptr;
+    OperationalDeviceProxy * mDeviceOperational        = nullptr;
 
     Credentials::CertificateType mCertificateTypeBeingRequested = Credentials::CertificateType::kUnknown;
 
@@ -688,7 +688,7 @@ private:
     /* Callback called when adding root cert to device results in failure */
     static void OnRootCertFailureResponse(void * context, uint8_t status);
 
-    static void OnDeviceConnectedFn(void * context, DeviceProxy * device);
+    static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,
