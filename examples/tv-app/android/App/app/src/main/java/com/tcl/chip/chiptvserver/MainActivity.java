@@ -5,25 +5,9 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import chip.appserver.ChipAppServer;
-import chip.platform.AndroidBleManager;
-import chip.platform.AndroidChipPlatform;
-import chip.platform.ChipMdnsCallbackImpl;
-import chip.platform.NsdManagerServiceResolver;
-import chip.platform.PreferencesConfigurationManager;
-import chip.platform.PreferencesKeyValueStoreManager;
 import chip.setuppayload.DiscoveryCapability;
 import chip.setuppayload.SetupPayload;
 import chip.setuppayload.SetupPayloadParser;
-
-import com.tcl.chip.tvapp.ChannelManagerStub;
-import com.tcl.chip.tvapp.ContentLaunchManagerStub;
-import com.tcl.chip.tvapp.KeypadInputManagerStub;
-import com.tcl.chip.tvapp.MediaInputManagerStub;
-import com.tcl.chip.tvapp.MediaPlaybackManagerStub;
-import com.tcl.chip.tvapp.TvApp;
-import com.tcl.chip.tvapp.WakeOnLanManagerStub;
-
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
@@ -39,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
     mQrCodeImg = findViewById(R.id.qrCodeImg);
     mQrCodeTxt = findViewById(R.id.qrCodeTxt);
     mManualPairingCodeTxt = findViewById(R.id.manualPairingCodeTxt);
-
 
     // TODO: Get these parameters from PreferencesConfigurationManager
     HashSet<DiscoveryCapability> discoveryCapabilities = new HashSet<>();
@@ -64,7 +47,5 @@ public class MainActivity extends AppCompatActivity {
     } catch (SetupPayloadParser.SetupPayloadException e) {
       e.printStackTrace();
     }
-
-
   }
 }
