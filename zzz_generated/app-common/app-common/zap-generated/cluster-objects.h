@@ -28899,6 +28899,17 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::ListNullablesAndOptionalsStruct::Id; }
 };
 } // namespace ListNullablesAndOptionalsStruct
+namespace ListLongOctetString {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const chip::ByteSpan>;
+    using DecodableType    = DataModel::DecodableList<chip::ByteSpan>;
+    using DecodableArgType = const DataModel::DecodableList<chip::ByteSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ListLongOctetString::Id; }
+};
+} // namespace ListLongOctetString
 namespace Unsupported {
 struct TypeInfo
 {

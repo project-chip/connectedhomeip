@@ -3958,6 +3958,11 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000024: {
+                "attributeName": "ListLongOctetString",
+                "attributeId": 0x00000024,
+                "type": "bytes",
+            },
             0x000000FF: {
                 "attributeName": "Unsupported",
                 "attributeId": 0x000000FF,
