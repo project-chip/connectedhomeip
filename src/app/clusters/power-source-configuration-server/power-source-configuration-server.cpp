@@ -52,7 +52,7 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (aPath.mClusterId != PowerSourceConfiguration::Id && aPath.mEndpointId != 0x00)
+    if (aPath.mClusterId != PowerSourceConfiguration::Id || aPath.mEndpointId != 0x00)
     {
         return CHIP_ERROR_INVALID_PATH_LIST;
     }
