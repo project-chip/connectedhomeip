@@ -205,31 +205,31 @@ int main(int argc, char * argv[])
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
-    // This will allow ExampleOTARequestor to call SendQueryImageCommand REFACTOR DELETE THIS
-    //    ExampleOTARequestor::GetInstance().SetConnectToProviderCallback(SendQueryImageCommand);
-
-    // Initialize and interconnect the Requestor objects
-
+    // Initialize and interconnect the Requestor and Image Processor objects -- START
     // Initialize the instance of the main Requestor Class
     OTARequestor * requestorCore = new OTARequestor;
     SetRequestorInstance(requestorCore);
 
+    // Initialize an instance of the Requestor Driver
     LinuxOTARequestorDriver * requestorUser = new LinuxOTARequestorDriver;
 
-    // Connect the two objects
+    // Connect the Requestor and Requestor Driver objects
     requestorCore->SetOtaRequestorDriver(requestorUser);
 
+    // Initialize  the Downloader object
     OTADownloader * downloaderCore = new OTADownloader;
     // TODO: enable    SetDownloaderInstance(downloaderCore);
 
+    // Initialize the Image Processor object
     LinuxOTAImageProcessor * downloaderUser = new LinuxOTAImageProcessor;
 
-    // Connect the two objects
+    // Connect the Downloader and Image Processor objects
     downloaderCore->SetImageProcessorDelegate(downloaderUser);
+    // Initialize and interconnect the Requestor and Image Processor objects -- END
 
+    // Pass the IP Address to the OTARequestor object: Use of explicit IP address is temporary 
+    // until the Exchange Layer implements address resolution
     {
-        // Pass the IP Address to the OTARequestor object
-        // Use of explicit IP address is temporary until the Exchange Layer implements address resolution
         IPAddress ipAddr;
         IPAddress::FromString(ipAddress, ipAddr);
         requestorCore->SetIpAddress(ipAddr);

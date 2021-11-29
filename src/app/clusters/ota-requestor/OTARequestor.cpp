@@ -16,6 +16,9 @@
  *    limitations under the License.
  */
 
+/* This file contains the implementation of the OTARequestor class. All the core 
+ * OTA Requestor logic is contained in this class. 
+ */
 #include "ota-requestor.h"
 
 #include <app/server/Server.h>
