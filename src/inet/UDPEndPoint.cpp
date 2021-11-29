@@ -136,7 +136,8 @@ namespace {
 
 CHIP_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
-    VerifyOrReturnError(aInterfaceId.IsPresent(), INET_ERROR_UNKNOWN_INTERFACE);
+    // Skip verification of Interface since IsPresent() always fail
+    // VerifyOrReturnError(aInterfaceId.IsPresent(), INET_ERROR_UNKNOWN_INTERFACE);
     VerifyOrReturnError(aAddress.IsMulticast(), INET_ERROR_WRONG_ADDRESS_TYPE);
     return CHIP_NO_ERROR;
 }
@@ -1419,7 +1420,6 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 
-#if defined(INET_IPV6_ADD_MEMBERSHIP) && defined(INET_IPV6_DROP_MEMBERSHIP)
     const InterfaceId::PlatformType lIfIndex = aInterfaceId.GetPlatformInterface();
 
     struct ipv6_mreq lMulticastRequest;
@@ -1435,9 +1435,6 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
         return CHIP_ERROR_POSIX(errno);
     }
     return CHIP_NO_ERROR;
-#else  // defined(INET_IPV6_ADD_MEMBERSHIP) && defined(INET_IPV6_DROP_MEMBERSHIP)
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // defined(INET_IPV6_ADD_MEMBERSHIP) && defined(INET_IPV6_DROP_MEMBERSHIP)
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -2023,7 +2020,7 @@ void UDPEndPoint::Close()
 
 CHIP_ERROR UDPEndPoint::JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
-    CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR lRetval = CHIP_NO_ERROR;
 
     const IPAddressType lAddrType = aAddress.Type();
     lRetval                       = CheckMulticastGroupArgs(aInterfaceId, aAddress);

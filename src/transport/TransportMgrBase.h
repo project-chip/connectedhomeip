@@ -43,6 +43,8 @@ public:
 
     void SetSessionManager(TransportMgrDelegate * sessionManager) { mSessionManager = sessionManager; }
 
+    CHIP_ERROR MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join);
+
     void HandleMessageReceived(const Transport::PeerAddress & peerAddress, System::PacketBufferHandle && msg) override;
 
 private:
