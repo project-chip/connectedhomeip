@@ -65,7 +65,7 @@ jobs:
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
             - name: Build Apps
-              timeout-minutes: 5
+              timeout-minutes: 20
               run: |
                   EVENT_LOOP_VARIANT=""; \
                   if "$USE_SEPARATE_EVENTLOOP" -ne "true"; then \
