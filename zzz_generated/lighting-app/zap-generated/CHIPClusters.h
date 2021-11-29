@@ -57,13 +57,6 @@ public:
     OnOffCluster() : ClusterBase(app::Clusters::OnOff::Id) {}
     ~OnOffCluster() {}
 
-    // Cluster Commands
-    CHIP_ERROR OffWithEffect(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint8_t effectId,
-                             uint8_t effectVariant);
-    CHIP_ERROR OnWithRecallGlobalScene(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR OnWithTimedOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                              uint8_t onOffControl, uint16_t onTime, uint16_t offWaitTime);
-
     // Cluster Attributes
     CHIP_ERROR ReadAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SubscribeAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
@@ -100,8 +93,6 @@ public:
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
-
-private:
 };
 
 } // namespace Controller

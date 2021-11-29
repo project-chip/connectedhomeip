@@ -331,42 +331,6 @@ chip::Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback> gP
 static void OnPowerSourceConfigurationSourcesListAttributeResponse(void * context,
                                                                    const chip::app::DataModel::DecodableList<uint8_t> & list)
 {
-    size_t count   = 0;
-    CHIP_ERROR err = list.ComputeSize(&count);
-    if (err != CHIP_NO_ERROR)
-    {
-        if (gFailureResponseDelegate != nullptr)
-        {
-            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
-        }
-        return;
-    }
-
-    ChipLogProgress(Zcl, "  attributeValue:%s", count > 0 ? "" : " []");
-
-    if (count > 0)
-        ChipLogProgress(Zcl, "  [");
-
-    auto iter = list.begin();
-    while (iter.Next())
-    {
-#if CHIP_PROGRESS_LOGGING
-        auto & entry = iter.GetValue();
-        ChipLogProgress(Zcl, "    %" PRIu8 ",", entry);
-#endif // CHIP_PROGRESS_LOGGING
-    }
-    if (iter.GetStatus() != CHIP_NO_ERROR)
-    {
-        if (gFailureResponseDelegate != nullptr)
-        {
-            gFailureResponseDelegate(EMBER_ZCL_STATUS_INVALID_VALUE);
-        }
-        return;
-    }
-
-    if (count > 0)
-        ChipLogProgress(Zcl, "  ]");
-
     if (gSuccessResponseDelegate != nullptr)
         gSuccessResponseDelegate();
 }

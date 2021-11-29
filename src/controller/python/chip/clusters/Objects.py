@@ -5957,7 +5957,7 @@ class PowerSourceConfiguration(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return 0x0000
+                return 0x00000000
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
