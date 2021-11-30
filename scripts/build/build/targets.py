@@ -179,7 +179,7 @@ def HostTargets():
                 if HasConflicts(subgroup):
                     continue
 
-                # Target ready to be created - no conflicss
+                # Target ready to be created - no conflicts
                 variant_target = target.Clone()
                 for option in subgroup:
                     variant_target = variant_target.Extend(
