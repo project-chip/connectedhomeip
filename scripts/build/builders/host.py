@@ -19,6 +19,7 @@ from enum import Enum, auto
 
 from .gn import GnBuilder
 
+
 class HostApp(Enum):
     ALL_CLUSTERS = auto()
     CHIP_TOOL = auto()
