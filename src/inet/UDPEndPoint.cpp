@@ -1420,6 +1420,7 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 
+#ifdef IPV6_MULTICAST_IMPLEMENTED
     const InterfaceId::PlatformType lIfIndex = aInterfaceId.GetPlatformInterface();
 
     struct ipv6_mreq lMulticastRequest;
@@ -1435,6 +1436,9 @@ CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId a
         return CHIP_ERROR_POSIX(errno);
     }
     return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
