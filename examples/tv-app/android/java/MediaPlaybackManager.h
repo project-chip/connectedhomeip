@@ -21,17 +21,27 @@
 #include <app-common/zap-generated/enums.h>
 #include <app/clusters/media-playback-server/media-playback-server.h>
 #include <app/util/af-types.h>
-
+#include <app/util/attribute-storage.h>
+#include <jni.h>
 #include <lib/core/CHIPError.h>
 
 class MediaPlaybackManager
 {
 public:
-    CHIP_ERROR Init();
-    void storeNewPlaybackState(chip::EndpointId endpoint, uint8_t newPlaybackState);
-    EmberAfMediaPlaybackStatus proxyMediaPlaybackRequest(MediaPlaybackRequest mediaPlaybackRequest,
-                                                         uint64_t deltaPositionMilliseconds);
+    void InitializeWithObjects(jobject managerObject);
+    CHIP_ERROR GetAttribute(chip::app::AttributeValueEncoder & aEncoder, int attributeId);
+    EmberAfMediaPlaybackStatus Request(MediaPlaybackRequest mediaPlaybackRequest, uint64_t deltaPositionMilliseconds);
 
 private:
-    uint8_t oldPlaybackState;
+    friend MediaPlaybackManager & MediaPlaybackMgr();
+
+    static MediaPlaybackManager sInstance;
+    jobject mMediaPlaybackManagerObject = nullptr;
+    jmethodID mRequestMethod            = nullptr;
+    jmethodID mGetAttributeMethod       = nullptr;
 };
+
+inline MediaPlaybackManager & MediaPlaybackMgr()
+{
+    return MediaPlaybackManager::sInstance;
+}

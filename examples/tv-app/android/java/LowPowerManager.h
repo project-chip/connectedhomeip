@@ -16,10 +16,26 @@
  *    limitations under the License.
  */
 
-#include "LowPowerManager.h"
+#pragma once
 
-bool lowPowerClusterSleep()
+#include <jni.h>
+#include <lib/core/CHIPError.h>
+
+class LowPowerManager
 {
-    // TODO: Insert code here
-    return true;
+public:
+    void InitializeWithObjects(jobject managerObject);
+    bool Sleep();
+
+private:
+    friend LowPowerManager & LowPowerMgr();
+
+    static LowPowerManager sInstance;
+    jobject mLowPowerManagerObject = nullptr;
+    jmethodID mSleepMethod         = nullptr;
+};
+
+inline LowPowerManager & LowPowerMgr()
+{
+    return LowPowerManager::sInstance;
 }

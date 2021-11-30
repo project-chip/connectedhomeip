@@ -1,7 +1,6 @@
-/*
+/**
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,9 +17,12 @@
 
 #pragma once
 
-#include <lib/core/CHIPError.h>
+#include <app-common/zap-generated/cluster-objects.h>
+#include <lib/support/Span.h>
 
-class LowPowerManager
+struct ContentLaunchResponse
 {
-public:
+    CHIP_ERROR err;
+    chip::CharSpan data;
+    chip::app::Clusters::ContentLauncher::ContentLaunchStatus status;
 };
