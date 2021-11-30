@@ -32,10 +32,12 @@ import logging
 import threading
 import builtins
 
+
 @unique
 class EventTimestampType(Enum):
     SYSTEM = 1
     EPOCH = 2
+
 
 @unique
 class EventPriority(Enum):
