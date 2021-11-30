@@ -25,11 +25,14 @@
 
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/EFR32/DiagnosticDataProviderImpl.h>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 
 #include <lwip/tcpip.h>
 
 #include "AppConfig.h"
 #include "FreeRTOS.h"
+
+using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
 namespace chip {
 namespace DeviceLayer {
@@ -96,9 +99,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
 {
-    uint32_t reason = 0; 
-    CHIP_ERROR err = ConfigurationMgr().GetBootReason(reason);
-    
+    uint32_t reason = 0;
+    CHIP_ERROR err  = ConfigurationMgr().GetBootReason(reason);
+
     if (err == CHIP_NO_ERROR)
     {
         VerifyOrReturnError(reason <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
@@ -140,11 +143,9 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
     return CHIP_ERROR_INVALID_TIME;
 }
 
-
 CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMaxHardwareFaults> & hardwareFaults)
 {
 #if CHIP_CONFIG_TEST
-    // On Linux Simulation, set following hardware faults statically.
     ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
     ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
     ReturnErrorOnFailure(hardwareFaults.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
@@ -157,11 +158,8 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveHardwareFaults(GeneralFaults<kMa
 CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRadioFaults> & radioFaults)
 {
 #if CHIP_CONFIG_TEST
-    // On Linux Simulation, set following radio faults statically.
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
     ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
-    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
+    ReturnErrorOnFailure(radioFaults.add(EMBER_ZCL_RADIO_FAULT_TYPE_BLE_FAULT));
 #endif
 
     return CHIP_NO_ERROR;
@@ -170,13 +168,41 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetActiveRadioFaults(GeneralFaults<kMaxRa
 CHIP_ERROR DiagnosticDataProviderImpl::GetActiveNetworkFaults(GeneralFaults<kMaxNetworkFaults> & networkFaults)
 {
 #if CHIP_CONFIG_TEST
-    // On Linux Simulation, set following radio faults statically.
     ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
     ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
     ReturnErrorOnFailure(networkFaults.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
 #endif
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
+{
+    NetworkInterface * ifp = new NetworkInterface();
+
+    const char * threadNetworkName       = otThreadGetNetworkName(ThreadStackMgrImpl().OTInstance());
+    ifp->name                            = Span<const char>(threadNetworkName, strlen(threadNetworkName));
+    ifp->fabricConnected                 = true;
+    ifp->offPremiseServicesReachableIPv4 = false;
+    ifp->offPremiseServicesReachableIPv6 = false;
+    ifp->type                            = InterfaceType::EMBER_ZCL_INTERFACE_TYPE_THREAD;
+
+    uint8_t macBuffer[ConfigurationManager::kPrimaryMACAddressLength];
+    ConfigurationMgr().GetPrimary802154MACAddress(macBuffer);
+    ifp->hardwareAddress = ByteSpan(macBuffer, ConfigurationManager::kPrimaryMACAddressLength);
+
+    *netifpp = ifp;
+    return CHIP_NO_ERROR;
+}
+
+void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * netifp)
+{
+    while (netifp)
+    {
+        NetworkInterface * del = netifp;
+        netifp                 = netifp->Next;
+        delete del;
+    }
 }
 
 } // namespace DeviceLayer

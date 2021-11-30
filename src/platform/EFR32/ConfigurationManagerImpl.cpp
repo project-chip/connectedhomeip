@@ -54,7 +54,8 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     // TODO: Initialize the global GroupKeyStore object here (#1626)
 
     IncreaseBootCount();
-    //RMU_ResetControl(,rmuResetModeFull);
+    // It is possible to configure the possible reset sources with RMU_ResetControl
+    // In this case, we keep Reset control at default setting
     rebootCause = RMU_ResetCauseGet();
     RMU_ResetCauseClear();
 
@@ -95,13 +96,63 @@ CHIP_ERROR ConfigurationManagerImpl::IncreaseBootCount(void)
         GetRebootCount(bootCount);
     }
 
-    return EFR32Config::WriteConfigValue(EFR32Config::kConfigKey_BootCount, bootCount+1);
+    return EFR32Config::WriteConfigValue(EFR32Config::kConfigKey_BootCount, bootCount + 1);
 }
 
 uint32_t ConfigurationManagerImpl::GetBootReason(void)
 {
     // rebootCause is obtained at bootup.
-    return rebootCause;
+    uint32_t matterBootCause;
+#if defined(_SILICON_LABS_32B_SERIES_1)
+    if (rebootCause & RMU_RSTCAUSE_PORST || rebootCause & RMU_RSTCAUSE_EXTRST) // PowerOn or External pin reset
+    {
+        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT;
+    }
+    else if (rebootCause & RMU_RSTCAUSE_AVDDBOD || rebootCause & RMU_RSTCAUSE_DVDDBOD || rebootCause & RMU_RSTCAUSE_DECBOD)
+    {
+        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET;
+    }
+    else if (rebootCause & RMU_RSTCAUSE_SYSREQRST)
+    {
+        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET;
+    }
+    else if (rebootCause & RMU_RSTCAUSE_WDOGRST)
+    {
+        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET;
+    }
+    else
+    {
+        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+    }
+    // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
+#elif defined(_SILICON_LABS_32B_SERIES_2)
+    if (rebootCause & EMU_RSTCAUSE_POR || rebootCause & EMU_RSTCAUSE_PIN) // PowerOn or External pin reset
+    {
+        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT;
+    }
+    else if (rebootCause & EMU_RSTCAUSE_AVDDBOD || rebootCause & EMU_RSTCAUSE_DVDDBOD || rebootCause & EMU_RSTCAUSE_DECBOD ||
+             rebootCause & EMU_RSTCAUSE_VREGIN || rebootCause & EMU_RSTCAUSE_IOVDD0BOD || rebootCause & EMU_RSTCAUSE_DVDDLEBOD)
+    {
+        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET;
+    }
+    else if (rebootCause & EMU_RSTCAUSE_SYSREQ)
+    {
+        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET;
+    }
+    else if (rebootCause & EMU_RSTCAUSE_WDOG0 || rebootCause & EMU_RSTCAUSE_WDOG1)
+    {
+        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET;
+    }
+    else
+    {
+        matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+    }
+    // Not tracked HARDWARE_WATCHDOG_RESET && SOFTWARE_UPDATE_COMPLETED
+#else
+    matterBootCause = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+#endif
+
+    return matterBootCause;
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOperationalHours)
@@ -111,7 +162,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetTotalOperationalHours(uint32_t & totalOp
         totalOperationalHours = 0;
         return CHIP_NO_ERROR;
     }
-     
+
     return EFR32Config::ReadConfigValue(EFR32Config::kConfigKey_TotalOperationalHours, totalOperationalHours);
 }
 
