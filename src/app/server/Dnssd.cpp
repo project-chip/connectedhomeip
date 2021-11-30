@@ -258,15 +258,13 @@ CHIP_ERROR DnssdServer::AdvertiseOperational()
             MutableByteSpan mac(macBuffer);
             chip::DeviceLayer::ConfigurationMgr().GetPrimaryMACAddress(mac);
 
-            const auto advertiseParameters =
-                chip::Dnssd::OperationalAdvertisingParameters()
-                    .SetPeerId(fabricInfo.GetPeerId())
-                    .SetMac(mac)
-                    .SetPort(GetSecuredPort())
-                    .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL),
-                                          Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
-                    .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
-                    .EnableIpV4(true);
+            const auto advertiseParameters = chip::Dnssd::OperationalAdvertisingParameters()
+                                                 .SetPeerId(fabricInfo.GetPeerId())
+                                                 .SetMac(mac)
+                                                 .SetPort(GetSecuredPort())
+                                                 .SetMRPConfig(gDefaultMRPConfig)
+                                                 .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT))
+                                                 .EnableIpV4(true);
 
             auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
 
@@ -322,7 +320,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
         ChipLogError(Discovery, "Setup discriminator not known. Using a default.");
         value = 840;
     }
-    advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>(value & 0xFF)).SetLongDiscriminator(value);
+    advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>((value >> 8) & 0x0F)).SetLongDiscriminator(value);
 
     if (DeviceLayer::ConfigurationMgr().IsCommissionableDeviceTypeEnabled() &&
         DeviceLayer::ConfigurationMgr().GetDeviceTypeId(value) == CHIP_NO_ERROR)
@@ -343,10 +341,7 @@ CHIP_ERROR DnssdServer::Advertise(bool commissionableNode, chip::Dnssd::Commissi
     advertiseParameters.SetRotatingId(chip::Optional<const char *>::Value(rotatingDeviceIdHexBuffer));
 #endif
 
-    advertiseParameters
-        .SetMRPRetryIntervals(Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL),
-                              Optional<uint32_t>(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL))
-        .SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
+    advertiseParameters.SetMRPConfig(gDefaultMRPConfig).SetTcpSupported(Optional<bool>(INET_CONFIG_ENABLE_TCP_ENDPOINT));
 
     if (mode != chip::Dnssd::CommissioningMode::kEnabledEnhanced)
     {

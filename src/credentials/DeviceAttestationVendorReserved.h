@@ -44,6 +44,7 @@ public:
     CHIP_ERROR PrepareToReadVendorReservedElements(const ByteSpan & attestationElements, size_t count)
     {
         mIsInitialized         = false;
+        mIsDone                = false;
         mNumVendorReservedData = count;
         mAttestationData       = attestationElements;
 
@@ -54,7 +55,12 @@ public:
         // position to first ProfileTag
         while (true)
         {
-            ReturnErrorOnFailure(mTlvReader.Next());
+            CHIP_ERROR err = mTlvReader.Next();
+            if (err == CHIP_END_OF_TLV)
+            {
+                mIsDone = true;
+                break;
+            }
 
             TLV::Tag tag = mTlvReader.GetTag();
             if (!TLV::IsContextTag(tag))
@@ -81,6 +87,10 @@ public:
     CHIP_ERROR GetNextVendorReservedElement(struct VendorReservedElement & element)
     {
         VerifyOrReturnError(mIsInitialized, CHIP_ERROR_INCORRECT_STATE);
+        if (mIsDone)
+        {
+            return CHIP_END_OF_TLV;
+        }
 
         if (mIsAtFirstToken)
         {
@@ -90,7 +100,12 @@ public:
         }
         else
         {
-            ReturnErrorOnFailure(mTlvReader.Next());
+            CHIP_ERROR error = mTlvReader.Next();
+            if (error == CHIP_END_OF_TLV)
+            {
+                mIsDone = true;
+            }
+            ReturnErrorOnFailure(error);
         }
 
         TLV::Tag tag = mTlvReader.GetTag();
@@ -114,6 +129,7 @@ private:
     ByteSpan mAttestationData;
     bool mIsInitialized  = false;
     bool mIsAtFirstToken = false;
+    bool mIsDone         = false;
     TLV::ContiguousBufferTLVReader mTlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 };

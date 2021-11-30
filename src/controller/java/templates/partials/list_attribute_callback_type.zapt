@@ -2,23 +2,21 @@
 {{> @partial-block }}{{asUpperCamelCase name}}Attribute
 {{else}}
   {{#if isNullable}}
-  {{#unless isArray}}
-  {{#unless isStruct}}
   @Nullable
-  {{/unless}}
-  {{/unless}}
   {{/if}}
   {{#if isOptional}}
-  {{#unless isArray}}
-  {{#unless isStruct}}
   Optional<
-  {{/unless}}
-  {{/unless}}
   {{/if}}
-  {{#if (isOctetString type)}}
+  {{#if isArray}}
+  {{! TODO Implement a real type for arrays. }}
+  Object
+  {{else if isStruct}}
+  {{! TODO Implement a real type for structs. }}
+  Object
+  {{else if (isOctetString type)}}
   byte[]
   {{else if (isCharString type)}}
-  // Add String field here after ByteSpan is properly emitted in C++ layer
+  String
   {{else}}
   {{! NOTE: asJavaBasicTypeForZclType ends up sniffing for isArray on the
       context.  Since we want the type of our _entry_, force isArray to
@@ -27,10 +25,6 @@
   {{> asJavaBasicTypeForEntry isArray=false}}
   {{/if}}
   {{#if isOptional}}
-  {{#unless isArray}}
-  {{#unless isStruct}}
   >
-  {{/unless}}
-  {{/unless}}
   {{/if}}
 {{/if}}

@@ -20,7 +20,7 @@
 #define APP_CONFIG_H
 
 // ---- Lock Example App Config ----
-
+#define APP_TASK_NAME "APP"
 #define APP_LOCK_BUTTON BTN_SW4
 #define APP_FUNCTION_BUTTON BTN_SW5
 

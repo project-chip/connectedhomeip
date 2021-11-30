@@ -62,6 +62,10 @@ public:
 
     void Shutdown();
 
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    void SetWriterReserved(uint32_t aReservedSize) { mReservedSize = aReservedSize; }
+#endif
+
     /**
      * Main work-horse function that executes the run-loop.
      */
@@ -97,7 +101,7 @@ private:
     CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
                                                  bool * apHasMoreChunks);
     CHIP_ERROR RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
-                                   const ConcreteAttributePath & aClusterInfo);
+                                   const ConcreteReadAttributePath & aClusterInfo);
     EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
 
     /**
@@ -146,8 +150,9 @@ private:
      */
     ClusterInfo * mpGlobalDirtySet = nullptr;
 
-    constexpr static uint32_t kReservedSizeForMoreChunksFlag =
-        2; // According to TLV encoding, the TAG length is 1 byte and its type is 1 byte.
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    uint32_t mReservedSize = 0;
+#endif
 };
 
 }; // namespace reporting

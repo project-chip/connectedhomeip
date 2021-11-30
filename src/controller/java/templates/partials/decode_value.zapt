@@ -1,31 +1,31 @@
-jobject {{asSymbol label}};
+jobject {{target}};
 {{#if isOptional}}
-if (!dataResponse.{{asLowerCamelCase label}}.HasValue()) {
-  chip::JniReferences::GetInstance().CreateOptional(nullptr, {{asSymbol label}});
+if (!{{source}}.HasValue()) {
+  chip::JniReferences::GetInstance().CreateOptional(nullptr, {{target}});
 } else {
 {{#if isNullable}}
-if (dataResponse.{{asLowerCamelCase label}}.Value().IsNull()) {
-  chip::JniReferences::GetInstance().CreateOptional(nullptr, {{asSymbol label}});
+if ({{source}}.Value().IsNull()) {
+  chip::JniReferences::GetInstance().CreateOptional(nullptr, {{target}});
 } else {
 {{/if}}
 {{/if}}
-{{~#*inline "item"}}dataResponse.{{asLowerCamelCase name}}{{#if isOptional}}.Value(){{/if}}{{#if isNullable}}.Value(){{/if}}{{/inline}}
+{{~#*inline "item"}}{{source}}{{#if isOptional}}.Value(){{/if}}{{#if isNullable}}.Value(){{/if}}{{/inline}}
 {{#if isArray}}
 {{asSymbol label}} = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
 {{! TODO: Use if_is_struct, which works better for nested types. Currently can't because inline partials aren't found in its else block. }}
 {{else if isStruct}}
 {{asSymbol label}} = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
 {{else if (isOctetString type)}}
-{{asSymbol label}} = chip::ByteArray(env, {{>item}}).jniValue();
+{{target}} = chip::ByteArray(env, {{>item}}).jniValue();
 {{else if (isCharString type)}}
-{{asSymbol label}} = chip::UtfString(env, {{>item}}).jniValue();
+{{target}} = chip::UtfString(env, {{>item}}).jniValue();
 {{else}}
-std::string {{asSymbol label}}ClassName = "java/lang/{{asJavaBasicTypeForZclType type true}}";
-std::string {{asSymbol label}}CtorSignature = "({{asJniSignature type false}})V";
-chip::JniReferences::GetInstance().CreateBoxedObject<{{chipType}}>({{asSymbol label}}ClassName.c_str(), {{asSymbol label}}CtorSignature.c_str(), {{>item}}, {{asSymbol label}});
+std::string {{target}}ClassName = "java/lang/{{asJavaBasicTypeForZclType type true}}";
+std::string {{target}}CtorSignature = "({{asJniSignature type false}})V";
+chip::JniReferences::GetInstance().CreateBoxedObject<{{zapTypeToDecodableClusterObjectType type ns=parent.parent.name forceNotNullable=true forceNotOptional=true}}>({{target}}ClassName.c_str(), {{target}}CtorSignature.c_str(), {{>item}}, {{target}});
 {{/if}}
 {{#if isOptional}}
-chip::JniReferences::GetInstance().CreateOptional({{asSymbol label}}, {{asSymbol label}});
+chip::JniReferences::GetInstance().CreateOptional({{target}}, {{target}});
 {{#if isNullable}}
 }
 {{/if}}

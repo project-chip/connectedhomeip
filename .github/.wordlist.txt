@@ -4,6 +4,11 @@ aarch
 abcdef
 abfb
 ABI
+AES
+DMM
+ECDH
+ECDSA
+SHA
 ABIs
 ables
 accessor
@@ -51,6 +56,7 @@ armeabi
 ARMmbed
 armv
 asdk
+AssertionError
 ASYNC
 att
 attId
@@ -387,6 +393,7 @@ FOTA
 FreeRTOS
 FreeRTOSConfig
 fsl
+fstab
 fsync
 fullclean
 gcloud
@@ -430,6 +437,7 @@ Gv
 gz
 hardcoded
 hardknott
+hardwarever
 HardwareVersion
 HardwareVersionString
 hci
@@ -743,8 +751,6 @@ prj
 ProductID
 ProductLabel
 ProductName
-productrev
-ProductRevision
 ProductURL
 proto
 protobuf
@@ -769,6 +775,7 @@ PyFunction
 pylint
 PyObject
 PyRun
+pytest
 QEMU
 Qorvo
 QPG
@@ -782,6 +789,7 @@ qvCHIP
 RADVD
 raspberryPi
 RasPi
+rAv
 RCP
 ReadConfigValue
 readelf
@@ -867,6 +875,7 @@ SLAAC
 SLTB
 SLWSTK
 SmartThings
+smoketest
 SMP
 socat
 socio

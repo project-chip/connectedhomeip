@@ -52,6 +52,16 @@ public:
         (void) certDeclBuffer;
         return AttestationVerificationResult::kNotImplemented;
     }
+
+    AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
+                                                                        const ByteSpan & firmwareInfo,
+                                                                        const DeviceInfoForAttestation & deviceInfo) override
+    {
+        (void) certDeclBuffer;
+        (void) firmwareInfo;
+        (void) deviceInfo;
+        return AttestationVerificationResult::kNotImplemented;
+    }
 };
 
 // Default to avoid nullptr on getter and cleanly handle new products/clients before

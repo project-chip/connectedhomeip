@@ -125,12 +125,13 @@ public:
     void SetHostname(const char * name) { mHostname = name; }
     const char * GetHostname() { return mHostname.c_str(); }
 
+    void Delete(GenericContext * context);
+
 private:
     MdnsContexts(){};
     static MdnsContexts sInstance;
     std::string mHostname;
 
-    void Delete(GenericContext * context);
     std::vector<GenericContext *> mContexts;
 };
 

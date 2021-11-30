@@ -22,6 +22,7 @@
 #include "ListParser.h"
 
 #include <app/AppBuildConfig.h>
+#include <app/AttributePathParams.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -192,7 +193,9 @@ public:
      *  @return A reference to *this
      */
     AttributePathIB::Builder & EndOfAttributePathIB();
+
+    CHIP_ERROR Encode(const AttributePathParams & aAttributePathParams);
 };
-}; // namespace AttributePathIB
+} // namespace AttributePathIB
 } // namespace app
 } // namespace chip

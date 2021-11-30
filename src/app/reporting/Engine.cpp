@@ -62,11 +62,13 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 
 CHIP_ERROR
 Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
-                            const ConcreteAttributePath & aPath)
+                            const ConcreteReadAttributePath & aPath)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     AttributeReportIB::Builder attributeReport = aAttributeReportIBs.CreateAttributeReport();
+    err                                        = attributeReport.GetError();
+    SuccessOrExit(attributeReport.GetError());
 
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
                   aPath.mAttributeId);
@@ -95,11 +97,20 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
     bool attributeDataWritten = false;
     bool hasMoreChunks        = true;
     TLV::TLVWriter backup;
+    const uint32_t kReservedSizeEndOfReportIBs = 1;
+
     aReportDataBuilder.Checkpoint(backup);
     auto attributeReportIBs = aReportDataBuilder.CreateAttributeReportIBs();
     SuccessOrExit(err = aReportDataBuilder.GetError());
 
+    //
+    // Reserve enough space for closing out the Report IB list
+    //
+    attributeReportIBs.GetWriter()->ReserveBuffer(kReservedSizeEndOfReportIBs);
+
     {
+        // TODO: Figure out how AttributePathExpandIterator should handle read
+        // vs write paths.
         ConcreteAttributePath readPath;
 
         // For each path included in the interested path of the read handler...
@@ -125,11 +136,12 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
                     continue;
                 }
             }
-            // If we are processing a read request, or the initial report of a subscription, just regard all paths as dirty paths.
 
+            // If we are processing a read request, or the initial report of a subscription, just regard all paths as dirty paths.
             TLV::TLVWriter attributeBackup;
             attributeReportIBs.Checkpoint(attributeBackup);
-            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, readPath);
+            ConcreteReadAttributePath pathForRetrieval(readPath);
+            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, pathForRetrieval);
             if (err != CHIP_NO_ERROR)
             {
                 // We met a error during writing reports, one common case is we are running out of buffer, rollback the
@@ -144,19 +156,48 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
         hasMoreChunks = false;
     }
 exit:
+    //
+    // Running out of space is an error that we're expected to handle - the incompletely written DataIB has already been rolled back
+    // earlier to ensure only whole and complete DataIBs are present in the stream.
+    //
+    // We can safely clear out the error so that the rest of the machinery to close out the reports, etc. will function correctly.
+    // These are are guaranteed to not fail since we've already reserved memory for the remaining 'close out' TLV operations in this
+    // function and its callers.
+    //
     if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
     {
         ChipLogDetail(DataManagement, "<RE:Run> We cannot put more chunks into this report. Enable chunking.");
+
+        //
+        // Reset the error tracked within the builder. Otherwise, any further attempts to write
+        // data through the builder will be blocked by that error.
+        //
+        attributeReportIBs.ResetError();
         err = CHIP_NO_ERROR;
     }
 
+    //
+    // Only close out the report if we haven't hit an error yet so far.
+    //
     if (err == CHIP_NO_ERROR)
     {
+        attributeReportIBs.GetWriter()->UnreserveBuffer(kReservedSizeEndOfReportIBs);
+
         attributeReportIBs.EndOfAttributeReportIBs();
         err = attributeReportIBs.GetError();
+
+        //
+        // We reserved space for this earlier - consequently, the call to end the ReportIBs should
+        // never fail, so assert if we do since that's a logic bug.
+        //
+        VerifyOrDie(err == CHIP_NO_ERROR);
     }
 
-    if (!attributeDataWritten || err != CHIP_NO_ERROR)
+    //
+    // Rollback the the entire ReportIB array if we never wrote any attributes
+    // AND never hit an error.
+    //
+    if (!attributeDataWritten && err == CHIP_NO_ERROR)
     {
         aReportDataBuilder.Rollback(backup);
     }
@@ -266,7 +307,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     ChipLogDetail(DataManagement, "Fetched %zu events", eventCount);
 
 exit:
-    if (err != CHIP_NO_ERROR || eventCount == 0 || eventClean)
+    if (err == CHIP_NO_ERROR && (eventCount == 0 || eventClean))
     {
         aReportDataBuilder.Rollback(backup);
     }
@@ -286,6 +327,12 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     uint16_t reservedSize                      = 0;
     bool hasMoreChunks                         = false;
 
+    // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
+    const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
+
+    // Reserved size for the end of report message, which is an end-of-container (i.e 1 byte for the control tag).
+    const uint32_t kReservedSizeForEndOfReportMessage = 1;
+
     VerifyOrExit(!bufHandle.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     if (bufHandle->AvailableDataLength() > kMaxSecureSduLengthBytes)
@@ -294,6 +341,10 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     }
 
     reportDataWriter.Init(std::move(bufHandle));
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    reportDataWriter.ReserveBuffer(mReservedSize);
+#endif
 
     // Always limit the size of the generated packet to fit within kMaxSecureSduLengthBytes regardless of the available buffer
     // capacity.
@@ -311,7 +362,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
         reportDataBuilder.SubscriptionId(subscriptionId);
     }
 
-    SuccessOrExit(err = reportDataWriter.ReserveBuffer(Engine::kReservedSizeForMoreChunksFlag));
+    SuccessOrExit(err = reportDataWriter.ReserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfReportMessage));
 
     err = BuildSingleReportDataAttributeReportIBs(reportDataBuilder, apReadHandler, &hasMoreChunks);
     SuccessOrExit(err);
@@ -319,7 +370,9 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     err = BuildSingleReportDataEventReports(reportDataBuilder, apReadHandler, &hasMoreChunks);
     SuccessOrExit(err);
 
-    SuccessOrExit(err = reportDataWriter.UnreserveBuffer(Engine::kReservedSizeForMoreChunksFlag));
+    SuccessOrExit(reportDataBuilder.GetError());
+
+    SuccessOrExit(err = reportDataWriter.UnreserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfReportMessage));
     if (hasMoreChunks)
     {
         reportDataBuilder.MoreChunkedMessages(hasMoreChunks);
@@ -330,7 +383,12 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     }
 
     reportDataBuilder.EndOfReportDataMessage();
-    SuccessOrExit(err = reportDataBuilder.GetError());
+
+    //
+    // Since we've already reserved space for both the MoreChunked/SuppressResponse flags, as well as
+    // the end-of-container flag for the end of the report, we should never hit an error closing out the message.
+    //
+    VerifyOrDie(reportDataBuilder.GetError() == CHIP_NO_ERROR);
 
     err = reportDataWriter.Finalize(&bufHandle);
     SuccessOrExit(err);

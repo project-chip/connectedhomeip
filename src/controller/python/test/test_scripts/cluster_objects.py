@@ -20,6 +20,7 @@ import chip.clusters as Clusters
 import logging
 from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus
 import chip.interaction_model
+import asyncio
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -96,54 +97,77 @@ class ClusterObjectTests:
             raise AssertionError("Read returned unexpected result.")
 
     @classmethod
-    async def SendReadRequest(cls, devCtrl):
+    async def TestSubscribeAttribute(cls, devCtrl):
+        logger.info("Test Subscription")
+        sub = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], reportInterval=(3, 10))
+        updated = False
+
+        def subUpdate(path, value):
+            nonlocal updated
+            logger.info(
+                f"Received attribute update path {path}, New value {value}")
+            updated = True
+        sub.SetAttributeUpdateCallback(subUpdate)
+        req = Clusters.OnOff.Commands.On()
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+        await asyncio.sleep(5)
+        req = Clusters.OnOff.Commands.Off()
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+        await asyncio.sleep(5)
+
+        if not updated:
+            raise AssertionError("Did not receive updated attribute")
+
+    @classmethod
+    async def TestReadRequests(cls, devCtrl):
+        '''
+        Tests out various permutations of endpoint, cluster and attribute ID (with wildcards) to validate
+        reads.
+
+        With the use of cluster objects, the actual received data is validated against the data model description
+        for those values, so no extra validation has to be done here in this test for the values themselves.
+        '''
+
+        logger.info("1: Reading Ex Cx Ax")
         req = [
             (0, Clusters.Basic.Attributes.VendorName),
-            (0, Clusters.Basic.Attributes.VendorID),
-            (0, Clusters.Basic.Attributes.ProductName),
             (0, Clusters.Basic.Attributes.ProductID),
-            (0, Clusters.Basic.Attributes.NodeLabel),
-            (0, Clusters.Basic.Attributes.Location),
             (0, Clusters.Basic.Attributes.HardwareVersion),
-            (0, Clusters.Basic.Attributes.HardwareVersionString),
-            (0, Clusters.Basic.Attributes.SoftwareVersion),
-            (0, Clusters.Basic.Attributes.SoftwareVersionString),
         ]
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
+        if (len(res) != 3):
+            raise AssertionError(
+                f"Got back {len(res)} data items instead of 3")
 
-        # Note: The server might be too small to handle reading lots of attributes at the same time.
-        res = [
-            await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[r]) for r in req
+        logger.info("2: Reading Ex Cx A*")
+        req = [
+            (0, Clusters.Basic),
         ]
+        await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
 
-        expectedRes = [
-            [AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=1), Status=chip.interaction_model.Status.Success, Data='TEST_VENDOR'), ],
-            [AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=2), Status=chip.interaction_model.Status.Success, Data=9050), ],
-            [AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=3), Status=chip.interaction_model.Status.Success, Data='TEST_PRODUCT'), ],
-            [AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=4), Status=chip.interaction_model.Status.Success, Data=65279), ],
-            [AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=5), Status=chip.interaction_model.Status.Success, Data='Test'), ],
-            [AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=6), Status=chip.interaction_model.Status.Success, Data=''), ],
-            [AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=7), Status=chip.interaction_model.Status.Success, Data=0), ],
-            [AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=8), Status=chip.interaction_model.Status.Success, Data='TEST_VERSION'), ],
-            [AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=9), Status=chip.interaction_model.Status.Success, Data=0), ],
-            [AttributeReadResult(Path=AttributePath(
-                EndpointId=0, ClusterId=40, AttributeId=10), Status=chip.interaction_model.Status.Success, Data='prerelease')],
+        logger.info("3: Reading E* Cx Ax")
+        req = [
+            Clusters.Descriptor.Attributes.ServerList
         ]
+        await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
 
-        if res != expectedRes:
-            for i in range(len(res)):
-                if res[i] != expectedRes[i]:
-                    logger.error(
-                        f"Item {i} is not expected, expect {expectedRes[i]} got {res[i]}")
-            raise AssertionError("Read returned unexpected result.")
+        logger.info("4: Reading Ex C* A*")
+        req = [
+            0
+        ]
+        await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
+
+        logger.info("5: Reading E* Cx A*")
+        req = [
+            Clusters.Descriptor
+        ]
+        await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
+
+        logger.info("6: Reading E* C* A*")
+        req = [
+            '*'
+        ]
+        await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
 
     @classmethod
     async def RunTest(cls, devCtrl):
@@ -153,7 +177,8 @@ class ClusterObjectTests:
             await cls.RoundTripTestWithBadEndpoint(devCtrl)
             await cls.SendCommandWithResponse(devCtrl)
             await cls.SendWriteRequest(devCtrl)
-            await cls.SendReadRequest(devCtrl)
+            await cls.TestReadRequests(devCtrl)
+            await cls.TestSubscribeAttribute(devCtrl)
         except Exception as ex:
             logger.error(
                 f"Unexpected error occurred when running tests: {ex}")

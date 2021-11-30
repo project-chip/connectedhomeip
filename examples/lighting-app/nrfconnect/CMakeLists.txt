@@ -160,9 +160,9 @@ pw_proto_library(lighting_service
 )
 
 target_sources(app PRIVATE
-  main/Rpc.cpp
   ../../common/pigweed/RpcService.cpp
   ../../common/pigweed/nrfconnect/PigweedLoggerMutex.cpp
+  ${NRFCONNECT_COMMON}/Rpc.cpp
   ${NRFCONNECT_COMMON}/util/PigweedLogger.cpp
 )
 
@@ -170,9 +170,16 @@ target_include_directories(app PRIVATE
   ${PIGWEED_ROOT}/pw_sys_io/public
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
+  ${NRFCONNECT_COMMON}
   ../../common
   ../../common/pigweed
   ../../common/pigweed/nrfconnect)
+
+target_compile_options(app PRIVATE
+                       "-DPW_RPC_ATTRIBUTE_SERVICE=1"
+                       "-DPW_RPC_BUTTON_SERVICE=1"
+                       "-DPW_RPC_DEVICE_SERVICE=1"
+                       "-DPW_RPC_LIGHTING_SERVICE=1")
 
 target_link_libraries(app PRIVATE
   attributes_service.nanopb_rpc

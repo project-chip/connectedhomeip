@@ -3997,6 +3997,17 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPTestClusterClusterSimpleStructResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = [CHIPTestClusterClusterSimpleStruct new];
+    }
+    return self;
+}
+@end
+
 @implementation CHIPTestClusterClusterTestListInt8UArgumentRequestParams
 - (instancetype)init
 {
@@ -4093,6 +4104,17 @@ NS_ASSUME_NONNULL_BEGIN
         _optionalList = nil;
 
         _nullableOptionalList = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPTestClusterClusterSimpleStructEchoRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = [CHIPTestClusterClusterSimpleStruct new];
     }
     return self;
 }
@@ -4384,28 +4406,6 @@ NS_ASSUME_NONNULL_BEGIN
         _endpointId = @(0);
 
         _clusterId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPSampleMfgSpecificClusterClusterCommandOneParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _argOne = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPSampleMfgSpecificCluster2ClusterCommandTwoParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _argOne = @(0);
     }
     return self;
 }

@@ -24,7 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPError : NSObject
 + (nullable NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode;
 + (nullable NSError *)errorForZCLErrorCode:(uint8_t)errorCode;
-+ (CHIP_ERROR)errorToCHIPErrorCode:(NSError *)errorCode;
++ (CHIP_ERROR)errorToCHIPErrorCode:(NSError *)error;
++ (uint8_t)errorToZCLErrorCode:(NSError * _Nullable)error;
 @end
 
 NS_ASSUME_NONNULL_END

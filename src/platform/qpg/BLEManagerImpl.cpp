@@ -53,6 +53,7 @@ namespace {
 
 // FreeeRTOS sw timer
 TimerHandle_t sbleAdvTimeoutTimer;
+StaticTimer_t sbleAdvTimeoutTimerBuffer;
 
 // Full service UUID - CHIP_BLE_SVC_ID - taken from BleUUID.h header
 const uint8_t chipUUID_CHIPoBLE_Service[CHIP_ADV_SHORT_UUID_LEN] = { 0xFF, 0xF6 };
@@ -94,12 +95,24 @@ CHIP_ERROR BLEManagerImpl::_Init()
     qvCHIP_BleInit(&appCbacks);
 
     // Create FreeRTOS sw timer for BLE timeouts and interval change.
+#if defined(CHIP_CONFIG_FREERTOS_USE_STATIC_TASK) && CHIP_CONFIG_FREERTOS_USE_STATIC_TASK
+    sbleAdvTimeoutTimer = xTimerCreateStatic("BleAdvTimer",             // Just a text name, not used by the RTOS kernel
+                                             1,                         // == default timer period (mS)
+                                             false,                     // no timer reload (==one-shot)
+                                             (void *) this,             // init timer id = ble obj context
+                                             BleAdvTimeoutHandler,      // timer callback handler
+                                             &sbleAdvTimeoutTimerBuffer // static buffer for timer
+
+    );
+
+#else
     sbleAdvTimeoutTimer = xTimerCreate("BleAdvTimer",       // Just a text name, not used by the RTOS kernel
                                        1,                   // == default timer period (mS)
                                        false,               // no timer reload (==one-shot)
                                        (void *) this,       // init timer id = ble obj context
                                        BleAdvTimeoutHandler // timer callback handler
     );
+#endif
     VerifyOrExit(sbleAdvTimeoutTimer != NULL, err = CHIP_ERROR_INCORRECT_STATE);
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);

@@ -97,9 +97,15 @@ function asTypeMaxValue(type)
   return templateUtil.templatePromise(this.global, promise);
 }
 
+function utf8StringLength(str)
+{
+  return new TextEncoder().encode(str).length
+}
+
 //
 // Module exports
 //
 exports.asDelimitedCommand = asDelimitedCommand;
 exports.asTypeMinValue     = asTypeMinValue;
 exports.asTypeMaxValue     = asTypeMaxValue;
+exports.utf8StringLength   = utf8StringLength;

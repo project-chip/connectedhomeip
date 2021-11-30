@@ -151,54 +151,6 @@ function loadGlobalAttributes(packageId)
 // Load step 2
 //
 
-/**
- * This method converts a ZCL type to the length expected for the
- * BufferWriter.Put method.
- * TODO
- * Not all types are supported at the moment, so if there is any unsupported type
- * that we are trying to convert, it will throw an error.
- */
-function asPutLength(zclType)
-{
-  const type = ChipTypesHelper.asBasicType(zclType);
-  switch (type) {
-  case 'bool':
-    return '8';
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-  case 'uint8_t':
-  case 'uint16_t':
-  case 'uint32_t':
-  case 'uint64_t':
-    return type.replace(/[^0-9]/g, '');
-  default:
-    throw error = 'asPutLength: Unhandled type: ' + zclType;
-  }
-}
-
-function asPutCastType(zclType)
-{
-  const type = ChipTypesHelper.asBasicType(zclType);
-  switch (type) {
-  case 'bool':
-    return 'uint8_t';
-  case 'int8_t':
-  case 'int16_t':
-  case 'int32_t':
-  case 'int64_t':
-    return 'u' + type;
-  case 'uint8_t':
-  case 'uint16_t':
-  case 'uint32_t':
-  case 'uint64_t':
-    return type;
-  default:
-    throw error = 'asPutCastType: Unhandled type: ' + zclType;
-  }
-}
-
 function asChipCallback(item)
 {
   if (StringHelper.isOctetString(item.type)) {
@@ -332,13 +284,11 @@ function handleBasic(item, [ atomics, enums, bitmaps, structs ])
 
   const atomic = getAtomic(atomics, itemType);
   if (atomic) {
-    item.name                = item.name || item.label;
-    item.isStruct            = false;
-    item.atomicTypeId        = atomic.atomicId;
-    item.size                = atomic.size;
-    item.chipType            = atomic.chipType;
-    item.chipTypePutLength   = asPutLength(atomic.chipType);
-    item.chipTypePutCastType = asPutCastType(atomic.chipType);
+    item.name         = item.name || item.label;
+    item.isStruct     = false;
+    item.atomicTypeId = atomic.atomicId;
+    item.size         = atomic.size;
+    item.chipType     = atomic.chipType;
     return true;
   }
 
@@ -393,7 +343,10 @@ function enhancedCommands(commands, types)
   });
 
   commands.forEach(command => {
-    command.isResponse                    = command.name.includes('Response');
+    // Flag things ending in "Response" so we can filter out unused responses,
+    // but don't stomp on a true isResponse value if it's set already because
+    // some other command had this one as its response.
+    command.isResponse                    = command.isResponse || command.name.includes('Response');
     command.isManufacturerSpecificCommand = !!this.mfgCode;
 
     command.hasSpecificResponse = !!command.response;
@@ -404,6 +357,11 @@ function enhancedCommands(commands, types)
       // helper. But this one does not contains all the metadata informations added by
       // `enhancedItem`, so instead of using the one from ZAP, retrieve the enhanced version.
       command.response = commands.find(command => command.name == responseName);
+      // We might have failed to find a response if our configuration is weird
+      // in some way.
+      if (command.response) {
+        command.response.isResponse = true;
+      }
     } else {
       command.responseName = 'DefaultSuccess';
       command.response     = { arguments : [] };

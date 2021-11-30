@@ -47,7 +47,7 @@
 namespace chip {
 
 constexpr uint16_t kSigmaParamRandomNumberSize = 32;
-constexpr uint16_t kTrustedRootIdSize          = Credentials::kKeyIdentifierLength;
+constexpr uint16_t kTrustedRootIdSize          = Crypto::kSubjectKeyIdentifierLength;
 constexpr uint16_t kMaxTrustedRootIds          = 5;
 
 constexpr uint16_t kIPKSize = 16;
@@ -68,6 +68,7 @@ struct CASESessionSerializable
     uint16_t mMessageDigestLen;
     uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
     NodeId mPeerNodeId;
+    Credentials::CATValues mPeerCATs;
     uint16_t mLocalSessionId;
     uint16_t mPeerSessionId;
     uint8_t mResumptionId[kCASEResumptionIDSize];

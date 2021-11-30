@@ -108,7 +108,7 @@ enum class Status : uint16_t
     UnsupportedCluster     = 0xc3,
     Deprecatedc4           = 0xc4,
     NoUpstreamSubscription = 0xc5,
-    InvalidArgument        = 0xc6,
+    NeedsTimedInteraction  = 0xc6,
 };
 } // namespace InteractionModel
 

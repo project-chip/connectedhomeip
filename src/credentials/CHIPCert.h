@@ -34,6 +34,7 @@
 #include <lib/asn1/ASN1.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPTLV.h>
+#include <lib/core/DataModelTypes.h>
 #include <lib/core/PeerId.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/DLLUtil.h>
@@ -42,7 +43,7 @@
 namespace chip {
 namespace Credentials {
 
-static constexpr uint32_t kKeyIdentifierLength                 = 20;
+static constexpr uint32_t kKeyIdentifierLength                 = static_cast<uint32_t>(Crypto::kSubjectKeyIdentifierLength);
 static constexpr uint32_t kChip32bitAttrUTF8Length             = 8;
 static constexpr uint32_t kChip64bitAttrUTF8Length             = 16;
 static constexpr uint16_t kX509NoWellDefinedExpirationDateYear = 9999;
@@ -56,6 +57,15 @@ static constexpr uint32_t kMaxCHIPCertDecodeBufLength = kMaxDERCertLength - Cryp
 
 // Muximum number of CASE Authenticated Tags (CAT) in the CHIP certificate subject.
 static constexpr size_t kMaxSubjectCATAttributeCount = CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES - 2;
+static constexpr CASEAuthTag kUndefinedCAT           = 0;
+
+struct CATValues
+{
+    CASEAuthTag val[kMaxSubjectCATAttributeCount];
+
+    size_t size() const { return ArraySize(val); }
+};
+static constexpr CATValues kUndefinedCATs = { { Credentials::kUndefinedCAT } };
 
 /** Data Element Tags for the CHIP Certificate
  */
@@ -800,15 +810,25 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
 CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ChipCertificateData & opcert, NodeId * nodeId, FabricId * fabricId);
 
 /**
+ * Extract CASE Authenticated Tags from an operational certificate in ByteSpan TLV-encoded form.
+ *
+ * All values in the 'cats' struct will be set either to a valid CAT value or zero (undefined) value.
+ *
+ * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert is not NOC.
+ * @return CHIP_ERROR_BUFFER_TOO_SMALL if there are too many CATs in the NOC
+ */
+CHIP_ERROR ExtractCATsFromOpCert(const ByteSpan & opcert, CATValues & cats);
+
+/**
  * Extract CASE Authenticated Tags from an operational certificate that has already been
  * parsed.
  *
- * All values in the 'cats' array will be set either to a valid CAT value or zero (undefined) value.
+ * All values in the 'cats' struct will be set either to a valid CAT value or to the kUndefinedCAT value.
  *
  * @return CHIP_ERROR_INVALID_ARGUMENT if the passed-in cert is not NOC.
  * @return CHIP_ERROR_BUFFER_TOO_SMALL if the passed-in CATs array is too small.
  */
-CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, uint32_t * cats, uint8_t catsSize);
+CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues & cats);
 
 /**
  * Extract Node ID and Fabric ID from an operational certificate in ByteSpan TLV-encoded

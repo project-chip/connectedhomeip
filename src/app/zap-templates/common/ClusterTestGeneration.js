@@ -26,24 +26,24 @@ const path              = require('path');
 // Import helpers from zap core
 const templateUtil = require(zapPath + 'dist/src-electron/generator/template-util.js')
 
-const { DelayCommands }                 = require('./simulated-clusters/TestDelayCommands.js');
-const { LogCommands }                   = require('./simulated-clusters/TestLogCommands.js');
-const { Clusters, asBlocks, asPromise } = require('./ClustersHelper.js');
-const { asUpperCamelCase }              = require(basePath + 'src/app/zap-templates/templates/app/helper.js');
+const { getClusters, getCommands, getAttributes, isTestOnlyCluster } = require('./simulated-clusters/SimulatedClusters.js');
+const { asBlocks }                                                   = require('./ClustersHelper.js');
 
-const kClusterName       = 'cluster';
-const kEndpointName      = 'endpoint';
-const kGroupId           = 'groupId';
-const kCommandName       = 'command';
-const kWaitCommandName   = 'wait';
-const kIndexName         = 'index';
-const kValuesName        = 'values';
-const kConstraintsName   = 'constraints';
-const kArgumentsName     = 'arguments';
-const kResponseName      = 'response';
-const kDisabledName      = 'disabled';
-const kResponseErrorName = 'error';
-const kPICSName          = 'PICS';
+const kClusterName            = 'cluster';
+const kEndpointName           = 'endpoint';
+const kGroupId                = 'groupId';
+const kCommandName            = 'command';
+const kWaitCommandName        = 'wait';
+const kIndexName              = 'index';
+const kValuesName             = 'values';
+const kConstraintsName        = 'constraints';
+const kArgumentsName          = 'arguments';
+const kResponseName           = 'response';
+const kDisabledName           = 'disabled';
+const kResponseErrorName      = 'error';
+const kResponseWrongErrorName = 'errorWrongValue';
+const kPICSName               = 'PICS';
+const kSaveAsName             = 'saveAs';
 
 class NullObject {
   toString()
@@ -184,19 +184,32 @@ function setDefaultArguments(test)
   delete test[kArgumentsName].value;
 }
 
+function ensureValidError(response, errorName)
+{
+  if (isNaN(response[errorName])) {
+    response[errorName] = "EMBER_ZCL_STATUS_" + response[errorName];
+  }
+}
+
 function setDefaultResponse(test)
 {
   const defaultResponse = {};
   setDefault(test, kResponseName, defaultResponse);
 
+  const hasResponseError = (kResponseErrorName in test[kResponseName]) || (kResponseWrongErrorName in test[kResponseName]);
+
   const defaultResponseError = 0;
   setDefault(test[kResponseName], kResponseErrorName, defaultResponseError);
+  setDefault(test[kResponseName], kResponseWrongErrorName, defaultResponseError);
 
   const defaultResponseValues = [];
   setDefault(test[kResponseName], kValuesName, defaultResponseValues);
 
   const defaultResponseConstraints = {};
   setDefault(test[kResponseName], kConstraintsName, defaultResponseConstraints);
+
+  const defaultResponseSaveAs = '';
+  setDefault(test[kResponseName], kSaveAsName, defaultResponseSaveAs);
 
   const hasResponseValue              = 'value' in test[kResponseName];
   const hasResponseConstraints        = 'constraints' in test[kResponseName] && Object.keys(test[kResponseName].constraints).length;
@@ -214,6 +227,9 @@ function setDefaultResponse(test)
         '      - value: 7\n';
     throwError(test, errorStr);
   }
+
+  ensureValidError(test[kResponseName], kResponseErrorName);
+  ensureValidError(test[kResponseName], kResponseWrongErrorName);
 
   // Step that waits for a particular event does not requires constraints nor expected values.
   if (test.isWait) {
@@ -233,19 +249,21 @@ function setDefaultResponse(test)
     return;
   }
 
-  if (!hasResponseValueOrConstraints) {
+  if (!hasResponseValueOrConstraints && !hasResponseError) {
     console.log(test);
     console.log(test[kResponseName]);
-    const errorStr = 'Test does not have a "value" or a "constraints" defined.';
+    const errorStr = 'Test does not have a "value" or a "constraints" defined and is not expecting an error.';
     throwError(test, errorStr);
   }
 
   if (hasResponseValue) {
-    test[kResponseName].values.push({ name : test.attribute, value : test[kResponseName].value });
+    test[kResponseName].values.push(
+        { name : test.attribute, value : test[kResponseName].value, saveAs : test[kResponseName].saveAs });
   }
 
   if (hasResponseConstraints) {
-    test[kResponseName].values.push({ name : test.attribute, constraints : test[kResponseName].constraints });
+    test[kResponseName].values.push(
+        { name : test.attribute, constraints : test[kResponseName].constraints, saveAs : test[kResponseName].saveAs });
   }
 
   delete test[kResponseName].value;
@@ -322,6 +340,7 @@ function parse(filename)
   });
 
   yaml.filename   = filename;
+  yaml.timeout    = yaml.config.timeout;
   yaml.totalTests = yaml.tests.length;
 
   return yaml;
@@ -332,37 +351,6 @@ function printErrorAndExit(context, msg)
   console.log(context.testName, ': ', context.label);
   console.log(msg);
   process.exit(1);
-}
-
-function getClusters()
-{
-  // Create a new array to merge the configured clusters list and test
-  // simulated clusters.
-  return Clusters.getClusters().then(clusters => clusters.concat(DelayCommands, LogCommands));
-}
-
-function getCommands(clusterName)
-{
-  switch (clusterName) {
-  case DelayCommands.name:
-    return Promise.resolve(DelayCommands.commands);
-  case LogCommands.name:
-    return Promise.resolve(LogCommands.commands);
-  default:
-    return Clusters.getClientCommands(clusterName);
-  }
-}
-
-function getAttributes(clusterName)
-{
-  switch (clusterName) {
-  case DelayCommands.name:
-    return Promise.resolve(DelayCommands.attributes);
-  case LogCommands.name:
-    return Promise.resolve(LogCommands.attributes);
-  default:
-    return Clusters.getServerAttributes(clusterName);
-  }
 }
 
 function assertCommandOrAttribute(context)
@@ -436,26 +424,30 @@ function chip_tests_pics(options)
   return templateUtil.collectBlocks(PICS.getAll(), options, this);
 }
 
-function chip_tests(list, options)
+async function chip_tests(list, options)
 {
   const items = Array.isArray(list) ? list : list.split(',');
   const names = items.map(name => name.trim());
-  const tests = names.map(item => parse(item));
+  let tests   = names.map(item => parse(item));
+  tests       = await Promise.all(tests.map(async function(test) {
+    test.tests = await Promise.all(test.tests.map(async function(item) {
+      if (item.isCommand) {
+        let command        = await assertCommandOrAttribute(item);
+        item.commandObject = command;
+      } else if (item.isAttribute) {
+        let attr             = await assertCommandOrAttribute(item);
+        item.attributeObject = attr;
+      }
+      return item;
+    }));
+    return test;
+  }));
   return templateUtil.collectBlocks(tests, options, this);
 }
 
 function chip_tests_items(options)
 {
   return templateUtil.collectBlocks(this.tests, options, this);
-}
-
-function isTestOnlyCluster(name)
-{
-  const testOnlyClusters = [
-    DelayCommands.name,
-    LogCommands.name,
-  ];
-  return testOnlyClusters.includes(name);
 }
 
 // test_cluster_command_value and test_cluster_value-equals are recursive partials using #each. At some point the |global|
@@ -556,6 +548,10 @@ function chip_tests_item_response_parameters(options)
         if ('constraints' in expected) {
           responseArg.hasExpectedConstraints = true;
           responseArg.expectedConstraints    = expected.constraints;
+        }
+
+        if ('saveAs' in expected) {
+          responseArg.saveAs = expected.saveAs;
         }
       }
 

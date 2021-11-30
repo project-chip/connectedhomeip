@@ -52,7 +52,7 @@ const AmebaConfig::Key AmebaConfig::kConfigKey_MfrDeviceId         = { kConfigNa
 const AmebaConfig::Key AmebaConfig::kConfigKey_MfrDeviceCert       = { kConfigNamespace_ChipFactory, "device-cert" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
-const AmebaConfig::Key AmebaConfig::kConfigKey_ProductRevision     = { kConfigNamespace_ChipFactory, "product-rev" };
+const AmebaConfig::Key AmebaConfig::kConfigKey_HardwareVersion     = { kConfigNamespace_ChipFactory, "hardware-ver" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
 const AmebaConfig::Key AmebaConfig::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
@@ -251,17 +251,7 @@ CHIP_ERROR AmebaConfig::ClearConfigValue(Key key)
 
 bool AmebaConfig::ConfigValueExists(Key key)
 {
-    int32_t exist;
-    CHIP_ERROR err;
-
-    exist = checkExist(key.Namespace, key.Name);
-
-    if (exist == 1)
-        err = CHIP_NO_ERROR;
-    else
-        err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
-
-    return (err == CHIP_NO_ERROR);
+    return checkExist(key.Namespace, key.Name);
 }
 
 CHIP_ERROR AmebaConfig::EnsureNamespace(const char * ns)

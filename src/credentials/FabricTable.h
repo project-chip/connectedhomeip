@@ -163,6 +163,10 @@ public:
             mOperationalKey = chip::Platform::New<Crypto::P256Keypair>();
 #endif
             mOperationalKey->Initialize();
+#ifdef ENABLE_HSM_CASE_OPS_KEY
+            // Set provisioned_key = true , so that key is not deleted from HSM.
+            mOperationalKey->provisioned_key = true;
+#endif
         }
         return mOperationalKey;
     }

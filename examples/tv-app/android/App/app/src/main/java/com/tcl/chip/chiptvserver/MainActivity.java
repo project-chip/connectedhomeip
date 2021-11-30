@@ -15,8 +15,14 @@ import chip.platform.PreferencesKeyValueStoreManager;
 import chip.setuppayload.DiscoveryCapability;
 import chip.setuppayload.SetupPayload;
 import chip.setuppayload.SetupPayloadParser;
+import com.tcl.chip.tvapp.ContentLaunchManagerStub;
 import com.tcl.chip.tvapp.KeypadInputManagerStub;
+import com.tcl.chip.tvapp.LowPowerManagerStub;
+import com.tcl.chip.tvapp.MediaInputManagerStub;
+import com.tcl.chip.tvapp.MediaPlaybackManagerStub;
 import com.tcl.chip.tvapp.TvApp;
+import com.tcl.chip.tvapp.TvChannelManagerStub;
+import com.tcl.chip.tvapp.WakeOnLanManagerStub;
 import java.util.HashSet;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,6 +40,12 @@ public class MainActivity extends AppCompatActivity {
     mManualPairingCodeTxt = findViewById(R.id.manualPairingCodeTxt);
     TvApp tvApp = new TvApp();
     tvApp.setKeypadInputManager(new KeypadInputManagerStub());
+    tvApp.setWakeOnLanManager(new WakeOnLanManagerStub());
+    tvApp.setMediaInputManager(new MediaInputManagerStub());
+    tvApp.setContentLaunchManager(new ContentLaunchManagerStub());
+    tvApp.setLowPowerManager(new LowPowerManagerStub());
+    tvApp.setMediaPlaybackManager(new MediaPlaybackManagerStub());
+    tvApp.setTvChannelManager(new TvChannelManagerStub());
 
     AndroidChipPlatform chipPlatform =
         new AndroidChipPlatform(
