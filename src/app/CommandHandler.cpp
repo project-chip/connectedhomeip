@@ -173,7 +173,13 @@ void CommandHandler::DecrementHoldOff()
     {
         return;
     }
-    CHIP_ERROR err = SendCommandResponse();
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (!mpExchangeCtx->IsGroupExchangeContext())
+    {
+        err = SendCommandResponse();
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DataManagement, "Failed to send command response: %" CHIP_ERROR_FORMAT, err.Format());
@@ -223,10 +229,24 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     err = commandPath.GetCommandId(&commandId);
     SuccessOrExit(err);
 
-    err = commandPath.GetEndpointId(&endpointId);
+    // TODO retrieve Endpoint ID with GroupDataProvider using GroupId and FabricId
+    // Issue 11075
+
+    // Using endpoint 1 for test purposes
+    if (mpExchangeCtx->IsGroupExchangeContext())
+    {
+        endpointId = 1;
+        err        = CHIP_NO_ERROR;
+    }
+    else
+    {
+        err = commandPath.GetEndpointId(&endpointId);
+    }
     SuccessOrExit(err);
+
     VerifyOrExit(mpCallback->CommandExists(ConcreteCommandPath(endpointId, clusterId, commandId)),
                  err = CHIP_ERROR_INVALID_PROFILE_ID);
+
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
