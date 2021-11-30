@@ -4,6 +4,11 @@ aarch
 abcdef
 abfb
 ABI
+AES
+DMM
+ECDH
+ECDSA
+SHA
 ABIs
 ables
 accessor
