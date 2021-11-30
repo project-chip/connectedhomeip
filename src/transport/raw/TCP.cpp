@@ -85,7 +85,8 @@ CHIP_ERROR TCPBase::Init(TcpListenParameters & params)
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = params.GetInetLayer()->NewTCPEndPoint(&mListenSocket);
+    VerifyOrDieWithMsg(params.GetEndPointManager() != nullptr, Inet, "TCP not initialized");
+    err = params.GetEndPointManager()->NewEndPoint(&mListenSocket);
 #else
     err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
@@ -248,7 +249,7 @@ CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuf
     VerifyOrExit(mUsedEndPointCount < mActiveConnectionsSize, err = CHIP_ERROR_NO_MEMORY);
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = mListenSocket->Layer().NewTCPEndPoint(&endPoint);
+    err = mListenSocket->GetEndPointManager().NewEndPoint(&endPoint);
 #else
     err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif

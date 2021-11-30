@@ -98,6 +98,8 @@ public class ChipClusters {
   {{/chip_cluster_responses}}
 
   {{#chip_server_cluster_attributes}}
+  {{! TODO: Add support for struct-typed attributes }}
+  {{#unless (isStrEqual chipCallback.name "Unsupported")}}
   {{#if isList}}
   {{#if isStruct}}
     public static class {{asUpperCamelCase name}}Attribute {
@@ -203,8 +205,11 @@ public class ChipClusters {
       }
     {{/if}}
   {{/if_in_global_responses}}
+  {{/unless}}
   {{/chip_server_cluster_attributes}}
   {{#chip_server_cluster_attributes}}
+  {{! TODO: Add support for struct-typed attributes }}
+  {{#unless (isStrEqual chipCallback.name "Unsupported")}}
 
     public void read{{asUpperCamelCase name}}Attribute(
     {{#if_in_global_responses}}
@@ -235,9 +240,12 @@ public class ChipClusters {
     }
   {{/unless}}
   {{/if}}
+  {{/unless}}
   {{/chip_server_cluster_attributes}}
   {{#chip_server_cluster_attributes}}
-  
+  {{! TODO: Add support for struct-typed attributes }}
+  {{#unless (isStrEqual chipCallback.name "Unsupported")}}
+
     private native void read{{asUpperCamelCase name}}Attribute(long chipClusterPtr,
       {{#if_in_global_responses}}
         {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback
@@ -259,6 +267,7 @@ public class ChipClusters {
     private native void report{{asCamelCased name false}}Attribute(long chipClusterPtr, {{convertAttributeCallbackTypeToJavaName chipCallback.type}}AttributeCallback callback);
   {{/unless}}
   {{/if}}
+  {{/unless}}
   {{/chip_server_cluster_attributes}}
   }
   {{#not_last}}

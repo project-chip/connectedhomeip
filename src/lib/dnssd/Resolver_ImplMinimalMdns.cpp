@@ -20,6 +20,7 @@
 
 #include <limits>
 
+#include <inet/IPPacketInfo.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/ServiceNaming.h>

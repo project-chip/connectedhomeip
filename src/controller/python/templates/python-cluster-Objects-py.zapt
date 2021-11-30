@@ -42,7 +42,7 @@ class {{asUpperCamelCase name}}(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                         {{#zcl_struct_items}}
-                            ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ index }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}),
+                            ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ fieldIdentifier }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}),
                         {{/zcl_struct_items}}
                     ])
 

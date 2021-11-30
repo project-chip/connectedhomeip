@@ -31,6 +31,22 @@ chip::Inet::InetLayer & InetLayer()
     return gInetLayer;
 }
 
+chip::Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager()
+{
+    static chip::Inet::UDPEndPointManagerImpl gUDPEndPointManager;
+    return &gUDPEndPointManager;
+}
+
+chip::Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager()
+{
+#if INET_CONFIG_ENABLE_TCP_ENDPOINT
+    static chip::Inet::TCPEndPointManagerImpl gTCPEndPointManager;
+    return &gTCPEndPointManager;
+#else  // INET_CONFIG_ENABLE_TCP_ENDPOINT
+    return nullptr;
+#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
+}
+
 chip::System::LayerImpl * gMockedSystemLayer = nullptr;
 
 void SetSystemLayerForTesting(System::LayerImpl * layer)

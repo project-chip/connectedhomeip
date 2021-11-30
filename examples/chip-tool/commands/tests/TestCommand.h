@@ -60,7 +60,7 @@ public:
     CHIP_ERROR WaitForMs(uint16_t ms) { return Wait(chip::System::Clock::Milliseconds32(ms)); }
     CHIP_ERROR WaitForCommissionee();
     CHIP_ERROR Log(const char * message);
-    CHIP_ERROR Prompt(const char * message);
+    CHIP_ERROR UserPrompt(const char * message);
 
 protected:
     ChipDevice * mDevice;
@@ -69,6 +69,8 @@ protected:
     static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
     static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context);
+
+    CHIP_ERROR ContinueOnChipMainThread() { return WaitForMs(0); };
 
     void Exit(std::string message);
     void ThrowFailureResponse();

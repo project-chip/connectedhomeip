@@ -85,8 +85,7 @@ CHIP_ERROR LayerImplSelect::Shutdown()
     }
     mWakeEvent.Close(*this);
 
-    mLayerState.SetShutdown();
-    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
+    mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
     return CHIP_NO_ERROR;
 }
 

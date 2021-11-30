@@ -3350,12 +3350,40 @@ NS_ASSUME_NONNULL_BEGIN
                                 responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeInt16uWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeInt24uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt24uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeInt24uWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt24uWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
 - (void)readAttributeInt32uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt32uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt32uWithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeInt32uWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeInt40uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt40uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeInt40uWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt40uWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeInt48uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt48uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeInt48uWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt48uWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeInt56uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt56uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeInt56uWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt56uWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
 - (void)readAttributeInt64uWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt64uWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -3378,12 +3406,40 @@ NS_ASSUME_NONNULL_BEGIN
                                 responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeInt16sWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeInt24sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt24sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeInt24sWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt24sWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
 - (void)readAttributeInt32sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt32sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeInt32sWithMinInterval:(uint16_t)minInterval
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeInt32sWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeInt40sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt40sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeInt40sWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt40sWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeInt48sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt48sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeInt48sWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt48sWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeInt56sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeInt56sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeInt56sWithMinInterval:(uint16_t)minInterval
+                                    maxInterval:(uint16_t)maxInterval
+                                responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeInt56sWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
 - (void)readAttributeInt64sWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeInt64sWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -3481,6 +3537,46 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeListNullablesAndOptionalsStructWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                               NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeRangeRestrictedInt8uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
+- (void)writeAttributeRangeRestrictedInt8uWithValue:(NSNumber * _Nonnull)value
+                                  completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeRangeRestrictedInt8uWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRangeRestrictedInt8uWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeRangeRestrictedInt8sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))completionHandler;
+- (void)writeAttributeRangeRestrictedInt8sWithValue:(NSNumber * _Nonnull)value
+                                  completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeRangeRestrictedInt8sWithMinInterval:(uint16_t)minInterval
+                                                  maxInterval:(uint16_t)maxInterval
+                                              responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRangeRestrictedInt8sWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                   NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeRangeRestrictedInt16uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
+- (void)writeAttributeRangeRestrictedInt16uWithValue:(NSNumber * _Nonnull)value
+                                   completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeRangeRestrictedInt16uWithMinInterval:(uint16_t)minInterval
+                                                   maxInterval:(uint16_t)maxInterval
+                                               responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRangeRestrictedInt16uWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeRangeRestrictedInt16sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))completionHandler;
+- (void)writeAttributeRangeRestrictedInt16sWithValue:(NSNumber * _Nonnull)value
+                                   completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeRangeRestrictedInt16sWithMinInterval:(uint16_t)minInterval
+                                                   maxInterval:(uint16_t)maxInterval
+                                               responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeRangeRestrictedInt16sWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                    NSError * _Nullable error))responseHandler;
+
 - (void)readAttributeUnsupportedWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeUnsupportedWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -3553,6 +3649,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeNullableInt16uWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeNullableInt24uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt24uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableInt24uWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt24uWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
 - (void)readAttributeNullableInt32uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt32uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -3560,6 +3665,33 @@ NS_ASSUME_NONNULL_BEGIN
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeNullableInt32uWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableInt40uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt40uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableInt40uWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt40uWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableInt48uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt48uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableInt48uWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt48uWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableInt56uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt56uWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableInt56uWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt56uWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
 - (void)readAttributeNullableInt64uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
@@ -3589,6 +3721,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeNullableInt16sWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeNullableInt24sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt24sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableInt24sWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt24sWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
 - (void)readAttributeNullableInt32sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                              NSError * _Nullable error))completionHandler;
 - (void)writeAttributeNullableInt32sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
@@ -3596,6 +3737,33 @@ NS_ASSUME_NONNULL_BEGIN
                                             maxInterval:(uint16_t)maxInterval
                                         responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeNullableInt32sWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableInt40sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt40sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableInt40sWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt40sWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableInt48sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt48sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableInt48sWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt48sWithResponseHandler:(void (^)(
+                                                             NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableInt56sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                             NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableInt56sWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableInt56sWithMinInterval:(uint16_t)minInterval
+                                            maxInterval:(uint16_t)maxInterval
+                                        responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableInt56sWithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
 - (void)readAttributeNullableInt64sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
@@ -3642,6 +3810,46 @@ NS_ASSUME_NONNULL_BEGIN
                                             responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeNullableCharStringWithResponseHandler:(void (^)(NSString * _Nullable value,
                                                                  NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableRangeRestrictedInt8uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableRangeRestrictedInt8uWithValue:(NSNumber * _Nullable)value
+                                          completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableRangeRestrictedInt8uWithMinInterval:(uint16_t)minInterval
+                                                          maxInterval:(uint16_t)maxInterval
+                                                      responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableRangeRestrictedInt8uWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableRangeRestrictedInt8sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableRangeRestrictedInt8sWithValue:(NSNumber * _Nullable)value
+                                          completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableRangeRestrictedInt8sWithMinInterval:(uint16_t)minInterval
+                                                          maxInterval:(uint16_t)maxInterval
+                                                      responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableRangeRestrictedInt8sWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                           NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableRangeRestrictedInt16uWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableRangeRestrictedInt16uWithValue:(NSNumber * _Nullable)value
+                                           completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableRangeRestrictedInt16uWithMinInterval:(uint16_t)minInterval
+                                                           maxInterval:(uint16_t)maxInterval
+                                                       responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableRangeRestrictedInt16uWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableRangeRestrictedInt16sWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableRangeRestrictedInt16sWithValue:(NSNumber * _Nullable)value
+                                           completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableRangeRestrictedInt16sWithMinInterval:(uint16_t)minInterval
+                                                           maxInterval:(uint16_t)maxInterval
+                                                       responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableRangeRestrictedInt16sWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                            NSError * _Nullable error))responseHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;

@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
+ *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,14 +16,19 @@
  *    limitations under the License.
  */
 
-const kType = 'STRUCT';
+#include "IPPacketInfo.h"
 
-function isStruct(type)
+namespace chip {
+namespace Inet {
+
+void IPPacketInfo::Clear()
 {
-  return type.toUpperCase() == kType;
+    SrcAddress  = IPAddress::Any;
+    DestAddress = IPAddress::Any;
+    Interface   = InterfaceId::Null();
+    SrcPort     = 0;
+    DestPort    = 0;
 }
 
-//
-// Module exports
-//
-exports.isStruct = isStruct;
+} // namespace Inet
+} // namespace chip
