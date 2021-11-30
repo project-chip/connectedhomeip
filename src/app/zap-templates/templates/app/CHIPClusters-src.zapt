@@ -22,7 +22,7 @@ namespace Controller {
 
 // {{asUpperCamelCase name}} Cluster Commands
 {{#chip_cluster_commands}}
-CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}})
+CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}, {{chipType}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}})
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVWriter * writer     = nullptr;
@@ -44,6 +44,8 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
 {{#chip_cluster_command_arguments_with_structs_expanded}}
+{{#if_is_struct type}}
+{{else}}
 {{#first}}
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 {{/first}}
@@ -53,6 +55,7 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
 {{else}}
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}));
 {{/if}}
+{{/if_is_struct}}
 {{else}}
     // Command takes no arguments.
 {{/chip_cluster_command_arguments_with_structs_expanded}}

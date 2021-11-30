@@ -79,7 +79,6 @@ class ExecutionCapture:
 
 @dataclass
 class TestDefinition:
-    yaml_file: str
     name: str
     run_name: str
     target: TestTarget

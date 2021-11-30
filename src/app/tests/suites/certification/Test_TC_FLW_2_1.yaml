@@ -47,7 +47,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write the default value to optional attribute: MinMeasuredValue"
       command: "writeAttribute"
@@ -55,7 +55,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write the default value to optional attribute: MaxMeasuredValue"
       command: "writeAttribute"
@@ -63,7 +63,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
@@ -110,7 +110,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "read the optional attribute: Tolerance"
       disabled: true

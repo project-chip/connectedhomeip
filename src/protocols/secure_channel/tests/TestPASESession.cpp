@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -100,6 +100,11 @@ void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
     // Test all combinations of invalid parameters
     TestSecurePairingDelegate delegate;
     PASESession pairing;
+
+    NL_TEST_ASSERT(inSuite, pairing.GetSecureSessionType() == SecureSession::Type::kPASE);
+    Credentials::CATValues peerCATs;
+    peerCATs = pairing.GetPeerCATs();
+    NL_TEST_ASSERT(inSuite, memcmp(&peerCATs, &Credentials::kUndefinedCATs, sizeof(Credentials::CATValues)) == 0);
 
     gLoopback.Reset();
 

@@ -700,9 +700,9 @@ static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uin
     // Otherwise, move as fast as possible
     if (rate == 0xFF)
     {
-        uint8_t defaultMoveRate;
-        status = Attributes::DefaultMoveRate::Get(endpoint, &defaultMoveRate);
-        if (status != EMBER_ZCL_STATUS_SUCCESS)
+        app::DataModel::Nullable<uint8_t> defaultMoveRate;
+        status = Attributes::DefaultMoveRate::Get(endpoint, defaultMoveRate);
+        if (status != EMBER_ZCL_STATUS_SUCCESS || defaultMoveRate.IsNull())
         {
             emberAfLevelControlClusterPrintln("ERR: reading default move rate %x", status);
             state->eventDurationMs = FASTEST_TRANSITION_TIME_MS;
@@ -710,12 +710,12 @@ static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uin
         else
         {
             // nonsensical case, means "don't move", so we're done
-            if (defaultMoveRate == 0)
+            if (defaultMoveRate.Value() == 0)
             {
                 status = EMBER_ZCL_STATUS_SUCCESS;
                 goto send_default_response;
             }
-            state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / defaultMoveRate;
+            state->eventDurationMs = MILLISECOND_TICKS_PER_SECOND / defaultMoveRate.Value();
         }
     }
     else

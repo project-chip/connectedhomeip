@@ -198,6 +198,10 @@ public:
         });
     }
 
+    void RegisterRecoveryDelegate(SessionRecoveryDelegate & cb);
+    void UnregisterRecoveryDelegate(SessionRecoveryDelegate & cb);
+    void RefreshSessionOperationalData(const SessionHandle & sessionHandle);
+
     /**
      * @brief
      *   Establish a new pairing with a peer node
@@ -290,6 +294,9 @@ private:
     //       delegate directly, in order to prevent dangling handles.
     BitMapObjectPool<std::reference_wrapper<SessionReleaseDelegate>, CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES>
         mSessionReleaseDelegates;
+
+    BitMapObjectPool<std::reference_wrapper<SessionRecoveryDelegate>, CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES>
+        mSessionRecoveryDelegates;
 
     TransportMgrBase * mTransportMgr                                   = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;

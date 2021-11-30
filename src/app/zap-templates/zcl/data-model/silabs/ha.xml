@@ -222,7 +222,7 @@ limitations under the License.
     <!-- COLOR_TEMPERATURE -->
     <attribute side="server" code="0x0008" define="COLOR_CONTROL_COLOR_MODE" type="ENUM8" min="0x00" max="0x02" writable="false" default="0x01" optional="true">color mode</attribute>
     <!-- COLOR_MODE -->
-    <attribute side="server" code="0x000F" define="COLOR_CONTROL_OPTIONS" type="BITMAP8" min="0x00" max="0xFF" writable="true" default="0x00" optional="false" introducedIn="zcl-6.0-15-02017-001">color control options</attribute>
+    <attribute side="server" code="0x000F" define="COLOR_CONTROL_OPTIONS" type="BITMAP8" writable="true" default="0x00" optional="false" introducedIn="zcl-6.0-15-02017-001">color control options</attribute>
     <!-- COLOR_CONTROL_OPTIONS -->
     <attribute side="server" code="0x0010" define="COLOR_CONTROL_NUMBER_OF_PRIMARIES" type="INT8U" min="0x00" max="0x06" writable="false" optional="true">number of primaries</attribute>
     <!-- NUMBER_OF_PRIMARIES -->
@@ -270,22 +270,22 @@ limitations under the License.
     <!-- COLOR_POINT_R_X -->
     <attribute side="server" code="0x0033" define="COLOR_CONTROL_COLOR_POINT_R_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point r y</attribute>
     <!-- COLOR_POINT_R_Y -->
-    <attribute side="server" code="0x0034" define="COLOR_CONTROL_COLOR_POINT_R_INTENSITY" type="INT8U" min="0x00" max="0xFF" writable="true" optional="true">color point r intensity</attribute>
+    <attribute side="server" code="0x0034" define="COLOR_CONTROL_COLOR_POINT_R_INTENSITY" type="INT8U" writable="true" optional="true">color point r intensity</attribute>
     <!-- COLOR_POINT_R_INTENSITY -->
     <attribute side="server" code="0x0036" define="COLOR_CONTROL_COLOR_POINT_G_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point g x</attribute>
     <!-- COLOR_POINT_G_X -->
     <attribute side="server" code="0x0037" define="COLOR_CONTROL_COLOR_POINT_G_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point g y</attribute>
     <!-- COLOR_POINT_G_Y -->
-    <attribute side="server" code="0x0038" define="COLOR_CONTROL_COLOR_POINT_G_INTENSITY" type="INT8U" min="0x00" max="0xFF" writable="true" optional="true">color point g intensity</attribute>
+    <attribute side="server" code="0x0038" define="COLOR_CONTROL_COLOR_POINT_G_INTENSITY" type="INT8U" writable="true" optional="true">color point g intensity</attribute>
     <!-- COLOR_POINT_G_INTENSITY -->
     <attribute side="server" code="0x003A" define="COLOR_CONTROL_COLOR_POINT_B_X" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point b x</attribute>
     <!-- COLOR_POINT_B_X -->
     <attribute side="server" code="0x003B" define="COLOR_CONTROL_COLOR_POINT_B_Y" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="true">color point b y</attribute>
     <!-- COLOR_POINT_B_Y -->
-    <attribute side="server" code="0x003C" define="COLOR_CONTROL_COLOR_POINT_B_INTENSITY" type="INT8U" min="0x00" max="0xFF" writable="true" optional="true">color point b intensity</attribute>
+    <attribute side="server" code="0x003C" define="COLOR_CONTROL_COLOR_POINT_B_INTENSITY" type="INT8U" writable="true" optional="true">color point b intensity</attribute>
     <!-- COLOR_POINT_B_INTENSITY -->
     <attribute side="server" code="0x400D" define="COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS" type="INT16U" min="0x0000" max="0xFFFF" writable="false" optional="false" introducedIn="l&amp;o-1.0-15-0014-04">couple color temp to level min-mireds</attribute>
-    <attribute side="server" code="0x4010" define="START_UP_COLOR_TEMPERATURE_MIREDS" type="INT16U" min="0x0000" max="0xFFFF" writable="true" optional="false" introducedIn="l&amp;o-1.0-15-0014-04">start up color temperature mireds</attribute>
+    <attribute side="server" code="0x4010" define="START_UP_COLOR_TEMPERATURE_MIREDS" type="INT16U" min="0x0000" max="0xFEFF" writable="true" optional="false" introducedIn="l&amp;o-1.0-15-0014-04">start up color temperature mireds</attribute>
     <command source="client" code="0x00" name="MoveToHue" optional="true" cli="zcl color-control movetohue">
       <description>
         Move to specified hue.

@@ -43,7 +43,7 @@ CHIP_ERROR BoltLockManager::Init()
         appError(APP_ERROR_CREATE_TIMER_FAILED);
     }
 
-    mState              = State::kLockingCompleted;
+    mState              = State::kUnlockingCompleted;
     mAutoLockTimerArmed = false;
     mAutoRelock         = false;
     mAutoLockDuration   = 0;

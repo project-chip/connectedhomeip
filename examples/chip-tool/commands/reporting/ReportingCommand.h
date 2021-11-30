@@ -42,7 +42,7 @@ private:
     NodeId mNodeId;
     uint8_t mEndPointId;
 
-    static void OnDeviceConnectedFn(void * context, chip::DeviceProxy * device);
+    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 
     chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;

@@ -1,11 +1,11 @@
-# CHIP CC1352 CC2652 Lock Example Application
+# Matter CC1352 CC2652 Lock Example Application
 
-An example application showing the use [CHIP][chip] on the Texas Instruments
-CC13X2_26X2 family of Wireless MCUs.
+An example application showing the use of [Matter][matter] on the Texas
+Instruments CC13X2_26X2 family of Wireless MCUs.
 
 ---
 
--   [CHIP CC1352 CC2652 Lock Example Application](#chip-cc1352-cc2652-lock-example-application)
+-   [Matter CC1352 CC2652 Lock Example Application](#matter-cc1352-cc2652-lock-example-application)
     -   [Introduction](#introduction)
         -   [Device UI](#device-ui)
     -   [Building](#building)
@@ -19,7 +19,7 @@ CC13X2_26X2 family of Wireless MCUs.
         -   [Provisioning](#provisioning)
             -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
             -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
-        -   [CHIP Remote Commands](#chip-remote-commands)
+        -   [Matter Remote Commands](#matter-remote-commands)
     -   [TI Support](#ti-support)
 
 ---
@@ -29,16 +29,16 @@ CC13X2_26X2 family of Wireless MCUs.
 ![CC1352R1_LAUNCHXL](doc/images/cc1352r1_launchxl.jpg)
 
 The CC13X2_26X2 lock example application provides a working demonstration of a
-connected door lock device. This uses the open-source CHIP implementation and
+connected door lock device. This uses the open-source Matter implementation and
 the Texas Instruments SimpleLink™ CC13x2 and CC26x2 software development kit.
 
 This example is enabled to build for CC2652R7 devices. This upcoming devices are
 currently not yet in full production. For more information on device
-availability or early access to an engineering build of our CHIP-enabled SDK,
-please reach out [here][ti_cc13x2_26x2_r7_chip_request].
+availability or early access to an engineering build of our Matter-enabled SDK,
+please reach out [here][ti_cc13x2_26x2_r7_matter_request].
 
 The lock example is intended to serve both as a means to explore the workings of
-CHIP, as well as a template for creating real products based on the Texas
+Matter, as well as a template for creating real products based on the Texas
 Instruments devices.
 
 ## Device UI
@@ -66,7 +66,7 @@ section will need to be done when migrating to new versions of the SDK. This
 guide assumes that the environment is linux based, and recommends Ubuntu 20.04.
 
 -   An engineering SDK from TI is required. Please request access for it
-    [here][ti_cc13x2_26x2_r7_chip_request].
+    [here][ti_cc13x2_26x2_r7_matter_request].
 
     -   Follow the default installation instructions when executing the
         installer.
@@ -152,15 +152,15 @@ Ninja to build the executable.
 -   Run the build to produce a default executable. By default on Linux both the
     TI SimpleLink SDK and Sysconfig are located in a `ti` folder in the user's
     home directory, and you must provide the absolute path to them. For example
-    `/home/username/ti/simplelink_cc13x2_26x2_sdk_4_40_05_02_eng` and
-    `/home/username/ti/sysconfig_1.7.0`. On Windows the default directory is
+    `/home/username/ti/simplelink_cc13xx_cc26xx_sdk_5_30_03_01_eng` and
+    `/home/username/ti/sysconfig_1.10.0`. On Windows the default directory is
     `C:\ti`. Take note of this install path, as it will be used in the next
     step.
 
     ```
     $ cd ~/connectedhomeip/examples/lock-app/cc13x2x7_26x2x7
-    $ export TI_SIMPLELINK_SDK_ROOT=$HOME/ti/simplelink_cc13x2_26x2_sdk_4_40_05_02_eng
-    $ export TI_SYSCONFIG_ROOT=$HOME/ti/sysconfig_1.7.0
+    $ export TI_SIMPLELINK_SDK_ROOT=$HOME/ti/simplelink_cc13xx_cc26xx_sdk_5_30_03_01_eng
+    $ export TI_SYSCONFIG_ROOT=$HOME/ti/sysconfig_1.10.0
     $ gn gen out/debug --args="ti_simplelink_sdk_root=\"${TI_SIMPLELINK_SDK_ROOT}\" ti_sysconfig_root=\"${TI_SYSCONFIG_ROOT}\""
     $ ninja -C out/debug
 
@@ -252,8 +252,8 @@ Router][ot_border_router_setup].
 
 ### Provisioning
 
-The first step to bring the CHIP device onto the network is to provision it. Our
-example accomplishes this with Bluetooth Low Energy (BLE) and the
+The first step to bring the Matter device onto the network is to provision it.
+Our example accomplishes this with Bluetooth Low Energy (BLE) and the
 [CHIPTool](../../../src/android/CHIPTool/README.md) mobile app.
 
 #### Bluetooth LE Advertising
@@ -265,9 +265,9 @@ fully provisioned, BLE advertising will stop.
 
 #### Bluetooth LE Rendezvous
 
-To commission and control this application within a CHIP-enabled Thread network,
-consult the [CHIPTool README](../../../src/android/CHIPTool/README.md) for
-information on the Android smartphone application. Reference the Device
+To commission and control this application within a Matter-enabled Thread
+network, consult the [CHIPTool README](../../../src/android/CHIPTool/README.md)
+for information on the Android smartphone application. Reference the Device
 Configuration information printed in the Logging Output of this application.
 
 ## TI Support
@@ -275,7 +275,7 @@ Configuration information printed in the Logging Output of this application.
 For technical support, please consider creating a post on TI's [E2E forum][e2e].
 Additionally, we welcome any feedback.
 
-[chip]: https://github.com/project-chip/connectedhomeip
+[matter]: https://github.com/project-chip/connectedhomeip
 [ccs]: https://www.ti.com/tool/CCSTUDIO
 [ccs_after_launch]:
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#after-launch
@@ -287,14 +287,11 @@ Additionally, we welcome any feedback.
     https://software-dl.ti.com/ccs/esd/documents/users_guide/ccs_debug-main.html?configuration#manual-method
 [cc1352r1_launchxl]: https://www.ti.com/tool/LAUNCHXL-CC1352R1
 [e2e]: https://e2e.ti.com/support/wireless-connectivity/zigbee-and-thread
-[simplelink_sdk]: https://www.ti.com/tool/SIMPLELINK-CC13X2-26X2-SDK
-[simplelink_sdk_4.30.00.54]:
-    https://www.ti.com/tool/download/SIMPLELINK-CC13X2-26X2-SDK/4.30.00.54
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
 [sysconfig_recommended]:
-    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.7.0_1746-setup.run
+    https://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.10.0_2163-setup.run
 [ti_thread_dnd]:
     https://www.ti.com/wireless-connectivity/thread/design-development.html
-[ti_cc13x2_26x2_r7_chip_request]: https://ti.com/chip_sdk
+[ti_cc13x2_26x2_r7_matter_request]: https://ti.com/chip_sdk
 [ot_border_router_setup]: https://openthread.io/guides/border-router/build
 [uniflash]: https://www.ti.com/tool/download/UNIFLASH

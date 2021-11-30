@@ -49,7 +49,7 @@ tests:
       arguments:
           value: 2
       response:
-          error: 135
+          error: CONSTRAINT_ERROR
 
     - label: "Writes a value of 0 to KeypadLockout attribute of DUT"
       command: "writeAttribute"
@@ -120,7 +120,7 @@ tests:
       arguments:
           value: 6
       response:
-          error: 135
+          error: CONSTRAINT_ERROR
 
     - label:
           "Writes a value of 0 to ScheduleProgrammingVisibility attribute of DUT"
@@ -158,4 +158,4 @@ tests:
       arguments:
           value: 2
       response:
-          error: 135
+          error: CONSTRAINT_ERROR

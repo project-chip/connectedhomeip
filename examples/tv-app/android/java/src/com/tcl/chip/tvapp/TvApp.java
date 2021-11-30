@@ -26,6 +26,14 @@ public class TvApp {
 
   public native void setMediaInputManager(MediaInputManager manager);
 
+  public native void setContentLaunchManager(ContentLaunchManager manager);
+
+  public native void setLowPowerManager(LowPowerManager manager);
+
+  public native void setMediaPlaybackManager(MediaPlaybackManager manager);
+
+  public native void setTvChannelManager(TvChannelManager manager);
+
   static {
     System.loadLibrary("TvApp");
   }

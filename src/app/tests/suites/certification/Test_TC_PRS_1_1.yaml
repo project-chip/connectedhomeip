@@ -40,7 +40,7 @@ tests:
       arguments:
           value: 2
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back global attribute: ClusterRevision"
       command: "readAttribute"
@@ -71,7 +71,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory global attribute: AttributeList"
       disabled: true
@@ -103,7 +103,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory global attribute: CommandList"
       disabled: true
@@ -134,7 +134,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory global attribute: EventList"
       disabled: true
@@ -165,7 +165,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back optional global attribute: FeatureMap"
       disabled: true

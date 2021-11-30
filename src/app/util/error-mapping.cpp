@@ -34,7 +34,7 @@ EmberAfStatus ToEmberAfStatus(Protocols::InteractionModel::Status code)
     case imcode::UnsupportedAccess: // 0x7e
         return EMBER_ZCL_STATUS_NOT_AUTHORIZED;
     case imcode::UnsupportedEndpoint: // 0x7f
-        return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
+        return EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT;
     case imcode::InvalidAction: // 0x80
         return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
     case imcode::UnsupportedCommand: // 0x81
@@ -123,6 +123,8 @@ Protocols::InteractionModel::Status ToInteractionModelStatus(EmberAfStatus code)
         return imcode::Failure;
     case EMBER_ZCL_STATUS_NOT_AUTHORIZED: // 0x7E
         return imcode::UnsupportedAccess;
+    case EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT: // 0x7F
+        return imcode::UnsupportedEndpoint;
     case EMBER_ZCL_STATUS_MALFORMED_COMMAND: // 0x80
         return imcode::InvalidAction;
     case EMBER_ZCL_STATUS_UNSUP_COMMAND: // 0x81
