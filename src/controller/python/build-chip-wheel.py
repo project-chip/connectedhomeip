@@ -116,7 +116,12 @@ try:
     requiredPackages = [
         "coloredlogs",
         'construct',
-        'ipython',
+
+        #
+        # IPython 7.30.0 has a bug which results in the use of await ... failing on some platforms (see https://github.com/ipython/ipython/pull/13269)
+        # For now, let's just avoid that version.
+        #
+        'ipython!=7.30.0',
         'dacite',
         'rich',
         'stringcase',
