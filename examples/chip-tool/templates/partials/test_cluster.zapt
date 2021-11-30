@@ -191,7 +191,7 @@ class {{filename}}: public TestCommand
             (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::{{#if isGroupCommand}}InvokeGroupCommand{{else}}InvokeCommand{{/if}}(mDevice, this, success, failure, {{#if isGroupCommand}}groupId{{else}}endpoint{{/if}}, request));
         {{#unless async}}return CHIP_NO_ERROR;{{/unless}}
         {{else}}
         chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
