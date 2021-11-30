@@ -34,7 +34,7 @@ tests:
       arguments:
           value: 1
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "reads back global attribute: ClusterRevision"
       disabled: true
@@ -57,7 +57,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "reads back optional global attribute: FeatureMap"
       disabled: true

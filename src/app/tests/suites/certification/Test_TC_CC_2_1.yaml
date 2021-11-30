@@ -40,7 +40,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: CurrentHue"
       command: "readAttribute"
@@ -69,7 +69,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: CurrentSaturation"
       command: "readAttribute"
@@ -98,7 +98,7 @@ tests:
       arguments:
           value: 24939
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: CurrentX"
       command: "readAttribute"
@@ -127,7 +127,7 @@ tests:
       arguments:
           value: 24701
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: CurrentY"
       command: "readAttribute"
@@ -160,7 +160,7 @@ tests:
       arguments:
           value: 250
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: ColorTemperatureMireds"
       disabled: true
@@ -192,7 +192,7 @@ tests:
       arguments:
           value: 1
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: ColorMode"
       disabled: true
@@ -246,7 +246,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: EnhancedCurrentHue"
       command: "readAttribute"
@@ -276,7 +276,7 @@ tests:
       arguments:
           value: 1
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: EnhancedColorMode"
       disabled: true
@@ -304,7 +304,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: ColorLoopActive"
       command: "readAttribute"
@@ -332,7 +332,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: ColorLoopDirection"
       command: "readAttribute"
@@ -359,7 +359,7 @@ tests:
       arguments:
           value: 25
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: ColorLoopTime"
       command: "readAttribute"
@@ -388,7 +388,7 @@ tests:
       arguments:
           value: 8960
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: ColorLoopStartEnhancedHue"
       command: "readAttribute"
@@ -417,7 +417,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: ColorLoopStoredEnhancedHue"
       command: "readAttribute"
@@ -447,7 +447,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: ColorCapabilities"
       command: "readAttribute"
@@ -478,7 +478,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: ColorTempPhysicalMinMireds"
       command: "readAttribute"
@@ -509,7 +509,7 @@ tests:
       arguments:
           value: 65279
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: ColorTempPhysicalMaxMireds"
       command: "readAttribute"
@@ -532,7 +532,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back optional attribute: CoupleColorTempToLevelMinMireds"
       command: "readAttribute"
@@ -584,7 +584,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back optional attribute: RemainingTime"
       command: "readAttribute"
@@ -607,7 +607,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back optional attribute: DriftCompensation"
       command: "readAttribute"
@@ -630,7 +630,7 @@ tests:
       arguments:
           value: ""
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back optional attribute: CompensationText"
       disabled: true
@@ -656,7 +656,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: NumberOfPrimaries"
       command: "readAttribute"
@@ -679,7 +679,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary1X"
       command: "readAttribute"
@@ -702,7 +702,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary1Y"
       command: "readAttribute"
@@ -724,7 +724,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary1Intensity"
       disabled: true
@@ -748,7 +748,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary2X"
       command: "readAttribute"
@@ -771,7 +771,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary2Y"
       command: "readAttribute"
@@ -793,7 +793,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary2Intensity"
       disabled: true
@@ -817,7 +817,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary3X"
       command: "readAttribute"
@@ -840,7 +840,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary3Y"
       command: "readAttribute"
@@ -862,7 +862,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary3Intensity"
       disabled: true
@@ -887,7 +887,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary4X"
       command: "readAttribute"
@@ -910,7 +910,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary4Y"
       command: "readAttribute"
@@ -932,7 +932,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary4Intensity"
       disabled: true
@@ -956,7 +956,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary5X"
       command: "readAttribute"
@@ -979,7 +979,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary5Y"
       command: "readAttribute"
@@ -1001,7 +1001,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary5Intensity"
       disabled: true
@@ -1025,7 +1025,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary6X"
       command: "readAttribute"
@@ -1048,7 +1048,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary6Y"
       command: "readAttribute"
@@ -1070,7 +1070,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back the mandatory attribute: Primary6Intensity"
       disabled: true

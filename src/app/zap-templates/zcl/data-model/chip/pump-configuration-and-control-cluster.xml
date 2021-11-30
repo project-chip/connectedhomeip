@@ -42,9 +42,9 @@ limitations under the License.
     <attribute side="server" code="0x0012" define="EFFECTIVE_CONTROL_MODE" type="ENUM8" min="0x00" max="0xFE" writable="false" optional="false">EffectiveControlMode</attribute>
     <attribute side="server" code="0x0013" define="CAPACITY" type="INT16S" min="0x0000" max="0x7FFF" writable="false" reportable="true" optional="false">Capacity</attribute>
     <attribute side="server" code="0x0014" define="SPEED" type="INT16U" min="0x0000" max="0xFFFE" writable="false" optional="true">Speed</attribute>
-    <attribute side="server" code="0x0015" define="LIFETIME_RUNNING_HOURS" type="INT24U" min="0x000000" max="0xFFFFFE" writable="true" default="0x000000" optional="true">LifetimeRunningHours</attribute>
-    <attribute side="server" code="0x0016" define="PUMP_POWER" type="INT24U" min="0x000000" max="0xFFFFFE" writable="true" optional="true">Power</attribute>
-    <attribute side="server" code="0x0017" define="LIFETIME_ENERGY_CONSUMED" type="INT32U" min="0x00000000" max="0xFFFFFFFE" writable="false" default="0x00000000" optional="true">LifetimeEnergyConsumed</attribute>
+    <attribute side="server" code="0x0015" define="LIFETIME_RUNNING_HOURS" type="INT24U" isNullable="true" writable="true" default="0x000000" optional="true">LifetimeRunningHours</attribute>
+    <attribute side="server" code="0x0016" define="PUMP_POWER" type="INT24U" min="0x000000" max="0xFFFFFE" writable="false" optional="true">Power</attribute>
+    <attribute side="server" code="0x0017" define="LIFETIME_ENERGY_CONSUMED" type="INT32U" isNullable="true" writable="true" default="0x00000000" optional="true">LifetimeEnergyConsumed</attribute>
     <attribute side="server" code="0x0020" define="OPERATION_MODE" type="ENUM8" min="0x00" max="0xFE" writable="true" default="0x00" optional="false">OperationMode</attribute>
     <attribute side="server" code="0x0021" define="CONTROL_MODE" type="ENUM8" min="0x00" max="0xFE" writable="true" default="0x00" optional="true">ControlMode</attribute>
     <attribute side="server" code="0x0022" define="PUMP_ALARM_MASK" type="BITMAP16" writable="false" optional="true">AlarmMask</attribute>

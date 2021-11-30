@@ -140,8 +140,8 @@ class Flasher(firmware_utils.Flasher):
             if self.erase().err:
                 return self
 
-        application = self.optional_file(self.option.application)
-        if application:
+        if self.option.application:
+            application = self.option.application
             if self.flash(application).err:
                 return self
             if self.option.verify_application:

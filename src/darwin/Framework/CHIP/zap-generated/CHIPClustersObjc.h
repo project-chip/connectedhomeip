@@ -1987,7 +1987,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOnLevelWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)writeAttributeOnLevelWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeOnLevelWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOnLevelWithMinInterval:(uint16_t)minInterval
                                      maxInterval:(uint16_t)maxInterval
                                  responseHandler:(ResponseHandler)responseHandler;
@@ -1995,7 +1995,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOnTransitionTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                NSError * _Nullable error))completionHandler;
-- (void)writeAttributeOnTransitionTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeOnTransitionTimeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOnTransitionTimeWithMinInterval:(uint16_t)minInterval
                                               maxInterval:(uint16_t)maxInterval
                                           responseHandler:(ResponseHandler)responseHandler;
@@ -2004,7 +2004,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeOffTransitionTimeWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
-- (void)writeAttributeOffTransitionTimeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeOffTransitionTimeWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeOffTransitionTimeWithMinInterval:(uint16_t)minInterval
                                                maxInterval:(uint16_t)maxInterval
                                            responseHandler:(ResponseHandler)responseHandler;
@@ -2013,7 +2013,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeDefaultMoveRateWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)writeAttributeDefaultMoveRateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeDefaultMoveRateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeDefaultMoveRateWithMinInterval:(uint16_t)minInterval
                                              maxInterval:(uint16_t)maxInterval
                                          responseHandler:(ResponseHandler)responseHandler;
@@ -2849,7 +2849,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLifetimeRunningHoursWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                    NSError * _Nullable error))completionHandler;
-- (void)writeAttributeLifetimeRunningHoursWithValue:(NSNumber * _Nonnull)value
+- (void)writeAttributeLifetimeRunningHoursWithValue:(NSNumber * _Nullable)value
                                   completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLifetimeRunningHoursWithMinInterval:(uint16_t)minInterval
                                                   maxInterval:(uint16_t)maxInterval
@@ -2858,7 +2858,6 @@ NS_ASSUME_NONNULL_BEGIN
                                                                    NSError * _Nullable error))responseHandler;
 
 - (void)readAttributePowerWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)writeAttributePowerWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributePowerWithMinInterval:(uint16_t)minInterval
                                    maxInterval:(uint16_t)maxInterval
                                responseHandler:(ResponseHandler)responseHandler;
@@ -2866,6 +2865,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeLifetimeEnergyConsumedWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                      NSError * _Nullable error))completionHandler;
+- (void)writeAttributeLifetimeEnergyConsumedWithValue:(NSNumber * _Nullable)value
+                                    completionHandler:(StatusCompletion)completionHandler;
 - (void)subscribeAttributeLifetimeEnergyConsumedWithMinInterval:(uint16_t)minInterval
                                                     maxInterval:(uint16_t)maxInterval
                                                 responseHandler:(ResponseHandler)responseHandler;
@@ -3271,9 +3272,19 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testListInt8UReverseRequestWithParams:(CHIPTestClusterClusterTestListInt8UReverseRequestParams *)params
                             completionHandler:(void (^)(CHIPTestClusterClusterTestListInt8UReverseResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler;
+- (void)testListNestedStructListArgumentRequestWithParams:
+            (CHIPTestClusterClusterTestListNestedStructListArgumentRequestParams *)params
+                                        completionHandler:(void (^)(CHIPTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                              NSError * _Nullable error))completionHandler;
 - (void)testListStructArgumentRequestWithParams:(CHIPTestClusterClusterTestListStructArgumentRequestParams *)params
                               completionHandler:(void (^)(CHIPTestClusterClusterBooleanResponseParams * _Nullable data,
                                                     NSError * _Nullable error))completionHandler;
+- (void)testNestedStructArgumentRequestWithParams:(CHIPTestClusterClusterTestNestedStructArgumentRequestParams *)params
+                                completionHandler:(void (^)(CHIPTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                      NSError * _Nullable error))completionHandler;
+- (void)testNestedStructListArgumentRequestWithParams:(CHIPTestClusterClusterTestNestedStructListArgumentRequestParams *)params
+                                    completionHandler:(void (^)(CHIPTestClusterClusterBooleanResponseParams * _Nullable data,
+                                                          NSError * _Nullable error))completionHandler;
 - (void)testNotHandledWithCompletionHandler:(StatusCompletion)completionHandler;
 - (void)testNullableOptionalRequestWithParams:(CHIPTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
                             completionHandler:(void (^)(CHIPTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,

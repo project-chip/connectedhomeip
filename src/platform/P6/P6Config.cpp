@@ -71,6 +71,11 @@ const P6Config::Key P6Config::kConfigKey_LastUsedEpochKeyId = { kConfigNamespace
 const P6Config::Key P6Config::kConfigKey_FailSafeArmed      = { kConfigNamespace_ChipConfig, "fail-safe-armed" };
 const P6Config::Key P6Config::kConfigKey_WiFiStationSecType = { kConfigNamespace_ChipConfig, "sta-sec-type" };
 
+// Keys stored in the Chip-counters namespace
+const P6Config::Key P6Config::kCounterKey_RebootCount           = { kConfigNamespace_ChipCounters, "reboot-count" };
+const P6Config::Key P6Config::kCounterKey_UpTime                = { kConfigNamespace_ChipCounters, "up-time" };
+const P6Config::Key P6Config::kCounterKey_TotalOperationalHours = { kConfigNamespace_ChipCounters, "total-hours" };
+
 // Prefix used for keys that contain Chip group encryption keys.
 const char P6Config::kGroupKeyNamePrefix[] = "gk-";
 

@@ -190,6 +190,14 @@ public:
     bool Valid() const { return (mTypeId != kInvalidType); }
 
     template <typename T, typename... Args>
+    static Variant<Ts...> Create(Args &&... args)
+    {
+        Variant<Ts...> instance;
+        instance.template Set<T>(std::forward<Args>(args)...);
+        return instance;
+    }
+
+    template <typename T, typename... Args>
     void Set(Args &&... args)
     {
         Curry::Destroy(mTypeId, &mData);

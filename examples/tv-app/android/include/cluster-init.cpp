@@ -19,9 +19,7 @@
 #include "application-basic/ApplicationBasicManager.h"
 #include "application-launcher/ApplicationLauncherManager.h"
 #include "audio-output/AudioOutputManager.h"
-#include "content-launcher/ContentLauncherManager.h"
 #include "target-navigator/TargetNavigatorManager.h"
-#include "tv-channel/TvChannelManager.h"
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -80,33 +78,6 @@ void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint)
 
 namespace {
 
-TvAttrAccess<TvChannelManager, app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo,
-             &TvChannelManager::proxyGetTvChannelList>
-    gTvChannelAttrAccess;
-
-} // anonymous namespace
-
-/** @brief Tv Channel  Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfTvChannelClusterInitCallback(EndpointId endpoint)
-{
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gTvChannelAttrAccess);
-        attrAccessRegistered = true;
-    }
-}
-
-namespace {
-
 TvAttrAccess<ApplicationLauncherManager, app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherList::TypeInfo,
              &ApplicationLauncherManager::proxyGetApplicationList>
     gApplicationLauncherAttrAccess;
@@ -155,53 +126,6 @@ void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
     if (!attrAccessRegistered)
     {
         registerAttributeAccessOverride(&gAudioOutputAttrAccess);
-        attrAccessRegistered = true;
-    }
-}
-
-namespace {
-
-class ContentLauncherAttrAccess : public app::AttributeAccessInterface
-{
-public:
-    ContentLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ContentLauncher::Id)
-    {}
-
-    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
-    {
-        if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::Id)
-        {
-            return ContentLauncherManager().proxyGetAcceptsHeader(aEncoder);
-        }
-
-        if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::Id)
-        {
-            return ContentLauncherManager().proxyGetSupportedStreamingTypes(aEncoder);
-        }
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-ContentLauncherAttrAccess gContentLauncherAttrAccess;
-
-} // anonymous namespace
-
-/** @brief Content Launch Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
-{
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gContentLauncherAttrAccess);
         attrAccessRegistered = true;
     }
 }

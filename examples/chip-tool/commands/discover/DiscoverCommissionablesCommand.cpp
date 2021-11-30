@@ -23,9 +23,9 @@ using namespace ::chip;
 
 CHIP_ERROR DiscoverCommissionablesCommand::RunCommand()
 {
-    mController.RegisterDeviceDiscoveryDelegate(this);
+    CurrentCommissioner().RegisterDeviceDiscoveryDelegate(this);
     Dnssd::DiscoveryFilter filter(Dnssd::DiscoveryFilterType::kNone, (uint64_t) 0);
-    return mController.DiscoverCommissionableNodes(filter);
+    return CurrentCommissioner().DiscoverCommissionableNodes(filter);
 }
 
 void DiscoverCommissionablesCommand::OnDiscoveredDevice(const chip::Dnssd::DiscoveredNodeData & nodeData)

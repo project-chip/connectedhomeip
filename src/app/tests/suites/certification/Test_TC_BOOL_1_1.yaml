@@ -33,7 +33,7 @@ tests:
       arguments:
           value: 1
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "reads back global attribute: ClusterRevision"
       command: "readAttribute"
