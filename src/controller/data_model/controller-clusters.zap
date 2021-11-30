@@ -11602,7 +11602,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "TestListStructArgumentRequest",
@@ -11626,7 +11626,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "TestListNestedStructListArgumentRequest",
@@ -11634,7 +11634,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "TestListInt8UReverseRequest",

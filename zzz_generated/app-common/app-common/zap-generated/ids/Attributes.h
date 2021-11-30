@@ -1168,13 +1168,13 @@ namespace BasicCommissioningInfoList {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace BasicCommissioningInfoList
 
-namespace RegulatoryConfigList {
+namespace RegulatoryConfig {
 static constexpr AttributeId Id = 0x00000002;
-} // namespace RegulatoryConfigList
+} // namespace RegulatoryConfig
 
-namespace LocationCapabilityList {
+namespace LocationCapability {
 static constexpr AttributeId Id = 0x00000003;
-} // namespace LocationCapabilityList
+} // namespace LocationCapability
 
 namespace FeatureMap {
 static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;

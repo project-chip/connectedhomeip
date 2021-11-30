@@ -7163,8 +7163,9 @@ JNI_METHOD(void, LevelControlCluster, readOnLevelAttribute)(JNIEnv * env, jobjec
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo;
-    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
-        chip::Platform::New<CHIPInt8uAttributeCallback>(callback, false), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    std::unique_ptr<CHIPLevelControlOnLevelAttributeCallback, void (*)(CHIPLevelControlOnLevelAttributeCallback *)> onSuccess(
+        chip::Platform::New<CHIPLevelControlOnLevelAttributeCallback>(callback, false),
+        chip::Platform::Delete<CHIPLevelControlOnLevelAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -7197,8 +7198,10 @@ JNI_METHOD(void, LevelControlCluster, readOnTransitionTimeAttribute)(JNIEnv * en
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo;
-    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
-        chip::Platform::New<CHIPInt16uAttributeCallback>(callback, false), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    std::unique_ptr<CHIPLevelControlOnTransitionTimeAttributeCallback,
+                    void (*)(CHIPLevelControlOnTransitionTimeAttributeCallback *)>
+        onSuccess(chip::Platform::New<CHIPLevelControlOnTransitionTimeAttributeCallback>(callback, false),
+                  chip::Platform::Delete<CHIPLevelControlOnTransitionTimeAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -7232,8 +7235,10 @@ JNI_METHOD(void, LevelControlCluster, readOffTransitionTimeAttribute)
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo;
-    std::unique_ptr<CHIPInt16uAttributeCallback, void (*)(CHIPInt16uAttributeCallback *)> onSuccess(
-        chip::Platform::New<CHIPInt16uAttributeCallback>(callback, false), chip::Platform::Delete<CHIPInt16uAttributeCallback>);
+    std::unique_ptr<CHIPLevelControlOffTransitionTimeAttributeCallback,
+                    void (*)(CHIPLevelControlOffTransitionTimeAttributeCallback *)>
+        onSuccess(chip::Platform::New<CHIPLevelControlOffTransitionTimeAttributeCallback>(callback, false),
+                  chip::Platform::Delete<CHIPLevelControlOffTransitionTimeAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -7266,8 +7271,9 @@ JNI_METHOD(void, LevelControlCluster, readDefaultMoveRateAttribute)(JNIEnv * env
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo;
-    std::unique_ptr<CHIPInt8uAttributeCallback, void (*)(CHIPInt8uAttributeCallback *)> onSuccess(
-        chip::Platform::New<CHIPInt8uAttributeCallback>(callback, false), chip::Platform::Delete<CHIPInt8uAttributeCallback>);
+    std::unique_ptr<CHIPLevelControlDefaultMoveRateAttributeCallback, void (*)(CHIPLevelControlDefaultMoveRateAttributeCallback *)>
+        onSuccess(chip::Platform::New<CHIPLevelControlDefaultMoveRateAttributeCallback>(callback, false),
+                  chip::Platform::Delete<CHIPLevelControlDefaultMoveRateAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -10145,8 +10151,10 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readLifetimeRunningHoursAtt
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo;
-    std::unique_ptr<CHIPInt32uAttributeCallback, void (*)(CHIPInt32uAttributeCallback *)> onSuccess(
-        chip::Platform::New<CHIPInt32uAttributeCallback>(callback, false), chip::Platform::Delete<CHIPInt32uAttributeCallback>);
+    std::unique_ptr<CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback,
+                    void (*)(CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback *)>
+        onSuccess(chip::Platform::New<CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback>(callback, false),
+                  chip::Platform::Delete<CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));
@@ -10218,8 +10226,10 @@ JNI_METHOD(void, PumpConfigurationAndControlCluster, readLifetimeEnergyConsumedA
 {
     chip::DeviceLayer::StackLock lock;
     using TypeInfo = chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo;
-    std::unique_ptr<CHIPInt32uAttributeCallback, void (*)(CHIPInt32uAttributeCallback *)> onSuccess(
-        chip::Platform::New<CHIPInt32uAttributeCallback>(callback, false), chip::Platform::Delete<CHIPInt32uAttributeCallback>);
+    std::unique_ptr<CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback,
+                    void (*)(CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback *)>
+        onSuccess(chip::Platform::New<CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback>(callback, false),
+                  chip::Platform::Delete<CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback>);
     VerifyOrReturn(onSuccess.get() != nullptr,
                    chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(
                        env, callback, "Error creating native success callback", CHIP_ERROR_NO_MEMORY));

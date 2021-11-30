@@ -2672,7 +2672,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readOnLevelAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readOnLevelAttribute(
+                      (ChipClusters.LevelControlCluster.OnLevelAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlOnLevelCommandParams);
@@ -2684,7 +2685,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readOnTransitionTimeAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readOnTransitionTimeAttribute(
+                      (ChipClusters.LevelControlCluster.OnTransitionTimeAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlOnTransitionTimeCommandParams);
@@ -2696,7 +2699,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readOffTransitionTimeAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readOffTransitionTimeAttribute(
+                      (ChipClusters.LevelControlCluster.OffTransitionTimeAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlOffTransitionTimeCommandParams);
@@ -2709,7 +2714,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readDefaultMoveRateAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readDefaultMoveRateAttribute(
+                      (ChipClusters.LevelControlCluster.DefaultMoveRateAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlDefaultMoveRateCommandParams);
@@ -3779,7 +3785,10 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .readLifetimeRunningHoursAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readLifetimeRunningHoursAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .LifetimeRunningHoursAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPumpConfigurationAndControlLifetimeRunningHoursCommandParams);
@@ -3806,7 +3815,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
                   .readLifetimeEnergyConsumedAttribute(
-                      (ChipClusters.LongAttributeCallback) callback);
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .LifetimeEnergyConsumedAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPumpConfigurationAndControlLifetimeEnergyConsumedCommandParams);

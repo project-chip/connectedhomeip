@@ -725,23 +725,25 @@ public class ClusterWriteMapping {
     writePumpConfigurationAndControlInteractionInfo.put(
         "writeLifetimeRunningHoursAttribute",
         writePumpConfigurationAndControlLifetimeRunningHoursAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> writePumpConfigurationAndControlPowerCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo pumpConfigurationAndControlpowerCommandParameterInfo =
+    Map<String, CommandParameterInfo>
+        writePumpConfigurationAndControlLifetimeEnergyConsumedCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo pumpConfigurationAndControllifetimeEnergyConsumedCommandParameterInfo =
         new CommandParameterInfo("value", long.class);
-    writePumpConfigurationAndControlPowerCommandParams.put(
-        "value", pumpConfigurationAndControlpowerCommandParameterInfo);
-    InteractionInfo writePumpConfigurationAndControlPowerAttributeInteractionInfo =
+    writePumpConfigurationAndControlLifetimeEnergyConsumedCommandParams.put(
+        "value", pumpConfigurationAndControllifetimeEnergyConsumedCommandParameterInfo);
+    InteractionInfo writePumpConfigurationAndControlLifetimeEnergyConsumedAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
-                  .writePowerAttribute(
+                  .writeLifetimeEnergyConsumedAttribute(
                       (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
             },
             () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writePumpConfigurationAndControlPowerCommandParams);
+            writePumpConfigurationAndControlLifetimeEnergyConsumedCommandParams);
     writePumpConfigurationAndControlInteractionInfo.put(
-        "writePowerAttribute", writePumpConfigurationAndControlPowerAttributeInteractionInfo);
+        "writeLifetimeEnergyConsumedAttribute",
+        writePumpConfigurationAndControlLifetimeEnergyConsumedAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writePumpConfigurationAndControlOperationModeCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo pumpConfigurationAndControloperationModeCommandParameterInfo =

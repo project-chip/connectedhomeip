@@ -16,9 +16,11 @@ if ({{source}}.Value().IsNull()) {
 {{else if isStruct}}
 {{asSymbol label}} = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
 {{else if (isOctetString type)}}
-{{target}} = chip::ByteArray(env, {{>item}}).jniValue();
+chip::ByteArray {{target}}ByteArray(env, {{>item}});
+{{target}} = {{target}}ByteArray.jniValue();
 {{else if (isCharString type)}}
-{{target}} = chip::UtfString(env, {{>item}}).jniValue();
+chip::UtfString {{target}}UtfString(env, {{>item}});
+{{target}} = {{target}}UtfString.jniValue();
 {{else}}
 std::string {{target}}ClassName = "java/lang/{{asJavaBasicTypeForZclType type true}}";
 std::string {{target}}CtorSignature = "({{asJniSignature type false}})V";

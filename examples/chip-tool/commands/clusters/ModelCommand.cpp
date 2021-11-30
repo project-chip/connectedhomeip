@@ -27,7 +27,8 @@ CHIP_ERROR ModelCommand::RunCommand()
 {
     ChipLogProgress(chipTool, "Sending command to node 0x%" PRIx64, mNodeId);
 
-    CHIP_ERROR err = mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err =
+        CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %" CHIP_ERROR_FORMAT,
                               mNodeId, err.Format()));

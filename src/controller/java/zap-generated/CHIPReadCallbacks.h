@@ -871,6 +871,102 @@ private:
     bool keepAlive;
 };
 
+class CHIPLevelControlOnLevelAttributeCallback
+    : public chip::Callback::Callback<CHIPLevelControlClusterOnLevelAttributeCallbackType>
+{
+public:
+    CHIPLevelControlOnLevelAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPLevelControlOnLevelAttributeCallback();
+
+    static void maybeDestroy(CHIPLevelControlOnLevelAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPLevelControlOnLevelAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPLevelControlOnTransitionTimeAttributeCallback
+    : public chip::Callback::Callback<CHIPLevelControlClusterOnTransitionTimeAttributeCallbackType>
+{
+public:
+    CHIPLevelControlOnTransitionTimeAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPLevelControlOnTransitionTimeAttributeCallback();
+
+    static void maybeDestroy(CHIPLevelControlOnTransitionTimeAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPLevelControlOnTransitionTimeAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPLevelControlOffTransitionTimeAttributeCallback
+    : public chip::Callback::Callback<CHIPLevelControlClusterOffTransitionTimeAttributeCallbackType>
+{
+public:
+    CHIPLevelControlOffTransitionTimeAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPLevelControlOffTransitionTimeAttributeCallback();
+
+    static void maybeDestroy(CHIPLevelControlOffTransitionTimeAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPLevelControlOffTransitionTimeAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPLevelControlDefaultMoveRateAttributeCallback
+    : public chip::Callback::Callback<CHIPLevelControlClusterDefaultMoveRateAttributeCallbackType>
+{
+public:
+    CHIPLevelControlDefaultMoveRateAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPLevelControlDefaultMoveRateAttributeCallback();
+
+    static void maybeDestroy(CHIPLevelControlDefaultMoveRateAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPLevelControlDefaultMoveRateAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPMediaInputMediaInputListAttributeCallback
     : public chip::Callback::Callback<CHIPMediaInputClusterMediaInputListAttributeCallbackType>
 {
@@ -1016,6 +1112,54 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback
+    : public chip::Callback::Callback<CHIPPumpConfigurationAndControlClusterLifetimeRunningHoursAttributeCallbackType>
+{
+public:
+    CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback();
+
+    static void maybeDestroy(CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback
+    : public chip::Callback::Callback<CHIPPumpConfigurationAndControlClusterLifetimeEnergyConsumedAttributeCallbackType>
+{
+public:
+    CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback();
+
+    static void maybeDestroy(CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPumpConfigurationAndControlLifetimeEnergyConsumedAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
 
 private:
     jobject javaCallbackRef;

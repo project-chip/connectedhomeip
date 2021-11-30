@@ -33,7 +33,7 @@ tests:
       arguments:
           value: 2
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "reads back global attribute: ClusterRevision"
       disabled: true

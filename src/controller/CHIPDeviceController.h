@@ -188,6 +188,7 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
  *   relevant information when the application tries to communicate with the device
  */
 class DLL_EXPORT DeviceController : public SessionReleaseDelegate,
+                                    public SessionRecoveryDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
                                     public AbstractDnssdDiscoveryController,
 #endif
@@ -378,6 +379,9 @@ protected:
 
     //////////// SessionReleaseDelegate Implementation ///////////////
     void OnSessionReleased(SessionHandle session) override;
+
+    //////////// SessionRecoveryDelegate Implementation ///////////////
+    void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     //////////// ResolverDelegate Implementation ///////////////

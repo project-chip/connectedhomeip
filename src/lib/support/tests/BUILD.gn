@@ -41,6 +41,7 @@ chip_test_suite("tests") {
     "TestScopedBuffer.cpp",
     "TestSerializableIntegerSet.cpp",
     "TestSpan.cpp",
+    "TestStateMachine.cpp",
     "TestStringBuilder.cpp",
     "TestThreadOperationalDataset.cpp",
     "TestTimeUtils.cpp",
