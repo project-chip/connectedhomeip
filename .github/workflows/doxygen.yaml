@@ -29,6 +29,9 @@ jobs:
         timeout-minutes: 5
 
         runs-on: ubuntu-20.04
+        container:
+            image: connectedhomeip/chip-build-doxygen:0.5.30
+
         if: github.actor != 'restyled-io[bot]'
 
         steps:
