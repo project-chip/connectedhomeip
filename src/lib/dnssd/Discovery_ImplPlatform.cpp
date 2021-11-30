@@ -459,17 +459,21 @@ CHIP_ERROR DiscoveryImplPlatform::FinalizeServiceUpdate()
     return ChipDnssdFinalizeServiceUpdate();
 }
 
-CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
+CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type,
+                                                Resolver::CacheBypass dnssdCacheBypass)
 {
     ReturnErrorOnFailure(InitImpl());
 
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    /* see if the entry is cached and use it.... */
-    ResolvedNodeData nodeData;
-    if (sDnssdCache.Lookup(peerId, nodeData) == CHIP_NO_ERROR)
+    if (dnssdCacheBypass == Resolver::CacheBypass::Off)
     {
-        mResolverDelegate->OnNodeIdResolved(nodeData);
-        return CHIP_NO_ERROR;
+        /* see if the entry is cached and use it.... */
+        ResolvedNodeData nodeData;
+        if (sDnssdCache.Lookup(peerId, nodeData) == CHIP_NO_ERROR)
+        {
+            mResolverDelegate->OnNodeIdResolved(nodeData);
+            return CHIP_NO_ERROR;
+        }
     }
 #endif
 

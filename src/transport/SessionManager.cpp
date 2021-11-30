@@ -364,6 +364,38 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     }
 }
 
+void SessionManager::RegisterRecoveryDelegate(SessionRecoveryDelegate & cb)
+{
+#ifndef NDEBUG
+    mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * i) {
+        VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
+        return true;
+    });
+#endif
+    std::reference_wrapper<SessionRecoveryDelegate> * slot = mSessionRecoveryDelegates.CreateObject(cb);
+    VerifyOrDie(slot != nullptr);
+}
+
+void SessionManager::UnregisterRecoveryDelegate(SessionRecoveryDelegate & cb)
+{
+    mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * i) {
+        if (std::addressof(cb) == std::addressof(i->get()))
+        {
+            mSessionRecoveryDelegates.ReleaseObject(i);
+            return false;
+        }
+        return true;
+    });
+}
+
+void SessionManager::RefreshSessionOperationalData(const SessionHandle & sessionHandle)
+{
+    mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * cb) {
+        cb->get().OnFirstMessageDeliveryFailed(sessionHandle);
+        return true;
+    });
+}
+
 void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                      System::PacketBufferHandle && msg)
 {
