@@ -134,6 +134,9 @@ public:
     virtual CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint)            = 0;
     virtual CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize) = 0;
 
+    virtual CHIP_ERROR GetRegulatoryConfig(uint8_t & location);
+    virtual CHIP_ERROR GetLocationCapability(uint8_t & location);
+
 protected:
     // ===== Members for internal use by the following friends.
 
@@ -177,6 +180,16 @@ extern ConfigurationManager & ConfigurationMgr();
  * no changes will be made.
  */
 extern void SetConfigurationMgr(ConfigurationManager * configurationManager);
+
+inline CHIP_ERROR ConfigurationManager::GetRegulatoryConfig(uint8_t & location)
+{
+    return GetLocationCapability(location);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetLocationCapability(uint8_t & location)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
 
 } // namespace DeviceLayer
 } // namespace chip
