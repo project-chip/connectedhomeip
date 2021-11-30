@@ -445,26 +445,6 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace OnOff
 
-namespace SampleMfgSpecificAttribute0x00000x1002 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace SampleMfgSpecificAttribute0x00000x1002
-
-namespace SampleMfgSpecificAttribute0x00000x1049 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace SampleMfgSpecificAttribute0x00000x1049
-
-namespace SampleMfgSpecificAttribute0x00010x1002 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace SampleMfgSpecificAttribute0x00010x1002
-
-namespace SampleMfgSpecificAttribute0x00010x1040 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace SampleMfgSpecificAttribute0x00010x1040
-
 namespace GlobalSceneControl {
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);
@@ -553,23 +533,31 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace OnOffTransitionTime
 
 namespace OnLevel {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint8_t> & value);
 } // namespace OnLevel
 
 namespace OnTransitionTime {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint16_t> & value);
 } // namespace OnTransitionTime
 
 namespace OffTransitionTime {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint16_t> & value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint16_t> & value);
 } // namespace OffTransitionTime
 
 namespace DefaultMoveRate {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint8_t> & value);
 } // namespace DefaultMoveRate
 
 namespace StartUpCurrentLevel {
@@ -1079,6 +1067,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int64u
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
 } // namespace Breadcrumb
 
+namespace RegulatoryConfig {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace RegulatoryConfig
+
+namespace LocationCapability {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace LocationCapability
+
 } // namespace Attributes
 } // namespace GeneralCommissioning
 
@@ -1133,8 +1131,8 @@ namespace ThreadNetworkDiagnostics {
 namespace Attributes {
 
 namespace Channel {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Channel
 
 namespace RoutingRole {
@@ -2256,8 +2254,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace Speed
 
 namespace LifetimeRunningHours {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int24u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int24u
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint32_t> & value);
 } // namespace LifetimeRunningHours
 
 namespace Power {
@@ -2266,8 +2266,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
 } // namespace Power
 
 namespace LifetimeEnergyConsumed {
-EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint32_t> & value); // int32u
 EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint32_t> & value);
 } // namespace LifetimeEnergyConsumed
 
 namespace OperationMode {
@@ -5218,38 +5220,6 @@ namespace Attributes {
 
 } // namespace Attributes
 } // namespace GroupKeyManagement
-
-namespace SampleMfgSpecificCluster {
-namespace Attributes {
-
-namespace EmberSampleAttribute {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace EmberSampleAttribute
-
-namespace EmberSampleAttribute2 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace EmberSampleAttribute2
-
-} // namespace Attributes
-} // namespace SampleMfgSpecificCluster
-
-namespace SampleMfgSpecificCluster2 {
-namespace Attributes {
-
-namespace EmberSampleAttribute3 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace EmberSampleAttribute3
-
-namespace EmberSampleAttribute4 {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace EmberSampleAttribute4
-
-} // namespace Attributes
-} // namespace SampleMfgSpecificCluster2
 
 } // namespace Clusters
 } // namespace app

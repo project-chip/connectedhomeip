@@ -26,6 +26,7 @@ class HostApp(Enum):
     THERMOSTAT = auto()
     RPC_CONSOLE = auto()
     MIN_MDNS = auto()
+    TV_APP = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -38,6 +39,8 @@ class HostApp(Enum):
             return 'common/pigweed/rpc_console'
         if self == HostApp.MIN_MDNS:
             return 'minimal-mdns'
+        if self == HostApp.TV_APP:
+            return 'tv-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -60,6 +63,9 @@ class HostApp(Enum):
             yield 'minimal-mdns-client.map'
             yield 'minimal-mdns-server'
             yield 'minimal-mdns-server.map'
+        elif self == HostApp.TV_APP:
+            yield 'chip-tv-app'
+            yield 'chip-tv-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 

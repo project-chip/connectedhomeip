@@ -80,7 +80,7 @@ private:
         kInvalid
     };
 
-    Function mFunction              = Function::kInvalid;
+    Function mFunction              = Function::kNoneSelected;
     bool mFunctionTimerActive       = false;
     bool mSyncClusterToButtonAction = false;
 

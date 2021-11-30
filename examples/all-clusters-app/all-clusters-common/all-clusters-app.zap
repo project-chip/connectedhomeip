@@ -32,7 +32,7 @@
   "endpointTypes": [
     {
       "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "CHIP-All-Clusters-Server",
+      "deviceTypeName": "MA-all-clusters-app",
       "deviceTypeCode": 0,
       "deviceTypeProfileId": 259,
       "clusters": [
@@ -1530,6 +1530,21 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "6",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -6797,7 +6812,7 @@
     },
     {
       "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "CHIP-All-Clusters-Server",
+      "deviceTypeName": "MA-all-clusters-app",
       "deviceTypeCode": 0,
       "deviceTypeProfileId": 259,
       "clusters": [
@@ -15296,6 +15311,14 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 0
+            },
+            {
+              "name": "SimpleStructEchoRequest",
+              "code": 17,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -15359,6 +15382,14 @@
             {
               "name": "TestNullableOptionalResponse",
               "code": 6,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "SimpleStructResponse",
+              "code": 9,
               "mfgCode": null,
               "source": "server",
               "incoming": 0,

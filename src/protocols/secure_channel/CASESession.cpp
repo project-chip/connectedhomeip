@@ -1,3 +1,4 @@
+
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
@@ -91,6 +92,7 @@ static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = System::Cloc
 
 CASESession::CASESession()
 {
+    SetSecureSessionType(Transport::SecureSession::Type::kCASE);
     mTrustedRootId = CertificateKeyId();
 }
 
@@ -174,8 +176,12 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     serializable.mMessageDigestLen = LittleEndian::HostSwap16(static_cast<uint16_t>(sizeof(mMessageDigest)));
     serializable.mVersion          = kCASESessionVersion;
     serializable.mPeerNodeId       = LittleEndian::HostSwap64(peerNodeId);
-    serializable.mLocalSessionId   = LittleEndian::HostSwap16(GetLocalSessionId());
-    serializable.mPeerSessionId    = LittleEndian::HostSwap16(GetPeerSessionId());
+    for (size_t i = 0; i < serializable.mPeerCATs.size(); i++)
+    {
+        serializable.mPeerCATs.val[i] = LittleEndian::HostSwap32(GetPeerCATs().val[i]);
+    }
+    serializable.mLocalSessionId = LittleEndian::HostSwap16(GetLocalSessionId());
+    serializable.mPeerSessionId  = LittleEndian::HostSwap16(GetPeerSessionId());
 
     memcpy(serializable.mResumptionId, mResumptionId, sizeof(mResumptionId));
     memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
@@ -198,6 +204,12 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     memcpy(mMessageDigest, serializable.mMessageDigest, length);
 
     SetPeerNodeId(LittleEndian::HostSwap64(serializable.mPeerNodeId));
+    Credentials::CATValues peerCATs;
+    for (size_t i = 0; i < serializable.mPeerCATs.size(); i++)
+    {
+        peerCATs.val[i] = LittleEndian::HostSwap32(serializable.mPeerCATs.val[i]);
+    }
+    SetPeerCATs(peerCATs);
     SetLocalSessionId(LittleEndian::HostSwap16(serializable.mLocalSessionId));
     SetPeerSessionId(LittleEndian::HostSwap16(serializable.mPeerSessionId));
 
@@ -325,13 +337,13 @@ CHIP_ERROR CASESession::DeriveSecureSession(CryptoContext & session, CryptoConte
 
 CHIP_ERROR CASESession::SendSigma1()
 {
-    size_t data_len = EstimateTLVStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
-                                                sizeof(uint16_t),            // initiatorSessionId,
-                                                kSHA256_Hash_Length,         // destinationId
-                                                kP256_PublicKey_Length,      // InitiatorEphPubKey,
-                                                /* EstimateTLVStructOverhead(sizeof(uint16_t),
-                                                   sizeof(uint16)_t), // initiatorMRPParams */
-                                                kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, // initiatorRandom
+                                                  sizeof(uint16_t),            // initiatorSessionId,
+                                                  kSHA256_Hash_Length,         // destinationId
+                                                  kP256_PublicKey_Length,      // InitiatorEphPubKey,
+                                                  /* TLV::EstimateStructOverhead(sizeof(uint16_t),
+                                                     sizeof(uint16)_t), // initiatorMRPParams */
+                                                  kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     System::PacketBufferTLVWriter tlvWriter;
     System::PacketBufferHandle msg_R1;
@@ -339,9 +351,6 @@ CHIP_ERROR CASESession::SendSigma1()
     uint8_t destinationIdentifier[kSHA256_Hash_Length] = { 0 };
 
     // Generate an ephemeral keypair
-#ifdef ENABLE_HSM_CASE_EPHEMERAL_KEY
-    mEphemeralKey.SetKeyId(CASE_EPHEMERAL_KEY);
-#endif
     ReturnErrorOnFailure(mEphemeralKey.Initialize());
 
     // Fill in the random value
@@ -492,8 +501,8 @@ exit:
 
 CHIP_ERROR CASESession::SendSigma2Resume(const ByteSpan & initiatorRandom)
 {
-    size_t max_sigma2_resume_data_len = EstimateTLVStructOverhead(kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
-                                                                  sizeof(uint16_t) /*, kMRPOptionalParamsLength, */);
+    size_t max_sigma2_resume_data_len = TLV::EstimateStructOverhead(kCASEResumptionIDSize, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES,
+                                                                    sizeof(uint16_t) /*, kMRPOptionalParamsLength, */);
 
     System::PacketBufferTLVWriter tlvWriter;
     System::PacketBufferHandle msg_R2_resume;
@@ -577,7 +586,7 @@ CHIP_ERROR CASESession::SendSigma2()
 
     // Construct Sigma2 TBS Data
     size_t msg_r2_signed_len =
-        EstimateTLVStructOverhead(nocCert.size(), icaCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
+        TLV::EstimateStructOverhead(nocCert.size(), icaCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R2_Signed;
     VerifyOrReturnError(msg_R2_Signed.Alloc(msg_r2_signed_len), CHIP_ERROR_NO_MEMORY);
@@ -596,7 +605,7 @@ CHIP_ERROR CASESession::SendSigma2()
 
     // Construct Sigma2 TBE Data
     size_t msg_r2_signed_enc_len =
-        EstimateTLVStructOverhead(nocCert.size(), icaCert.size(), tbsData2Signature.Length(), kCASEResumptionIDSize);
+        TLV::EstimateStructOverhead(nocCert.size(), icaCert.size(), tbsData2Signature.Length(), kCASEResumptionIDSize);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> msg_R2_Encrypted;
     VerifyOrReturnError(msg_R2_Encrypted.Alloc(msg_r2_signed_enc_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES), CHIP_ERROR_NO_MEMORY);
@@ -630,8 +639,8 @@ CHIP_ERROR CASESession::SendSigma2()
                                          CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES));
 
     // Construct Sigma2 Msg
-    size_t data_len = EstimateTLVStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length,
-                                                msg_r2_signed_enc_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
+    size_t data_len = TLV::EstimateStructOverhead(kSigmaParamRandomNumberSize, sizeof(uint16_t), kP256_PublicKey_Length,
+                                                  msg_r2_signed_enc_len, CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES);
 
     System::PacketBufferHandle msg_R2 = System::PacketBufferHandle::New(data_len);
     VerifyOrReturnError(!msg_R2.IsNull(), CHIP_ERROR_NO_MEMORY);
@@ -845,8 +854,8 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     SuccessOrExit(err = Validate_and_RetrieveResponderID(responderNOC, responderICAC, remoteCredential));
 
     // Construct msg_R2_Signed and validate the signature in msg_r2_encrypted
-    msg_r2_signed_len = EstimateTLVStructOverhead(sizeof(uint16_t), responderNOC.size(), responderICAC.size(),
-                                                  kP256_PublicKey_Length, kP256_PublicKey_Length);
+    msg_r2_signed_len = TLV::EstimateStructOverhead(sizeof(uint16_t), responderNOC.size(), responderICAC.size(),
+                                                    kP256_PublicKey_Length, kP256_PublicKey_Length);
 
     VerifyOrExit(msg_R2_Signed.Alloc(msg_r2_signed_len), err = CHIP_ERROR_NO_MEMORY);
 
@@ -865,6 +874,11 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     // Retrieve session resumption ID
     SuccessOrExit(err = decryptedDataTlvReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(kTag_TBEData_ResumptionID)));
     SuccessOrExit(err = decryptedDataTlvReader.GetBytes(mResumptionId, static_cast<uint32_t>(sizeof(mResumptionId))));
+
+    // Retrieve peer CASE Authenticated Tags (CATs) from peer's NOC.
+    Credentials::CATValues peerCATs;
+    SuccessOrExit(err = ExtractCATsFromOpCert(responderNOC, peerCATs));
+    SetPeerCATs(peerCATs);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -908,7 +922,7 @@ CHIP_ERROR CASESession::SendSigma3()
     VerifyOrExit(!mTrustedRootId.empty(), err = CHIP_ERROR_INTERNAL);
 
     // Prepare Sigma3 TBS Data Blob
-    msg_r3_signed_len = EstimateTLVStructOverhead(icaCert.size(), nocCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
+    msg_r3_signed_len = TLV::EstimateStructOverhead(icaCert.size(), nocCert.size(), kP256_PublicKey_Length, kP256_PublicKey_Length);
 
     VerifyOrExit(msg_R3_Signed.Alloc(msg_r3_signed_len), err = CHIP_ERROR_NO_MEMORY);
 
@@ -921,7 +935,7 @@ CHIP_ERROR CASESession::SendSigma3()
     SuccessOrExit(err);
 
     // Prepare Sigma3 TBE Data Blob
-    msg_r3_encrypted_len = EstimateTLVStructOverhead(nocCert.size(), icaCert.size(), tbsData3Signature.Length());
+    msg_r3_encrypted_len = TLV::EstimateStructOverhead(nocCert.size(), icaCert.size(), tbsData3Signature.Length());
 
     VerifyOrExit(msg_R3_Encrypted.Alloc(msg_r3_encrypted_len + CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES), err = CHIP_ERROR_NO_MEMORY);
 
@@ -962,7 +976,7 @@ CHIP_ERROR CASESession::SendSigma3()
     SuccessOrExit(err);
 
     // Generate Sigma3 Msg
-    data_len = EstimateTLVStructOverhead(CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES + msg_r3_encrypted_len);
+    data_len = TLV::EstimateStructOverhead(CHIP_CRYPTO_AEAD_MIC_LENGTH_BYTES, msg_r3_encrypted_len);
 
     msg_R3 = System::PacketBufferHandle::New(data_len);
     VerifyOrExit(!msg_R3.IsNull(), err = CHIP_ERROR_NO_MEMORY);
@@ -1099,8 +1113,8 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     SuccessOrExit(err = Validate_and_RetrieveResponderID(initiatorNOC, initiatorICAC, remoteCredential));
 
     // Step 4 - Construct Sigma3 TBS Data
-    msg_r3_signed_len = EstimateTLVStructOverhead(sizeof(uint16_t), initiatorNOC.size(), initiatorICAC.size(),
-                                                  kP256_PublicKey_Length, kP256_PublicKey_Length);
+    msg_r3_signed_len = TLV::EstimateStructOverhead(sizeof(uint16_t), initiatorNOC.size(), initiatorICAC.size(),
+                                                    kP256_PublicKey_Length, kP256_PublicKey_Length);
 
     VerifyOrExit(msg_R3_Signed.Alloc(msg_r3_signed_len), err = CHIP_ERROR_NO_MEMORY);
 
@@ -1122,6 +1136,11 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     SuccessOrExit(err = remoteCredential.ECDSA_validate_msg_signature(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature));
 
     SuccessOrExit(err = mCommissioningHash.Finish(messageDigestSpan));
+
+    // Retrieve peer CASE Authenticated Tags (CATs) from peer's NOC.
+    Credentials::CATValues peerCATs;
+    SuccessOrExit(err = ExtractCATsFromOpCert(initiatorNOC, peerCATs));
+    SetPeerCATs(peerCATs);
 
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 

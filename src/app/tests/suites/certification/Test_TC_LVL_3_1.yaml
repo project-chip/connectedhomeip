@@ -96,8 +96,6 @@ tests:
       attribute: "default move rate"
       arguments:
           value: 20
-      response:
-          error: 0
 
     - label: "reads default move rate attribute from DUT"
       command: "readAttribute"

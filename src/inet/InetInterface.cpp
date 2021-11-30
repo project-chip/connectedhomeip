@@ -49,13 +49,9 @@
 #ifdef HAVE_SYS_SOCKIO_H
 #include <sys/sockio.h>
 #endif /* HAVE_SYS_SOCKIO_H */
+#include <ifaddrs.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
-#ifdef __ANDROID__
-#include "ifaddrs-android.h"
-#else // !defined(__ANDROID__)
-#include <ifaddrs.h>
-#endif // !defined(__ANDROID__)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF

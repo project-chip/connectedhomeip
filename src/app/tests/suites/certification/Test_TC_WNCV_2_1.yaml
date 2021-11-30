@@ -38,7 +38,7 @@ tests:
       arguments:
           value: 250
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO mandatory attribute: Type"
       command: "readAttribute"
@@ -64,7 +64,7 @@ tests:
       arguments:
           value: 128
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO mandatory attribute: ConfigStatus"
       command: "readAttribute"
@@ -91,7 +91,7 @@ tests:
       arguments:
           value: 128
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO mandatory attribute: OperationalStatus"
       command: "readAttribute"
@@ -117,7 +117,7 @@ tests:
       arguments:
           value: 250
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO mandatory attribute: EndProductType"
       command: "readAttribute"
@@ -142,8 +142,6 @@ tests:
       attribute: "Mode"
       arguments:
           value: 8
-      response:
-          error: 0
 
     - label: "3b: reads back the RW mandatory attribute: Mode"
       command: "readAttribute"
@@ -172,7 +170,7 @@ tests:
       arguments:
           value: 20000
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "3b: reads back the RO optional attribute:
@@ -204,7 +202,7 @@ tests:
       arguments:
           value: 20000
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "3b: reads back the RO optional attribute:
@@ -236,7 +234,7 @@ tests:
       arguments:
           value: 20000
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "3b: reads back the RO optional attribute:
@@ -268,7 +266,7 @@ tests:
       arguments:
           value: 20000
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "3b: reads back the RO optional attribute:
@@ -298,7 +296,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO optional attribute: InstalledOpenLimitLift"
       command: "readAttribute"
@@ -328,7 +326,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "3b: reads back the RO optional attribute: InstalledClosedLimitLift"
@@ -358,7 +356,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back the RO optional attribute: InstalledOpenLimitTilt"
       command: "readAttribute"
@@ -388,7 +386,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "3b: reads back the RO optional attribute: InstalledClosedLimitTilt"
@@ -417,7 +415,7 @@ tests:
       arguments:
           value: 4096
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO mandatory attribute: SafetyStatus"
       command: "readAttribute"
@@ -448,7 +446,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: PhysicalClosedLimitLift"
       disabled: true
@@ -481,7 +479,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: PhysicalClosedLimitTilt"
       disabled: true
@@ -510,7 +508,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: CurrentPositionLift"
       command: "readAttribute"
@@ -538,7 +536,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: CurrentPositionTilt"
       command: "readAttribute"
@@ -569,7 +567,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: NumberOfActuationsLift"
       disabled: true
@@ -601,7 +599,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "5b: reads back the RO optional attribute: NumberOfActuationsTilt"
       disabled: true
@@ -633,7 +631,7 @@ tests:
       arguments:
           value: 200
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "5b: reads back the RO optional attribute:
@@ -665,7 +663,7 @@ tests:
       arguments:
           value: 200
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "5b: reads back the RO optional attribute:

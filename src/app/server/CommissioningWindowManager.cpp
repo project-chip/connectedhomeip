@@ -229,12 +229,9 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t 
                                                                        PASEVerifier & verifier, uint32_t iterations, ByteSpan salt,
                                                                        uint16_t passcodeID)
 {
-#if CONFIG_NETWORK_LAYER_BLE
-    // TODO: Don't use BLE for commissioning additional fabrics on a device
-    SetBLE(true);
-#else
+    // Once a device is operational, it shall be commissioned into subsequent fabrics using
+    // the operational network only.
     SetBLE(false);
-#endif
 
     VerifyOrReturnError(salt.size() <= sizeof(mECMSalt), CHIP_ERROR_INVALID_ARGUMENT);
 

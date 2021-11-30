@@ -824,8 +824,10 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 6:
                 if args[0] not in all_attrs:
                     raise exceptions.UnknownCluster(args[0])
-                self.devCtrl.ZCLSubscribeAttribute(args[0], args[1], int(
+                res = self.devCtrl.ZCLSubscribeAttribute(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), int(args[5]))
+                print(res.GetAllValues())
+                print(f"Subscription Established: {res}")
             elif len(args) == 2 and args[0] == '-shutdown':
                 subscriptionId = int(args[1], base=0)
                 self.devCtrl.ZCLShutdownSubscription(subscriptionId)

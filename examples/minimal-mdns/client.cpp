@@ -283,10 +283,21 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
         return;
     }
 
-    if (server->BroadcastSend(builder.ReleasePacket(), gOptions.querySendPort) != CHIP_NO_ERROR)
+    if (gOptions.unicastAnswers)
     {
-        printf("Error sending\n");
-        return;
+        if (server->BroadcastUnicastQuery(builder.ReleasePacket(), gOptions.querySendPort) != CHIP_NO_ERROR)
+        {
+            printf("Error sending\n");
+            return;
+        }
+    }
+    else
+    {
+        if (server->BroadcastSend(builder.ReleasePacket(), gOptions.querySendPort) != CHIP_NO_ERROR)
+        {
+            printf("Error sending\n");
+            return;
+        }
     }
 }
 

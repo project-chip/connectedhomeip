@@ -41,13 +41,12 @@ namespace Internal {
     (key);                                                                                                                         \
     static_assert(sizeof(key) <= SETTINGS_MAX_NAME_LEN, "Config key too long: " key)
 
-// Define the configuration keys to be part of the CHIP_DEVICE_CONFIG_SETTINGS_KEY subtree
-// so that they get erased when KeyValueStoreManagerImpl::DoFactoryReset() is called.
-// clang-format off
-#define NAMESPACE_FACTORY  CHIP_DEVICE_CONFIG_SETTINGS_KEY "/fct/"
-#define NAMESPACE_CONFIG   CHIP_DEVICE_CONFIG_SETTINGS_KEY "/cfg/"
+// Define the configuration keys (except the factory keys) to be part of the
+// CHIP_DEVICE_CONFIG_SETTINGS_KEY subtree so that they get erased when
+// KeyValueStoreManagerImpl::DoFactoryReset() is called.
+#define NAMESPACE_FACTORY CHIP_DEVICE_CONFIG_SETTINGS_KEY "-fct/"
+#define NAMESPACE_CONFIG CHIP_DEVICE_CONFIG_SETTINGS_KEY "/cfg/"
 #define NAMESPACE_COUNTERS CHIP_DEVICE_CONFIG_SETTINGS_KEY "/ctr/"
-// clang-format on
 
 // Keys stored in the chip factory nam
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_SerialNum           = CONFIG_KEY(NAMESPACE_FACTORY "serial-num");
@@ -55,7 +54,7 @@ const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceId         = CONFIG_KE
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceCert       = CONFIG_KEY(NAMESPACE_FACTORY "device-cert");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDeviceICACerts   = CONFIG_KEY(NAMESPACE_FACTORY "device-ca-certs");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_MfrDevicePrivateKey = CONFIG_KEY(NAMESPACE_FACTORY "device-key");
-const ZephyrConfig::Key ZephyrConfig::kConfigKey_ProductRevision     = CONFIG_KEY(NAMESPACE_FACTORY "product-rev");
+const ZephyrConfig::Key ZephyrConfig::kConfigKey_HardwareVersion     = CONFIG_KEY(NAMESPACE_FACTORY "hardware-ver");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_ManufacturingDate   = CONFIG_KEY(NAMESPACE_FACTORY "mfg-date");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupPinCode        = CONFIG_KEY(NAMESPACE_FACTORY "pin-code");
 const ZephyrConfig::Key ZephyrConfig::kConfigKey_SetupDiscriminator  = CONFIG_KEY(NAMESPACE_FACTORY "discriminator");

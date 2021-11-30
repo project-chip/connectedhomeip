@@ -24,94 +24,6 @@
 
 // ZCL enums
 
-// Enum for ActionErrorEnum
-enum EmberAfActionErrorEnum : uint8_t
-{
-    EMBER_ZCL_ACTION_ERROR_ENUM_UNKNOWN     = 0,
-    EMBER_ZCL_ACTION_ERROR_ENUM_INTERRUPTED = 1,
-};
-
-// Enum for ActionStatusEnum
-enum EmberAfActionStatusEnum : uint8_t
-{
-    EMBER_ZCL_ACTION_STATUS_ENUM_INACTIVE = 0,
-    EMBER_ZCL_ACTION_STATUS_ENUM_ACTIVE   = 1,
-    EMBER_ZCL_ACTION_STATUS_ENUM_PAUSED   = 2,
-    EMBER_ZCL_ACTION_STATUS_ENUM_DISABLED = 3,
-};
-
-// Enum for ActionTypeEnum
-enum EmberAfActionTypeEnum : uint8_t
-{
-    EMBER_ZCL_ACTION_TYPE_ENUM_OTHER        = 0,
-    EMBER_ZCL_ACTION_TYPE_ENUM_SCENE        = 1,
-    EMBER_ZCL_ACTION_TYPE_ENUM_SEQUENCE     = 2,
-    EMBER_ZCL_ACTION_TYPE_ENUM_AUTOMATION   = 3,
-    EMBER_ZCL_ACTION_TYPE_ENUM_EXCEPTION    = 4,
-    EMBER_ZCL_ACTION_TYPE_ENUM_NOTIFICATION = 5,
-    EMBER_ZCL_ACTION_TYPE_ENUM_ALARM        = 6,
-};
-
-// Enum for AlertCountType
-enum EmberAfAlertCountType : uint8_t
-{
-    EMBER_ZCL_ALERT_COUNT_TYPE_UNSTRUCTURED = 0,
-};
-
-// Enum for AlertStructureCategory
-enum EmberAfAlertStructureCategory : uint16_t
-{
-    EMBER_ZCL_ALERT_STRUCTURE_CATEGORY_WARNING = 256,
-    EMBER_ZCL_ALERT_STRUCTURE_CATEGORY_DANGER  = 512,
-    EMBER_ZCL_ALERT_STRUCTURE_CATEGORY_FAILURE = 768,
-};
-
-// Enum for AlertStructurePresenceRecovery
-enum EmberAfAlertStructurePresenceRecovery : uint16_t
-{
-    EMBER_ZCL_ALERT_STRUCTURE_PRESENCE_RECOVERY_RECOVERY = 0,
-    EMBER_ZCL_ALERT_STRUCTURE_PRESENCE_RECOVERY_PRESENCE = 4096,
-};
-
-// Enum for AmiRegistrationState
-enum EmberAfAmiRegistrationState : uint8_t
-{
-    EMBER_ZCL_AMI_REGISTRATION_STATE_UNREGISTERED                   = 0,
-    EMBER_ZCL_AMI_REGISTRATION_STATE_JOINING_NETWORK                = 1,
-    EMBER_ZCL_AMI_REGISTRATION_STATE_JOINED_NETWORK                 = 2,
-    EMBER_ZCL_AMI_REGISTRATION_STATE_SUBMITTED_REGISTRATION_REQUEST = 3,
-    EMBER_ZCL_AMI_REGISTRATION_STATE_REGISTRATION_REJECTED          = 4,
-    EMBER_ZCL_AMI_REGISTRATION_STATE_REGISTERED                     = 5,
-    EMBER_ZCL_AMI_REGISTRATION_STATE_REGISTERATION_NOT_POSSIBLE     = 6,
-};
-
-// Enum for AnonymousDataState
-enum EmberAfAnonymousDataState : uint8_t
-{
-    EMBER_ZCL_ANONYMOUS_DATA_STATE_NO_SOURCE_FOUND = 0,
-    EMBER_ZCL_ANONYMOUS_DATA_STATE_SOURCE_FOUND    = 1,
-};
-
-// Enum for ApplianceStatus
-enum EmberAfApplianceStatus : uint8_t
-{
-    EMBER_ZCL_APPLIANCE_STATUS_OFF                         = 1,
-    EMBER_ZCL_APPLIANCE_STATUS_STAND_BY                    = 2,
-    EMBER_ZCL_APPLIANCE_STATUS_PROGRAMMED                  = 3,
-    EMBER_ZCL_APPLIANCE_STATUS_PROGRAMMED_WAITING_TO_START = 4,
-    EMBER_ZCL_APPLIANCE_STATUS_RUNNING                     = 5,
-    EMBER_ZCL_APPLIANCE_STATUS_PAUSE                       = 6,
-    EMBER_ZCL_APPLIANCE_STATUS_END_PROGRAMMED              = 7,
-    EMBER_ZCL_APPLIANCE_STATUS_FAILURE                     = 8,
-    EMBER_ZCL_APPLIANCE_STATUS_PROGRAMME_INTERRUPTED       = 9,
-    EMBER_ZCL_APPLIANCE_STATUS_IDLE                        = 10,
-    EMBER_ZCL_APPLIANCE_STATUS_RINSE_HOLD                  = 11,
-    EMBER_ZCL_APPLIANCE_STATUS_SERVICE                     = 12,
-    EMBER_ZCL_APPLIANCE_STATUS_SUPERFREEZING               = 13,
-    EMBER_ZCL_APPLIANCE_STATUS_SUPERCOOLING                = 14,
-    EMBER_ZCL_APPLIANCE_STATUS_SUPERHEATING                = 15,
-};
-
 // Enum for ApplicationBasicStatus
 enum EmberAfApplicationBasicStatus : uint8_t
 {
@@ -127,15 +39,6 @@ enum EmberAfApplicationLauncherStatus : uint8_t
     EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS           = 0,
     EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_APP_NOT_AVAILABLE = 1,
     EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SYSTEM_BUSY       = 2,
-};
-
-// Enum for AssociationFailureCause
-enum EmberAfAssociationFailureCause : uint8_t
-{
-    EMBER_ZCL_ASSOCIATION_FAILURE_CAUSE_UNKNOWN               = 0,
-    EMBER_ZCL_ASSOCIATION_FAILURE_CAUSE_ASSOCIATION_FAILED    = 1,
-    EMBER_ZCL_ASSOCIATION_FAILURE_CAUSE_AUTHENTICATION_FAILED = 2,
-    EMBER_ZCL_ASSOCIATION_FAILURE_CAUSE_SSID_NOT_FOUND        = 3,
 };
 
 // Enum for AttributeWritePermission
@@ -177,69 +80,6 @@ enum EmberAfBarrierControlMovingState : uint8_t
     EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING = 2,
 };
 
-// Enum for BatChargeFaultType
-enum EmberAfBatChargeFaultType : uint8_t
-{
-    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_UNSPECFIED            = 0,
-    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_AMBIENT_TOO_HOT       = 1,
-    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_AMBIENT_TOO_COLD      = 2,
-    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_BATTERY_TOO_HOT       = 3,
-    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_BATTERY_TOO_COLD      = 4,
-    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_BATTERY_ABSENT        = 5,
-    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_BATTERY_OVER_VOLTAGE  = 6,
-    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_BATTERY_UNDER_VOLTAGE = 7,
-    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_CHARGER_OVER_VOLTAGE  = 8,
-    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_CHARGER_UNDER_VOLTAGE = 9,
-    EMBER_ZCL_BAT_CHARGE_FAULT_TYPE_SAFETY_TIMEOUT        = 10,
-};
-
-// Enum for BatChargeLevel
-enum EmberAfBatChargeLevel : uint8_t
-{
-    EMBER_ZCL_BAT_CHARGE_LEVEL_OK       = 0,
-    EMBER_ZCL_BAT_CHARGE_LEVEL_WARNING  = 1,
-    EMBER_ZCL_BAT_CHARGE_LEVEL_CRITICAL = 2,
-};
-
-// Enum for BatChargeState
-enum EmberAfBatChargeState : uint8_t
-{
-    EMBER_ZCL_BAT_CHARGE_STATE_UNKNOWN           = 0,
-    EMBER_ZCL_BAT_CHARGE_STATE_IS_CHARGING       = 1,
-    EMBER_ZCL_BAT_CHARGE_STATE_IS_AT_FULL_CHARGE = 2,
-    EMBER_ZCL_BAT_CHARGE_STATE_IS_NOT_CHARGING   = 3,
-};
-
-// Enum for BatFaultType
-enum EmberAfBatFaultType : uint8_t
-{
-    EMBER_ZCL_BAT_FAULT_TYPE_UNSPECFIED = 0,
-    EMBER_ZCL_BAT_FAULT_TYPE_OVER_TEMP  = 1,
-    EMBER_ZCL_BAT_FAULT_TYPE_UNDER_TEMP = 2,
-};
-
-// Enum for BatReplaceability
-enum EmberAfBatReplaceability : uint8_t
-{
-    EMBER_ZCL_BAT_REPLACEABILITY_UNSPECIFIED         = 0,
-    EMBER_ZCL_BAT_REPLACEABILITY_NOT_REPLACEABLE     = 1,
-    EMBER_ZCL_BAT_REPLACEABILITY_USER_REPLACEABLE    = 2,
-    EMBER_ZCL_BAT_REPLACEABILITY_FACTORY_REPLACEABLE = 3,
-};
-
-// Enum for BatterySize
-enum EmberAfBatterySize : uint8_t
-{
-    EMBER_ZCL_BATTERY_SIZE_NO_BATTERY = 0,
-    EMBER_ZCL_BATTERY_SIZE_BUILT_IN   = 1,
-    EMBER_ZCL_BATTERY_SIZE_OTHER      = 2,
-    EMBER_ZCL_BATTERY_SIZE_AA         = 3,
-    EMBER_ZCL_BATTERY_SIZE_AAA        = 4,
-    EMBER_ZCL_BATTERY_SIZE_C          = 5,
-    EMBER_ZCL_BATTERY_SIZE_D          = 6,
-    EMBER_ZCL_BATTERY_SIZE_UNKNOWN    = 255,
-};
-
 // Enum for BootReasonType
 enum EmberAfBootReasonType : uint8_t
 {
@@ -250,13 +90,6 @@ enum EmberAfBootReasonType : uint8_t
     EMBER_ZCL_BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET   = 4,
     EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED = 5,
     EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET            = 6,
-};
-
-// Enum for CecedSpecificationVersion
-enum EmberAfCecedSpecificationVersion : uint8_t
-{
-    EMBER_ZCL_CECED_SPECIFICATION_VERSION_COMPLIANT_WITH_V10_NOT_CERTIFIED = 16,
-    EMBER_ZCL_CECED_SPECIFICATION_VERSION_COMPLIANT_WITH_V10_CERTIFIED     = 26,
 };
 
 // Enum for ChangeReasonEnum
@@ -298,45 +131,6 @@ enum EmberAfColorMode : uint8_t
     EMBER_ZCL_COLOR_MODE_COLOR_TEMPERATURE                  = 2,
 };
 
-// Enum for CommandIdentification
-enum EmberAfCommandIdentification : uint8_t
-{
-    EMBER_ZCL_COMMAND_IDENTIFICATION_START                  = 1,
-    EMBER_ZCL_COMMAND_IDENTIFICATION_STOP                   = 2,
-    EMBER_ZCL_COMMAND_IDENTIFICATION_PAUSE                  = 3,
-    EMBER_ZCL_COMMAND_IDENTIFICATION_START_SUPERFREEZING    = 4,
-    EMBER_ZCL_COMMAND_IDENTIFICATION_STOP_SUPERFREEZING     = 5,
-    EMBER_ZCL_COMMAND_IDENTIFICATION_START_SUPERCOOLING     = 6,
-    EMBER_ZCL_COMMAND_IDENTIFICATION_STOP_SUPERCOOLING      = 7,
-    EMBER_ZCL_COMMAND_IDENTIFICATION_DISABLE_GAS            = 8,
-    EMBER_ZCL_COMMAND_IDENTIFICATION_ENABLE_GAS             = 9,
-    EMBER_ZCL_COMMAND_IDENTIFICATION_ENABLE_ENERGY_CONTROL  = 10,
-    EMBER_ZCL_COMMAND_IDENTIFICATION_DISABLE_ENERGY_CONTROL = 11,
-};
-
-// Enum for ContentLaunchMetricType
-enum EmberAfContentLaunchMetricType : uint8_t
-{
-    EMBER_ZCL_CONTENT_LAUNCH_METRIC_TYPE_PIXELS     = 0,
-    EMBER_ZCL_CONTENT_LAUNCH_METRIC_TYPE_PERCENTAGE = 1,
-};
-
-// Enum for ContentLaunchParameterEnum
-enum EmberAfContentLaunchParameterEnum : uint8_t
-{
-    EMBER_ZCL_CONTENT_LAUNCH_PARAMETER_ENUM_ACTOR       = 0,
-    EMBER_ZCL_CONTENT_LAUNCH_PARAMETER_ENUM_CHANNEL     = 1,
-    EMBER_ZCL_CONTENT_LAUNCH_PARAMETER_ENUM_CHARACTER   = 2,
-    EMBER_ZCL_CONTENT_LAUNCH_PARAMETER_ENUM_EVENT       = 3,
-    EMBER_ZCL_CONTENT_LAUNCH_PARAMETER_ENUM_FRANCHISE   = 4,
-    EMBER_ZCL_CONTENT_LAUNCH_PARAMETER_ENUM_GENRE       = 5,
-    EMBER_ZCL_CONTENT_LAUNCH_PARAMETER_ENUM_LEAGUE      = 6,
-    EMBER_ZCL_CONTENT_LAUNCH_PARAMETER_ENUM_POPULARITY  = 7,
-    EMBER_ZCL_CONTENT_LAUNCH_PARAMETER_ENUM_SPORT       = 8,
-    EMBER_ZCL_CONTENT_LAUNCH_PARAMETER_ENUM_SPORTS_TEAM = 9,
-    EMBER_ZCL_CONTENT_LAUNCH_PARAMETER_ENUM_VIDEO       = 10,
-};
-
 // Enum for ContentLaunchStatus
 enum EmberAfContentLaunchStatus : uint8_t
 {
@@ -350,28 +144,6 @@ enum EmberAfContentLaunchStreamingType : uint8_t
 {
     EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_DASH = 0,
     EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_HLS  = 1,
-};
-
-// Enum for DataQualityId
-enum EmberAfDataQualityId : uint16_t
-{
-    EMBER_ZCL_DATA_QUALITY_ID_ALL_DATA_CERTIFIED                       = 0,
-    EMBER_ZCL_DATA_QUALITY_ID_ONLY_INSTANTANEOUS_POWER_NOT_CERTIFIED   = 1,
-    EMBER_ZCL_DATA_QUALITY_ID_ONLY_CUMULATED_CONSUMPTION_NOT_CERTIFIED = 2,
-    EMBER_ZCL_DATA_QUALITY_ID_NOT_CERTIFIED_DATA                       = 3,
-};
-
-// Enum for DehumidifcationLockout
-enum EmberAfDehumidifcationLockout : uint8_t
-{
-    EMBER_ZCL_DEHUMIDIFCATION_LOCKOUT_NOT_ALLOWED = 0,
-    EMBER_ZCL_DEHUMIDIFCATION_LOCKOUT_ALLOWED     = 1,
-};
-
-// Enum for DeviceStatus2Structure
-enum EmberAfDeviceStatus2Structure : uint8_t
-{
-    EMBER_ZCL_DEVICE_STATUS2_STRUCTURE_IRIS_SYMPTOM_CODE = 32,
 };
 
 // Enum for DoorLockEventSource
@@ -435,51 +207,12 @@ enum EmberAfDoorLockProgrammingEventCode : uint8_t
     EMBER_ZCL_DOOR_LOCK_PROGRAMMING_EVENT_CODE_ID_DELETED              = 6,
 };
 
-// Enum for DoorLockSecurityLevel
-enum EmberAfDoorLockSecurityLevel : uint8_t
-{
-    EMBER_ZCL_DOOR_LOCK_SECURITY_LEVEL_NETWORK_SECURITY = 0,
-    EMBER_ZCL_DOOR_LOCK_SECURITY_LEVEL_APS_SECURITY     = 1,
-};
-
-// Enum for DoorLockSetPinOrIdStatus
-enum EmberAfDoorLockSetPinOrIdStatus : uint8_t
-{
-    EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_SUCCESS              = 0,
-    EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_GENERAL_FAILURE      = 1,
-    EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_MEMORY_FULL          = 2,
-    EMBER_ZCL_DOOR_LOCK_SET_PIN_OR_ID_STATUS_DUPLICATE_CODE_ERROR = 3,
-};
-
-// Enum for DoorLockSoundVolume
-enum EmberAfDoorLockSoundVolume : uint8_t
-{
-    EMBER_ZCL_DOOR_LOCK_SOUND_VOLUME_SILENT = 0,
-    EMBER_ZCL_DOOR_LOCK_SOUND_VOLUME_LOW    = 1,
-    EMBER_ZCL_DOOR_LOCK_SOUND_VOLUME_HIGH   = 2,
-};
-
 // Enum for DoorLockState
 enum EmberAfDoorLockState : uint8_t
 {
     EMBER_ZCL_DOOR_LOCK_STATE_NOT_FULLY_LOCKED = 0,
     EMBER_ZCL_DOOR_LOCK_STATE_LOCKED           = 1,
     EMBER_ZCL_DOOR_LOCK_STATE_UNLOCKED         = 2,
-};
-
-// Enum for DoorLockType
-enum EmberAfDoorLockType : uint8_t
-{
-    EMBER_ZCL_DOOR_LOCK_TYPE_DEAD_BOLT      = 0,
-    EMBER_ZCL_DOOR_LOCK_TYPE_MAGNETIC       = 1,
-    EMBER_ZCL_DOOR_LOCK_TYPE_MORTISE        = 2,
-    EMBER_ZCL_DOOR_LOCK_TYPE_RIM            = 3,
-    EMBER_ZCL_DOOR_LOCK_TYPE_LATCH_BOLT     = 4,
-    EMBER_ZCL_DOOR_LOCK_TYPE_CYLINDRICAL    = 5,
-    EMBER_ZCL_DOOR_LOCK_TYPE_TUBULAR        = 6,
-    EMBER_ZCL_DOOR_LOCK_TYPE_INTERCONNECTED = 7,
-    EMBER_ZCL_DOOR_LOCK_TYPE_DEAD_LATCH     = 8,
-    EMBER_ZCL_DOOR_LOCK_TYPE_OTHER          = 9,
 };
 
 // Enum for DoorLockUserStatus
@@ -512,14 +245,6 @@ enum EmberAfDoorState : uint8_t
     EMBER_ZCL_DOOR_STATE_ERROR_UNSPECIFIED = 4,
 };
 
-// Enum for EndpointListTypeEnum
-enum EmberAfEndpointListTypeEnum : uint8_t
-{
-    EMBER_ZCL_ENDPOINT_LIST_TYPE_ENUM_OTHER = 0,
-    EMBER_ZCL_ENDPOINT_LIST_TYPE_ENUM_ROOM  = 1,
-    EMBER_ZCL_ENDPOINT_LIST_TYPE_ENUM_ZONE  = 2,
-};
-
 // Enum for EnhancedColorMode
 enum EmberAfEnhancedColorMode : uint8_t
 {
@@ -527,171 +252,6 @@ enum EmberAfEnhancedColorMode : uint8_t
     EMBER_ZCL_ENHANCED_COLOR_MODE_CURRENT_X_AND_CURRENT_Y                     = 1,
     EMBER_ZCL_ENHANCED_COLOR_MODE_COLOR_TEMPERATURE                           = 2,
     EMBER_ZCL_ENHANCED_COLOR_MODE_ENHANCED_CURRENT_HUE_AND_CURRENT_SATURATION = 3,
-};
-
-// Enum for EventId
-enum EmberAfEventId : uint8_t
-{
-    EMBER_ZCL_EVENT_ID_METER_COVER_REMOVED                   = 0,
-    EMBER_ZCL_EVENT_ID_METER_COVER_CLOSED                    = 1,
-    EMBER_ZCL_EVENT_ID_STRONG_MAGNETIC_FIELD                 = 2,
-    EMBER_ZCL_EVENT_ID_NO_STRONG_MAGNETIC_FIELD              = 3,
-    EMBER_ZCL_EVENT_ID_BATTERY_FAILURE                       = 4,
-    EMBER_ZCL_EVENT_ID_LOW_BATTERY                           = 5,
-    EMBER_ZCL_EVENT_ID_PROGRAM_MEMORY_ERROR                  = 6,
-    EMBER_ZCL_EVENT_ID_RAM_ERROR                             = 7,
-    EMBER_ZCL_EVENT_ID_NV_MEMORY_ERROR                       = 8,
-    EMBER_ZCL_EVENT_ID_MEASUREMENT_SYSTEM_ERROR              = 9,
-    EMBER_ZCL_EVENT_ID_WATCHDOG_ERROR                        = 10,
-    EMBER_ZCL_EVENT_ID_SUPPLY_DISCONNECT_FAILURE             = 11,
-    EMBER_ZCL_EVENT_ID_SUPPLY_CONNECT_FAILURE                = 12,
-    EMBER_ZCL_EVENT_ID_MEASURMENT_SOFTWARE_CHANGED           = 13,
-    EMBER_ZCL_EVENT_ID_DST_ENABLED                           = 14,
-    EMBER_ZCL_EVENT_ID_DST_DISABLED                          = 15,
-    EMBER_ZCL_EVENT_ID_CLOCK_ADJ_BACKWARD                    = 16,
-    EMBER_ZCL_EVENT_ID_CLOCK_ADJ_FORWARD                     = 17,
-    EMBER_ZCL_EVENT_ID_CLOCK_INVALID                         = 18,
-    EMBER_ZCL_EVENT_ID_COMMS_ERROR_HAN                       = 19,
-    EMBER_ZCL_EVENT_ID_COMMS_OK_HAN                          = 20,
-    EMBER_ZCL_EVENT_ID_FRAUD_ATTEMPT                         = 21,
-    EMBER_ZCL_EVENT_ID_POWER_LOSS                            = 22,
-    EMBER_ZCL_EVENT_ID_INCORRECT_PROTOCOL                    = 23,
-    EMBER_ZCL_EVENT_ID_UNUSUAL_HAN_TRAFFIC                   = 24,
-    EMBER_ZCL_EVENT_ID_UNEXPECTED_CLOCK_CHANGE               = 25,
-    EMBER_ZCL_EVENT_ID_COMMS_USING_UNAUTHENTICATED_COMPONENT = 26,
-    EMBER_ZCL_EVENT_ID_ERROR_REG_CLEAR                       = 27,
-    EMBER_ZCL_EVENT_ID_ALARM_REG_CLEAR                       = 28,
-    EMBER_ZCL_EVENT_ID_UNEXPECTED_HW_RESET                   = 29,
-    EMBER_ZCL_EVENT_ID_UNEXPECTED_PROGRAM_EXECUTION          = 30,
-    EMBER_ZCL_EVENT_ID_EVENT_LOG_CLEARED                     = 31,
-    EMBER_ZCL_EVENT_ID_MANUAL_DISCONNECT                     = 32,
-    EMBER_ZCL_EVENT_ID_MANUAL_CONNECT                        = 33,
-    EMBER_ZCL_EVENT_ID_REMOTE_DISCONNECTION                  = 34,
-    EMBER_ZCL_EVENT_ID_LOCAL_DISCONNECTION                   = 35,
-    EMBER_ZCL_EVENT_ID_LIMIT_THRESHOLD_EXCEEDED              = 36,
-    EMBER_ZCL_EVENT_ID_LIMIT_THRESHOLD_OK                    = 37,
-    EMBER_ZCL_EVENT_ID_LIMIT_THRESHOLD_CHANGED               = 38,
-    EMBER_ZCL_EVENT_ID_MAXIMUM_DEMAND_EXCEEDED               = 39,
-    EMBER_ZCL_EVENT_ID_PROFILE_CLEARED                       = 40,
-    EMBER_ZCL_EVENT_ID_FIRMWARE_READY_FOR_ACTIVATION         = 41,
-    EMBER_ZCL_EVENT_ID_FIRMWARE_ACTIVATED                    = 42,
-    EMBER_ZCL_EVENT_ID_PATCH_FAILURE                         = 43,
-    EMBER_ZCL_EVENT_ID_TOU_TARIFF_ACTIVATION                 = 44,
-    EMBER_ZCL_EVENT_ID_8X8_TARIFFACTIVATED                   = 45,
-    EMBER_ZCL_EVENT_ID_SINGLE_TARIFF_RATE_ACTIVATED          = 46,
-    EMBER_ZCL_EVENT_ID_ASYNCHRONOUS_BILLING_OCCURRED         = 47,
-    EMBER_ZCL_EVENT_ID_SYNCHRONOUS_BILLING_OCCURRED          = 48,
-    EMBER_ZCL_EVENT_ID_INCORRECT_POLARITY                    = 128,
-    EMBER_ZCL_EVENT_ID_CURRENT_NO_VOLTAGE                    = 129,
-    EMBER_ZCL_EVENT_ID_UNDER_VOLTAGE                         = 130,
-    EMBER_ZCL_EVENT_ID_OVER_VOLTAGE                          = 131,
-    EMBER_ZCL_EVENT_ID_NORMAL_VOLTAGE                        = 132,
-    EMBER_ZCL_EVENT_ID_PF_BELOW_THRESHOLD                    = 133,
-    EMBER_ZCL_EVENT_ID_PF_ABOVE_THRESHOLD                    = 134,
-    EMBER_ZCL_EVENT_ID_TERMINAL_COVER_REMOVED                = 135,
-    EMBER_ZCL_EVENT_ID_TERMINAL_COVER_CLOSED                 = 136,
-    EMBER_ZCL_EVENT_ID_REVERSE_FLOW                          = 160,
-    EMBER_ZCL_EVENT_ID_TILT_TAMPER                           = 161,
-    EMBER_ZCL_EVENT_ID_BATTERY_COVER_REMOVED                 = 162,
-    EMBER_ZCL_EVENT_ID_BATTERY_COVER_CLOSED                  = 163,
-    EMBER_ZCL_EVENT_ID_EXCESS_FLOW                           = 164,
-    EMBER_ZCL_EVENT_ID_CREDIT_OK                             = 192,
-    EMBER_ZCL_EVENT_ID_LOW_CREDIT                            = 193,
-    EMBER_ZCL_EVENT_ID_EMERGENCY_CREDIT_IN_USE               = 192,
-    EMBER_ZCL_EVENT_ID_EMERGENCY_CREDIT_EXHAUSTED            = 193,
-    EMBER_ZCL_EVENT_ID_ZERO_CREDIT_EC_NOT_SELECTED           = 194,
-    EMBER_ZCL_EVENT_ID_SUPPLY_ON                             = 195,
-    EMBER_ZCL_EVENT_ID_SUPPLY_OFF_AARMED                     = 196,
-    EMBER_ZCL_EVENT_ID_SUPPLY_OFF                            = 197,
-    EMBER_ZCL_EVENT_ID_DISCOUNT_APPLIED                      = 198,
-    EMBER_ZCL_EVENT_ID_MANUFACTURER_SPECIFIC_A               = 224,
-    EMBER_ZCL_EVENT_ID_MANUFACTURER_SPECIFIC_B               = 225,
-    EMBER_ZCL_EVENT_ID_MANUFACTURER_SPECIFIC_C               = 226,
-    EMBER_ZCL_EVENT_ID_MANUFACTURER_SPECIFIC_D               = 227,
-    EMBER_ZCL_EVENT_ID_MANUFACTURER_SPECIFIC_E               = 228,
-    EMBER_ZCL_EVENT_ID_MANUFACTURER_SPECIFIC_F               = 229,
-    EMBER_ZCL_EVENT_ID_MANUFACTURER_SPECIFIC_G               = 230,
-    EMBER_ZCL_EVENT_ID_MANUFACTURER_SPECIFIC_H               = 231,
-    EMBER_ZCL_EVENT_ID_MANUFACTURER_SPECIFIC_I               = 232,
-};
-
-// Enum for EventIdentification
-enum EmberAfEventIdentification : uint8_t
-{
-    EMBER_ZCL_EVENT_IDENTIFICATION_END_OF_CYCLE        = 1,
-    EMBER_ZCL_EVENT_IDENTIFICATION_TEMPERATURE_REACHED = 4,
-    EMBER_ZCL_EVENT_IDENTIFICATION_END_OF_COOKING      = 5,
-    EMBER_ZCL_EVENT_IDENTIFICATION_SWITCHING_OFF       = 6,
-    EMBER_ZCL_EVENT_IDENTIFICATION_WRONG_DATA          = 7,
-};
-
-// Enum for FanMode
-enum EmberAfFanMode : uint8_t
-{
-    EMBER_ZCL_FAN_MODE_OFF    = 0,
-    EMBER_ZCL_FAN_MODE_LOW    = 1,
-    EMBER_ZCL_FAN_MODE_MEDIUM = 2,
-    EMBER_ZCL_FAN_MODE_HIGH   = 3,
-    EMBER_ZCL_FAN_MODE_ON     = 4,
-    EMBER_ZCL_FAN_MODE_AUTO   = 5,
-    EMBER_ZCL_FAN_MODE_SMART  = 6,
-};
-
-// Enum for FanModeSequence
-enum EmberAfFanModeSequence : uint8_t
-{
-    EMBER_ZCL_FAN_MODE_SEQUENCE_LOW_MED_HIGH      = 0,
-    EMBER_ZCL_FAN_MODE_SEQUENCE_LOW_HIGH          = 1,
-    EMBER_ZCL_FAN_MODE_SEQUENCE_LOW_MED_HIGH_AUTO = 2,
-    EMBER_ZCL_FAN_MODE_SEQUENCE_LOW_HIGH_AUTO     = 3,
-    EMBER_ZCL_FAN_MODE_SEQUENCE_ON_AUTO           = 4,
-};
-
-// Enum for GeneralCommissioningError
-enum EmberAfGeneralCommissioningError : uint8_t
-{
-    EMBER_ZCL_GENERAL_COMMISSIONING_ERROR_OK                     = 0,
-    EMBER_ZCL_GENERAL_COMMISSIONING_ERROR_VALUE_OUTSIDE_RANGE    = 1,
-    EMBER_ZCL_GENERAL_COMMISSIONING_ERROR_INVALID_AUTHENTICATION = 2,
-};
-
-// Enum for GenericDeviceClass
-enum EmberAfGenericDeviceClass : uint8_t
-{
-    EMBER_ZCL_GENERIC_DEVICE_CLASS_LIGHTING = 0,
-};
-
-// Enum for GenericDeviceType
-enum EmberAfGenericDeviceType : uint8_t
-{
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_INCANDESCENT               = 0,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_SPOTLIGHT_HALOGEN          = 1,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_HALOGEN_BULB               = 2,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_CFL                        = 3,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_LINEAR_FLOURESCENT         = 4,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_LED_BULB                   = 5,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_SPOTLIGHT_LED              = 6,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_LED_STRIP                  = 7,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_LED_TUBE                   = 8,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_GENERIC_INDOOR_FIXTURE     = 9,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_GENERIC_OUTDOOR_FIXTURE    = 10,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_PENDANT_FIXTURE            = 11,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_FLOOR_STANDING_FIXTURE     = 12,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_GENERIC_CONTROLLER         = 224,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_WALL_SWITCH                = 225,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_PORTABLE_REMOTE_CONTROLLER = 226,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_MOTION_OR_LIGHT_SENSOR     = 227,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_GENERIC_ACTUATOR           = 240,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_PLUGIN_UNIT                = 241,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_RETROFIT_ACTUATOR          = 242,
-    EMBER_ZCL_GENERIC_DEVICE_TYPE_UNSPECIFIED                = 255,
-};
-
-// Enum for GroupKeySecurityPolicy
-enum EmberAfGroupKeySecurityPolicy : uint8_t
-{
-    EMBER_ZCL_GROUP_KEY_SECURITY_POLICY_STANDARD    = 0,
-    EMBER_ZCL_GROUP_KEY_SECURITY_POLICY_LOW_LATENCY = 1,
 };
 
 // Enum for HardwareFaultType
@@ -732,73 +292,6 @@ enum EmberAfHueStepMode : uint8_t
 {
     EMBER_ZCL_HUE_STEP_MODE_UP   = 1,
     EMBER_ZCL_HUE_STEP_MODE_DOWN = 3,
-};
-
-// Enum for IasAceAlarmStatus
-enum EmberAfIasAceAlarmStatus : uint8_t
-{
-    EMBER_ZCL_IAS_ACE_ALARM_STATUS_NO_ALARM        = 0,
-    EMBER_ZCL_IAS_ACE_ALARM_STATUS_BURGLAR         = 1,
-    EMBER_ZCL_IAS_ACE_ALARM_STATUS_FIRE            = 2,
-    EMBER_ZCL_IAS_ACE_ALARM_STATUS_EMERGENCY       = 3,
-    EMBER_ZCL_IAS_ACE_ALARM_STATUS_POLICE_PANIC    = 4,
-    EMBER_ZCL_IAS_ACE_ALARM_STATUS_FIRE_PANIC      = 5,
-    EMBER_ZCL_IAS_ACE_ALARM_STATUS_EMERGENCY_PANIC = 6,
-};
-
-// Enum for IasAceArmMode
-enum EmberAfIasAceArmMode : uint8_t
-{
-    EMBER_ZCL_IAS_ACE_ARM_MODE_DISARM                     = 0,
-    EMBER_ZCL_IAS_ACE_ARM_MODE_ARM_DAY_HOME_ZONES_ONLY    = 1,
-    EMBER_ZCL_IAS_ACE_ARM_MODE_ARM_NIGHT_SLEEP_ZONES_ONLY = 2,
-    EMBER_ZCL_IAS_ACE_ARM_MODE_ARM_ALL_ZONES              = 3,
-};
-
-// Enum for IasAceArmNotification
-enum EmberAfIasAceArmNotification : uint8_t
-{
-    EMBER_ZCL_IAS_ACE_ARM_NOTIFICATION_ALL_ZONES_DISARMED           = 0,
-    EMBER_ZCL_IAS_ACE_ARM_NOTIFICATION_ONLY_DAY_HOME_ZONES_ARMED    = 1,
-    EMBER_ZCL_IAS_ACE_ARM_NOTIFICATION_ONLY_NIGHT_SLEEP_ZONES_ARMED = 2,
-    EMBER_ZCL_IAS_ACE_ARM_NOTIFICATION_ALL_ZONES_ARMED              = 3,
-    EMBER_ZCL_IAS_ACE_ARM_NOTIFICATION_INVALID_ARM_DISARM_CODE      = 4,
-    EMBER_ZCL_IAS_ACE_ARM_NOTIFICATION_NOT_READY_TO_ARM             = 5,
-    EMBER_ZCL_IAS_ACE_ARM_NOTIFICATION_ALREADY_DISARMED             = 6,
-};
-
-// Enum for IasAceAudibleNotification
-enum EmberAfIasAceAudibleNotification : uint8_t
-{
-    EMBER_ZCL_IAS_ACE_AUDIBLE_NOTIFICATION_MUTE          = 0,
-    EMBER_ZCL_IAS_ACE_AUDIBLE_NOTIFICATION_DEFAULT_SOUND = 1,
-};
-
-// Enum for IasAceBypassResult
-enum EmberAfIasAceBypassResult : uint8_t
-{
-    EMBER_ZCL_IAS_ACE_BYPASS_RESULT_ZONE_BYPASSED           = 0,
-    EMBER_ZCL_IAS_ACE_BYPASS_RESULT_ZONE_NOT_BYPASSED       = 1,
-    EMBER_ZCL_IAS_ACE_BYPASS_RESULT_NOT_ALLOWED             = 2,
-    EMBER_ZCL_IAS_ACE_BYPASS_RESULT_INVALID_ZONE_ID         = 3,
-    EMBER_ZCL_IAS_ACE_BYPASS_RESULT_UNKNOWN_ZONE_ID         = 4,
-    EMBER_ZCL_IAS_ACE_BYPASS_RESULT_INVALID_ARM_DISARM_CODE = 5,
-};
-
-// Enum for IasAcePanelStatus
-enum EmberAfIasAcePanelStatus : uint8_t
-{
-    EMBER_ZCL_IAS_ACE_PANEL_STATUS_PANEL_DISARMED   = 0,
-    EMBER_ZCL_IAS_ACE_PANEL_STATUS_ARMED_STAY       = 1,
-    EMBER_ZCL_IAS_ACE_PANEL_STATUS_ARMED_NIGHT      = 2,
-    EMBER_ZCL_IAS_ACE_PANEL_STATUS_ARMED_AWAY       = 3,
-    EMBER_ZCL_IAS_ACE_PANEL_STATUS_EXIT_DELAY       = 4,
-    EMBER_ZCL_IAS_ACE_PANEL_STATUS_ENTRY_DELAY      = 5,
-    EMBER_ZCL_IAS_ACE_PANEL_STATUS_NOT_READY_TO_ARM = 6,
-    EMBER_ZCL_IAS_ACE_PANEL_STATUS_IN_ALARM         = 7,
-    EMBER_ZCL_IAS_ACE_PANEL_STATUS_ARMING_STAY      = 8,
-    EMBER_ZCL_IAS_ACE_PANEL_STATUS_ARMING_NIGHT     = 9,
-    EMBER_ZCL_IAS_ACE_PANEL_STATUS_ARMING_AWAY      = 10,
 };
 
 // Enum for IasEnrollResponseCode
@@ -993,46 +486,6 @@ enum EmberAfLevelControlOptions : uint8_t
     EMBER_ZCL_LEVEL_CONTROL_OPTIONS_COUPLE_COLOR_TEMP_TO_LEVEL = 2,
 };
 
-// Enum for LevelStatus
-enum EmberAfLevelStatus : uint8_t
-{
-    EMBER_ZCL_LEVEL_STATUS_ON_TARGET    = 0,
-    EMBER_ZCL_LEVEL_STATUS_BELOW_TARGET = 1,
-    EMBER_ZCL_LEVEL_STATUS_ABOVE_TARGET = 2,
-};
-
-// Enum for LightSensorType
-enum EmberAfLightSensorType : uint8_t
-{
-    EMBER_ZCL_LIGHT_SENSOR_TYPE_PHOTODIODE = 0,
-    EMBER_ZCL_LIGHT_SENSOR_TYPE_CMOS       = 1,
-};
-
-// Enum for LogsIntent
-enum EmberAfLogsIntent : uint8_t
-{
-    EMBER_ZCL_LOGS_INTENT_END_USER_SUPPORT = 0,
-    EMBER_ZCL_LOGS_INTENT_NETWORK_DIAG     = 1,
-    EMBER_ZCL_LOGS_INTENT_CRASH_LOGS       = 2,
-};
-
-// Enum for LogsStatus
-enum EmberAfLogsStatus : uint8_t
-{
-    EMBER_ZCL_LOGS_STATUS_SUCCESS   = 0,
-    EMBER_ZCL_LOGS_STATUS_EXHAUSTED = 1,
-    EMBER_ZCL_LOGS_STATUS_NO_LOGS   = 2,
-    EMBER_ZCL_LOGS_STATUS_BUSY      = 3,
-    EMBER_ZCL_LOGS_STATUS_DENIED    = 4,
-};
-
-// Enum for LogsTransferProtocol
-enum EmberAfLogsTransferProtocol : uint8_t
-{
-    EMBER_ZCL_LOGS_TRANSFER_PROTOCOL_RESPONSE_PAYLOAD = 0,
-    EMBER_ZCL_LOGS_TRANSFER_PROTOCOL_BDX              = 1,
-};
-
 // Enum for MediaInputType
 enum EmberAfMediaInputType : uint8_t
 {
@@ -1070,63 +523,11 @@ enum EmberAfMediaPlaybackStatus : uint8_t
     EMBER_ZCL_MEDIA_PLAYBACK_STATUS_SEEK_OUT_OF_RANGE         = 5,
 };
 
-// Enum for MessagingControlConfirmation
-enum EmberAfMessagingControlConfirmation : uint8_t
-{
-    EMBER_ZCL_MESSAGING_CONTROL_CONFIRMATION_NOT_REQUIRED = 0,
-    EMBER_ZCL_MESSAGING_CONTROL_CONFIRMATION_REQUIRED     = 128,
-};
-
-// Enum for MessagingControlEnhancedConfirmation
-enum EmberAfMessagingControlEnhancedConfirmation : uint8_t
-{
-    EMBER_ZCL_MESSAGING_CONTROL_ENHANCED_CONFIRMATION_NOT_REQUIRED = 0,
-    EMBER_ZCL_MESSAGING_CONTROL_ENHANCED_CONFIRMATION_REQUIRED     = 32,
-};
-
-// Enum for MessagingControlImportance
-enum EmberAfMessagingControlImportance : uint8_t
-{
-    EMBER_ZCL_MESSAGING_CONTROL_IMPORTANCE_LOW      = 0,
-    EMBER_ZCL_MESSAGING_CONTROL_IMPORTANCE_MEDIUM   = 4,
-    EMBER_ZCL_MESSAGING_CONTROL_IMPORTANCE_HIGH     = 8,
-    EMBER_ZCL_MESSAGING_CONTROL_IMPORTANCE_CRITICAL = 12,
-};
-
-// Enum for MessagingControlTransmission
-enum EmberAfMessagingControlTransmission : uint8_t
-{
-    EMBER_ZCL_MESSAGING_CONTROL_TRANSMISSION_NORMAL               = 0,
-    EMBER_ZCL_MESSAGING_CONTROL_TRANSMISSION_NORMAL_AND_ANONYMOUS = 1,
-    EMBER_ZCL_MESSAGING_CONTROL_TRANSMISSION_ANONYMOUS            = 2,
-    EMBER_ZCL_MESSAGING_CONTROL_TRANSMISSION_RESERVED             = 3,
-};
-
-// Enum for MeterTypeId
-enum EmberAfMeterTypeId : uint16_t
-{
-    EMBER_ZCL_METER_TYPE_ID_UTILITY_PRIMARY_METER    = 0,
-    EMBER_ZCL_METER_TYPE_ID_UTILITY_PRODUCTION_METER = 1,
-    EMBER_ZCL_METER_TYPE_ID_UTILITY_SECONDARY_METER  = 2,
-    EMBER_ZCL_METER_TYPE_ID_PRIVATE_PRIMARY_METER    = 256,
-    EMBER_ZCL_METER_TYPE_ID_PRIVATE_PRODUCTION_METER = 257,
-    EMBER_ZCL_METER_TYPE_ID_PRIVATE_SECONDARY_METERS = 258,
-    EMBER_ZCL_METER_TYPE_ID_GENERIC_METER            = 272,
-};
-
 // Enum for MoveMode
 enum EmberAfMoveMode : uint8_t
 {
     EMBER_ZCL_MOVE_MODE_UP   = 0,
     EMBER_ZCL_MOVE_MODE_DOWN = 1,
-};
-
-// Enum for NavigateTargetStatus
-enum EmberAfNavigateTargetStatus : uint8_t
-{
-    EMBER_ZCL_NAVIGATE_TARGET_STATUS_SUCCESS           = 0,
-    EMBER_ZCL_NAVIGATE_TARGET_STATUS_APP_NOT_AVAILABLE = 1,
-    EMBER_ZCL_NAVIGATE_TARGET_STATUS_SYSTEM_BUSY       = 2,
 };
 
 // Enum for NetworkCommissioningError
@@ -1152,15 +553,6 @@ enum EmberAfNetworkCommissioningError : uint8_t
     EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_LABEL14                  = 17,
     EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_LABEL15                  = 18,
     EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_UNKNOWN_ERROR            = 19,
-};
-
-// Enum for NetworkFault
-enum EmberAfNetworkFault : uint8_t
-{
-    EMBER_ZCL_NETWORK_FAULT_UNSPECIFIED      = 0,
-    EMBER_ZCL_NETWORK_FAULT_LINK_DOWN        = 1,
-    EMBER_ZCL_NETWORK_FAULT_HARDWARE_FAILURE = 2,
-    EMBER_ZCL_NETWORK_FAULT_NETWORK_JAMMED   = 3,
 };
 
 // Enum for NetworkFaultType
@@ -1220,15 +612,6 @@ enum EmberAfOTAQueryStatus : uint8_t
     EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE    = 2,
 };
 
-// Enum for OccupancySensorType
-enum EmberAfOccupancySensorType : uint8_t
-{
-    EMBER_ZCL_OCCUPANCY_SENSOR_TYPE_PIR                = 0,
-    EMBER_ZCL_OCCUPANCY_SENSOR_TYPE_ULTRASONIC         = 1,
-    EMBER_ZCL_OCCUPANCY_SENSOR_TYPE_PIR_AND_ULTRASONIC = 2,
-    EMBER_ZCL_OCCUPANCY_SENSOR_TYPE_PHYSICAL_CONTACT   = 3,
-};
-
 // Enum for OnOffDelayedAllOffEffectVariant
 enum EmberAfOnOffDelayedAllOffEffectVariant : uint8_t
 {
@@ -1250,13 +633,6 @@ enum EmberAfOnOffEffectIdentifier : uint8_t
     EMBER_ZCL_ON_OFF_EFFECT_IDENTIFIER_DYING_LIGHT     = 1,
 };
 
-// Enum for OperatingMode
-enum EmberAfOperatingMode : uint8_t
-{
-    EMBER_ZCL_OPERATING_MODE_NORMAL    = 0,
-    EMBER_ZCL_OPERATING_MODE_CONFIGURE = 1,
-};
-
 // Enum for PHYRateType
 enum EmberAfPHYRateType : uint8_t
 {
@@ -1270,96 +646,6 @@ enum EmberAfPHYRateType : uint8_t
     EMBER_ZCL_PHY_RATE_TYPE_100_G  = 7,
     EMBER_ZCL_PHY_RATE_TYPE_200_G  = 8,
     EMBER_ZCL_PHY_RATE_TYPE_400_G  = 9,
-};
-
-// Enum for PhysicalEnvironment
-enum EmberAfPhysicalEnvironment : uint8_t
-{
-    EMBER_ZCL_PHYSICAL_ENVIRONMENT_UNSPECIFIED                   = 0,
-    EMBER_ZCL_PHYSICAL_ENVIRONMENT_FIRST_PROFILE_SPECIFIED_VALUE = 1,
-    EMBER_ZCL_PHYSICAL_ENVIRONMENT_LAST_PROFILE_SPECIFIED_VALUE  = 127,
-    EMBER_ZCL_PHYSICAL_ENVIRONMENT_UNKNOWN                       = 255,
-};
-
-// Enum for PowerProfileState
-enum EmberAfPowerProfileState : uint8_t
-{
-    EMBER_ZCL_POWER_PROFILE_STATE_POWER_PROFILE_WAITING_TO_START = 1,
-    EMBER_ZCL_POWER_PROFILE_STATE_POWER_PROFILE_STARTED          = 2,
-    EMBER_ZCL_POWER_PROFILE_STATE_ENERGY_PHASE_RUNNING           = 3,
-    EMBER_ZCL_POWER_PROFILE_STATE_ENERGY_PHASE_ENDED             = 4,
-    EMBER_ZCL_POWER_PROFILE_STATE_ENERGY_PHASE_WAITING_TO_START  = 5,
-    EMBER_ZCL_POWER_PROFILE_STATE_ENERGY_PHASE_STARTED           = 6,
-    EMBER_ZCL_POWER_PROFILE_STATE_POWER_PROFILE_ENDED            = 7,
-    EMBER_ZCL_POWER_PROFILE_STATE_PROFILE_READY_FOR_SCHEDULING   = 8,
-    EMBER_ZCL_POWER_PROFILE_STATE_POWER_PROFILE_SCHEDULED        = 9,
-};
-
-// Enum for PowerSource
-enum EmberAfPowerSource : uint8_t
-{
-    EMBER_ZCL_POWER_SOURCE_UNKNOWN                         = 0,
-    EMBER_ZCL_POWER_SOURCE_SINGLE_PHASE_MAINS              = 1,
-    EMBER_ZCL_POWER_SOURCE_THREE_PHASE_MAINS               = 2,
-    EMBER_ZCL_POWER_SOURCE_BATTERY                         = 3,
-    EMBER_ZCL_POWER_SOURCE_DC_SOURCE                       = 4,
-    EMBER_ZCL_POWER_SOURCE_EMERGENCY_MAINS_CONSTANT_POWER  = 5,
-    EMBER_ZCL_POWER_SOURCE_EMERGENCY_MAINS_TRANSFER_SWITCH = 6,
-    EMBER_ZCL_POWER_SOURCE_BATTERY_BACKUP                  = 128,
-};
-
-// Enum for PowerSourceStatus
-enum EmberAfPowerSourceStatus : uint8_t
-{
-    EMBER_ZCL_POWER_SOURCE_STATUS_UNSPECFIED  = 0,
-    EMBER_ZCL_POWER_SOURCE_STATUS_ACTIVE      = 1,
-    EMBER_ZCL_POWER_SOURCE_STATUS_STANDBY     = 2,
-    EMBER_ZCL_POWER_SOURCE_STATUS_UNAVAILABLE = 3,
-};
-
-// Enum for ProductCode
-enum EmberAfProductCode : uint8_t
-{
-    EMBER_ZCL_PRODUCT_CODE_MANUFACTURER_DEFINED        = 0,
-    EMBER_ZCL_PRODUCT_CODE_ITERNATIONAL_ARTICLE_NUMBER = 1,
-    EMBER_ZCL_PRODUCT_CODE_GLOBAL_TRADE_ITEM_NUMBER    = 2,
-    EMBER_ZCL_PRODUCT_CODE_UNIVERSAL_PRODUCT_CODE      = 3,
-    EMBER_ZCL_PRODUCT_CODE_STOCK_KEEPING_UNIT          = 4,
-};
-
-// Enum for ProductTypeId
-enum EmberAfProductTypeId : uint16_t
-{
-    EMBER_ZCL_PRODUCT_TYPE_ID_WHITE_GOODS          = 0,
-    EMBER_ZCL_PRODUCT_TYPE_ID_DISHWASHER           = 22017,
-    EMBER_ZCL_PRODUCT_TYPE_ID_TUMBLE_DRYER         = 22018,
-    EMBER_ZCL_PRODUCT_TYPE_ID_WASHER_DRYER         = 22019,
-    EMBER_ZCL_PRODUCT_TYPE_ID_WASHING_MACHINE      = 22020,
-    EMBER_ZCL_PRODUCT_TYPE_ID_HOBS                 = 24067,
-    EMBER_ZCL_PRODUCT_TYPE_ID_INDUCTION_HOBS       = 24073,
-    EMBER_ZCL_PRODUCT_TYPE_ID_OVEN                 = 24065,
-    EMBER_ZCL_PRODUCT_TYPE_ID_ELECTRICAL_OVEN      = 24070,
-    EMBER_ZCL_PRODUCT_TYPE_ID_REFRIGERATOR_FREEZER = 26113,
-};
-
-// Enum for PumpControlMode
-enum EmberAfPumpControlMode : uint8_t
-{
-    EMBER_ZCL_PUMP_CONTROL_MODE_CONSTANT_SPEED        = 0,
-    EMBER_ZCL_PUMP_CONTROL_MODE_CONSTANT_PRESSURE     = 1,
-    EMBER_ZCL_PUMP_CONTROL_MODE_PROPORTIONAL_PRESSURE = 2,
-    EMBER_ZCL_PUMP_CONTROL_MODE_CONSTANT_FLOW         = 3,
-    EMBER_ZCL_PUMP_CONTROL_MODE_CONSTANT_TEMPERATURE  = 5,
-    EMBER_ZCL_PUMP_CONTROL_MODE_AUTOMATIC             = 7,
-};
-
-// Enum for PumpOperationMode
-enum EmberAfPumpOperationMode : uint8_t
-{
-    EMBER_ZCL_PUMP_OPERATION_MODE_NORMAL  = 0,
-    EMBER_ZCL_PUMP_OPERATION_MODE_MINIMUM = 1,
-    EMBER_ZCL_PUMP_OPERATION_MODE_MAXIMUM = 2,
-    EMBER_ZCL_PUMP_OPERATION_MODE_LOCAL   = 3,
 };
 
 // Enum for RadioFaultType
@@ -1380,29 +666,6 @@ enum EmberAfRegulatoryLocationType : uint8_t
     EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR         = 0,
     EMBER_ZCL_REGULATORY_LOCATION_TYPE_OUTDOOR        = 1,
     EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR_OUTDOOR = 2,
-};
-
-// Enum for RelativeHumidityDisplay
-enum EmberAfRelativeHumidityDisplay : uint8_t
-{
-    EMBER_ZCL_RELATIVE_HUMIDITY_DISPLAY_NOT_DISPLAYED = 0,
-    EMBER_ZCL_RELATIVE_HUMIDITY_DISPLAY_DISPLAYED     = 1,
-};
-
-// Enum for RelativeHumidityMode
-enum EmberAfRelativeHumidityMode : uint8_t
-{
-    EMBER_ZCL_RELATIVE_HUMIDITY_MODE_MEASURE_LOCALLY          = 0,
-    EMBER_ZCL_RELATIVE_HUMIDITY_MODE_UPDATED_OVER_THE_NETWORK = 1,
-};
-
-// Enum for RemoteEnableFlags
-enum EmberAfRemoteEnableFlags : uint8_t
-{
-    EMBER_ZCL_REMOTE_ENABLE_FLAGS_DISABLED                          = 0,
-    EMBER_ZCL_REMOTE_ENABLE_FLAGS_TEMPORARILY_LOCKED_DISABLED       = 7,
-    EMBER_ZCL_REMOTE_ENABLE_FLAGS_ENABLED_REMOTE_CONTROL            = 15,
-    EMBER_ZCL_REMOTE_ENABLE_FLAGS_ENABLED_REMOTE_AND_ENERGY_CONTROL = 1,
 };
 
 // Enum for RoutingRole
@@ -1460,41 +723,6 @@ enum EmberAfSimpleEnum : uint8_t
     EMBER_ZCL_SIMPLE_ENUM_VALUE_C     = 3,
 };
 
-// Enum for SquawkLevel
-enum EmberAfSquawkLevel : uint8_t
-{
-    EMBER_ZCL_SQUAWK_LEVEL_LOW_LEVEL       = 0,
-    EMBER_ZCL_SQUAWK_LEVEL_MEDIUM_LEVEL    = 1,
-    EMBER_ZCL_SQUAWK_LEVEL_HIGH_LEVEL      = 2,
-    EMBER_ZCL_SQUAWK_LEVEL_VERY_HIGH_LEVEL = 2,
-};
-
-// Enum for SquawkMode
-enum EmberAfSquawkMode : uint8_t
-{
-    EMBER_ZCL_SQUAWK_MODE_SYSTEM_IS_ARMED    = 0,
-    EMBER_ZCL_SQUAWK_MODE_SYSTEM_IS_DISARMED = 1,
-};
-
-// Enum for SquawkStobe
-enum EmberAfSquawkStobe : uint8_t
-{
-    EMBER_ZCL_SQUAWK_STOBE_NO_STROBE  = 0,
-    EMBER_ZCL_SQUAWK_STOBE_USE_STROBE = 1,
-};
-
-// Enum for StartOfWeek
-enum EmberAfStartOfWeek : uint8_t
-{
-    EMBER_ZCL_START_OF_WEEK_SUNDAY    = 0,
-    EMBER_ZCL_START_OF_WEEK_MONDAY    = 1,
-    EMBER_ZCL_START_OF_WEEK_TUESDAY   = 2,
-    EMBER_ZCL_START_OF_WEEK_WEDNESDAY = 3,
-    EMBER_ZCL_START_OF_WEEK_THURSDAY  = 4,
-    EMBER_ZCL_START_OF_WEEK_FRIDAY    = 5,
-    EMBER_ZCL_START_OF_WEEK_SATURDAY  = 6,
-};
-
 // Enum for StartUpOnOffValue
 enum EmberAfStartUpOnOffValue : uint8_t
 {
@@ -1519,34 +747,11 @@ enum EmberAfStepMode : uint8_t
     EMBER_ZCL_STEP_MODE_DOWN = 1,
 };
 
-// Enum for SwitchActions
-enum EmberAfSwitchActions : uint8_t
-{
-    EMBER_ZCL_SWITCH_ACTIONS_ON     = 0,
-    EMBER_ZCL_SWITCH_ACTIONS_OFF    = 1,
-    EMBER_ZCL_SWITCH_ACTIONS_TOGGLE = 2,
-};
-
-// Enum for SwitchType
-enum EmberAfSwitchType : uint8_t
-{
-    EMBER_ZCL_SWITCH_TYPE_TOGGLE         = 0,
-    EMBER_ZCL_SWITCH_TYPE_MOMENTARY      = 1,
-    EMBER_ZCL_SWITCH_TYPE_MULTI_FUNCTION = 2,
-};
-
 // Enum for TemperatureDisplayMode
 enum EmberAfTemperatureDisplayMode : uint8_t
 {
     EMBER_ZCL_TEMPERATURE_DISPLAY_MODE_CELSIUS    = 0,
     EMBER_ZCL_TEMPERATURE_DISPLAY_MODE_FAHRENHEIT = 1,
-};
-
-// Enum for TemperatureSetpointHold
-enum EmberAfTemperatureSetpointHold : uint8_t
-{
-    EMBER_ZCL_TEMPERATURE_SETPOINT_HOLD_SETPOINT_HOLD_OFF = 0,
-    EMBER_ZCL_TEMPERATURE_SETPOINT_HOLD_SETPOINT_HOLD_ON  = 1,
 };
 
 // Enum for ThermostatControlSequence
@@ -1580,33 +785,6 @@ enum EmberAfThermostatSystemMode : uint8_t
     EMBER_ZCL_THERMOSTAT_SYSTEM_MODE_FAN_ONLY          = 7,
 };
 
-// Enum for ThreadConnectionStatus
-enum EmberAfThreadConnectionStatus : uint8_t
-{
-    EMBER_ZCL_THREAD_CONNECTION_STATUS_CONNECTED     = 0,
-    EMBER_ZCL_THREAD_CONNECTION_STATUS_NOT_CONNECTED = 1,
-};
-
-// Enum for TimeEncoding
-enum EmberAfTimeEncoding : uint8_t
-{
-    EMBER_ZCL_TIME_ENCODING_RELATIVE = 0,
-    EMBER_ZCL_TIME_ENCODING_ABSOLUTE = 64,
-};
-
-// Enum for TvChannelErrorType
-enum EmberAfTvChannelErrorType : uint8_t
-{
-    EMBER_ZCL_TV_CHANNEL_ERROR_TYPE_MULTIPLE_MATCHES = 0,
-    EMBER_ZCL_TV_CHANNEL_ERROR_TYPE_NO_MATCHES       = 1,
-};
-
-// Enum for TvChannelLineupInfoType
-enum EmberAfTvChannelLineupInfoType : uint8_t
-{
-    EMBER_ZCL_TV_CHANNEL_LINEUP_INFO_TYPE_MSO = 0,
-};
-
 // Enum for UpdateStateEnum
 enum EmberAfUpdateStateEnum : uint8_t
 {
@@ -1619,35 +797,6 @@ enum EmberAfUpdateStateEnum : uint8_t
     EMBER_ZCL_UPDATE_STATE_ENUM_DELAYED_ON_APPLY        = 6,
     EMBER_ZCL_UPDATE_STATE_ENUM_ROLLING_BACK            = 7,
     EMBER_ZCL_UPDATE_STATE_ENUM_DELAYED_ON_USER_CONSENT = 8,
-};
-
-// Enum for WarningEvent
-enum EmberAfWarningEvent : uint8_t
-{
-    EMBER_ZCL_WARNING_EVENT_WARNING1_OVERALL_POWER_ABOVE_AVAILABLE_POWER_LEVEL                                             = 0,
-    EMBER_ZCL_WARNING_EVENT_WARNING2_OVERALL_POWER_ABOVE_POWER_THRESHOLD_LEVEL                                             = 1,
-    EMBER_ZCL_WARNING_EVENT_WARNING3_OVERALL_POWER_BACK_BELOW_THE_AVAILABLE_POWER_LEVEL                                    = 2,
-    EMBER_ZCL_WARNING_EVENT_WARNING4_OVERALL_POWER_BACK_BELOW_THE_POWER_THRESHOLD_LEVEL                                    = 3,
-    EMBER_ZCL_WARNING_EVENT_WARNING5_OVERALL_POWER_WILL_BE_POTENTIALLY_ABOVE_AVAILABLE_POWER_LEVEL_IF_THE_APPLIANCE_STARTS = 4,
-};
-
-// Enum for WarningMode
-enum EmberAfWarningMode : uint8_t
-{
-    EMBER_ZCL_WARNING_MODE_STOP            = 0,
-    EMBER_ZCL_WARNING_MODE_BURGLAR         = 1,
-    EMBER_ZCL_WARNING_MODE_FIRE            = 2,
-    EMBER_ZCL_WARNING_MODE_EMERGENCY       = 3,
-    EMBER_ZCL_WARNING_MODE_POLICE_PANIC    = 4,
-    EMBER_ZCL_WARNING_MODE_FIRE_PANIC      = 5,
-    EMBER_ZCL_WARNING_MODE_EMERGENCY_PANIC = 6,
-};
-
-// Enum for WarningStobe
-enum EmberAfWarningStobe : uint8_t
-{
-    EMBER_ZCL_WARNING_STOBE_NO_STROBE  = 0,
-    EMBER_ZCL_WARNING_STOBE_USE_STROBE = 1,
 };
 
 // Enum for WcEndProductType
@@ -1696,13 +845,6 @@ enum EmberAfWcType : uint8_t
     EMBER_ZCL_WC_TYPE_UNKNOWN                     = 255,
 };
 
-// Enum for WiFiConnectionStatus
-enum EmberAfWiFiConnectionStatus : uint8_t
-{
-    EMBER_ZCL_WI_FI_CONNECTION_STATUS_CONNECTED     = 0,
-    EMBER_ZCL_WI_FI_CONNECTION_STATUS_NOT_CONNECTED = 1,
-};
-
 // Enum for WiFiVersionType
 enum EmberAfWiFiVersionType : uint8_t
 {
@@ -1712,21 +854,6 @@ enum EmberAfWiFiVersionType : uint8_t
     EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N  = 3,
     EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AC = 4,
     EMBER_ZCL_WI_FI_VERSION_TYPE_802__11AX = 5,
-};
-
-// Enum for WiredCurrentType
-enum EmberAfWiredCurrentType : uint8_t
-{
-    EMBER_ZCL_WIRED_CURRENT_TYPE_AC = 0,
-    EMBER_ZCL_WIRED_CURRENT_TYPE_DC = 1,
-};
-
-// Enum for WiredFaultType
-enum EmberAfWiredFaultType : uint8_t
-{
-    EMBER_ZCL_WIRED_FAULT_TYPE_UNSPECFIED    = 0,
-    EMBER_ZCL_WIRED_FAULT_TYPE_OVER_VOLTAGE  = 1,
-    EMBER_ZCL_WIRED_FAULT_TYPE_UNDER_VOLTAGE = 2,
 };
 
 #define EMBER_AF_ALARM_MASK_GENERAL_HW_FAULT (1)
@@ -1845,6 +972,14 @@ enum EmberAfWiredFaultType : uint8_t
 #define EMBER_AF_ETHERNET_NETWORK_DIAGNOSTICS_FEATURE_PACKET_COUNTS_OFFSET (0)
 #define EMBER_AF_ETHERNET_NETWORK_DIAGNOSTICS_FEATURE_ERROR_COUNTS (2)
 #define EMBER_AF_ETHERNET_NETWORK_DIAGNOSTICS_FEATURE_ERROR_COUNTS_OFFSET (1)
+#define EMBER_AF_GENERAL_COMMISSIONING_FEATURE_GENERAL_COMMISSIONING (1)
+#define EMBER_AF_GENERAL_COMMISSIONING_FEATURE_GENERAL_COMMISSIONING_OFFSET (0)
+#define EMBER_AF_GENERAL_COMMISSIONING_FEATURE_WI_FI_NETWORK_INTERFACE (2)
+#define EMBER_AF_GENERAL_COMMISSIONING_FEATURE_WI_FI_NETWORK_INTERFACE_OFFSET (1)
+#define EMBER_AF_GENERAL_COMMISSIONING_FEATURE_THREAD_NETWORK_INTERFACE (4)
+#define EMBER_AF_GENERAL_COMMISSIONING_FEATURE_THREAD_NETWORK_INTERFACE_OFFSET (2)
+#define EMBER_AF_GENERAL_COMMISSIONING_FEATURE_ETHERNET_NETWORK_INTERFACE (8)
+#define EMBER_AF_GENERAL_COMMISSIONING_FEATURE_ETHERNET_NETWORK_INTERFACE_OFFSET (3)
 #define EMBER_AF_IAS_ZONE_STATUS_ALARM1 (1)
 #define EMBER_AF_IAS_ZONE_STATUS_ALARM1_OFFSET (0)
 #define EMBER_AF_IAS_ZONE_STATUS_ALARM2 (2)

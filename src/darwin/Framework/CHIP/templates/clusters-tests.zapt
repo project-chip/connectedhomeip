@@ -7,6 +7,10 @@
 #import <CHIP/CHIP.h>
 #import <CHIP/CHIPTestClustersObjc.h>
 
+#import "CHIPErrorTestUtils.h"
+
+#import <app/util/af-enums.h>
+
 // system dependencies
 #import <XCTest/XCTest.h>
 

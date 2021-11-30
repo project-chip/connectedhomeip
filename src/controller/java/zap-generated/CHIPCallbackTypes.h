@@ -145,8 +145,36 @@ typedef void (*CHIPBridgedActionsClusterSetupUrlAttributeCallbackType)(
 typedef void (*CHIPBridgedActionsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::BridgedActions::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
-typedef void (*CHIPBridgedDeviceBasicInformationClusterClusterRevisionAttributeCallbackType)(
-    void *, chip::app::Clusters::BridgedDeviceBasicInformation::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterVendorNameAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::VendorName::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterVendorIDAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::VendorID::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterProductNameAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductName::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterNodeLabelAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::NodeLabel::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterHardwareVersionAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersion::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterHardwareVersionStringAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::HardwareVersionString::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterSoftwareVersionAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersion::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterSoftwareVersionStringAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::SoftwareVersionString::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterManufacturingDateAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::ManufacturingDate::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterPartNumberAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::PartNumber::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterProductURLAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductURL::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterProductLabelAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::ProductLabel::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterSerialNumberAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::SerialNumber::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterReachableAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::Reachable::TypeInfo::DecodableArgType);
+typedef void (*CHIPBridgedDeviceBasicClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::BridgedDeviceBasic::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
 typedef void (*CHIPColorControlClusterCurrentHueAttributeCallbackType)(
     void *, chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo::DecodableArgType);
@@ -835,6 +863,8 @@ typedef void (*CHIPTemperatureMeasurementClusterClusterRevisionAttributeCallback
     void *, chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterBooleanResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType &);
+typedef void (*CHIPTestClusterClusterSimpleStructResponseCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestAddArgumentsResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestEnumsResponseCallbackType)(

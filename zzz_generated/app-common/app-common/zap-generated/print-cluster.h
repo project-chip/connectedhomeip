@@ -108,12 +108,6 @@
 #define CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER
 #endif
 
-#if defined(ZCL_USING_ACL_CLUSTER_SERVER) || defined(ZCL_USING_ACL_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_ACL_CLUSTER { ZCL_ACL_CLUSTER_ID, 31, "ACL" },
-#else
-#define CHIP_PRINTCLUSTER_ACL_CLUSTER
-#endif
-
 #if defined(ZCL_USING_POLL_CONTROL_CLUSTER_SERVER) || defined(ZCL_USING_POLL_CONTROL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER { ZCL_POLL_CONTROL_CLUSTER_ID, 32, "Poll Control" },
 #else
@@ -232,14 +226,6 @@
 #define CHIP_PRINTCLUSTER_TIME_SYNCHRONIZATION_CLUSTER { ZCL_TIME_SYNCHRONIZATION_CLUSTER_ID, 56, "Time Synchronization" },
 #else
 #define CHIP_PRINTCLUSTER_TIME_SYNCHRONIZATION_CLUSTER
-#endif
-
-#if defined(ZCL_USING_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_SERVER) ||                                                          \
-    defined(ZCL_USING_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER                                                                 \
-    { ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_ID, 57, "Bridged Device Basic Information" },
-#else
-#define CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER
 #endif
 
 #if defined(ZCL_USING_BRIDGED_DEVICE_BASIC_CLUSTER_SERVER) || defined(ZCL_USING_BRIDGED_DEVICE_BASIC_CLUSTER_CLIENT)
@@ -778,19 +764,6 @@
 #define CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER
 #endif
 
-#if defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_SERVER) || defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER { ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID, 64512, "Sample Mfg Specific Cluster" },
-#else
-#define CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER
-#endif
-
-#if defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_2_SERVER) || defined(ZCL_USING_SAMPLE_MFG_SPECIFIC_CLUSTER_2_CLIENT)
-#define CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER_2                                                                            \
-    { ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_2_ID, 64512, "Sample Mfg Specific Cluster 2" },
-#else
-#define CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER_2
-#endif
-
 #define CLUSTER_IDS_TO_NAMES                                                                                                       \
     CHIP_PRINTCLUSTER_POWER_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DEVICE_TEMP_CLUSTER                                                                                          \
@@ -806,7 +779,6 @@
     CHIP_PRINTCLUSTER_POWER_PROFILE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_APPLIANCE_CONTROL_CLUSTER                                                                                    \
     CHIP_PRINTCLUSTER_DESCRIPTOR_CLUSTER                                                                                           \
-    CHIP_PRINTCLUSTER_ACL_CLUSTER                                                                                                  \
     CHIP_PRINTCLUSTER_POLL_CONTROL_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_BRIDGED_ACTIONS_CLUSTER                                                                                      \
     CHIP_PRINTCLUSTER_BASIC_CLUSTER                                                                                                \
@@ -826,7 +798,6 @@
     CHIP_PRINTCLUSTER_WIFI_NETWORK_DIAGNOSTICS_CLUSTER                                                                             \
     CHIP_PRINTCLUSTER_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER                                                                         \
     CHIP_PRINTCLUSTER_TIME_SYNCHRONIZATION_CLUSTER                                                                                 \
-    CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER                                                                     \
     CHIP_PRINTCLUSTER_BRIDGED_DEVICE_BASIC_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_SWITCH_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER                                                                          \
@@ -904,8 +875,6 @@
     CHIP_PRINTCLUSTER_APPLIANCE_STATISTICS_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
     CHIP_PRINTCLUSTER_BINDING_CLUSTER                                                                                              \
-    CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER                                                                                 \
-    CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER                                                                                  \
-    CHIP_PRINTCLUSTER_SAMPLE_MFG_SPECIFIC_CLUSTER_2
+    CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER
 
 #define MAX_CLUSTER_NAME_LENGTH 52

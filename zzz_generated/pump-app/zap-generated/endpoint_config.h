@@ -53,225 +53,228 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
+            /* 266 - FeatureMap, */                                                                                                \
+            0x00, 0x00, 0x00, 0x06,                                                                                                \
+                                                                                                                                   \
             /* Endpoint: 0, Cluster: Network Commissioning (server), big-endian */                                                 \
                                                                                                                                    \
-            /* 266 - FeatureMap, */                                                                                                \
+            /* 270 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x01,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server), big-endian */                                                   \
                                                                                                                                    \
-            /* 270 - UpTime, */                                                                                                    \
+            /* 274 - UpTime, */                                                                                                    \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 278 - TotalOperationalHours, */                                                                                     \
+            /* 282 - TotalOperationalHours, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Software Diagnostics (server), big-endian */                                                  \
                                                                                                                                    \
-            /* 282 - CurrentHeapFree, */                                                                                           \
+            /* 286 - CurrentHeapFree, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 290 - CurrentHeapUsed, */                                                                                           \
+            /* 294 - CurrentHeapUsed, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 298 - CurrentHeapHighWatermark, */                                                                                  \
+            /* 302 - CurrentHeapHighWatermark, */                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 306 - FeatureMap, */                                                                                                \
+            /* 310 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x01,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Thread Network Diagnostics (server), big-endian */                                            \
                                                                                                                                    \
-            /* 310 - NetworkName, */                                                                                               \
+            /* 314 - NetworkName, */                                                                                               \
             0x00, 0x00,                                                                                                            \
                                                                                                                                    \
-            /* 312 - ExtendedPanId, */                                                                                             \
+            /* 316 - ExtendedPanId, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 320 - OverrunCount, */                                                                                              \
+            /* 324 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 328 - PartitionId, */                                                                                               \
+            /* 332 - PartitionId, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 332 - TxTotalCount, */                                                                                              \
+            /* 336 - TxTotalCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 336 - TxUnicastCount, */                                                                                            \
+            /* 340 - TxUnicastCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 340 - TxBroadcastCount, */                                                                                          \
+            /* 344 - TxBroadcastCount, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 344 - TxAckRequestedCount, */                                                                                       \
+            /* 348 - TxAckRequestedCount, */                                                                                       \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 348 - TxAckedCount, */                                                                                              \
+            /* 352 - TxAckedCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 352 - TxNoAckRequestedCount, */                                                                                     \
+            /* 356 - TxNoAckRequestedCount, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 356 - TxDataCount, */                                                                                               \
+            /* 360 - TxDataCount, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 360 - TxDataPollCount, */                                                                                           \
+            /* 364 - TxDataPollCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 364 - TxBeaconCount, */                                                                                             \
+            /* 368 - TxBeaconCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 368 - TxBeaconRequestCount, */                                                                                      \
+            /* 372 - TxBeaconRequestCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 372 - TxOtherCount, */                                                                                              \
+            /* 376 - TxOtherCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 376 - TxRetryCount, */                                                                                              \
+            /* 380 - TxRetryCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 380 - TxDirectMaxRetryExpiryCount, */                                                                               \
+            /* 384 - TxDirectMaxRetryExpiryCount, */                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 384 - TxIndirectMaxRetryExpiryCount, */                                                                             \
+            /* 388 - TxIndirectMaxRetryExpiryCount, */                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 388 - TxErrCcaCount, */                                                                                             \
+            /* 392 - TxErrCcaCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 392 - TxErrAbortCount, */                                                                                           \
+            /* 396 - TxErrAbortCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 396 - TxErrBusyChannelCount, */                                                                                     \
+            /* 400 - TxErrBusyChannelCount, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 400 - RxTotalCount, */                                                                                              \
+            /* 404 - RxTotalCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 404 - RxUnicastCount, */                                                                                            \
+            /* 408 - RxUnicastCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 408 - RxBroadcastCount, */                                                                                          \
+            /* 412 - RxBroadcastCount, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 412 - RxDataCount, */                                                                                               \
+            /* 416 - RxDataCount, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 416 - RxDataPollCount, */                                                                                           \
+            /* 420 - RxDataPollCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 420 - RxBeaconCount, */                                                                                             \
+            /* 424 - RxBeaconCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 424 - RxBeaconRequestCount, */                                                                                      \
+            /* 428 - RxBeaconRequestCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 428 - RxOtherCount, */                                                                                              \
+            /* 432 - RxOtherCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 432 - RxAddressFilteredCount, */                                                                                    \
+            /* 436 - RxAddressFilteredCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 436 - RxDestAddrFilteredCount, */                                                                                   \
+            /* 440 - RxDestAddrFilteredCount, */                                                                                   \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 440 - RxDuplicatedCount, */                                                                                         \
+            /* 444 - RxDuplicatedCount, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 444 - RxErrNoFrameCount, */                                                                                         \
+            /* 448 - RxErrNoFrameCount, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 448 - RxErrUnknownNeighborCount, */                                                                                 \
+            /* 452 - RxErrUnknownNeighborCount, */                                                                                 \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 452 - RxErrInvalidSrcAddrCount, */                                                                                  \
+            /* 456 - RxErrInvalidSrcAddrCount, */                                                                                  \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 456 - RxErrSecCount, */                                                                                             \
+            /* 460 - RxErrSecCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 460 - RxErrFcsCount, */                                                                                             \
+            /* 464 - RxErrFcsCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 464 - RxErrOtherCount, */                                                                                           \
+            /* 468 - RxErrOtherCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 468 - ActiveTimestamp, */                                                                                           \
+            /* 472 - ActiveTimestamp, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 476 - PendingTimestamp, */                                                                                          \
+            /* 480 - PendingTimestamp, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 484 - delay, */                                                                                                     \
+            /* 488 - delay, */                                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 488 - ChannelMask, */                                                                                               \
+            /* 492 - ChannelMask, */                                                                                               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server), big-endian */                                              \
                                                                                                                                    \
-            /* 495 - BeaconLostCount, */                                                                                           \
+            /* 499 - BeaconLostCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 499 - BeaconRxCount, */                                                                                             \
+            /* 503 - BeaconRxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 503 - PacketMulticastRxCount, */                                                                                    \
+            /* 507 - PacketMulticastRxCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 507 - PacketMulticastTxCount, */                                                                                    \
+            /* 511 - PacketMulticastTxCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 511 - PacketUnicastRxCount, */                                                                                      \
+            /* 515 - PacketUnicastRxCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 515 - PacketUnicastTxCount, */                                                                                      \
+            /* 519 - PacketUnicastTxCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 519 - CurrentMaxRate, */                                                                                            \
+            /* 523 - CurrentMaxRate, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 527 - OverrunCount, */                                                                                              \
+            /* 531 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 535 - FeatureMap, */                                                                                                \
+            /* 539 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x03,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server), big-endian */                                          \
                                                                                                                                    \
-            /* 539 - PacketRxCount, */                                                                                             \
+            /* 543 - PacketRxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 547 - PacketTxCount, */                                                                                             \
+            /* 551 - PacketTxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 555 - TxErrCount, */                                                                                                \
+            /* 559 - TxErrCount, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 563 - CollisionCount, */                                                                                            \
+            /* 567 - CollisionCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 571 - OverrunCount, */                                                                                              \
+            /* 575 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 579 - TimeSinceReset, */                                                                                            \
+            /* 583 - TimeSinceReset, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 587 - FeatureMap, */                                                                                                \
+            /* 591 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x03,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Pump Configuration and Control (server), big-endian */                                        \
                                                                                                                                    \
-            /* 591 - LifetimeRunningHours, */                                                                                      \
+            /* 595 - LifetimeRunningHours, */                                                                                      \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 594 - Power, */                                                                                                     \
+            /* 598 - Power, */                                                                                                     \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 597 - LifetimeEnergyConsumed, */                                                                                    \
+            /* 601 - LifetimeEnergyConsumed, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 601 - FeatureMap, */                                                                                                \
+            /* 605 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
     }
 
@@ -305,240 +308,243 @@
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,      \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
+            /* 266 - FeatureMap, */                                                                                                \
+            0x06, 0x00, 0x00, 0x00,                                                                                                \
+                                                                                                                                   \
             /* Endpoint: 0, Cluster: Network Commissioning (server), little-endian */                                              \
                                                                                                                                    \
-            /* 266 - FeatureMap, */                                                                                                \
+            /* 270 - FeatureMap, */                                                                                                \
             0x01, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server), little-endian */                                                \
                                                                                                                                    \
-            /* 270 - UpTime, */                                                                                                    \
+            /* 274 - UpTime, */                                                                                                    \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 278 - TotalOperationalHours, */                                                                                     \
+            /* 282 - TotalOperationalHours, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Software Diagnostics (server), little-endian */                                               \
                                                                                                                                    \
-            /* 282 - CurrentHeapFree, */                                                                                           \
+            /* 286 - CurrentHeapFree, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 290 - CurrentHeapUsed, */                                                                                           \
+            /* 294 - CurrentHeapUsed, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 298 - CurrentHeapHighWatermark, */                                                                                  \
+            /* 302 - CurrentHeapHighWatermark, */                                                                                  \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 306 - FeatureMap, */                                                                                                \
+            /* 310 - FeatureMap, */                                                                                                \
             0x01, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Thread Network Diagnostics (server), little-endian */                                         \
                                                                                                                                    \
-            /* 310 - NetworkName, */                                                                                               \
+            /* 314 - NetworkName, */                                                                                               \
             0x00, 0x00,                                                                                                            \
                                                                                                                                    \
-            /* 312 - ExtendedPanId, */                                                                                             \
+            /* 316 - ExtendedPanId, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 320 - OverrunCount, */                                                                                              \
+            /* 324 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 328 - PartitionId, */                                                                                               \
+            /* 332 - PartitionId, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 332 - TxTotalCount, */                                                                                              \
+            /* 336 - TxTotalCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 336 - TxUnicastCount, */                                                                                            \
+            /* 340 - TxUnicastCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 340 - TxBroadcastCount, */                                                                                          \
+            /* 344 - TxBroadcastCount, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 344 - TxAckRequestedCount, */                                                                                       \
+            /* 348 - TxAckRequestedCount, */                                                                                       \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 348 - TxAckedCount, */                                                                                              \
+            /* 352 - TxAckedCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 352 - TxNoAckRequestedCount, */                                                                                     \
+            /* 356 - TxNoAckRequestedCount, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 356 - TxDataCount, */                                                                                               \
+            /* 360 - TxDataCount, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 360 - TxDataPollCount, */                                                                                           \
+            /* 364 - TxDataPollCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 364 - TxBeaconCount, */                                                                                             \
+            /* 368 - TxBeaconCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 368 - TxBeaconRequestCount, */                                                                                      \
+            /* 372 - TxBeaconRequestCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 372 - TxOtherCount, */                                                                                              \
+            /* 376 - TxOtherCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 376 - TxRetryCount, */                                                                                              \
+            /* 380 - TxRetryCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 380 - TxDirectMaxRetryExpiryCount, */                                                                               \
+            /* 384 - TxDirectMaxRetryExpiryCount, */                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 384 - TxIndirectMaxRetryExpiryCount, */                                                                             \
+            /* 388 - TxIndirectMaxRetryExpiryCount, */                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 388 - TxErrCcaCount, */                                                                                             \
+            /* 392 - TxErrCcaCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 392 - TxErrAbortCount, */                                                                                           \
+            /* 396 - TxErrAbortCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 396 - TxErrBusyChannelCount, */                                                                                     \
+            /* 400 - TxErrBusyChannelCount, */                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 400 - RxTotalCount, */                                                                                              \
+            /* 404 - RxTotalCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 404 - RxUnicastCount, */                                                                                            \
+            /* 408 - RxUnicastCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 408 - RxBroadcastCount, */                                                                                          \
+            /* 412 - RxBroadcastCount, */                                                                                          \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 412 - RxDataCount, */                                                                                               \
+            /* 416 - RxDataCount, */                                                                                               \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 416 - RxDataPollCount, */                                                                                           \
+            /* 420 - RxDataPollCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 420 - RxBeaconCount, */                                                                                             \
+            /* 424 - RxBeaconCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 424 - RxBeaconRequestCount, */                                                                                      \
+            /* 428 - RxBeaconRequestCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 428 - RxOtherCount, */                                                                                              \
+            /* 432 - RxOtherCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 432 - RxAddressFilteredCount, */                                                                                    \
+            /* 436 - RxAddressFilteredCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 436 - RxDestAddrFilteredCount, */                                                                                   \
+            /* 440 - RxDestAddrFilteredCount, */                                                                                   \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 440 - RxDuplicatedCount, */                                                                                         \
+            /* 444 - RxDuplicatedCount, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 444 - RxErrNoFrameCount, */                                                                                         \
+            /* 448 - RxErrNoFrameCount, */                                                                                         \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 448 - RxErrUnknownNeighborCount, */                                                                                 \
+            /* 452 - RxErrUnknownNeighborCount, */                                                                                 \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 452 - RxErrInvalidSrcAddrCount, */                                                                                  \
+            /* 456 - RxErrInvalidSrcAddrCount, */                                                                                  \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 456 - RxErrSecCount, */                                                                                             \
+            /* 460 - RxErrSecCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 460 - RxErrFcsCount, */                                                                                             \
+            /* 464 - RxErrFcsCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 464 - RxErrOtherCount, */                                                                                           \
+            /* 468 - RxErrOtherCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 468 - ActiveTimestamp, */                                                                                           \
+            /* 472 - ActiveTimestamp, */                                                                                           \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 476 - PendingTimestamp, */                                                                                          \
+            /* 480 - PendingTimestamp, */                                                                                          \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 484 - delay, */                                                                                                     \
+            /* 488 - delay, */                                                                                                     \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 488 - ChannelMask, */                                                                                               \
+            /* 492 - ChannelMask, */                                                                                               \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server), little-endian */                                           \
                                                                                                                                    \
-            /* 495 - BeaconLostCount, */                                                                                           \
+            /* 499 - BeaconLostCount, */                                                                                           \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 499 - BeaconRxCount, */                                                                                             \
+            /* 503 - BeaconRxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 503 - PacketMulticastRxCount, */                                                                                    \
+            /* 507 - PacketMulticastRxCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 507 - PacketMulticastTxCount, */                                                                                    \
+            /* 511 - PacketMulticastTxCount, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 511 - PacketUnicastRxCount, */                                                                                      \
+            /* 515 - PacketUnicastRxCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 515 - PacketUnicastTxCount, */                                                                                      \
+            /* 519 - PacketUnicastTxCount, */                                                                                      \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 519 - CurrentMaxRate, */                                                                                            \
+            /* 523 - CurrentMaxRate, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 527 - OverrunCount, */                                                                                              \
+            /* 531 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 535 - FeatureMap, */                                                                                                \
+            /* 539 - FeatureMap, */                                                                                                \
             0x03, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server), little-endian */                                       \
                                                                                                                                    \
-            /* 539 - PacketRxCount, */                                                                                             \
+            /* 543 - PacketRxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 547 - PacketTxCount, */                                                                                             \
+            /* 551 - PacketTxCount, */                                                                                             \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 555 - TxErrCount, */                                                                                                \
+            /* 559 - TxErrCount, */                                                                                                \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 563 - CollisionCount, */                                                                                            \
+            /* 567 - CollisionCount, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 571 - OverrunCount, */                                                                                              \
+            /* 575 - OverrunCount, */                                                                                              \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 579 - TimeSinceReset, */                                                                                            \
+            /* 583 - TimeSinceReset, */                                                                                            \
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,                                                                        \
                                                                                                                                    \
-            /* 587 - FeatureMap, */                                                                                                \
+            /* 591 - FeatureMap, */                                                                                                \
             0x03, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Pump Configuration and Control (server), little-endian */                                     \
                                                                                                                                    \
-            /* 591 - LifetimeRunningHours, */                                                                                      \
+            /* 595 - LifetimeRunningHours, */                                                                                      \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 594 - Power, */                                                                                                     \
+            /* 598 - Power, */                                                                                                     \
             0x00, 0x00, 0x00,                                                                                                      \
                                                                                                                                    \
-            /* 597 - LifetimeEnergyConsumed, */                                                                                    \
+            /* 601 - LifetimeEnergyConsumed, */                                                                                    \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
                                                                                                                                    \
-            /* 601 - FeatureMap, */                                                                                                \
+            /* 605 - FeatureMap, */                                                                                                \
             0x00, 0x00, 0x00, 0x00,                                                                                                \
     }
 
 #endif // BIGENDIAN_CPU
 
-#define GENERATED_DEFAULTS_COUNT (72)
+#define GENERATED_DEFAULTS_COUNT (73)
 
 #define ZAP_TYPE(type) ZCL_##type##_ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index)                                                                                             \
     {                                                                                                                              \
-        (uint8_t *) (&generatedDefaults[index])                                                                                    \
+        &generatedDefaults[index]                                                                                                  \
     }
 #define ZAP_MIN_MAX_DEFAULTS_INDEX(index)                                                                                          \
     {                                                                                                                              \
-        (uint8_t *) (&minMaxDefault[index])                                                                                        \
+        &minMaxDefaults[index]                                                                                                     \
     }
 #define ZAP_EMPTY_DEFAULT()                                                                                                        \
     {                                                                                                                              \
@@ -550,14 +556,20 @@
     }
 
 // This is an array of EmberAfAttributeMinMaxValue structures.
-#define GENERATED_MIN_MAX_DEFAULT_COUNT 0
+#define GENERATED_MIN_MAX_DEFAULT_COUNT 2
 #define GENERATED_MIN_MAX_DEFAULTS                                                                                                 \
     {                                                                                                                              \
+                                                                                                                                   \
+        /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                        \
+        { (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFE }, /* OperationMode */                                                   \
+        {                                                                                                                          \
+            (uint16_t) 0x0, (uint16_t) 0x0, (uint16_t) 0xFE                                                                        \
+        } /* ControlMode */                                                                                                        \
     }
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 184
+#define GENERATED_ATTRIBUTE_COUNT 185
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
                                                                                                                                    \
@@ -586,18 +598,19 @@
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Commissioning (server) */                                                             \
             { 0x0000, ZAP_TYPE(INT64U), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(4) }, /* Breadcrumb */            \
-            { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(12) }, /* BasicCommissioningInfoList */                     \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },   /* ClusterRevision */                                \
+            { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(12) },   /* BasicCommissioningInfoList */                   \
+            { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(266) }, /* FeatureMap */                                   \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                             \
-            { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(266) }, /* FeatureMap */                                   \
+            { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(270) }, /* FeatureMap */                                   \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: General Diagnostics (server) */                                                               \
             { 0x0000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* NetworkInterfaces */     \
             { 0x0001, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                            /* RebootCount */           \
-            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(270) },                          /* UpTime */                \
-            { 0x0003, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(278) },                          /* TotalOperationalHours */ \
+            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(274) },                          /* UpTime */                \
+            { 0x0003, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(282) },                          /* TotalOperationalHours */ \
             { 0x0004, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* BootReasons */           \
             { 0x0005, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ActiveHardwareFaults */  \
             { 0x0006, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ActiveRadioFaults */     \
@@ -606,23 +619,23 @@
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                              \
             { 0x0000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* ThreadMetrics */         \
-            { 0x0001, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(282) },                          /* CurrentHeapFree */       \
-            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(290) },                          /* CurrentHeapUsed */       \
-            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(298) },   /* CurrentHeapHighWatermark */                     \
-            { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(306) }, /* FeatureMap */                                   \
+            { 0x0001, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(286) },                          /* CurrentHeapFree */       \
+            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(294) },                          /* CurrentHeapUsed */       \
+            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(302) },   /* CurrentHeapHighWatermark */                     \
+            { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(310) }, /* FeatureMap */                                   \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                        \
-            { 0x0000, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* channel */               \
+            { 0x0000, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },                                   /* channel */               \
             { 0x0001, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* RoutingRole */           \
-            { 0x0002, ZAP_TYPE(OCTET_STRING), 17, 0, ZAP_LONG_DEFAULTS_INDEX(310) },                   /* NetworkName */           \
+            { 0x0002, ZAP_TYPE(OCTET_STRING), 17, 0, ZAP_LONG_DEFAULTS_INDEX(314) },                   /* NetworkName */           \
             { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },                            /* PanId */                 \
-            { 0x0004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(312) },                          /* ExtendedPanId */         \
+            { 0x0004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(316) },                          /* ExtendedPanId */         \
             { 0x0005, ZAP_TYPE(OCTET_STRING), 18, 0, ZAP_EMPTY_DEFAULT() },                            /* MeshLocalPrefix */       \
-            { 0x0006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(320) },                          /* OverrunCount */          \
+            { 0x0006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(324) },                          /* OverrunCount */          \
             { 0x0007, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* NeighborTableList */     \
             { 0x0008, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* RouteTableList */        \
-            { 0x0009, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(328) },                          /* PartitionId */           \
+            { 0x0009, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(332) },                          /* PartitionId */           \
             { 0x000A, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* weighting */             \
             { 0x000B, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* DataVersion */           \
             { 0x000C, ZAP_TYPE(INT8U), 1, 0, ZAP_EMPTY_DEFAULT() },                                    /* StableDataVersion */     \
@@ -635,45 +648,45 @@
             { 0x0013, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },   /* PartitionIdChangeCount */                         \
             { 0x0014, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },   /* BetterPartitionAttachAttemptCount */              \
             { 0x0015, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },   /* ParentChangeCount */                              \
-            { 0x0016, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(332) }, /* TxTotalCount */                                   \
-            { 0x0017, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(336) }, /* TxUnicastCount */                                 \
-            { 0x0018, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(340) }, /* TxBroadcastCount */                               \
-            { 0x0019, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(344) }, /* TxAckRequestedCount */                            \
-            { 0x001A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(348) }, /* TxAckedCount */                                   \
-            { 0x001B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(352) }, /* TxNoAckRequestedCount */                          \
-            { 0x001C, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(356) }, /* TxDataCount */                                    \
-            { 0x001D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(360) }, /* TxDataPollCount */                                \
-            { 0x001E, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(364) }, /* TxBeaconCount */                                  \
-            { 0x001F, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(368) }, /* TxBeaconRequestCount */                           \
-            { 0x0020, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(372) }, /* TxOtherCount */                                   \
-            { 0x0021, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(376) }, /* TxRetryCount */                                   \
-            { 0x0022, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(380) }, /* TxDirectMaxRetryExpiryCount */                    \
-            { 0x0023, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(384) }, /* TxIndirectMaxRetryExpiryCount */                  \
-            { 0x0024, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(388) }, /* TxErrCcaCount */                                  \
-            { 0x0025, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(392) }, /* TxErrAbortCount */                                \
-            { 0x0026, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(396) }, /* TxErrBusyChannelCount */                          \
-            { 0x0027, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(400) }, /* RxTotalCount */                                   \
-            { 0x0028, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(404) }, /* RxUnicastCount */                                 \
-            { 0x0029, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(408) }, /* RxBroadcastCount */                               \
-            { 0x002A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(412) }, /* RxDataCount */                                    \
-            { 0x002B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(416) }, /* RxDataPollCount */                                \
-            { 0x002C, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(420) }, /* RxBeaconCount */                                  \
-            { 0x002D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(424) }, /* RxBeaconRequestCount */                           \
-            { 0x002E, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(428) }, /* RxOtherCount */                                   \
-            { 0x002F, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(432) }, /* RxAddressFilteredCount */                         \
-            { 0x0030, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(436) }, /* RxDestAddrFilteredCount */                        \
-            { 0x0031, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(440) }, /* RxDuplicatedCount */                              \
-            { 0x0032, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(444) }, /* RxErrNoFrameCount */                              \
-            { 0x0033, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(448) }, /* RxErrUnknownNeighborCount */                      \
-            { 0x0034, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(452) }, /* RxErrInvalidSrcAddrCount */                       \
-            { 0x0035, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(456) }, /* RxErrSecCount */                                  \
-            { 0x0036, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(460) }, /* RxErrFcsCount */                                  \
-            { 0x0037, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(464) }, /* RxErrOtherCount */                                \
-            { 0x0038, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(468) }, /* ActiveTimestamp */                                \
-            { 0x0039, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(476) }, /* PendingTimestamp */                               \
-            { 0x003A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(484) }, /* delay */                                          \
+            { 0x0016, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(336) }, /* TxTotalCount */                                   \
+            { 0x0017, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(340) }, /* TxUnicastCount */                                 \
+            { 0x0018, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(344) }, /* TxBroadcastCount */                               \
+            { 0x0019, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(348) }, /* TxAckRequestedCount */                            \
+            { 0x001A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(352) }, /* TxAckedCount */                                   \
+            { 0x001B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(356) }, /* TxNoAckRequestedCount */                          \
+            { 0x001C, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(360) }, /* TxDataCount */                                    \
+            { 0x001D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(364) }, /* TxDataPollCount */                                \
+            { 0x001E, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(368) }, /* TxBeaconCount */                                  \
+            { 0x001F, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(372) }, /* TxBeaconRequestCount */                           \
+            { 0x0020, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(376) }, /* TxOtherCount */                                   \
+            { 0x0021, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(380) }, /* TxRetryCount */                                   \
+            { 0x0022, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(384) }, /* TxDirectMaxRetryExpiryCount */                    \
+            { 0x0023, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(388) }, /* TxIndirectMaxRetryExpiryCount */                  \
+            { 0x0024, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(392) }, /* TxErrCcaCount */                                  \
+            { 0x0025, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(396) }, /* TxErrAbortCount */                                \
+            { 0x0026, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(400) }, /* TxErrBusyChannelCount */                          \
+            { 0x0027, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(404) }, /* RxTotalCount */                                   \
+            { 0x0028, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(408) }, /* RxUnicastCount */                                 \
+            { 0x0029, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(412) }, /* RxBroadcastCount */                               \
+            { 0x002A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(416) }, /* RxDataCount */                                    \
+            { 0x002B, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(420) }, /* RxDataPollCount */                                \
+            { 0x002C, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(424) }, /* RxBeaconCount */                                  \
+            { 0x002D, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(428) }, /* RxBeaconRequestCount */                           \
+            { 0x002E, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(432) }, /* RxOtherCount */                                   \
+            { 0x002F, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(436) }, /* RxAddressFilteredCount */                         \
+            { 0x0030, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(440) }, /* RxDestAddrFilteredCount */                        \
+            { 0x0031, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(444) }, /* RxDuplicatedCount */                              \
+            { 0x0032, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(448) }, /* RxErrNoFrameCount */                              \
+            { 0x0033, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(452) }, /* RxErrUnknownNeighborCount */                      \
+            { 0x0034, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(456) }, /* RxErrInvalidSrcAddrCount */                       \
+            { 0x0035, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(460) }, /* RxErrSecCount */                                  \
+            { 0x0036, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(464) }, /* RxErrFcsCount */                                  \
+            { 0x0037, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(468) }, /* RxErrOtherCount */                                \
+            { 0x0038, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(472) }, /* ActiveTimestamp */                                \
+            { 0x0039, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(480) }, /* PendingTimestamp */                               \
+            { 0x003A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(488) }, /* delay */                                          \
             { 0x003B, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE), ZAP_EMPTY_DEFAULT() }, /* SecurityPolicy */        \
-            { 0x003C, ZAP_TYPE(OCTET_STRING), 5, 0, ZAP_LONG_DEFAULTS_INDEX(488) },                    /* ChannelMask */           \
+            { 0x003C, ZAP_TYPE(OCTET_STRING), 5, 0, ZAP_LONG_DEFAULTS_INDEX(492) },                    /* ChannelMask */           \
             { 0x003D, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                    \
               ZAP_EMPTY_DEFAULT() }, /* OperationalDatasetComponents */                                                            \
             { 0x003E, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                    \
@@ -686,28 +699,28 @@
             { 0x0002, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },             /* WiFiVersion */                                  \
             { 0x0003, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0000) },     /* ChannelNumber */                                \
             { 0x0004, ZAP_TYPE(INT8S), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },        /* Rssi */                                         \
-            { 0x0005, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(495) },   /* BeaconLostCount */                              \
-            { 0x0006, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(499) },   /* BeaconRxCount */                                \
-            { 0x0007, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(503) },   /* PacketMulticastRxCount */                       \
-            { 0x0008, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(507) },   /* PacketMulticastTxCount */                       \
-            { 0x0009, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(511) },   /* PacketUnicastRxCount */                         \
-            { 0x000A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(515) },   /* PacketUnicastTxCount */                         \
-            { 0x000B, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(519) },   /* CurrentMaxRate */                               \
-            { 0x000C, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(527) },   /* OverrunCount */                                 \
-            { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(535) }, /* FeatureMap */                                   \
+            { 0x0005, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(499) },   /* BeaconLostCount */                              \
+            { 0x0006, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(503) },   /* BeaconRxCount */                                \
+            { 0x0007, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(507) },   /* PacketMulticastRxCount */                       \
+            { 0x0008, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(511) },   /* PacketMulticastTxCount */                       \
+            { 0x0009, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(515) },   /* PacketUnicastRxCount */                         \
+            { 0x000A, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(519) },   /* PacketUnicastTxCount */                         \
+            { 0x000B, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(523) },   /* CurrentMaxRate */                               \
+            { 0x000C, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(531) },   /* OverrunCount */                                 \
+            { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(539) }, /* FeatureMap */                                   \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                      \
             { 0x0000, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },             /* PHYRate */                                      \
             { 0x0001, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* FullDuplex */                                   \
-            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(539) },   /* PacketRxCount */                                \
-            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(547) },   /* PacketTxCount */                                \
-            { 0x0004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(555) },   /* TxErrCount */                                   \
-            { 0x0005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(563) },   /* CollisionCount */                               \
-            { 0x0006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(571) },   /* OverrunCount */                                 \
+            { 0x0002, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(543) },   /* PacketRxCount */                                \
+            { 0x0003, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(551) },   /* PacketTxCount */                                \
+            { 0x0004, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(559) },   /* TxErrCount */                                   \
+            { 0x0005, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(567) },   /* CollisionCount */                               \
+            { 0x0006, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(575) },   /* OverrunCount */                                 \
             { 0x0007, ZAP_TYPE(BOOLEAN), 1, 0, ZAP_SIMPLE_DEFAULT(0x00) },      /* CarrierDetect */                                \
-            { 0x0008, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(579) },   /* TimeSinceReset */                               \
-            { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(587) }, /* FeatureMap */                                   \
+            { 0x0008, ZAP_TYPE(INT64U), 8, 0, ZAP_LONG_DEFAULTS_INDEX(583) },   /* TimeSinceReset */                               \
+            { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(591) }, /* FeatureMap */                                   \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                        \
@@ -757,15 +770,18 @@
             { 0x0012, ZAP_TYPE(ENUM8), 1, 0, ZAP_EMPTY_DEFAULT() },    /* EffectiveControlMode */                                  \
             { 0x0013, ZAP_TYPE(INT16S), 2, 0, ZAP_EMPTY_DEFAULT() },   /* Capacity */                                              \
             { 0x0014, ZAP_TYPE(INT16U), 2, 0, ZAP_EMPTY_DEFAULT() },   /* Speed */                                                 \
-            { 0x0015, ZAP_TYPE(INT24U), 3, ZAP_ATTRIBUTE_MASK(WRITABLE),                                                           \
-              ZAP_LONG_DEFAULTS_INDEX(591) }, /* LifetimeRunningHours */                                                           \
-            { 0x0016, ZAP_TYPE(INT24U), 3, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_LONG_DEFAULTS_INDEX(594) }, /* Power */               \
-            { 0x0017, ZAP_TYPE(INT32U), 4, 0, ZAP_LONG_DEFAULTS_INDEX(597) },                       /* LifetimeEnergyConsumed */   \
-            { 0x0020, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x00) }, /* OperationMode */            \
-            { 0x0021, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(WRITABLE), ZAP_SIMPLE_DEFAULT(0x00) }, /* ControlMode */              \
-            { 0x0022, ZAP_TYPE(BITMAP16), 2, 0, ZAP_EMPTY_DEFAULT() },                              /* AlarmMask */                \
-            { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(601) },                     /* FeatureMap */               \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },                         /* ClusterRevision */          \
+            { 0x0015, ZAP_TYPE(INT24U), 3, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                            \
+              ZAP_LONG_DEFAULTS_INDEX(595) },                                 /* LifetimeRunningHours */                           \
+            { 0x0016, ZAP_TYPE(INT24U), 3, 0, ZAP_LONG_DEFAULTS_INDEX(598) }, /* Power */                                          \
+            { 0x0017, ZAP_TYPE(INT32U), 4, ZAP_ATTRIBUTE_MASK(WRITABLE) | ZAP_ATTRIBUTE_MASK(NULLABLE),                            \
+              ZAP_LONG_DEFAULTS_INDEX(601) }, /* LifetimeEnergyConsumed */                                                         \
+            { 0x0020, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                              \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(0) }, /* OperationMode */                                                                 \
+            { 0x0021, ZAP_TYPE(ENUM8), 1, ZAP_ATTRIBUTE_MASK(MIN_MAX) | ZAP_ATTRIBUTE_MASK(WRITABLE),                              \
+              ZAP_MIN_MAX_DEFAULTS_INDEX(1) },                                  /* ControlMode */                                  \
+            { 0x0022, ZAP_TYPE(BITMAP16), 2, 0, ZAP_EMPTY_DEFAULT() },          /* AlarmMask */                                    \
+            { 0xFFFC, ZAP_TYPE(BITMAP32), 4, 0, ZAP_LONG_DEFAULTS_INDEX(605) }, /* FeatureMap */                                   \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) },     /* ClusterRevision */                              \
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                           \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(3) }, /* ClusterRevision */              \
@@ -826,75 +842,75 @@
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayBasicServer }, /* Endpoint: 0, Cluster: Basic (server) */                                               \
             {                                                                                                                      \
-                0x0030, ZAP_ATTRIBUTE_INDEX(17), 3, 264, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+                0x0030, ZAP_ATTRIBUTE_INDEX(17), 4, 268, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
             {                                                                                                                      \
-                0x0031, ZAP_ATTRIBUTE_INDEX(20), 2, 6, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x0031, ZAP_ATTRIBUTE_INDEX(21), 2, 6, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                          \
             {                                                                                                                      \
-                0x0032, ZAP_ATTRIBUTE_INDEX(22), 0, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x0032, ZAP_ATTRIBUTE_INDEX(23), 0, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 0, Cluster: Diagnostic Logs (server) */                                                                \
             {                                                                                                                      \
-                0x0033, ZAP_ATTRIBUTE_INDEX(22), 9, 17, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0033, ZAP_ATTRIBUTE_INDEX(23), 9, 17, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: General Diagnostics (server) */                                                            \
             {                                                                                                                      \
-                0x0034, ZAP_ATTRIBUTE_INDEX(31), 6, 30, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0034, ZAP_ATTRIBUTE_INDEX(32), 6, 30, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                           \
             {                                                                                                                      \
-                0x0035, ZAP_ATTRIBUTE_INDEX(37), 64, 242, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+                0x0035, ZAP_ATTRIBUTE_INDEX(38), 64, 243, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                     \
             {                                                                                                                      \
-                0x0036, ZAP_ATTRIBUTE_INDEX(101), 15, 58, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+                0x0036, ZAP_ATTRIBUTE_INDEX(102), 15, 58, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                       \
             {                                                                                                                      \
-                0x0037, ZAP_ATTRIBUTE_INDEX(116), 11, 57, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+                0x0037, ZAP_ATTRIBUTE_INDEX(117), 11, 57, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                   \
             {                                                                                                                      \
-                0x003C, ZAP_ATTRIBUTE_INDEX(127), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x003C, ZAP_ATTRIBUTE_INDEX(128), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                     \
             {                                                                                                                      \
-                0x003E, ZAP_ATTRIBUTE_INDEX(128), 6, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x003E, ZAP_ATTRIBUTE_INDEX(129), 6, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
             { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(134),                                                                                            \
+              ZAP_ATTRIBUTE_INDEX(135),                                                                                            \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayOnOffServer }, /* Endpoint: 1, Cluster: On/Off (server) */                                              \
             { 0x0008,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(136),                                                                                            \
+              ZAP_ATTRIBUTE_INDEX(137),                                                                                            \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayLevelControlServer }, /* Endpoint: 1, Cluster: Level Control (server) */                                \
             {                                                                                                                      \
-                0x001D, ZAP_ATTRIBUTE_INDEX(138), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x001D, ZAP_ATTRIBUTE_INDEX(139), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Descriptor (server) */                                                                     \
             {                                                                                                                      \
                 0x0200,                                                                                                            \
-                ZAP_ATTRIBUTE_INDEX(143),                                                                                          \
+                ZAP_ATTRIBUTE_INDEX(144),                                                                                          \
                 26,                                                                                                                \
                 54,                                                                                                                \
                 ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(ATTRIBUTE_CHANGED_FUNCTION),         \
                 chipFuncArrayPumpConfigurationAndControlServer                                                                     \
             }, /* Endpoint: 1, Cluster: Pump Configuration and Control (server) */                                                 \
             {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(169), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+                0x0402, ZAP_ATTRIBUTE_INDEX(170), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (client) */                                                        \
             {                                                                                                                      \
-                0x0402, ZAP_ATTRIBUTE_INDEX(170), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0402, ZAP_ATTRIBUTE_INDEX(171), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Temperature Measurement (server) */                                                        \
             {                                                                                                                      \
-                0x0403, ZAP_ATTRIBUTE_INDEX(174), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+                0x0403, ZAP_ATTRIBUTE_INDEX(175), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
             }, /* Endpoint: 1, Cluster: Pressure Measurement (client) */                                                           \
             {                                                                                                                      \
-                0x0403, ZAP_ATTRIBUTE_INDEX(175), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0403, ZAP_ATTRIBUTE_INDEX(176), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Pressure Measurement (server) */                                                           \
             {                                                                                                                      \
-                0x0404, ZAP_ATTRIBUTE_INDEX(179), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
+                0x0404, ZAP_ATTRIBUTE_INDEX(180), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
             }, /* Endpoint: 1, Cluster: Flow Measurement (client) */                                                               \
             {                                                                                                                      \
-                0x0404, ZAP_ATTRIBUTE_INDEX(180), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0404, ZAP_ATTRIBUTE_INDEX(181), 4, 8, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 1, Cluster: Flow Measurement (server) */                                                               \
     }
 
@@ -903,7 +919,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 12, 926 }, { ZAP_CLUSTER_INDEX(12), 10, 90 },                                                      \
+        { ZAP_CLUSTER_INDEX(0), 12, 931 }, { ZAP_CLUSTER_INDEX(12), 10, 90 },                                                      \
     }
 
 // Largest attribute size is needed for various buffers
@@ -913,7 +929,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (246)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (1016)
+#define ATTRIBUTE_MAX_SIZE (1021)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)

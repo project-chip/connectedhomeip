@@ -32,7 +32,7 @@
   "endpointTypes": [
     {
       "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "CHIP-All-Clusters-Server",
+      "deviceTypeName": "MA-all-clusters-app",
       "deviceTypeCode": 0,
       "deviceTypeProfileId": 259,
       "clusters": [
@@ -2659,6 +2659,21 @@
             }
           ],
           "attributes": [
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
             {
               "name": "ClusterRevision",
               "code": 65533,
@@ -11505,7 +11520,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "TestListStructArgumentRequest",
@@ -11529,7 +11544,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "TestListNestedStructListArgumentRequest",
@@ -11537,7 +11552,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
-              "outgoing": 0
+              "outgoing": 1
             },
             {
               "name": "TestListInt8UReverseRequest",
@@ -11558,6 +11573,14 @@
             {
               "name": "TestNullableOptionalRequest",
               "code": 15,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "SimpleStructEchoRequest",
+              "code": 17,
               "mfgCode": null,
               "source": "client",
               "incoming": 0,
@@ -11633,6 +11656,14 @@
             {
               "name": "BooleanResponse",
               "code": 8,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "SimpleStructResponse",
+              "code": 9,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,

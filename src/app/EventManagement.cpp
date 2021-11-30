@@ -610,20 +610,18 @@ CHIP_ERROR EventManagement::CopyEvent(const TLVReader & aReader, TLVWriter & aWr
 
 static bool IsInterestedEventPaths(EventLoadOutContext * eventLoadOutContext, const EventEnvelopeContext & event)
 {
-    ClusterInfo * interestedEventPaths = eventLoadOutContext->mpInterestedEventPaths;
     if (eventLoadOutContext->mCurrentEventNumber < eventLoadOutContext->mStartingEventNumber)
     {
         return false;
     }
-    while (interestedEventPaths != nullptr)
+    ConcreteEventPath path(event.mEndpointId, event.mClusterId, event.mEventId);
+    for (auto * interestedPath = eventLoadOutContext->mpInterestedEventPaths; interestedPath != nullptr;
+         interestedPath        = interestedPath->mpNext)
     {
-        // TODO: Support wildcard event path
-        if (interestedEventPaths->mNodeId == event.mNodeId && interestedEventPaths->mEndpointId == event.mEndpointId &&
-            interestedEventPaths->mClusterId == event.mClusterId && interestedEventPaths->mEventId == event.mEventId)
+        if (interestedPath->IsEventPathSupersetOf(path))
         {
             return true;
         }
-        interestedEventPaths = interestedEventPaths->mpNext;
     }
     return false;
 }

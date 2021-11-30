@@ -21,6 +21,8 @@
 #import "CHIPCommandPayloadsObjc.h"
 #import "CHIPStructsObjc.h"
 
+#include <lib/support/TypeTraits.h>
+
 void CHIPDefaultSuccessCallbackBridge::OnSuccessFn(void * context) { DispatchSuccess(context, nil); };
 
 void CHIPCommandSuccessCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::NullObjectType &)
@@ -231,7 +233,7 @@ void CHIPNullableInt64sAttributeCallbackBridge::OnSuccessFn(void * context, cons
 void CHIPVendorIdAttributeCallbackBridge::OnSuccessFn(void * context, chip::VendorId value)
 {
     NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedShort:value];
+    objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value)];
     DispatchSuccess(context, objCValue);
 };
 
@@ -242,7 +244,7 @@ void CHIPNullableVendorIdAttributeCallbackBridge::OnSuccessFn(
     if (value.IsNull()) {
         objCValue = nil;
     } else {
-        objCValue = [NSNumber numberWithUnsignedShort:value.Value()];
+        objCValue = [NSNumber numberWithUnsignedShort:chip::to_underlying(value.Value())];
     }
     DispatchSuccess(context, objCValue);
 };
@@ -278,7 +280,7 @@ void CHIPAudioOutputAudioOutputListListAttributeCallbackBridge::OnSuccessFn(void
         CHIPAudioOutputClusterAudioOutputInfo * newElement_0;
         newElement_0 = [CHIPAudioOutputClusterAudioOutputInfo new];
         newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
-        newElement_0.outputType = [NSNumber numberWithUnsignedChar:entry_0.outputType];
+        newElement_0.outputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.outputType)];
         newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                      length:entry_0.name.size()
                                                    encoding:NSUTF8StringEncoding];
@@ -306,10 +308,10 @@ void CHIPBridgedActionsActionListListAttributeCallbackBridge::OnSuccessFn(void *
         newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                      length:entry_0.name.size()
                                                    encoding:NSUTF8StringEncoding];
-        newElement_0.type = [NSNumber numberWithUnsignedChar:entry_0.type];
+        newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
         newElement_0.endpointListID = [NSNumber numberWithUnsignedShort:entry_0.endpointListID];
         newElement_0.supportedCommands = [NSNumber numberWithUnsignedShort:entry_0.supportedCommands];
-        newElement_0.status = [NSNumber numberWithUnsignedChar:entry_0.status];
+        newElement_0.status = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.status)];
         [array_0 addObject:newElement_0];
     }
     if (iter_0.GetStatus() != CHIP_NO_ERROR) {
@@ -335,7 +337,7 @@ void CHIPBridgedActionsEndpointListListAttributeCallbackBridge::OnSuccessFn(void
         newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                      length:entry_0.name.size()
                                                    encoding:NSUTF8StringEncoding];
-        newElement_0.type = [NSNumber numberWithUnsignedChar:entry_0.type];
+        newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
         auto * array_NaN = [NSMutableArray new];
         auto iter_NaN = entry_0.endpoints.begin();
         while (iter_NaN.Next()) {
@@ -386,7 +388,7 @@ void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge::OnSu
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
         NSNumber * newElement_0;
-        newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
         [array_0 addObject:newElement_0];
     }
     if (iter_0.GetStatus() != CHIP_NO_ERROR) {
@@ -545,7 +547,7 @@ void CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge::OnSucce
         newElement_0.offPremiseServicesReachableIPv4 = [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv4];
         newElement_0.offPremiseServicesReachableIPv6 = [NSNumber numberWithBool:entry_0.offPremiseServicesReachableIPv6];
         newElement_0.hardwareAddress = [NSData dataWithBytes:entry_0.hardwareAddress.data() length:entry_0.hardwareAddress.size()];
-        newElement_0.type = [NSNumber numberWithUnsignedChar:entry_0.type];
+        newElement_0.type = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.type)];
         [array_0 addObject:newElement_0];
     }
     if (iter_0.GetStatus() != CHIP_NO_ERROR) {
@@ -653,7 +655,7 @@ void CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge::OnSuccessFn(voi
         newElement_0.groupKeyIndex = [NSNumber numberWithUnsignedShort:entry_0.groupKeyIndex];
         newElement_0.groupKeyRoot = [NSData dataWithBytes:entry_0.groupKeyRoot.data() length:entry_0.groupKeyRoot.size()];
         newElement_0.groupKeyEpochStartTime = [NSNumber numberWithUnsignedLongLong:entry_0.groupKeyEpochStartTime];
-        newElement_0.groupKeySecurityPolicy = [NSNumber numberWithUnsignedChar:entry_0.groupKeySecurityPolicy];
+        newElement_0.groupKeySecurityPolicy = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.groupKeySecurityPolicy)];
         [array_0 addObject:newElement_0];
     }
     if (iter_0.GetStatus() != CHIP_NO_ERROR) {
@@ -675,7 +677,7 @@ void CHIPMediaInputMediaInputListListAttributeCallbackBridge::OnSuccessFn(void *
         CHIPMediaInputClusterMediaInputInfo * newElement_0;
         newElement_0 = [CHIPMediaInputClusterMediaInputInfo new];
         newElement_0.index = [NSNumber numberWithUnsignedChar:entry_0.index];
-        newElement_0.inputType = [NSNumber numberWithUnsignedChar:entry_0.inputType];
+        newElement_0.inputType = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.inputType)];
         newElement_0.name = [[NSString alloc] initWithBytes:entry_0.name.data()
                                                      length:entry_0.name.size()
                                                    encoding:NSUTF8StringEncoding];
@@ -995,25 +997,29 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
             newElement_0.nullableStruct = [CHIPTestClusterClusterSimpleStruct new];
             newElement_0.nullableStruct.a = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().a];
             newElement_0.nullableStruct.b = [NSNumber numberWithBool:entry_0.nullableStruct.Value().b];
-            newElement_0.nullableStruct.c = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().c];
+            newElement_0.nullableStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableStruct.Value().c)];
             newElement_0.nullableStruct.d = [NSData dataWithBytes:entry_0.nullableStruct.Value().d.data()
                                                            length:entry_0.nullableStruct.Value().d.size()];
             newElement_0.nullableStruct.e = [[NSString alloc] initWithBytes:entry_0.nullableStruct.Value().e.data()
                                                                      length:entry_0.nullableStruct.Value().e.size()
                                                                    encoding:NSUTF8StringEncoding];
             newElement_0.nullableStruct.f = [NSNumber numberWithUnsignedChar:entry_0.nullableStruct.Value().f.Raw()];
+            newElement_0.nullableStruct.g = [NSNumber numberWithFloat:entry_0.nullableStruct.Value().g];
+            newElement_0.nullableStruct.h = [NSNumber numberWithDouble:entry_0.nullableStruct.Value().h];
         }
         if (entry_0.optionalStruct.HasValue()) {
             newElement_0.optionalStruct = [CHIPTestClusterClusterSimpleStruct new];
             newElement_0.optionalStruct.a = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().a];
             newElement_0.optionalStruct.b = [NSNumber numberWithBool:entry_0.optionalStruct.Value().b];
-            newElement_0.optionalStruct.c = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().c];
+            newElement_0.optionalStruct.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.optionalStruct.Value().c)];
             newElement_0.optionalStruct.d = [NSData dataWithBytes:entry_0.optionalStruct.Value().d.data()
                                                            length:entry_0.optionalStruct.Value().d.size()];
             newElement_0.optionalStruct.e = [[NSString alloc] initWithBytes:entry_0.optionalStruct.Value().e.data()
                                                                      length:entry_0.optionalStruct.Value().e.size()
                                                                    encoding:NSUTF8StringEncoding];
             newElement_0.optionalStruct.f = [NSNumber numberWithUnsignedChar:entry_0.optionalStruct.Value().f.Raw()];
+            newElement_0.optionalStruct.g = [NSNumber numberWithFloat:entry_0.optionalStruct.Value().g];
+            newElement_0.optionalStruct.h = [NSNumber numberWithDouble:entry_0.optionalStruct.Value().h];
         } else {
             newElement_0.optionalStruct = nil;
         }
@@ -1026,7 +1032,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
                     [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().a];
                 newElement_0.nullableOptionalStruct.b = [NSNumber numberWithBool:entry_0.nullableOptionalStruct.Value().Value().b];
                 newElement_0.nullableOptionalStruct.c =
-                    [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().c];
+                    [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.nullableOptionalStruct.Value().Value().c)];
                 newElement_0.nullableOptionalStruct.d =
                     [NSData dataWithBytes:entry_0.nullableOptionalStruct.Value().Value().d.data()
                                    length:entry_0.nullableOptionalStruct.Value().Value().d.size()];
@@ -1036,6 +1042,9 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
                                            encoding:NSUTF8StringEncoding];
                 newElement_0.nullableOptionalStruct.f =
                     [NSNumber numberWithUnsignedChar:entry_0.nullableOptionalStruct.Value().Value().f.Raw()];
+                newElement_0.nullableOptionalStruct.g = [NSNumber numberWithFloat:entry_0.nullableOptionalStruct.Value().Value().g];
+                newElement_0.nullableOptionalStruct.h =
+                    [NSNumber numberWithDouble:entry_0.nullableOptionalStruct.Value().Value().h];
             }
         } else {
             newElement_0.nullableOptionalStruct = nil;
@@ -1048,7 +1057,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
             while (iter_NaN.Next()) {
                 auto & entry_NaN = iter_NaN.GetValue();
                 NSNumber * newElement_NaN;
-                newElement_NaN = [NSNumber numberWithUnsignedChar:entry_NaN];
+                newElement_NaN = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_NaN)];
                 [array_NaN addObject:newElement_NaN];
             }
             if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
@@ -1061,7 +1070,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
             while (iter_NaN.Next()) {
                 auto & entry_NaN = iter_NaN.GetValue();
                 NSNumber * newElement_NaN;
-                newElement_NaN = [NSNumber numberWithUnsignedChar:entry_NaN];
+                newElement_NaN = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_NaN)];
                 [array_NaN addObject:newElement_NaN];
             }
             if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
@@ -1079,7 +1088,7 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
                 while (iter_NaN.Next()) {
                     auto & entry_NaN = iter_NaN.GetValue();
                     NSNumber * newElement_NaN;
-                    newElement_NaN = [NSNumber numberWithUnsignedChar:entry_NaN];
+                    newElement_NaN = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_NaN)];
                     [array_NaN addObject:newElement_NaN];
                 }
                 if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
@@ -1230,7 +1239,7 @@ void CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBri
     while (iter_0.Next()) {
         auto & entry_0 = iter_0.GetValue();
         NSNumber * newElement_0;
-        newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
         [array_0 addObject:newElement_0];
     }
     if (iter_0.GetStatus() != CHIP_NO_ERROR) {
@@ -1259,7 +1268,7 @@ void CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPApplicationLauncherClusterLaunchAppResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
         response.status = value;
     }
     {
@@ -1281,7 +1290,7 @@ void CHIPContentLauncherClusterLaunchContentResponseCallbackBridge::OnSuccessFn(
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.contentLaunchStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
         response.contentLaunchStatus = value;
     }
     DispatchSuccess(context, response);
@@ -1298,7 +1307,7 @@ void CHIPContentLauncherClusterLaunchURLResponseCallbackBridge::OnSuccessFn(
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.contentLaunchStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
         response.contentLaunchStatus = value;
     }
     DispatchSuccess(context, response);
@@ -1310,7 +1319,7 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPDiagnosticLogsClusterRetrieveLogsResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
         response.status = value;
     }
     {
@@ -1500,12 +1509,12 @@ void CHIPDoorLockClusterGetPinResponseCallbackBridge::OnSuccessFn(
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.userStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus)];
         response.userStatus = value;
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.userType];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType)];
         response.userType = value;
     }
     {
@@ -1527,12 +1536,12 @@ void CHIPDoorLockClusterGetRfidResponseCallbackBridge::OnSuccessFn(
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.userStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus)];
         response.userStatus = value;
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.userType];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType)];
         response.userType = value;
     }
     {
@@ -1554,7 +1563,7 @@ void CHIPDoorLockClusterGetUserTypeResponseCallbackBridge::OnSuccessFn(
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.userType];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType)];
         response.userType = value;
     }
     DispatchSuccess(context, response);
@@ -1669,7 +1678,7 @@ void CHIPDoorLockClusterSetPinResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPDoorLockClusterSetPinResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
         response.status = value;
     }
     DispatchSuccess(context, response);
@@ -1681,7 +1690,7 @@ void CHIPDoorLockClusterSetRfidResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPDoorLockClusterSetRfidResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
         response.status = value;
     }
     DispatchSuccess(context, response);
@@ -1753,7 +1762,7 @@ void CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge::OnSuccess
     auto * response = [CHIPGeneralCommissioningClusterArmFailSafeResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.errorCode];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
         response.errorCode = value;
     }
     {
@@ -1770,7 +1779,7 @@ void CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge:
     auto * response = [CHIPGeneralCommissioningClusterCommissioningCompleteResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.errorCode];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
         response.errorCode = value;
     }
     {
@@ -1787,7 +1796,7 @@ void CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge::O
     auto * response = [CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.errorCode];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorCode)];
         response.errorCode = value;
     }
     {
@@ -1901,7 +1910,7 @@ void CHIPKeypadInputClusterSendKeyResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPKeypadInputClusterSendKeyResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
         response.status = value;
     }
     DispatchSuccess(context, response);
@@ -1913,7 +1922,7 @@ void CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackBridge::OnSuccessFn
     auto * response = [CHIPMediaPlaybackClusterMediaFastForwardResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
         response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
@@ -1925,7 +1934,7 @@ void CHIPMediaPlaybackClusterMediaNextResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPMediaPlaybackClusterMediaNextResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
         response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
@@ -1937,7 +1946,7 @@ void CHIPMediaPlaybackClusterMediaPauseResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPMediaPlaybackClusterMediaPauseResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
         response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
@@ -1949,7 +1958,7 @@ void CHIPMediaPlaybackClusterMediaPlayResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPMediaPlaybackClusterMediaPlayResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
         response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
@@ -1961,7 +1970,7 @@ void CHIPMediaPlaybackClusterMediaPreviousResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPMediaPlaybackClusterMediaPreviousResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
         response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
@@ -1973,7 +1982,7 @@ void CHIPMediaPlaybackClusterMediaRewindResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPMediaPlaybackClusterMediaRewindResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
         response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
@@ -1985,7 +1994,7 @@ void CHIPMediaPlaybackClusterMediaSeekResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPMediaPlaybackClusterMediaSeekResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
         response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
@@ -1997,7 +2006,7 @@ void CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackBridge::OnSuccessF
     auto * response = [CHIPMediaPlaybackClusterMediaSkipBackwardResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
         response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
@@ -2009,7 +2018,7 @@ void CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackBridge::OnSuccessFn
     auto * response = [CHIPMediaPlaybackClusterMediaSkipForwardResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
         response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
@@ -2021,7 +2030,7 @@ void CHIPMediaPlaybackClusterMediaStartOverResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPMediaPlaybackClusterMediaStartOverResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
         response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
@@ -2033,7 +2042,7 @@ void CHIPMediaPlaybackClusterMediaStopResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPMediaPlaybackClusterMediaStopResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.mediaPlaybackStatus];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.mediaPlaybackStatus)];
         response.mediaPlaybackStatus = value;
     }
     DispatchSuccess(context, response);
@@ -2222,7 +2231,7 @@ void CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge::OnSu
     auto * response = [CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.action];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.action)];
         response.action = value;
     }
     {
@@ -2239,7 +2248,7 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge::OnSuc
     auto * response = [CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
         response.status = value;
     }
     {
@@ -2593,7 +2602,7 @@ void CHIPTvChannelClusterChangeChannelResponseCallbackBridge::OnSuccessFn(
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.errorType];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.errorType)];
         response.errorType = value;
     }
     DispatchSuccess(context, response);
@@ -2605,7 +2614,7 @@ void CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge::OnSuccessFn
     auto * response = [CHIPTargetNavigatorClusterNavigateTargetResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
         response.status = value;
     }
     {
@@ -2628,6 +2637,26 @@ void CHIPTestClusterClusterBooleanResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
+void CHIPTestClusterClusterSimpleStructResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & data)
+{
+    auto * response = [CHIPTestClusterClusterSimpleStructResponseParams new];
+    {
+        CHIPTestClusterClusterSimpleStruct * value;
+        value = [CHIPTestClusterClusterSimpleStruct new];
+        value.a = [NSNumber numberWithUnsignedChar:data.arg1.a];
+        value.b = [NSNumber numberWithBool:data.arg1.b];
+        value.c = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg1.c)];
+        value.d = [NSData dataWithBytes:data.arg1.d.data() length:data.arg1.d.size()];
+        value.e = [[NSString alloc] initWithBytes:data.arg1.e.data() length:data.arg1.e.size() encoding:NSUTF8StringEncoding];
+        value.f = [NSNumber numberWithUnsignedChar:data.arg1.f.Raw()];
+        value.g = [NSNumber numberWithFloat:data.arg1.g];
+        value.h = [NSNumber numberWithDouble:data.arg1.h];
+        response.arg1 = value;
+    }
+    DispatchSuccess(context, response);
+};
+
 void CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & data)
 {
@@ -2646,12 +2675,12 @@ void CHIPTestClusterClusterTestEnumsResponseCallbackBridge::OnSuccessFn(
     auto * response = [CHIPTestClusterClusterTestEnumsResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.arg1];
+        value = [NSNumber numberWithUnsignedShort:chip::to_underlying(data.arg1)];
         response.arg1 = value;
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.arg2];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.arg2)];
         response.arg2 = value;
     }
     DispatchSuccess(context, response);

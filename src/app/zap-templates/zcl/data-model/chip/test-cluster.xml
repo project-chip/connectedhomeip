@@ -45,6 +45,8 @@ limitations under the License.
     <item name="d" type="OCTET_STRING" optional="false"/>
     <item name="e" type="CHAR_STRING" optional="false"/>
     <item name="f" type="SimpleBitmap" optional="false"/>
+    <item name="g" type="single" optional="false"/>
+    <item name="h" type="double" optional="false"/>
   </struct>
 
   <struct name="NestedStruct">
@@ -270,7 +272,7 @@ limitations under the License.
       <arg name="arg1" type="NestedStructList"/>
     </command>
 
-    <command source="client" code="0x0C" name="TestListNestedStructListArgumentRequest" optional="false">
+    <command source="client" code="0x0C" name="TestListNestedStructListArgumentRequest" response="BooleanResponse" optional="false">
       <description>
         Command that takes an argument which is a list of Nested Struct List.
         The response returns false if there is some struct in arg1 (either
@@ -331,6 +333,15 @@ limitations under the License.
       <arg name="OptionalList" type="SimpleEnum" optional="true" array="true"/>
       <arg name="NullableOptionalList" type="SimpleEnum" isNullable="true"
            array="true" optional="true"/>
+    </command>
+
+    <command source="client" code="0x11" name="SimpleStructEchoRequest"
+             response="SimpleStructResponse" optional="false">
+      <description>
+        Command that takes an argument which is a struct.  The response echoes
+        the struct back.
+      </description>
+      <arg name="arg1" type="SimpleStruct"/>
     </command>
 
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
@@ -435,6 +446,14 @@ limitations under the License.
         what we're responding to.
       </description>
       <arg name="value" type="BOOLEAN"/>
+    </command>
+
+    <command source="server" code="0x09" name="SimpleStructResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Command that returns a single argument which is a struct.  The contents
+        of the struct depend on what we are responding to.
+      </description>
+      <arg name="arg1" type="SimpleStruct"/>
     </command>
 
     <event code="0x0001" name="TestEvent" priority="info" side="server">

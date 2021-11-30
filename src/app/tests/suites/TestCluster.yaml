@@ -25,7 +25,7 @@ tests:
     - label: "Send Test Not Handled Command"
       command: "testNotHandled"
       response:
-          error: 1
+          error: INVALID_COMMAND
 
     - label: "Send Test Specific Command"
       command: "testSpecific"
@@ -56,7 +56,7 @@ tests:
               - name: "arg2"
                 value: 6
       response:
-          error: 1
+          error: INVALID_COMMAND
 
     # Tests for Boolean attribute
 
@@ -624,7 +624,7 @@ tests:
       arguments:
           value: "TestValueLongerThan10"
       response:
-          error: true
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute OCTET_STRING"
       command: "readAttribute"
@@ -681,7 +681,6 @@ tests:
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
       attribute: "char_string"
-      disabled: true
       response:
           value: "☉T☉"
 
@@ -691,14 +690,13 @@ tests:
       arguments:
           value: "☉TestValueLongerThan10☉"
       response:
-          error: true
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
       attribute: "char_string"
-      disabled: true
       response:
-          value: "☉TestVal"
+          value: "☉T☉"
 
     - label: "Write attribute CHAR_STRING - Empty"
       command: "writeAttribute"
@@ -816,8 +814,17 @@ tests:
       command: "test"
       endpoint: 200
       response:
-          # No cluster on that endpoint, so expect an error.
-          error: 1
+          # No such endpoint, so expect an error.
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_ENDPOINT
+
+    - label: "Send Test Command to unsupported cluster"
+      command: "test"
+      endpoint: 0
+      response:
+          # No TestCluster on that, so expect an error.
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_CLUSTER
 
     # Tests for vendor id
 
@@ -874,6 +881,8 @@ tests:
                         d: "octet_string",
                         e: "char_string",
                         f: 1,
+                        g: 0,
+                        h: 0,
                     }
       response:
           values:
@@ -893,6 +902,8 @@ tests:
                         d: "octet_string",
                         e: "char_string",
                         f: 1,
+                        g: 0,
+                        h: 0,
                     }
       response:
           values:
@@ -901,7 +912,6 @@ tests:
 
     - label:
           "Send Test Command With Nested Struct Argument and arg1.c.b is true"
-      disabled: true
       command: "testNestedStructArgumentRequest"
       arguments:
           values:
@@ -918,6 +928,8 @@ tests:
                                 d: "octet_string",
                                 e: "char_string",
                                 f: 1,
+                                g: 0,
+                                h: 0,
                             },
                     }
       response:
@@ -926,7 +938,6 @@ tests:
                 value: true
 
     - label: "Send Test Command With Nested Struct Argument arg1.c.b is false"
-      disabled: true
       command: "testNestedStructArgumentRequest"
       arguments:
           values:
@@ -943,6 +954,8 @@ tests:
                                 d: "octet_string",
                                 e: "char_string",
                                 f: 1,
+                                g: 0,
+                                h: 0,
                             },
                     }
       response:
@@ -953,7 +966,6 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and all fields b
           of arg1.d are true"
-      disabled: true
       command: "testNestedStructListArgumentRequest"
       arguments:
           values:
@@ -970,6 +982,8 @@ tests:
                                 d: "octet_string",
                                 e: "char_string",
                                 f: 1,
+                                g: 0,
+                                h: 0,
                             },
                         d:
                             [
@@ -980,6 +994,8 @@ tests:
                                     d: "nested_octet_string",
                                     e: "nested_char_string",
                                     f: 1,
+                                    g: 0,
+                                    h: 0,
                                 },
                                 {
                                     a: 2,
@@ -988,6 +1004,67 @@ tests:
                                     d: "nested_octet_string",
                                     e: "nested_char_string",
                                     f: 1,
+                                    g: 0,
+                                    h: 0,
+                                },
+                            ],
+                        e: [1, 2, 3],
+                        f:
+                            [
+                                "octet_string_1",
+                                "octect_string_2",
+                                "octet_string_3",
+                            ],
+                        g: [0, 255],
+                    }
+      response:
+          values:
+              - name: "value"
+                value: true
+
+    - label:
+          "Send Test Command With Nested Struct List Argument and some fields b
+          of arg1.d are false"
+      command: "testNestedStructListArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 0,
+                        b: true,
+                        c:
+                            {
+                                a: 0,
+                                b: true,
+                                c: 2,
+                                d: "octet_string",
+                                e: "char_string",
+                                f: 1,
+                                g: 0,
+                                h: 0,
+                            },
+                        d:
+                            [
+                                {
+                                    a: 1,
+                                    b: true,
+                                    c: 3,
+                                    d: "nested_octet_string",
+                                    e: "nested_char_string",
+                                    f: 1,
+                                    g: 0,
+                                    h: 0,
+                                },
+                                {
+                                    a: 2,
+                                    b: false,
+                                    c: 3,
+                                    d: "nested_octet_string",
+                                    e: "nested_char_string",
+                                    f: 1,
+                                    g: 0,
+                                    h: 0,
                                 },
                             ],
                         e: [1, 2, 3],
@@ -1004,59 +1081,36 @@ tests:
               - name: "value"
                 value: false
 
-    - label:
-          "Send Test Command With Nested Struct List Argument and some fields b
-          of arg1.d are false"
-      disabled: true
-      command: "testNestedStructListArgumentRequest"
+    - label: "Send Test Command With Struct Argument and see what we get back"
+      command: "SimpleStructEchoRequest"
       arguments:
           values:
               - name: "arg1"
                 value:
                     {
-                        a: 0,
-                        b: true,
-                        c:
-                            {
-                                a: 0,
-                                b: true,
-                                c: 2,
-                                d: "octet_string",
-                                e: "char_string",
-                                f: 1,
-                            },
-                        d:
-                            [
-                                {
-                                    a: 1,
-                                    b: true,
-                                    c: 3,
-                                    d: "nested_octet_string",
-                                    e: "nested_char_string",
-                                    f: 1,
-                                },
-                                {
-                                    a: 2,
-                                    b: false,
-                                    c: 3,
-                                    d: "nested_octet_string",
-                                    e: "nested_char_string",
-                                    f: 1,
-                                },
-                            ],
-                        e: [1, 2, 3],
-                        f:
-                            [
-                                "octet_string_1",
-                                "octect_string_2",
-                                "octet_string_3",
-                            ],
-                        g: [0, 255],
+                        a: 17,
+                        b: false,
+                        c: 2,
+                        d: "octet_string",
+                        e: "char_string",
+                        f: 1,
+                        g: 0.1,
+                        h: 0.1,
                     }
       response:
           values:
-              - name: "value"
-                value: false
+              - name: "arg1"
+                value:
+                    {
+                        a: 17,
+                        b: false,
+                        c: 2,
+                        d: "octet_string",
+                        e: "char_string",
+                        f: 1,
+                        g: 0.1,
+                        h: 0.1,
+                    }
 
     # Tests for List
 
@@ -1121,6 +1175,8 @@ tests:
                             d: "first_octet_string",
                             e: "first_char_string",
                             f: 1,
+                            g: 0,
+                            h: 0,
                         },
                         {
                             a: 1,
@@ -1129,6 +1185,8 @@ tests:
                             d: "second_octet_string",
                             e: "second_char_string",
                             f: 1,
+                            g: 0,
+                            h: 0,
                         },
                     ]
       response:
@@ -1152,6 +1210,8 @@ tests:
                             d: "second_octet_string",
                             e: "second_char_string",
                             f: 1,
+                            g: 0,
+                            h: 0,
                         },
                         {
                             a: 0,
@@ -1160,6 +1220,8 @@ tests:
                             d: "first_octet_string",
                             e: "first_char_string",
                             f: 1,
+                            g: 0,
+                            h: 0,
                         },
                     ]
       response:
@@ -1170,7 +1232,6 @@ tests:
     - label:
           "Send Test Command With List of Nested Struct List Argument and all
           fields b of elements of arg1.d are true"
-      disabled: true
       command: "testListNestedStructListArgumentRequest"
       arguments:
           values:
@@ -1188,6 +1249,8 @@ tests:
                                     d: "octet_string",
                                     e: "char_string",
                                     f: 1,
+                                    g: 0,
+                                    h: 0,
                                 },
                             d:
                                 [
@@ -1198,6 +1261,8 @@ tests:
                                         d: "nested_octet_string",
                                         e: "nested_char_string",
                                         f: 1,
+                                        g: 0,
+                                        h: 0,
                                     },
                                     {
                                         a: 2,
@@ -1206,6 +1271,8 @@ tests:
                                         d: "nested_octet_string",
                                         e: "nested_char_string",
                                         f: 1,
+                                        g: 0,
+                                        h: 0,
                                     },
                                 ],
                             e: [1, 2, 3],
@@ -1226,7 +1293,6 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
           of elements of arg1.d are false"
-      disabled: true
       command: "testListNestedStructListArgumentRequest"
       arguments:
           values:
@@ -1244,6 +1310,8 @@ tests:
                                     d: "octet_string",
                                     e: "char_string",
                                     f: 1,
+                                    g: 0,
+                                    h: 0,
                                 },
                             d:
                                 [
@@ -1254,6 +1322,8 @@ tests:
                                         d: "nested_octet_string",
                                         e: "nested_char_string",
                                         f: 1,
+                                        g: 0,
+                                        h: 0,
                                     },
                                     {
                                         a: 2,
@@ -1262,6 +1332,8 @@ tests:
                                         d: "nested_octet_string",
                                         e: "nested_char_string",
                                         f: 1,
+                                        g: 0,
+                                        h: 0,
                                     },
                                 ],
                             e: [1, 2, 3],
@@ -1402,7 +1474,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP8 unchanged Value"
       command: "readAttribute"
@@ -1442,7 +1514,7 @@ tests:
       arguments:
           value: 65535
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP16 unchanged Value"
       command: "readAttribute"
@@ -1482,7 +1554,7 @@ tests:
       arguments:
           value: 4294967295
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP32 unchanged Value"
       command: "readAttribute"
@@ -1522,7 +1594,7 @@ tests:
       arguments:
           value: "18446744073709551615"
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP64 unchanged Value"
       command: "readAttribute"
@@ -1562,7 +1634,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT8U unchanged Value"
       command: "readAttribute"
@@ -1602,7 +1674,7 @@ tests:
       arguments:
           value: 65535
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT16U unchanged Value"
       command: "readAttribute"
@@ -1642,7 +1714,7 @@ tests:
       arguments:
           value: 4294967295
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT32U unchanged Value"
       command: "readAttribute"
@@ -1682,7 +1754,7 @@ tests:
       arguments:
           value: "18446744073709551615"
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT64U unchanged Value"
       command: "readAttribute"
@@ -1722,7 +1794,7 @@ tests:
       arguments:
           value: -128
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT8S unchanged Value"
       command: "readAttribute"
@@ -1762,7 +1834,7 @@ tests:
       arguments:
           value: -32768
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT16S unchanged Value"
       command: "readAttribute"
@@ -1802,7 +1874,7 @@ tests:
       arguments:
           value: -2147483648
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT32S unchanged Value"
       command: "readAttribute"
@@ -1845,7 +1917,7 @@ tests:
           # work around that.
           value: "-9223372036854775807LL - 1"
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT64S unchanged Value"
       command: "readAttribute"
@@ -1885,7 +1957,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_ENUM8 unchanged Value"
       command: "readAttribute"
@@ -1925,7 +1997,7 @@ tests:
       arguments:
           value: 65535
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_ENUM16 unchanged Value"
       command: "readAttribute"
@@ -2006,7 +2078,6 @@ tests:
     - label: "Read attribute NULLABLE_CHAR_STRING"
       command: "readAttribute"
       attribute: "nullable_char_string"
-      disabled: true
       response:
           value: "☉T☉"
 
@@ -2033,3 +2104,19 @@ tests:
       attribute: "nullable_char_string"
       response:
           value: ""
+
+    - label: "Read attribute from nonexistent endpoint."
+      endpoint: 200
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_ENDPOINT
+
+    - label: "Read attribute from nonexistent cluster."
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_CLUSTER

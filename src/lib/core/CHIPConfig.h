@@ -1403,6 +1403,8 @@
  *  @note
  *    WARNING: This option makes it possible to circumvent basic chip security functionality,
  *    including message encryption. Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
+ *
+ *    To build with this flag, pass 'treat_warnings_as_errors=false' to gn/ninja.
  */
 #ifndef CHIP_CONFIG_SECURITY_TEST_MODE
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
@@ -2493,6 +2495,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CONFIG_IM_BUILD_FOR_UNIT_TEST
+ *
+ * @brief Defines whether we're currently building the IM for unit testing, which enables a set of features
+ *        that are only utilized in those tests.
+ */
+#ifndef CONFIG_IM_BUILD_FOR_UNIT_TEST
+#define CONFIG_IM_BUILD_FOR_UNIT_TEST 0
+#endif
+
+/**
  * @def CHIP_DEVICE_CONTROLLER_SUBSCRIPTION_ATTRIBUTE_PATH_POOL_SIZE
  *
  * @brief Defines the object pool for allocating attribute path for subscription in device controller.
@@ -2688,6 +2700,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
 #define CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
+ *
+ * @brief Defines the max number of SessionRecoveryDelegate
+ */
+#ifndef CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
+#define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 3
 #endif
 
 /**

@@ -20,16 +20,12 @@
 
 #include <app-common/zap-generated/af-structs.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/clusters/content-launch-server/content-launch-server.h>
 
 #include <lib/core/CHIPError.h>
 #include <list>
 #include <string>
 #include <vector>
-struct ContentLaunchResponse
-{
-    EmberAfContentLaunchStatus status;
-    std::string data;
-};
 
 class ContentLauncherManager
 {

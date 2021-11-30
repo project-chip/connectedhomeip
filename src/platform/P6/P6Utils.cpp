@@ -42,6 +42,7 @@
 #include "lwip/sockets.h"
 #include "lwip/sys.h"
 #include "lwip/timeouts.h"
+#include <malloc.h>
 
 using namespace ::chip::DeviceLayer::Internal;
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
@@ -674,4 +675,131 @@ CHIP_ERROR P6Utils::ping_init(void)
         err = CHIP_ERROR_INTERNAL;
     }
     return err;
+}
+
+static int xtlv_hdr_size(uint16_t opts, const uint8_t ** data)
+{
+    int len = (int) OFFSETOF(xtlv_t, data); /* nominal */
+    if (opts & XTLV_OPTION_LENU8)
+    {
+        --len;
+    }
+    if (opts & XTLV_OPTION_IDU8)
+    {
+        --len;
+    }
+    return len;
+}
+
+static int xtlv_size_for_data(int dlen, uint16_t opts, const uint8_t ** data)
+{
+    int hsz;
+    hsz = xtlv_hdr_size(opts, data);
+    return ((opts & XTLV_OPTION_ALIGN32) ? ALIGN_SIZE(dlen + hsz, 4) : (dlen + hsz));
+}
+
+static int xtlv_len(const xtlv_t * elt, uint16_t opts)
+{
+    const uint8_t * lenp;
+    int len;
+
+    lenp = (const uint8_t *) &elt->len; /* nominal */
+    if (opts & XTLV_OPTION_IDU8)
+    {
+        --lenp;
+    }
+    if (opts & XTLV_OPTION_LENU8)
+    {
+        len = *lenp;
+    }
+    else
+    {
+        len = _LTOH16_UA(lenp);
+    }
+    return len;
+}
+
+static int xtlv_id(const xtlv_t * elt, uint16_t opts)
+{
+    int id = 0;
+    if (opts & XTLV_OPTION_IDU8)
+    {
+        id = *(const uint8_t *) elt;
+    }
+    else
+    {
+        id = _LTOH16_UA((const uint8_t *) elt);
+    }
+    return id;
+}
+
+static void xtlv_unpack_xtlv(const xtlv_t * xtlv, uint16_t * type, uint16_t * len, const uint8_t ** data, uint16_t opts)
+{
+    if (type)
+    {
+        *type = (uint16_t) xtlv_id(xtlv, opts);
+    }
+    if (len)
+    {
+        *len = (uint16_t) xtlv_len(xtlv, opts);
+    }
+    if (data)
+    {
+        *data = (const uint8_t *) xtlv + xtlv_hdr_size(opts, data);
+    }
+}
+
+void P6Utils::unpack_xtlv_buf(const uint8_t * tlv_buf, uint16_t buflen, wl_cnt_ver_30_t * cnt, wl_cnt_ge40mcst_v1_t * cnt_ge40)
+{
+    uint16_t len;
+    uint16_t type;
+    int size;
+    const xtlv_t * ptlv;
+    int sbuflen = buflen;
+    const uint8_t * data;
+    int hdr_size;
+    hdr_size = xtlv_hdr_size(XTLV_OPTION_ALIGN32, &data);
+    while (sbuflen >= hdr_size)
+    {
+        ptlv = (const xtlv_t *) tlv_buf;
+
+        xtlv_unpack_xtlv(ptlv, &type, &len, &data, XTLV_OPTION_ALIGN32);
+        size = xtlv_size_for_data(len, XTLV_OPTION_ALIGN32, &data);
+
+        sbuflen -= size;
+        if (sbuflen < 0) /* check for buffer overrun */
+        {
+            break;
+        }
+        if (type == 0x100)
+        {
+            memcpy(cnt, (wl_cnt_ver_30_t *) data, sizeof(wl_cnt_ver_30_t));
+        }
+        if (type == 0x400)
+        {
+            memcpy(cnt_ge40, (wl_cnt_ge40mcst_v1_t *) data, sizeof(wl_cnt_ge40mcst_v1_t));
+        }
+        tlv_buf += size;
+    }
+}
+
+/* Get the Heap total size for P6 Linker file */
+uint32_t get_heap_total()
+{
+    extern uint8_t __HeapBase;  /* Symbol exported by the linker. */
+    extern uint8_t __HeapLimit; /* Symbol exported by the linker. */
+
+    uint8_t * heap_base  = (uint8_t *) &__HeapBase;
+    uint8_t * heap_limit = (uint8_t *) &__HeapLimit;
+    return (uint32_t)(heap_limit - heap_base);
+}
+
+/* Populate Heap info based on heap total size and Current Heap usage */
+void P6Utils::heap_usage(heap_info_t * heap)
+{
+    struct mallinfo mall_info = mallinfo();
+
+    heap->HeapMax  = mall_info.arena;
+    heap->HeapUsed = mall_info.uordblks;
+    heap->HeapFree = get_heap_total() - mall_info.uordblks;
 }

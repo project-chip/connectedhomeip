@@ -182,6 +182,7 @@ function getTests()
     'TestConstraints',
     'TestDelayCommands',
     'TestLogCommands',
+    'TestSaveAs',
     'TestDescriptorCluster',
     'TestBasicInformation',
     'TestIdentifyCluster',

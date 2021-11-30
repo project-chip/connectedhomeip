@@ -1907,7 +1907,7 @@ static void TestSKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     HeapChecker heapChecker(inSuite);
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t skidBuf[Credentials::kKeyIdentifierLength];
+    uint8_t skidBuf[kSubjectKeyIdentifierLength];
     MutableByteSpan skidOut(skidBuf);
 
     ByteSpan cert;
@@ -1934,7 +1934,7 @@ static void TestAKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
 
     HeapChecker heapChecker(inSuite);
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t akidBuf[Credentials::kKeyIdentifierLength];
+    uint8_t akidBuf[kAuthorityKeyIdentifierLength];
     MutableByteSpan akidOut(akidBuf);
 
     ByteSpan cert;

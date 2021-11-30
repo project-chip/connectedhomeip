@@ -79,14 +79,14 @@ public class ChipClusters {
   {{#chip_cluster_commands}}
 
     public void {{asLowerCamelCase name}}({{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} callback
-      {{#chip_cluster_command_arguments_with_structs_expanded}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}}) {
-      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}});
+      {{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}}) {
+      {{asLowerCamelCase name}}(chipClusterPtr, callback{{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}, {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}});
     }
 
   {{/chip_cluster_commands}}
   {{#chip_cluster_commands}}
     private native void {{asLowerCamelCase name}}(long chipClusterPtr, {{#if hasSpecificResponse}}{{asUpperCamelCase responseName}}Callback{{else}}DefaultClusterCallback{{/if}} Callback
-      {{#chip_cluster_command_arguments_with_structs_expanded}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}});
+      {{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}{{>java_type_for_argument}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}});
   {{/chip_cluster_commands}}
   {{#chip_cluster_responses}}
     public interface {{asUpperCamelCase name}}Callback {

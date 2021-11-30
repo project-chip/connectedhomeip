@@ -17,13 +17,16 @@
  */
 
 #include "AppTask.h"
-#include "Rpc.h"
 
 #include <lib/support/CHIPMem.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <system/SystemError.h>
 
 #include <kernel.h>
+
+#ifdef CONFIG_CHIP_PW_RPC
+#include "Rpc.h"
+#endif
 
 #ifdef CONFIG_USB
 #include <usb/usb_device.h>
