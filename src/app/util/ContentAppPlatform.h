@@ -29,6 +29,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifndef DYNAMIC_ENDPOINT_COUNT
+#define DYNAMIC_ENDPOINT_COUNT 0
+#endif // DYNAMIC_ENDPOINT_COUNT
+
 namespace chip {
 namespace AppPlatform {
 
