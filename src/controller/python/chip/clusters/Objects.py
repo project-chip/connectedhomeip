@@ -22,7 +22,7 @@
 # This file contains generated struct, enum, command definition.
 # Users are not expected to import this file, instead, users can use import chip.clusters, which will import all symbols from this file and can get a readable, pretty naming like clusters.OnOff.commands.OnCommand
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import typing
 from enum import IntEnum
 from chip import ChipUtility
@@ -1570,9 +1570,9 @@ class Scenes(Cluster):
                             Label="value", Tag=3, Type=uint),
                     ])
 
-            clusterId: 'uint' = None
-            length: 'uint' = None
-            value: 'uint' = None
+            clusterId: 'uint' = 0
+            length: 'uint' = 0
+            value: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -3425,10 +3425,10 @@ class PowerProfile(Cluster):
                             Label="powerProfileState", Tag=4, Type=uint),
                     ])
 
-            powerProfileId: 'uint' = None
-            energyPhaseId: 'uint' = None
-            powerProfileRemoteControl: 'bool' = None
-            powerProfileState: 'uint' = None
+            powerProfileId: 'uint' = 0
+            energyPhaseId: 'uint' = 0
+            powerProfileRemoteControl: 'bool' = False
+            powerProfileState: 'uint' = 0
 
         @dataclass
         class ScheduledPhase(ClusterObject):
@@ -3442,8 +3442,8 @@ class PowerProfile(Cluster):
                             Label="scheduledTime", Tag=2, Type=uint),
                     ])
 
-            energyPhaseId: 'uint' = None
-            scheduledTime: 'uint' = None
+            energyPhaseId: 'uint' = 0
+            scheduledTime: 'uint' = 0
 
         @dataclass
         class TransferredPhase(ClusterObject):
@@ -3465,12 +3465,12 @@ class PowerProfile(Cluster):
                             Label="maxActivationDelay", Tag=6, Type=uint),
                     ])
 
-            energyPhaseId: 'uint' = None
-            macroPhaseId: 'uint' = None
-            expectedDuration: 'uint' = None
-            peakPower: 'uint' = None
-            energy: 'uint' = None
-            maxActivationDelay: 'uint' = None
+            energyPhaseId: 'uint' = 0
+            macroPhaseId: 'uint' = 0
+            expectedDuration: 'uint' = 0
+            peakPower: 'uint' = 0
+            energy: 'uint' = 0
+            maxActivationDelay: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -4281,8 +4281,8 @@ class Descriptor(Cluster):
                             Label="revision", Tag=2, Type=uint),
                     ])
 
-            type: 'uint' = None
-            revision: 'uint' = None
+            type: 'uint' = 0
+            revision: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -4658,12 +4658,12 @@ class BridgedActions(Cluster):
                             Label="status", Tag=6, Type=BridgedActions.Enums.ActionStatusEnum),
                     ])
 
-            actionID: 'uint' = None
-            name: 'str' = None
-            type: 'BridgedActions.Enums.ActionTypeEnum' = None
-            endpointListID: 'uint' = None
-            supportedCommands: 'uint' = None
-            status: 'BridgedActions.Enums.ActionStatusEnum' = None
+            actionID: 'uint' = 0
+            name: 'str' = ""
+            type: 'BridgedActions.Enums.ActionTypeEnum' = 0
+            endpointListID: 'uint' = 0
+            supportedCommands: 'uint' = 0
+            status: 'BridgedActions.Enums.ActionStatusEnum' = 0
 
         @dataclass
         class EndpointListStruct(ClusterObject):
@@ -4681,10 +4681,10 @@ class BridgedActions(Cluster):
                             Label="endpoints", Tag=4, Type=typing.List[uint]),
                     ])
 
-            endpointListID: 'uint' = None
-            name: 'str' = None
-            type: 'BridgedActions.Enums.EndpointListTypeEnum' = None
-            endpoints: 'typing.List[uint]' = None
+            endpointListID: 'uint' = 0
+            name: 'str' = ""
+            type: 'BridgedActions.Enums.EndpointListTypeEnum' = 0
+            endpoints: 'typing.List[uint]' = field(default_factory=lambda: [])
 
     class Commands:
         @dataclass
@@ -6543,7 +6543,7 @@ class GeneralCommissioning(Cluster):
                             Label="failSafeExpiryLengthMs", Tag=1, Type=uint),
                     ])
 
-            failSafeExpiryLengthMs: 'uint' = None
+            failSafeExpiryLengthMs: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -6798,7 +6798,7 @@ class NetworkCommissioning(Cluster):
                             Label="discoveryResponse", Tag=1, Type=bytes),
                     ])
 
-            discoveryResponse: 'bytes' = None
+            discoveryResponse: 'bytes' = b""
 
         @dataclass
         class WiFiInterfaceScanResult(ClusterObject):
@@ -6818,11 +6818,11 @@ class NetworkCommissioning(Cluster):
                             Label="frequencyBand", Tag=5, Type=uint),
                     ])
 
-            security: 'uint' = None
-            ssid: 'bytes' = None
-            bssid: 'bytes' = None
-            channel: 'uint' = None
-            frequencyBand: 'uint' = None
+            security: 'uint' = 0
+            ssid: 'bytes' = b""
+            bssid: 'bytes' = b""
+            channel: 'uint' = 0
+            frequencyBand: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -7372,12 +7372,12 @@ class GeneralDiagnostics(Cluster):
                             Label="type", Tag=6, Type=GeneralDiagnostics.Enums.InterfaceType),
                     ])
 
-            name: 'str' = None
-            fabricConnected: 'bool' = None
-            offPremiseServicesReachableIPv4: 'bool' = None
-            offPremiseServicesReachableIPv6: 'bool' = None
-            hardwareAddress: 'bytes' = None
-            type: 'GeneralDiagnostics.Enums.InterfaceType' = None
+            name: 'str' = ""
+            fabricConnected: 'bool' = False
+            offPremiseServicesReachableIPv4: 'bool' = False
+            offPremiseServicesReachableIPv6: 'bool' = False
+            hardwareAddress: 'bytes' = b""
+            type: 'GeneralDiagnostics.Enums.InterfaceType' = 0
 
     class Attributes:
         @dataclass
@@ -7630,9 +7630,9 @@ class SoftwareDiagnostics(Cluster):
                             Label="faultRecording", Tag=3, Type=bytes),
                     ])
 
-            id: 'uint' = None
-            name: 'str' = None
-            faultRecording: 'bytes' = None
+            id: 'uint' = 0
+            name: 'str' = ""
+            faultRecording: 'bytes' = b""
 
         @dataclass
         class ThreadMetrics(ClusterObject):
@@ -7652,11 +7652,11 @@ class SoftwareDiagnostics(Cluster):
                             Label="stackSize", Tag=5, Type=uint),
                     ])
 
-            id: 'uint' = None
-            name: 'str' = None
-            stackFreeCurrent: 'uint' = None
-            stackFreeMinimum: 'uint' = None
-            stackSize: 'uint' = None
+            id: 'uint' = 0
+            name: 'str' = ""
+            stackFreeCurrent: 'uint' = 0
+            stackFreeMinimum: 'uint' = 0
+            stackSize: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -7846,20 +7846,20 @@ class ThreadNetworkDiagnostics(Cluster):
                             Label="isChild", Tag=14, Type=bool),
                     ])
 
-            extAddress: 'uint' = None
-            age: 'uint' = None
-            rloc16: 'uint' = None
-            linkFrameCounter: 'uint' = None
-            mleFrameCounter: 'uint' = None
-            lqi: 'uint' = None
-            averageRssi: 'int' = None
-            lastRssi: 'int' = None
-            frameErrorRate: 'uint' = None
-            messageErrorRate: 'uint' = None
-            rxOnWhenIdle: 'bool' = None
-            fullThreadDevice: 'bool' = None
-            fullNetworkData: 'bool' = None
-            isChild: 'bool' = None
+            extAddress: 'uint' = 0
+            age: 'uint' = 0
+            rloc16: 'uint' = 0
+            linkFrameCounter: 'uint' = 0
+            mleFrameCounter: 'uint' = 0
+            lqi: 'uint' = 0
+            averageRssi: 'int' = 0
+            lastRssi: 'int' = 0
+            frameErrorRate: 'uint' = 0
+            messageErrorRate: 'uint' = 0
+            rxOnWhenIdle: 'bool' = False
+            fullThreadDevice: 'bool' = False
+            fullNetworkData: 'bool' = False
+            isChild: 'bool' = False
 
         @dataclass
         class OperationalDatasetComponents(ClusterObject):
@@ -7893,18 +7893,18 @@ class ThreadNetworkDiagnostics(Cluster):
                             Label="channelMaskPresent", Tag=12, Type=bool),
                     ])
 
-            activeTimestampPresent: 'bool' = None
-            pendingTimestampPresent: 'bool' = None
-            masterKeyPresent: 'bool' = None
-            networkNamePresent: 'bool' = None
-            extendedPanIdPresent: 'bool' = None
-            meshLocalPrefixPresent: 'bool' = None
-            delayPresent: 'bool' = None
-            panIdPresent: 'bool' = None
-            channelPresent: 'bool' = None
-            pskcPresent: 'bool' = None
-            securityPolicyPresent: 'bool' = None
-            channelMaskPresent: 'bool' = None
+            activeTimestampPresent: 'bool' = False
+            pendingTimestampPresent: 'bool' = False
+            masterKeyPresent: 'bool' = False
+            networkNamePresent: 'bool' = False
+            extendedPanIdPresent: 'bool' = False
+            meshLocalPrefixPresent: 'bool' = False
+            delayPresent: 'bool' = False
+            panIdPresent: 'bool' = False
+            channelPresent: 'bool' = False
+            pskcPresent: 'bool' = False
+            securityPolicyPresent: 'bool' = False
+            channelMaskPresent: 'bool' = False
 
         @dataclass
         class RouteTable(ClusterObject):
@@ -7934,16 +7934,16 @@ class ThreadNetworkDiagnostics(Cluster):
                             Label="linkEstablished", Tag=10, Type=bool),
                     ])
 
-            extAddress: 'uint' = None
-            rloc16: 'uint' = None
-            routerId: 'uint' = None
-            nextHop: 'uint' = None
-            pathCost: 'uint' = None
-            LQIIn: 'uint' = None
-            LQIOut: 'uint' = None
-            age: 'uint' = None
-            allocated: 'bool' = None
-            linkEstablished: 'bool' = None
+            extAddress: 'uint' = 0
+            rloc16: 'uint' = 0
+            routerId: 'uint' = 0
+            nextHop: 'uint' = 0
+            pathCost: 'uint' = 0
+            LQIIn: 'uint' = 0
+            LQIOut: 'uint' = 0
+            age: 'uint' = 0
+            allocated: 'bool' = False
+            linkEstablished: 'bool' = False
 
         @dataclass
         class SecurityPolicy(ClusterObject):
@@ -7957,8 +7957,8 @@ class ThreadNetworkDiagnostics(Cluster):
                             Label="flags", Tag=2, Type=uint),
                     ])
 
-            rotationTime: 'uint' = None
-            flags: 'uint' = None
+            rotationTime: 'uint' = 0
+            flags: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -10279,12 +10279,12 @@ class OperationalCredentials(Cluster):
                             Label="label", Tag=6, Type=str),
                     ])
 
-            fabricIndex: 'uint' = None
-            rootPublicKey: 'bytes' = None
-            vendorId: 'uint' = None
-            fabricId: 'uint' = None
-            nodeId: 'uint' = None
-            label: 'str' = None
+            fabricIndex: 'uint' = 0
+            rootPublicKey: 'bytes' = b""
+            vendorId: 'uint' = 0
+            fabricId: 'uint' = 0
+            nodeId: 'uint' = 0
+            label: 'str' = ""
 
         @dataclass
         class NOCStruct(ClusterObject):
@@ -10298,8 +10298,8 @@ class OperationalCredentials(Cluster):
                             Label="noc", Tag=2, Type=bytes),
                     ])
 
-            fabricIndex: 'uint' = None
-            noc: 'bytes' = None
+            fabricIndex: 'uint' = 0
+            noc: 'bytes' = b""
 
     class Commands:
         @dataclass
@@ -10668,8 +10668,8 @@ class FixedLabel(Cluster):
                             Label="value", Tag=2, Type=str),
                     ])
 
-            label: 'str' = None
-            value: 'str' = None
+            label: 'str' = ""
+            value: 'str' = ""
 
     class Attributes:
         @dataclass
@@ -10810,9 +10810,9 @@ class ModeSelect(Cluster):
                             Label="semanticTag", Tag=3, Type=uint),
                     ])
 
-            label: 'str' = None
-            mode: 'uint' = None
-            semanticTag: 'uint' = None
+            label: 'str' = ""
+            mode: 'uint' = 0
+            semanticTag: 'uint' = 0
 
         @dataclass
         class SemanticTag(ClusterObject):
@@ -10826,8 +10826,8 @@ class ModeSelect(Cluster):
                             Label="value", Tag=2, Type=uint),
                     ])
 
-            mfgCode: 'uint' = None
-            value: 'uint' = None
+            mfgCode: 'uint' = 0
+            value: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -21537,8 +21537,8 @@ class IasAce(Cluster):
                             Label="zoneStatus", Tag=2, Type=uint),
                     ])
 
-            zoneId: 'uint' = None
-            zoneStatus: 'uint' = None
+            zoneId: 'uint' = 0
+            zoneStatus: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -22150,11 +22150,11 @@ class TvChannel(Cluster):
                             Label="affiliateCallSign", Tag=5, Type=str),
                     ])
 
-            majorNumber: 'uint' = None
-            minorNumber: 'uint' = None
-            name: 'str' = None
-            callSign: 'str' = None
-            affiliateCallSign: 'str' = None
+            majorNumber: 'uint' = 0
+            minorNumber: 'uint' = 0
+            name: 'str' = ""
+            callSign: 'str' = ""
+            affiliateCallSign: 'str' = ""
 
         @dataclass
         class TvChannelLineupInfo(ClusterObject):
@@ -22172,10 +22172,10 @@ class TvChannel(Cluster):
                             Label="lineupInfoType", Tag=4, Type=TvChannel.Enums.TvChannelLineupInfoType),
                     ])
 
-            operatorName: 'str' = None
-            lineupName: 'str' = None
-            postalCode: 'str' = None
-            lineupInfoType: 'TvChannel.Enums.TvChannelLineupInfoType' = None
+            operatorName: 'str' = ""
+            lineupName: 'str' = ""
+            postalCode: 'str' = ""
+            lineupInfoType: 'TvChannel.Enums.TvChannelLineupInfoType' = 0
 
     class Commands:
         @dataclass
@@ -22353,8 +22353,8 @@ class TargetNavigator(Cluster):
                             Label="name", Tag=2, Type=str),
                     ])
 
-            identifier: 'uint' = None
-            name: 'str' = None
+            identifier: 'uint' = 0
+            name: 'str' = ""
 
     class Commands:
         @dataclass
@@ -22493,8 +22493,8 @@ class MediaPlayback(Cluster):
                             Label="position", Tag=2, Type=uint),
                     ])
 
-            updatedAt: 'uint' = None
-            position: 'uint' = None
+            updatedAt: 'uint' = 0
+            position: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -23015,10 +23015,10 @@ class MediaInput(Cluster):
                             Label="description", Tag=4, Type=str),
                     ])
 
-            index: 'uint' = None
-            inputType: 'MediaInput.Enums.MediaInputType' = None
-            name: 'str' = None
-            description: 'str' = None
+            index: 'uint' = 0
+            inputType: 'MediaInput.Enums.MediaInputType' = 0
+            name: 'str' = ""
+            description: 'str' = ""
 
     class Commands:
         @dataclass
@@ -23406,8 +23406,8 @@ class ContentLauncher(Cluster):
                             Label="value", Tag=2, Type=str),
                     ])
 
-            name: 'str' = None
-            value: 'str' = None
+            name: 'str' = ""
+            value: 'str' = ""
 
         @dataclass
         class ContentLaunchParamater(ClusterObject):
@@ -23423,9 +23423,10 @@ class ContentLauncher(Cluster):
                             Label="externalIDList", Tag=3, Type=typing.List[ContentLauncher.Structs.ContentLaunchAdditionalInfo]),
                     ])
 
-            type: 'ContentLauncher.Enums.ContentLaunchParameterEnum' = None
-            value: 'str' = None
-            externalIDList: 'typing.List[ContentLauncher.Structs.ContentLaunchAdditionalInfo]' = None
+            type: 'ContentLauncher.Enums.ContentLaunchParameterEnum' = 0
+            value: 'str' = ""
+            externalIDList: 'typing.List[ContentLauncher.Structs.ContentLaunchAdditionalInfo]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class ContentLaunchBrandingInformation(ClusterObject):
@@ -23447,12 +23448,12 @@ class ContentLauncher(Cluster):
                             Label="waterMark", Tag=6, Type=uint),
                     ])
 
-            providerName: 'str' = None
-            background: 'uint' = None
-            logo: 'uint' = None
-            progressBar: 'uint' = None
-            splash: 'uint' = None
-            waterMark: 'uint' = None
+            providerName: 'str' = ""
+            background: 'uint' = 0
+            logo: 'uint' = 0
+            progressBar: 'uint' = 0
+            splash: 'uint' = 0
+            waterMark: 'uint' = 0
 
         @dataclass
         class ContentLaunchDimension(ClusterObject):
@@ -23468,9 +23469,9 @@ class ContentLauncher(Cluster):
                             Label="metric", Tag=3, Type=ContentLauncher.Enums.ContentLaunchMetricType),
                     ])
 
-            width: 'str' = None
-            height: 'str' = None
-            metric: 'ContentLauncher.Enums.ContentLaunchMetricType' = None
+            width: 'str' = ""
+            height: 'str' = ""
+            metric: 'ContentLauncher.Enums.ContentLaunchMetricType' = 0
 
         @dataclass
         class ContentLaunchStyleInformation(ClusterObject):
@@ -23486,9 +23487,9 @@ class ContentLauncher(Cluster):
                             Label="size", Tag=3, Type=uint),
                     ])
 
-            imageUrl: 'str' = None
-            color: 'str' = None
-            size: 'uint' = None
+            imageUrl: 'str' = ""
+            color: 'str' = ""
+            size: 'uint' = 0
 
     class Commands:
         @dataclass
@@ -23661,9 +23662,9 @@ class AudioOutput(Cluster):
                             Label="name", Tag=3, Type=str),
                     ])
 
-            index: 'uint' = None
-            outputType: 'AudioOutput.Enums.AudioOutputType' = None
-            name: 'str' = None
+            index: 'uint' = 0
+            outputType: 'AudioOutput.Enums.AudioOutputType' = 0
+            name: 'str' = ""
 
     class Commands:
         @dataclass
@@ -23790,8 +23791,8 @@ class ApplicationLauncher(Cluster):
                             Label="applicationId", Tag=2, Type=str),
                     ])
 
-            catalogVendorId: 'uint' = None
-            applicationId: 'str' = None
+            catalogVendorId: 'uint' = 0
+            applicationId: 'str' = ""
 
     class Commands:
         @dataclass
@@ -24217,14 +24218,14 @@ class TestCluster(Cluster):
                             Label="h", Tag=8, Type=float),
                     ])
 
-            a: 'uint' = None
-            b: 'bool' = None
-            c: 'TestCluster.Enums.SimpleEnum' = None
-            d: 'bytes' = None
-            e: 'str' = None
-            f: 'uint' = None
-            g: 'float' = None
-            h: 'float' = None
+            a: 'uint' = 0
+            b: 'bool' = False
+            c: 'TestCluster.Enums.SimpleEnum' = 0
+            d: 'bytes' = b""
+            e: 'str' = ""
+            f: 'uint' = 0
+            g: 'float' = 0.0
+            h: 'float' = 0.0
 
         @dataclass
         class NullablesAndOptionalsStruct(ClusterObject):
@@ -24258,16 +24259,16 @@ class TestCluster(Cluster):
                             Label="nullableOptionalList", Tag=12, Type=typing.Union[None, Nullable, typing.List[TestCluster.Enums.SimpleEnum]]),
                     ])
 
-            nullableInt: 'typing.Union[Nullable, uint]' = None
+            nullableInt: 'typing.Union[Nullable, uint]' = NullValue
             optionalInt: 'typing.Optional[uint]' = None
             nullableOptionalInt: 'typing.Union[None, Nullable, uint]' = None
-            nullableString: 'typing.Union[Nullable, str]' = None
+            nullableString: 'typing.Union[Nullable, str]' = NullValue
             optionalString: 'typing.Optional[str]' = None
             nullableOptionalString: 'typing.Union[None, Nullable, str]' = None
-            nullableStruct: 'typing.Union[Nullable, TestCluster.Structs.SimpleStruct]' = None
+            nullableStruct: 'typing.Union[Nullable, TestCluster.Structs.SimpleStruct]' = NullValue
             optionalStruct: 'typing.Optional[TestCluster.Structs.SimpleStruct]' = None
             nullableOptionalStruct: 'typing.Union[None, Nullable, TestCluster.Structs.SimpleStruct]' = None
-            nullableList: 'typing.Union[Nullable, typing.List[TestCluster.Enums.SimpleEnum]]' = None
+            nullableList: 'typing.Union[Nullable, typing.List[TestCluster.Enums.SimpleEnum]]' = NullValue
             optionalList: 'typing.Optional[typing.List[TestCluster.Enums.SimpleEnum]]' = None
             nullableOptionalList: 'typing.Union[None, Nullable, typing.List[TestCluster.Enums.SimpleEnum]]' = None
 
@@ -24285,9 +24286,10 @@ class TestCluster(Cluster):
                             Label="c", Tag=3, Type=TestCluster.Structs.SimpleStruct),
                     ])
 
-            a: 'uint' = None
-            b: 'bool' = None
-            c: 'TestCluster.Structs.SimpleStruct' = None
+            a: 'uint' = 0
+            b: 'bool' = False
+            c: 'TestCluster.Structs.SimpleStruct' = field(
+                default_factory=lambda: TestCluster.Structs.SimpleStruct())
 
         @dataclass
         class NestedStructList(ClusterObject):
@@ -24311,13 +24313,15 @@ class TestCluster(Cluster):
                             Label="g", Tag=7, Type=typing.List[uint]),
                     ])
 
-            a: 'uint' = None
-            b: 'bool' = None
-            c: 'TestCluster.Structs.SimpleStruct' = None
-            d: 'typing.List[TestCluster.Structs.SimpleStruct]' = None
-            e: 'typing.List[uint]' = None
-            f: 'typing.List[bytes]' = None
-            g: 'typing.List[uint]' = None
+            a: 'uint' = 0
+            b: 'bool' = False
+            c: 'TestCluster.Structs.SimpleStruct' = field(
+                default_factory=lambda: TestCluster.Structs.SimpleStruct())
+            d: 'typing.List[TestCluster.Structs.SimpleStruct]' = field(
+                default_factory=lambda: [])
+            e: 'typing.List[uint]' = field(default_factory=lambda: [])
+            f: 'typing.List[bytes]' = field(default_factory=lambda: [])
+            g: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class DoubleNestedStructList(ClusterObject):
@@ -24329,7 +24333,8 @@ class TestCluster(Cluster):
                             Label="a", Tag=1, Type=typing.List[TestCluster.Structs.NestedStructList]),
                     ])
 
-            a: 'typing.List[TestCluster.Structs.NestedStructList]' = None
+            a: 'typing.List[TestCluster.Structs.NestedStructList]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class TestListStructOctet(ClusterObject):
@@ -24343,8 +24348,8 @@ class TestCluster(Cluster):
                             Label="operationalCert", Tag=2, Type=bytes),
                     ])
 
-            fabricIndex: 'uint' = None
-            operationalCert: 'bytes' = None
+            fabricIndex: 'uint' = 0
+            operationalCert: 'bytes' = b""
 
     class Commands:
         @dataclass
@@ -29572,11 +29577,11 @@ class GroupKeyManagement(Cluster):
                             Label="groupKeySecurityPolicy", Tag=5, Type=GroupKeyManagement.Enums.GroupKeySecurityPolicy),
                     ])
 
-            vendorId: 'uint' = None
-            groupKeyIndex: 'uint' = None
-            groupKeyRoot: 'bytes' = None
-            groupKeyEpochStartTime: 'uint' = None
-            groupKeySecurityPolicy: 'GroupKeyManagement.Enums.GroupKeySecurityPolicy' = None
+            vendorId: 'uint' = 0
+            groupKeyIndex: 'uint' = 0
+            groupKeyRoot: 'bytes' = b""
+            groupKeyEpochStartTime: 'uint' = 0
+            groupKeySecurityPolicy: 'GroupKeyManagement.Enums.GroupKeySecurityPolicy' = 0
 
         @dataclass
         class GroupState(ClusterObject):
@@ -29592,9 +29597,9 @@ class GroupKeyManagement(Cluster):
                             Label="groupKeySetIndex", Tag=3, Type=uint),
                     ])
 
-            vendorId: 'uint' = None
-            vendorGroupId: 'uint' = None
-            groupKeySetIndex: 'uint' = None
+            vendorId: 'uint' = 0
+            vendorGroupId: 'uint' = 0
+            groupKeySetIndex: 'uint' = 0
 
     class Attributes:
         @dataclass
