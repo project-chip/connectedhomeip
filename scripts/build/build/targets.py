@@ -113,7 +113,7 @@ class HostBuildVariant:
     def __init__(self, name: str, validator=AcceptAnyName(), conflicts: List[str] = [], **buildargs):
         self.name = name
         self.validator = validator
-        self.conflicts = conflictst
+        self.conflicts = conflicts
         self.buildargs = buildargs
 
 
