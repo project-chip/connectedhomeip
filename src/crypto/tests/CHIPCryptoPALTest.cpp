@@ -1952,7 +1952,7 @@ static void TestX509_IssuingTimestampValidation(nlTestSuite * inSuite, void * in
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_EXPIRED);
 
     // test certificate validity (this one contains validity until year 9999 so it will not fail soon)
-    err = IsCertificateValid(kDacCert);
+    err = IsCertificateValidAtCurrentTime(kDacCert);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 

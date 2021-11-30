@@ -1323,7 +1323,6 @@ exit:
     mbedtls_x509_crt_free(&mbedToBeEvaluatedCertificate);
 
 #else
-    (void) validityType;
     (void) referenceCertificate;
     (void) toBeEvaluatedCertificate;
     CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
@@ -1332,7 +1331,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR IsCertificateValid(const ByteSpan & certificate)
+CHIP_ERROR IsCertificateValidAtCurrentTime(const ByteSpan & certificate)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
     CHIP_ERROR error = CHIP_NO_ERROR;

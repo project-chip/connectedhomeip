@@ -1713,7 +1713,7 @@ CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, c
     ASN1_TIME * refNotBeforeTime                    = nullptr;
     ASN1_TIME * tbeNotBeforeTime                    = nullptr;
     ASN1_TIME * tbeNotAfterTime                     = nullptr;
-    int result                                      = 0;
+    // int result                                      = 0;
 
     VerifyOrReturnError(!referenceCertificate.empty() && !toBeEvaluatedCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -1744,7 +1744,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR IsCertificateValid(const ByteSpan & certificate)
+CHIP_ERROR IsCertificateValidAtCurrentTime(const ByteSpan & certificate)
 {
     CHIP_ERROR error                   = CHIP_NO_ERROR;
     X509 * x509Certificate             = nullptr;
