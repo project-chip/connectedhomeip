@@ -168,23 +168,15 @@ bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData &
     switch (currentFilter.type)
     {
     case Dnssd::DiscoveryFilterType::kShort:
-        return (nodeData.longDiscriminator >> 8) == currentFilter.code;
+        return ((nodeData.longDiscriminator >> 8) & 0x0F) == currentFilter.code;
     case Dnssd::DiscoveryFilterType::kLong:
         return nodeData.longDiscriminator == currentFilter.code;
-    case Dnssd::DiscoveryFilterType::kVendor:
-        return nodeData.vendorId == currentFilter.code;
-    case Dnssd::DiscoveryFilterType::kDeviceType:
-        return nodeData.deviceType == currentFilter.code;
-    case Dnssd::DiscoveryFilterType::kCommissioningMode:
-        return nodeData.commissioningMode == currentFilter.code;
-    case Dnssd::DiscoveryFilterType::kNone:
-    case Dnssd::DiscoveryFilterType::kInstanceName:
-    case Dnssd::DiscoveryFilterType::kCommissioner:
-    case Dnssd::DiscoveryFilterType::kCompressedFabricId:
+    default:
         return false;
     }
     return false;
 }
+
 void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::DiscoveredNodeData & nodeData)
 {
     if (!NodeMatchesCurrentFilter(nodeData))
