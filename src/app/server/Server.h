@@ -23,6 +23,7 @@
 #include <credentials/FabricTable.h>
 #include <credentials/GroupDataProviderImpl.h>
 #include <inet/InetConfig.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/CASEServer.h>
@@ -91,7 +92,7 @@ public:
     static Server & GetInstance() { return sServer; }
 
 private:
-    Server() : mCommissioningWindowManager(this), mGroupsProvider(mServerStorage) {}
+    Server() : mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage) {}
 
     static Server sServer;
 
@@ -146,9 +147,14 @@ private:
     chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     SecurePairingUsingTestSecret mTestPairing;
-
-    ServerStorageDelegate mServerStorage;
     CommissioningWindowManager mCommissioningWindowManager;
+
+    // Both PersistentStorageDelegate, and GroupDataProvider should be injected by the applications
+    // See: https://github.com/project-chip/connectedhomeip/issues/12276
+    ServerStorageDelegate mServerStorage;
+    // Currently, the GroupDataProvider cannot use KeyValueStoreMgr() due to
+    // (https://github.com/project-chip/connectedhomeip/issues/12174)
+    TestPersistentStorageDelegate mGroupsStorage;
     Credentials::GroupDataProviderImpl mGroupsProvider;
 
     chip::OperationalDeviceProxy * mOperationalDeviceProxy = nullptr;
