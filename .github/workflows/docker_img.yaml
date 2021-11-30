@@ -31,8 +31,24 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                # TODO: Enables "-crosscompile" and "-vscode" images
-                img: ["", "-android", "-cirque", "-doxygen", "-efr32", "-esp32", "-esp32-qemu", "-infineon", "-k32w", "-mbed-os", "-nrf-platform", "-telink", "-tizen"]
+                img:
+                    - ""
+                    - "-ameba"
+                    - "-android"
+                    - "-cirque"
+                    - "-crosscompile"
+                    - "-doxygen"
+                    - "-efr32"
+                    - "-esp32"
+                    - "-esp32-qemu"
+                    - "-infineon"
+                    - "-k32w"
+                    - "-mbed-os"
+                    - "-nrf-platform"
+                    - "-telink"
+                    - "-tizen"
+                    # NOTE: vscode image consumes ~52 GB disk space but GitHub-hosted runners provide ~10 GB free disk space(https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources)
+                    #- "-vscode"
         steps:
             - name: Checkout
               uses: actions/checkout@v2
@@ -43,6 +59,7 @@ jobs:
             - name: Scan for vulnerabilities
               uses: crazy-max/docker-scan-action@master
               with:
-                  image: connectedhomeip/chip-build${{ matrix.img }}:0.5.33
+                  # NOTE: This task validates the images built previously with latest tag
+                  image: connectedhomeip/chip-build${{ matrix.img }}:latest
                   annotations: true
 
