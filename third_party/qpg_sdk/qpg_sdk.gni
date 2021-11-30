@@ -58,6 +58,7 @@ template("qpg_sdk") {
 
     include_dirs += [
       "${qpg_sdk_root}/${qpg_target_ic}/comps/qvCHIP/inc",
+      "${qpg_sdk_root}/${qpg_target_ic}/comps/qvIO/inc",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/gpFreeRTOS/config",
       "${qpg_sdk_root}/${qpg_target_ic}/comps/libmbedtls",
       "${mbedtls_root}/repo/include",
