@@ -116,6 +116,13 @@ class HostBuildVariant:
         self.conflicts = []
         self.buildargs = buildargs
 
+def HasConflicts(items: List[HostBuildVariant]) -> bool:
+    for a, b in combinations(subgroup, 2):
+        if (a.name in b.conflicts) or (b.name in a.conflicts):
+           return True
+    return False
+
+
 
 def HostTargets():
     target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
@@ -143,7 +150,7 @@ def HostTargets():
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
 
-    # Possible build variantes. Note that number of potential
+    # Possible build variants. Note that number of potential
     # builds is exponential here
     variants = [
         HostBuildVariant(name="ipv6only", enable_ipv4=False),
@@ -169,14 +176,7 @@ def HostTargets():
         # Build every possible variant
         for variant_count in range(1, len(ok_variants) + 1):
             for subgroup in combinations(ok_variants, variant_count):
-                # find if a subgroup contains a conflict
-                conflict = False
-                for a, b in combinations(subgroup, 2):
-                    if (a.name in b.conflicts) or (b.name in a.conflicts):
-                        conflict = True
-                        break
-
-                if conflict:
+                if HasConflicts(subgroup):
                     continue
 
                 # Target ready to be created - no conflicss
