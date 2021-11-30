@@ -83,8 +83,8 @@ public:
     CHIP_ERROR RunCommand(NodeId remoteId, uint64_t fabricId) override
     {
         ChipLogProgress(chipTool, "Mdns: Updating NodeId: %" PRIx64 " Compressed FabricId: %" PRIx64 " ...", remoteId,
-                        mController.GetCompressedFabricId());
-        return mController.UpdateDevice(remoteId);
+                        CurrentCommissioner().GetCompressedFabricId());
+        return CurrentCommissioner().UpdateDevice(remoteId);
     }
 
     /////////// DeviceAddressUpdateDelegate Interface /////////

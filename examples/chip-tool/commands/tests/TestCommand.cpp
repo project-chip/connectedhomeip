@@ -20,7 +20,7 @@
 
 CHIP_ERROR TestCommand::RunCommand()
 {
-    return mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
 void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
