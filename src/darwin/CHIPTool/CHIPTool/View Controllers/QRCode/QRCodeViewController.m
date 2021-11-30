@@ -684,8 +684,8 @@
         NSString * ssid = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey);
         params.networkID = [ssid dataUsingEncoding:NSUTF8StringEncoding];
     } else {
-        uint8_t tempThreadNetworkId[] = { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef };
-        params.networkID = [NSData dataWithBytes:tempThreadNetworkId length:sizeof(tempThreadNetworkId)];
+        NSString * ExtPanID = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kThreadNetworkExtPanIDDefaultsKey);
+        params.networkID = [self convertString:ExtPanID];
     }
     params.breadcrumb = @(0);
     params.timeoutMs = @(3000);
