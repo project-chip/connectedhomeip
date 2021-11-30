@@ -87,7 +87,7 @@ jobs:
               timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
-                  "./scripts/tests/run_test_suite.py 
+                  "./scripts/tests/run_test_suite.py \
                      --chip-tool ./out/debug/standalone/chip-tool \
                      run \
                      --iterations 2 \
