@@ -26,6 +26,7 @@
 
 #include <cstdint>
 
+#include <app-common/zap-generated/enums.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/PersistedStorage.h>
@@ -188,7 +189,8 @@ inline CHIP_ERROR ConfigurationManager::GetRegulatoryConfig(uint8_t & location)
 
 inline CHIP_ERROR ConfigurationManager::GetLocationCapability(uint8_t & location)
 {
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    location = EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR;
+    return CHIP_NO_ERROR;
 }
 
 } // namespace DeviceLayer
