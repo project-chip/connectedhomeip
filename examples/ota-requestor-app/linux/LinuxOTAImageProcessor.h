@@ -16,32 +16,30 @@
  *    limitations under the License.
  */
 
-/* This file contains the declarations for OTAImageProcessor, a platform-agnostic
- * interface for processing downloaded chunks of OTA image data.
- * Each platform should provide an implementation of this interface.
+/* This file contains the decalarions for the Linux implementation of the
+ * the OTAImageProcessorDriver interface class
  */
 
-#pragma once
+#include "app/clusters/ota-requestor/OTAImageProcessor.h"
 
-// This is a platform-agnostic interface for processing downloaded
-// chunks of OTA image data (data could be raw image data meant for flash or
-// metadata). Each platform should provide an implementation of this
-// interface.
-class OTAImageProcessorDriver
+class LinuxOTAImageProcessor : public OTAImageProcessorDriver
 {
-public:
+
+    // Virtuial functions from OTAImageProcessorDriver -- start
     // Open file, find block of space in persistent memory, or allocate a buffer, etc.
-    virtual CHIP_ERROR PrepareDownload() = 0;
+    CHIP_ERROR PrepareDownload() { return CHIP_NO_ERROR; }
 
     // Must not be a blocking call to support cases that require IO to elements such as // external peripherals/radios
-    virtual CHIP_ERROR ProcessBlock(ByteSpan & data) = 0;
+    CHIP_ERROR ProcessBlock(chip::ByteSpan & data) { return CHIP_NO_ERROR; }
 
     // Close file, close persistent storage, etc
-    virtual CHIP_ERROR Finalize() = 0;
+    CHIP_ERROR Finalize() { return CHIP_NO_ERROR; }
 
-    virtual chip::Optional<uint8_t> PercentComplete() = 0;
+    chip::Optional<uint8_t> PercentComplete() { return chip::Optional<uint8_t>(0); }
 
     // Clean up the download which could mean erasing everything that was written,
     // releasing buffers, etc.
-    virtual CHIP_ERROR Abort() = 0;
+    CHIP_ERROR Abort() { return CHIP_NO_ERROR; }
+
+    // Virtuial functions from OTAImageProcessorDriver -- end
 };
