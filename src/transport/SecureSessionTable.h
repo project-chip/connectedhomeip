@@ -50,6 +50,7 @@ public:
      * @param peerCATs represents peer CASE Authenticated Tags
      * @param peerSessionId represents the encryption key ID assigned by peer node
      * @param fabric represents fabric ID for the session
+     * @param config represents the reliable message protocol configuration
      *
      * @note the newly created state will have an 'active' time set based on the current time source.
      *

@@ -34,30 +34,14 @@ constexpr uint32_t kTimeoutMs  = 6000;
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    // If we're OpenCommissioningWindow we don't need to be registered as a
-    // delegate; we just get notified directly via the callbacks we pass to
-    // GetConnectedDevice.  In fact, if we _do_ register as a delegate we get
-    // callbacks we don't expect and then weird things happen.
-    if (mPairingMode != PairingMode::OpenCommissioningWindow)
-    {
-        CurrentCommissioner().RegisterDeviceAddressUpdateDelegate(this);
-        CurrentCommissioner().RegisterPairingDelegate(this);
-    }
-
-    err = RunInternal(mNodeId);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Init Failure! PairDevice: %s", ErrorStr(err)));
-
-exit:
-    return err;
+    CurrentCommissioner().RegisterDeviceAddressUpdateDelegate(this);
+    CurrentCommissioner().RegisterPairingDelegate(this);
+    return RunInternal(mNodeId);
 }
 
 CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
-    InitCallbacks();
 
     switch (mPairingMode)
     {
@@ -82,30 +66,9 @@ CHIP_ERROR PairingCommand::RunInternal(NodeId remoteId)
     case PairingMode::Ethernet:
         err = Pair(remoteId, PeerAddress::UDP(mRemoteAddr.address, mRemotePort));
         break;
-    case PairingMode::OpenCommissioningWindow:
-        err = CurrentCommissioner().GetConnectedDevice(remoteId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %" CHIP_ERROR_FORMAT,
-                         remoteId, err.Format());
-        }
-
-        break;
     }
 
     return err;
-}
-
-void PairingCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
-{
-    PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
-    command->OpenCommissioningWindow();
-}
-void PairingCommand::OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error)
-{
-    PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
-    ChipLogError(chipTool, "Failed in connecting to the device %" PRIu64 ". Error %" CHIP_ERROR_FORMAT, deviceId, error.Format());
-    command->SetCommandExitStatus(error);
 }
 
 CHIP_ERROR PairingCommand::PairWithQRCode(NodeId remoteId)
@@ -160,24 +123,6 @@ CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
     CHIP_ERROR err = CurrentCommissioner().UnpairDevice(remoteId);
     SetCommandExitStatus(err);
     return err;
-}
-
-void PairingCommand::OnOpenCommissioningWindowResponse(void * context, NodeId remoteId, CHIP_ERROR err, chip::SetupPayload payload)
-{
-    PairingCommand * command = reinterpret_cast<PairingCommand *>(context);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(chipTool,
-                     "Failed in opening commissioning window on the device: 0x" ChipLogFormatX64 ", error %" CHIP_ERROR_FORMAT,
-                     ChipLogValueX64(remoteId), err.Format());
-    }
-    command->SetCommandExitStatus(err);
-}
-
-CHIP_ERROR PairingCommand::OpenCommissioningWindow()
-{
-    return CurrentCommissioner().OpenCommissioningWindowWithCallback(
-        mNodeId, mTimeout, mIteration, mDiscriminator, mCommissioningWindowOption, &mOnOpenCommissioningWindowCallback);
 }
 
 void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
@@ -267,25 +212,6 @@ exit:
     return err;
 }
 
-void PairingCommand::InitCallbacks()
-{
-    mOnAddThreadNetworkCallback =
-        new Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback>(OnAddNetworkResponse, this);
-    mOnAddWiFiNetworkCallback =
-        new Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback>(OnAddNetworkResponse, this);
-    mOnEnableNetworkCallback =
-        new Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback>(OnEnableNetworkResponse, this);
-    mOnFailureCallback = new Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-}
-
-void PairingCommand::Shutdown()
-{
-    delete mOnAddThreadNetworkCallback;
-    delete mOnAddWiFiNetworkCallback;
-    delete mOnEnableNetworkCallback;
-    delete mOnFailureCallback;
-}
-
 CHIP_ERROR PairingCommand::AddNetwork(PairingNetworkType networkType)
 {
     return (networkType == PairingNetworkType::WiFi) ? AddWiFiNetwork() : AddThreadNetwork();
@@ -293,16 +219,16 @@ CHIP_ERROR PairingCommand::AddNetwork(PairingNetworkType networkType)
 
 CHIP_ERROR PairingCommand::AddThreadNetwork()
 {
-    Callback::Cancelable * successCallback = mOnAddThreadNetworkCallback->Cancel();
-    Callback::Cancelable * failureCallback = mOnFailureCallback->Cancel();
+    Callback::Cancelable * successCallback = mOnAddThreadNetworkCallback.Cancel();
+    Callback::Cancelable * failureCallback = mOnFailureCallback.Cancel();
 
     return mCluster.AddThreadNetwork(successCallback, failureCallback, mOperationalDataset, kBreadcrumb, kTimeoutMs);
 }
 
 CHIP_ERROR PairingCommand::AddWiFiNetwork()
 {
-    Callback::Cancelable * successCallback = mOnAddWiFiNetworkCallback->Cancel();
-    Callback::Cancelable * failureCallback = mOnFailureCallback->Cancel();
+    Callback::Cancelable * successCallback = mOnAddWiFiNetworkCallback.Cancel();
+    Callback::Cancelable * failureCallback = mOnFailureCallback.Cancel();
 
     return mCluster.AddWiFiNetwork(successCallback, failureCallback, mSSID, mPassword, kBreadcrumb, kTimeoutMs);
 }
@@ -329,8 +255,8 @@ chip::ByteSpan PairingCommand::GetThreadNetworkId()
 
 CHIP_ERROR PairingCommand::EnableNetwork()
 {
-    Callback::Cancelable * successCallback = mOnEnableNetworkCallback->Cancel();
-    Callback::Cancelable * failureCallback = mOnFailureCallback->Cancel();
+    Callback::Cancelable * successCallback = mOnEnableNetworkCallback.Cancel();
+    Callback::Cancelable * failureCallback = mOnFailureCallback.Cancel();
 
     ByteSpan networkId;
     if (mNetworkType == PairingNetworkType::WiFi)

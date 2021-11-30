@@ -21,6 +21,11 @@
  * this interface.
  */
 
+#include <app-common/zap-generated/cluster-objects.h>
+#include <app/CommandHandler.h>
+
+#include <app/util/util.h>
+
 #pragma once
 
 // Interface class to connect the OTA Software Update Requestor cluster command processing
@@ -29,15 +34,25 @@ class OTARequestorInterface
 {
 public:
     // Handler for the AnnounceOTAProvider command
-    virtual bool HandleAnnounceOTAProvider(
+    virtual EmberAfStatus HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData ch) = 0;
+        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData) = 0;
 
+    // TBD: This probably doesn't need to be a method OTARequestorInterface as the response handler is
+    // explicitly supplied at command invocation
     // Handler for the QueryImageResponse command
-    virtual bool HandleQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, CharSpan imageURI,
-                                          uint32_t softwareVersion, CharSpan softwareVersionString, ByteSpan updateToken,
-                                          bool userConsentNeeded, ByteSpan metadataForRequester) = 0;
+    // virtual bool
+    // HandleQueryImageResponse(chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType) = 0;
 
-    // Handler for the ApplyUpdateResponse command
-    virtual bool HandleApplyUpdateResponse(ApplyUpdateResponse::DecodableType);
+    // Destructor
+    virtual ~OTARequestorInterface() = default;
 };
+
+// The instance of the class implementing OTARequestorInterface must be managed through
+// the following global getter and setter functions.
+
+// Set the object implementing OTARequestorInterface
+void SetRequestorInstance(OTARequestorInterface * instance);
+
+// Get the object implementing OTARequestorInterface
+OTARequestorInterface * GetRequestorInstance();
