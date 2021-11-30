@@ -17,6 +17,8 @@
 
 #pragma once
 
+#include "OTAUpdater_esp32.h"
+#include "platform/ESP32/ESP32Utils.h"
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
@@ -24,9 +26,6 @@
 #include <protocols/bdx/BdxMessages.h>
 #include <protocols/bdx/BdxTransferSession.h>
 #include <protocols/bdx/TransferFacilitator.h>
-#include "platform/ESP32/ESP32Utils.h"
-#include "OTAUpdater_esp32.h"
-
 
 namespace chip {
 namespace Shell {
@@ -100,8 +99,7 @@ inline void DFUManager::HandleTransferSessionOutput(bdx::TransferSession::Output
             OTAUpdater::GetInstance().Begin();
         }
         // TODO: Process/skip the Matter OTA header
-        OTAUpdater::GetInstance().Write(reinterpret_cast<const void *>(event.blockdata.Data),
-                                        event.blockdata.Length);
+        OTAUpdater::GetInstance().Write(reinterpret_cast<const void *>(event.blockdata.Data), event.blockdata.Length);
         if (event.blockdata.IsEof)
         {
             err = mTransfer.PrepareBlockAck();

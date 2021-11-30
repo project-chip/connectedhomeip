@@ -169,7 +169,7 @@ void OnQueryImageFailure(void * /* context */, EmberAfStatus status)
     ChipLogError(SoftwareUpdate, "QueryImage failed: %" PRIu16, static_cast<uint16_t>(status));
 }
 
-}
+} // namespace
 } // namespace Shell
 } // namespace chip
 

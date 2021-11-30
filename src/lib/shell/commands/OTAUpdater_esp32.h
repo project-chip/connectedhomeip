@@ -21,7 +21,7 @@
 #include "esp_ota_ops.h"
 #include "esp_system.h"
 
-static const char* TAG = "OTAUpdater";
+static const char * TAG = "OTAUpdater";
 
 class OTAUpdater
 {
@@ -34,11 +34,12 @@ public:
     bool IsInProgress(void) { return otaUpdateInProgress; }
     esp_err_t Begin(void);
     esp_err_t End(void);
-    esp_err_t Write(const void* data, size_t length);
+    esp_err_t Write(const void * data, size_t length);
     esp_err_t Abort(void);
     esp_err_t Apply();
+
 private:
-    bool otaUpdateInProgress = false;
+    bool otaUpdateInProgress                   = false;
     const esp_partition_t * otaUpdatePartition = nullptr;
     esp_ota_handle_t otaUpdateHandle;
     uint32_t otaUpdateImageLen = 0;
