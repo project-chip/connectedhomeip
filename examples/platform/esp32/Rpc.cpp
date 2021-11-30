@@ -53,8 +53,8 @@
 #endif // defined(PW_RPC_LOCKING_SERVICE) && PW_RPC_LOCKING_SERVICE
 
 #if defined(PW_RPC_TRACING_SERVICE) && PW_RPC_TRACING_SERVICE
-#include "pw_trace_tokenized/trace_rpc_service_nanopb.h"
 #include "pw_trace/trace.h"
+#include "pw_trace_tokenized/trace_rpc_service_nanopb.h"
 
 // Define trace time for pw_trace
 PW_TRACE_TIME_TYPE pw_trace_GetTraceTime()
