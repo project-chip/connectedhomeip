@@ -222,8 +222,7 @@ void pychip_WriteClient_InitCallbacks(OnWriteResponseCallback onWriteResponseCal
 void pychip_ReadClient_InitCallbacks(OnReadAttributeDataCallback onReadAttributeDataCallback,
                                      OnReadEventDataCallback onReadEventDataCallback,
                                      OnSubscriptionEstablishedCallback onSubscriptionEstablishedCallback,
-                                     OnReadErrorCallback onReadErrorCallback,
-                                     OnReadDoneCallback onReadDoneCallback)
+                                     OnReadErrorCallback onReadErrorCallback, OnReadDoneCallback onReadDoneCallback)
 {
     gOnReadAttributeDataCallback       = onReadAttributeDataCallback;
     gOnReadEventDataCallback           = onReadEventDataCallback;
