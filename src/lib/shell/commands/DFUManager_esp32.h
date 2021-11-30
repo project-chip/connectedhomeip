@@ -62,7 +62,7 @@ inline void DFUManager::HandleTransferSessionOutput(bdx::TransferSession::Output
     using SendMessageFlags = Messaging::SendMessageFlags;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-    
+
     if (event.EventType != OutputEventType::kNone)
     {
         ChipLogDetail(BDX, "OutputEvent type: %s", event.ToString(event.EventType));

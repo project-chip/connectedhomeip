@@ -54,7 +54,7 @@ inline esp_err_t OTAUpdater::Begin(void)
         ESP_LOGW(TAG, "Already in progress");
         return ESP_ERR_INVALID_STATE;
     }
-    
+
     ESP_LOGI(TAG, "Begin OTA");
     otaUpdatePartition = esp_ota_get_next_update_partition(NULL);
     if (otaUpdatePartition == NULL)
