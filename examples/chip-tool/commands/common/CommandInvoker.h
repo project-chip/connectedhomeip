@@ -86,13 +86,45 @@ public:
 
     CHIP_ERROR InvokeCommand(DeviceProxy * aDevice, EndpointId aEndpoint, const RequestType & aRequestData)
     {
-        app::CommandPathParams commandPath = { aEndpoint, 0, RequestType::GetClusterId(), RequestType::GetCommandId(),
+        app::CommandPathParams commandPath = { aEndpoint, 0 /* groupId */, RequestType::GetClusterId(), RequestType::GetCommandId(),
                                                (app::CommandPathFlags::kEndpointIdValid) };
         auto commandSender                 = Platform::MakeUnique<app::CommandSender>(this, aDevice->GetExchangeManager());
         VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
         ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, aRequestData));
         ReturnErrorOnFailure(commandSender->SendCommandRequest(aDevice->GetSecureSession().Value()));
+        commandSender.release();
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR InvokeGroupCommand(DeviceProxy * aDevice, GroupId groupId, const RequestType & aRequestData)
+    {
+        app::CommandPathParams commandPath = { 0 /* endpoint */, groupId, RequestType::GetClusterId(), RequestType::GetCommandId(),
+                                               (app::CommandPathFlags::kGroupIdValid) };
+
+        auto commandSender = Platform::MakeUnique<app::CommandSender>(this, aDevice->GetExchangeManager());
+        VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
+
+        ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, aRequestData));
+
+        if (aDevice->GetSecureSession().HasValue())
+        {
+            SessionHandle session = aDevice->GetSecureSession().Value();
+            session.SetGroupId(groupId);
+
+            if (!session.IsGroupSession())
+            {
+                return CHIP_ERROR_INCORRECT_STATE;
+            }
+
+            ReturnErrorOnFailure(commandSender->SendCommandRequest(session));
+        }
+        else
+        {
+            // something fishy is going on
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
         commandSender.release();
         return CHIP_NO_ERROR;
     }
@@ -158,6 +190,19 @@ CHIP_ERROR InvokeCommand(DeviceProxy * aDevice, void * aContext,
     auto invoker = detail::CommandInvoker<RequestType>::Alloc(aContext, aSuccessCallback, aFailureCallback);
     VerifyOrReturnError(invoker != nullptr, CHIP_ERROR_NO_MEMORY);
     ReturnErrorOnFailure(invoker->InvokeCommand(aDevice, aEndpoint, aRequestData));
+    invoker.release();
+    return CHIP_NO_ERROR;
+}
+
+template <typename RequestType>
+CHIP_ERROR InvokeGroupCommand(DeviceProxy * aDevice, void * aContext,
+                              typename detail::CommandInvoker<RequestType>::SuccessCallback aSuccessCallback,
+                              typename detail::CommandInvoker<RequestType>::FailureCallback aFailureCallback, GroupId groupId,
+                              const RequestType & aRequestData)
+{
+    auto invoker = detail::CommandInvoker<RequestType>::Alloc(aContext, aSuccessCallback, aFailureCallback);
+    VerifyOrReturnError(invoker != nullptr, CHIP_ERROR_NO_MEMORY);
+    ReturnErrorOnFailure(invoker->InvokeGroupCommand(aDevice, groupId, aRequestData));
     invoker.release();
     return CHIP_NO_ERROR;
 }
