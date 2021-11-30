@@ -33,6 +33,7 @@
 #include "qvCHIP.h"
 
 // CHIP includes
+#include <app/server/Dnssd.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPPlatformMemory.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -127,7 +128,7 @@ CHIP_ERROR CHIP_Init(void)
 #endif // CHIP_ENABLE_OPENTHREAD
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    chip::app::MdnsServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
 #endif
 
     ChipLogProgress(NotSpecified, "Starting Platform Manager Event Loop");

@@ -27,7 +27,7 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
-#include <app/server/Mdns.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -116,7 +116,7 @@ CHIP_ERROR AppTask::Init()
     qvCHIP_LedSet(LOCK_STATE_LED, !BoltLockMgr().IsUnlocked());
 
 #if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
-    chip::app::MdnsServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
 #endif
 
     // Init ZCL Data Model
