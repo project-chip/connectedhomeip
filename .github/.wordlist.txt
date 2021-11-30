@@ -549,6 +549,7 @@ lightin
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
+LinuxOTARequestorDriver
 LocalConfigDisabled
 localhost
 localstatedir
@@ -701,9 +702,13 @@ optionsMask
 optionsOverride
 orgs
 OTA
+OTADownloader
+OTAImageProcessorDriver
 OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
+OTARequestor
+OTARequestorDriver
 OTARequesterImpl
 OTARequestorSerialPort
 OTBR
@@ -860,7 +865,10 @@ SERIALDEVICE
 SerialNumber
 ServiceId
 SetDns
+SetImageProcessorDelegate
+SetOtaRequestorDriver
 SetpointRaiseLower
+SetRequestorInstance
 SetUpPINCode
 SetupQRCode
 sexualized
