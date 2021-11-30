@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #include "AppEvent.h"
@@ -28,57 +29,58 @@
 
 #include <lib/core/CHIPError.h>
 
-class BoltLockManager
+class LightingManager
 {
 public:
-    enum class Action
+    enum Action_t
     {
-        kLock = 0,
-        kUnlock,
-        KInvalid
-    };
+        ON_ACTION = 0,
+        OFF_ACTION,
 
-    enum class State
+        INVALID_ACTION
+    } Action;
+
+    enum State_t
     {
-        kLockingInitiated = 0,
-        kLockingCompleted,
-        kUnlockingInitiated,
-        kUnlockingCompleted,
-    };
+        kState_OffInitiated = 0,
+        kState_OffCompleted,
+        kState_OnInitiated,
+        kState_OnCompleted,
+    } State;
 
     CHIP_ERROR Init();
-    bool IsUnlocked();
-    void EnableAutoRelock(bool aOn);
-    void SetAutoLockDuration(uint32_t aDurationInSecs);
+    bool IsLightOn();
+    void EnableAutoTurnOff(bool aOn);
+    void SetAutoTurnOffDuration(uint32_t aDurationInSecs);
     bool IsActionInProgress();
-    bool InitiateAction(int32_t aActor, Action aAction);
+    bool InitiateAction(int32_t aActor, Action_t aAction);
 
-    typedef void (*Callback_fn_initiated)(Action, int32_t aActor);
-    typedef void (*Callback_fn_completed)(Action);
+    typedef void (*Callback_fn_initiated)(Action_t, int32_t aActor);
+    typedef void (*Callback_fn_completed)(Action_t);
     void SetCallbacks(Callback_fn_initiated aActionInitiated_CB, Callback_fn_completed aActionCompleted_CB);
 
 private:
-    friend BoltLockManager & BoltLockMgr(void);
-    State mState = State::kUnlockingCompleted;
+    friend LightingManager & LightMgr(void);
+    State_t mState = kState_OnCompleted;
 
     Callback_fn_initiated mActionInitiated_CB;
     Callback_fn_completed mActionCompleted_CB;
 
-    bool mAutoRelock           = false;
-    uint32_t mAutoLockDuration = 0;
-    bool mAutoLockTimerArmed   = false;
+    bool mAutoTurnOff;
+    uint32_t mAutoTurnOffDuration;
+    bool mAutoTurnOffTimerArmed;
 
     void CancelTimer(void);
     void StartTimer(uint32_t aTimeoutMs);
 
     static void TimerEventHandler(TimerHandle_t xTimer);
-    static void AutoReLockTimerEventHandler(AppEvent * aEvent);
+    static void AutoTurnOffTimerEventHandler(AppEvent * aEvent);
     static void ActuatorMovementTimerEventHandler(AppEvent * aEvent);
 
-    static BoltLockManager sLock;
+    static LightingManager sLight;
 };
 
-inline BoltLockManager & BoltLockMgr(void)
+inline LightingManager & LightMgr(void)
 {
-    return BoltLockManager::sLock;
+    return LightingManager::sLight;
 }

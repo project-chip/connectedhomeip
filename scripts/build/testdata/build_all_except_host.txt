@@ -272,6 +272,9 @@ idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rp
 # Generating infineon-p6-all-clusters
 gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-all-clusters
 
+# Generating infineon-p6-light
+gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-light
+
 # Generating infineon-p6-lock
 gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
 
@@ -678,6 +681,9 @@ idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rp
 
 # Building infineon-p6-all-clusters
 ninja -C {out}/infineon-p6-all-clusters
+
+# Building infineon-p6-light
+ninja -C {out}/infineon-p6-light
 
 # Building infineon-p6-lock
 ninja -C {out}/infineon-p6-lock

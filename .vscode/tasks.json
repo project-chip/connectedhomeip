@@ -246,6 +246,7 @@
                 "esp32-m5stack-all-clusters-rpc-ipv6only",
                 "infineon-p6-all-clusters",
                 "infineon-p6-lock",
+                "infineon-p6-light",
                 "linux-arm64-all-clusters",
                 "linux-arm64-all-clusters-ipv6only",
                 "linux-arm64-chip-tool",

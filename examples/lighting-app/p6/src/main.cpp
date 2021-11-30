@@ -2,7 +2,6 @@
  *
  *    Copyright (c) 2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
- *    Copyright 2021, Cypress Semiconductor Corporation (an Infineon company)
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -83,7 +82,7 @@ int main(void)
 #endif
 
     P6_LOG("==================================================\r\n");
-    P6_LOG("chip-p6-all-clusters-example starting\r\n");
+    P6_LOG("chip-p6-lighting-example starting\r\n");
     P6_LOG("==================================================\r\n");
 
     // Init Chip memory management before the stack
@@ -102,14 +101,7 @@ int main(void)
         P6_LOG("PlatformMgr().InitChipStack() failed");
         appError(ret);
     }
-
-    ret = chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("P6_CLUSTERS");
-    if (ret != CHIP_NO_ERROR)
-    {
-        P6_LOG("ConnectivityMgr().SetBLEDeviceName() failed");
-        appError(ret);
-    }
-
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("P6_LIGHT");
     P6_LOG("Starting Platform Manager Event Loop");
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
