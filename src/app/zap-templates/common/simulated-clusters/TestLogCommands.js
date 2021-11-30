@@ -30,9 +30,15 @@ const Log = {
   response : { arguments : [] }
 };
 
+const UserPrompt = {
+  name : 'UserPrompt',
+  arguments : [ { type : 'CHAR_STRING', name : 'message' } ],
+  response : { arguments : [] }
+};
+
 const LogCommands = {
   name : 'LogCommands',
-  commands : [ Log ],
+  commands : [ Log, UserPrompt ],
 };
 
 //

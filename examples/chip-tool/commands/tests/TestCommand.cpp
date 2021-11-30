@@ -60,7 +60,14 @@ CHIP_ERROR TestCommand::Wait(chip::System::Clock::Timeout duration)
 CHIP_ERROR TestCommand::Log(const char * message)
 {
     ChipLogDetail(chipTool, "%s", message);
-    WaitForMs(0);
+    ReturnErrorOnFailure(ContinueOnChipMainThread());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TestCommand::UserPrompt(const char * message)
+{
+    ChipLogDetail(chipTool, "USER_PROMPT: %s", message);
+    ReturnErrorOnFailure(ContinueOnChipMainThread());
     return CHIP_NO_ERROR;
 }
 
@@ -175,7 +182,7 @@ bool TestCommand::ShouldSkip(const char * expression)
     if (shouldSkip)
     {
         ChipLogProgress(chipTool, " **** Skipping: %s == false\n", expression);
-        WaitForMs(0);
+        ContinueOnChipMainThread();
     }
     return shouldSkip;
 }
