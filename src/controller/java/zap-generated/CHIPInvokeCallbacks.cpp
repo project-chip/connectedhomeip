@@ -83,7 +83,8 @@ void CHIPAccountLoginClusterGetSetupPINResponseCallback::CallbackFn(
 
     jobject setupPIN;
 
-    setupPIN = chip::UtfString(env, dataResponse.setupPIN).jniValue();
+    chip::UtfString setupPINUtfString(env, dataResponse.setupPIN);
+    setupPIN = setupPINUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, setupPIN);
 }
@@ -149,7 +150,8 @@ void CHIPApplicationLauncherClusterLaunchAppResponseCallback::CallbackFn(
         statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
     jobject data;
 
-    data = chip::UtfString(env, dataResponse.data).jniValue();
+    chip::UtfString dataUtfString(env, dataResponse.data);
+    data = dataUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
 }
@@ -209,7 +211,8 @@ void CHIPContentLauncherClusterLaunchContentResponseCallback::CallbackFn(
 
     jobject data;
 
-    data = chip::UtfString(env, dataResponse.data).jniValue();
+    chip::UtfString dataUtfString(env, dataResponse.data);
+    data = dataUtfString.jniValue();
     jobject contentLaunchStatus;
 
     std::string contentLaunchStatusClassName     = "java/lang/Integer";
@@ -275,7 +278,8 @@ void CHIPContentLauncherClusterLaunchURLResponseCallback::CallbackFn(
 
     jobject data;
 
-    data = chip::UtfString(env, dataResponse.data).jniValue();
+    chip::UtfString dataUtfString(env, dataResponse.data);
+    data = dataUtfString.jniValue();
     jobject contentLaunchStatus;
 
     std::string contentLaunchStatusClassName     = "java/lang/Integer";
@@ -347,7 +351,8 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback::CallbackFn(
         statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
     jobject content;
 
-    content = chip::ByteArray(env, dataResponse.content).jniValue();
+    chip::ByteArray contentByteArray(env, dataResponse.content);
+    content = contentByteArray.jniValue();
     jobject timeStamp;
 
     std::string timeStampClassName     = "java/lang/Long";
@@ -970,7 +975,8 @@ void CHIPDoorLockClusterGetLogRecordResponseCallback::CallbackFn(
                                                                    dataResponse.userId, userId);
     jobject pin;
 
-    pin = chip::ByteArray(env, dataResponse.pin).jniValue();
+    chip::ByteArray pinByteArray(env, dataResponse.pin);
+    pin = pinByteArray.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, logEntryId, timestamp, eventType, source, eventIdOrAlarmCode, userId, pin);
 }
@@ -1046,7 +1052,8 @@ void CHIPDoorLockClusterGetPinResponseCallback::CallbackFn(
         userTypeClassName.c_str(), userTypeCtorSignature.c_str(), dataResponse.userType, userType);
     jobject pin;
 
-    pin = chip::ByteArray(env, dataResponse.pin).jniValue();
+    chip::ByteArray pinByteArray(env, dataResponse.pin);
+    pin = pinByteArray.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, userId, userStatus, userType, pin);
 }
@@ -1122,7 +1129,8 @@ void CHIPDoorLockClusterGetRfidResponseCallback::CallbackFn(
         userTypeClassName.c_str(), userTypeCtorSignature.c_str(), dataResponse.userType, userType);
     jobject rfid;
 
-    rfid = chip::ByteArray(env, dataResponse.rfid).jniValue();
+    chip::ByteArray rfidByteArray(env, dataResponse.rfid);
+    rfid = rfidByteArray.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, userId, userStatus, userType, rfid);
 }
@@ -1994,7 +2002,8 @@ void CHIPGeneralCommissioningClusterArmFailSafeResponseCallback::CallbackFn(
         errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(), dataResponse.errorCode, errorCode);
     jobject debugText;
 
-    debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
+    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
+    debugText = debugTextUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
@@ -2062,7 +2071,8 @@ void CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallback::Callb
         errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(), dataResponse.errorCode, errorCode);
     jobject debugText;
 
-    debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
+    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
+    debugText = debugTextUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
@@ -2130,7 +2140,8 @@ void CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback::Callbac
         errorCodeClassName.c_str(), errorCodeCtorSignature.c_str(), dataResponse.errorCode, errorCode);
     jobject debugText;
 
-    debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
+    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
+    debugText = debugTextUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
@@ -2398,7 +2409,8 @@ void CHIPGroupsClusterViewGroupResponseCallback::CallbackFn(
                                                                    dataResponse.groupId, groupId);
     jobject groupName;
 
-    groupName = chip::UtfString(env, dataResponse.groupName).jniValue();
+    chip::UtfString groupNameUtfString(env, dataResponse.groupName);
+    groupName = groupNameUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, groupId, groupName);
 }
@@ -3271,7 +3283,8 @@ void CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallback::CallbackFn
                                                                   dataResponse.errorCode, errorCode);
     jobject debugText;
 
-    debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
+    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
+    debugText = debugTextUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
@@ -3337,7 +3350,8 @@ void CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallback::CallbackFn(
                                                                   dataResponse.errorCode, errorCode);
     jobject debugText;
 
-    debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
+    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
+    debugText = debugTextUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
@@ -3403,7 +3417,8 @@ void CHIPNetworkCommissioningClusterDisableNetworkResponseCallback::CallbackFn(
                                                                   dataResponse.errorCode, errorCode);
     jobject debugText;
 
-    debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
+    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
+    debugText = debugTextUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
@@ -3469,7 +3484,8 @@ void CHIPNetworkCommissioningClusterEnableNetworkResponseCallback::CallbackFn(
                                                                   dataResponse.errorCode, errorCode);
     jobject debugText;
 
-    debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
+    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
+    debugText = debugTextUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
@@ -3535,7 +3551,8 @@ void CHIPNetworkCommissioningClusterRemoveNetworkResponseCallback::CallbackFn(
                                                                   dataResponse.errorCode, errorCode);
     jobject debugText;
 
-    debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
+    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
+    debugText = debugTextUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
@@ -3601,7 +3618,8 @@ void CHIPNetworkCommissioningClusterScanNetworksResponseCallback::CallbackFn(
                                                                   dataResponse.errorCode, errorCode);
     jobject debugText;
 
-    debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
+    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
+    debugText = debugTextUtfString.jniValue();
     jobject wifiScanResults;
 
     wifiScanResults = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
@@ -3675,7 +3693,8 @@ void CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallback::Callbac
                                                                   dataResponse.errorCode, errorCode);
     jobject debugText;
 
-    debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
+    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
+    debugText = debugTextUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
@@ -3743,7 +3762,8 @@ void CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallback::CallbackF
                                                                   dataResponse.errorCode, errorCode);
     jobject debugText;
 
-    debugText = chip::UtfString(env, dataResponse.debugText).jniValue();
+    chip::UtfString debugTextUtfString(env, dataResponse.debugText);
+    debugText = debugTextUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
@@ -3905,7 +3925,8 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     else
     {
 
-        imageURI = chip::UtfString(env, dataResponse.imageURI.Value()).jniValue();
+        chip::UtfString imageURIUtfString(env, dataResponse.imageURI.Value());
+        imageURI = imageURIUtfString.jniValue();
         chip::JniReferences::GetInstance().CreateOptional(imageURI, imageURI);
     }
     jobject softwareVersion;
@@ -3931,7 +3952,8 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     else
     {
 
-        softwareVersionString = chip::UtfString(env, dataResponse.softwareVersionString.Value()).jniValue();
+        chip::UtfString softwareVersionStringUtfString(env, dataResponse.softwareVersionString.Value());
+        softwareVersionString = softwareVersionStringUtfString.jniValue();
         chip::JniReferences::GetInstance().CreateOptional(softwareVersionString, softwareVersionString);
     }
     jobject updateToken;
@@ -3942,7 +3964,8 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     else
     {
 
-        updateToken = chip::ByteArray(env, dataResponse.updateToken.Value()).jniValue();
+        chip::ByteArray updateTokenByteArray(env, dataResponse.updateToken.Value());
+        updateToken = updateTokenByteArray.jniValue();
         chip::JniReferences::GetInstance().CreateOptional(updateToken, updateToken);
     }
     jobject userConsentNeeded;
@@ -3968,7 +3991,8 @@ void CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallback::CallbackFn(
     else
     {
 
-        metadataForRequestor = chip::ByteArray(env, dataResponse.metadataForRequestor.Value()).jniValue();
+        chip::ByteArray metadataForRequestorByteArray(env, dataResponse.metadataForRequestor.Value());
+        metadataForRequestor = metadataForRequestorByteArray.jniValue();
         chip::JniReferences::GetInstance().CreateOptional(metadataForRequestor, metadataForRequestor);
     }
 
@@ -4030,10 +4054,12 @@ void CHIPOperationalCredentialsClusterAttestationResponseCallback::CallbackFn(
 
     jobject AttestationElements;
 
-    AttestationElements = chip::ByteArray(env, dataResponse.attestationElements).jniValue();
+    chip::ByteArray AttestationElementsByteArray(env, dataResponse.attestationElements);
+    AttestationElements = AttestationElementsByteArray.jniValue();
     jobject Signature;
 
-    Signature = chip::ByteArray(env, dataResponse.signature).jniValue();
+    chip::ByteArray SignatureByteArray(env, dataResponse.signature);
+    Signature = SignatureByteArray.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, AttestationElements, Signature);
 }
@@ -4094,7 +4120,8 @@ void CHIPOperationalCredentialsClusterCertificateChainResponseCallback::Callback
 
     jobject Certificate;
 
-    Certificate = chip::ByteArray(env, dataResponse.certificate).jniValue();
+    chip::ByteArray CertificateByteArray(env, dataResponse.certificate);
+    Certificate = CertificateByteArray.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, Certificate);
 }
@@ -4165,7 +4192,8 @@ void CHIPOperationalCredentialsClusterNOCResponseCallback::CallbackFn(
                                                                   dataResponse.fabricIndex, FabricIndex);
     jobject DebugText;
 
-    DebugText = chip::UtfString(env, dataResponse.debugText).jniValue();
+    chip::UtfString DebugTextUtfString(env, dataResponse.debugText);
+    DebugText = DebugTextUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, StatusCode, FabricIndex, DebugText);
 }
@@ -4224,10 +4252,12 @@ void CHIPOperationalCredentialsClusterOpCSRResponseCallback::CallbackFn(
 
     jobject NOCSRElements;
 
-    NOCSRElements = chip::ByteArray(env, dataResponse.NOCSRElements).jniValue();
+    chip::ByteArray NOCSRElementsByteArray(env, dataResponse.NOCSRElements);
+    NOCSRElements = NOCSRElementsByteArray.jniValue();
     jobject AttestationSignature;
 
-    AttestationSignature = chip::ByteArray(env, dataResponse.attestationSignature).jniValue();
+    chip::ByteArray AttestationSignatureByteArray(env, dataResponse.attestationSignature);
+    AttestationSignature = AttestationSignatureByteArray.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, NOCSRElements, AttestationSignature);
 }
@@ -4680,7 +4710,8 @@ void CHIPScenesClusterViewSceneResponseCallback::CallbackFn(
         transitionTimeClassName.c_str(), transitionTimeCtorSignature.c_str(), dataResponse.transitionTime, transitionTime);
     jobject sceneName;
 
-    sceneName = chip::UtfString(env, dataResponse.sceneName).jniValue();
+    chip::UtfString sceneNameUtfString(env, dataResponse.sceneName);
+    sceneName = sceneNameUtfString.jniValue();
     jobject extensionFieldSets;
 
     extensionFieldSets = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
@@ -4813,7 +4844,8 @@ void CHIPTargetNavigatorClusterNavigateTargetResponseCallback::CallbackFn(
         statusClassName.c_str(), statusCtorSignature.c_str(), dataResponse.status, status);
     jobject data;
 
-    data = chip::UtfString(env, dataResponse.data).jniValue();
+    chip::UtfString dataUtfString(env, dataResponse.data);
+    data = dataUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, status, data);
 }

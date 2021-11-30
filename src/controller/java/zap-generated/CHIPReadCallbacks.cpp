@@ -5953,7 +5953,8 @@ void CHIPTestClusterNullableOctetStringAttributeCallback::CallbackFn(void * cont
 
     jobject javaValue;
 
-    javaValue = chip::ByteArray(env, value.Value()).jniValue();
+    chip::ByteArray javaValueByteArray(env, value.Value());
+    javaValue = javaValueByteArray.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
@@ -6011,7 +6012,8 @@ void CHIPTestClusterNullableCharStringAttributeCallback::CallbackFn(void * conte
 
     jobject javaValue;
 
-    javaValue = chip::UtfString(env, value.Value()).jniValue();
+    chip::UtfString javaValueUtfString(env, value.Value());
+    javaValue = javaValueUtfString.jniValue();
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
 }
