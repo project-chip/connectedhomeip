@@ -18,8 +18,8 @@
 
 #include "CHIPCommand.h"
 
-#include "controller/ExampleOperationalCredentialsIssuer.h"
 #include <controller/CHIPDeviceControllerFactory.h>
+#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DefaultDeviceAttestationVerifier.h>
