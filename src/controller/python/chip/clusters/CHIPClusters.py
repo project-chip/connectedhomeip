@@ -3242,13 +3242,13 @@ class ChipClusters:
                 "attributeId": 0x00000016,
                 "type": "int",
                 "reportable": True,
-                "writable": True,
             },
             0x00000017: {
                 "attributeName": "LifetimeEnergyConsumed",
                 "attributeId": 0x00000017,
                 "type": "int",
                 "reportable": True,
+                "writable": True,
             },
             0x00000020: {
                 "attributeName": "OperationMode",

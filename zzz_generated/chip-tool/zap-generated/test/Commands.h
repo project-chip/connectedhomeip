@@ -15324,7 +15324,7 @@ private:
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_10(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_10(void * context, uint8_t defaultMoveRate)
+    static void OnSuccessCallback_10(void * context, const chip::app::DataModel::Nullable<uint8_t> & defaultMoveRate)
     {
         (static_cast<Test_TC_LVL_3_1 *>(context))->OnSuccessResponse_10(defaultMoveRate);
     }
@@ -15502,8 +15502,8 @@ private:
         chip::Controller::LevelControlClusterTest cluster;
         cluster.Associate(mDevice, endpoint);
 
-        uint8_t defaultMoveRateArgument;
-        defaultMoveRateArgument = 20;
+        chip::app::DataModel::Nullable<uint8_t> defaultMoveRateArgument;
+        defaultMoveRateArgument.SetNonNull() = 20;
 
         return cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
             defaultMoveRateArgument, this, OnSuccessCallback_9, OnFailureCallback_9);
@@ -15525,9 +15525,10 @@ private:
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(uint8_t defaultMoveRate)
+    void OnSuccessResponse_10(const chip::app::DataModel::Nullable<uint8_t> & defaultMoveRate)
     {
-        VerifyOrReturn(CheckValue("defaultMoveRate", defaultMoveRate, 20));
+        VerifyOrReturn(CheckValueNonNull("defaultMoveRate", defaultMoveRate));
+        VerifyOrReturn(CheckValue("defaultMoveRate.Value()", defaultMoveRate.Value(), 20));
 
         NextTest();
     }
