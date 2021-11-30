@@ -34,7 +34,7 @@ def _AssumeDecodeSuccess(values):
         print(f"{k} = {v}")
         if isinstance(v.Data, ValueDecodeFailure):
             raise AssertionError(
-                f"Cannot decode value for path {k}: got {v.Data}")
+                f"Cannot decode value for path {k}, got error: '{str(v.Data.Reason)}', raw TLV data: '{v.Data.TLVValue}'")
 
 
 class ClusterObjectTests:

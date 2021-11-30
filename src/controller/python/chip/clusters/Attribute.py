@@ -30,6 +30,7 @@ import inspect
 import sys
 import logging
 import threading
+import builtins
 
 
 @dataclass
@@ -99,7 +100,11 @@ class AttributeReadResult(AttributeStatus):
 
 @dataclass
 class ValueDecodeFailure:
-    Value: Any = None
+    ''' Encapsulates a failure to decode a TLV value into a cluster object.
+        Some exceptions have custom fields, so run str(ReasonException) to get more info.
+    '''
+
+    TLVValue: Any = None
     Reason: Exception = None
 
 
@@ -217,8 +222,13 @@ class AsyncReadTransaction:
                         f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Attribute = {path.AttributeId}")
                     logging.error(
                         f"Failed Cluster Object: {str(attributeType)}")
+                    logging.error(ex)
                     attributeValue = ValueDecodeFailure(
                         tlvData, ex)
+
+                    # If we're in debug mode, raise the exception so that we can better debug what's happening.
+                    if (builtins.enableDebugMode):
+                        raise
 
             with self._resLock:
                 self._res[path] = AttributeReadResult(
