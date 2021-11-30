@@ -105,7 +105,7 @@ class RunContext:
 @click.option(
     '--chip-tool',
     default=FindBinaryPath('chip-tool'),
-    help='What chip tool app to use to run the test')
+    help='Binary path of chip tool app to use to run the test')
 @click.pass_context
 def main(context, log_level, target, target_glob, target_skip_glob, no_log_timestamps, root, internal_inside_unshare, chip_tool):
     # Ensures somewhat pretty logging of what is going on
