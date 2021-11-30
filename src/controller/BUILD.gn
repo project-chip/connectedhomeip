@@ -34,6 +34,8 @@ static_library("controller") {
   if (chip_controller) {
     sources += [
       "AbstractDnssdDiscoveryController.cpp",
+      "AutoCommissioner.cpp",
+      "AutoCommissioner.h",
       "CHIPCommissionableNodeController.cpp",
       "CHIPCommissionableNodeController.h",
       "CHIPDeviceController.cpp",
