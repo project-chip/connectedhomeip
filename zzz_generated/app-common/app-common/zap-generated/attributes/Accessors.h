@@ -1059,6 +1059,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int64u
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
 } // namespace Breadcrumb
 
+namespace RegulatoryConfig {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace RegulatoryConfig
+
+namespace LocationCapability {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace LocationCapability
+
 } // namespace Attributes
 } // namespace GeneralCommissioning
 
