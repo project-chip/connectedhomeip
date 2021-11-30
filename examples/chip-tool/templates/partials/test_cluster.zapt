@@ -44,6 +44,9 @@ class {{filename}}: public TestCommand
       }
     }
 
+  {{#if timeout}}
+    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(mTimeout.HasValue() : mTimeout.Value() : {{timeout}}); }
+  {{/if}}
 
   private:
     std::atomic_uint16_t mTestIndex;
