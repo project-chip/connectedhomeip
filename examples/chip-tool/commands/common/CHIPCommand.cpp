@@ -148,7 +148,7 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
     ReturnLogErrorOnFailure(mCommissionerStorage.Init(key.c_str()));
     ReturnLogErrorOnFailure(opCredsIssuer.Initialize(mCommissionerStorage));
     ReturnLogErrorOnFailure(opCredsIssuer.GenerateNOCChainAfterValidation(mCommissionerStorage.GetLocalNodeId(), fabricId,
-                                                                           ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
+                                                                          ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
     chip::Controller::SetupParams commissionerParams;
