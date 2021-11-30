@@ -272,7 +272,7 @@ limitations under the License.
       <arg name="arg1" type="NestedStructList"/>
     </command>
 
-    <command source="client" code="0x0C" name="TestListNestedStructListArgumentRequest" optional="false">
+    <command source="client" code="0x0C" name="TestListNestedStructListArgumentRequest" response="BooleanResponse" optional="false">
       <description>
         Command that takes an argument which is a list of Nested Struct List.
         The response returns false if there is some struct in arg1 (either

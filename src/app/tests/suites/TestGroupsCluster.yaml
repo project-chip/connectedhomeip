@@ -334,8 +334,6 @@ tests:
 
     - label: "Remove All"
       command: "RemoveAllGroups"
-      response:
-          error: 0x00
 
     - label: "View Group 1 (removed)"
       command: "ViewGroup"

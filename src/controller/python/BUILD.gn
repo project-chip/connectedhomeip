@@ -44,7 +44,6 @@ shared_library("ChipDeviceCtrl") {
     "ChipDeviceController-ScriptDevicePairingDelegate.h",
     "ChipDeviceController-StorageDelegate.cpp",
     "ChipDeviceController-StorageDelegate.h",
-    "chip/clusters/CHIPClusters.cpp",
     "chip/clusters/attribute.cpp",
     "chip/clusters/command.cpp",
     "chip/discovery/NodeResolution.cpp",

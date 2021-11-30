@@ -20,6 +20,7 @@ import chip.clusters as Clusters
 import logging
 from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus
 import chip.interaction_model
+import asyncio
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
@@ -96,6 +97,28 @@ class ClusterObjectTests:
             raise AssertionError("Read returned unexpected result.")
 
     @classmethod
+    async def TestSubscribeAttribute(cls, devCtrl):
+        logger.info("Test Subscription")
+        sub = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], reportInterval=(3, 10))
+        updated = False
+
+        def subUpdate(path, value):
+            nonlocal updated
+            logger.info(
+                f"Received attribute update path {path}, New value {value}")
+            updated = True
+        sub.SetAttributeUpdateCallback(subUpdate)
+        req = Clusters.OnOff.Commands.On()
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+        await asyncio.sleep(5)
+        req = Clusters.OnOff.Commands.Off()
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+        await asyncio.sleep(5)
+
+        if not updated:
+            raise AssertionError("Did not receive updated attribute")
+
+    @classmethod
     async def TestReadRequests(cls, devCtrl):
         '''
         Tests out various permutations of endpoint, cluster and attribute ID (with wildcards) to validate
@@ -155,6 +178,7 @@ class ClusterObjectTests:
             await cls.SendCommandWithResponse(devCtrl)
             await cls.SendWriteRequest(devCtrl)
             await cls.TestReadRequests(devCtrl)
+            await cls.TestSubscribeAttribute(devCtrl)
         except Exception as ex:
             logger.error(
                 f"Unexpected error occurred when running tests: {ex}")

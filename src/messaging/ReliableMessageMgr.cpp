@@ -31,6 +31,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ErrorCategory.h>
 #include <messaging/ExchangeMessageDispatch.h>
+#include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageContext.h>
 
@@ -353,6 +354,17 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 
     if (err == CHIP_NO_ERROR)
     {
+        const ExchangeManager * exchangeMgr = entry->ec->GetExchangeMgr();
+        // TODO: investigate why in ReliableMessageMgr::CheckResendApplicationMessageWithPeerExchange unit test released exchange
+        // context with mExchangeMgr==nullptr is used.
+        if (exchangeMgr)
+        {
+            // After the first failure notify session manager to refresh device data
+            if (entry->sendCount == 0)
+            {
+                exchangeMgr->GetSessionManager()->RefreshSessionOperationalData(entry->ec->GetSessionHandle());
+            }
+        }
         // Update the counters
         entry->sendCount++;
     }

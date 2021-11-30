@@ -81,6 +81,7 @@ ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(list<Con
 {
     // TODO: Insert code here
     ContentLaunchResponse response;
+    response.err    = CHIP_NO_ERROR;
     response.data   = "Example data";
     response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
     return response;
@@ -90,49 +91,23 @@ ContentLaunchResponse ContentLauncherManager::proxyLaunchUrlRequest(string conte
 {
     // TODO: Insert code here
     ContentLaunchResponse response;
+    response.err    = CHIP_NO_ERROR;
     response.data   = "Example data";
     response.status = EMBER_ZCL_CONTENT_LAUNCH_STATUS_SUCCESS;
     return response;
 }
 
-static void sendResponse(const char * responseName, ContentLaunchResponse launchResponse, chip::CommandId commandId)
+ContentLaunchResponse contentLauncherClusterLaunchContent(std::list<ContentLaunchParamater> parameterList, bool autoplay,
+                                                          const chip::CharSpan & data)
 {
-    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_CONTENT_LAUNCH_CLUSTER_ID,
-                              commandId, "us", launchResponse.status, &launchResponse.data);
-
-    EmberStatus status = emberAfSendResponse();
-    if (status != EMBER_SUCCESS)
-    {
-        ChipLogError(Zcl, "Failed to send %s. Error:%d", responseName, static_cast<int>(status));
-    }
-}
-
-bool emberAfContentLauncherClusterLaunchContentCallback(
-    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchContent::DecodableType & commandData)
-{
-    auto & autoplay = commandData.autoPlay;
-    auto & data     = commandData.data;
-
     string dataString(data.data(), data.size());
-    list<ContentLaunchParamater> parameterList;
-    ContentLaunchResponse response = ContentLauncherManager().proxyLaunchContentRequest(parameterList, autoplay, dataString);
-    sendResponse("LaunchContent", response, ZCL_LAUNCH_CONTENT_RESPONSE_COMMAND_ID);
-    return true;
+    return ContentLauncherManager().proxyLaunchContentRequest(parameterList, autoplay, dataString);
 }
 
-bool emberAfContentLauncherClusterLaunchURLCallback(
-    chip::app::CommandHandler * command, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::ContentLauncher::Commands::LaunchURL::DecodableType & commandData)
+ContentLaunchResponse contentLauncherClusterLaunchUrl(const chip::CharSpan & contentUrl, const chip::CharSpan & displayString,
+                                                      ContentLaunchBrandingInformation & brandingInformation)
 {
-    auto & contentUrl    = commandData.contentURL;
-    auto & displayString = commandData.displayString;
-
     string contentUrlString(contentUrl.data(), contentUrl.size());
     string displayStringString(displayString.data(), displayString.size());
-    ContentLaunchBrandingInformation brandingInformation;
-    ContentLaunchResponse response =
-        ContentLauncherManager().proxyLaunchUrlRequest(contentUrlString, displayStringString, brandingInformation);
-    sendResponse("LaunchURL", response, ZCL_LAUNCH_URL_RESPONSE_COMMAND_ID);
-    return true;
+    return ContentLauncherManager().proxyLaunchUrlRequest(contentUrlString, displayStringString, brandingInformation);
 }

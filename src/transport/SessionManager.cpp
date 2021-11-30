@@ -294,7 +294,8 @@ CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & p
 
     ChipLogDetail(Inet, "New secure session created for device 0x" ChipLogFormatX64 ", key %d!!", ChipLogValueX64(peerNodeId),
                   peerSessionId);
-    session = mSecureSessions.CreateNewSecureSession(localSessionId, peerNodeId, peerSessionId, fabric, pairing->GetMRPConfig());
+    session = mSecureSessions.CreateNewSecureSession(pairing->GetSecureSessionType(), localSessionId, peerNodeId,
+                                                     pairing->GetPeerCATs(), peerSessionId, fabric, pairing->GetMRPConfig());
     ReturnErrorCodeIf(session == nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (peerAddr.HasValue() && peerAddr.Value().GetIPAddress() != Inet::IPAddress::Any)
@@ -361,6 +362,38 @@ void SessionManager::OnMessageReceived(const PeerAddress & peerAddress, System::
     {
         MessageDispatch(packetHeader, peerAddress, std::move(msg));
     }
+}
+
+void SessionManager::RegisterRecoveryDelegate(SessionRecoveryDelegate & cb)
+{
+#ifndef NDEBUG
+    mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * i) {
+        VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
+        return true;
+    });
+#endif
+    std::reference_wrapper<SessionRecoveryDelegate> * slot = mSessionRecoveryDelegates.CreateObject(cb);
+    VerifyOrDie(slot != nullptr);
+}
+
+void SessionManager::UnregisterRecoveryDelegate(SessionRecoveryDelegate & cb)
+{
+    mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * i) {
+        if (std::addressof(cb) == std::addressof(i->get()))
+        {
+            mSessionRecoveryDelegates.ReleaseObject(i);
+            return false;
+        }
+        return true;
+    });
+}
+
+void SessionManager::RefreshSessionOperationalData(const SessionHandle & sessionHandle)
+{
+    mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * cb) {
+        cb->get().OnFirstMessageDeliveryFailed(sessionHandle);
+        return true;
+    });
 }
 
 void SessionManager::MessageDispatch(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,

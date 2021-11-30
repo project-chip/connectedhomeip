@@ -18,10 +18,10 @@
 from asyncio.futures import Future
 import ctypes
 from dataclasses import dataclass
-from typing import Type, Union, List, Any
-from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint32,  c_uint16, py_object
+from typing import Tuple, Type, Union, List, Any, Callable
+from ctypes import CFUNCTYPE, c_char_p, c_size_t, c_void_p, c_uint32,  c_uint16, py_object, c_uint64
 
-from .ClusterObjects import ClusterAttributeDescriptor
+from .ClusterObjects import Cluster, ClusterAttributeDescriptor
 import chip.exceptions
 import chip.interaction_model
 import chip.tlv
@@ -29,6 +29,7 @@ import chip.tlv
 import inspect
 import sys
 import logging
+import threading
 
 
 @dataclass
@@ -58,6 +59,14 @@ class AttributePath:
 
     def __str__(self) -> str:
         return f"{self.EndpointId}/{self.ClusterId}/{self.AttributeId}"
+
+    def __hash__(self):
+        return str(self).__hash__()
+
+
+@dataclass
+class AttributePathWithListIndex(AttributePath):
+    ListIndex: int = None
 
 
 @dataclass
@@ -114,13 +123,73 @@ def _BuildAttributeIndex():
                                 'chip.clusters.Objects.' + clusterName + '.Attributes.' + attributeName)
 
 
+def _on_update_noop(path: AttributePath, value: Any):
+    '''
+    Default OnUpdate callback, simplily does nothing.
+    '''
+    pass
+
+
+@dataclass
+class SubscriptionParameters:
+    MinReportIntervalFloorSeconds: int
+    MaxReportIntervalCeilingSeconds: int
+
+
+class SubscriptionTransaction:
+    def __init__(self, transaction: 'AsyncReadTransaction', subscriptionId, devCtrl):
+        self._on_update = _on_update_noop
+        self._read_transaction = transaction
+        self._subscriptionId = subscriptionId
+        self._devCtrl = devCtrl
+
+    def GetValue(self, path: Tuple[int, Type[ClusterAttributeDescriptor]]):
+        '''
+        Gets the attribute from cache, returns the value and the timestamp when it was updated last time.
+        '''
+        return self._read_transaction.GetValue(AttributePath(path[0], Attribute=path[1]))
+
+    def GetAllValues(self):
+        return self._read_transaction.GetAllValues()
+
+    def SetAttributeUpdateCallback(self, callback: Callable[[AttributePath, Any], None]):
+        '''
+        Sets the callback function for the attribute value change event, accepts a Callable accpets an attribute path and its updated value.
+        '''
+        if callback is None:
+            self._on_update = _on_update_noop
+        else:
+            self._on_update = callback
+
+    @property
+    def OnUpdate(self) -> Callable[[AttributePath, Any], None]:
+        return self._on_update
+
+    def Shutdown(self):
+        self._devCtrl.ZCLShutdownSubscription(self._subscriptionId)
+
+    def __repr__(self):
+        return f'<Subscription (Id={self._subscriptionId})>'
+
+
 class AsyncReadTransaction:
-    def __init__(self, future: Future, eventLoop):
+    def __init__(self, future: Future, eventLoop, devCtrl):
         self._event_loop = eventLoop
         self._future = future
-        self._res = []
+        self._subscription_handler = None
+        self._res = {}
+        self._devCtrl = devCtrl
+        # For subscriptions, the data comes from CHIP Thread, whild the value will be accessed from Python's thread, so a lock is required here.
+        self._resLock = threading.Lock()
 
-    def _handleAttributeData(self, path: AttributePath, status: int, data: bytes):
+    def GetValue(self, path: AttributePath):
+        with self._resLock:
+            return self._res.get(path)
+
+    def GetAllValues(self):
+        return self._res
+
+    def _handleAttributeData(self, path: AttributePathWithListIndex, status: int, data: bytes):
         try:
             imStatus = status
             try:
@@ -142,14 +211,21 @@ class AsyncReadTransaction:
                         f"Failed Cluster Object: {str(attributeType)}")
                     raise
 
-            self._res.append(AttributeReadResult(
-                Path=path, Status=imStatus, Data=attributeType(attributeValue)))
+            with self._resLock:
+                self._res[path] = AttributeReadResult(
+                    Path=path, Status=imStatus, Data=attributeType(attributeValue))
+                if self._subscription_handler is not None:
+                    self._subscription_handler.OnUpdate(
+                        path, attributeType(attributeValue))
         except Exception as ex:
             logging.exception(ex)
 
     def handleAttributeData(self, path: AttributePath, status: int, data: bytes):
-        self._event_loop.call_soon_threadsafe(
-            self._handleAttributeData, path, status, data)
+        if self._subscription_handler is not None:
+            self._handleAttributeData(path, status, data)
+        else:
+            self._event_loop.call_soon_threadsafe(
+                self._handleAttributeData, path, status, data)
 
     def _handleError(self, chipError: int):
         self._future.set_exception(
@@ -160,12 +236,22 @@ class AsyncReadTransaction:
             self._handleError, chipError
         )
 
-    def _handleDone(self, asd):
+    def _handleSubscriptionEstablished(self, subscriptionId):
+        if not self._future.done():
+            self._subscription_handler = SubscriptionTransaction(
+                self, subscriptionId, self._devCtrl)
+            self._future.set_result(self._subscription_handler)
+
+    def handleSubscriptionEstablished(self, subscriptionId):
+        self._event_loop.call_soon_threadsafe(
+            self._handleSubscriptionEstablished, subscriptionId)
+
+    def _handleDone(self):
         if not self._future.done():
             self._future.set_result(self._res)
 
     def handleDone(self):
-        self._event_loop.call_soon_threadsafe(self._handleDone, "asdasa")
+        self._event_loop.call_soon_threadsafe(self._handleDone)
 
 
 class AsyncWriteTransaction:
@@ -204,6 +290,7 @@ class AsyncWriteTransaction:
 
 _OnReadAttributeDataCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint16, c_uint32, c_uint32, c_uint32, c_void_p, c_size_t)
+_OnSubscriptionEstablishedCallbackFunct = CFUNCTYPE(None, py_object, c_uint64)
 _OnReadErrorCallbackFunct = CFUNCTYPE(
     None, py_object, c_uint32)
 _OnReadDoneCallbackFunct = CFUNCTYPE(
@@ -215,6 +302,11 @@ def _OnReadAttributeDataCallback(closure, endpoint: int, cluster: int, attribute
     dataBytes = ctypes.string_at(data, len)
     closure.handleAttributeData(AttributePath(
         EndpointId=endpoint, ClusterId=cluster, AttributeId=attribute), status, dataBytes[:])
+
+
+@_OnSubscriptionEstablishedCallbackFunct
+def _OnSubscriptionEstablishedCallback(closure, subscriptionId):
+    closure.handleSubscriptionEstablished(subscriptionId)
 
 
 @_OnReadErrorCallbackFunct
@@ -278,9 +370,9 @@ def WriteAttributes(future: Future, eventLoop, device, attributes: List[Attribut
     return res
 
 
-def ReadAttributes(future: Future, eventLoop, device, attributes: List[AttributePath]) -> int:
+def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[AttributePath], subscriptionParameters: SubscriptionParameters = None) -> int:
     handle = chip.native.GetLibraryHandle()
-    transaction = AsyncReadTransaction(future, eventLoop)
+    transaction = AsyncReadTransaction(future, eventLoop, devCtrl)
 
     readargs = []
     for attr in attributes:
@@ -296,8 +388,16 @@ def ReadAttributes(future: Future, eventLoop, device, attributes: List[Attribute
         readargs.append(ctypes.c_char_p(path))
 
     ctypes.pythonapi.Py_IncRef(ctypes.py_object(transaction))
+    minInterval = 0
+    maxInterval = 0
+    if subscriptionParameters is not None:
+        minInterval = subscriptionParameters.MinReportIntervalFloorSeconds
+        maxInterval = subscriptionParameters.MaxReportIntervalCeilingSeconds
     res = handle.pychip_ReadClient_ReadAttributes(
-        ctypes.py_object(transaction), device, ctypes.c_size_t(len(attributes)), *readargs)
+        ctypes.py_object(transaction), device,
+        ctypes.c_bool(subscriptionParameters is not None),
+        ctypes.c_uint32(minInterval), ctypes.c_uint32(maxInterval),
+        ctypes.c_size_t(len(attributes)), *readargs)
     if res != 0:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res
@@ -316,11 +416,11 @@ def Init():
                    _OnWriteResponseCallbackFunct, _OnWriteErrorCallbackFunct, _OnWriteDoneCallbackFunct])
         handle.pychip_ReadClient_ReadAttributes.restype = c_uint32
         setter.Set('pychip_ReadClient_InitCallbacks', None, [
-                   _OnReadAttributeDataCallbackFunct, _OnReadErrorCallbackFunct, _OnReadDoneCallbackFunct])
+                   _OnReadAttributeDataCallbackFunct, _OnSubscriptionEstablishedCallbackFunct, _OnReadErrorCallbackFunct, _OnReadDoneCallbackFunct])
 
     handle.pychip_WriteClient_InitCallbacks(
         _OnWriteResponseCallback, _OnWriteErrorCallback, _OnWriteDoneCallback)
     handle.pychip_ReadClient_InitCallbacks(
-        _OnReadAttributeDataCallback, _OnReadErrorCallback, _OnReadDoneCallback)
+        _OnReadAttributeDataCallback, _OnSubscriptionEstablishedCallback, _OnReadErrorCallback, _OnReadDoneCallback)
 
     _BuildAttributeIndex()

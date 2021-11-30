@@ -116,11 +116,13 @@ jobs:
 
         strategy:
           matrix:
-            type: [tsan]
+            type: [tsan, asan]
             eventloop: [eventloop_same, eventloop_separate]
         env:
             USE_SEPARATE_EVENTLOOP: ${{ matrix.eventloop == 'eventloop_separate' }}
             USE_TSAN: ${{ matrix.type == 'tsan' }}
+
+            USE_ASAN: ${{ matrix.type == 'asan' }}
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -160,11 +162,11 @@ jobs:
             - name: Run Build Test Server
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN} is_asan=${USE_ASAN}
             - name: Build chip-tool
               timeout-minutes: 10
               run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
+                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} is_asan=${USE_ASAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
             - name: Copy objdir
               run: |
                   # The idea is to not upload our objdir unless builds have

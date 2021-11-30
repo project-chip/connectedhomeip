@@ -252,6 +252,12 @@ public:
 class Resolver
 {
 public:
+    enum class CacheBypass
+    {
+        On,
+        Off
+    };
+
     virtual ~Resolver() {}
 
     /**
@@ -276,11 +282,15 @@ public:
     /**
      * Requests resolution of the given operational node service.
      *
+     * If `dnssdCacheBypass` is set to `On` it forces resolution of the given node and bypass option
+     * of using DNS-SD cache.
+     *
      * When the operation succeeds or fails, and a resolver delegate has been registered,
      * the result of the operation is passed to the delegate's `OnNodeIdResolved` or
      * `OnNodeIdResolutionFailed` method, respectively.
      */
-    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
+    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type,
+                                     Resolver::CacheBypass dnssdCacheBypass = CacheBypass::Off) = 0;
 
     /**
      * Finds all commissionable nodes matching the given filter.

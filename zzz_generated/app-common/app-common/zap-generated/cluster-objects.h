@@ -832,7 +832,7 @@ enum class IdentifyEffectIdentifier : uint8_t
     kStopEffect    = 0xFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IdentifyEffectIdentifier             = EmberAfIdentifyEffectIdentifier;
+using IdentifyEffectIdentifier        = EmberAfIdentifyEffectIdentifier;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -843,7 +843,7 @@ enum class IdentifyEffectVariant : uint8_t
     kDefault = 0x00,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IdentifyEffectVariant                = EmberAfIdentifyEffectVariant;
+using IdentifyEffectVariant           = EmberAfIdentifyEffectVariant;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -859,7 +859,7 @@ enum class IdentifyIdentifyType : uint8_t
     kActuator     = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IdentifyIdentifyType                 = EmberAfIdentifyIdentifyType;
+using IdentifyIdentifyType            = EmberAfIdentifyIdentifyType;
 #endif
 
 namespace Commands {
@@ -2407,7 +2407,7 @@ enum class OnOffDelayedAllOffEffectVariant : uint8_t
     k50PercentDimDownIn0p8SecondsThenFadeToOffIn12Seconds = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OnOffDelayedAllOffEffectVariant      = EmberAfOnOffDelayedAllOffEffectVariant;
+using OnOffDelayedAllOffEffectVariant = EmberAfOnOffDelayedAllOffEffectVariant;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -2418,7 +2418,7 @@ enum class OnOffDyingLightEffectVariant : uint8_t
     k20PercenterDimUpIn0p5SecondsThenFadeToOffIn1Second = 0x00,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OnOffDyingLightEffectVariant         = EmberAfOnOffDyingLightEffectVariant;
+using OnOffDyingLightEffectVariant    = EmberAfOnOffDyingLightEffectVariant;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -2430,7 +2430,7 @@ enum class OnOffEffectIdentifier : uint8_t
     kDyingLight    = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OnOffEffectIdentifier                = EmberAfOnOffEffectIdentifier;
+using OnOffEffectIdentifier           = EmberAfOnOffEffectIdentifier;
 #endif
 
 // Bitmap for OnOffControl
@@ -2790,7 +2790,7 @@ enum class MoveMode : uint8_t
     kDown = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MoveMode                             = EmberAfMoveMode;
+using MoveMode                        = EmberAfMoveMode;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -2802,7 +2802,7 @@ enum class StepMode : uint8_t
     kDown = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using StepMode                             = EmberAfStepMode;
+using StepMode                        = EmberAfStepMode;
 #endif
 
 namespace Commands {
@@ -3237,9 +3237,9 @@ struct TypeInfo
 namespace OnLevel {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = DataModel::Nullable<uint8_t>;
+    using DecodableType    = DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnLevel::Id; }
@@ -3248,9 +3248,9 @@ struct TypeInfo
 namespace OnTransitionTime {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = DataModel::Nullable<uint16_t>;
+    using DecodableType    = DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnTransitionTime::Id; }
@@ -3259,9 +3259,9 @@ struct TypeInfo
 namespace OffTransitionTime {
 struct TypeInfo
 {
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
+    using Type             = DataModel::Nullable<uint16_t>;
+    using DecodableType    = DataModel::Nullable<uint16_t>;
+    using DecodableArgType = const DataModel::Nullable<uint16_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OffTransitionTime::Id; }
@@ -3270,9 +3270,9 @@ struct TypeInfo
 namespace DefaultMoveRate {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = DataModel::Nullable<uint8_t>;
+    using DecodableType    = DataModel::Nullable<uint8_t>;
+    using DecodableArgType = const DataModel::Nullable<uint8_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DefaultMoveRate::Id; }
@@ -4818,9 +4818,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace PowerProfile
 namespace ApplianceControl {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ApplianceStatus
 enum class ApplianceStatus : uint8_t
 {
@@ -4840,12 +4837,6 @@ enum class ApplianceStatus : uint8_t
     kSupercooling             = 0x0E,
     kSuperheating             = 0x0F,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ApplianceStatus                      = EmberAfApplianceStatus;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for CommandIdentification
 enum class CommandIdentification : uint8_t
 {
@@ -4861,12 +4852,6 @@ enum class CommandIdentification : uint8_t
     kEnableEnergyControl  = 0x0A,
     kDisableEnergyControl = 0x0B,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using CommandIdentification                = EmberAfCommandIdentification;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for WarningEvent
 enum class WarningEvent : uint8_t
 {
@@ -4876,9 +4861,6 @@ enum class WarningEvent : uint8_t
     kWarning4OverallPowerBackBelowThePowerThresholdLevel                               = 0x03,
     kWarning5OverallPowerWillBePotentiallyAboveAvailablePowerLevelIfTheApplianceStarts = 0x04,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using WarningEvent                         = EmberAfWarningEvent;
-#endif
 
 // Bitmap for RemoteEnableFlagsAndDeviceStatus2
 enum class RemoteEnableFlagsAndDeviceStatus2 : uint8_t
@@ -5616,21 +5598,12 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace PollControl
 namespace BridgedActions {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ActionErrorEnum
 enum class ActionErrorEnum : uint8_t
 {
     kUnknown     = 0x00,
     kInterrupted = 0x01,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ActionErrorEnum                      = EmberAfActionErrorEnum;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ActionStatusEnum
 enum class ActionStatusEnum : uint8_t
 {
@@ -5639,12 +5612,6 @@ enum class ActionStatusEnum : uint8_t
     kPaused   = 0x02,
     kDisabled = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ActionStatusEnum                     = EmberAfActionStatusEnum;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ActionTypeEnum
 enum class ActionTypeEnum : uint8_t
 {
@@ -5656,12 +5623,6 @@ enum class ActionTypeEnum : uint8_t
     kNotification = 0x05,
     kAlarm        = 0x06,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ActionTypeEnum                       = EmberAfActionTypeEnum;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for EndpointListTypeEnum
 enum class EndpointListTypeEnum : uint8_t
 {
@@ -5669,9 +5630,6 @@ enum class EndpointListTypeEnum : uint8_t
     kRoom  = 0x01,
     kZone  = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using EndpointListTypeEnum                 = EmberAfEndpointListTypeEnum;
-#endif
 
 // Bitmap for CommandBits
 enum class CommandBits : uint16_t
@@ -6793,7 +6751,7 @@ enum class OTAApplyUpdateAction : uint8_t
     kDiscontinue     = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTAApplyUpdateAction                 = EmberAfOTAApplyUpdateAction;
+using OTAApplyUpdateAction            = EmberAfOTAApplyUpdateAction;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -6807,7 +6765,7 @@ enum class OTADownloadProtocol : uint8_t
     kVendorSpecific  = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTADownloadProtocol                  = EmberAfOTADownloadProtocol;
+using OTADownloadProtocol             = EmberAfOTADownloadProtocol;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -6820,7 +6778,7 @@ enum class OTAQueryStatus : uint8_t
     kNotAvailable    = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTAQueryStatus                       = EmberAfOTAQueryStatus;
+using OTAQueryStatus                  = EmberAfOTAQueryStatus;
 #endif
 
 namespace Commands {
@@ -7096,7 +7054,7 @@ enum class ChangeReasonEnum : uint8_t
     kDelayByProvider = 0x04,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ChangeReasonEnum                     = EmberAfChangeReasonEnum;
+using ChangeReasonEnum                = EmberAfChangeReasonEnum;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -7109,7 +7067,7 @@ enum class OTAAnnouncementReason : uint8_t
     kUrgentUpdateAvailable = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using OTAAnnouncementReason                = EmberAfOTAAnnouncementReason;
+using OTAAnnouncementReason           = EmberAfOTAAnnouncementReason;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -7128,7 +7086,7 @@ enum class UpdateStateEnum : uint8_t
     kDelayedOnUserConsent = 0x08,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using UpdateStateEnum                      = EmberAfUpdateStateEnum;
+using UpdateStateEnum                 = EmberAfUpdateStateEnum;
 #endif
 
 namespace Commands {
@@ -7829,19 +7787,14 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace PowerSource
 namespace GeneralCommissioning {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for GeneralCommissioningError
 enum class GeneralCommissioningError : uint8_t
 {
     kOk                    = 0x00,
     kValueOutsideRange     = 0x01,
     kInvalidAuthentication = 0x02,
+    kNotCommissioning      = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using GeneralCommissioningError            = EmberAfGeneralCommissioningError;
-#endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -7853,7 +7806,7 @@ enum class RegulatoryLocationType : uint8_t
     kIndoorOutdoor = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RegulatoryLocationType               = EmberAfRegulatoryLocationType;
+using RegulatoryLocationType          = EmberAfRegulatoryLocationType;
 #endif
 
 namespace Structs {
@@ -8138,28 +8091,28 @@ struct TypeInfo
     static constexpr AttributeId GetAttributeId() { return Attributes::BasicCommissioningInfoList::Id; }
 };
 } // namespace BasicCommissioningInfoList
-namespace RegulatoryConfigList {
+namespace RegulatoryConfig {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const RegulatoryLocationType>;
-    using DecodableType    = DataModel::DecodableList<RegulatoryLocationType>;
-    using DecodableArgType = const DataModel::DecodableList<RegulatoryLocationType> &;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RegulatoryConfigList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RegulatoryConfig::Id; }
 };
-} // namespace RegulatoryConfigList
-namespace LocationCapabilityList {
+} // namespace RegulatoryConfig
+namespace LocationCapability {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const RegulatoryLocationType>;
-    using DecodableType    = DataModel::DecodableList<RegulatoryLocationType>;
-    using DecodableArgType = const DataModel::DecodableList<RegulatoryLocationType> &;
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::LocationCapabilityList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LocationCapability::Id; }
 };
-} // namespace LocationCapabilityList
+} // namespace LocationCapability
 namespace FeatureMap {
 struct TypeInfo
 {
@@ -8213,7 +8166,7 @@ enum class NetworkCommissioningError : uint8_t
     kUnknownError           = 0x13,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NetworkCommissioningError            = EmberAfNetworkCommissioningError;
+using NetworkCommissioningError       = EmberAfNetworkCommissioningError;
 #endif
 
 namespace Structs {
@@ -8941,9 +8894,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace NetworkCommissioning
 namespace DiagnosticLogs {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for LogsIntent
 enum class LogsIntent : uint8_t
 {
@@ -8951,12 +8901,6 @@ enum class LogsIntent : uint8_t
     kNetworkDiag    = 0x01,
     kCrashLogs      = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using LogsIntent                           = EmberAfLogsIntent;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for LogsStatus
 enum class LogsStatus : uint8_t
 {
@@ -8966,21 +8910,12 @@ enum class LogsStatus : uint8_t
     kBusy      = 0x03,
     kDenied    = 0x04,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using LogsStatus                           = EmberAfLogsStatus;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for LogsTransferProtocol
 enum class LogsTransferProtocol : uint8_t
 {
     kResponsePayload = 0x00,
     kBdx             = 0x01,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using LogsTransferProtocol                 = EmberAfLogsTransferProtocol;
-#endif
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -9116,7 +9051,7 @@ enum class BootReasonType : uint8_t
     kSoftwareReset           = 0x06,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using BootReasonType                       = EmberAfBootReasonType;
+using BootReasonType                  = EmberAfBootReasonType;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -9137,7 +9072,7 @@ enum class HardwareFaultType : uint8_t
     kTamperDetected         = 0x0A,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HardwareFaultType                    = EmberAfHardwareFaultType;
+using HardwareFaultType               = EmberAfHardwareFaultType;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -9152,7 +9087,7 @@ enum class InterfaceType : uint8_t
     kThread      = 0x04,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using InterfaceType                        = EmberAfInterfaceType;
+using InterfaceType                   = EmberAfInterfaceType;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -9166,7 +9101,7 @@ enum class NetworkFaultType : uint8_t
     kConnectionFailed = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NetworkFaultType                     = EmberAfNetworkFaultType;
+using NetworkFaultType                = EmberAfNetworkFaultType;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -9183,7 +9118,7 @@ enum class RadioFaultType : uint8_t
     kEthernetFault = 0x06,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RadioFaultType                       = EmberAfRadioFaultType;
+using RadioFaultType                  = EmberAfRadioFaultType;
 #endif
 
 namespace Structs {
@@ -9670,9 +9605,6 @@ public:
 } // namespace Events
 } // namespace SoftwareDiagnostics
 namespace ThreadNetworkDiagnostics {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for NetworkFault
 enum class NetworkFault : uint8_t
 {
@@ -9681,9 +9613,6 @@ enum class NetworkFault : uint8_t
     kHardwareFailure = 0x02,
     kNetworkJammed   = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NetworkFault                         = EmberAfNetworkFault;
-#endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -9699,20 +9628,14 @@ enum class RoutingRole : uint8_t
     kLeader          = 0x06,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using RoutingRole                          = EmberAfRoutingRole;
+using RoutingRole                     = EmberAfRoutingRole;
 #endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ThreadConnectionStatus
 enum class ThreadConnectionStatus : uint8_t
 {
     kConnected    = 0x00,
     kNotConnected = 0x01,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ThreadConnectionStatus               = EmberAfThreadConnectionStatus;
-#endif
 
 namespace Structs {
 namespace NeighborTable {
@@ -10650,9 +10573,6 @@ public:
 } // namespace Events
 } // namespace ThreadNetworkDiagnostics
 namespace WiFiNetworkDiagnostics {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for AssociationFailureCause
 enum class AssociationFailureCause : uint8_t
 {
@@ -10661,9 +10581,6 @@ enum class AssociationFailureCause : uint8_t
     kAuthenticationFailed = 0x02,
     kSsidNotFound         = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using AssociationFailureCause              = EmberAfAssociationFailureCause;
-#endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -10678,20 +10595,14 @@ enum class SecurityType : uint8_t
     kWpa3        = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SecurityType                         = EmberAfSecurityType;
+using SecurityType                    = EmberAfSecurityType;
 #endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for WiFiConnectionStatus
 enum class WiFiConnectionStatus : uint8_t
 {
     kConnected    = 0x00,
     kNotConnected = 0x01,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using WiFiConnectionStatus                 = EmberAfWiFiConnectionStatus;
-#endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -10706,7 +10617,7 @@ enum class WiFiVersionType : uint8_t
     k80211ax = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using WiFiVersionType                      = EmberAfWiFiVersionType;
+using WiFiVersionType                 = EmberAfWiFiVersionType;
 #endif
 
 namespace Commands {
@@ -11039,7 +10950,7 @@ enum class PHYRateType : uint8_t
     k400g  = 0x09,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using PHYRateType                          = EmberAfPHYRateType;
+using PHYRateType                     = EmberAfPHYRateType;
 #endif
 
 namespace Commands {
@@ -11867,7 +11778,7 @@ enum class StatusCode : uint8_t
     kWindowNotOpen      = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using StatusCode                           = EmberAfStatusCode;
+using StatusCode                      = EmberAfStatusCode;
 #endif
 
 namespace Commands {
@@ -12038,7 +11949,7 @@ enum class NodeOperationalCertStatus : uint8_t
     kInvalidFabricIndex    = 0x0B,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NodeOperationalCertStatus            = EmberAfNodeOperationalCertStatus;
+using NodeOperationalCertStatus       = EmberAfNodeOperationalCertStatus;
 #endif
 
 namespace Structs {
@@ -13072,7 +12983,7 @@ enum class DoorLockOperationEventCode : uint8_t
     kManualUnlock          = 0x0E,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using DoorLockOperationEventCode           = EmberAfDoorLockOperationEventCode;
+using DoorLockOperationEventCode      = EmberAfDoorLockOperationEventCode;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -13089,11 +13000,8 @@ enum class DoorLockProgrammingEventCode : uint8_t
     kIdDeleted            = 0x06,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using DoorLockProgrammingEventCode         = EmberAfDoorLockProgrammingEventCode;
+using DoorLockProgrammingEventCode    = EmberAfDoorLockProgrammingEventCode;
 #endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for DoorLockSetPinOrIdStatus
 enum class DoorLockSetPinOrIdStatus : uint8_t
 {
@@ -13102,9 +13010,6 @@ enum class DoorLockSetPinOrIdStatus : uint8_t
     kMemoryFull         = 0x02,
     kDuplicateCodeError = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using DoorLockSetPinOrIdStatus             = EmberAfDoorLockSetPinOrIdStatus;
-#endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -13117,7 +13022,7 @@ enum class DoorLockUserStatus : uint8_t
     kNotSupported     = 0xFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using DoorLockUserStatus                   = EmberAfDoorLockUserStatus;
+using DoorLockUserStatus              = EmberAfDoorLockUserStatus;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -13133,7 +13038,7 @@ enum class DoorLockUserType : uint8_t
     kNotSupported        = 0xFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using DoorLockUserType                     = EmberAfDoorLockUserType;
+using DoorLockUserType                = EmberAfDoorLockUserType;
 #endif
 
 // Bitmap for DoorLockDayOfWeek
@@ -16563,9 +16468,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace BarrierControl
 namespace PumpConfigurationAndControl {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for PumpControlMode
 enum class PumpControlMode : uint8_t
 {
@@ -16576,12 +16478,6 @@ enum class PumpControlMode : uint8_t
     kConstantTemperature  = 0x05,
     kAutomatic            = 0x07,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using PumpControlMode                      = EmberAfPumpControlMode;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for PumpOperationMode
 enum class PumpOperationMode : uint8_t
 {
@@ -16590,9 +16486,6 @@ enum class PumpOperationMode : uint8_t
     kMaximum = 0x02,
     kLocal   = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using PumpOperationMode                    = EmberAfPumpOperationMode;
-#endif
 
 // Bitmap for PumpStatus
 enum class PumpStatus : uint16_t
@@ -16810,9 +16703,9 @@ struct TypeInfo
 namespace LifetimeRunningHours {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = DataModel::Nullable<uint32_t>;
+    using DecodableType    = DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeRunningHours::Id; }
@@ -16832,9 +16725,9 @@ struct TypeInfo
 namespace LifetimeEnergyConsumed {
 struct TypeInfo
 {
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
+    using Type             = DataModel::Nullable<uint32_t>;
+    using DecodableType    = DataModel::Nullable<uint32_t>;
+    using DecodableArgType = const DataModel::Nullable<uint32_t> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeEnergyConsumed::Id; }
@@ -17387,7 +17280,7 @@ enum class SetpointAdjustMode : uint8_t
     kHeatAndCoolSetpoints = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SetpointAdjustMode                   = EmberAfSetpointAdjustMode;
+using SetpointAdjustMode              = EmberAfSetpointAdjustMode;
 #endif
 
 // Bitmap for DayOfWeek
@@ -18428,7 +18321,7 @@ enum class ColorLoopAction : uint8_t
     kActivateFromEnhancedCurrentHue        = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ColorLoopAction                      = EmberAfColorLoopAction;
+using ColorLoopAction                 = EmberAfColorLoopAction;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -18440,7 +18333,7 @@ enum class ColorLoopDirection : uint8_t
     kIncrementHue = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ColorLoopDirection                   = EmberAfColorLoopDirection;
+using ColorLoopDirection              = EmberAfColorLoopDirection;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -18453,7 +18346,7 @@ enum class ColorMode : uint8_t
     kColorTemperature               = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ColorMode                            = EmberAfColorMode;
+using ColorMode                       = EmberAfColorMode;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -18467,7 +18360,7 @@ enum class HueDirection : uint8_t
     kDown             = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HueDirection                         = EmberAfHueDirection;
+using HueDirection                    = EmberAfHueDirection;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -18480,7 +18373,7 @@ enum class HueMoveMode : uint8_t
     kDown = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HueMoveMode                          = EmberAfHueMoveMode;
+using HueMoveMode                     = EmberAfHueMoveMode;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -18492,7 +18385,7 @@ enum class HueStepMode : uint8_t
     kDown = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using HueStepMode                          = EmberAfHueStepMode;
+using HueStepMode                     = EmberAfHueStepMode;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -18505,7 +18398,7 @@ enum class SaturationMoveMode : uint8_t
     kDown = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SaturationMoveMode                   = EmberAfSaturationMoveMode;
+using SaturationMoveMode              = EmberAfSaturationMoveMode;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -18517,7 +18410,7 @@ enum class SaturationStepMode : uint8_t
     kDown = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SaturationStepMode                   = EmberAfSaturationStepMode;
+using SaturationStepMode              = EmberAfSaturationStepMode;
 #endif
 
 // Bitmap for ColorCapabilities
@@ -20229,18 +20122,12 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace BallastConfiguration
 namespace IlluminanceMeasurement {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for LightSensorType
 enum class LightSensorType : uint8_t
 {
     kPhotodiode = 0x00,
     kCmos       = 0x01,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using LightSensorType                      = EmberAfLightSensorType;
-#endif
 
 namespace Attributes {
 namespace MeasuredValue {
@@ -22963,7 +22850,7 @@ enum class IasEnrollResponseCode : uint8_t
     kTooManyZones   = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasEnrollResponseCode                = EmberAfIasEnrollResponseCode;
+using IasEnrollResponseCode           = EmberAfIasEnrollResponseCode;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -22989,7 +22876,7 @@ enum class IasZoneType : uint16_t
     kInvalidZoneType         = 0xFFFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasZoneType                          = EmberAfIasZoneType;
+using IasZoneType                     = EmberAfIasZoneType;
 #endif
 
 // Bitmap for IasZoneStatus
@@ -23369,9 +23256,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace IasZone
 namespace IasAce {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasAceAlarmStatus
 enum class IasAceAlarmStatus : uint8_t
 {
@@ -23383,12 +23267,6 @@ enum class IasAceAlarmStatus : uint8_t
     kFirePanic      = 0x05,
     kEmergencyPanic = 0x06,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasAceAlarmStatus                    = EmberAfIasAceAlarmStatus;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasAceArmMode
 enum class IasAceArmMode : uint8_t
 {
@@ -23397,12 +23275,6 @@ enum class IasAceArmMode : uint8_t
     kArmNightSleepZonesOnly = 0x02,
     kArmAllZones            = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasAceArmMode                        = EmberAfIasAceArmMode;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasAceArmNotification
 enum class IasAceArmNotification : uint8_t
 {
@@ -23414,24 +23286,12 @@ enum class IasAceArmNotification : uint8_t
     kNotReadyToArm            = 0x05,
     kAlreadyDisarmed          = 0x06,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasAceArmNotification                = EmberAfIasAceArmNotification;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasAceAudibleNotification
 enum class IasAceAudibleNotification : uint8_t
 {
     kMute         = 0x00,
     kDefaultSound = 0x01,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasAceAudibleNotification            = EmberAfIasAceAudibleNotification;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasAceBypassResult
 enum class IasAceBypassResult : uint8_t
 {
@@ -23442,12 +23302,6 @@ enum class IasAceBypassResult : uint8_t
     kUnknownZoneId        = 0x04,
     kInvalidArmDisarmCode = 0x05,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasAceBypassResult                   = EmberAfIasAceBypassResult;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for IasAcePanelStatus
 enum class IasAcePanelStatus : uint8_t
 {
@@ -23463,9 +23317,6 @@ enum class IasAcePanelStatus : uint8_t
     kArmingNight   = 0x09,
     kArmingAway    = 0x0A,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasAcePanelStatus                    = EmberAfIasAcePanelStatus;
-#endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -23490,7 +23341,7 @@ enum class IasZoneType : uint16_t
     kInvalidZoneType         = 0xFFFF,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using IasZoneType                          = EmberAfIasZoneType;
+using IasZoneType                     = EmberAfIasZoneType;
 #endif
 
 // Bitmap for IasZoneStatus
@@ -24499,29 +24350,17 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace WakeOnLan
 namespace TvChannel {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for TvChannelErrorType
 enum class TvChannelErrorType : uint8_t
 {
     kMultipleMatches = 0x00,
     kNoMatches       = 0x01,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using TvChannelErrorType                   = EmberAfTvChannelErrorType;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for TvChannelLineupInfoType
 enum class TvChannelLineupInfoType : uint8_t
 {
     kMso = 0x00,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using TvChannelLineupInfoType              = EmberAfTvChannelLineupInfoType;
-#endif
 
 namespace Structs {
 namespace TvChannelInfo {
@@ -24789,9 +24628,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace TvChannel
 namespace TargetNavigator {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for NavigateTargetStatus
 enum class NavigateTargetStatus : uint8_t
 {
@@ -24799,9 +24635,6 @@ enum class NavigateTargetStatus : uint8_t
     kAppNotAvailable = 0x01,
     kSystemBusy      = 0x02,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using NavigateTargetStatus                 = EmberAfNavigateTargetStatus;
-#endif
 
 namespace Structs {
 namespace NavigateTargetTargetInfo {
@@ -24970,7 +24803,7 @@ enum class MediaPlaybackState : uint8_t
     kBuffering  = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MediaPlaybackState                   = EmberAfMediaPlaybackState;
+using MediaPlaybackState              = EmberAfMediaPlaybackState;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -24986,7 +24819,7 @@ enum class MediaPlaybackStatus : uint8_t
     kSeekOutOfRange         = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MediaPlaybackStatus                  = EmberAfMediaPlaybackStatus;
+using MediaPlaybackStatus             = EmberAfMediaPlaybackStatus;
 #endif
 
 namespace Structs {
@@ -25892,7 +25725,7 @@ enum class MediaInputType : uint8_t
     kOther     = 0x0B,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MediaInputType                       = EmberAfMediaInputType;
+using MediaInputType                  = EmberAfMediaInputType;
 #endif
 
 namespace Structs {
@@ -26273,7 +26106,7 @@ enum class KeypadInputCecKeyCode : uint8_t
     kData                      = 0x76,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using KeypadInputCecKeyCode                = EmberAfKeypadInputCecKeyCode;
+using KeypadInputCecKeyCode           = EmberAfKeypadInputCecKeyCode;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -26286,7 +26119,7 @@ enum class KeypadInputStatus : uint8_t
     kInvalidKeyInCurrentState = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using KeypadInputStatus                    = EmberAfKeypadInputStatus;
+using KeypadInputStatus               = EmberAfKeypadInputStatus;
 #endif
 
 namespace Commands {
@@ -26393,21 +26226,12 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace KeypadInput
 namespace ContentLauncher {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ContentLaunchMetricType
 enum class ContentLaunchMetricType : uint8_t
 {
     kPixels     = 0x00,
     kPercentage = 0x01,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ContentLaunchMetricType              = EmberAfContentLaunchMetricType;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ContentLaunchParameterEnum
 enum class ContentLaunchParameterEnum : uint8_t
 {
@@ -26423,9 +26247,6 @@ enum class ContentLaunchParameterEnum : uint8_t
     kSportsTeam = 0x09,
     kVideo      = 0x0A,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ContentLaunchParameterEnum           = EmberAfContentLaunchParameterEnum;
-#endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -26437,7 +26258,7 @@ enum class ContentLaunchStatus : uint8_t
     kAuthFailed      = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ContentLaunchStatus                  = EmberAfContentLaunchStatus;
+using ContentLaunchStatus             = EmberAfContentLaunchStatus;
 #endif
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -26449,7 +26270,7 @@ enum class ContentLaunchStreamingType : uint8_t
     kHls  = 0x01,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ContentLaunchStreamingType           = EmberAfContentLaunchStreamingType;
+using ContentLaunchStreamingType      = EmberAfContentLaunchStreamingType;
 #endif
 
 namespace Structs {
@@ -26797,7 +26618,7 @@ enum class AudioOutputType : uint8_t
     kOther     = 0x05,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using AudioOutputType                      = EmberAfAudioOutputType;
+using AudioOutputType                 = EmberAfAudioOutputType;
 #endif
 
 namespace Structs {
@@ -26965,7 +26786,7 @@ enum class ApplicationLauncherStatus : uint8_t
     kSystemBusy      = 0x02,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ApplicationLauncherStatus            = EmberAfApplicationLauncherStatus;
+using ApplicationLauncherStatus       = EmberAfApplicationLauncherStatus;
 #endif
 
 namespace Structs {
@@ -27149,7 +26970,7 @@ enum class ApplicationBasicStatus : uint8_t
     kActiveVisibleNotFocus = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ApplicationBasicStatus               = EmberAfApplicationBasicStatus;
+using ApplicationBasicStatus          = EmberAfApplicationBasicStatus;
 #endif
 
 namespace Commands {
@@ -27453,7 +27274,7 @@ enum class SimpleEnum : uint8_t
     kValueC      = 0x03,
 };
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SimpleEnum                           = EmberAfSimpleEnum;
+using SimpleEnum                      = EmberAfSimpleEnum;
 #endif
 
 // Bitmap for SimpleBitmap
@@ -28591,7 +28412,7 @@ public:
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = DataModel::NullObjectType;
+    using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
 };
 
 struct DecodableType
@@ -29352,9 +29173,6 @@ public:
 } // namespace Events
 } // namespace TestCluster
 namespace Messaging {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for EventId
 enum class EventId : uint8_t
 {
@@ -29440,36 +29258,18 @@ enum class EventId : uint8_t
     kManufacturerSpecificH              = 0xE7,
     kManufacturerSpecificI              = 0xE8,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using EventId                              = EmberAfEventId;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MessagingControlConfirmation
 enum class MessagingControlConfirmation : uint8_t
 {
     kNotRequired = 0x00,
     kRequired    = 0x80,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MessagingControlConfirmation         = EmberAfMessagingControlConfirmation;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MessagingControlEnhancedConfirmation
 enum class MessagingControlEnhancedConfirmation : uint8_t
 {
     kNotRequired = 0x00,
     kRequired    = 0x20,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MessagingControlEnhancedConfirmation = EmberAfMessagingControlEnhancedConfirmation;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MessagingControlImportance
 enum class MessagingControlImportance : uint8_t
 {
@@ -29478,12 +29278,6 @@ enum class MessagingControlImportance : uint8_t
     kHigh     = 0x08,
     kCritical = 0x0C,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MessagingControlImportance           = EmberAfMessagingControlImportance;
-#endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for MessagingControlTransmission
 enum class MessagingControlTransmission : uint8_t
 {
@@ -29492,9 +29286,6 @@ enum class MessagingControlTransmission : uint8_t
     kAnonymous          = 0x02,
     kReserved           = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using MessagingControlTransmission         = EmberAfMessagingControlTransmission;
-#endif
 
 // Bitmap for MessagingConfirmationControl
 enum class MessagingConfirmationControl : uint8_t
@@ -30153,9 +29944,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace MeterIdentification
 namespace ApplianceEventsAndAlert {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for EventIdentification
 enum class EventIdentification : uint8_t
 {
@@ -30165,9 +29953,6 @@ enum class EventIdentification : uint8_t
     kSwitchingOff       = 0x06,
     kWrongData          = 0x07,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using EventIdentification                  = EmberAfEventIdentification;
-#endif
 
 // Bitmap for AlertCount
 enum class AlertCount : uint8_t
@@ -32382,18 +32167,12 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace Binding
 namespace GroupKeyManagement {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for GroupKeySecurityPolicy
 enum class GroupKeySecurityPolicy : uint8_t
 {
     kStandard   = 0x00,
     kLowLatency = 0x01,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using GroupKeySecurityPolicy               = EmberAfGroupKeySecurityPolicy;
-#endif
 
 namespace Structs {
 namespace GroupKey {
