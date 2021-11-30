@@ -46,9 +46,7 @@ CHIP_ERROR LayerImplLwIP::Init()
 
 CHIP_ERROR LayerImplLwIP::Shutdown()
 {
-    VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
-    mLayerState.SetShutdown();
-    mLayerState.Reset(); // Return to uninitialized state to permit re-initialization.
+    VerifyOrReturnError(mLayerState.ResetFromInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
 

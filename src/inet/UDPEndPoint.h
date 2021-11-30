@@ -30,8 +30,9 @@
 
 #include <inet/EndPointBasis.h>
 #include <inet/IPAddress.h>
+#include <inet/IPPacketInfo.h>
 #include <inet/InetInterface.h>
-#include <lib/core/ReferenceCounted.h>
+#include <inet/InetLayer.h>
 #include <lib/support/Pool.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -52,16 +53,6 @@
 namespace chip {
 namespace Inet {
 
-class InetLayer;
-class IPPacketInfo;
-
-class UDPEndPoint;
-class UDPEndPointDeletor
-{
-public:
-    static void Release(UDPEndPoint * obj);
-};
-
 /**
  * @brief   Objects of this class represent UDP transport endpoints.
  *
@@ -70,19 +61,13 @@ public:
  *  endpoints (SOCK_DGRAM sockets on Linux and BSD-derived systems) or LwIP
  *  UDP protocol control blocks, as the system is configured accordingly.
  */
-class DLL_EXPORT UDPEndPoint : public EndPointBase, public ReferenceCounted<UDPEndPoint, UDPEndPointDeletor>
+class DLL_EXPORT UDPEndPoint : public EndPointBasis<UDPEndPoint>
 {
 public:
-    UDPEndPoint(InetLayer & inetLayer, void * appState = nullptr) :
-        EndPointBase(inetLayer, appState), mState(State::kReady), OnMessageReceived(nullptr), OnReceiveError(nullptr)
-    {}
-
     UDPEndPoint(const UDPEndPoint &) = delete;
     UDPEndPoint(UDPEndPoint &&)      = delete;
     UDPEndPoint & operator=(const UDPEndPoint &) = delete;
     UDPEndPoint & operator=(UDPEndPoint &&) = delete;
-
-    virtual ~UDPEndPoint() = default;
 
     /**
      * Type of message text reception event handling function.
@@ -274,6 +259,12 @@ public:
     virtual void Free() = 0;
 
 protected:
+    UDPEndPoint(EndPointManager<UDPEndPoint> & endPointManager) :
+        EndPointBasis(endPointManager), mState(State::kReady), OnMessageReceived(nullptr), OnReceiveError(nullptr)
+    {}
+
+    virtual ~UDPEndPoint() = default;
+
     /**
      * Basic dynamic state of the underlying endpoint.
      *
@@ -296,9 +287,6 @@ protected:
     /** The endpoint's receive error event handling function delegate. */
     OnReceiveErrorFunct OnReceiveError;
 
-    friend class UDPEndPointDeletor;
-    virtual void Delete() = 0;
-
     /*
      * Implementation helpers for shared methods.
      */
@@ -314,17 +302,12 @@ protected:
     virtual void CloseImpl()                                                                                                  = 0;
 };
 
-inline void UDPEndPointDeletor::Release(UDPEndPoint * obj)
-{
-    obj->Delete();
-}
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
 class UDPEndPointImplLwIP : public UDPEndPoint, public EndPointStateLwIP
 {
 public:
-    UDPEndPointImplLwIP(InetLayer & inetLayer, void * appState = nullptr) : UDPEndPoint(inetLayer, appState) {}
+    UDPEndPointImplLwIP(EndPointManager<UDPEndPoint> & endPointManager) : UDPEndPoint(endPointManager) {}
 
     // UDPEndPoint overrides.
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
@@ -333,11 +316,6 @@ public:
     void Free() override;
 
 private:
-    friend class InetLayer;
-    friend class BitMapObjectPool<UDPEndPointImplLwIP, INET_CONFIG_NUM_UDP_ENDPOINTS>;
-    static BitMapObjectPool<UDPEndPointImplLwIP, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
-    void Delete() override { sPool.ReleaseObject(this); }
-
     // UDPEndPoint overrides.
 #if INET_CONFIG_ENABLE_IPV4
     CHIP_ERROR IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join) override;
@@ -392,8 +370,8 @@ using UDPEndPointImpl = UDPEndPointImplLwIP;
 class UDPEndPointImplSockets : public UDPEndPoint, public EndPointStateSockets
 {
 public:
-    UDPEndPointImplSockets(InetLayer & inetLayer, void * appState = nullptr) :
-        UDPEndPoint(inetLayer, appState), mBoundIntfId(InterfaceId::Null())
+    UDPEndPointImplSockets(EndPointManager<UDPEndPoint> & endPointManager) :
+        UDPEndPoint(endPointManager), mBoundIntfId(InterfaceId::Null())
     {}
 
     // UDPEndPoint overrides.
@@ -403,11 +381,6 @@ public:
     void Free() override;
 
 private:
-    friend class InetLayer;
-    friend class BitMapObjectPool<UDPEndPointImplSockets, INET_CONFIG_NUM_UDP_ENDPOINTS>;
-    static BitMapObjectPool<UDPEndPointImplSockets, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
-    void Delete() override { sPool.ReleaseObject(this); }
-
     // UDPEndPoint overrides.
 #if INET_CONFIG_ENABLE_IPV4
     CHIP_ERROR IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join) override;
@@ -451,7 +424,7 @@ using UDPEndPointImpl = UDPEndPointImplSockets;
 class UDPEndPointImplNetworkFramework : public UDPEndPoint, public EndPointStateNetworkFramework
 {
 public:
-    UDPEndPointImplNetworkFramework(InetLayer & inetLayer, void * appState = nullptr) : UDPEndPoint(inetLayer, appState) {}
+    UDPEndPointImplNetworkFramework(EndPointManager<UDPEndPoint> & endPointManager) : UDPEndPoint(endPointManager) {}
 
     // UDPEndPoint overrides.
     CHIP_ERROR SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback) override;
@@ -460,11 +433,6 @@ public:
     void Free() override;
 
 private:
-    friend class InetLayer;
-    friend class BitMapObjectPool<UDPEndPointImplNetworkFramework, INET_CONFIG_NUM_UDP_ENDPOINTS>;
-    static BitMapObjectPool<UDPEndPointImplNetworkFramework, INET_CONFIG_NUM_UDP_ENDPOINTS> sPool;
-    void Delete() override { sPool.ReleaseObject(this); }
-
     // UDPEndPoint overrides.
 #if INET_CONFIG_ENABLE_IPV4
     CHIP_ERROR IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join) override;
@@ -499,6 +467,15 @@ private:
 using UDPEndPointImpl = UDPEndPointImplNetworkFramework;
 
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
+
+using UDPEndPointManagerImpl = EndPointManagerImplPool<UDPEndPointImpl, INET_CONFIG_NUM_UDP_ENDPOINTS>;
+
+template <>
+struct EndPointProperties<UDPEndPoint>
+{
+    static constexpr const char * Name  = "UDP";
+    static constexpr int SystemStatsKey = System::Stats::kInetLayer_NumUDPEps;
+};
 
 } // namespace Inet
 } // namespace chip

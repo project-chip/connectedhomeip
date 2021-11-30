@@ -42,11 +42,11 @@ namespace Transport {
 class TcpListenParameters
 {
 public:
-    explicit TcpListenParameters(Inet::InetLayer * layer) : mLayer(layer) {}
+    explicit TcpListenParameters(Inet::InetLayer * inetLayer) : mEndPointManager(inetLayer->GetTCPEndPointManager()) {}
     TcpListenParameters(const TcpListenParameters &) = default;
     TcpListenParameters(TcpListenParameters &&)      = default;
 
-    Inet::InetLayer * GetInetLayer() { return mLayer; }
+    Inet::EndPointManager<Inet::TCPEndPoint> * GetEndPointManager() { return mEndPointManager; }
 
     Inet::IPAddressType GetAddressType() const { return mAddressType; }
     TcpListenParameters & SetAddressType(Inet::IPAddressType type)
@@ -73,7 +73,7 @@ public:
     }
 
 private:
-    Inet::InetLayer * mLayer         = nullptr;                    ///< Associated inet layer
+    Inet::EndPointManager<Inet::TCPEndPoint> * mEndPointManager;   ///< Associated endpoint factory
     Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
     uint16_t mListenPort             = CHIP_PORT;                  ///< TCP listen port
     Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();  ///< Interface to listen on
