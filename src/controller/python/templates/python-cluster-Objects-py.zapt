@@ -79,7 +79,7 @@ class {{asUpperCamelCase name}}(Cluster):
                     ])
 
             {{#zcl_command_arguments}}
-            {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}' = None
+            {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
             {{/zcl_command_arguments}}
 
 {{/zcl_commands}}
@@ -107,9 +107,9 @@ class {{asUpperCamelCase name}}(Cluster):
             {{/if}}
 
             {{#if entryType}}
-            value: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = None
+            value: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = {{getPythonFieldDefault entryType ns=(asUpperCamelCase parent.name)}}
             {{else}}
-            value: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = None
+            value: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.name)}}
             {{/if}}
 
 {{/zcl_attributes_server}}
@@ -133,7 +133,7 @@ class {{asUpperCamelCase name}}(Cluster):
                     ])
 
             {{#zcl_event_fields}}
-            {{ asLowerCamelCase name }}: {{#if isArray}}typing.List[{{/if}}'{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}'{{#if isArray}}]{{/if}} = None
+            {{ asLowerCamelCase name }}: {{#if isArray}}typing.List[{{/if}}'{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}'{{#if isArray}}]{{/if}} = {{getPythonFieldDefault type ns=(asUpperCamelCase parent.parent.name)}}
             {{/zcl_event_fields}}
 
 {{/zcl_events}}

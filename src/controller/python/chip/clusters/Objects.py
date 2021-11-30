@@ -980,7 +980,7 @@ class PowerConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -1002,7 +1002,7 @@ class DeviceTemperatureConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class MinTempExperienced(ClusterAttributeDescriptor):
@@ -1162,7 +1162,7 @@ class DeviceTemperatureConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -1204,7 +1204,7 @@ class Identify(Cluster):
                             Label="identifyTime", Tag=0, Type=uint),
                     ])
 
-            identifyTime: 'uint' = None
+            identifyTime: 'uint' = 0
 
         @dataclass
         class IdentifyQueryResponse(ClusterCommand):
@@ -1220,7 +1220,7 @@ class Identify(Cluster):
                             Label="timeout", Tag=0, Type=uint),
                     ])
 
-            timeout: 'uint' = None
+            timeout: 'uint' = 0
 
         @dataclass
         class IdentifyQuery(ClusterCommand):
@@ -1250,8 +1250,8 @@ class Identify(Cluster):
                             Label="effectVariant", Tag=1, Type=Identify.Enums.IdentifyEffectVariant),
                     ])
 
-            effectIdentifier: 'Identify.Enums.IdentifyEffectIdentifier' = None
-            effectVariant: 'Identify.Enums.IdentifyEffectVariant' = None
+            effectIdentifier: 'Identify.Enums.IdentifyEffectIdentifier' = 0
+            effectVariant: 'Identify.Enums.IdentifyEffectVariant' = 0
 
     class Attributes:
         @dataclass
@@ -1268,7 +1268,7 @@ class Identify(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class IdentifyType(ClusterAttributeDescriptor):
@@ -1284,7 +1284,7 @@ class Identify(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -1316,7 +1316,7 @@ class Identify(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -1340,8 +1340,8 @@ class Groups(Cluster):
                             Label="groupName", Tag=1, Type=str),
                     ])
 
-            groupId: 'uint' = None
-            groupName: 'str' = None
+            groupId: 'uint' = 0
+            groupName: 'str' = ""
 
         @dataclass
         class AddGroupResponse(ClusterCommand):
@@ -1359,8 +1359,8 @@ class Groups(Cluster):
                             Label="groupId", Tag=1, Type=uint),
                     ])
 
-            status: 'uint' = None
-            groupId: 'uint' = None
+            status: 'uint' = 0
+            groupId: 'uint' = 0
 
         @dataclass
         class ViewGroup(ClusterCommand):
@@ -1376,7 +1376,7 @@ class Groups(Cluster):
                             Label="groupId", Tag=0, Type=uint),
                     ])
 
-            groupId: 'uint' = None
+            groupId: 'uint' = 0
 
         @dataclass
         class ViewGroupResponse(ClusterCommand):
@@ -1396,9 +1396,9 @@ class Groups(Cluster):
                             Label="groupName", Tag=2, Type=str),
                     ])
 
-            status: 'uint' = None
-            groupId: 'uint' = None
-            groupName: 'str' = None
+            status: 'uint' = 0
+            groupId: 'uint' = 0
+            groupName: 'str' = ""
 
         @dataclass
         class GetGroupMembership(ClusterCommand):
@@ -1414,7 +1414,7 @@ class Groups(Cluster):
                             Label="groupList", Tag=0, Type=typing.List[uint]),
                     ])
 
-            groupList: 'typing.List[uint]' = None
+            groupList: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class GetGroupMembershipResponse(ClusterCommand):
@@ -1432,8 +1432,8 @@ class Groups(Cluster):
                             Label="groupList", Tag=1, Type=typing.List[uint]),
                     ])
 
-            capacity: 'uint' = None
-            groupList: 'typing.List[uint]' = None
+            capacity: 'uint' = 0
+            groupList: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class RemoveGroup(ClusterCommand):
@@ -1449,7 +1449,7 @@ class Groups(Cluster):
                             Label="groupId", Tag=0, Type=uint),
                     ])
 
-            groupId: 'uint' = None
+            groupId: 'uint' = 0
 
         @dataclass
         class RemoveGroupResponse(ClusterCommand):
@@ -1467,8 +1467,8 @@ class Groups(Cluster):
                             Label="groupId", Tag=1, Type=uint),
                     ])
 
-            status: 'uint' = None
-            groupId: 'uint' = None
+            status: 'uint' = 0
+            groupId: 'uint' = 0
 
         @dataclass
         class RemoveAllGroups(ClusterCommand):
@@ -1498,8 +1498,8 @@ class Groups(Cluster):
                             Label="groupName", Tag=1, Type=str),
                     ])
 
-            groupId: 'uint' = None
-            groupName: 'str' = None
+            groupId: 'uint' = 0
+            groupName: 'str' = ""
 
     class Attributes:
         @dataclass
@@ -1516,7 +1516,7 @@ class Groups(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -1548,7 +1548,7 @@ class Groups(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -1597,11 +1597,12 @@ class Scenes(Cluster):
                             Label="extensionFieldSets", Tag=4, Type=typing.List[Scenes.Structs.SceneExtensionFieldSet]),
                     ])
 
-            groupId: 'uint' = None
-            sceneId: 'uint' = None
-            transitionTime: 'uint' = None
-            sceneName: 'str' = None
-            extensionFieldSets: 'typing.List[Scenes.Structs.SceneExtensionFieldSet]' = None
+            groupId: 'uint' = 0
+            sceneId: 'uint' = 0
+            transitionTime: 'uint' = 0
+            sceneName: 'str' = ""
+            extensionFieldSets: 'typing.List[Scenes.Structs.SceneExtensionFieldSet]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class AddSceneResponse(ClusterCommand):
@@ -1621,9 +1622,9 @@ class Scenes(Cluster):
                             Label="sceneId", Tag=2, Type=uint),
                     ])
 
-            status: 'uint' = None
-            groupId: 'uint' = None
-            sceneId: 'uint' = None
+            status: 'uint' = 0
+            groupId: 'uint' = 0
+            sceneId: 'uint' = 0
 
         @dataclass
         class ViewScene(ClusterCommand):
@@ -1641,8 +1642,8 @@ class Scenes(Cluster):
                             Label="sceneId", Tag=1, Type=uint),
                     ])
 
-            groupId: 'uint' = None
-            sceneId: 'uint' = None
+            groupId: 'uint' = 0
+            sceneId: 'uint' = 0
 
         @dataclass
         class ViewSceneResponse(ClusterCommand):
@@ -1668,12 +1669,13 @@ class Scenes(Cluster):
                             Label="extensionFieldSets", Tag=5, Type=typing.List[Scenes.Structs.SceneExtensionFieldSet]),
                     ])
 
-            status: 'uint' = None
-            groupId: 'uint' = None
-            sceneId: 'uint' = None
-            transitionTime: 'uint' = None
-            sceneName: 'str' = None
-            extensionFieldSets: 'typing.List[Scenes.Structs.SceneExtensionFieldSet]' = None
+            status: 'uint' = 0
+            groupId: 'uint' = 0
+            sceneId: 'uint' = 0
+            transitionTime: 'uint' = 0
+            sceneName: 'str' = ""
+            extensionFieldSets: 'typing.List[Scenes.Structs.SceneExtensionFieldSet]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class RemoveScene(ClusterCommand):
@@ -1691,8 +1693,8 @@ class Scenes(Cluster):
                             Label="sceneId", Tag=1, Type=uint),
                     ])
 
-            groupId: 'uint' = None
-            sceneId: 'uint' = None
+            groupId: 'uint' = 0
+            sceneId: 'uint' = 0
 
         @dataclass
         class RemoveSceneResponse(ClusterCommand):
@@ -1712,9 +1714,9 @@ class Scenes(Cluster):
                             Label="sceneId", Tag=2, Type=uint),
                     ])
 
-            status: 'uint' = None
-            groupId: 'uint' = None
-            sceneId: 'uint' = None
+            status: 'uint' = 0
+            groupId: 'uint' = 0
+            sceneId: 'uint' = 0
 
         @dataclass
         class RemoveAllScenes(ClusterCommand):
@@ -1730,7 +1732,7 @@ class Scenes(Cluster):
                             Label="groupId", Tag=0, Type=uint),
                     ])
 
-            groupId: 'uint' = None
+            groupId: 'uint' = 0
 
         @dataclass
         class RemoveAllScenesResponse(ClusterCommand):
@@ -1748,8 +1750,8 @@ class Scenes(Cluster):
                             Label="groupId", Tag=1, Type=uint),
                     ])
 
-            status: 'uint' = None
-            groupId: 'uint' = None
+            status: 'uint' = 0
+            groupId: 'uint' = 0
 
         @dataclass
         class StoreScene(ClusterCommand):
@@ -1767,8 +1769,8 @@ class Scenes(Cluster):
                             Label="sceneId", Tag=1, Type=uint),
                     ])
 
-            groupId: 'uint' = None
-            sceneId: 'uint' = None
+            groupId: 'uint' = 0
+            sceneId: 'uint' = 0
 
         @dataclass
         class StoreSceneResponse(ClusterCommand):
@@ -1788,9 +1790,9 @@ class Scenes(Cluster):
                             Label="sceneId", Tag=2, Type=uint),
                     ])
 
-            status: 'uint' = None
-            groupId: 'uint' = None
-            sceneId: 'uint' = None
+            status: 'uint' = 0
+            groupId: 'uint' = 0
+            sceneId: 'uint' = 0
 
         @dataclass
         class RecallScene(ClusterCommand):
@@ -1810,9 +1812,9 @@ class Scenes(Cluster):
                             Label="transitionTime", Tag=2, Type=uint),
                     ])
 
-            groupId: 'uint' = None
-            sceneId: 'uint' = None
-            transitionTime: 'uint' = None
+            groupId: 'uint' = 0
+            sceneId: 'uint' = 0
+            transitionTime: 'uint' = 0
 
         @dataclass
         class GetSceneMembership(ClusterCommand):
@@ -1828,7 +1830,7 @@ class Scenes(Cluster):
                             Label="groupId", Tag=0, Type=uint),
                     ])
 
-            groupId: 'uint' = None
+            groupId: 'uint' = 0
 
         @dataclass
         class GetSceneMembershipResponse(ClusterCommand):
@@ -1852,11 +1854,11 @@ class Scenes(Cluster):
                             Label="sceneList", Tag=4, Type=typing.List[uint]),
                     ])
 
-            status: 'uint' = None
-            capacity: 'uint' = None
-            groupId: 'uint' = None
-            sceneCount: 'uint' = None
-            sceneList: 'typing.List[uint]' = None
+            status: 'uint' = 0
+            capacity: 'uint' = 0
+            groupId: 'uint' = 0
+            sceneCount: 'uint' = 0
+            sceneList: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class EnhancedAddScene(ClusterCommand):
@@ -1880,11 +1882,12 @@ class Scenes(Cluster):
                             Label="extensionFieldSets", Tag=4, Type=typing.List[Scenes.Structs.SceneExtensionFieldSet]),
                     ])
 
-            groupId: 'uint' = None
-            sceneId: 'uint' = None
-            transitionTime: 'uint' = None
-            sceneName: 'str' = None
-            extensionFieldSets: 'typing.List[Scenes.Structs.SceneExtensionFieldSet]' = None
+            groupId: 'uint' = 0
+            sceneId: 'uint' = 0
+            transitionTime: 'uint' = 0
+            sceneName: 'str' = ""
+            extensionFieldSets: 'typing.List[Scenes.Structs.SceneExtensionFieldSet]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class EnhancedAddSceneResponse(ClusterCommand):
@@ -1904,9 +1907,9 @@ class Scenes(Cluster):
                             Label="sceneId", Tag=2, Type=uint),
                     ])
 
-            status: 'uint' = None
-            groupId: 'uint' = None
-            sceneId: 'uint' = None
+            status: 'uint' = 0
+            groupId: 'uint' = 0
+            sceneId: 'uint' = 0
 
         @dataclass
         class EnhancedViewScene(ClusterCommand):
@@ -1924,8 +1927,8 @@ class Scenes(Cluster):
                             Label="sceneId", Tag=1, Type=uint),
                     ])
 
-            groupId: 'uint' = None
-            sceneId: 'uint' = None
+            groupId: 'uint' = 0
+            sceneId: 'uint' = 0
 
         @dataclass
         class EnhancedViewSceneResponse(ClusterCommand):
@@ -1951,12 +1954,13 @@ class Scenes(Cluster):
                             Label="extensionFieldSets", Tag=5, Type=typing.List[Scenes.Structs.SceneExtensionFieldSet]),
                     ])
 
-            status: 'uint' = None
-            groupId: 'uint' = None
-            sceneId: 'uint' = None
-            transitionTime: 'uint' = None
-            sceneName: 'str' = None
-            extensionFieldSets: 'typing.List[Scenes.Structs.SceneExtensionFieldSet]' = None
+            status: 'uint' = 0
+            groupId: 'uint' = 0
+            sceneId: 'uint' = 0
+            transitionTime: 'uint' = 0
+            sceneName: 'str' = ""
+            extensionFieldSets: 'typing.List[Scenes.Structs.SceneExtensionFieldSet]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class CopyScene(ClusterCommand):
@@ -1980,11 +1984,11 @@ class Scenes(Cluster):
                             Label="sceneIdTo", Tag=4, Type=uint),
                     ])
 
-            mode: 'uint' = None
-            groupIdFrom: 'uint' = None
-            sceneIdFrom: 'uint' = None
-            groupIdTo: 'uint' = None
-            sceneIdTo: 'uint' = None
+            mode: 'uint' = 0
+            groupIdFrom: 'uint' = 0
+            sceneIdFrom: 'uint' = 0
+            groupIdTo: 'uint' = 0
+            sceneIdTo: 'uint' = 0
 
         @dataclass
         class CopySceneResponse(ClusterCommand):
@@ -2004,9 +2008,9 @@ class Scenes(Cluster):
                             Label="sceneIdFrom", Tag=2, Type=uint),
                     ])
 
-            status: 'uint' = None
-            groupIdFrom: 'uint' = None
-            sceneIdFrom: 'uint' = None
+            status: 'uint' = 0
+            groupIdFrom: 'uint' = 0
+            sceneIdFrom: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -2023,7 +2027,7 @@ class Scenes(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CurrentScene(ClusterAttributeDescriptor):
@@ -2039,7 +2043,7 @@ class Scenes(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CurrentGroup(ClusterAttributeDescriptor):
@@ -2055,7 +2059,7 @@ class Scenes(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class SceneValid(ClusterAttributeDescriptor):
@@ -2071,7 +2075,7 @@ class Scenes(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class NameSupport(ClusterAttributeDescriptor):
@@ -2087,7 +2091,7 @@ class Scenes(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class LastConfiguredBy(ClusterAttributeDescriptor):
@@ -2135,7 +2139,7 @@ class Scenes(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -2208,8 +2212,8 @@ class OnOff(Cluster):
                             Label="effectVariant", Tag=1, Type=OnOff.Enums.OnOffDelayedAllOffEffectVariant),
                     ])
 
-            effectId: 'OnOff.Enums.OnOffEffectIdentifier' = None
-            effectVariant: 'OnOff.Enums.OnOffDelayedAllOffEffectVariant' = None
+            effectId: 'OnOff.Enums.OnOffEffectIdentifier' = 0
+            effectVariant: 'OnOff.Enums.OnOffDelayedAllOffEffectVariant' = 0
 
         @dataclass
         class OnWithRecallGlobalScene(ClusterCommand):
@@ -2241,9 +2245,9 @@ class OnOff(Cluster):
                             Label="offWaitTime", Tag=2, Type=uint),
                     ])
 
-            onOffControl: 'uint' = None
-            onTime: 'uint' = None
-            offWaitTime: 'uint' = None
+            onOffControl: 'uint' = 0
+            onTime: 'uint' = 0
+            offWaitTime: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -2260,7 +2264,7 @@ class OnOff(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class GlobalSceneControl(ClusterAttributeDescriptor):
@@ -2356,7 +2360,7 @@ class OnOff(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -2378,7 +2382,7 @@ class OnOffSwitchConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class SwitchActions(ClusterAttributeDescriptor):
@@ -2394,7 +2398,7 @@ class OnOffSwitchConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -2426,7 +2430,7 @@ class OnOffSwitchConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -2463,10 +2467,10 @@ class LevelControl(Cluster):
                             Label="optionOverride", Tag=3, Type=uint),
                     ])
 
-            level: 'uint' = None
-            transitionTime: 'uint' = None
-            optionMask: 'uint' = None
-            optionOverride: 'uint' = None
+            level: 'uint' = 0
+            transitionTime: 'uint' = 0
+            optionMask: 'uint' = 0
+            optionOverride: 'uint' = 0
 
         @dataclass
         class Move(ClusterCommand):
@@ -2488,10 +2492,10 @@ class LevelControl(Cluster):
                             Label="optionOverride", Tag=3, Type=uint),
                     ])
 
-            moveMode: 'LevelControl.Enums.MoveMode' = None
-            rate: 'uint' = None
-            optionMask: 'uint' = None
-            optionOverride: 'uint' = None
+            moveMode: 'LevelControl.Enums.MoveMode' = 0
+            rate: 'uint' = 0
+            optionMask: 'uint' = 0
+            optionOverride: 'uint' = 0
 
         @dataclass
         class Step(ClusterCommand):
@@ -2515,11 +2519,11 @@ class LevelControl(Cluster):
                             Label="optionOverride", Tag=4, Type=uint),
                     ])
 
-            stepMode: 'LevelControl.Enums.StepMode' = None
-            stepSize: 'uint' = None
-            transitionTime: 'uint' = None
-            optionMask: 'uint' = None
-            optionOverride: 'uint' = None
+            stepMode: 'LevelControl.Enums.StepMode' = 0
+            stepSize: 'uint' = 0
+            transitionTime: 'uint' = 0
+            optionMask: 'uint' = 0
+            optionOverride: 'uint' = 0
 
         @dataclass
         class Stop(ClusterCommand):
@@ -2537,8 +2541,8 @@ class LevelControl(Cluster):
                             Label="optionOverride", Tag=1, Type=uint),
                     ])
 
-            optionMask: 'uint' = None
-            optionOverride: 'uint' = None
+            optionMask: 'uint' = 0
+            optionOverride: 'uint' = 0
 
         @dataclass
         class MoveToLevelWithOnOff(ClusterCommand):
@@ -2556,8 +2560,8 @@ class LevelControl(Cluster):
                             Label="transitionTime", Tag=1, Type=uint),
                     ])
 
-            level: 'uint' = None
-            transitionTime: 'uint' = None
+            level: 'uint' = 0
+            transitionTime: 'uint' = 0
 
         @dataclass
         class MoveWithOnOff(ClusterCommand):
@@ -2575,8 +2579,8 @@ class LevelControl(Cluster):
                             Label="rate", Tag=1, Type=uint),
                     ])
 
-            moveMode: 'LevelControl.Enums.MoveMode' = None
-            rate: 'uint' = None
+            moveMode: 'LevelControl.Enums.MoveMode' = 0
+            rate: 'uint' = 0
 
         @dataclass
         class StepWithOnOff(ClusterCommand):
@@ -2596,9 +2600,9 @@ class LevelControl(Cluster):
                             Label="transitionTime", Tag=2, Type=uint),
                     ])
 
-            stepMode: 'LevelControl.Enums.StepMode' = None
-            stepSize: 'uint' = None
-            transitionTime: 'uint' = None
+            stepMode: 'LevelControl.Enums.StepMode' = 0
+            stepSize: 'uint' = 0
+            transitionTime: 'uint' = 0
 
         @dataclass
         class StopWithOnOff(ClusterCommand):
@@ -2627,7 +2631,7 @@ class LevelControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RemainingTime(ClusterAttributeDescriptor):
@@ -2867,7 +2871,7 @@ class LevelControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -2891,8 +2895,8 @@ class Alarms(Cluster):
                             Label="clusterId", Tag=1, Type=uint),
                     ])
 
-            alarmCode: 'uint' = None
-            clusterId: 'uint' = None
+            alarmCode: 'uint' = 0
+            clusterId: 'uint' = 0
 
         @dataclass
         class Alarm(ClusterCommand):
@@ -2910,8 +2914,8 @@ class Alarms(Cluster):
                             Label="clusterId", Tag=1, Type=uint),
                     ])
 
-            alarmCode: 'uint' = None
-            clusterId: 'uint' = None
+            alarmCode: 'uint' = 0
+            clusterId: 'uint' = 0
 
         @dataclass
         class ResetAllAlarms(ClusterCommand):
@@ -2945,10 +2949,10 @@ class Alarms(Cluster):
                             Label="timeStamp", Tag=3, Type=uint),
                     ])
 
-            status: 'uint' = None
-            alarmCode: 'uint' = None
-            clusterId: 'uint' = None
-            timeStamp: 'uint' = None
+            status: 'uint' = 0
+            alarmCode: 'uint' = 0
+            clusterId: 'uint' = 0
+            timeStamp: 'uint' = 0
 
         @dataclass
         class GetAlarm(ClusterCommand):
@@ -3021,7 +3025,7 @@ class Alarms(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -3043,7 +3047,7 @@ class Time(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TimeStatus(ClusterAttributeDescriptor):
@@ -3059,7 +3063,7 @@ class Time(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TimeZone(ClusterAttributeDescriptor):
@@ -3219,7 +3223,7 @@ class Time(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -3289,7 +3293,7 @@ class BinaryInputBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class Polarity(ClusterAttributeDescriptor):
@@ -3321,7 +3325,7 @@ class BinaryInputBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class Reliability(ClusterAttributeDescriptor):
@@ -3353,7 +3357,7 @@ class BinaryInputBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ApplicationType(ClusterAttributeDescriptor):
@@ -3401,7 +3405,7 @@ class BinaryInputBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -3487,7 +3491,7 @@ class PowerProfile(Cluster):
                             Label="powerProfileId", Tag=0, Type=uint),
                     ])
 
-            powerProfileId: 'uint' = None
+            powerProfileId: 'uint' = 0
 
         @dataclass
         class PowerProfileNotification(ClusterCommand):
@@ -3509,10 +3513,11 @@ class PowerProfile(Cluster):
                             Label="transferredPhases", Tag=3, Type=typing.List[PowerProfile.Structs.TransferredPhase]),
                     ])
 
-            totalProfileNum: 'uint' = None
-            powerProfileId: 'uint' = None
-            numOfTransferredPhases: 'uint' = None
-            transferredPhases: 'typing.List[PowerProfile.Structs.TransferredPhase]' = None
+            totalProfileNum: 'uint' = 0
+            powerProfileId: 'uint' = 0
+            numOfTransferredPhases: 'uint' = 0
+            transferredPhases: 'typing.List[PowerProfile.Structs.TransferredPhase]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class PowerProfileStateRequest(ClusterCommand):
@@ -3546,10 +3551,11 @@ class PowerProfile(Cluster):
                             Label="transferredPhases", Tag=3, Type=typing.List[PowerProfile.Structs.TransferredPhase]),
                     ])
 
-            totalProfileNum: 'uint' = None
-            powerProfileId: 'uint' = None
-            numOfTransferredPhases: 'uint' = None
-            transferredPhases: 'typing.List[PowerProfile.Structs.TransferredPhase]' = None
+            totalProfileNum: 'uint' = 0
+            powerProfileId: 'uint' = 0
+            numOfTransferredPhases: 'uint' = 0
+            transferredPhases: 'typing.List[PowerProfile.Structs.TransferredPhase]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class GetPowerProfilePriceResponse(ClusterCommand):
@@ -3571,10 +3577,10 @@ class PowerProfile(Cluster):
                             Label="priceTrailingDigit", Tag=3, Type=uint),
                     ])
 
-            powerProfileId: 'uint' = None
-            currency: 'uint' = None
-            price: 'uint' = None
-            priceTrailingDigit: 'uint' = None
+            powerProfileId: 'uint' = 0
+            currency: 'uint' = 0
+            price: 'uint' = 0
+            priceTrailingDigit: 'uint' = 0
 
         @dataclass
         class PowerProfileStateResponse(ClusterCommand):
@@ -3592,8 +3598,9 @@ class PowerProfile(Cluster):
                             Label="powerProfileRecords", Tag=1, Type=typing.List[PowerProfile.Structs.PowerProfileRecord]),
                     ])
 
-            powerProfileCount: 'uint' = None
-            powerProfileRecords: 'typing.List[PowerProfile.Structs.PowerProfileRecord]' = None
+            powerProfileCount: 'uint' = 0
+            powerProfileRecords: 'typing.List[PowerProfile.Structs.PowerProfileRecord]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class GetOverallSchedulePriceResponse(ClusterCommand):
@@ -3613,9 +3620,9 @@ class PowerProfile(Cluster):
                             Label="priceTrailingDigit", Tag=2, Type=uint),
                     ])
 
-            currency: 'uint' = None
-            price: 'uint' = None
-            priceTrailingDigit: 'uint' = None
+            currency: 'uint' = 0
+            price: 'uint' = 0
+            priceTrailingDigit: 'uint' = 0
 
         @dataclass
         class GetPowerProfilePrice(ClusterCommand):
@@ -3631,7 +3638,7 @@ class PowerProfile(Cluster):
                             Label="powerProfileId", Tag=0, Type=uint),
                     ])
 
-            powerProfileId: 'uint' = None
+            powerProfileId: 'uint' = 0
 
         @dataclass
         class EnergyPhasesScheduleNotification(ClusterCommand):
@@ -3651,9 +3658,10 @@ class PowerProfile(Cluster):
                             Label="scheduledPhases", Tag=2, Type=typing.List[PowerProfile.Structs.ScheduledPhase]),
                     ])
 
-            powerProfileId: 'uint' = None
-            numOfScheduledPhases: 'uint' = None
-            scheduledPhases: 'typing.List[PowerProfile.Structs.ScheduledPhase]' = None
+            powerProfileId: 'uint' = 0
+            numOfScheduledPhases: 'uint' = 0
+            scheduledPhases: 'typing.List[PowerProfile.Structs.ScheduledPhase]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class PowerProfilesStateNotification(ClusterCommand):
@@ -3671,8 +3679,9 @@ class PowerProfile(Cluster):
                             Label="powerProfileRecords", Tag=1, Type=typing.List[PowerProfile.Structs.PowerProfileRecord]),
                     ])
 
-            powerProfileCount: 'uint' = None
-            powerProfileRecords: 'typing.List[PowerProfile.Structs.PowerProfileRecord]' = None
+            powerProfileCount: 'uint' = 0
+            powerProfileRecords: 'typing.List[PowerProfile.Structs.PowerProfileRecord]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class EnergyPhasesScheduleResponse(ClusterCommand):
@@ -3692,9 +3701,10 @@ class PowerProfile(Cluster):
                             Label="scheduledPhases", Tag=2, Type=typing.List[PowerProfile.Structs.ScheduledPhase]),
                     ])
 
-            powerProfileId: 'uint' = None
-            numOfScheduledPhases: 'uint' = None
-            scheduledPhases: 'typing.List[PowerProfile.Structs.ScheduledPhase]' = None
+            powerProfileId: 'uint' = 0
+            numOfScheduledPhases: 'uint' = 0
+            scheduledPhases: 'typing.List[PowerProfile.Structs.ScheduledPhase]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class GetOverallSchedulePrice(ClusterCommand):
@@ -3722,7 +3732,7 @@ class PowerProfile(Cluster):
                             Label="powerProfileId", Tag=0, Type=uint),
                     ])
 
-            powerProfileId: 'uint' = None
+            powerProfileId: 'uint' = 0
 
         @dataclass
         class EnergyPhasesScheduleRequest(ClusterCommand):
@@ -3738,7 +3748,7 @@ class PowerProfile(Cluster):
                             Label="powerProfileId", Tag=0, Type=uint),
                     ])
 
-            powerProfileId: 'uint' = None
+            powerProfileId: 'uint' = 0
 
         @dataclass
         class EnergyPhasesScheduleStateRequest(ClusterCommand):
@@ -3754,7 +3764,7 @@ class PowerProfile(Cluster):
                             Label="powerProfileId", Tag=0, Type=uint),
                     ])
 
-            powerProfileId: 'uint' = None
+            powerProfileId: 'uint' = 0
 
         @dataclass
         class EnergyPhasesScheduleStateResponse(ClusterCommand):
@@ -3774,9 +3784,10 @@ class PowerProfile(Cluster):
                             Label="scheduledPhases", Tag=2, Type=typing.List[PowerProfile.Structs.ScheduledPhase]),
                     ])
 
-            powerProfileId: 'uint' = None
-            numOfScheduledPhases: 'uint' = None
-            scheduledPhases: 'typing.List[PowerProfile.Structs.ScheduledPhase]' = None
+            powerProfileId: 'uint' = 0
+            numOfScheduledPhases: 'uint' = 0
+            scheduledPhases: 'typing.List[PowerProfile.Structs.ScheduledPhase]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class GetPowerProfilePriceExtendedResponse(ClusterCommand):
@@ -3798,10 +3809,10 @@ class PowerProfile(Cluster):
                             Label="priceTrailingDigit", Tag=3, Type=uint),
                     ])
 
-            powerProfileId: 'uint' = None
-            currency: 'uint' = None
-            price: 'uint' = None
-            priceTrailingDigit: 'uint' = None
+            powerProfileId: 'uint' = 0
+            currency: 'uint' = 0
+            price: 'uint' = 0
+            priceTrailingDigit: 'uint' = 0
 
         @dataclass
         class EnergyPhasesScheduleStateNotification(ClusterCommand):
@@ -3821,9 +3832,10 @@ class PowerProfile(Cluster):
                             Label="scheduledPhases", Tag=2, Type=typing.List[PowerProfile.Structs.ScheduledPhase]),
                     ])
 
-            powerProfileId: 'uint' = None
-            numOfScheduledPhases: 'uint' = None
-            scheduledPhases: 'typing.List[PowerProfile.Structs.ScheduledPhase]' = None
+            powerProfileId: 'uint' = 0
+            numOfScheduledPhases: 'uint' = 0
+            scheduledPhases: 'typing.List[PowerProfile.Structs.ScheduledPhase]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class PowerProfileScheduleConstraintsNotification(ClusterCommand):
@@ -3843,9 +3855,9 @@ class PowerProfile(Cluster):
                             Label="stopBefore", Tag=2, Type=uint),
                     ])
 
-            powerProfileId: 'uint' = None
-            startAfter: 'uint' = None
-            stopBefore: 'uint' = None
+            powerProfileId: 'uint' = 0
+            startAfter: 'uint' = 0
+            stopBefore: 'uint' = 0
 
         @dataclass
         class PowerProfileScheduleConstraintsResponse(ClusterCommand):
@@ -3865,9 +3877,9 @@ class PowerProfile(Cluster):
                             Label="stopBefore", Tag=2, Type=uint),
                     ])
 
-            powerProfileId: 'uint' = None
-            startAfter: 'uint' = None
-            stopBefore: 'uint' = None
+            powerProfileId: 'uint' = 0
+            startAfter: 'uint' = 0
+            stopBefore: 'uint' = 0
 
         @dataclass
         class GetPowerProfilePriceExtended(ClusterCommand):
@@ -3887,9 +3899,9 @@ class PowerProfile(Cluster):
                             Label="powerProfileStartTime", Tag=2, Type=uint),
                     ])
 
-            options: 'uint' = None
-            powerProfileId: 'uint' = None
-            powerProfileStartTime: 'uint' = None
+            options: 'uint' = 0
+            powerProfileId: 'uint' = 0
+            powerProfileStartTime: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -3906,7 +3918,7 @@ class PowerProfile(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class MultipleScheduling(ClusterAttributeDescriptor):
@@ -3922,7 +3934,7 @@ class PowerProfile(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class EnergyFormatting(ClusterAttributeDescriptor):
@@ -3938,7 +3950,7 @@ class PowerProfile(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class EnergyRemote(ClusterAttributeDescriptor):
@@ -3954,7 +3966,7 @@ class PowerProfile(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class ScheduleMode(ClusterAttributeDescriptor):
@@ -3970,7 +3982,7 @@ class PowerProfile(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -4002,7 +4014,7 @@ class PowerProfile(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -4062,7 +4074,7 @@ class ApplianceControl(Cluster):
                             Label="commandId", Tag=0, Type=ApplianceControl.Enums.CommandIdentification),
                     ])
 
-            commandId: 'ApplianceControl.Enums.CommandIdentification' = None
+            commandId: 'ApplianceControl.Enums.CommandIdentification' = 0
 
         @dataclass
         class SignalStateResponse(ClusterCommand):
@@ -4082,9 +4094,9 @@ class ApplianceControl(Cluster):
                             Label="applianceStatus2", Tag=2, Type=ApplianceControl.Enums.ApplianceStatus),
                     ])
 
-            applianceStatus: 'ApplianceControl.Enums.ApplianceStatus' = None
-            remoteEnableFlagsAndDeviceStatus2: 'uint' = None
-            applianceStatus2: 'ApplianceControl.Enums.ApplianceStatus' = None
+            applianceStatus: 'ApplianceControl.Enums.ApplianceStatus' = 0
+            remoteEnableFlagsAndDeviceStatus2: 'uint' = 0
+            applianceStatus2: 'ApplianceControl.Enums.ApplianceStatus' = 0
 
         @dataclass
         class SignalState(ClusterCommand):
@@ -4116,9 +4128,9 @@ class ApplianceControl(Cluster):
                             Label="applianceStatus2", Tag=2, Type=ApplianceControl.Enums.ApplianceStatus),
                     ])
 
-            applianceStatus: 'ApplianceControl.Enums.ApplianceStatus' = None
-            remoteEnableFlagsAndDeviceStatus2: 'uint' = None
-            applianceStatus2: 'ApplianceControl.Enums.ApplianceStatus' = None
+            applianceStatus: 'ApplianceControl.Enums.ApplianceStatus' = 0
+            remoteEnableFlagsAndDeviceStatus2: 'uint' = 0
+            applianceStatus2: 'ApplianceControl.Enums.ApplianceStatus' = 0
 
         @dataclass
         class WriteFunctions(ClusterCommand):
@@ -4138,9 +4150,10 @@ class ApplianceControl(Cluster):
                             Label="functionData", Tag=2, Type=typing.List[uint]),
                     ])
 
-            functionId: 'uint' = None
-            functionDataType: 'uint' = None
-            functionData: 'typing.List[uint]' = None
+            functionId: 'uint' = 0
+            functionDataType: 'uint' = 0
+            functionData: 'typing.List[uint]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class OverloadPauseResume(ClusterCommand):
@@ -4180,7 +4193,7 @@ class ApplianceControl(Cluster):
                             Label="warningEvent", Tag=0, Type=ApplianceControl.Enums.WarningEvent),
                     ])
 
-            warningEvent: 'ApplianceControl.Enums.WarningEvent' = None
+            warningEvent: 'ApplianceControl.Enums.WarningEvent' = 0
 
     class Attributes:
         @dataclass
@@ -4197,7 +4210,7 @@ class ApplianceControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FinishTime(ClusterAttributeDescriptor):
@@ -4213,7 +4226,7 @@ class ApplianceControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RemainingTime(ClusterAttributeDescriptor):
@@ -4261,7 +4274,7 @@ class ApplianceControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -4299,7 +4312,8 @@ class Descriptor(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[Descriptor.Structs.DeviceType])
 
-            value: 'typing.List[Descriptor.Structs.DeviceType]' = None
+            value: 'typing.List[Descriptor.Structs.DeviceType]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class ServerList(ClusterAttributeDescriptor):
@@ -4315,7 +4329,7 @@ class Descriptor(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[uint])
 
-            value: 'typing.List[uint]' = None
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class ClientList(ClusterAttributeDescriptor):
@@ -4331,7 +4345,7 @@ class Descriptor(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[uint])
 
-            value: 'typing.List[uint]' = None
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class PartsList(ClusterAttributeDescriptor):
@@ -4347,7 +4361,7 @@ class Descriptor(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[uint])
 
-            value: 'typing.List[uint]' = None
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -4379,7 +4393,7 @@ class Descriptor(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -4415,8 +4429,8 @@ class PollControl(Cluster):
                             Label="fastPollTimeout", Tag=1, Type=uint),
                     ])
 
-            startFastPolling: 'bool' = None
-            fastPollTimeout: 'uint' = None
+            startFastPolling: 'bool' = False
+            fastPollTimeout: 'uint' = 0
 
         @dataclass
         class FastPollStop(ClusterCommand):
@@ -4444,7 +4458,7 @@ class PollControl(Cluster):
                             Label="newLongPollInterval", Tag=0, Type=uint),
                     ])
 
-            newLongPollInterval: 'uint' = None
+            newLongPollInterval: 'uint' = 0
 
         @dataclass
         class SetShortPollInterval(ClusterCommand):
@@ -4460,7 +4474,7 @@ class PollControl(Cluster):
                             Label="newShortPollInterval", Tag=0, Type=uint),
                     ])
 
-            newShortPollInterval: 'uint' = None
+            newShortPollInterval: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -4477,7 +4491,7 @@ class PollControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class LongPollInterval(ClusterAttributeDescriptor):
@@ -4493,7 +4507,7 @@ class PollControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ShortPollInterval(ClusterAttributeDescriptor):
@@ -4509,7 +4523,7 @@ class PollControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FastPollTimeout(ClusterAttributeDescriptor):
@@ -4525,7 +4539,7 @@ class PollControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CheckInIntervalMin(ClusterAttributeDescriptor):
@@ -4605,7 +4619,7 @@ class PollControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -4703,7 +4717,7 @@ class BridgedActions(Cluster):
                             Label="invokeID", Tag=1, Type=typing.Optional[uint]),
                     ])
 
-            actionID: 'uint' = None
+            actionID: 'uint' = 0
             invokeID: 'typing.Optional[uint]' = None
 
         @dataclass
@@ -4724,9 +4738,9 @@ class BridgedActions(Cluster):
                             Label="transitionTime", Tag=2, Type=uint),
                     ])
 
-            actionID: 'uint' = None
+            actionID: 'uint' = 0
             invokeID: 'typing.Optional[uint]' = None
-            transitionTime: 'uint' = None
+            transitionTime: 'uint' = 0
 
         @dataclass
         class StartAction(ClusterCommand):
@@ -4744,7 +4758,7 @@ class BridgedActions(Cluster):
                             Label="invokeID", Tag=1, Type=typing.Optional[uint]),
                     ])
 
-            actionID: 'uint' = None
+            actionID: 'uint' = 0
             invokeID: 'typing.Optional[uint]' = None
 
         @dataclass
@@ -4765,9 +4779,9 @@ class BridgedActions(Cluster):
                             Label="duration", Tag=2, Type=uint),
                     ])
 
-            actionID: 'uint' = None
+            actionID: 'uint' = 0
             invokeID: 'typing.Optional[uint]' = None
-            duration: 'uint' = None
+            duration: 'uint' = 0
 
         @dataclass
         class StopAction(ClusterCommand):
@@ -4785,7 +4799,7 @@ class BridgedActions(Cluster):
                             Label="invokeID", Tag=1, Type=typing.Optional[uint]),
                     ])
 
-            actionID: 'uint' = None
+            actionID: 'uint' = 0
             invokeID: 'typing.Optional[uint]' = None
 
         @dataclass
@@ -4804,7 +4818,7 @@ class BridgedActions(Cluster):
                             Label="invokeID", Tag=1, Type=typing.Optional[uint]),
                     ])
 
-            actionID: 'uint' = None
+            actionID: 'uint' = 0
             invokeID: 'typing.Optional[uint]' = None
 
         @dataclass
@@ -4825,9 +4839,9 @@ class BridgedActions(Cluster):
                             Label="duration", Tag=2, Type=uint),
                     ])
 
-            actionID: 'uint' = None
+            actionID: 'uint' = 0
             invokeID: 'typing.Optional[uint]' = None
-            duration: 'uint' = None
+            duration: 'uint' = 0
 
         @dataclass
         class ResumeAction(ClusterCommand):
@@ -4845,7 +4859,7 @@ class BridgedActions(Cluster):
                             Label="invokeID", Tag=1, Type=typing.Optional[uint]),
                     ])
 
-            actionID: 'uint' = None
+            actionID: 'uint' = 0
             invokeID: 'typing.Optional[uint]' = None
 
         @dataclass
@@ -4864,7 +4878,7 @@ class BridgedActions(Cluster):
                             Label="invokeID", Tag=1, Type=typing.Optional[uint]),
                     ])
 
-            actionID: 'uint' = None
+            actionID: 'uint' = 0
             invokeID: 'typing.Optional[uint]' = None
 
         @dataclass
@@ -4885,9 +4899,9 @@ class BridgedActions(Cluster):
                             Label="duration", Tag=2, Type=uint),
                     ])
 
-            actionID: 'uint' = None
+            actionID: 'uint' = 0
             invokeID: 'typing.Optional[uint]' = None
-            duration: 'uint' = None
+            duration: 'uint' = 0
 
         @dataclass
         class DisableAction(ClusterCommand):
@@ -4905,7 +4919,7 @@ class BridgedActions(Cluster):
                             Label="invokeID", Tag=1, Type=typing.Optional[uint]),
                     ])
 
-            actionID: 'uint' = None
+            actionID: 'uint' = 0
             invokeID: 'typing.Optional[uint]' = None
 
         @dataclass
@@ -4926,9 +4940,9 @@ class BridgedActions(Cluster):
                             Label="duration", Tag=2, Type=uint),
                     ])
 
-            actionID: 'uint' = None
+            actionID: 'uint' = 0
             invokeID: 'typing.Optional[uint]' = None
-            duration: 'uint' = None
+            duration: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -4945,7 +4959,8 @@ class BridgedActions(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[BridgedActions.Structs.ActionStruct])
 
-            value: 'typing.List[BridgedActions.Structs.ActionStruct]' = None
+            value: 'typing.List[BridgedActions.Structs.ActionStruct]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class EndpointList(ClusterAttributeDescriptor):
@@ -4961,7 +4976,8 @@ class BridgedActions(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[BridgedActions.Structs.EndpointListStruct])
 
-            value: 'typing.List[BridgedActions.Structs.EndpointListStruct]' = None
+            value: 'typing.List[BridgedActions.Structs.EndpointListStruct]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class SetupUrl(ClusterAttributeDescriptor):
@@ -5009,7 +5025,7 @@ class BridgedActions(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -5080,7 +5096,7 @@ class Basic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class VendorName(ClusterAttributeDescriptor):
@@ -5096,7 +5112,7 @@ class Basic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class VendorID(ClusterAttributeDescriptor):
@@ -5112,7 +5128,7 @@ class Basic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ProductName(ClusterAttributeDescriptor):
@@ -5128,7 +5144,7 @@ class Basic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class ProductID(ClusterAttributeDescriptor):
@@ -5144,7 +5160,7 @@ class Basic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class NodeLabel(ClusterAttributeDescriptor):
@@ -5160,7 +5176,7 @@ class Basic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class Location(ClusterAttributeDescriptor):
@@ -5176,7 +5192,7 @@ class Basic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class HardwareVersion(ClusterAttributeDescriptor):
@@ -5192,7 +5208,7 @@ class Basic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class HardwareVersionString(ClusterAttributeDescriptor):
@@ -5208,7 +5224,7 @@ class Basic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class SoftwareVersion(ClusterAttributeDescriptor):
@@ -5224,7 +5240,7 @@ class Basic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class SoftwareVersionString(ClusterAttributeDescriptor):
@@ -5240,7 +5256,7 @@ class Basic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class ManufacturingDate(ClusterAttributeDescriptor):
@@ -5400,7 +5416,7 @@ class Basic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
     class Events:
         @dataclass
@@ -5416,7 +5432,7 @@ class Basic(Cluster):
                             Label="softwareVersion", Tag=0, Type=uint),
                     ])
 
-            softwareVersion: 'uint' = None
+            softwareVersion: 'uint' = 0
 
         @dataclass
         class ShutDown(ClusterEventDescriptor):
@@ -5453,7 +5469,7 @@ class Basic(Cluster):
                             Label="reachableNewValue", Tag=0, Type=bool),
                     ])
 
-            reachableNewValue: 'bool' = None
+            reachableNewValue: 'bool' = False
 
 
 @dataclass
@@ -5506,10 +5522,11 @@ class OtaSoftwareUpdateProvider(Cluster):
                             Label="metadataForProvider", Tag=7, Type=typing.Optional[bytes]),
                     ])
 
-            vendorId: 'uint' = None
-            productId: 'uint' = None
-            softwareVersion: 'uint' = None
-            protocolsSupported: 'typing.List[OtaSoftwareUpdateProvider.Enums.OTADownloadProtocol]' = None
+            vendorId: 'uint' = 0
+            productId: 'uint' = 0
+            softwareVersion: 'uint' = 0
+            protocolsSupported: 'typing.List[OtaSoftwareUpdateProvider.Enums.OTADownloadProtocol]' = field(
+                default_factory=lambda: [])
             hardwareVersion: 'typing.Optional[uint]' = None
             location: 'typing.Optional[str]' = None
             requestorCanConsent: 'typing.Optional[bool]' = None
@@ -5531,8 +5548,8 @@ class OtaSoftwareUpdateProvider(Cluster):
                             Label="newVersion", Tag=1, Type=uint),
                     ])
 
-            updateToken: 'bytes' = None
-            newVersion: 'uint' = None
+            updateToken: 'bytes' = b""
+            newVersion: 'uint' = 0
 
         @dataclass
         class NotifyUpdateApplied(ClusterCommand):
@@ -5550,8 +5567,8 @@ class OtaSoftwareUpdateProvider(Cluster):
                             Label="softwareVersion", Tag=1, Type=uint),
                     ])
 
-            updateToken: 'bytes' = None
-            softwareVersion: 'uint' = None
+            updateToken: 'bytes' = b""
+            softwareVersion: 'uint' = 0
 
         @dataclass
         class QueryImageResponse(ClusterCommand):
@@ -5581,7 +5598,7 @@ class OtaSoftwareUpdateProvider(Cluster):
                             Label="metadataForRequestor", Tag=7, Type=typing.Optional[bytes]),
                     ])
 
-            status: 'OtaSoftwareUpdateProvider.Enums.OTAQueryStatus' = None
+            status: 'OtaSoftwareUpdateProvider.Enums.OTAQueryStatus' = 0
             delayedActionTime: 'typing.Optional[uint]' = None
             imageURI: 'typing.Optional[str]' = None
             softwareVersion: 'typing.Optional[uint]' = None
@@ -5606,8 +5623,8 @@ class OtaSoftwareUpdateProvider(Cluster):
                             Label="delayedActionTime", Tag=1, Type=uint),
                     ])
 
-            action: 'OtaSoftwareUpdateProvider.Enums.OTAApplyUpdateAction' = None
-            delayedActionTime: 'uint' = None
+            action: 'OtaSoftwareUpdateProvider.Enums.OTAApplyUpdateAction' = 0
+            delayedActionTime: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -5640,7 +5657,7 @@ class OtaSoftwareUpdateProvider(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -5692,9 +5709,9 @@ class OtaSoftwareUpdateRequestor(Cluster):
                             Label="metadataForNode", Tag=3, Type=typing.Optional[bytes]),
                     ])
 
-            providerLocation: 'uint' = None
-            vendorId: 'uint' = None
-            announcementReason: 'OtaSoftwareUpdateRequestor.Enums.OTAAnnouncementReason' = None
+            providerLocation: 'uint' = 0
+            vendorId: 'uint' = 0
+            announcementReason: 'OtaSoftwareUpdateRequestor.Enums.OTAAnnouncementReason' = 0
             metadataForNode: 'typing.Optional[bytes]' = None
 
     class Attributes:
@@ -5712,7 +5729,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bytes)
 
-            value: 'bytes' = None
+            value: 'bytes' = b""
 
         @dataclass
         class UpdatePossible(ClusterAttributeDescriptor):
@@ -5728,7 +5745,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -5760,7 +5777,7 @@ class OtaSoftwareUpdateRequestor(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
     class Events:
         @dataclass
@@ -5782,10 +5799,10 @@ class OtaSoftwareUpdateRequestor(Cluster):
                             Label="targetSoftwareVersion", Tag=3, Type=uint),
                     ])
 
-            previousState: 'OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum' = None
-            newState: 'OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum' = None
-            reason: 'OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum' = None
-            targetSoftwareVersion: 'uint' = None
+            previousState: 'OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum' = 0
+            newState: 'OtaSoftwareUpdateRequestor.Enums.UpdateStateEnum' = 0
+            reason: 'OtaSoftwareUpdateRequestor.Enums.ChangeReasonEnum' = 0
+            targetSoftwareVersion: 'uint' = 0
 
         @dataclass
         class VersionApplied(ClusterEventDescriptor):
@@ -5802,8 +5819,8 @@ class OtaSoftwareUpdateRequestor(Cluster):
                             Label="productID", Tag=1, Type=uint),
                     ])
 
-            softwareVersion: 'uint' = None
-            productID: 'uint' = None
+            softwareVersion: 'uint' = 0
+            productID: 'uint' = 0
 
         @dataclass
         class DownloadError(ClusterEventDescriptor):
@@ -5824,10 +5841,10 @@ class OtaSoftwareUpdateRequestor(Cluster):
                             Label="platformCode", Tag=3, Type=int),
                     ])
 
-            softwareVersion: 'uint' = None
-            bytesDownloaded: 'uint' = None
-            progressPercent: 'uint' = None
-            platformCode: 'int' = None
+            softwareVersion: 'uint' = 0
+            bytesDownloaded: 'uint' = 0
+            progressPercent: 'uint' = 0
+            platformCode: 'int' = 0
 
 
 @dataclass
@@ -5865,7 +5882,7 @@ class LocalizationConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -5903,7 +5920,7 @@ class LocalizationTimeFormat(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -5941,7 +5958,7 @@ class LocalizationUnit(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -5979,7 +5996,7 @@ class PowerSourceConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -6001,7 +6018,7 @@ class PowerSource(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Order(ClusterAttributeDescriptor):
@@ -6017,7 +6034,7 @@ class PowerSource(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Description(ClusterAttributeDescriptor):
@@ -6033,7 +6050,7 @@ class PowerSource(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class WiredAssessedInputVoltage(ClusterAttributeDescriptor):
@@ -6513,7 +6530,7 @@ class PowerSource(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -6564,9 +6581,9 @@ class GeneralCommissioning(Cluster):
                             Label="timeoutMs", Tag=2, Type=uint),
                     ])
 
-            expiryLengthSeconds: 'uint' = None
-            breadcrumb: 'uint' = None
-            timeoutMs: 'uint' = None
+            expiryLengthSeconds: 'uint' = 0
+            breadcrumb: 'uint' = 0
+            timeoutMs: 'uint' = 0
 
         @dataclass
         class ArmFailSafeResponse(ClusterCommand):
@@ -6584,8 +6601,8 @@ class GeneralCommissioning(Cluster):
                             Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'GeneralCommissioning.Enums.GeneralCommissioningError' = None
-            debugText: 'str' = None
+            errorCode: 'GeneralCommissioning.Enums.GeneralCommissioningError' = 0
+            debugText: 'str' = ""
 
         @dataclass
         class SetRegulatoryConfig(ClusterCommand):
@@ -6607,10 +6624,10 @@ class GeneralCommissioning(Cluster):
                             Label="timeoutMs", Tag=3, Type=uint),
                     ])
 
-            location: 'GeneralCommissioning.Enums.RegulatoryLocationType' = None
-            countryCode: 'str' = None
-            breadcrumb: 'uint' = None
-            timeoutMs: 'uint' = None
+            location: 'GeneralCommissioning.Enums.RegulatoryLocationType' = 0
+            countryCode: 'str' = ""
+            breadcrumb: 'uint' = 0
+            timeoutMs: 'uint' = 0
 
         @dataclass
         class SetRegulatoryConfigResponse(ClusterCommand):
@@ -6628,8 +6645,8 @@ class GeneralCommissioning(Cluster):
                             Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'GeneralCommissioning.Enums.GeneralCommissioningError' = None
-            debugText: 'str' = None
+            errorCode: 'GeneralCommissioning.Enums.GeneralCommissioningError' = 0
+            debugText: 'str' = ""
 
         @dataclass
         class CommissioningComplete(ClusterCommand):
@@ -6659,8 +6676,8 @@ class GeneralCommissioning(Cluster):
                             Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'GeneralCommissioning.Enums.GeneralCommissioningError' = None
-            debugText: 'str' = None
+            errorCode: 'GeneralCommissioning.Enums.GeneralCommissioningError' = 0
+            debugText: 'str' = ""
 
     class Attributes:
         @dataclass
@@ -6677,7 +6694,7 @@ class GeneralCommissioning(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class BasicCommissioningInfoList(ClusterAttributeDescriptor):
@@ -6693,7 +6710,8 @@ class GeneralCommissioning(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[GeneralCommissioning.Structs.BasicCommissioningInfoType])
 
-            value: 'typing.List[GeneralCommissioning.Structs.BasicCommissioningInfoType]' = None
+            value: 'typing.List[GeneralCommissioning.Structs.BasicCommissioningInfoType]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class RegulatoryConfig(ClusterAttributeDescriptor):
@@ -6757,7 +6775,7 @@ class GeneralCommissioning(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -6843,9 +6861,9 @@ class NetworkCommissioning(Cluster):
                             Label="timeoutMs", Tag=2, Type=uint),
                     ])
 
-            ssid: 'bytes' = None
-            breadcrumb: 'uint' = None
-            timeoutMs: 'uint' = None
+            ssid: 'bytes' = b""
+            breadcrumb: 'uint' = 0
+            timeoutMs: 'uint' = 0
 
         @dataclass
         class ScanNetworksResponse(ClusterCommand):
@@ -6867,10 +6885,12 @@ class NetworkCommissioning(Cluster):
                             Label="threadScanResults", Tag=3, Type=typing.List[NetworkCommissioning.Structs.ThreadInterfaceScanResult]),
                     ])
 
-            errorCode: 'uint' = None
-            debugText: 'str' = None
-            wifiScanResults: 'typing.List[NetworkCommissioning.Structs.WiFiInterfaceScanResult]' = None
-            threadScanResults: 'typing.List[NetworkCommissioning.Structs.ThreadInterfaceScanResult]' = None
+            errorCode: 'uint' = 0
+            debugText: 'str' = ""
+            wifiScanResults: 'typing.List[NetworkCommissioning.Structs.WiFiInterfaceScanResult]' = field(
+                default_factory=lambda: [])
+            threadScanResults: 'typing.List[NetworkCommissioning.Structs.ThreadInterfaceScanResult]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class AddWiFiNetwork(ClusterCommand):
@@ -6892,10 +6912,10 @@ class NetworkCommissioning(Cluster):
                             Label="timeoutMs", Tag=3, Type=uint),
                     ])
 
-            ssid: 'bytes' = None
-            credentials: 'bytes' = None
-            breadcrumb: 'uint' = None
-            timeoutMs: 'uint' = None
+            ssid: 'bytes' = b""
+            credentials: 'bytes' = b""
+            breadcrumb: 'uint' = 0
+            timeoutMs: 'uint' = 0
 
         @dataclass
         class AddWiFiNetworkResponse(ClusterCommand):
@@ -6913,8 +6933,8 @@ class NetworkCommissioning(Cluster):
                             Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'uint' = None
-            debugText: 'str' = None
+            errorCode: 'uint' = 0
+            debugText: 'str' = ""
 
         @dataclass
         class UpdateWiFiNetwork(ClusterCommand):
@@ -6936,10 +6956,10 @@ class NetworkCommissioning(Cluster):
                             Label="timeoutMs", Tag=3, Type=uint),
                     ])
 
-            ssid: 'bytes' = None
-            credentials: 'bytes' = None
-            breadcrumb: 'uint' = None
-            timeoutMs: 'uint' = None
+            ssid: 'bytes' = b""
+            credentials: 'bytes' = b""
+            breadcrumb: 'uint' = 0
+            timeoutMs: 'uint' = 0
 
         @dataclass
         class UpdateWiFiNetworkResponse(ClusterCommand):
@@ -6957,8 +6977,8 @@ class NetworkCommissioning(Cluster):
                             Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'uint' = None
-            debugText: 'str' = None
+            errorCode: 'uint' = 0
+            debugText: 'str' = ""
 
         @dataclass
         class AddThreadNetwork(ClusterCommand):
@@ -6978,9 +6998,9 @@ class NetworkCommissioning(Cluster):
                             Label="timeoutMs", Tag=2, Type=uint),
                     ])
 
-            operationalDataset: 'bytes' = None
-            breadcrumb: 'uint' = None
-            timeoutMs: 'uint' = None
+            operationalDataset: 'bytes' = b""
+            breadcrumb: 'uint' = 0
+            timeoutMs: 'uint' = 0
 
         @dataclass
         class AddThreadNetworkResponse(ClusterCommand):
@@ -6998,8 +7018,8 @@ class NetworkCommissioning(Cluster):
                             Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'uint' = None
-            debugText: 'str' = None
+            errorCode: 'uint' = 0
+            debugText: 'str' = ""
 
         @dataclass
         class UpdateThreadNetwork(ClusterCommand):
@@ -7019,9 +7039,9 @@ class NetworkCommissioning(Cluster):
                             Label="timeoutMs", Tag=2, Type=uint),
                     ])
 
-            operationalDataset: 'bytes' = None
-            breadcrumb: 'uint' = None
-            timeoutMs: 'uint' = None
+            operationalDataset: 'bytes' = b""
+            breadcrumb: 'uint' = 0
+            timeoutMs: 'uint' = 0
 
         @dataclass
         class UpdateThreadNetworkResponse(ClusterCommand):
@@ -7039,8 +7059,8 @@ class NetworkCommissioning(Cluster):
                             Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'uint' = None
-            debugText: 'str' = None
+            errorCode: 'uint' = 0
+            debugText: 'str' = ""
 
         @dataclass
         class RemoveNetwork(ClusterCommand):
@@ -7060,9 +7080,9 @@ class NetworkCommissioning(Cluster):
                             Label="timeoutMs", Tag=2, Type=uint),
                     ])
 
-            networkID: 'bytes' = None
-            breadcrumb: 'uint' = None
-            timeoutMs: 'uint' = None
+            networkID: 'bytes' = b""
+            breadcrumb: 'uint' = 0
+            timeoutMs: 'uint' = 0
 
         @dataclass
         class RemoveNetworkResponse(ClusterCommand):
@@ -7080,8 +7100,8 @@ class NetworkCommissioning(Cluster):
                             Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'uint' = None
-            debugText: 'str' = None
+            errorCode: 'uint' = 0
+            debugText: 'str' = ""
 
         @dataclass
         class EnableNetwork(ClusterCommand):
@@ -7101,9 +7121,9 @@ class NetworkCommissioning(Cluster):
                             Label="timeoutMs", Tag=2, Type=uint),
                     ])
 
-            networkID: 'bytes' = None
-            breadcrumb: 'uint' = None
-            timeoutMs: 'uint' = None
+            networkID: 'bytes' = b""
+            breadcrumb: 'uint' = 0
+            timeoutMs: 'uint' = 0
 
         @dataclass
         class EnableNetworkResponse(ClusterCommand):
@@ -7121,8 +7141,8 @@ class NetworkCommissioning(Cluster):
                             Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'uint' = None
-            debugText: 'str' = None
+            errorCode: 'uint' = 0
+            debugText: 'str' = ""
 
         @dataclass
         class DisableNetwork(ClusterCommand):
@@ -7142,9 +7162,9 @@ class NetworkCommissioning(Cluster):
                             Label="timeoutMs", Tag=2, Type=uint),
                     ])
 
-            networkID: 'bytes' = None
-            breadcrumb: 'uint' = None
-            timeoutMs: 'uint' = None
+            networkID: 'bytes' = b""
+            breadcrumb: 'uint' = 0
+            timeoutMs: 'uint' = 0
 
         @dataclass
         class DisableNetworkResponse(ClusterCommand):
@@ -7162,8 +7182,8 @@ class NetworkCommissioning(Cluster):
                             Label="debugText", Tag=1, Type=str),
                     ])
 
-            errorCode: 'uint' = None
-            debugText: 'str' = None
+            errorCode: 'uint' = 0
+            debugText: 'str' = ""
 
     class Attributes:
         @dataclass
@@ -7196,7 +7216,7 @@ class NetworkCommissioning(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -7239,9 +7259,9 @@ class DiagnosticLogs(Cluster):
                             Label="transferFileDesignator", Tag=2, Type=bytes),
                     ])
 
-            intent: 'DiagnosticLogs.Enums.LogsIntent' = None
-            requestedProtocol: 'DiagnosticLogs.Enums.LogsTransferProtocol' = None
-            transferFileDesignator: 'bytes' = None
+            intent: 'DiagnosticLogs.Enums.LogsIntent' = 0
+            requestedProtocol: 'DiagnosticLogs.Enums.LogsTransferProtocol' = 0
+            transferFileDesignator: 'bytes' = b""
 
         @dataclass
         class RetrieveLogsResponse(ClusterCommand):
@@ -7263,10 +7283,10 @@ class DiagnosticLogs(Cluster):
                             Label="timeSinceBoot", Tag=3, Type=uint),
                     ])
 
-            status: 'DiagnosticLogs.Enums.LogsStatus' = None
-            content: 'bytes' = None
-            timeStamp: 'uint' = None
-            timeSinceBoot: 'uint' = None
+            status: 'DiagnosticLogs.Enums.LogsStatus' = 0
+            content: 'bytes' = b""
+            timeStamp: 'uint' = 0
+            timeSinceBoot: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -7299,7 +7319,7 @@ class DiagnosticLogs(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -7394,7 +7414,8 @@ class GeneralDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[GeneralDiagnostics.Structs.NetworkInterfaceType])
 
-            value: 'typing.List[GeneralDiagnostics.Structs.NetworkInterfaceType]' = None
+            value: 'typing.List[GeneralDiagnostics.Structs.NetworkInterfaceType]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class RebootCount(ClusterAttributeDescriptor):
@@ -7410,7 +7431,7 @@ class GeneralDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class UpTime(ClusterAttributeDescriptor):
@@ -7538,7 +7559,7 @@ class GeneralDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
     class Events:
         @dataclass
@@ -7556,8 +7577,10 @@ class GeneralDiagnostics(Cluster):
                             Label="previous", Tag=1, Type=typing.List[GeneralDiagnostics.Enums.HardwareFaultType], IsArray=True),
                     ])
 
-            current: typing.List['typing.List[GeneralDiagnostics.Enums.HardwareFaultType]'] = None
-            previous: typing.List['typing.List[GeneralDiagnostics.Enums.HardwareFaultType]'] = None
+            current: typing.List['typing.List[GeneralDiagnostics.Enums.HardwareFaultType]'] = field(
+                default_factory=lambda: [])
+            previous: typing.List['typing.List[GeneralDiagnostics.Enums.HardwareFaultType]'] = field(
+                default_factory=lambda: [])
 
         @dataclass
         class RadioFaultChange(ClusterEventDescriptor):
@@ -7574,8 +7597,10 @@ class GeneralDiagnostics(Cluster):
                             Label="previous", Tag=1, Type=typing.List[GeneralDiagnostics.Enums.RadioFaultType], IsArray=True),
                     ])
 
-            current: typing.List['typing.List[GeneralDiagnostics.Enums.RadioFaultType]'] = None
-            previous: typing.List['typing.List[GeneralDiagnostics.Enums.RadioFaultType]'] = None
+            current: typing.List['typing.List[GeneralDiagnostics.Enums.RadioFaultType]'] = field(
+                default_factory=lambda: [])
+            previous: typing.List['typing.List[GeneralDiagnostics.Enums.RadioFaultType]'] = field(
+                default_factory=lambda: [])
 
         @dataclass
         class NetworkFaultChange(ClusterEventDescriptor):
@@ -7592,8 +7617,10 @@ class GeneralDiagnostics(Cluster):
                             Label="previous", Tag=1, Type=typing.List[GeneralDiagnostics.Enums.NetworkFaultType], IsArray=True),
                     ])
 
-            current: typing.List['typing.List[GeneralDiagnostics.Enums.NetworkFaultType]'] = None
-            previous: typing.List['typing.List[GeneralDiagnostics.Enums.NetworkFaultType]'] = None
+            current: typing.List['typing.List[GeneralDiagnostics.Enums.NetworkFaultType]'] = field(
+                default_factory=lambda: [])
+            previous: typing.List['typing.List[GeneralDiagnostics.Enums.NetworkFaultType]'] = field(
+                default_factory=lambda: [])
 
         @dataclass
         class BootReason(ClusterEventDescriptor):
@@ -7608,7 +7635,7 @@ class GeneralDiagnostics(Cluster):
                             Label="bootReason", Tag=0, Type=GeneralDiagnostics.Enums.BootReasonType),
                     ])
 
-            bootReason: 'GeneralDiagnostics.Enums.BootReasonType' = None
+            bootReason: 'GeneralDiagnostics.Enums.BootReasonType' = 0
 
 
 @dataclass
@@ -7734,7 +7761,7 @@ class SoftwareDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -7766,7 +7793,7 @@ class SoftwareDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
     class Events:
         @dataclass
@@ -7782,7 +7809,8 @@ class SoftwareDiagnostics(Cluster):
                             Label="softwareFault", Tag=0, Type=SoftwareDiagnostics.Structs.SoftwareFault),
                     ])
 
-            softwareFault: 'SoftwareDiagnostics.Structs.SoftwareFault' = None
+            softwareFault: 'SoftwareDiagnostics.Structs.SoftwareFault' = field(
+                default_factory=lambda: SoftwareDiagnostics.Structs.SoftwareFault())
 
 
 @dataclass
@@ -7988,7 +8016,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RoutingRole(ClusterAttributeDescriptor):
@@ -8004,7 +8032,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class NetworkName(ClusterAttributeDescriptor):
@@ -8020,7 +8048,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bytes)
 
-            value: 'bytes' = None
+            value: 'bytes' = b""
 
         @dataclass
         class PanId(ClusterAttributeDescriptor):
@@ -8036,7 +8064,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ExtendedPanId(ClusterAttributeDescriptor):
@@ -8052,7 +8080,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class MeshLocalPrefix(ClusterAttributeDescriptor):
@@ -8068,7 +8096,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bytes)
 
-            value: 'bytes' = None
+            value: 'bytes' = b""
 
         @dataclass
         class OverrunCount(ClusterAttributeDescriptor):
@@ -8084,7 +8112,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class NeighborTableList(ClusterAttributeDescriptor):
@@ -8100,7 +8128,8 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable])
 
-            value: 'typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]' = None
+            value: 'typing.List[ThreadNetworkDiagnostics.Structs.NeighborTable]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class RouteTableList(ClusterAttributeDescriptor):
@@ -8116,7 +8145,8 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[ThreadNetworkDiagnostics.Structs.RouteTable])
 
-            value: 'typing.List[ThreadNetworkDiagnostics.Structs.RouteTable]' = None
+            value: 'typing.List[ThreadNetworkDiagnostics.Structs.RouteTable]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class PartitionId(ClusterAttributeDescriptor):
@@ -8132,7 +8162,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Weighting(ClusterAttributeDescriptor):
@@ -8148,7 +8178,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class DataVersion(ClusterAttributeDescriptor):
@@ -8164,7 +8194,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class StableDataVersion(ClusterAttributeDescriptor):
@@ -8180,7 +8210,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class LeaderRouterId(ClusterAttributeDescriptor):
@@ -8196,7 +8226,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class DetachedRoleCount(ClusterAttributeDescriptor):
@@ -8212,7 +8242,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ChildRoleCount(ClusterAttributeDescriptor):
@@ -8228,7 +8258,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RouterRoleCount(ClusterAttributeDescriptor):
@@ -8244,7 +8274,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class LeaderRoleCount(ClusterAttributeDescriptor):
@@ -8260,7 +8290,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class AttachAttemptCount(ClusterAttributeDescriptor):
@@ -8276,7 +8306,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class PartitionIdChangeCount(ClusterAttributeDescriptor):
@@ -8292,7 +8322,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class BetterPartitionAttachAttemptCount(ClusterAttributeDescriptor):
@@ -8308,7 +8338,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ParentChangeCount(ClusterAttributeDescriptor):
@@ -8324,7 +8354,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxTotalCount(ClusterAttributeDescriptor):
@@ -8340,7 +8370,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxUnicastCount(ClusterAttributeDescriptor):
@@ -8356,7 +8386,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxBroadcastCount(ClusterAttributeDescriptor):
@@ -8372,7 +8402,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxAckRequestedCount(ClusterAttributeDescriptor):
@@ -8388,7 +8418,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxAckedCount(ClusterAttributeDescriptor):
@@ -8404,7 +8434,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxNoAckRequestedCount(ClusterAttributeDescriptor):
@@ -8420,7 +8450,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxDataCount(ClusterAttributeDescriptor):
@@ -8436,7 +8466,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxDataPollCount(ClusterAttributeDescriptor):
@@ -8452,7 +8482,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxBeaconCount(ClusterAttributeDescriptor):
@@ -8468,7 +8498,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxBeaconRequestCount(ClusterAttributeDescriptor):
@@ -8484,7 +8514,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxOtherCount(ClusterAttributeDescriptor):
@@ -8500,7 +8530,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxRetryCount(ClusterAttributeDescriptor):
@@ -8516,7 +8546,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxDirectMaxRetryExpiryCount(ClusterAttributeDescriptor):
@@ -8532,7 +8562,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxIndirectMaxRetryExpiryCount(ClusterAttributeDescriptor):
@@ -8548,7 +8578,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxErrCcaCount(ClusterAttributeDescriptor):
@@ -8564,7 +8594,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxErrAbortCount(ClusterAttributeDescriptor):
@@ -8580,7 +8610,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxErrBusyChannelCount(ClusterAttributeDescriptor):
@@ -8596,7 +8626,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxTotalCount(ClusterAttributeDescriptor):
@@ -8612,7 +8642,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxUnicastCount(ClusterAttributeDescriptor):
@@ -8628,7 +8658,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxBroadcastCount(ClusterAttributeDescriptor):
@@ -8644,7 +8674,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxDataCount(ClusterAttributeDescriptor):
@@ -8660,7 +8690,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxDataPollCount(ClusterAttributeDescriptor):
@@ -8676,7 +8706,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxBeaconCount(ClusterAttributeDescriptor):
@@ -8692,7 +8722,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxBeaconRequestCount(ClusterAttributeDescriptor):
@@ -8708,7 +8738,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxOtherCount(ClusterAttributeDescriptor):
@@ -8724,7 +8754,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxAddressFilteredCount(ClusterAttributeDescriptor):
@@ -8740,7 +8770,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxDestAddrFilteredCount(ClusterAttributeDescriptor):
@@ -8756,7 +8786,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxDuplicatedCount(ClusterAttributeDescriptor):
@@ -8772,7 +8802,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxErrNoFrameCount(ClusterAttributeDescriptor):
@@ -8788,7 +8818,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxErrUnknownNeighborCount(ClusterAttributeDescriptor):
@@ -8804,7 +8834,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxErrInvalidSrcAddrCount(ClusterAttributeDescriptor):
@@ -8820,7 +8850,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxErrSecCount(ClusterAttributeDescriptor):
@@ -8836,7 +8866,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxErrFcsCount(ClusterAttributeDescriptor):
@@ -8852,7 +8882,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RxErrOtherCount(ClusterAttributeDescriptor):
@@ -8868,7 +8898,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ActiveTimestamp(ClusterAttributeDescriptor):
@@ -8932,7 +8962,8 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[ThreadNetworkDiagnostics.Structs.SecurityPolicy])
 
-            value: 'typing.List[ThreadNetworkDiagnostics.Structs.SecurityPolicy]' = None
+            value: 'typing.List[ThreadNetworkDiagnostics.Structs.SecurityPolicy]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class ChannelMask(ClusterAttributeDescriptor):
@@ -8948,7 +8979,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bytes)
 
-            value: 'bytes' = None
+            value: 'bytes' = b""
 
         @dataclass
         class OperationalDatasetComponents(ClusterAttributeDescriptor):
@@ -8964,7 +8995,8 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents])
 
-            value: 'typing.List[ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]' = None
+            value: 'typing.List[ThreadNetworkDiagnostics.Structs.OperationalDatasetComponents]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class ActiveNetworkFaultsList(ClusterAttributeDescriptor):
@@ -8980,7 +9012,8 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault])
 
-            value: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]' = None
+            value: 'typing.List[ThreadNetworkDiagnostics.Enums.NetworkFault]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -9012,7 +9045,7 @@ class ThreadNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
     class Events:
         @dataclass
@@ -9028,7 +9061,7 @@ class ThreadNetworkDiagnostics(Cluster):
                             Label="connectionStatus", Tag=0, Type=ThreadNetworkDiagnostics.Enums.ThreadConnectionStatus),
                     ])
 
-            connectionStatus: 'ThreadNetworkDiagnostics.Enums.ThreadConnectionStatus' = None
+            connectionStatus: 'ThreadNetworkDiagnostics.Enums.ThreadConnectionStatus' = 0
 
 
 @dataclass
@@ -9090,7 +9123,7 @@ class WiFiNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bytes)
 
-            value: 'bytes' = None
+            value: 'bytes' = b""
 
         @dataclass
         class SecurityType(ClusterAttributeDescriptor):
@@ -9106,7 +9139,7 @@ class WiFiNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class WiFiVersion(ClusterAttributeDescriptor):
@@ -9122,7 +9155,7 @@ class WiFiNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ChannelNumber(ClusterAttributeDescriptor):
@@ -9138,7 +9171,7 @@ class WiFiNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Rssi(ClusterAttributeDescriptor):
@@ -9154,7 +9187,7 @@ class WiFiNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class BeaconLostCount(ClusterAttributeDescriptor):
@@ -9314,7 +9347,7 @@ class WiFiNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
     class Events:
         @dataclass
@@ -9330,7 +9363,7 @@ class WiFiNetworkDiagnostics(Cluster):
                             Label="reasonCode", Tag=0, Type=uint),
                     ])
 
-            reasonCode: 'uint' = None
+            reasonCode: 'uint' = 0
 
         @dataclass
         class AssociationFailure(ClusterEventDescriptor):
@@ -9347,8 +9380,8 @@ class WiFiNetworkDiagnostics(Cluster):
                             Label="status", Tag=1, Type=uint),
                     ])
 
-            associationFailure: 'WiFiNetworkDiagnostics.Enums.AssociationFailureCause' = None
-            status: 'uint' = None
+            associationFailure: 'WiFiNetworkDiagnostics.Enums.AssociationFailureCause' = 0
+            status: 'uint' = 0
 
         @dataclass
         class ConnectionStatus(ClusterEventDescriptor):
@@ -9363,7 +9396,7 @@ class WiFiNetworkDiagnostics(Cluster):
                             Label="connectionStatus", Tag=0, Type=WiFiNetworkDiagnostics.Enums.WiFiConnectionStatus),
                     ])
 
-            connectionStatus: 'WiFiNetworkDiagnostics.Enums.WiFiConnectionStatus' = None
+            connectionStatus: 'WiFiNetworkDiagnostics.Enums.WiFiConnectionStatus' = 0
 
 
 @dataclass
@@ -9443,7 +9476,7 @@ class EthernetNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class PacketTxCount(ClusterAttributeDescriptor):
@@ -9459,7 +9492,7 @@ class EthernetNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TxErrCount(ClusterAttributeDescriptor):
@@ -9475,7 +9508,7 @@ class EthernetNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CollisionCount(ClusterAttributeDescriptor):
@@ -9491,7 +9524,7 @@ class EthernetNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class OverrunCount(ClusterAttributeDescriptor):
@@ -9507,7 +9540,7 @@ class EthernetNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CarrierDetect(ClusterAttributeDescriptor):
@@ -9571,7 +9604,7 @@ class EthernetNetworkDiagnostics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -9609,7 +9642,7 @@ class TimeSynchronization(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -9888,7 +9921,7 @@ class BridgedDeviceBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class UniqueID(ClusterAttributeDescriptor):
@@ -9936,7 +9969,7 @@ class BridgedDeviceBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -9958,7 +9991,7 @@ class Switch(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CurrentPosition(ClusterAttributeDescriptor):
@@ -9974,7 +10007,7 @@ class Switch(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class MultiPressMax(ClusterAttributeDescriptor):
@@ -9990,7 +10023,7 @@ class Switch(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -10022,7 +10055,7 @@ class Switch(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
     class Events:
         @dataclass
@@ -10038,7 +10071,7 @@ class Switch(Cluster):
                             Label="newPosition", Tag=0, Type=uint),
                     ])
 
-            newPosition: 'uint' = None
+            newPosition: 'uint' = 0
 
         @dataclass
         class InitialPress(ClusterEventDescriptor):
@@ -10053,7 +10086,7 @@ class Switch(Cluster):
                             Label="newPosition", Tag=0, Type=uint),
                     ])
 
-            newPosition: 'uint' = None
+            newPosition: 'uint' = 0
 
         @dataclass
         class LongPress(ClusterEventDescriptor):
@@ -10068,7 +10101,7 @@ class Switch(Cluster):
                             Label="newPosition", Tag=0, Type=uint),
                     ])
 
-            newPosition: 'uint' = None
+            newPosition: 'uint' = 0
 
         @dataclass
         class ShortRelease(ClusterEventDescriptor):
@@ -10083,7 +10116,7 @@ class Switch(Cluster):
                             Label="previousPosition", Tag=0, Type=uint),
                     ])
 
-            previousPosition: 'uint' = None
+            previousPosition: 'uint' = 0
 
         @dataclass
         class LongRelease(ClusterEventDescriptor):
@@ -10098,7 +10131,7 @@ class Switch(Cluster):
                             Label="previousPosition", Tag=0, Type=uint),
                     ])
 
-            previousPosition: 'uint' = None
+            previousPosition: 'uint' = 0
 
         @dataclass
         class MultiPressOngoing(ClusterEventDescriptor):
@@ -10115,8 +10148,8 @@ class Switch(Cluster):
                             Label="currentNumberOfPressesCounted", Tag=1, Type=uint),
                     ])
 
-            newPosition: 'uint' = None
-            currentNumberOfPressesCounted: 'uint' = None
+            newPosition: 'uint' = 0
+            currentNumberOfPressesCounted: 'uint' = 0
 
         @dataclass
         class MultiPressComplete(ClusterEventDescriptor):
@@ -10133,8 +10166,8 @@ class Switch(Cluster):
                             Label="totalNumberOfPressesCounted", Tag=1, Type=uint),
                     ])
 
-            newPosition: 'uint' = None
-            totalNumberOfPressesCounted: 'uint' = None
+            newPosition: 'uint' = 0
+            totalNumberOfPressesCounted: 'uint' = 0
 
 
 @dataclass
@@ -10172,12 +10205,12 @@ class AdministratorCommissioning(Cluster):
                             Label="passcodeID", Tag=5, Type=uint),
                     ])
 
-            commissioningTimeout: 'uint' = None
-            PAKEVerifier: 'bytes' = None
-            discriminator: 'uint' = None
-            iterations: 'uint' = None
-            salt: 'bytes' = None
-            passcodeID: 'uint' = None
+            commissioningTimeout: 'uint' = 0
+            PAKEVerifier: 'bytes' = b""
+            discriminator: 'uint' = 0
+            iterations: 'uint' = 0
+            salt: 'bytes' = b""
+            passcodeID: 'uint' = 0
 
         @dataclass
         class OpenBasicCommissioningWindow(ClusterCommand):
@@ -10193,7 +10226,7 @@ class AdministratorCommissioning(Cluster):
                             Label="commissioningTimeout", Tag=0, Type=uint),
                     ])
 
-            commissioningTimeout: 'uint' = None
+            commissioningTimeout: 'uint' = 0
 
         @dataclass
         class RevokeCommissioning(ClusterCommand):
@@ -10238,7 +10271,7 @@ class AdministratorCommissioning(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -10316,7 +10349,7 @@ class OperationalCredentials(Cluster):
                             Label="attestationNonce", Tag=0, Type=bytes),
                     ])
 
-            attestationNonce: 'bytes' = None
+            attestationNonce: 'bytes' = b""
 
         @dataclass
         class AttestationResponse(ClusterCommand):
@@ -10334,8 +10367,8 @@ class OperationalCredentials(Cluster):
                             Label="signature", Tag=1, Type=bytes),
                     ])
 
-            attestationElements: 'bytes' = None
-            signature: 'bytes' = None
+            attestationElements: 'bytes' = b""
+            signature: 'bytes' = b""
 
         @dataclass
         class CertificateChainRequest(ClusterCommand):
@@ -10351,7 +10384,7 @@ class OperationalCredentials(Cluster):
                             Label="certificateType", Tag=0, Type=uint),
                     ])
 
-            certificateType: 'uint' = None
+            certificateType: 'uint' = 0
 
         @dataclass
         class CertificateChainResponse(ClusterCommand):
@@ -10367,7 +10400,7 @@ class OperationalCredentials(Cluster):
                             Label="certificate", Tag=0, Type=bytes),
                     ])
 
-            certificate: 'bytes' = None
+            certificate: 'bytes' = b""
 
         @dataclass
         class OpCSRRequest(ClusterCommand):
@@ -10383,7 +10416,7 @@ class OperationalCredentials(Cluster):
                             Label="CSRNonce", Tag=0, Type=bytes),
                     ])
 
-            CSRNonce: 'bytes' = None
+            CSRNonce: 'bytes' = b""
 
         @dataclass
         class OpCSRResponse(ClusterCommand):
@@ -10401,8 +10434,8 @@ class OperationalCredentials(Cluster):
                             Label="attestationSignature", Tag=1, Type=bytes),
                     ])
 
-            NOCSRElements: 'bytes' = None
-            attestationSignature: 'bytes' = None
+            NOCSRElements: 'bytes' = b""
+            attestationSignature: 'bytes' = b""
 
         @dataclass
         class AddNOC(ClusterCommand):
@@ -10426,11 +10459,11 @@ class OperationalCredentials(Cluster):
                             Label="adminVendorId", Tag=4, Type=uint),
                     ])
 
-            NOCValue: 'bytes' = None
+            NOCValue: 'bytes' = b""
             ICACValue: 'typing.Optional[bytes]' = None
-            IPKValue: 'bytes' = None
-            caseAdminNode: 'uint' = None
-            adminVendorId: 'uint' = None
+            IPKValue: 'bytes' = b""
+            caseAdminNode: 'uint' = 0
+            adminVendorId: 'uint' = 0
 
         @dataclass
         class UpdateNOC(ClusterCommand):
@@ -10448,7 +10481,7 @@ class OperationalCredentials(Cluster):
                             Label="ICACValue", Tag=1, Type=typing.Optional[bytes]),
                     ])
 
-            NOCValue: 'bytes' = None
+            NOCValue: 'bytes' = b""
             ICACValue: 'typing.Optional[bytes]' = None
 
         @dataclass
@@ -10469,9 +10502,9 @@ class OperationalCredentials(Cluster):
                             Label="debugText", Tag=2, Type=str),
                     ])
 
-            statusCode: 'uint' = None
-            fabricIndex: 'uint' = None
-            debugText: 'str' = None
+            statusCode: 'uint' = 0
+            fabricIndex: 'uint' = 0
+            debugText: 'str' = ""
 
         @dataclass
         class UpdateFabricLabel(ClusterCommand):
@@ -10487,7 +10520,7 @@ class OperationalCredentials(Cluster):
                             Label="label", Tag=0, Type=str),
                     ])
 
-            label: 'str' = None
+            label: 'str' = ""
 
         @dataclass
         class RemoveFabric(ClusterCommand):
@@ -10503,7 +10536,7 @@ class OperationalCredentials(Cluster):
                             Label="fabricIndex", Tag=0, Type=uint),
                     ])
 
-            fabricIndex: 'uint' = None
+            fabricIndex: 'uint' = 0
 
         @dataclass
         class AddTrustedRootCertificate(ClusterCommand):
@@ -10519,7 +10552,7 @@ class OperationalCredentials(Cluster):
                             Label="rootCertificate", Tag=0, Type=bytes),
                     ])
 
-            rootCertificate: 'bytes' = None
+            rootCertificate: 'bytes' = b""
 
         @dataclass
         class RemoveTrustedRootCertificate(ClusterCommand):
@@ -10535,7 +10568,7 @@ class OperationalCredentials(Cluster):
                             Label="trustedRootIdentifier", Tag=0, Type=bytes),
                     ])
 
-            trustedRootIdentifier: 'bytes' = None
+            trustedRootIdentifier: 'bytes' = b""
 
     class Attributes:
         @dataclass
@@ -10552,7 +10585,8 @@ class OperationalCredentials(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[OperationalCredentials.Structs.FabricDescriptor])
 
-            value: 'typing.List[OperationalCredentials.Structs.FabricDescriptor]' = None
+            value: 'typing.List[OperationalCredentials.Structs.FabricDescriptor]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class SupportedFabrics(ClusterAttributeDescriptor):
@@ -10568,7 +10602,7 @@ class OperationalCredentials(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CommissionedFabrics(ClusterAttributeDescriptor):
@@ -10584,7 +10618,7 @@ class OperationalCredentials(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TrustedRootCertificates(ClusterAttributeDescriptor):
@@ -10600,7 +10634,7 @@ class OperationalCredentials(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[bytes])
 
-            value: 'typing.List[bytes]' = None
+            value: 'typing.List[bytes]' = field(default_factory=lambda: [])
 
         @dataclass
         class CurrentFabricIndex(ClusterAttributeDescriptor):
@@ -10616,7 +10650,7 @@ class OperationalCredentials(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -10648,7 +10682,7 @@ class OperationalCredentials(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -10686,7 +10720,8 @@ class FixedLabel(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[FixedLabel.Structs.LabelStruct])
 
-            value: 'typing.List[FixedLabel.Structs.LabelStruct]' = None
+            value: 'typing.List[FixedLabel.Structs.LabelStruct]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -10718,7 +10753,7 @@ class FixedLabel(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -10740,7 +10775,7 @@ class BooleanState(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -10772,7 +10807,7 @@ class BooleanState(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
     class Events:
         @dataclass
@@ -10788,7 +10823,7 @@ class BooleanState(Cluster):
                             Label="stateValue", Tag=0, Type=bool),
                     ])
 
-            stateValue: 'bool' = None
+            stateValue: 'bool' = False
 
 
 @dataclass
@@ -10844,7 +10879,7 @@ class ModeSelect(Cluster):
                             Label="newMode", Tag=0, Type=uint),
                     ])
 
-            newMode: 'uint' = None
+            newMode: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -10861,7 +10896,7 @@ class ModeSelect(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class SupportedModes(ClusterAttributeDescriptor):
@@ -10877,7 +10912,8 @@ class ModeSelect(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[ModeSelect.Structs.ModeOptionStruct])
 
-            value: 'typing.List[ModeSelect.Structs.ModeOptionStruct]' = None
+            value: 'typing.List[ModeSelect.Structs.ModeOptionStruct]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class OnMode(ClusterAttributeDescriptor):
@@ -10909,7 +10945,7 @@ class ModeSelect(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Description(ClusterAttributeDescriptor):
@@ -10925,7 +10961,7 @@ class ModeSelect(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -10957,7 +10993,7 @@ class ModeSelect(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -11011,7 +11047,7 @@ class ShadeConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ClosedLimit(ClusterAttributeDescriptor):
@@ -11027,7 +11063,7 @@ class ShadeConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Mode(ClusterAttributeDescriptor):
@@ -11043,7 +11079,7 @@ class ShadeConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -11075,7 +11111,7 @@ class ShadeConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -11144,7 +11180,7 @@ class DoorLock(Cluster):
                             Label="pin", Tag=0, Type=bytes),
                     ])
 
-            pin: 'bytes' = None
+            pin: 'bytes' = b""
 
         @dataclass
         class LockDoorResponse(ClusterCommand):
@@ -11160,7 +11196,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class UnlockDoor(ClusterCommand):
@@ -11176,7 +11212,7 @@ class DoorLock(Cluster):
                             Label="pin", Tag=0, Type=bytes),
                     ])
 
-            pin: 'bytes' = None
+            pin: 'bytes' = b""
 
         @dataclass
         class UnlockDoorResponse(ClusterCommand):
@@ -11192,7 +11228,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class Toggle(ClusterCommand):
@@ -11208,7 +11244,7 @@ class DoorLock(Cluster):
                             Label="pin", Tag=0, Type=str),
                     ])
 
-            pin: 'str' = None
+            pin: 'str' = ""
 
         @dataclass
         class ToggleResponse(ClusterCommand):
@@ -11224,7 +11260,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class UnlockWithTimeout(ClusterCommand):
@@ -11242,8 +11278,8 @@ class DoorLock(Cluster):
                             Label="pin", Tag=1, Type=bytes),
                     ])
 
-            timeoutInSeconds: 'uint' = None
-            pin: 'bytes' = None
+            timeoutInSeconds: 'uint' = 0
+            pin: 'bytes' = b""
 
         @dataclass
         class UnlockWithTimeoutResponse(ClusterCommand):
@@ -11259,7 +11295,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class GetLogRecord(ClusterCommand):
@@ -11275,7 +11311,7 @@ class DoorLock(Cluster):
                             Label="logIndex", Tag=0, Type=uint),
                     ])
 
-            logIndex: 'uint' = None
+            logIndex: 'uint' = 0
 
         @dataclass
         class GetLogRecordResponse(ClusterCommand):
@@ -11303,13 +11339,13 @@ class DoorLock(Cluster):
                             Label="pin", Tag=6, Type=bytes),
                     ])
 
-            logEntryId: 'uint' = None
-            timestamp: 'uint' = None
-            eventType: 'uint' = None
-            source: 'uint' = None
-            eventIdOrAlarmCode: 'uint' = None
-            userId: 'uint' = None
-            pin: 'bytes' = None
+            logEntryId: 'uint' = 0
+            timestamp: 'uint' = 0
+            eventType: 'uint' = 0
+            source: 'uint' = 0
+            eventIdOrAlarmCode: 'uint' = 0
+            userId: 'uint' = 0
+            pin: 'bytes' = b""
 
         @dataclass
         class SetPin(ClusterCommand):
@@ -11331,10 +11367,10 @@ class DoorLock(Cluster):
                             Label="pin", Tag=3, Type=bytes),
                     ])
 
-            userId: 'uint' = None
-            userStatus: 'DoorLock.Enums.DoorLockUserStatus' = None
-            userType: 'DoorLock.Enums.DoorLockUserType' = None
-            pin: 'bytes' = None
+            userId: 'uint' = 0
+            userStatus: 'DoorLock.Enums.DoorLockUserStatus' = 0
+            userType: 'DoorLock.Enums.DoorLockUserType' = 0
+            pin: 'bytes' = b""
 
         @dataclass
         class SetPinResponse(ClusterCommand):
@@ -11350,7 +11386,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=DoorLock.Enums.DoorLockSetPinOrIdStatus),
                     ])
 
-            status: 'DoorLock.Enums.DoorLockSetPinOrIdStatus' = None
+            status: 'DoorLock.Enums.DoorLockSetPinOrIdStatus' = 0
 
         @dataclass
         class GetPin(ClusterCommand):
@@ -11366,7 +11402,7 @@ class DoorLock(Cluster):
                             Label="userId", Tag=0, Type=uint),
                     ])
 
-            userId: 'uint' = None
+            userId: 'uint' = 0
 
         @dataclass
         class GetPinResponse(ClusterCommand):
@@ -11388,10 +11424,10 @@ class DoorLock(Cluster):
                             Label="pin", Tag=3, Type=bytes),
                     ])
 
-            userId: 'uint' = None
-            userStatus: 'DoorLock.Enums.DoorLockUserStatus' = None
-            userType: 'DoorLock.Enums.DoorLockUserType' = None
-            pin: 'bytes' = None
+            userId: 'uint' = 0
+            userStatus: 'DoorLock.Enums.DoorLockUserStatus' = 0
+            userType: 'DoorLock.Enums.DoorLockUserType' = 0
+            pin: 'bytes' = b""
 
         @dataclass
         class ClearPin(ClusterCommand):
@@ -11407,7 +11443,7 @@ class DoorLock(Cluster):
                             Label="userId", Tag=0, Type=uint),
                     ])
 
-            userId: 'uint' = None
+            userId: 'uint' = 0
 
         @dataclass
         class ClearPinResponse(ClusterCommand):
@@ -11423,7 +11459,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class ClearAllPins(ClusterCommand):
@@ -11451,7 +11487,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class SetUserStatus(ClusterCommand):
@@ -11469,8 +11505,8 @@ class DoorLock(Cluster):
                             Label="userStatus", Tag=1, Type=uint),
                     ])
 
-            userId: 'uint' = None
-            userStatus: 'uint' = None
+            userId: 'uint' = 0
+            userStatus: 'uint' = 0
 
         @dataclass
         class SetUserStatusResponse(ClusterCommand):
@@ -11486,7 +11522,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class GetUserStatus(ClusterCommand):
@@ -11502,7 +11538,7 @@ class DoorLock(Cluster):
                             Label="userId", Tag=0, Type=uint),
                     ])
 
-            userId: 'uint' = None
+            userId: 'uint' = 0
 
         @dataclass
         class GetUserStatusResponse(ClusterCommand):
@@ -11520,8 +11556,8 @@ class DoorLock(Cluster):
                             Label="status", Tag=1, Type=uint),
                     ])
 
-            userId: 'uint' = None
-            status: 'uint' = None
+            userId: 'uint' = 0
+            status: 'uint' = 0
 
         @dataclass
         class SetWeekdaySchedule(ClusterCommand):
@@ -11549,13 +11585,13 @@ class DoorLock(Cluster):
                             Label="endMinute", Tag=6, Type=uint),
                     ])
 
-            scheduleId: 'uint' = None
-            userId: 'uint' = None
-            daysMask: 'uint' = None
-            startHour: 'uint' = None
-            startMinute: 'uint' = None
-            endHour: 'uint' = None
-            endMinute: 'uint' = None
+            scheduleId: 'uint' = 0
+            userId: 'uint' = 0
+            daysMask: 'uint' = 0
+            startHour: 'uint' = 0
+            startMinute: 'uint' = 0
+            endHour: 'uint' = 0
+            endMinute: 'uint' = 0
 
         @dataclass
         class SetWeekdayScheduleResponse(ClusterCommand):
@@ -11571,7 +11607,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class GetWeekdaySchedule(ClusterCommand):
@@ -11589,8 +11625,8 @@ class DoorLock(Cluster):
                             Label="userId", Tag=1, Type=uint),
                     ])
 
-            scheduleId: 'uint' = None
-            userId: 'uint' = None
+            scheduleId: 'uint' = 0
+            userId: 'uint' = 0
 
         @dataclass
         class GetWeekdayScheduleResponse(ClusterCommand):
@@ -11620,14 +11656,14 @@ class DoorLock(Cluster):
                             Label="endMinute", Tag=7, Type=uint),
                     ])
 
-            scheduleId: 'uint' = None
-            userId: 'uint' = None
-            status: 'uint' = None
-            daysMask: 'uint' = None
-            startHour: 'uint' = None
-            startMinute: 'uint' = None
-            endHour: 'uint' = None
-            endMinute: 'uint' = None
+            scheduleId: 'uint' = 0
+            userId: 'uint' = 0
+            status: 'uint' = 0
+            daysMask: 'uint' = 0
+            startHour: 'uint' = 0
+            startMinute: 'uint' = 0
+            endHour: 'uint' = 0
+            endMinute: 'uint' = 0
 
         @dataclass
         class ClearWeekdaySchedule(ClusterCommand):
@@ -11645,8 +11681,8 @@ class DoorLock(Cluster):
                             Label="userId", Tag=1, Type=uint),
                     ])
 
-            scheduleId: 'uint' = None
-            userId: 'uint' = None
+            scheduleId: 'uint' = 0
+            userId: 'uint' = 0
 
         @dataclass
         class ClearWeekdayScheduleResponse(ClusterCommand):
@@ -11662,7 +11698,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class SetYeardaySchedule(ClusterCommand):
@@ -11684,10 +11720,10 @@ class DoorLock(Cluster):
                             Label="localEndTime", Tag=3, Type=uint),
                     ])
 
-            scheduleId: 'uint' = None
-            userId: 'uint' = None
-            localStartTime: 'uint' = None
-            localEndTime: 'uint' = None
+            scheduleId: 'uint' = 0
+            userId: 'uint' = 0
+            localStartTime: 'uint' = 0
+            localEndTime: 'uint' = 0
 
         @dataclass
         class SetYeardayScheduleResponse(ClusterCommand):
@@ -11703,7 +11739,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class GetYeardaySchedule(ClusterCommand):
@@ -11721,8 +11757,8 @@ class DoorLock(Cluster):
                             Label="userId", Tag=1, Type=uint),
                     ])
 
-            scheduleId: 'uint' = None
-            userId: 'uint' = None
+            scheduleId: 'uint' = 0
+            userId: 'uint' = 0
 
         @dataclass
         class GetYeardayScheduleResponse(ClusterCommand):
@@ -11746,11 +11782,11 @@ class DoorLock(Cluster):
                             Label="localEndTime", Tag=4, Type=uint),
                     ])
 
-            scheduleId: 'uint' = None
-            userId: 'uint' = None
-            status: 'uint' = None
-            localStartTime: 'uint' = None
-            localEndTime: 'uint' = None
+            scheduleId: 'uint' = 0
+            userId: 'uint' = 0
+            status: 'uint' = 0
+            localStartTime: 'uint' = 0
+            localEndTime: 'uint' = 0
 
         @dataclass
         class ClearYeardaySchedule(ClusterCommand):
@@ -11768,8 +11804,8 @@ class DoorLock(Cluster):
                             Label="userId", Tag=1, Type=uint),
                     ])
 
-            scheduleId: 'uint' = None
-            userId: 'uint' = None
+            scheduleId: 'uint' = 0
+            userId: 'uint' = 0
 
         @dataclass
         class ClearYeardayScheduleResponse(ClusterCommand):
@@ -11785,7 +11821,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class SetHolidaySchedule(ClusterCommand):
@@ -11807,10 +11843,10 @@ class DoorLock(Cluster):
                             Label="operatingModeDuringHoliday", Tag=3, Type=uint),
                     ])
 
-            scheduleId: 'uint' = None
-            localStartTime: 'uint' = None
-            localEndTime: 'uint' = None
-            operatingModeDuringHoliday: 'uint' = None
+            scheduleId: 'uint' = 0
+            localStartTime: 'uint' = 0
+            localEndTime: 'uint' = 0
+            operatingModeDuringHoliday: 'uint' = 0
 
         @dataclass
         class SetHolidayScheduleResponse(ClusterCommand):
@@ -11826,7 +11862,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class GetHolidaySchedule(ClusterCommand):
@@ -11842,7 +11878,7 @@ class DoorLock(Cluster):
                             Label="scheduleId", Tag=0, Type=uint),
                     ])
 
-            scheduleId: 'uint' = None
+            scheduleId: 'uint' = 0
 
         @dataclass
         class GetHolidayScheduleResponse(ClusterCommand):
@@ -11866,11 +11902,11 @@ class DoorLock(Cluster):
                             Label="operatingModeDuringHoliday", Tag=4, Type=uint),
                     ])
 
-            scheduleId: 'uint' = None
-            status: 'uint' = None
-            localStartTime: 'uint' = None
-            localEndTime: 'uint' = None
-            operatingModeDuringHoliday: 'uint' = None
+            scheduleId: 'uint' = 0
+            status: 'uint' = 0
+            localStartTime: 'uint' = 0
+            localEndTime: 'uint' = 0
+            operatingModeDuringHoliday: 'uint' = 0
 
         @dataclass
         class ClearHolidaySchedule(ClusterCommand):
@@ -11886,7 +11922,7 @@ class DoorLock(Cluster):
                             Label="scheduleId", Tag=0, Type=uint),
                     ])
 
-            scheduleId: 'uint' = None
+            scheduleId: 'uint' = 0
 
         @dataclass
         class ClearHolidayScheduleResponse(ClusterCommand):
@@ -11902,7 +11938,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class SetUserType(ClusterCommand):
@@ -11920,8 +11956,8 @@ class DoorLock(Cluster):
                             Label="userType", Tag=1, Type=DoorLock.Enums.DoorLockUserType),
                     ])
 
-            userId: 'uint' = None
-            userType: 'DoorLock.Enums.DoorLockUserType' = None
+            userId: 'uint' = 0
+            userType: 'DoorLock.Enums.DoorLockUserType' = 0
 
         @dataclass
         class SetUserTypeResponse(ClusterCommand):
@@ -11937,7 +11973,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class GetUserType(ClusterCommand):
@@ -11953,7 +11989,7 @@ class DoorLock(Cluster):
                             Label="userId", Tag=0, Type=uint),
                     ])
 
-            userId: 'uint' = None
+            userId: 'uint' = 0
 
         @dataclass
         class GetUserTypeResponse(ClusterCommand):
@@ -11971,8 +12007,8 @@ class DoorLock(Cluster):
                             Label="userType", Tag=1, Type=DoorLock.Enums.DoorLockUserType),
                     ])
 
-            userId: 'uint' = None
-            userType: 'DoorLock.Enums.DoorLockUserType' = None
+            userId: 'uint' = 0
+            userType: 'DoorLock.Enums.DoorLockUserType' = 0
 
         @dataclass
         class SetRfid(ClusterCommand):
@@ -11994,10 +12030,10 @@ class DoorLock(Cluster):
                             Label="id", Tag=3, Type=bytes),
                     ])
 
-            userId: 'uint' = None
-            userStatus: 'DoorLock.Enums.DoorLockUserStatus' = None
-            userType: 'DoorLock.Enums.DoorLockUserType' = None
-            id: 'bytes' = None
+            userId: 'uint' = 0
+            userStatus: 'DoorLock.Enums.DoorLockUserStatus' = 0
+            userType: 'DoorLock.Enums.DoorLockUserType' = 0
+            id: 'bytes' = b""
 
         @dataclass
         class SetRfidResponse(ClusterCommand):
@@ -12013,7 +12049,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=DoorLock.Enums.DoorLockSetPinOrIdStatus),
                     ])
 
-            status: 'DoorLock.Enums.DoorLockSetPinOrIdStatus' = None
+            status: 'DoorLock.Enums.DoorLockSetPinOrIdStatus' = 0
 
         @dataclass
         class GetRfid(ClusterCommand):
@@ -12029,7 +12065,7 @@ class DoorLock(Cluster):
                             Label="userId", Tag=0, Type=uint),
                     ])
 
-            userId: 'uint' = None
+            userId: 'uint' = 0
 
         @dataclass
         class GetRfidResponse(ClusterCommand):
@@ -12051,10 +12087,10 @@ class DoorLock(Cluster):
                             Label="rfid", Tag=3, Type=bytes),
                     ])
 
-            userId: 'uint' = None
-            userStatus: 'DoorLock.Enums.DoorLockUserStatus' = None
-            userType: 'DoorLock.Enums.DoorLockUserType' = None
-            rfid: 'bytes' = None
+            userId: 'uint' = 0
+            userStatus: 'DoorLock.Enums.DoorLockUserStatus' = 0
+            userType: 'DoorLock.Enums.DoorLockUserType' = 0
+            rfid: 'bytes' = b""
 
         @dataclass
         class ClearRfid(ClusterCommand):
@@ -12070,7 +12106,7 @@ class DoorLock(Cluster):
                             Label="userId", Tag=0, Type=uint),
                     ])
 
-            userId: 'uint' = None
+            userId: 'uint' = 0
 
         @dataclass
         class ClearRfidResponse(ClusterCommand):
@@ -12086,7 +12122,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class ClearAllRfids(ClusterCommand):
@@ -12114,7 +12150,7 @@ class DoorLock(Cluster):
                             Label="status", Tag=0, Type=uint),
                     ])
 
-            status: 'uint' = None
+            status: 'uint' = 0
 
         @dataclass
         class OperationEventNotification(ClusterCommand):
@@ -12140,12 +12176,12 @@ class DoorLock(Cluster):
                             Label="data", Tag=5, Type=str),
                     ])
 
-            source: 'uint' = None
-            eventCode: 'DoorLock.Enums.DoorLockOperationEventCode' = None
-            userId: 'uint' = None
-            pin: 'bytes' = None
-            timeStamp: 'uint' = None
-            data: 'str' = None
+            source: 'uint' = 0
+            eventCode: 'DoorLock.Enums.DoorLockOperationEventCode' = 0
+            userId: 'uint' = 0
+            pin: 'bytes' = b""
+            timeStamp: 'uint' = 0
+            data: 'str' = ""
 
         @dataclass
         class ProgrammingEventNotification(ClusterCommand):
@@ -12175,14 +12211,14 @@ class DoorLock(Cluster):
                             Label="data", Tag=7, Type=str),
                     ])
 
-            source: 'uint' = None
-            eventCode: 'DoorLock.Enums.DoorLockProgrammingEventCode' = None
-            userId: 'uint' = None
-            pin: 'bytes' = None
-            userType: 'DoorLock.Enums.DoorLockUserType' = None
-            userStatus: 'DoorLock.Enums.DoorLockUserStatus' = None
-            timeStamp: 'uint' = None
-            data: 'str' = None
+            source: 'uint' = 0
+            eventCode: 'DoorLock.Enums.DoorLockProgrammingEventCode' = 0
+            userId: 'uint' = 0
+            pin: 'bytes' = b""
+            userType: 'DoorLock.Enums.DoorLockUserType' = 0
+            userStatus: 'DoorLock.Enums.DoorLockUserStatus' = 0
+            timeStamp: 'uint' = 0
+            data: 'str' = ""
 
     class Attributes:
         @dataclass
@@ -12199,7 +12235,7 @@ class DoorLock(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class LockType(ClusterAttributeDescriptor):
@@ -12215,7 +12251,7 @@ class DoorLock(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ActuatorEnabled(ClusterAttributeDescriptor):
@@ -12231,7 +12267,7 @@ class DoorLock(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class DoorState(ClusterAttributeDescriptor):
@@ -12903,7 +12939,7 @@ class DoorLock(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -12961,7 +12997,7 @@ class WindowCovering(Cluster):
                             Label="liftValue", Tag=0, Type=uint),
                     ])
 
-            liftValue: 'uint' = None
+            liftValue: 'uint' = 0
 
         @dataclass
         class GoToLiftPercentage(ClusterCommand):
@@ -12979,8 +13015,8 @@ class WindowCovering(Cluster):
                             Label="liftPercent100thsValue", Tag=1, Type=uint),
                     ])
 
-            liftPercentageValue: 'uint' = None
-            liftPercent100thsValue: 'uint' = None
+            liftPercentageValue: 'uint' = 0
+            liftPercent100thsValue: 'uint' = 0
 
         @dataclass
         class GoToTiltValue(ClusterCommand):
@@ -12996,7 +13032,7 @@ class WindowCovering(Cluster):
                             Label="tiltValue", Tag=0, Type=uint),
                     ])
 
-            tiltValue: 'uint' = None
+            tiltValue: 'uint' = 0
 
         @dataclass
         class GoToTiltPercentage(ClusterCommand):
@@ -13014,8 +13050,8 @@ class WindowCovering(Cluster):
                             Label="tiltPercent100thsValue", Tag=1, Type=uint),
                     ])
 
-            tiltPercentageValue: 'uint' = None
-            tiltPercent100thsValue: 'uint' = None
+            tiltPercentageValue: 'uint' = 0
+            tiltPercent100thsValue: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -13032,7 +13068,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class PhysicalClosedLimitLift(ClusterAttributeDescriptor):
@@ -13144,7 +13180,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CurrentPositionLiftPercentage(ClusterAttributeDescriptor):
@@ -13160,7 +13196,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CurrentPositionTiltPercentage(ClusterAttributeDescriptor):
@@ -13176,7 +13212,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class OperationalStatus(ClusterAttributeDescriptor):
@@ -13192,7 +13228,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TargetPositionLiftPercent100ths(ClusterAttributeDescriptor):
@@ -13208,7 +13244,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class TargetPositionTiltPercent100ths(ClusterAttributeDescriptor):
@@ -13224,7 +13260,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class EndProductType(ClusterAttributeDescriptor):
@@ -13240,7 +13276,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CurrentPositionLiftPercent100ths(ClusterAttributeDescriptor):
@@ -13256,7 +13292,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CurrentPositionTiltPercent100ths(ClusterAttributeDescriptor):
@@ -13272,7 +13308,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class InstalledOpenLimitLift(ClusterAttributeDescriptor):
@@ -13288,7 +13324,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class InstalledClosedLimitLift(ClusterAttributeDescriptor):
@@ -13304,7 +13340,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class InstalledOpenLimitTilt(ClusterAttributeDescriptor):
@@ -13320,7 +13356,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class InstalledClosedLimitTilt(ClusterAttributeDescriptor):
@@ -13336,7 +13372,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class VelocityLift(ClusterAttributeDescriptor):
@@ -13400,7 +13436,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class IntermediateSetpointsLift(ClusterAttributeDescriptor):
@@ -13480,7 +13516,7 @@ class WindowCovering(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -13502,7 +13538,7 @@ class BarrierControl(Cluster):
                             Label="percentOpen", Tag=0, Type=uint),
                     ])
 
-            percentOpen: 'uint' = None
+            percentOpen: 'uint' = 0
 
         @dataclass
         class BarrierControlStop(ClusterCommand):
@@ -13531,7 +13567,7 @@ class BarrierControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class BarrierSafetyStatus(ClusterAttributeDescriptor):
@@ -13547,7 +13583,7 @@ class BarrierControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class BarrierCapabilities(ClusterAttributeDescriptor):
@@ -13563,7 +13599,7 @@ class BarrierControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class BarrierOpenEvents(ClusterAttributeDescriptor):
@@ -13675,7 +13711,7 @@ class BarrierControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -13707,7 +13743,7 @@ class BarrierControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -13744,7 +13780,7 @@ class PumpConfigurationAndControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class MaxSpeed(ClusterAttributeDescriptor):
@@ -13760,7 +13796,7 @@ class PumpConfigurationAndControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class MaxFlow(ClusterAttributeDescriptor):
@@ -13776,7 +13812,7 @@ class PumpConfigurationAndControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class MinConstPressure(ClusterAttributeDescriptor):
@@ -13968,7 +14004,7 @@ class PumpConfigurationAndControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class EffectiveControlMode(ClusterAttributeDescriptor):
@@ -13984,7 +14020,7 @@ class PumpConfigurationAndControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Capacity(ClusterAttributeDescriptor):
@@ -14000,7 +14036,7 @@ class PumpConfigurationAndControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class Speed(ClusterAttributeDescriptor):
@@ -14080,7 +14116,7 @@ class PumpConfigurationAndControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ControlMode(ClusterAttributeDescriptor):
@@ -14144,7 +14180,7 @@ class PumpConfigurationAndControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
     class Events:
         @dataclass
@@ -14362,8 +14398,8 @@ class Thermostat(Cluster):
                             Label="amount", Tag=1, Type=int),
                     ])
 
-            mode: 'Thermostat.Enums.SetpointAdjustMode' = None
-            amount: 'int' = None
+            mode: 'Thermostat.Enums.SetpointAdjustMode' = 0
+            amount: 'int' = 0
 
         @dataclass
         class CurrentWeeklySchedule(ClusterCommand):
@@ -14385,10 +14421,10 @@ class Thermostat(Cluster):
                             Label="payload", Tag=3, Type=typing.List[uint]),
                     ])
 
-            numberOfTransitionsForSequence: 'uint' = None
-            dayOfWeekForSequence: 'uint' = None
-            modeForSequence: 'uint' = None
-            payload: 'typing.List[uint]' = None
+            numberOfTransitionsForSequence: 'uint' = 0
+            dayOfWeekForSequence: 'uint' = 0
+            modeForSequence: 'uint' = 0
+            payload: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class SetWeeklySchedule(ClusterCommand):
@@ -14410,10 +14446,10 @@ class Thermostat(Cluster):
                             Label="payload", Tag=3, Type=typing.List[uint]),
                     ])
 
-            numberOfTransitionsForSequence: 'uint' = None
-            dayOfWeekForSequence: 'uint' = None
-            modeForSequence: 'uint' = None
-            payload: 'typing.List[uint]' = None
+            numberOfTransitionsForSequence: 'uint' = 0
+            dayOfWeekForSequence: 'uint' = 0
+            modeForSequence: 'uint' = 0
+            payload: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class RelayStatusLog(ClusterCommand):
@@ -14439,12 +14475,12 @@ class Thermostat(Cluster):
                             Label="unreadEntries", Tag=5, Type=uint),
                     ])
 
-            timeOfDay: 'uint' = None
-            relayStatus: 'uint' = None
-            localTemperature: 'int' = None
-            humidityInPercentage: 'uint' = None
-            setpoint: 'int' = None
-            unreadEntries: 'uint' = None
+            timeOfDay: 'uint' = 0
+            relayStatus: 'uint' = 0
+            localTemperature: 'int' = 0
+            humidityInPercentage: 'uint' = 0
+            setpoint: 'int' = 0
+            unreadEntries: 'uint' = 0
 
         @dataclass
         class GetWeeklySchedule(ClusterCommand):
@@ -14462,8 +14498,8 @@ class Thermostat(Cluster):
                             Label="modeToReturn", Tag=1, Type=uint),
                     ])
 
-            daysToReturn: 'uint' = None
-            modeToReturn: 'uint' = None
+            daysToReturn: 'uint' = 0
+            modeToReturn: 'uint' = 0
 
         @dataclass
         class ClearWeeklySchedule(ClusterCommand):
@@ -14504,7 +14540,7 @@ class Thermostat(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class OutdoorTemperature(ClusterAttributeDescriptor):
@@ -14680,7 +14716,7 @@ class Thermostat(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class OccupiedHeatingSetpoint(ClusterAttributeDescriptor):
@@ -14696,7 +14732,7 @@ class Thermostat(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class UnoccupiedCoolingSetpoint(ClusterAttributeDescriptor):
@@ -14840,7 +14876,7 @@ class Thermostat(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class SystemMode(ClusterAttributeDescriptor):
@@ -14856,7 +14892,7 @@ class Thermostat(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class AlarmMask(ClusterAttributeDescriptor):
@@ -15208,7 +15244,7 @@ class Thermostat(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -15230,7 +15266,7 @@ class FanControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FanModeSequence(ClusterAttributeDescriptor):
@@ -15246,7 +15282,7 @@ class FanControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -15278,7 +15314,7 @@ class FanControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -15316,7 +15352,7 @@ class DehumidificationControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RhDehumidificationSetpoint(ClusterAttributeDescriptor):
@@ -15332,7 +15368,7 @@ class DehumidificationControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RelativeHumidityMode(ClusterAttributeDescriptor):
@@ -15380,7 +15416,7 @@ class DehumidificationControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class DehumidificationMaxCool(ClusterAttributeDescriptor):
@@ -15396,7 +15432,7 @@ class DehumidificationControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RelativeHumidityDisplay(ClusterAttributeDescriptor):
@@ -15444,7 +15480,7 @@ class DehumidificationControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -15466,7 +15502,7 @@ class ThermostatUserInterfaceConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class KeypadLockout(ClusterAttributeDescriptor):
@@ -15482,7 +15518,7 @@ class ThermostatUserInterfaceConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ScheduleProgrammingVisibility(ClusterAttributeDescriptor):
@@ -15530,7 +15566,7 @@ class ThermostatUserInterfaceConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -15599,11 +15635,11 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=4, Type=uint),
                     ])
 
-            hue: 'uint' = None
-            direction: 'ColorControl.Enums.HueDirection' = None
-            transitionTime: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            hue: 'uint' = 0
+            direction: 'ColorControl.Enums.HueDirection' = 0
+            transitionTime: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class MoveHue(ClusterCommand):
@@ -15625,10 +15661,10 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
-            moveMode: 'ColorControl.Enums.HueMoveMode' = None
-            rate: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            moveMode: 'ColorControl.Enums.HueMoveMode' = 0
+            rate: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class StepHue(ClusterCommand):
@@ -15652,11 +15688,11 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=4, Type=uint),
                     ])
 
-            stepMode: 'ColorControl.Enums.HueStepMode' = None
-            stepSize: 'uint' = None
-            transitionTime: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            stepMode: 'ColorControl.Enums.HueStepMode' = 0
+            stepSize: 'uint' = 0
+            transitionTime: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class MoveToSaturation(ClusterCommand):
@@ -15678,10 +15714,10 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
-            saturation: 'uint' = None
-            transitionTime: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            saturation: 'uint' = 0
+            transitionTime: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class MoveSaturation(ClusterCommand):
@@ -15703,10 +15739,10 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
-            moveMode: 'ColorControl.Enums.SaturationMoveMode' = None
-            rate: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            moveMode: 'ColorControl.Enums.SaturationMoveMode' = 0
+            rate: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class StepSaturation(ClusterCommand):
@@ -15730,11 +15766,11 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=4, Type=uint),
                     ])
 
-            stepMode: 'ColorControl.Enums.SaturationStepMode' = None
-            stepSize: 'uint' = None
-            transitionTime: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            stepMode: 'ColorControl.Enums.SaturationStepMode' = 0
+            stepSize: 'uint' = 0
+            transitionTime: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class MoveToHueAndSaturation(ClusterCommand):
@@ -15758,11 +15794,11 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=4, Type=uint),
                     ])
 
-            hue: 'uint' = None
-            saturation: 'uint' = None
-            transitionTime: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            hue: 'uint' = 0
+            saturation: 'uint' = 0
+            transitionTime: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class MoveToColor(ClusterCommand):
@@ -15786,11 +15822,11 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=4, Type=uint),
                     ])
 
-            colorX: 'uint' = None
-            colorY: 'uint' = None
-            transitionTime: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            colorX: 'uint' = 0
+            colorY: 'uint' = 0
+            transitionTime: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class MoveColor(ClusterCommand):
@@ -15812,10 +15848,10 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
-            rateX: 'int' = None
-            rateY: 'int' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            rateX: 'int' = 0
+            rateY: 'int' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class StepColor(ClusterCommand):
@@ -15839,11 +15875,11 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=4, Type=uint),
                     ])
 
-            stepX: 'int' = None
-            stepY: 'int' = None
-            transitionTime: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            stepX: 'int' = 0
+            stepY: 'int' = 0
+            transitionTime: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class MoveToColorTemperature(ClusterCommand):
@@ -15865,10 +15901,10 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
-            colorTemperature: 'uint' = None
-            transitionTime: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            colorTemperature: 'uint' = 0
+            transitionTime: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class EnhancedMoveToHue(ClusterCommand):
@@ -15892,11 +15928,11 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=4, Type=uint),
                     ])
 
-            enhancedHue: 'uint' = None
-            direction: 'ColorControl.Enums.HueDirection' = None
-            transitionTime: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            enhancedHue: 'uint' = 0
+            direction: 'ColorControl.Enums.HueDirection' = 0
+            transitionTime: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class EnhancedMoveHue(ClusterCommand):
@@ -15918,10 +15954,10 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=3, Type=uint),
                     ])
 
-            moveMode: 'ColorControl.Enums.HueMoveMode' = None
-            rate: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            moveMode: 'ColorControl.Enums.HueMoveMode' = 0
+            rate: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class EnhancedStepHue(ClusterCommand):
@@ -15945,11 +15981,11 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=4, Type=uint),
                     ])
 
-            stepMode: 'ColorControl.Enums.HueStepMode' = None
-            stepSize: 'uint' = None
-            transitionTime: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            stepMode: 'ColorControl.Enums.HueStepMode' = 0
+            stepSize: 'uint' = 0
+            transitionTime: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class EnhancedMoveToHueAndSaturation(ClusterCommand):
@@ -15973,11 +16009,11 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=4, Type=uint),
                     ])
 
-            enhancedHue: 'uint' = None
-            saturation: 'uint' = None
-            transitionTime: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            enhancedHue: 'uint' = 0
+            saturation: 'uint' = 0
+            transitionTime: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class ColorLoopSet(ClusterCommand):
@@ -16005,13 +16041,13 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=6, Type=uint),
                     ])
 
-            updateFlags: 'uint' = None
-            action: 'ColorControl.Enums.ColorLoopAction' = None
-            direction: 'ColorControl.Enums.ColorLoopDirection' = None
-            time: 'uint' = None
-            startHue: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            updateFlags: 'uint' = 0
+            action: 'ColorControl.Enums.ColorLoopAction' = 0
+            direction: 'ColorControl.Enums.ColorLoopDirection' = 0
+            time: 'uint' = 0
+            startHue: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class StopMoveStep(ClusterCommand):
@@ -16029,8 +16065,8 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=1, Type=uint),
                     ])
 
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class MoveColorTemperature(ClusterCommand):
@@ -16056,12 +16092,12 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=5, Type=uint),
                     ])
 
-            moveMode: 'ColorControl.Enums.HueMoveMode' = None
-            rate: 'uint' = None
-            colorTemperatureMinimum: 'uint' = None
-            colorTemperatureMaximum: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            moveMode: 'ColorControl.Enums.HueMoveMode' = 0
+            rate: 'uint' = 0
+            colorTemperatureMinimum: 'uint' = 0
+            colorTemperatureMaximum: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
         @dataclass
         class StepColorTemperature(ClusterCommand):
@@ -16089,13 +16125,13 @@ class ColorControl(Cluster):
                             Label="optionsOverride", Tag=6, Type=uint),
                     ])
 
-            stepMode: 'ColorControl.Enums.HueStepMode' = None
-            stepSize: 'uint' = None
-            transitionTime: 'uint' = None
-            colorTemperatureMinimum: 'uint' = None
-            colorTemperatureMaximum: 'uint' = None
-            optionsMask: 'uint' = None
-            optionsOverride: 'uint' = None
+            stepMode: 'ColorControl.Enums.HueStepMode' = 0
+            stepSize: 'uint' = 0
+            transitionTime: 'uint' = 0
+            colorTemperatureMinimum: 'uint' = 0
+            colorTemperatureMaximum: 'uint' = 0
+            optionsMask: 'uint' = 0
+            optionsOverride: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -16160,7 +16196,7 @@ class ColorControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CurrentY(ClusterAttributeDescriptor):
@@ -16176,7 +16212,7 @@ class ColorControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class DriftCompensation(ClusterAttributeDescriptor):
@@ -16256,7 +16292,7 @@ class ColorControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class NumberOfPrimaries(ClusterAttributeDescriptor):
@@ -16912,7 +16948,7 @@ class ColorControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class StartUpColorTemperatureMireds(ClusterAttributeDescriptor):
@@ -16928,7 +16964,7 @@ class ColorControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -16960,7 +16996,7 @@ class ColorControl(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -17014,7 +17050,7 @@ class BallastConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class MinLevel(ClusterAttributeDescriptor):
@@ -17254,7 +17290,7 @@ class BallastConfiguration(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -17281,7 +17317,7 @@ class IlluminanceMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -17297,7 +17333,7 @@ class IlluminanceMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -17313,7 +17349,7 @@ class IlluminanceMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -17377,7 +17413,7 @@ class IlluminanceMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -17399,7 +17435,7 @@ class TemperatureMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -17415,7 +17451,7 @@ class TemperatureMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -17431,7 +17467,7 @@ class TemperatureMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -17479,7 +17515,7 @@ class TemperatureMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -17501,7 +17537,7 @@ class PressureMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -17517,7 +17553,7 @@ class PressureMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -17533,7 +17569,7 @@ class PressureMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -17661,7 +17697,7 @@ class PressureMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -17683,7 +17719,7 @@ class FlowMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -17699,7 +17735,7 @@ class FlowMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -17715,7 +17751,7 @@ class FlowMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -17763,7 +17799,7 @@ class FlowMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -17785,7 +17821,7 @@ class RelativeHumidityMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -17801,7 +17837,7 @@ class RelativeHumidityMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -17817,7 +17853,7 @@ class RelativeHumidityMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -17865,7 +17901,7 @@ class RelativeHumidityMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -17887,7 +17923,7 @@ class OccupancySensing(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class OccupancySensorType(ClusterAttributeDescriptor):
@@ -17903,7 +17939,7 @@ class OccupancySensing(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class OccupancySensorTypeBitmap(ClusterAttributeDescriptor):
@@ -17919,7 +17955,7 @@ class OccupancySensing(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class PirOccupiedToUnoccupiedDelay(ClusterAttributeDescriptor):
@@ -18095,7 +18131,7 @@ class OccupancySensing(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -18117,7 +18153,7 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -18133,7 +18169,7 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -18149,7 +18185,7 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -18197,7 +18233,7 @@ class CarbonMonoxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -18219,7 +18255,7 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -18235,7 +18271,7 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -18251,7 +18287,7 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -18299,7 +18335,7 @@ class CarbonDioxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -18321,7 +18357,7 @@ class EthyleneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -18337,7 +18373,7 @@ class EthyleneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -18353,7 +18389,7 @@ class EthyleneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -18401,7 +18437,7 @@ class EthyleneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -18423,7 +18459,7 @@ class EthyleneOxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -18439,7 +18475,7 @@ class EthyleneOxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -18455,7 +18491,7 @@ class EthyleneOxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -18503,7 +18539,7 @@ class EthyleneOxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -18525,7 +18561,7 @@ class HydrogenConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -18541,7 +18577,7 @@ class HydrogenConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -18557,7 +18593,7 @@ class HydrogenConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -18605,7 +18641,7 @@ class HydrogenConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -18627,7 +18663,7 @@ class HydrogenSulphideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -18643,7 +18679,7 @@ class HydrogenSulphideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -18659,7 +18695,7 @@ class HydrogenSulphideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -18707,7 +18743,7 @@ class HydrogenSulphideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -18729,7 +18765,7 @@ class NitricOxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -18745,7 +18781,7 @@ class NitricOxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -18761,7 +18797,7 @@ class NitricOxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -18809,7 +18845,7 @@ class NitricOxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -18831,7 +18867,7 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -18847,7 +18883,7 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -18863,7 +18899,7 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -18911,7 +18947,7 @@ class NitrogenDioxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -18933,7 +18969,7 @@ class OxygenConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -18949,7 +18985,7 @@ class OxygenConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -18965,7 +19001,7 @@ class OxygenConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -19013,7 +19049,7 @@ class OxygenConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -19035,7 +19071,7 @@ class OzoneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -19051,7 +19087,7 @@ class OzoneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -19067,7 +19103,7 @@ class OzoneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -19115,7 +19151,7 @@ class OzoneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -19137,7 +19173,7 @@ class SulfurDioxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -19153,7 +19189,7 @@ class SulfurDioxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -19169,7 +19205,7 @@ class SulfurDioxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -19217,7 +19253,7 @@ class SulfurDioxideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -19239,7 +19275,7 @@ class DissolvedOxygenConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -19255,7 +19291,7 @@ class DissolvedOxygenConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -19271,7 +19307,7 @@ class DissolvedOxygenConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -19319,7 +19355,7 @@ class DissolvedOxygenConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -19341,7 +19377,7 @@ class BromateConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -19357,7 +19393,7 @@ class BromateConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -19373,7 +19409,7 @@ class BromateConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -19421,7 +19457,7 @@ class BromateConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -19443,7 +19479,7 @@ class ChloraminesConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -19459,7 +19495,7 @@ class ChloraminesConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -19475,7 +19511,7 @@ class ChloraminesConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -19523,7 +19559,7 @@ class ChloraminesConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -19545,7 +19581,7 @@ class ChlorineConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -19561,7 +19597,7 @@ class ChlorineConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -19577,7 +19613,7 @@ class ChlorineConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -19625,7 +19661,7 @@ class ChlorineConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -19647,7 +19683,7 @@ class FecalColiformAndEColiConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -19663,7 +19699,7 @@ class FecalColiformAndEColiConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -19679,7 +19715,7 @@ class FecalColiformAndEColiConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -19727,7 +19763,7 @@ class FecalColiformAndEColiConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -19749,7 +19785,7 @@ class FluorideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -19765,7 +19801,7 @@ class FluorideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -19781,7 +19817,7 @@ class FluorideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -19829,7 +19865,7 @@ class FluorideConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -19851,7 +19887,7 @@ class HaloaceticAcidsConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -19867,7 +19903,7 @@ class HaloaceticAcidsConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -19883,7 +19919,7 @@ class HaloaceticAcidsConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -19931,7 +19967,7 @@ class HaloaceticAcidsConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -19953,7 +19989,7 @@ class TotalTrihalomethanesConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -19969,7 +20005,7 @@ class TotalTrihalomethanesConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -19985,7 +20021,7 @@ class TotalTrihalomethanesConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -20033,7 +20069,7 @@ class TotalTrihalomethanesConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -20055,7 +20091,7 @@ class TotalColiformBacteriaConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -20071,7 +20107,7 @@ class TotalColiformBacteriaConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -20087,7 +20123,7 @@ class TotalColiformBacteriaConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -20135,7 +20171,7 @@ class TotalColiformBacteriaConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -20157,7 +20193,7 @@ class TurbidityConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -20173,7 +20209,7 @@ class TurbidityConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -20189,7 +20225,7 @@ class TurbidityConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -20237,7 +20273,7 @@ class TurbidityConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -20259,7 +20295,7 @@ class CopperConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -20275,7 +20311,7 @@ class CopperConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -20291,7 +20327,7 @@ class CopperConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -20339,7 +20375,7 @@ class CopperConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -20361,7 +20397,7 @@ class LeadConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -20377,7 +20413,7 @@ class LeadConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -20393,7 +20429,7 @@ class LeadConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -20441,7 +20477,7 @@ class LeadConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -20463,7 +20499,7 @@ class ManganeseConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -20479,7 +20515,7 @@ class ManganeseConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -20495,7 +20531,7 @@ class ManganeseConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -20543,7 +20579,7 @@ class ManganeseConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -20565,7 +20601,7 @@ class SulfateConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -20581,7 +20617,7 @@ class SulfateConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -20597,7 +20633,7 @@ class SulfateConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -20645,7 +20681,7 @@ class SulfateConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -20667,7 +20703,7 @@ class BromodichloromethaneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -20683,7 +20719,7 @@ class BromodichloromethaneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -20699,7 +20735,7 @@ class BromodichloromethaneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -20747,7 +20783,7 @@ class BromodichloromethaneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -20769,7 +20805,7 @@ class BromoformConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -20785,7 +20821,7 @@ class BromoformConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -20801,7 +20837,7 @@ class BromoformConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -20849,7 +20885,7 @@ class BromoformConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -20871,7 +20907,7 @@ class ChlorodibromomethaneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -20887,7 +20923,7 @@ class ChlorodibromomethaneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -20903,7 +20939,7 @@ class ChlorodibromomethaneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -20951,7 +20987,7 @@ class ChlorodibromomethaneConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -20973,7 +21009,7 @@ class ChloroformConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -20989,7 +21025,7 @@ class ChloroformConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -21005,7 +21041,7 @@ class ChloroformConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -21053,7 +21089,7 @@ class ChloroformConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -21075,7 +21111,7 @@ class SodiumConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MinMeasuredValue(ClusterAttributeDescriptor):
@@ -21091,7 +21127,7 @@ class SodiumConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class MaxMeasuredValue(ClusterAttributeDescriptor):
@@ -21107,7 +21143,7 @@ class SodiumConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class Tolerance(ClusterAttributeDescriptor):
@@ -21155,7 +21191,7 @@ class SodiumConcentrationMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -21204,8 +21240,8 @@ class IasZone(Cluster):
                             Label="zoneId", Tag=1, Type=uint),
                     ])
 
-            enrollResponseCode: 'IasZone.Enums.IasEnrollResponseCode' = None
-            zoneId: 'uint' = None
+            enrollResponseCode: 'IasZone.Enums.IasEnrollResponseCode' = 0
+            zoneId: 'uint' = 0
 
         @dataclass
         class ZoneStatusChangeNotification(ClusterCommand):
@@ -21227,10 +21263,10 @@ class IasZone(Cluster):
                             Label="delay", Tag=3, Type=uint),
                     ])
 
-            zoneStatus: 'uint' = None
-            extendedStatus: 'uint' = None
-            zoneId: 'uint' = None
-            delay: 'uint' = None
+            zoneStatus: 'uint' = 0
+            extendedStatus: 'uint' = 0
+            zoneId: 'uint' = 0
+            delay: 'uint' = 0
 
         @dataclass
         class InitiateNormalOperationMode(ClusterCommand):
@@ -21260,8 +21296,8 @@ class IasZone(Cluster):
                             Label="manufacturerCode", Tag=1, Type=uint),
                     ])
 
-            zoneType: 'IasZone.Enums.IasZoneType' = None
-            manufacturerCode: 'uint' = None
+            zoneType: 'IasZone.Enums.IasZoneType' = 0
+            manufacturerCode: 'uint' = 0
 
         @dataclass
         class InitiateTestMode(ClusterCommand):
@@ -21279,8 +21315,8 @@ class IasZone(Cluster):
                             Label="currentZoneSensitivityLevel", Tag=1, Type=uint),
                     ])
 
-            testModeDuration: 'uint' = None
-            currentZoneSensitivityLevel: 'uint' = None
+            testModeDuration: 'uint' = 0
+            currentZoneSensitivityLevel: 'uint' = 0
 
         @dataclass
         class InitiateNormalOperationModeResponse(ClusterCommand):
@@ -21321,7 +21357,7 @@ class IasZone(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ZoneType(ClusterAttributeDescriptor):
@@ -21337,7 +21373,7 @@ class IasZone(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ZoneStatus(ClusterAttributeDescriptor):
@@ -21353,7 +21389,7 @@ class IasZone(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class IasCieAddress(ClusterAttributeDescriptor):
@@ -21369,7 +21405,7 @@ class IasZone(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ZoneId(ClusterAttributeDescriptor):
@@ -21385,7 +21421,7 @@ class IasZone(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class NumberOfZoneSensitivityLevelsSupported(ClusterAttributeDescriptor):
@@ -21449,7 +21485,7 @@ class IasZone(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -21559,9 +21595,9 @@ class IasAce(Cluster):
                             Label="zoneId", Tag=2, Type=uint),
                     ])
 
-            armMode: 'IasAce.Enums.IasAceArmMode' = None
-            armDisarmCode: 'str' = None
-            zoneId: 'uint' = None
+            armMode: 'IasAce.Enums.IasAceArmMode' = 0
+            armDisarmCode: 'str' = ""
+            zoneId: 'uint' = 0
 
         @dataclass
         class ArmResponse(ClusterCommand):
@@ -21577,7 +21613,7 @@ class IasAce(Cluster):
                             Label="armNotification", Tag=0, Type=IasAce.Enums.IasAceArmNotification),
                     ])
 
-            armNotification: 'IasAce.Enums.IasAceArmNotification' = None
+            armNotification: 'IasAce.Enums.IasAceArmNotification' = 0
 
         @dataclass
         class Bypass(ClusterCommand):
@@ -21597,9 +21633,9 @@ class IasAce(Cluster):
                             Label="armDisarmCode", Tag=2, Type=str),
                     ])
 
-            numberOfZones: 'uint' = None
-            zoneIds: 'typing.List[uint]' = None
-            armDisarmCode: 'str' = None
+            numberOfZones: 'uint' = 0
+            zoneIds: 'typing.List[uint]' = field(default_factory=lambda: [])
+            armDisarmCode: 'str' = ""
 
         @dataclass
         class GetZoneIdMapResponse(ClusterCommand):
@@ -21645,22 +21681,22 @@ class IasAce(Cluster):
                             Label="section15", Tag=15, Type=uint),
                     ])
 
-            section0: 'uint' = None
-            section1: 'uint' = None
-            section2: 'uint' = None
-            section3: 'uint' = None
-            section4: 'uint' = None
-            section5: 'uint' = None
-            section6: 'uint' = None
-            section7: 'uint' = None
-            section8: 'uint' = None
-            section9: 'uint' = None
-            section10: 'uint' = None
-            section11: 'uint' = None
-            section12: 'uint' = None
-            section13: 'uint' = None
-            section14: 'uint' = None
-            section15: 'uint' = None
+            section0: 'uint' = 0
+            section1: 'uint' = 0
+            section2: 'uint' = 0
+            section3: 'uint' = 0
+            section4: 'uint' = 0
+            section5: 'uint' = 0
+            section6: 'uint' = 0
+            section7: 'uint' = 0
+            section8: 'uint' = 0
+            section9: 'uint' = 0
+            section10: 'uint' = 0
+            section11: 'uint' = 0
+            section12: 'uint' = 0
+            section13: 'uint' = 0
+            section14: 'uint' = 0
+            section15: 'uint' = 0
 
         @dataclass
         class Emergency(ClusterCommand):
@@ -21694,10 +21730,10 @@ class IasAce(Cluster):
                             Label="zoneLabel", Tag=3, Type=str),
                     ])
 
-            zoneId: 'uint' = None
-            zoneType: 'IasAce.Enums.IasZoneType' = None
-            ieeeAddress: 'uint' = None
-            zoneLabel: 'str' = None
+            zoneId: 'uint' = 0
+            zoneType: 'IasAce.Enums.IasZoneType' = 0
+            ieeeAddress: 'uint' = 0
+            zoneLabel: 'str' = ""
 
         @dataclass
         class Fire(ClusterCommand):
@@ -21731,10 +21767,10 @@ class IasAce(Cluster):
                             Label="zoneLabel", Tag=3, Type=str),
                     ])
 
-            zoneId: 'uint' = None
-            zoneStatus: 'uint' = None
-            audibleNotification: 'IasAce.Enums.IasAceAudibleNotification' = None
-            zoneLabel: 'str' = None
+            zoneId: 'uint' = 0
+            zoneStatus: 'uint' = 0
+            audibleNotification: 'IasAce.Enums.IasAceAudibleNotification' = 0
+            zoneLabel: 'str' = ""
 
         @dataclass
         class Panic(ClusterCommand):
@@ -21768,10 +21804,10 @@ class IasAce(Cluster):
                             Label="alarmStatus", Tag=3, Type=IasAce.Enums.IasAceAlarmStatus),
                     ])
 
-            panelStatus: 'IasAce.Enums.IasAcePanelStatus' = None
-            secondsRemaining: 'uint' = None
-            audibleNotification: 'IasAce.Enums.IasAceAudibleNotification' = None
-            alarmStatus: 'IasAce.Enums.IasAceAlarmStatus' = None
+            panelStatus: 'IasAce.Enums.IasAcePanelStatus' = 0
+            secondsRemaining: 'uint' = 0
+            audibleNotification: 'IasAce.Enums.IasAceAudibleNotification' = 0
+            alarmStatus: 'IasAce.Enums.IasAceAlarmStatus' = 0
 
         @dataclass
         class GetZoneIdMap(ClusterCommand):
@@ -21805,10 +21841,10 @@ class IasAce(Cluster):
                             Label="alarmStatus", Tag=3, Type=IasAce.Enums.IasAceAlarmStatus),
                     ])
 
-            panelStatus: 'IasAce.Enums.IasAcePanelStatus' = None
-            secondsRemaining: 'uint' = None
-            audibleNotification: 'IasAce.Enums.IasAceAudibleNotification' = None
-            alarmStatus: 'IasAce.Enums.IasAceAlarmStatus' = None
+            panelStatus: 'IasAce.Enums.IasAcePanelStatus' = 0
+            secondsRemaining: 'uint' = 0
+            audibleNotification: 'IasAce.Enums.IasAceAudibleNotification' = 0
+            alarmStatus: 'IasAce.Enums.IasAceAlarmStatus' = 0
 
         @dataclass
         class GetZoneInformation(ClusterCommand):
@@ -21824,7 +21860,7 @@ class IasAce(Cluster):
                             Label="zoneId", Tag=0, Type=uint),
                     ])
 
-            zoneId: 'uint' = None
+            zoneId: 'uint' = 0
 
         @dataclass
         class SetBypassedZoneList(ClusterCommand):
@@ -21842,8 +21878,8 @@ class IasAce(Cluster):
                             Label="zoneIds", Tag=1, Type=typing.List[uint]),
                     ])
 
-            numberOfZones: 'uint' = None
-            zoneIds: 'typing.List[uint]' = None
+            numberOfZones: 'uint' = 0
+            zoneIds: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class GetPanelStatus(ClusterCommand):
@@ -21873,8 +21909,9 @@ class IasAce(Cluster):
                             Label="bypassResult", Tag=1, Type=typing.List[IasAce.Enums.IasAceBypassResult]),
                     ])
 
-            numberOfZones: 'uint' = None
-            bypassResult: 'typing.List[IasAce.Enums.IasAceBypassResult]' = None
+            numberOfZones: 'uint' = 0
+            bypassResult: 'typing.List[IasAce.Enums.IasAceBypassResult]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class GetBypassedZoneList(ClusterCommand):
@@ -21906,9 +21943,10 @@ class IasAce(Cluster):
                             Label="zoneStatusResult", Tag=2, Type=typing.List[IasAce.Structs.IasAceZoneStatusResult]),
                     ])
 
-            zoneStatusComplete: 'bool' = None
-            numberOfZones: 'uint' = None
-            zoneStatusResult: 'typing.List[IasAce.Structs.IasAceZoneStatusResult]' = None
+            zoneStatusComplete: 'bool' = False
+            numberOfZones: 'uint' = 0
+            zoneStatusResult: 'typing.List[IasAce.Structs.IasAceZoneStatusResult]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class GetZoneStatus(ClusterCommand):
@@ -21930,10 +21968,10 @@ class IasAce(Cluster):
                             Label="zoneStatusMask", Tag=3, Type=uint),
                     ])
 
-            startingZoneId: 'uint' = None
-            maxNumberOfZoneIds: 'uint' = None
-            zoneStatusMaskFlag: 'bool' = None
-            zoneStatusMask: 'uint' = None
+            startingZoneId: 'uint' = 0
+            maxNumberOfZoneIds: 'uint' = 0
+            zoneStatusMaskFlag: 'bool' = False
+            zoneStatusMask: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -21966,7 +22004,7 @@ class IasAce(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -21994,10 +22032,10 @@ class IasWd(Cluster):
                             Label="strobeLevel", Tag=3, Type=uint),
                     ])
 
-            warningInfo: 'uint' = None
-            warningDuration: 'uint' = None
-            strobeDutyCycle: 'uint' = None
-            strobeLevel: 'uint' = None
+            warningInfo: 'uint' = 0
+            warningDuration: 'uint' = 0
+            strobeDutyCycle: 'uint' = 0
+            strobeLevel: 'uint' = 0
 
         @dataclass
         class Squawk(ClusterCommand):
@@ -22013,7 +22051,7 @@ class IasWd(Cluster):
                             Label="squawkInfo", Tag=0, Type=uint),
                     ])
 
-            squawkInfo: 'uint' = None
+            squawkInfo: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -22030,7 +22068,7 @@ class IasWd(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -22062,7 +22100,7 @@ class IasWd(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -22084,7 +22122,7 @@ class WakeOnLan(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -22116,7 +22154,7 @@ class WakeOnLan(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -22192,7 +22230,7 @@ class TvChannel(Cluster):
                             Label="match", Tag=0, Type=str),
                     ])
 
-            match: 'str' = None
+            match: 'str' = ""
 
         @dataclass
         class ChangeChannelResponse(ClusterCommand):
@@ -22210,8 +22248,9 @@ class TvChannel(Cluster):
                             Label="errorType", Tag=1, Type=TvChannel.Enums.TvChannelErrorType),
                     ])
 
-            channelMatch: 'typing.List[TvChannel.Structs.TvChannelInfo]' = None
-            errorType: 'TvChannel.Enums.TvChannelErrorType' = None
+            channelMatch: 'typing.List[TvChannel.Structs.TvChannelInfo]' = field(
+                default_factory=lambda: [])
+            errorType: 'TvChannel.Enums.TvChannelErrorType' = 0
 
         @dataclass
         class ChangeChannelByNumber(ClusterCommand):
@@ -22229,8 +22268,8 @@ class TvChannel(Cluster):
                             Label="minorNumber", Tag=1, Type=uint),
                     ])
 
-            majorNumber: 'uint' = None
-            minorNumber: 'uint' = None
+            majorNumber: 'uint' = 0
+            minorNumber: 'uint' = 0
 
         @dataclass
         class SkipChannel(ClusterCommand):
@@ -22246,7 +22285,7 @@ class TvChannel(Cluster):
                             Label="count", Tag=0, Type=uint),
                     ])
 
-            count: 'uint' = None
+            count: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -22263,7 +22302,8 @@ class TvChannel(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[TvChannel.Structs.TvChannelInfo])
 
-            value: 'typing.List[TvChannel.Structs.TvChannelInfo]' = None
+            value: 'typing.List[TvChannel.Structs.TvChannelInfo]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class TvChannelLineup(ClusterAttributeDescriptor):
@@ -22279,7 +22319,7 @@ class TvChannel(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bytes)
 
-            value: 'bytes' = None
+            value: 'bytes' = b""
 
         @dataclass
         class CurrentTvChannel(ClusterAttributeDescriptor):
@@ -22295,7 +22335,7 @@ class TvChannel(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bytes)
 
-            value: 'bytes' = None
+            value: 'bytes' = b""
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -22327,7 +22367,7 @@ class TvChannel(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -22373,8 +22413,8 @@ class TargetNavigator(Cluster):
                             Label="data", Tag=1, Type=str),
                     ])
 
-            target: 'uint' = None
-            data: 'str' = None
+            target: 'uint' = 0
+            data: 'str' = ""
 
         @dataclass
         class NavigateTargetResponse(ClusterCommand):
@@ -22392,8 +22432,8 @@ class TargetNavigator(Cluster):
                             Label="data", Tag=1, Type=str),
                     ])
 
-            status: 'TargetNavigator.Enums.NavigateTargetStatus' = None
-            data: 'str' = None
+            status: 'TargetNavigator.Enums.NavigateTargetStatus' = 0
+            data: 'str' = ""
 
     class Attributes:
         @dataclass
@@ -22410,7 +22450,8 @@ class TargetNavigator(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[TargetNavigator.Structs.NavigateTargetTargetInfo])
 
-            value: 'typing.List[TargetNavigator.Structs.NavigateTargetTargetInfo]' = None
+            value: 'typing.List[TargetNavigator.Structs.NavigateTargetTargetInfo]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class CurrentNavigatorTarget(ClusterAttributeDescriptor):
@@ -22458,7 +22499,7 @@ class TargetNavigator(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -22523,7 +22564,7 @@ class MediaPlayback(Cluster):
                             Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
                     ])
 
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = None
+            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
 
         @dataclass
         class MediaPause(ClusterCommand):
@@ -22551,7 +22592,7 @@ class MediaPlayback(Cluster):
                             Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
                     ])
 
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = None
+            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
 
         @dataclass
         class MediaStop(ClusterCommand):
@@ -22579,7 +22620,7 @@ class MediaPlayback(Cluster):
                             Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
                     ])
 
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = None
+            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
 
         @dataclass
         class MediaStartOver(ClusterCommand):
@@ -22607,7 +22648,7 @@ class MediaPlayback(Cluster):
                             Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
                     ])
 
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = None
+            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
 
         @dataclass
         class MediaPrevious(ClusterCommand):
@@ -22635,7 +22676,7 @@ class MediaPlayback(Cluster):
                             Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
                     ])
 
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = None
+            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
 
         @dataclass
         class MediaNext(ClusterCommand):
@@ -22663,7 +22704,7 @@ class MediaPlayback(Cluster):
                             Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
                     ])
 
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = None
+            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
 
         @dataclass
         class MediaRewind(ClusterCommand):
@@ -22691,7 +22732,7 @@ class MediaPlayback(Cluster):
                             Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
                     ])
 
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = None
+            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
 
         @dataclass
         class MediaFastForward(ClusterCommand):
@@ -22719,7 +22760,7 @@ class MediaPlayback(Cluster):
                             Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
                     ])
 
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = None
+            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
 
         @dataclass
         class MediaSkipForward(ClusterCommand):
@@ -22735,7 +22776,7 @@ class MediaPlayback(Cluster):
                             Label="deltaPositionMilliseconds", Tag=0, Type=uint),
                     ])
 
-            deltaPositionMilliseconds: 'uint' = None
+            deltaPositionMilliseconds: 'uint' = 0
 
         @dataclass
         class MediaSkipForwardResponse(ClusterCommand):
@@ -22751,7 +22792,7 @@ class MediaPlayback(Cluster):
                             Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
                     ])
 
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = None
+            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
 
         @dataclass
         class MediaSkipBackward(ClusterCommand):
@@ -22767,7 +22808,7 @@ class MediaPlayback(Cluster):
                             Label="deltaPositionMilliseconds", Tag=0, Type=uint),
                     ])
 
-            deltaPositionMilliseconds: 'uint' = None
+            deltaPositionMilliseconds: 'uint' = 0
 
         @dataclass
         class MediaSkipBackwardResponse(ClusterCommand):
@@ -22783,7 +22824,7 @@ class MediaPlayback(Cluster):
                             Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
                     ])
 
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = None
+            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
 
         @dataclass
         class MediaSeek(ClusterCommand):
@@ -22799,7 +22840,7 @@ class MediaPlayback(Cluster):
                             Label="position", Tag=0, Type=uint),
                     ])
 
-            position: 'uint' = None
+            position: 'uint' = 0
 
         @dataclass
         class MediaSeekResponse(ClusterCommand):
@@ -22815,7 +22856,7 @@ class MediaPlayback(Cluster):
                             Label="mediaPlaybackStatus", Tag=0, Type=MediaPlayback.Enums.MediaPlaybackStatus),
                     ])
 
-            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = None
+            mediaPlaybackStatus: 'MediaPlayback.Enums.MediaPlaybackStatus' = 0
 
     class Attributes:
         @dataclass
@@ -22976,7 +23017,7 @@ class MediaPlayback(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -23035,7 +23076,7 @@ class MediaInput(Cluster):
                             Label="index", Tag=0, Type=uint),
                     ])
 
-            index: 'uint' = None
+            index: 'uint' = 0
 
         @dataclass
         class ShowInputStatus(ClusterCommand):
@@ -23077,8 +23118,8 @@ class MediaInput(Cluster):
                             Label="name", Tag=1, Type=str),
                     ])
 
-            index: 'uint' = None
-            name: 'str' = None
+            index: 'uint' = 0
+            name: 'str' = ""
 
     class Attributes:
         @dataclass
@@ -23095,7 +23136,8 @@ class MediaInput(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[MediaInput.Structs.MediaInputInfo])
 
-            value: 'typing.List[MediaInput.Structs.MediaInputInfo]' = None
+            value: 'typing.List[MediaInput.Structs.MediaInputInfo]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class CurrentMediaInput(ClusterAttributeDescriptor):
@@ -23143,7 +23185,7 @@ class MediaInput(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -23194,7 +23236,7 @@ class LowPower(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -23310,7 +23352,7 @@ class KeypadInput(Cluster):
                             Label="keyCode", Tag=0, Type=KeypadInput.Enums.KeypadInputCecKeyCode),
                     ])
 
-            keyCode: 'KeypadInput.Enums.KeypadInputCecKeyCode' = None
+            keyCode: 'KeypadInput.Enums.KeypadInputCecKeyCode' = 0
 
         @dataclass
         class SendKeyResponse(ClusterCommand):
@@ -23326,7 +23368,7 @@ class KeypadInput(Cluster):
                             Label="status", Tag=0, Type=KeypadInput.Enums.KeypadInputStatus),
                     ])
 
-            status: 'KeypadInput.Enums.KeypadInputStatus' = None
+            status: 'KeypadInput.Enums.KeypadInputStatus' = 0
 
     class Attributes:
         @dataclass
@@ -23359,7 +23401,7 @@ class KeypadInput(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -23508,8 +23550,8 @@ class ContentLauncher(Cluster):
                             Label="data", Tag=1, Type=str),
                     ])
 
-            autoPlay: 'bool' = None
-            data: 'str' = None
+            autoPlay: 'bool' = False
+            data: 'str' = ""
 
         @dataclass
         class LaunchContentResponse(ClusterCommand):
@@ -23527,8 +23569,8 @@ class ContentLauncher(Cluster):
                             Label="contentLaunchStatus", Tag=1, Type=ContentLauncher.Enums.ContentLaunchStatus),
                     ])
 
-            data: 'str' = None
-            contentLaunchStatus: 'ContentLauncher.Enums.ContentLaunchStatus' = None
+            data: 'str' = ""
+            contentLaunchStatus: 'ContentLauncher.Enums.ContentLaunchStatus' = 0
 
         @dataclass
         class LaunchURL(ClusterCommand):
@@ -23546,8 +23588,8 @@ class ContentLauncher(Cluster):
                             Label="displayString", Tag=1, Type=str),
                     ])
 
-            contentURL: 'str' = None
-            displayString: 'str' = None
+            contentURL: 'str' = ""
+            displayString: 'str' = ""
 
         @dataclass
         class LaunchURLResponse(ClusterCommand):
@@ -23565,8 +23607,8 @@ class ContentLauncher(Cluster):
                             Label="contentLaunchStatus", Tag=1, Type=ContentLauncher.Enums.ContentLaunchStatus),
                     ])
 
-            data: 'str' = None
-            contentLaunchStatus: 'ContentLauncher.Enums.ContentLaunchStatus' = None
+            data: 'str' = ""
+            contentLaunchStatus: 'ContentLauncher.Enums.ContentLaunchStatus' = 0
 
     class Attributes:
         @dataclass
@@ -23583,7 +23625,7 @@ class ContentLauncher(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[bytes])
 
-            value: 'typing.List[bytes]' = None
+            value: 'typing.List[bytes]' = field(default_factory=lambda: [])
 
         @dataclass
         class SupportedStreamingTypes(ClusterAttributeDescriptor):
@@ -23599,7 +23641,8 @@ class ContentLauncher(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[ContentLauncher.Enums.ContentLaunchStreamingType])
 
-            value: 'typing.List[ContentLauncher.Enums.ContentLaunchStreamingType]' = None
+            value: 'typing.List[ContentLauncher.Enums.ContentLaunchStreamingType]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -23631,7 +23674,7 @@ class ContentLauncher(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -23681,7 +23724,7 @@ class AudioOutput(Cluster):
                             Label="index", Tag=0, Type=uint),
                     ])
 
-            index: 'uint' = None
+            index: 'uint' = 0
 
         @dataclass
         class RenameOutput(ClusterCommand):
@@ -23699,8 +23742,8 @@ class AudioOutput(Cluster):
                             Label="name", Tag=1, Type=str),
                     ])
 
-            index: 'uint' = None
-            name: 'str' = None
+            index: 'uint' = 0
+            name: 'str' = ""
 
     class Attributes:
         @dataclass
@@ -23717,7 +23760,8 @@ class AudioOutput(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[AudioOutput.Structs.AudioOutputInfo])
 
-            value: 'typing.List[AudioOutput.Structs.AudioOutputInfo]' = None
+            value: 'typing.List[AudioOutput.Structs.AudioOutputInfo]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class CurrentAudioOutput(ClusterAttributeDescriptor):
@@ -23765,7 +23809,7 @@ class AudioOutput(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -23813,9 +23857,9 @@ class ApplicationLauncher(Cluster):
                             Label="applicationId", Tag=2, Type=str),
                     ])
 
-            data: 'str' = None
-            catalogVendorId: 'uint' = None
-            applicationId: 'str' = None
+            data: 'str' = ""
+            catalogVendorId: 'uint' = 0
+            applicationId: 'str' = ""
 
         @dataclass
         class LaunchAppResponse(ClusterCommand):
@@ -23833,8 +23877,8 @@ class ApplicationLauncher(Cluster):
                             Label="data", Tag=1, Type=str),
                     ])
 
-            status: 'ApplicationLauncher.Enums.ApplicationLauncherStatus' = None
-            data: 'str' = None
+            status: 'ApplicationLauncher.Enums.ApplicationLauncherStatus' = 0
+            data: 'str' = ""
 
     class Attributes:
         @dataclass
@@ -23851,7 +23895,7 @@ class ApplicationLauncher(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[uint])
 
-            value: 'typing.List[uint]' = None
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class CatalogVendorId(ClusterAttributeDescriptor):
@@ -23915,7 +23959,7 @@ class ApplicationLauncher(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -23944,7 +23988,7 @@ class ApplicationBasic(Cluster):
                             Label="status", Tag=0, Type=ApplicationBasic.Enums.ApplicationBasicStatus),
                     ])
 
-            status: 'ApplicationBasic.Enums.ApplicationBasicStatus' = None
+            status: 'ApplicationBasic.Enums.ApplicationBasicStatus' = 0
 
     class Attributes:
         @dataclass
@@ -23961,7 +24005,7 @@ class ApplicationBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class VendorId(ClusterAttributeDescriptor):
@@ -23977,7 +24021,7 @@ class ApplicationBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ApplicationName(ClusterAttributeDescriptor):
@@ -23993,7 +24037,7 @@ class ApplicationBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class ProductId(ClusterAttributeDescriptor):
@@ -24009,7 +24053,7 @@ class ApplicationBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ApplicationId(ClusterAttributeDescriptor):
@@ -24025,7 +24069,7 @@ class ApplicationBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class CatalogVendorId(ClusterAttributeDescriptor):
@@ -24041,7 +24085,7 @@ class ApplicationBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ApplicationStatus(ClusterAttributeDescriptor):
@@ -24057,7 +24101,7 @@ class ApplicationBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -24089,7 +24133,7 @@ class ApplicationBasic(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -24111,7 +24155,7 @@ class AccountLogin(Cluster):
                             Label="tempAccountIdentifier", Tag=0, Type=str),
                     ])
 
-            tempAccountIdentifier: 'str' = None
+            tempAccountIdentifier: 'str' = ""
 
         @dataclass
         class GetSetupPINResponse(ClusterCommand):
@@ -24127,7 +24171,7 @@ class AccountLogin(Cluster):
                             Label="setupPIN", Tag=0, Type=str),
                     ])
 
-            setupPIN: 'str' = None
+            setupPIN: 'str' = ""
 
         @dataclass
         class Login(ClusterCommand):
@@ -24145,8 +24189,8 @@ class AccountLogin(Cluster):
                             Label="setupPIN", Tag=1, Type=str),
                     ])
 
-            tempAccountIdentifier: 'str' = None
-            setupPIN: 'str' = None
+            tempAccountIdentifier: 'str' = ""
+            setupPIN: 'str' = ""
 
     class Attributes:
         @dataclass
@@ -24179,7 +24223,7 @@ class AccountLogin(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -24378,7 +24422,7 @@ class TestCluster(Cluster):
                             Label="returnValue", Tag=0, Type=uint),
                     ])
 
-            returnValue: 'uint' = None
+            returnValue: 'uint' = 0
 
         @dataclass
         class TestNotHandled(ClusterCommand):
@@ -24406,7 +24450,7 @@ class TestCluster(Cluster):
                             Label="returnValue", Tag=0, Type=uint),
                     ])
 
-            returnValue: 'uint' = None
+            returnValue: 'uint' = 0
 
         @dataclass
         class TestSpecific(ClusterCommand):
@@ -24434,7 +24478,7 @@ class TestCluster(Cluster):
                             Label="returnValue", Tag=0, Type=bool),
                     ])
 
-            returnValue: 'bool' = None
+            returnValue: 'bool' = False
 
         @dataclass
         class TestUnknownCommand(ClusterCommand):
@@ -24472,12 +24516,15 @@ class TestCluster(Cluster):
                             Label="arg6", Tag=5, Type=bool),
                     ])
 
-            arg1: 'typing.List[TestCluster.Structs.NestedStructList]' = None
-            arg2: 'typing.List[TestCluster.Structs.SimpleStruct]' = None
-            arg3: 'typing.List[TestCluster.Enums.SimpleEnum]' = None
-            arg4: 'typing.List[bool]' = None
-            arg5: 'TestCluster.Enums.SimpleEnum' = None
-            arg6: 'bool' = None
+            arg1: 'typing.List[TestCluster.Structs.NestedStructList]' = field(
+                default_factory=lambda: [])
+            arg2: 'typing.List[TestCluster.Structs.SimpleStruct]' = field(
+                default_factory=lambda: [])
+            arg3: 'typing.List[TestCluster.Enums.SimpleEnum]' = field(
+                default_factory=lambda: [])
+            arg4: 'typing.List[bool]' = field(default_factory=lambda: [])
+            arg5: 'TestCluster.Enums.SimpleEnum' = 0
+            arg6: 'bool' = False
 
         @dataclass
         class TestAddArguments(ClusterCommand):
@@ -24495,8 +24542,8 @@ class TestCluster(Cluster):
                             Label="arg2", Tag=1, Type=uint),
                     ])
 
-            arg1: 'uint' = None
-            arg2: 'uint' = None
+            arg1: 'uint' = 0
+            arg2: 'uint' = 0
 
         @dataclass
         class TestListInt8UReverseResponse(ClusterCommand):
@@ -24512,7 +24559,7 @@ class TestCluster(Cluster):
                             Label="arg1", Tag=0, Type=typing.List[uint]),
                     ])
 
-            arg1: 'typing.List[uint]' = None
+            arg1: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class TestSimpleArgumentRequest(ClusterCommand):
@@ -24528,7 +24575,7 @@ class TestCluster(Cluster):
                             Label="arg1", Tag=0, Type=bool),
                     ])
 
-            arg1: 'bool' = None
+            arg1: 'bool' = False
 
         @dataclass
         class TestEnumsResponse(ClusterCommand):
@@ -24546,8 +24593,8 @@ class TestCluster(Cluster):
                             Label="arg2", Tag=1, Type=TestCluster.Enums.SimpleEnum),
                     ])
 
-            arg1: 'uint' = None
-            arg2: 'TestCluster.Enums.SimpleEnum' = None
+            arg1: 'uint' = 0
+            arg2: 'TestCluster.Enums.SimpleEnum' = 0
 
         @dataclass
         class TestStructArrayArgumentRequest(ClusterCommand):
@@ -24573,12 +24620,15 @@ class TestCluster(Cluster):
                             Label="arg6", Tag=5, Type=bool),
                     ])
 
-            arg1: 'typing.List[TestCluster.Structs.NestedStructList]' = None
-            arg2: 'typing.List[TestCluster.Structs.SimpleStruct]' = None
-            arg3: 'typing.List[TestCluster.Enums.SimpleEnum]' = None
-            arg4: 'typing.List[bool]' = None
-            arg5: 'TestCluster.Enums.SimpleEnum' = None
-            arg6: 'bool' = None
+            arg1: 'typing.List[TestCluster.Structs.NestedStructList]' = field(
+                default_factory=lambda: [])
+            arg2: 'typing.List[TestCluster.Structs.SimpleStruct]' = field(
+                default_factory=lambda: [])
+            arg3: 'typing.List[TestCluster.Enums.SimpleEnum]' = field(
+                default_factory=lambda: [])
+            arg4: 'typing.List[bool]' = field(default_factory=lambda: [])
+            arg5: 'TestCluster.Enums.SimpleEnum' = 0
+            arg6: 'bool' = False
 
         @dataclass
         class TestNullableOptionalResponse(ClusterCommand):
@@ -24600,7 +24650,7 @@ class TestCluster(Cluster):
                             Label="originalValue", Tag=3, Type=typing.Union[None, Nullable, uint]),
                     ])
 
-            wasPresent: 'bool' = None
+            wasPresent: 'bool' = False
             wasNull: 'typing.Optional[bool]' = None
             value: 'typing.Optional[uint]' = None
             originalValue: 'typing.Union[None, Nullable, uint]' = None
@@ -24619,7 +24669,8 @@ class TestCluster(Cluster):
                             Label="arg1", Tag=0, Type=TestCluster.Structs.SimpleStruct),
                     ])
 
-            arg1: 'TestCluster.Structs.SimpleStruct' = None
+            arg1: 'TestCluster.Structs.SimpleStruct' = field(
+                default_factory=lambda: TestCluster.Structs.SimpleStruct())
 
         @dataclass
         class TestComplexNullableOptionalResponse(ClusterCommand):
@@ -24689,32 +24740,32 @@ class TestCluster(Cluster):
                             Label="nullableOptionalListValue", Tag=27, Type=typing.Optional[typing.List[TestCluster.Enums.SimpleEnum]]),
                     ])
 
-            nullableIntWasNull: 'bool' = None
+            nullableIntWasNull: 'bool' = False
             nullableIntValue: 'typing.Optional[uint]' = None
-            optionalIntWasPresent: 'bool' = None
+            optionalIntWasPresent: 'bool' = False
             optionalIntValue: 'typing.Optional[uint]' = None
-            nullableOptionalIntWasPresent: 'bool' = None
+            nullableOptionalIntWasPresent: 'bool' = False
             nullableOptionalIntWasNull: 'typing.Optional[bool]' = None
             nullableOptionalIntValue: 'typing.Optional[uint]' = None
-            nullableStringWasNull: 'bool' = None
+            nullableStringWasNull: 'bool' = False
             nullableStringValue: 'typing.Optional[str]' = None
-            optionalStringWasPresent: 'bool' = None
+            optionalStringWasPresent: 'bool' = False
             optionalStringValue: 'typing.Optional[str]' = None
-            nullableOptionalStringWasPresent: 'bool' = None
+            nullableOptionalStringWasPresent: 'bool' = False
             nullableOptionalStringWasNull: 'typing.Optional[bool]' = None
             nullableOptionalStringValue: 'typing.Optional[str]' = None
-            nullableStructWasNull: 'bool' = None
+            nullableStructWasNull: 'bool' = False
             nullableStructValue: 'typing.Optional[TestCluster.Structs.SimpleStruct]' = None
-            optionalStructWasPresent: 'bool' = None
+            optionalStructWasPresent: 'bool' = False
             optionalStructValue: 'typing.Optional[TestCluster.Structs.SimpleStruct]' = None
-            nullableOptionalStructWasPresent: 'bool' = None
+            nullableOptionalStructWasPresent: 'bool' = False
             nullableOptionalStructWasNull: 'typing.Optional[bool]' = None
             nullableOptionalStructValue: 'typing.Optional[TestCluster.Structs.SimpleStruct]' = None
-            nullableListWasNull: 'bool' = None
+            nullableListWasNull: 'bool' = False
             nullableListValue: 'typing.Optional[typing.List[TestCluster.Enums.SimpleEnum]]' = None
-            optionalListWasPresent: 'bool' = None
+            optionalListWasPresent: 'bool' = False
             optionalListValue: 'typing.Optional[typing.List[TestCluster.Enums.SimpleEnum]]' = None
-            nullableOptionalListWasPresent: 'bool' = None
+            nullableOptionalListWasPresent: 'bool' = False
             nullableOptionalListWasNull: 'typing.Optional[bool]' = None
             nullableOptionalListValue: 'typing.Optional[typing.List[TestCluster.Enums.SimpleEnum]]' = None
 
@@ -24732,7 +24783,8 @@ class TestCluster(Cluster):
                             Label="arg1", Tag=0, Type=TestCluster.Structs.NestedStruct),
                     ])
 
-            arg1: 'TestCluster.Structs.NestedStruct' = None
+            arg1: 'TestCluster.Structs.NestedStruct' = field(
+                default_factory=lambda: TestCluster.Structs.NestedStruct())
 
         @dataclass
         class BooleanResponse(ClusterCommand):
@@ -24748,7 +24800,7 @@ class TestCluster(Cluster):
                             Label="value", Tag=0, Type=bool),
                     ])
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class TestListStructArgumentRequest(ClusterCommand):
@@ -24764,7 +24816,8 @@ class TestCluster(Cluster):
                             Label="arg1", Tag=0, Type=typing.List[TestCluster.Structs.SimpleStruct]),
                     ])
 
-            arg1: 'typing.List[TestCluster.Structs.SimpleStruct]' = None
+            arg1: 'typing.List[TestCluster.Structs.SimpleStruct]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class SimpleStructResponse(ClusterCommand):
@@ -24780,7 +24833,8 @@ class TestCluster(Cluster):
                             Label="arg1", Tag=0, Type=TestCluster.Structs.SimpleStruct),
                     ])
 
-            arg1: 'TestCluster.Structs.SimpleStruct' = None
+            arg1: 'TestCluster.Structs.SimpleStruct' = field(
+                default_factory=lambda: TestCluster.Structs.SimpleStruct())
 
         @dataclass
         class TestListInt8UArgumentRequest(ClusterCommand):
@@ -24796,7 +24850,7 @@ class TestCluster(Cluster):
                             Label="arg1", Tag=0, Type=typing.List[uint]),
                     ])
 
-            arg1: 'typing.List[uint]' = None
+            arg1: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class TestNestedStructListArgumentRequest(ClusterCommand):
@@ -24812,7 +24866,8 @@ class TestCluster(Cluster):
                             Label="arg1", Tag=0, Type=TestCluster.Structs.NestedStructList),
                     ])
 
-            arg1: 'TestCluster.Structs.NestedStructList' = None
+            arg1: 'TestCluster.Structs.NestedStructList' = field(
+                default_factory=lambda: TestCluster.Structs.NestedStructList())
 
         @dataclass
         class TestListNestedStructListArgumentRequest(ClusterCommand):
@@ -24828,7 +24883,8 @@ class TestCluster(Cluster):
                             Label="arg1", Tag=0, Type=typing.List[TestCluster.Structs.NestedStructList]),
                     ])
 
-            arg1: 'typing.List[TestCluster.Structs.NestedStructList]' = None
+            arg1: 'typing.List[TestCluster.Structs.NestedStructList]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class TestListInt8UReverseRequest(ClusterCommand):
@@ -24844,7 +24900,7 @@ class TestCluster(Cluster):
                             Label="arg1", Tag=0, Type=typing.List[uint]),
                     ])
 
-            arg1: 'typing.List[uint]' = None
+            arg1: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class TestEnumsRequest(ClusterCommand):
@@ -24862,8 +24918,8 @@ class TestCluster(Cluster):
                             Label="arg2", Tag=1, Type=TestCluster.Enums.SimpleEnum),
                     ])
 
-            arg1: 'uint' = None
-            arg2: 'TestCluster.Enums.SimpleEnum' = None
+            arg1: 'uint' = 0
+            arg2: 'TestCluster.Enums.SimpleEnum' = 0
 
         @dataclass
         class TestNullableOptionalRequest(ClusterCommand):
@@ -24917,16 +24973,16 @@ class TestCluster(Cluster):
                             Label="nullableOptionalList", Tag=11, Type=typing.Union[None, Nullable, typing.List[TestCluster.Enums.SimpleEnum]]),
                     ])
 
-            nullableInt: 'typing.Union[Nullable, uint]' = None
+            nullableInt: 'typing.Union[Nullable, uint]' = NullValue
             optionalInt: 'typing.Optional[uint]' = None
             nullableOptionalInt: 'typing.Union[None, Nullable, uint]' = None
-            nullableString: 'typing.Union[Nullable, str]' = None
+            nullableString: 'typing.Union[Nullable, str]' = NullValue
             optionalString: 'typing.Optional[str]' = None
             nullableOptionalString: 'typing.Union[None, Nullable, str]' = None
-            nullableStruct: 'typing.Union[Nullable, TestCluster.Structs.SimpleStruct]' = None
+            nullableStruct: 'typing.Union[Nullable, TestCluster.Structs.SimpleStruct]' = NullValue
             optionalStruct: 'typing.Optional[TestCluster.Structs.SimpleStruct]' = None
             nullableOptionalStruct: 'typing.Union[None, Nullable, TestCluster.Structs.SimpleStruct]' = None
-            nullableList: 'typing.Union[Nullable, typing.List[TestCluster.Enums.SimpleEnum]]' = None
+            nullableList: 'typing.Union[Nullable, typing.List[TestCluster.Enums.SimpleEnum]]' = NullValue
             optionalList: 'typing.Optional[typing.List[TestCluster.Enums.SimpleEnum]]' = None
             nullableOptionalList: 'typing.Union[None, Nullable, typing.List[TestCluster.Enums.SimpleEnum]]' = None
 
@@ -24944,7 +25000,8 @@ class TestCluster(Cluster):
                             Label="arg1", Tag=0, Type=TestCluster.Structs.SimpleStruct),
                     ])
 
-            arg1: 'TestCluster.Structs.SimpleStruct' = None
+            arg1: 'TestCluster.Structs.SimpleStruct' = field(
+                default_factory=lambda: TestCluster.Structs.SimpleStruct())
 
     class Attributes:
         @dataclass
@@ -24961,7 +25018,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class Bitmap8(ClusterAttributeDescriptor):
@@ -24977,7 +25034,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Bitmap16(ClusterAttributeDescriptor):
@@ -24993,7 +25050,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Bitmap32(ClusterAttributeDescriptor):
@@ -25009,7 +25066,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Bitmap64(ClusterAttributeDescriptor):
@@ -25025,7 +25082,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Int8u(ClusterAttributeDescriptor):
@@ -25041,7 +25098,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Int16u(ClusterAttributeDescriptor):
@@ -25057,7 +25114,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Int24u(ClusterAttributeDescriptor):
@@ -25073,7 +25130,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Int32u(ClusterAttributeDescriptor):
@@ -25089,7 +25146,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Int40u(ClusterAttributeDescriptor):
@@ -25105,7 +25162,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Int48u(ClusterAttributeDescriptor):
@@ -25121,7 +25178,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Int56u(ClusterAttributeDescriptor):
@@ -25137,7 +25194,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Int64u(ClusterAttributeDescriptor):
@@ -25153,7 +25210,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Int8s(ClusterAttributeDescriptor):
@@ -25169,7 +25226,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class Int16s(ClusterAttributeDescriptor):
@@ -25185,7 +25242,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class Int24s(ClusterAttributeDescriptor):
@@ -25201,7 +25258,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class Int32s(ClusterAttributeDescriptor):
@@ -25217,7 +25274,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class Int40s(ClusterAttributeDescriptor):
@@ -25233,7 +25290,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class Int48s(ClusterAttributeDescriptor):
@@ -25249,7 +25306,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class Int56s(ClusterAttributeDescriptor):
@@ -25265,7 +25322,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class Int64s(ClusterAttributeDescriptor):
@@ -25281,7 +25338,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class Enum8(ClusterAttributeDescriptor):
@@ -25297,7 +25354,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class Enum16(ClusterAttributeDescriptor):
@@ -25313,7 +25370,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FloatSingle(ClusterAttributeDescriptor):
@@ -25329,7 +25386,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class FloatDouble(ClusterAttributeDescriptor):
@@ -25345,7 +25402,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=float)
 
-            value: 'float' = None
+            value: 'float' = 0.0
 
         @dataclass
         class OctetString(ClusterAttributeDescriptor):
@@ -25361,7 +25418,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bytes)
 
-            value: 'bytes' = None
+            value: 'bytes' = b""
 
         @dataclass
         class ListInt8u(ClusterAttributeDescriptor):
@@ -25377,7 +25434,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[uint])
 
-            value: 'typing.List[uint]' = None
+            value: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class ListOctetString(ClusterAttributeDescriptor):
@@ -25393,7 +25450,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[bytes])
 
-            value: 'typing.List[bytes]' = None
+            value: 'typing.List[bytes]' = field(default_factory=lambda: [])
 
         @dataclass
         class ListStructOctetString(ClusterAttributeDescriptor):
@@ -25409,7 +25466,8 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[TestCluster.Structs.TestListStructOctet])
 
-            value: 'typing.List[TestCluster.Structs.TestListStructOctet]' = None
+            value: 'typing.List[TestCluster.Structs.TestListStructOctet]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class LongOctetString(ClusterAttributeDescriptor):
@@ -25425,7 +25483,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bytes)
 
-            value: 'bytes' = None
+            value: 'bytes' = b""
 
         @dataclass
         class CharString(ClusterAttributeDescriptor):
@@ -25441,7 +25499,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class LongCharString(ClusterAttributeDescriptor):
@@ -25457,7 +25515,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class EpochUs(ClusterAttributeDescriptor):
@@ -25473,7 +25531,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class EpochS(ClusterAttributeDescriptor):
@@ -25489,7 +25547,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class VendorId(ClusterAttributeDescriptor):
@@ -25505,7 +25563,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class ListNullablesAndOptionalsStruct(ClusterAttributeDescriptor):
@@ -25521,7 +25579,8 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[TestCluster.Structs.NullablesAndOptionalsStruct])
 
-            value: 'typing.List[TestCluster.Structs.NullablesAndOptionalsStruct]' = None
+            value: 'typing.List[TestCluster.Structs.NullablesAndOptionalsStruct]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class EnumAttr(ClusterAttributeDescriptor):
@@ -25537,7 +25596,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=TestCluster.Enums.SimpleEnum)
 
-            value: 'TestCluster.Enums.SimpleEnum' = None
+            value: 'TestCluster.Enums.SimpleEnum' = 0
 
         @dataclass
         class Struct(ClusterAttributeDescriptor):
@@ -25553,7 +25612,8 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=TestCluster.Structs.SimpleStruct)
 
-            value: 'TestCluster.Structs.SimpleStruct' = None
+            value: 'TestCluster.Structs.SimpleStruct' = field(
+                default_factory=lambda: TestCluster.Structs.SimpleStruct())
 
         @dataclass
         class RangeRestrictedInt8u(ClusterAttributeDescriptor):
@@ -25569,7 +25629,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RangeRestrictedInt8s(ClusterAttributeDescriptor):
@@ -25585,7 +25645,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class RangeRestrictedInt16u(ClusterAttributeDescriptor):
@@ -25601,7 +25661,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class RangeRestrictedInt16s(ClusterAttributeDescriptor):
@@ -25617,7 +25677,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class Unsupported(ClusterAttributeDescriptor):
@@ -25633,7 +25693,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class NullableBoolean(ClusterAttributeDescriptor):
@@ -25649,7 +25709,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, bool])
 
-            value: 'typing.Union[Nullable, bool]' = None
+            value: 'typing.Union[Nullable, bool]' = NullValue
 
         @dataclass
         class NullableBitmap8(ClusterAttributeDescriptor):
@@ -25665,7 +25725,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableBitmap16(ClusterAttributeDescriptor):
@@ -25681,7 +25741,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableBitmap32(ClusterAttributeDescriptor):
@@ -25697,7 +25757,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableBitmap64(ClusterAttributeDescriptor):
@@ -25713,7 +25773,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableInt8u(ClusterAttributeDescriptor):
@@ -25729,7 +25789,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableInt16u(ClusterAttributeDescriptor):
@@ -25745,7 +25805,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableInt24u(ClusterAttributeDescriptor):
@@ -25761,7 +25821,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableInt32u(ClusterAttributeDescriptor):
@@ -25777,7 +25837,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableInt40u(ClusterAttributeDescriptor):
@@ -25793,7 +25853,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableInt48u(ClusterAttributeDescriptor):
@@ -25809,7 +25869,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableInt56u(ClusterAttributeDescriptor):
@@ -25825,7 +25885,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableInt64u(ClusterAttributeDescriptor):
@@ -25841,7 +25901,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableInt8s(ClusterAttributeDescriptor):
@@ -25857,7 +25917,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
-            value: 'typing.Union[Nullable, int]' = None
+            value: 'typing.Union[Nullable, int]' = NullValue
 
         @dataclass
         class NullableInt16s(ClusterAttributeDescriptor):
@@ -25873,7 +25933,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
-            value: 'typing.Union[Nullable, int]' = None
+            value: 'typing.Union[Nullable, int]' = NullValue
 
         @dataclass
         class NullableInt24s(ClusterAttributeDescriptor):
@@ -25889,7 +25949,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
-            value: 'typing.Union[Nullable, int]' = None
+            value: 'typing.Union[Nullable, int]' = NullValue
 
         @dataclass
         class NullableInt32s(ClusterAttributeDescriptor):
@@ -25905,7 +25965,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
-            value: 'typing.Union[Nullable, int]' = None
+            value: 'typing.Union[Nullable, int]' = NullValue
 
         @dataclass
         class NullableInt40s(ClusterAttributeDescriptor):
@@ -25921,7 +25981,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
-            value: 'typing.Union[Nullable, int]' = None
+            value: 'typing.Union[Nullable, int]' = NullValue
 
         @dataclass
         class NullableInt48s(ClusterAttributeDescriptor):
@@ -25937,7 +25997,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
-            value: 'typing.Union[Nullable, int]' = None
+            value: 'typing.Union[Nullable, int]' = NullValue
 
         @dataclass
         class NullableInt56s(ClusterAttributeDescriptor):
@@ -25953,7 +26013,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
-            value: 'typing.Union[Nullable, int]' = None
+            value: 'typing.Union[Nullable, int]' = NullValue
 
         @dataclass
         class NullableInt64s(ClusterAttributeDescriptor):
@@ -25969,7 +26029,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
-            value: 'typing.Union[Nullable, int]' = None
+            value: 'typing.Union[Nullable, int]' = NullValue
 
         @dataclass
         class NullableEnum8(ClusterAttributeDescriptor):
@@ -25985,7 +26045,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableEnum16(ClusterAttributeDescriptor):
@@ -26001,7 +26061,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableFloatSingle(ClusterAttributeDescriptor):
@@ -26017,7 +26077,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, float])
 
-            value: 'typing.Union[Nullable, float]' = None
+            value: 'typing.Union[Nullable, float]' = NullValue
 
         @dataclass
         class NullableFloatDouble(ClusterAttributeDescriptor):
@@ -26033,7 +26093,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, float])
 
-            value: 'typing.Union[Nullable, float]' = None
+            value: 'typing.Union[Nullable, float]' = NullValue
 
         @dataclass
         class NullableOctetString(ClusterAttributeDescriptor):
@@ -26049,7 +26109,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, bytes])
 
-            value: 'typing.Union[Nullable, bytes]' = None
+            value: 'typing.Union[Nullable, bytes]' = NullValue
 
         @dataclass
         class NullableCharString(ClusterAttributeDescriptor):
@@ -26065,7 +26125,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, str])
 
-            value: 'typing.Union[Nullable, str]' = None
+            value: 'typing.Union[Nullable, str]' = NullValue
 
         @dataclass
         class NullableEnumAttr(ClusterAttributeDescriptor):
@@ -26081,7 +26141,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, TestCluster.Enums.SimpleEnum])
 
-            value: 'typing.Union[Nullable, TestCluster.Enums.SimpleEnum]' = None
+            value: 'typing.Union[Nullable, TestCluster.Enums.SimpleEnum]' = NullValue
 
         @dataclass
         class NullableStruct(ClusterAttributeDescriptor):
@@ -26097,7 +26157,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, TestCluster.Structs.SimpleStruct])
 
-            value: 'typing.Union[Nullable, TestCluster.Structs.SimpleStruct]' = None
+            value: 'typing.Union[Nullable, TestCluster.Structs.SimpleStruct]' = NullValue
 
         @dataclass
         class NullableRangeRestrictedInt8u(ClusterAttributeDescriptor):
@@ -26113,7 +26173,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableRangeRestrictedInt8s(ClusterAttributeDescriptor):
@@ -26129,7 +26189,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
-            value: 'typing.Union[Nullable, int]' = None
+            value: 'typing.Union[Nullable, int]' = NullValue
 
         @dataclass
         class NullableRangeRestrictedInt16u(ClusterAttributeDescriptor):
@@ -26145,7 +26205,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, uint])
 
-            value: 'typing.Union[Nullable, uint]' = None
+            value: 'typing.Union[Nullable, uint]' = NullValue
 
         @dataclass
         class NullableRangeRestrictedInt16s(ClusterAttributeDescriptor):
@@ -26161,7 +26221,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.Union[Nullable, int])
 
-            value: 'typing.Union[Nullable, int]' = None
+            value: 'typing.Union[Nullable, int]' = NullValue
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -26193,7 +26253,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
     class Events:
         @dataclass
@@ -26219,12 +26279,15 @@ class TestCluster(Cluster):
                             Label="arg6", Tag=6, Type=typing.List[TestCluster.Enums.SimpleEnum], IsArray=True),
                     ])
 
-            arg1: 'uint' = None
-            arg2: 'TestCluster.Enums.SimpleEnum' = None
-            arg3: 'bool' = None
-            arg4: 'TestCluster.Structs.SimpleStruct' = None
-            arg5: typing.List['typing.List[TestCluster.Structs.SimpleStruct]'] = None
-            arg6: typing.List['typing.List[TestCluster.Enums.SimpleEnum]'] = None
+            arg1: 'uint' = 0
+            arg2: 'TestCluster.Enums.SimpleEnum' = 0
+            arg3: 'bool' = False
+            arg4: 'TestCluster.Structs.SimpleStruct' = field(
+                default_factory=lambda: TestCluster.Structs.SimpleStruct())
+            arg5: typing.List['typing.List[TestCluster.Structs.SimpleStruct]'] = field(
+                default_factory=lambda: [])
+            arg6: typing.List['typing.List[TestCluster.Enums.SimpleEnum]'] = field(
+                default_factory=lambda: [])
 
 
 @dataclass
@@ -26360,12 +26423,12 @@ class Messaging(Cluster):
                             Label="optionalExtendedMessageControl", Tag=5, Type=uint),
                     ])
 
-            messageId: 'uint' = None
-            messageControl: 'uint' = None
-            startTime: 'uint' = None
-            durationInMinutes: 'uint' = None
-            message: 'str' = None
-            optionalExtendedMessageControl: 'uint' = None
+            messageId: 'uint' = 0
+            messageControl: 'uint' = 0
+            startTime: 'uint' = 0
+            durationInMinutes: 'uint' = 0
+            message: 'str' = ""
+            optionalExtendedMessageControl: 'uint' = 0
 
         @dataclass
         class GetLastMessage(ClusterCommand):
@@ -26395,8 +26458,8 @@ class Messaging(Cluster):
                             Label="messageControl", Tag=1, Type=uint),
                     ])
 
-            messageId: 'uint' = None
-            messageControl: 'uint' = None
+            messageId: 'uint' = 0
+            messageControl: 'uint' = 0
 
         @dataclass
         class MessageConfirmation(ClusterCommand):
@@ -26418,10 +26481,10 @@ class Messaging(Cluster):
                             Label="messageResponse", Tag=3, Type=bytes),
                     ])
 
-            messageId: 'uint' = None
-            confirmationTime: 'uint' = None
-            messageConfirmationControl: 'uint' = None
-            messageResponse: 'bytes' = None
+            messageId: 'uint' = 0
+            confirmationTime: 'uint' = 0
+            messageConfirmationControl: 'uint' = 0
+            messageResponse: 'bytes' = b""
 
         @dataclass
         class DisplayProtectedMessage(ClusterCommand):
@@ -26447,12 +26510,12 @@ class Messaging(Cluster):
                             Label="optionalExtendedMessageControl", Tag=5, Type=uint),
                     ])
 
-            messageId: 'uint' = None
-            messageControl: 'uint' = None
-            startTime: 'uint' = None
-            durationInMinutes: 'uint' = None
-            message: 'str' = None
-            optionalExtendedMessageControl: 'uint' = None
+            messageId: 'uint' = 0
+            messageControl: 'uint' = 0
+            startTime: 'uint' = 0
+            durationInMinutes: 'uint' = 0
+            message: 'str' = ""
+            optionalExtendedMessageControl: 'uint' = 0
 
         @dataclass
         class GetMessageCancellation(ClusterCommand):
@@ -26468,7 +26531,7 @@ class Messaging(Cluster):
                             Label="earliestImplementationTime", Tag=0, Type=uint),
                     ])
 
-            earliestImplementationTime: 'uint' = None
+            earliestImplementationTime: 'uint' = 0
 
         @dataclass
         class CancelAllMessages(ClusterCommand):
@@ -26484,7 +26547,7 @@ class Messaging(Cluster):
                             Label="implementationDateTime", Tag=0, Type=uint),
                     ])
 
-            implementationDateTime: 'uint' = None
+            implementationDateTime: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -26517,7 +26580,7 @@ class Messaging(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -26539,7 +26602,7 @@ class ApplianceIdentification(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CompanyName(ClusterAttributeDescriptor):
@@ -26747,7 +26810,7 @@ class ApplianceIdentification(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -26769,7 +26832,7 @@ class MeterIdentification(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class MeterTypeId(ClusterAttributeDescriptor):
@@ -26785,7 +26848,7 @@ class MeterIdentification(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class DataQualityId(ClusterAttributeDescriptor):
@@ -26801,7 +26864,7 @@ class MeterIdentification(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class CustomerName(ClusterAttributeDescriptor):
@@ -26913,7 +26976,7 @@ class MeterIdentification(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=str)
 
-            value: 'str' = None
+            value: 'str' = ""
 
         @dataclass
         class AvailablePower(ClusterAttributeDescriptor):
@@ -26929,7 +26992,7 @@ class MeterIdentification(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class PowerThreshold(ClusterAttributeDescriptor):
@@ -26945,7 +27008,7 @@ class MeterIdentification(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=int)
 
-            value: 'int' = None
+            value: 'int' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -26977,7 +27040,7 @@ class MeterIdentification(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -27021,8 +27084,9 @@ class ApplianceEventsAndAlert(Cluster):
                             Label="alertStructures", Tag=1, Type=typing.List[uint]),
                     ])
 
-            alertsCount: 'uint' = None
-            alertStructures: 'typing.List[uint]' = None
+            alertsCount: 'uint' = 0
+            alertStructures: 'typing.List[uint]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class AlertsNotification(ClusterCommand):
@@ -27040,8 +27104,9 @@ class ApplianceEventsAndAlert(Cluster):
                             Label="alertStructures", Tag=1, Type=typing.List[uint]),
                     ])
 
-            alertsCount: 'uint' = None
-            alertStructures: 'typing.List[uint]' = None
+            alertsCount: 'uint' = 0
+            alertStructures: 'typing.List[uint]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class EventsNotification(ClusterCommand):
@@ -27059,8 +27124,8 @@ class ApplianceEventsAndAlert(Cluster):
                             Label="eventId", Tag=1, Type=ApplianceEventsAndAlert.Enums.EventIdentification),
                     ])
 
-            eventHeader: 'uint' = None
-            eventId: 'ApplianceEventsAndAlert.Enums.EventIdentification' = None
+            eventHeader: 'uint' = 0
+            eventId: 'ApplianceEventsAndAlert.Enums.EventIdentification' = 0
 
     class Attributes:
         @dataclass
@@ -27093,7 +27158,7 @@ class ApplianceEventsAndAlert(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -27121,10 +27186,10 @@ class ApplianceStatistics(Cluster):
                             Label="logPayload", Tag=3, Type=typing.List[uint]),
                     ])
 
-            timeStamp: 'uint' = None
-            logId: 'uint' = None
-            logLength: 'uint' = None
-            logPayload: 'typing.List[uint]' = None
+            timeStamp: 'uint' = 0
+            logId: 'uint' = 0
+            logLength: 'uint' = 0
+            logPayload: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class LogRequest(ClusterCommand):
@@ -27140,7 +27205,7 @@ class ApplianceStatistics(Cluster):
                             Label="logId", Tag=0, Type=uint),
                     ])
 
-            logId: 'uint' = None
+            logId: 'uint' = 0
 
         @dataclass
         class LogResponse(ClusterCommand):
@@ -27162,10 +27227,10 @@ class ApplianceStatistics(Cluster):
                             Label="logPayload", Tag=3, Type=typing.List[uint]),
                     ])
 
-            timeStamp: 'uint' = None
-            logId: 'uint' = None
-            logLength: 'uint' = None
-            logPayload: 'typing.List[uint]' = None
+            timeStamp: 'uint' = 0
+            logId: 'uint' = 0
+            logLength: 'uint' = 0
+            logPayload: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class LogQueueRequest(ClusterCommand):
@@ -27195,8 +27260,8 @@ class ApplianceStatistics(Cluster):
                             Label="logIds", Tag=1, Type=typing.List[uint]),
                     ])
 
-            logQueueSize: 'uint' = None
-            logIds: 'typing.List[uint]' = None
+            logQueueSize: 'uint' = 0
+            logIds: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class StatisticsAvailable(ClusterCommand):
@@ -27214,8 +27279,8 @@ class ApplianceStatistics(Cluster):
                             Label="logIds", Tag=1, Type=typing.List[uint]),
                     ])
 
-            logQueueSize: 'uint' = None
-            logIds: 'typing.List[uint]' = None
+            logQueueSize: 'uint' = 0
+            logIds: 'typing.List[uint]' = field(default_factory=lambda: [])
 
     class Attributes:
         @dataclass
@@ -27232,7 +27297,7 @@ class ApplianceStatistics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class LogQueueMaxSize(ClusterAttributeDescriptor):
@@ -27248,7 +27313,7 @@ class ApplianceStatistics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -27280,7 +27345,7 @@ class ApplianceStatistics(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -27308,10 +27373,11 @@ class ElectricalMeasurement(Cluster):
                             Label="listOfAttributes", Tag=3, Type=typing.List[uint]),
                     ])
 
-            profileCount: 'uint' = None
-            profileIntervalPeriod: 'uint' = None
-            maxNumberOfIntervals: 'uint' = None
-            listOfAttributes: 'typing.List[uint]' = None
+            profileCount: 'uint' = 0
+            profileIntervalPeriod: 'uint' = 0
+            maxNumberOfIntervals: 'uint' = 0
+            listOfAttributes: 'typing.List[uint]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class GetProfileInfoCommand(ClusterCommand):
@@ -27349,12 +27415,12 @@ class ElectricalMeasurement(Cluster):
                             Label="intervals", Tag=5, Type=typing.List[uint]),
                     ])
 
-            startTime: 'uint' = None
-            status: 'uint' = None
-            profileIntervalPeriod: 'uint' = None
-            numberOfIntervalsDelivered: 'uint' = None
-            attributeId: 'uint' = None
-            intervals: 'typing.List[uint]' = None
+            startTime: 'uint' = 0
+            status: 'uint' = 0
+            profileIntervalPeriod: 'uint' = 0
+            numberOfIntervalsDelivered: 'uint' = 0
+            attributeId: 'uint' = 0
+            intervals: 'typing.List[uint]' = field(default_factory=lambda: [])
 
         @dataclass
         class GetMeasurementProfileCommand(ClusterCommand):
@@ -27374,9 +27440,9 @@ class ElectricalMeasurement(Cluster):
                             Label="numberOfIntervals", Tag=2, Type=uint),
                     ])
 
-            attributeId: 'uint' = None
-            startTime: 'uint' = None
-            numberOfIntervals: 'uint' = None
+            attributeId: 'uint' = 0
+            startTime: 'uint' = 0
+            numberOfIntervals: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -29457,7 +29523,7 @@ class ElectricalMeasurement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -29485,10 +29551,10 @@ class Binding(Cluster):
                             Label="clusterId", Tag=3, Type=uint),
                     ])
 
-            nodeId: 'uint' = None
-            groupId: 'uint' = None
-            endpointId: 'uint' = None
-            clusterId: 'uint' = None
+            nodeId: 'uint' = 0
+            groupId: 'uint' = 0
+            endpointId: 'uint' = 0
+            clusterId: 'uint' = 0
 
         @dataclass
         class Unbind(ClusterCommand):
@@ -29510,10 +29576,10 @@ class Binding(Cluster):
                             Label="clusterId", Tag=3, Type=uint),
                     ])
 
-            nodeId: 'uint' = None
-            groupId: 'uint' = None
-            endpointId: 'uint' = None
-            clusterId: 'uint' = None
+            nodeId: 'uint' = 0
+            groupId: 'uint' = 0
+            endpointId: 'uint' = 0
+            clusterId: 'uint' = 0
 
     class Attributes:
         @dataclass
@@ -29546,7 +29612,7 @@ class Binding(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
@@ -29616,7 +29682,8 @@ class GroupKeyManagement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[GroupKeyManagement.Structs.GroupState])
 
-            value: 'typing.List[GroupKeyManagement.Structs.GroupState]' = None
+            value: 'typing.List[GroupKeyManagement.Structs.GroupState]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class GroupKeys(ClusterAttributeDescriptor):
@@ -29632,7 +29699,8 @@ class GroupKeyManagement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[GroupKeyManagement.Structs.GroupKey])
 
-            value: 'typing.List[GroupKeyManagement.Structs.GroupKey]' = None
+            value: 'typing.List[GroupKeyManagement.Structs.GroupKey]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -29664,4 +29732,4 @@ class GroupKeyManagement(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
