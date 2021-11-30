@@ -439,7 +439,8 @@ CHIP_ERROR DeviceController::ComputePASEVerifier(uint32_t iterations, uint32_t s
 
 CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint16_t iteration,
                                                                  uint16_t discriminator, uint8_t option,
-                                                                 Callback::Callback<OnOpenCommissioningWindow> * callback)
+                                                                 Callback::Callback<OnOpenCommissioningWindow> * callback,
+                                                                 bool readVIDPIDAttributes)
 {
     mSetupPayload = SetupPayload();
 
@@ -468,7 +469,7 @@ CHIP_ERROR DeviceController::OpenCommissioningWindowWithCallback(NodeId deviceId
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    if (callback != nullptr && mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode)
+    if (callback != nullptr && mCommissioningWindowOption != CommissioningWindowOption::kOriginalSetupCode && readVIDPIDAttributes)
     {
         OperationalDeviceProxy * device = mCASESessionManager->FindExistingSession(mDeviceWithCommissioningWindowOpen);
         VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
