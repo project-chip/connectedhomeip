@@ -36311,6 +36311,7 @@ private:
 | * TestSpecific                                                      |   0x02 |
 | * TestStructArgumentRequest                                         |   0x07 |
 | * TestUnknownCommand                                                |   0x03 |
+| * TimedInvokeRequest                                                |   0x12 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * Boolean                                                           | 0x0000 |
@@ -36355,6 +36356,7 @@ private:
 | * RangeRestrictedInt8s                                              | 0x0027 |
 | * RangeRestrictedInt16u                                             | 0x0028 |
 | * RangeRestrictedInt16s                                             | 0x0029 |
+| * TimedWriteBoolean                                                 | 0x0030 |
 | * Unsupported                                                       | 0x00FF |
 | * NullableBoolean                                                   | 0x8000 |
 | * NullableBitmap8                                                   | 0x8001 |
@@ -36733,6 +36735,25 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestUnknownCommand::Type mRequest;
+};
+
+/*
+ * Command TimedInvokeRequest
+ */
+class TestClusterTimedInvokeRequest : public ModelCommand
+{
+public:
+    TestClusterTimedInvokeRequest() : ModelCommand("timed-invoke-request") { ModelCommand::AddArguments(); }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000012) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type mRequest;
 };
 
 /*
@@ -40922,6 +40943,73 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute TimedWriteBoolean
+ */
+class ReadTestClusterTimedWriteBoolean : public ModelCommand
+{
+public:
+    ReadTestClusterTimedWriteBoolean() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "timed-write-boolean");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterTimedWriteBoolean()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeTimedWriteBoolean(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+class WriteTestClusterTimedWriteBoolean : public ModelCommand
+{
+public:
+    WriteTestClusterTimedWriteBoolean() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "timed-write-boolean");
+        AddArgument("attr-value", 0, 1, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteTestClusterTimedWriteBoolean()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttributeTimedWriteBoolean(onSuccessCallback->Cancel(), onFailureCallback->Cancel(), mValue);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    bool mValue;
 };
 
 /*
@@ -57201,6 +57289,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<TestClusterTestSpecific>(),                            //
         make_unique<TestClusterTestStructArgumentRequest>(),               //
         make_unique<TestClusterTestUnknownCommand>(),                      //
+        make_unique<TestClusterTimedInvokeRequest>(),                      //
         make_unique<ReadTestClusterBoolean>(),                             //
         make_unique<WriteTestClusterBoolean>(),                            //
         make_unique<ReportTestClusterBoolean>(),                           //
@@ -57307,6 +57396,8 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterRangeRestrictedInt16s>(),               //
         make_unique<WriteTestClusterRangeRestrictedInt16s>(),              //
         make_unique<ReportTestClusterRangeRestrictedInt16s>(),             //
+        make_unique<ReadTestClusterTimedWriteBoolean>(),                   //
+        make_unique<WriteTestClusterTimedWriteBoolean>(),                  //
         make_unique<ReadTestClusterUnsupported>(),                         //
         make_unique<WriteTestClusterUnsupported>(),                        //
         make_unique<ReportTestClusterUnsupported>(),                       //
