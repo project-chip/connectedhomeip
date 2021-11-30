@@ -171,6 +171,7 @@ CHIPDevice * GetConnectedDevice()
 {{#unless (isStrEqual "Basic" name)}}
 {{#unless (isStrEqual "Thermostat" name)}}
 {{#chip_server_cluster_attributes}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 - (void)testSendCluster{{asUpperCamelCase parent.name}}ReadAttribute{{asUpperCamelCase name}}WithCompletionHandler
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"{{asUpperCamelCase parent.name}}ReadAttribute{{asUpperCamelCase name}}WithCompletionHandler"];
@@ -209,6 +210,7 @@ CHIPDevice * GetConnectedDevice()
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/unless}}
 {{/unless}}

@@ -76,6 +76,7 @@ exit:
 {{/chip_cluster_commands}}
 // {{asUpperCamelCase name}} Cluster Attributes
 {{#chip_server_cluster_attributes}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReadAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     app::AttributePathParams attributePath;
@@ -115,6 +116,7 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReportAttribute{{asUpperCame
 
 {{/unless}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 
 {{/chip_client_clusters}}
