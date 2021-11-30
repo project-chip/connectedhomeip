@@ -30,7 +30,7 @@ jobs:
 
         strategy:
           matrix:
-             build_variant: [no-ble-tsan, no-ble-asan]
+             build_variant: [no-ble-tsan]
              chip_tool: [, -same-event-loop]
         env:
             BUILD_VARIANT: ${{matrix.build_variant}}
