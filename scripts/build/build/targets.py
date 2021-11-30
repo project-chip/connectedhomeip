@@ -113,15 +113,15 @@ class HostBuildVariant:
     def __init__(self, name: str, validator=AcceptAnyName(), conflicts: List[str] = [], **buildargs):
         self.name = name
         self.validator = validator
-        self.conflicts = []
+        self.conflicts = conflictst
         self.buildargs = buildargs
+
 
 def HasConflicts(items: List[HostBuildVariant]) -> bool:
     for a, b in combinations(items, 2):
         if (a.name in b.conflicts) or (b.name in a.conflicts):
-           return True
+            return True
     return False
-
 
 
 def HostTargets():
