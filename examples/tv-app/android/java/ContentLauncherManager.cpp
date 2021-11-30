@@ -176,7 +176,7 @@ CHIP_ERROR ContentLauncherManager::GetAcceptsHeader(chip::app::AttributeValueEnc
             {
                 JniUtfString header(env, acceptsheader);
 
-                chip::ByteSpan bHeader((const uint8_t *) (header.c_str()), (size_t) (header.size()));
+                chip::ByteSpan bHeader((const uint8_t *) (header.c_str()), (size_t)(header.size()));
                 ReturnErrorOnFailure(encoder.Encode(bHeader));
 
                 // Todo: should be chanSpan?
