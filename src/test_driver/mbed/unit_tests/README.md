@@ -51,8 +51,8 @@ build target and its requirements.
 > devcontainer is the recommended way to interact with Arm Mbed-OS port of the
 > Matter Project.**
 >
-> **Please read this [README.md](../../..//docs/VSCODE_DEVELOPMENT.md) for more
-> information about using VSCode in container.**
+> **Please read this [README.md](../../../../docs/VSCODE_DEVELOPMENT.md) for
+> more information about using VSCode in container.**
 
 To initialize the development environment, download all registered sub-modules
 and activate the environment:
@@ -183,7 +183,7 @@ devices:
 
 -   More details and guidelines about porting new hardware into the Matter
     project with Mbed OS can be found in
-    [MbedNewTarget](../../../docs/guides/mbedos_add_new_target.md)
+    [MbedNewTarget](../../../../docs/guides/mbedos_add_new_target.md)
 -   Some useful information about HW platform specific settings can be found in
     `test_driver/mbed/mbed_app.json`.  
     Information about this file syntax and its meaning in mbed-os project can be

@@ -167,7 +167,7 @@
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
-                    "${workspaceFolder}/src/test_driver/mbed/build"
+                    "${workspaceFolder}/src/test_driver/mbed/unit_tests/build"
                 ]
             }
         }
