@@ -5071,25 +5071,25 @@ using namespace chip::app::Clusters;
             using TypeInfo = PowerSourceConfiguration::Attributes::Sources::TypeInfo;
             TypeInfo::Type cppValue;
             {
-                using ListType = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType = ListMemberTypeGetter<ListType>::Type;
+                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
+                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
                 if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType>(value.count);
+                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
                     if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
                         return CHIP_ERROR_INVALID_ARGUMENT;
                     }
                     listFreer.add(listHolder_0);
-                    for (size_t i = 0; i < value.count; ++i) {
-                        if (![value[i] isKindOfClass:[NSNumber class]]) {
+                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
+                        if (![value[i_0] isKindOfClass:[NSNumber class]]) {
                             // Wrong kind of value.
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
-                        auto element_0 = (NSNumber *) value[i];
-                        listHolder_0->mList[i] = element_0.unsignedCharValue;
+                        auto element_0 = (NSNumber *) value[i_0];
+                        listHolder_0->mList[i_0] = element_0.unsignedCharValue;
                     }
-                    cppValue = ListType(listHolder_0->mList, value.count);
+                    cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {
-                    cppValue = ListType();
+                    cppValue = ListType_0();
                 }
             }
             auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
