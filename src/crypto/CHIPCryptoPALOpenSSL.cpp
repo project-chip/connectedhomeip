@@ -1703,16 +1703,16 @@ exit:
     return err;
 }
 
-CHIP_ERROR IsCertificateTimestampValid(CertificateValidityType validityType, const ByteSpan & referenceCertificate,
-                                       const ByteSpan & toBeEvaluatedCertificate)
+CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, const ByteSpan & toBeEvaluatedCertificate)
 {
     CHIP_ERROR error                                = CHIP_NO_ERROR;
     X509 * x509ReferenceCertificate                 = nullptr;
     X509 * x509toBeEvaluatedCertificate             = nullptr;
     const unsigned char * pReferenceCertificate     = referenceCertificate.data();
     const unsigned char * pToBeEvaluatedCertificate = toBeEvaluatedCertificate.data();
-    ASN1_TIME * timeA                               = nullptr;
-    ASN1_TIME * timeB                               = nullptr;
+    ASN1_TIME * refNotBeforeTime                    = nullptr;
+    ASN1_TIME * tbeNotBeforeTime                    = nullptr;
+    ASN1_TIME * tbeNotAfterTime                     = nullptr;
     int result                                      = 0;
 
     VerifyOrReturnError(!referenceCertificate.empty() && !toBeEvaluatedCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -1723,30 +1723,56 @@ CHIP_ERROR IsCertificateTimestampValid(CertificateValidityType validityType, con
     x509toBeEvaluatedCertificate = d2i_X509(NULL, &pToBeEvaluatedCertificate, static_cast<long>(toBeEvaluatedCertificate.size()));
     VerifyOrExit(x509toBeEvaluatedCertificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
 
-    switch (validityType)
-    {
-    case CertificateValidityType::kNotAfter:
-        timeB = X509_get_notAfter(x509ReferenceCertificate);
-        timeA = X509_get_notAfter(x509toBeEvaluatedCertificate);
-        break;
-    case CertificateValidityType::kNotBefore:
-        timeA = X509_get_notBefore(x509ReferenceCertificate);
-        timeB = X509_get_notBefore(x509toBeEvaluatedCertificate);
-        break;
-    default:
-        SuccessOrExit(error = CHIP_ERROR_INVALID_ARGUMENT);
-    }
+    refNotBeforeTime = X509_get_notBefore(x509ReferenceCertificate);
+    tbeNotBeforeTime = X509_get_notBefore(x509toBeEvaluatedCertificate);
+    tbeNotAfterTime  = X509_get_notAfter(x509toBeEvaluatedCertificate);
+    VerifyOrExit(refNotBeforeTime && tbeNotBeforeTime && tbeNotAfterTime, error = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(timeA && timeB, error = CHIP_ERROR_INTERNAL);
+    // TODO: Handle PAA/PAI re-issue and enable below time validations
+    // result = ASN1_TIME_compare(refNotBeforeTime, tbeNotBeforeTime);
+    // check if referenceCertificate is issued at or after tbeCertificate's notBefore timestamp
+    // VerifyOrExit(result >= 0, error = CHIP_ERROR_CERT_EXPIRED);
 
-    result = ASN1_TIME_compare(timeA, timeB);
-    // check if tbeCertificate is valid before/during referenceCertificate's notBefore timestamp.
-    // check if tbeCertificate is valid after/during referenceCertificate's notAfter timestamp.
-    VerifyOrExit(result >= 0, error = CHIP_ERROR_CERT_EXPIRED);
+    // result = ASN1_TIME_compare(refNotBeforeTime, tbeNotAfterTime);
+    // check if referenceCertificate is issued at or before tbeCertificate's notAfter timestamp
+    // VerifyOrExit(result <= 0, error = CHIP_ERROR_CERT_EXPIRED);
 
 exit:
     X509_free(x509ReferenceCertificate);
     X509_free(x509toBeEvaluatedCertificate);
+
+    return error;
+}
+
+CHIP_ERROR IsCertificateValid(const ByteSpan & certificate)
+{
+    CHIP_ERROR error                   = CHIP_NO_ERROR;
+    X509 * x509Certificate             = nullptr;
+    const unsigned char * pCertificate = certificate.data();
+    ASN1_TIME * time                   = nullptr;
+    int result                         = 0;
+
+    VerifyOrReturnError(!certificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    x509Certificate = d2i_X509(NULL, &pCertificate, static_cast<long>(certificate.size()));
+    VerifyOrExit(x509Certificate != nullptr, error = CHIP_ERROR_NO_MEMORY);
+
+    time = X509_get_notBefore(x509Certificate);
+    VerifyOrExit(time, error = CHIP_ERROR_INTERNAL);
+
+    result = X509_cmp_current_time(time);
+    // check if certificate's notBefore timestamp is earlier than or equal to current time.
+    VerifyOrExit(result == -1, error = CHIP_ERROR_CERT_EXPIRED);
+
+    time = X509_get_notAfter(x509Certificate);
+    VerifyOrExit(time, error = CHIP_ERROR_INTERNAL);
+
+    result = X509_cmp_current_time(time);
+    // check if certificate's notAfter timestamp is later than current time.
+    VerifyOrExit(result == 1, error = CHIP_ERROR_CERT_EXPIRED);
+
+exit:
+    X509_free(x509Certificate);
 
     return error;
 }
