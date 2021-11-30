@@ -29,20 +29,21 @@ const templateUtil = require(zapPath + 'dist/src-electron/generator/template-uti
 const { getClusters, getCommands, getAttributes, isTestOnlyCluster } = require('./simulated-clusters/SimulatedClusters.js');
 const { asBlocks }                                                   = require('./ClustersHelper.js');
 
-const kClusterName       = 'cluster';
-const kEndpointName      = 'endpoint';
-const kGroupId           = 'groupId';
-const kCommandName       = 'command';
-const kWaitCommandName   = 'wait';
-const kIndexName         = 'index';
-const kValuesName        = 'values';
-const kConstraintsName   = 'constraints';
-const kArgumentsName     = 'arguments';
-const kResponseName      = 'response';
-const kDisabledName      = 'disabled';
-const kResponseErrorName = 'error';
-const kPICSName          = 'PICS';
-const kSaveAsName        = 'saveAs';
+const kClusterName            = 'cluster';
+const kEndpointName           = 'endpoint';
+const kGroupId                = 'groupId';
+const kCommandName            = 'command';
+const kWaitCommandName        = 'wait';
+const kIndexName              = 'index';
+const kValuesName             = 'values';
+const kConstraintsName        = 'constraints';
+const kArgumentsName          = 'arguments';
+const kResponseName           = 'response';
+const kDisabledName           = 'disabled';
+const kResponseErrorName      = 'error';
+const kResponseWrongErrorName = 'errorWrongValue';
+const kPICSName               = 'PICS';
+const kSaveAsName             = 'saveAs';
 
 class NullObject {
   toString()
@@ -183,13 +184,23 @@ function setDefaultArguments(test)
   delete test[kArgumentsName].value;
 }
 
+function ensureValidError(response, errorName)
+{
+  if (isNaN(response[errorName])) {
+    response[errorName] = "EMBER_ZCL_STATUS_" + response[errorName];
+  }
+}
+
 function setDefaultResponse(test)
 {
   const defaultResponse = {};
   setDefault(test, kResponseName, defaultResponse);
 
+  const hasResponseError = (kResponseErrorName in test[kResponseName]) || (kResponseWrongErrorName in test[kResponseName]);
+
   const defaultResponseError = 0;
   setDefault(test[kResponseName], kResponseErrorName, defaultResponseError);
+  setDefault(test[kResponseName], kResponseWrongErrorName, defaultResponseError);
 
   const defaultResponseValues = [];
   setDefault(test[kResponseName], kValuesName, defaultResponseValues);
@@ -201,7 +212,6 @@ function setDefaultResponse(test)
   setDefault(test[kResponseName], kSaveAsName, defaultResponseSaveAs);
 
   const hasResponseValue              = 'value' in test[kResponseName];
-  const hasResponseError              = 'error' in test[kResponseName];
   const hasResponseConstraints        = 'constraints' in test[kResponseName] && Object.keys(test[kResponseName].constraints).length;
   const hasResponseValueOrConstraints = hasResponseValue || hasResponseConstraints;
 
@@ -217,6 +227,9 @@ function setDefaultResponse(test)
         '      - value: 7\n';
     throwError(test, errorStr);
   }
+
+  ensureValidError(test[kResponseName], kResponseErrorName);
+  ensureValidError(test[kResponseName], kResponseWrongErrorName);
 
   // Step that waits for a particular event does not requires constraints nor expected values.
   if (test.isWait) {

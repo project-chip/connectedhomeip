@@ -138,5 +138,5 @@ tests:
               - name: "keyCode"
                 value: 0xFF
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
     # TODO: Add Step 10 (TH sends <Any Navigation> Keycode to DUT, when DUT in a processing state)

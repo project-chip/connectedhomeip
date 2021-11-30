@@ -38,7 +38,7 @@ tests:
       arguments:
           value: 201
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back global attribute: ClusterRevision"
       command: "readAttribute"
@@ -65,7 +65,7 @@ tests:
       arguments:
           value: 32769
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "3b: reads back global attribute: FeatureMap"
       command: "readAttribute"

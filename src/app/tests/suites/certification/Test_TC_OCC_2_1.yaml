@@ -42,7 +42,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: Occupancy"
       command: "readAttribute"
@@ -74,7 +74,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: OccupancySensorType"
       command: "readAttribute"
@@ -106,7 +106,7 @@ tests:
       arguments:
           value: 1
       response:
-          error: 0x88 # UNSUPPORTED_WRITE
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: OccupancySensorTypeBitmap"
       command: "readAttribute"

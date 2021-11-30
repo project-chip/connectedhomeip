@@ -26,6 +26,8 @@
 
 #import "CHIPErrorTestUtils.h"
 
+#import <app/util/af-enums.h>
+
 // system dependencies
 #import <XCTest/XCTest.h>
 
@@ -221,7 +223,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -479,7 +481,7 @@ CHIPDevice * GetConnectedDevice()
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write the default values to mandatory non-global attribute: StatusFlags Error: %@", err);
 
-                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                   [expectation fulfill];
                               }];
 
@@ -745,7 +747,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -836,7 +838,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"Write the default value to mandatory non-global attribute: StateValue Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -885,7 +887,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -956,7 +958,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"Write the default value to mandatory attribute: CurrentHue Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -1046,13 +1048,14 @@ CHIPDevice * GetConnectedDevice()
 
     id currentSaturationArgument;
     currentSaturationArgument = [NSNumber numberWithUnsignedChar:0];
-    [cluster writeAttributeCurrentSaturationWithValue:currentSaturationArgument
-                                    completionHandler:^(NSError * _Nullable err) {
-                                        NSLog(@"Write the default value to mandatory attribute: CurrentSaturation Error: %@", err);
+    [cluster
+        writeAttributeCurrentSaturationWithValue:currentSaturationArgument
+                               completionHandler:^(NSError * _Nullable err) {
+                                   NSLog(@"Write the default value to mandatory attribute: CurrentSaturation Error: %@", err);
 
-                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
-                                        [expectation fulfill];
-                                    }];
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
+                                   [expectation fulfill];
+                               }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1143,7 +1146,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write the default value to mandatory attribute: CurrentX Error: %@", err);
 
-                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                [expectation fulfill];
                            }];
 
@@ -1237,7 +1240,7 @@ CHIPDevice * GetConnectedDevice()
                            completionHandler:^(NSError * _Nullable err) {
                                NSLog(@"Write the default values to mandatory attribute: CurrentY Error: %@", err);
 
-                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                [expectation fulfill];
                            }];
 
@@ -1465,7 +1468,8 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write the default values to mandatory attribute: EnhancedCurrentHue Error: %@", err);
 
-                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                    XCTAssertEqual(
+                                        [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                     [expectation fulfill];
                                 }];
 
@@ -1569,13 +1573,14 @@ CHIPDevice * GetConnectedDevice()
 
     id colorLoopActiveArgument;
     colorLoopActiveArgument = [NSNumber numberWithUnsignedChar:0];
-    [cluster writeAttributeColorLoopActiveWithValue:colorLoopActiveArgument
-                                  completionHandler:^(NSError * _Nullable err) {
-                                      NSLog(@"Write the default values to mandatory attribute: ColorLoopActive Error: %@", err);
+    [cluster
+        writeAttributeColorLoopActiveWithValue:colorLoopActiveArgument
+                             completionHandler:^(NSError * _Nullable err) {
+                                 NSLog(@"Write the default values to mandatory attribute: ColorLoopActive Error: %@", err);
 
-                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
-                                      [expectation fulfill];
-                                  }];
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
+                                 [expectation fulfill];
+                             }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1663,7 +1668,8 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write the default values to mandatory attribute: ColorLoopDirection Error: %@", err);
 
-                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                    XCTAssertEqual(
+                                        [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                     [expectation fulfill];
                                 }];
 
@@ -1748,13 +1754,14 @@ CHIPDevice * GetConnectedDevice()
 
     id colorLoopTimeArgument;
     colorLoopTimeArgument = [NSNumber numberWithUnsignedShort:25U];
-    [cluster writeAttributeColorLoopTimeWithValue:colorLoopTimeArgument
-                                completionHandler:^(NSError * _Nullable err) {
-                                    NSLog(@"Write the default values to mandatory attribute: ColorLoopTime Error: %@", err);
+    [cluster
+        writeAttributeColorLoopTimeWithValue:colorLoopTimeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"Write the default values to mandatory attribute: ColorLoopTime Error: %@", err);
 
-                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
-                                    [expectation fulfill];
-                                }];
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
+                               [expectation fulfill];
+                           }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -1844,7 +1851,8 @@ CHIPDevice * GetConnectedDevice()
                                                       @"Error: %@",
                                                     err);
 
-                                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                    EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                 [expectation fulfill];
                                             }];
 
@@ -1937,7 +1945,8 @@ CHIPDevice * GetConnectedDevice()
                                                        @"ColorLoopStoredEnhancedHue Error: %@",
                                                      err);
 
-                                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                     EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                  [expectation fulfill];
                                              }];
 
@@ -2028,13 +2037,14 @@ CHIPDevice * GetConnectedDevice()
 
     id colorCapabilitiesArgument;
     colorCapabilitiesArgument = [NSNumber numberWithUnsignedShort:0U];
-    [cluster writeAttributeColorCapabilitiesWithValue:colorCapabilitiesArgument
-                                    completionHandler:^(NSError * _Nullable err) {
-                                        NSLog(@"Write the default values to mandatory attribute: ColorCapabilities Error: %@", err);
+    [cluster
+        writeAttributeColorCapabilitiesWithValue:colorCapabilitiesArgument
+                               completionHandler:^(NSError * _Nullable err) {
+                                   NSLog(@"Write the default values to mandatory attribute: ColorCapabilities Error: %@", err);
 
-                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
-                                        [expectation fulfill];
-                                    }];
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
+                                   [expectation fulfill];
+                               }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -2130,7 +2140,8 @@ CHIPDevice * GetConnectedDevice()
                                           @"Write the default values to mandatory  attribute: ColorTempPhysicalMinMireds Error: %@",
                                           err);
 
-                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                      XCTAssertEqual(
+                                          [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                       [expectation fulfill];
                                   }];
 
@@ -2229,7 +2240,8 @@ CHIPDevice * GetConnectedDevice()
                                           @"Write the default values to mandatory attribute: ColorTempPhysicalMaxMireds Error: %@",
                                           err);
 
-                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                      XCTAssertEqual(
+                                          [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                       [expectation fulfill];
                                   }];
 
@@ -2299,7 +2311,8 @@ CHIPDevice * GetConnectedDevice()
                                                             @"CoupleColorTempToLevelMinMireds Error: %@",
                                                           err);
 
-                                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                          EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                       [expectation fulfill];
                                                   }];
 
@@ -2468,13 +2481,14 @@ CHIPDevice * GetConnectedDevice()
 
     id remainingTimeArgument;
     remainingTimeArgument = [NSNumber numberWithUnsignedShort:0U];
-    [cluster writeAttributeRemainingTimeWithValue:remainingTimeArgument
-                                completionHandler:^(NSError * _Nullable err) {
-                                    NSLog(@"Write the default values to optional attribute: RemainingTime Error: %@", err);
+    [cluster
+        writeAttributeRemainingTimeWithValue:remainingTimeArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"Write the default values to optional attribute: RemainingTime Error: %@", err);
 
-                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
-                                    [expectation fulfill];
-                                }];
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
+                               [expectation fulfill];
+                           }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -2538,13 +2552,14 @@ CHIPDevice * GetConnectedDevice()
 
     id driftCompensationArgument;
     driftCompensationArgument = [NSNumber numberWithUnsignedChar:0];
-    [cluster writeAttributeDriftCompensationWithValue:driftCompensationArgument
-                                    completionHandler:^(NSError * _Nullable err) {
-                                        NSLog(@"Write the default values to optional attribute: DriftCompensation Error: %@", err);
+    [cluster
+        writeAttributeDriftCompensationWithValue:driftCompensationArgument
+                               completionHandler:^(NSError * _Nullable err) {
+                                   NSLog(@"Write the default values to optional attribute: DriftCompensation Error: %@", err);
 
-                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
-                                        [expectation fulfill];
-                                    }];
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
+                                   [expectation fulfill];
+                               }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -2631,13 +2646,14 @@ CHIPDevice * GetConnectedDevice()
 
     id numberOfPrimariesArgument;
     numberOfPrimariesArgument = [NSNumber numberWithUnsignedChar:0];
-    [cluster writeAttributeNumberOfPrimariesWithValue:numberOfPrimariesArgument
-                                    completionHandler:^(NSError * _Nullable err) {
-                                        NSLog(@"Write the default mandatory attribute: NumberOfPrimaries Error: %@", err);
+    [cluster
+        writeAttributeNumberOfPrimariesWithValue:numberOfPrimariesArgument
+                               completionHandler:^(NSError * _Nullable err) {
+                                   NSLog(@"Write the default mandatory attribute: NumberOfPrimaries Error: %@", err);
 
-                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
-                                        [expectation fulfill];
-                                    }];
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
+                                   [expectation fulfill];
+                               }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -2704,7 +2720,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary1X Error: %@", err);
 
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                 [expectation fulfill];
                             }];
 
@@ -2773,7 +2789,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary1Y Error: %@", err);
 
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                 [expectation fulfill];
                             }];
 
@@ -2861,7 +2877,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary2X Error: %@", err);
 
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                 [expectation fulfill];
                             }];
 
@@ -2930,7 +2946,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary2Y Error: %@", err);
 
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                 [expectation fulfill];
                             }];
 
@@ -3018,7 +3034,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary3X Error: %@", err);
 
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                 [expectation fulfill];
                             }];
 
@@ -3087,7 +3103,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary3Y Error: %@", err);
 
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                 [expectation fulfill];
                             }];
 
@@ -3175,7 +3191,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary4X Error: %@", err);
 
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                 [expectation fulfill];
                             }];
 
@@ -3244,7 +3260,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary4Y Error: %@", err);
 
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                 [expectation fulfill];
                             }];
 
@@ -3332,7 +3348,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary5X Error: %@", err);
 
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                 [expectation fulfill];
                             }];
 
@@ -3401,7 +3417,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary5Y Error: %@", err);
 
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                 [expectation fulfill];
                             }];
 
@@ -3489,7 +3505,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary6X Error: %@", err);
 
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                 [expectation fulfill];
                             }];
 
@@ -3558,7 +3574,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Write the default mandatory attribute: Primary6Y Error: %@", err);
 
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                 [expectation fulfill];
                             }];
 
@@ -9100,7 +9116,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -9148,7 +9164,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -9224,13 +9240,14 @@ CHIPDevice * GetConnectedDevice()
 
     id minMeasuredValueArgument;
     minMeasuredValueArgument = [NSNumber numberWithShort:0];
-    [cluster writeAttributeMinMeasuredValueWithValue:minMeasuredValueArgument
-                                   completionHandler:^(NSError * _Nullable err) {
-                                       NSLog(@"write the default value to optional attribute: MinMeasuredValue Error: %@", err);
+    [cluster
+        writeAttributeMinMeasuredValueWithValue:minMeasuredValueArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"write the default value to optional attribute: MinMeasuredValue Error: %@", err);
 
-                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
-                                       [expectation fulfill];
-                                   }];
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
+                                  [expectation fulfill];
+                              }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -9246,13 +9263,14 @@ CHIPDevice * GetConnectedDevice()
 
     id maxMeasuredValueArgument;
     maxMeasuredValueArgument = [NSNumber numberWithShort:0];
-    [cluster writeAttributeMaxMeasuredValueWithValue:maxMeasuredValueArgument
-                                   completionHandler:^(NSError * _Nullable err) {
-                                       NSLog(@"write the default value to optional attribute: MaxMeasuredValue Error: %@", err);
+    [cluster
+        writeAttributeMaxMeasuredValueWithValue:maxMeasuredValueArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"write the default value to optional attribute: MaxMeasuredValue Error: %@", err);
 
-                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
-                                       [expectation fulfill];
-                                   }];
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
+                                  [expectation fulfill];
+                              }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -9398,7 +9416,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -9448,7 +9466,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -10359,7 +10377,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -10427,7 +10445,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -10474,7 +10492,7 @@ CHIPDevice * GetConnectedDevice()
                             completionHandler:^(NSError * _Nullable err) {
                                 NSLog(@"Writes the respective default value to mandatory attribute: Occupancy Error: %@", err);
 
-                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                 [expectation fulfill];
                             }];
 
@@ -10547,7 +10565,8 @@ CHIPDevice * GetConnectedDevice()
                                                 @"Error: %@",
                                               err);
 
-                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                          XCTAssertEqual(
+                                              [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                           [expectation fulfill];
                                       }];
 
@@ -10624,7 +10643,8 @@ CHIPDevice * GetConnectedDevice()
                                                       @"OccupancySensorTypeBitmap Error: %@",
                                                     err);
 
-                                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                    EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                 [expectation fulfill];
                                             }];
 
@@ -10736,7 +10756,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -10806,7 +10826,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to optional global attribute: FeatureMap Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -12491,7 +12511,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"Write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -12553,13 +12573,14 @@ CHIPDevice * GetConnectedDevice()
 
     id measuredValueArgument;
     measuredValueArgument = [NSNumber numberWithShort:0];
-    [cluster writeAttributeMeasuredValueWithValue:measuredValueArgument
-                                completionHandler:^(NSError * _Nullable err) {
-                                    NSLog(@"Write the default values to mandatory attribute: MeasuredValue Error: %@", err);
+    [cluster
+        writeAttributeMeasuredValueWithValue:measuredValueArgument
+                           completionHandler:^(NSError * _Nullable err) {
+                               NSLog(@"Write the default values to mandatory attribute: MeasuredValue Error: %@", err);
 
-                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
-                                    [expectation fulfill];
-                                }];
+                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
+                               [expectation fulfill];
+                           }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -12619,13 +12640,14 @@ CHIPDevice * GetConnectedDevice()
 
     id minMeasuredValueArgument;
     minMeasuredValueArgument = [NSNumber numberWithShort:0];
-    [cluster writeAttributeMinMeasuredValueWithValue:minMeasuredValueArgument
-                                   completionHandler:^(NSError * _Nullable err) {
-                                       NSLog(@"Write the default values to mandatory attribute: MinMeasuredValue Error: %@", err);
+    [cluster
+        writeAttributeMinMeasuredValueWithValue:minMeasuredValueArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write the default values to mandatory attribute: MinMeasuredValue Error: %@", err);
 
-                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
-                                       [expectation fulfill];
-                                   }];
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
+                                  [expectation fulfill];
+                              }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -12685,13 +12707,14 @@ CHIPDevice * GetConnectedDevice()
 
     id maxMeasuredValueArgument;
     maxMeasuredValueArgument = [NSNumber numberWithShort:0];
-    [cluster writeAttributeMaxMeasuredValueWithValue:maxMeasuredValueArgument
-                                   completionHandler:^(NSError * _Nullable err) {
-                                       NSLog(@"Write the default values to mandatory attribute: MaxMeasuredValue Error: %@", err);
+    [cluster
+        writeAttributeMaxMeasuredValueWithValue:maxMeasuredValueArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write the default values to mandatory attribute: MaxMeasuredValue Error: %@", err);
 
-                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
-                                       [expectation fulfill];
-                                   }];
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
+                                  [expectation fulfill];
+                              }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -12739,7 +12762,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -13061,7 +13084,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -13204,7 +13227,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -13319,7 +13342,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -13418,7 +13441,8 @@ CHIPDevice * GetConnectedDevice()
                                                     @"AbsMinHeatSetpointLimit Error: %@",
                                                   err);
 
-                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                              XCTAssertEqual(
+                                                  [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                               [expectation fulfill];
                                           }];
 
@@ -13521,7 +13545,8 @@ CHIPDevice * GetConnectedDevice()
                                                     @"AbsMaxHeatSetpointLimit Error: %@",
                                                   err);
 
-                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                              XCTAssertEqual(
+                                                  [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                               [expectation fulfill];
                                           }];
 
@@ -13624,7 +13649,8 @@ CHIPDevice * GetConnectedDevice()
                                                     @"AbsMinCoolSetpointLimit Error: %@",
                                                   err);
 
-                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                              XCTAssertEqual(
+                                                  [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                               [expectation fulfill];
                                           }];
 
@@ -13727,7 +13753,8 @@ CHIPDevice * GetConnectedDevice()
                                                     @"AbsMaxCoolSetpointLimit Error: %@",
                                                   err);
 
-                                              XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                              XCTAssertEqual(
+                                                  [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                               [expectation fulfill];
                                           }];
 
@@ -14721,7 +14748,7 @@ CHIPDevice * GetConnectedDevice()
                                   NSLog(@"Writes the respective default value to optional attributes to DUT: StartOfWeek Error: %@",
                                       err);
 
-                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                   [expectation fulfill];
                               }];
 
@@ -14789,7 +14816,8 @@ CHIPDevice * GetConnectedDevice()
                                                       @"NumberOfWeeklyTransitions Error: %@",
                                                     err);
 
-                                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                    EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                 [expectation fulfill];
                                             }];
 
@@ -14833,7 +14861,8 @@ CHIPDevice * GetConnectedDevice()
                                                      @"NumberOfDailyTransitions Error: %@",
                                                    err);
 
-                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                   EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                [expectation fulfill];
                                            }];
 
@@ -16067,7 +16096,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -16711,7 +16740,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"write the default values to mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -16789,7 +16818,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"3a: write a value into the RO mandatory global attribute: ClusterRevision Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -16859,7 +16888,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"3a: write the default value to optional global attribute: FeatureMap Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
 
@@ -16929,7 +16958,7 @@ CHIPDevice * GetConnectedDevice()
                        completionHandler:^(NSError * _Nullable err) {
                            NSLog(@"3a: write a value into the RO mandatory attribute: Type Error: %@", err);
 
-                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                           XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                            [expectation fulfill];
                        }];
 
@@ -16999,7 +17028,7 @@ CHIPDevice * GetConnectedDevice()
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"3a: write a value into the RO mandatory attribute: ConfigStatus Error: %@", err);
 
-                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                    [expectation fulfill];
                                }];
 
@@ -17071,7 +17100,7 @@ CHIPDevice * GetConnectedDevice()
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"3a: write a value into the RO mandatory attribute: OperationalStatus Error: %@", err);
 
-                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                    [expectation fulfill];
                                }];
 
@@ -17139,13 +17168,14 @@ CHIPDevice * GetConnectedDevice()
 
     id endProductTypeArgument;
     endProductTypeArgument = [NSNumber numberWithUnsignedChar:250];
-    [cluster writeAttributeEndProductTypeWithValue:endProductTypeArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(@"3a: write a value into the RO mandatory attribute: EndProductType Error: %@", err);
+    [cluster
+        writeAttributeEndProductTypeWithValue:endProductTypeArgument
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"3a: write a value into the RO mandatory attribute: EndProductType Error: %@", err);
 
-                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
-                                     [expectation fulfill];
-                                 }];
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
+                                [expectation fulfill];
+                            }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -17288,7 +17318,8 @@ CHIPDevice * GetConnectedDevice()
                                                             @"TargetPositionLiftPercent100ths Error: %@",
                                                           err);
 
-                                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                          EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                       [expectation fulfill];
                                                   }];
 
@@ -17364,7 +17395,8 @@ CHIPDevice * GetConnectedDevice()
                                                             @"TargetPositionTiltPercent100ths Error: %@",
                                                           err);
 
-                                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                          EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                       [expectation fulfill];
                                                   }];
 
@@ -17440,7 +17472,8 @@ CHIPDevice * GetConnectedDevice()
                                                              @"CurrentPositionLiftPercent100ths Error: %@",
                                                            err);
 
-                                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                           EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                        [expectation fulfill];
                                                    }];
 
@@ -17516,7 +17549,8 @@ CHIPDevice * GetConnectedDevice()
                                                              @"CurrentPositionTiltPercent100ths Error: %@",
                                                            err);
 
-                                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                           EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                        [expectation fulfill];
                                                    }];
 
@@ -17591,7 +17625,8 @@ CHIPDevice * GetConnectedDevice()
                                         NSLog(@"3a: write a value into the RO optional attribute: InstalledOpenLimitLift Error: %@",
                                             err);
 
-                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                        XCTAssertEqual(
+                                            [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                         [expectation fulfill];
                                     }];
 
@@ -17665,7 +17700,8 @@ CHIPDevice * GetConnectedDevice()
                                                      @"Error: %@",
                                                    err);
 
-                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                   EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                [expectation fulfill];
                                            }];
 
@@ -17739,7 +17775,8 @@ CHIPDevice * GetConnectedDevice()
                                         NSLog(@"3a: write a value into the RO optional attribute: InstalledOpenLimitTilt Error: %@",
                                             err);
 
-                                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                        XCTAssertEqual(
+                                            [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                         [expectation fulfill];
                                     }];
 
@@ -17813,7 +17850,8 @@ CHIPDevice * GetConnectedDevice()
                                                      @"Error: %@",
                                                    err);
 
-                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                               XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                   EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                [expectation fulfill];
                                            }];
 
@@ -17884,7 +17922,7 @@ CHIPDevice * GetConnectedDevice()
                                completionHandler:^(NSError * _Nullable err) {
                                    NSLog(@"5a: write a value into the RO mandatory attribute: SafetyStatus Error: %@", err);
 
-                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                    [expectation fulfill];
                                }];
 
@@ -17956,7 +17994,8 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"5a: write a value into the RO optional attribute: CurrentPositionLift Error: %@", err);
 
-                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                     XCTAssertEqual(
+                                         [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                      [expectation fulfill];
                                  }];
 
@@ -18029,7 +18068,8 @@ CHIPDevice * GetConnectedDevice()
                                  completionHandler:^(NSError * _Nullable err) {
                                      NSLog(@"5a: write a value into the RO optional attribute: CurrentPositionTilt Error: %@", err);
 
-                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                     XCTAssertEqual(
+                                         [CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                      [expectation fulfill];
                                  }];
 
@@ -18104,7 +18144,8 @@ CHIPDevice * GetConnectedDevice()
                                                           @"CurrentPositionLiftPercentage Error: %@",
                                                         err);
 
-                                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                        EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                     [expectation fulfill];
                                                 }];
 
@@ -18180,7 +18221,8 @@ CHIPDevice * GetConnectedDevice()
                                                           @"CurrentPositionTiltPercentage Error: %@",
                                                         err);
 
-                                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 136);
+                                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err],
+                                                        EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                                     [expectation fulfill];
                                                 }];
 
@@ -18531,7 +18573,7 @@ CHIPDevice * GetConnectedDevice()
     [cluster testNotHandledWithCompletionHandler:^(NSError * _Nullable err) {
         NSLog(@"Send Test Not Handled Command Error: %@", err);
 
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 133);
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_INVALID_COMMAND);
         [expectation fulfill];
     }];
 
@@ -18608,7 +18650,7 @@ CHIPDevice * GetConnectedDevice()
                           CHIPTestClusterClusterTestAddArgumentsResponseParams * _Nullable values, NSError * _Nullable err) {
                           NSLog(@"Send failing Test Add Arguments Command Error: %@", err);
 
-                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 133);
+                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_INVALID_COMMAND);
                           [expectation fulfill];
                       }];
 
@@ -20669,7 +20711,7 @@ CHIPDevice * GetConnectedDevice()
                               completionHandler:^(NSError * _Nullable err) {
                                   NSLog(@"Write attribute OCTET_STRING Error: %@", err);
 
-                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
                                   [expectation fulfill];
                               }];
 
@@ -20908,7 +20950,7 @@ CHIPDevice * GetConnectedDevice()
                              completionHandler:^(NSError * _Nullable err) {
                                  NSLog(@"Write attribute CHAR_STRING - Value too long Error: %@", err);
 
-                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
                                  [expectation fulfill];
                              }];
 
@@ -22809,13 +22851,14 @@ CHIPDevice * GetConnectedDevice()
 
     id nullableBitmap8Argument;
     nullableBitmap8Argument = [NSNumber numberWithUnsignedChar:255];
-    [cluster writeAttributeNullableBitmap8WithValue:nullableBitmap8Argument
-                                  completionHandler:^(NSError * _Nullable err) {
-                                      NSLog(@"Write attribute NULLABLE_BITMAP8 Invalid Value Error: %@", err);
+    [cluster
+        writeAttributeNullableBitmap8WithValue:nullableBitmap8Argument
+                             completionHandler:^(NSError * _Nullable err) {
+                                 NSLog(@"Write attribute NULLABLE_BITMAP8 Invalid Value Error: %@", err);
 
-                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
-                                      [expectation fulfill];
-                                  }];
+                                 XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                                 [expectation fulfill];
+                             }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -22948,13 +22991,14 @@ CHIPDevice * GetConnectedDevice()
 
     id nullableBitmap16Argument;
     nullableBitmap16Argument = [NSNumber numberWithUnsignedShort:65535U];
-    [cluster writeAttributeNullableBitmap16WithValue:nullableBitmap16Argument
-                                   completionHandler:^(NSError * _Nullable err) {
-                                       NSLog(@"Write attribute NULLABLE_BITMAP16 Invalid Value Error: %@", err);
+    [cluster
+        writeAttributeNullableBitmap16WithValue:nullableBitmap16Argument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write attribute NULLABLE_BITMAP16 Invalid Value Error: %@", err);
 
-                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
-                                       [expectation fulfill];
-                                   }];
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                                  [expectation fulfill];
+                              }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -23087,13 +23131,14 @@ CHIPDevice * GetConnectedDevice()
 
     id nullableBitmap32Argument;
     nullableBitmap32Argument = [NSNumber numberWithUnsignedInt:4294967295UL];
-    [cluster writeAttributeNullableBitmap32WithValue:nullableBitmap32Argument
-                                   completionHandler:^(NSError * _Nullable err) {
-                                       NSLog(@"Write attribute NULLABLE_BITMAP32 Invalid Value Error: %@", err);
+    [cluster
+        writeAttributeNullableBitmap32WithValue:nullableBitmap32Argument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write attribute NULLABLE_BITMAP32 Invalid Value Error: %@", err);
 
-                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
-                                       [expectation fulfill];
-                                   }];
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                                  [expectation fulfill];
+                              }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -23226,13 +23271,14 @@ CHIPDevice * GetConnectedDevice()
 
     id nullableBitmap64Argument;
     nullableBitmap64Argument = [NSNumber numberWithUnsignedLongLong:18446744073709551615ULL];
-    [cluster writeAttributeNullableBitmap64WithValue:nullableBitmap64Argument
-                                   completionHandler:^(NSError * _Nullable err) {
-                                       NSLog(@"Write attribute NULLABLE_BITMAP64 Invalid Value Error: %@", err);
+    [cluster
+        writeAttributeNullableBitmap64WithValue:nullableBitmap64Argument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write attribute NULLABLE_BITMAP64 Invalid Value Error: %@", err);
 
-                                       XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
-                                       [expectation fulfill];
-                                   }];
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                                  [expectation fulfill];
+                              }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -23369,7 +23415,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write attribute NULLABLE_INT8U Invalid Value Error: %@", err);
 
-                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
                                     [expectation fulfill];
                                 }];
 
@@ -23504,13 +23550,14 @@ CHIPDevice * GetConnectedDevice()
 
     id nullableInt16uArgument;
     nullableInt16uArgument = [NSNumber numberWithUnsignedShort:65535U];
-    [cluster writeAttributeNullableInt16uWithValue:nullableInt16uArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(@"Write attribute NULLABLE_INT16U Invalid Value Error: %@", err);
+    [cluster
+        writeAttributeNullableInt16uWithValue:nullableInt16uArgument
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"Write attribute NULLABLE_INT16U Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
-                                     [expectation fulfill];
-                                 }];
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                                [expectation fulfill];
+                            }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -23643,13 +23690,14 @@ CHIPDevice * GetConnectedDevice()
 
     id nullableInt32uArgument;
     nullableInt32uArgument = [NSNumber numberWithUnsignedInt:4294967295UL];
-    [cluster writeAttributeNullableInt32uWithValue:nullableInt32uArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(@"Write attribute NULLABLE_INT32U Invalid Value Error: %@", err);
+    [cluster
+        writeAttributeNullableInt32uWithValue:nullableInt32uArgument
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"Write attribute NULLABLE_INT32U Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
-                                     [expectation fulfill];
-                                 }];
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                                [expectation fulfill];
+                            }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -23782,13 +23830,14 @@ CHIPDevice * GetConnectedDevice()
 
     id nullableInt64uArgument;
     nullableInt64uArgument = [NSNumber numberWithUnsignedLongLong:18446744073709551615ULL];
-    [cluster writeAttributeNullableInt64uWithValue:nullableInt64uArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(@"Write attribute NULLABLE_INT64U Invalid Value Error: %@", err);
+    [cluster
+        writeAttributeNullableInt64uWithValue:nullableInt64uArgument
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"Write attribute NULLABLE_INT64U Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
-                                     [expectation fulfill];
-                                 }];
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                                [expectation fulfill];
+                            }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -23925,7 +23974,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write attribute NULLABLE_INT8S Invalid Value Error: %@", err);
 
-                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
                                     [expectation fulfill];
                                 }];
 
@@ -24060,13 +24109,14 @@ CHIPDevice * GetConnectedDevice()
 
     id nullableInt16sArgument;
     nullableInt16sArgument = [NSNumber numberWithShort:-32768];
-    [cluster writeAttributeNullableInt16sWithValue:nullableInt16sArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(@"Write attribute NULLABLE_INT16S Invalid Value Error: %@", err);
+    [cluster
+        writeAttributeNullableInt16sWithValue:nullableInt16sArgument
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"Write attribute NULLABLE_INT16S Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
-                                     [expectation fulfill];
-                                 }];
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                                [expectation fulfill];
+                            }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -24199,13 +24249,14 @@ CHIPDevice * GetConnectedDevice()
 
     id nullableInt32sArgument;
     nullableInt32sArgument = [NSNumber numberWithInt:-2147483648L];
-    [cluster writeAttributeNullableInt32sWithValue:nullableInt32sArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(@"Write attribute NULLABLE_INT32S Invalid Value Error: %@", err);
+    [cluster
+        writeAttributeNullableInt32sWithValue:nullableInt32sArgument
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"Write attribute NULLABLE_INT32S Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
-                                     [expectation fulfill];
-                                 }];
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                                [expectation fulfill];
+                            }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -24338,13 +24389,14 @@ CHIPDevice * GetConnectedDevice()
 
     id nullableInt64sArgument;
     nullableInt64sArgument = [NSNumber numberWithLongLong:-9223372036854775807LL - 1];
-    [cluster writeAttributeNullableInt64sWithValue:nullableInt64sArgument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(@"Write attribute NULLABLE_INT64S Invalid Value Error: %@", err);
+    [cluster
+        writeAttributeNullableInt64sWithValue:nullableInt64sArgument
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"Write attribute NULLABLE_INT64S Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
-                                     [expectation fulfill];
-                                 }];
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                                [expectation fulfill];
+                            }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -24481,7 +24533,7 @@ CHIPDevice * GetConnectedDevice()
                                 completionHandler:^(NSError * _Nullable err) {
                                     NSLog(@"Write attribute NULLABLE_ENUM8 Invalid Value Error: %@", err);
 
-                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
+                                    XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
                                     [expectation fulfill];
                                 }];
 
@@ -24616,13 +24668,14 @@ CHIPDevice * GetConnectedDevice()
 
     id nullableEnum16Argument;
     nullableEnum16Argument = [NSNumber numberWithUnsignedShort:65535U];
-    [cluster writeAttributeNullableEnum16WithValue:nullableEnum16Argument
-                                 completionHandler:^(NSError * _Nullable err) {
-                                     NSLog(@"Write attribute NULLABLE_ENUM16 Invalid Value Error: %@", err);
+    [cluster
+        writeAttributeNullableEnum16WithValue:nullableEnum16Argument
+                            completionHandler:^(NSError * _Nullable err) {
+                                NSLog(@"Write attribute NULLABLE_ENUM16 Invalid Value Error: %@", err);
 
-                                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
-                                     [expectation fulfill];
-                                 }];
+                                XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+                                [expectation fulfill];
+                            }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -28515,7 +28568,7 @@ uint16_t readAttributeVendorIdDefaultValue;
                   completionHandler:^(NSError * _Nullable err) {
                       NSLog(@"Change to Unsupported Mode Error: %@", err);
 
-                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 135);
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
                       [expectation fulfill];
                   }];
 
