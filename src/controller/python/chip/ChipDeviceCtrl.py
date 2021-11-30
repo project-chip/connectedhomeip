@@ -586,18 +586,6 @@ class ChipDeviceController(object):
             EndpointId=endpoint, Attribute=req)
         return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result['Attributes'][path].Data.value)
 
-    def ZCLReadEvent(self, cluster, event, nodeid, endpoint, groupid, blocking=True):
-        req = None
-        try:
-            req = eval(f"GeneratedObjects.{cluster}.Attributes.{event}")
-        except:
-            raise UnknownEvent(cluster, event)
-
-        result = asyncio.run(self.ReadEvent(nodeid, [(endpoint, req)]))
-        path = ClusterEvent.EventPath(
-            EndpointId=endpoint, Event=req)
-        return im.EventReadResult(path=im.EventPath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, eventId=path.EventId), value=result['Events'][path])
-
     def ZCLWriteAttribute(self, cluster: str, attribute: str, nodeid, endpoint, groupid, value, blocking=True):
         req = None
         try:
@@ -615,14 +603,6 @@ class ChipDeviceController(object):
         except:
             raise UnknownAttribute(cluster, attribute)
         return asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)], reportInterval=(minInterval, maxInterval)))
-
-    def ZCLSubscribeEvent(self, cluster, event, nodeid, endpoint, minInterval, maxInterval, blocking=True):
-        req = None
-        try:
-            req = eval(f"GeneratedObjects.{cluster}.Events.{event}")
-        except:
-            raise UnknownEvent(cluster, event)
-        return asyncio.run(self.ReadEvent(nodeid, [(endpoint, req)], reportInterval=(minInterval, maxInterval)))
 
     def ZCLShutdownSubscription(self, subscriptionId: int):
         res = self._ChipStack.Call(

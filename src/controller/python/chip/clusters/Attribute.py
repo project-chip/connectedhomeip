@@ -25,12 +25,23 @@ from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEventDes
 import chip.exceptions
 import chip.interaction_model
 import chip.tlv
-
+from enum import Enum, unique
 import inspect
 import sys
 import logging
 import threading
 import builtins
+
+@unique
+class EventTimestampType(Enum):
+    SYSTEM = 1
+    EPOCH = 2
+
+@unique
+class EventPriority(Enum):
+    DEBUG = 1
+    INFO = 2
+    CRITICAL = 3
 
 
 @dataclass
@@ -108,9 +119,9 @@ class EventHeader:
     ClusterId: int = None
     EventId: int = None
     EventNumber: int = None
-    Priority: int = None
+    Priority: EventPriority = None
     Timestamp: int = None
-    TimestampType: int = None
+    TimestampType: EventTimestampType = None
 
     def __init__(self, EndpointId: int = None, Cluster=None, Event=None, ClusterId=None, EventId=None, EventNumber=None, Priority=None, Timestamp=None, TimestampType=None):
         self.EndpointId = EndpointId
@@ -381,7 +392,7 @@ class AsyncReadTransaction:
             tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
             if eventType is None:
                 eventValue = ValueDecodeFailure(
-                    tlvData, LookupError("attribute schema not found"))
+                    tlvData, LookupError("event schema not found"))
             else:
                 try:
                     eventValue = eventType(eventType.FromTLV(data))
@@ -499,7 +510,7 @@ def _OnReadAttributeDataCallback(closure, endpoint: int, cluster: int, attribute
 def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: int, number: int, priority: int, timestamp: int, timestampType: int, data, len):
     dataBytes = ctypes.string_at(data, len)
     closure.handleEventData(EventHeader(
-        EndpointId=endpoint, ClusterId=cluster, EventId=event, EventNumber=number, Priority=priority, Timestamp=timestamp, TimestampType=timestampType), dataBytes[:])
+        EndpointId=endpoint, ClusterId=cluster, EventId=event, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), dataBytes[:])
 
 
 @_OnSubscriptionEstablishedCallbackFunct
