@@ -117,7 +117,7 @@ class HostBuildVariant:
         self.buildargs = buildargs
 
 def HasConflicts(items: List[HostBuildVariant]) -> bool:
-    for a, b in combinations(subgroup, 2):
+    for a, b in combinations(items, 2):
         if (a.name in b.conflicts) or (b.name in a.conflicts):
            return True
     return False
