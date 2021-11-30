@@ -14,7 +14,7 @@
 
 import os
 
-from typing import Any
+from typing import Any, List
 from itertools import combinations
 
 from builders.android import AndroidBoard, AndroidApp, AndroidBuilder
@@ -110,10 +110,11 @@ class AcceptNameWithSubstring:
 
 
 class HostBuildVariant:
-    def __init__(self, name: str, validator=AcceptAnyName(), **buildargs):
+    def __init__(self, name: str, validator=AcceptAnyName(), conflicts:List[str]=[], **buildargs):
         self.name = name
-        self.buildargs = buildargs
         self.validator = validator
+        self.conflicts = []
+        self.buildargs = buildargs
 
 
 def HostTargets():
@@ -147,7 +148,8 @@ def HostTargets():
     variants = [
         HostBuildVariant(name="ipv6only", enable_ipv4=False),
         HostBuildVariant(name="no-ble", enable_ble=False),
-        HostBuildVariant(name="tsan", use_tsan=True),
+        HostBuildVariant(name="tsan", conflicts=['asan'], use_tsan=True),
+        HostBuildVariant(name="asan", conflicts=['tsan'], use_asan=True),
         HostBuildVariant(name="same-event-loop",
                          validator=AcceptNameWithSubstring('-chip-tool'), separate_event_loop=False),
     ]
@@ -167,11 +169,23 @@ def HostTargets():
         # Build every possible variant
         for variant_count in range(1, len(ok_variants) + 1):
             for subgroup in combinations(ok_variants, variant_count):
+                # find if a subgroup contains a conflict
+                conflict = False
+                for a,b in combinations(subgroup, 2):
+                    if (a.name in b.conflicts) or (b.name  in a.conflicts):
+                        conflict = True
+                        break
+
+                if conflict:
+                    continue
+
+                # Target ready to be created - no conflicss
                 variant_target = target.Clone()
                 for option in subgroup:
                     variant_target = variant_target.Extend(
                         option.name, **option.buildargs)
 
+                # Only a few are whitelisted for globs
                 if '-'.join([o.name for o in subgroup]) not in glob_whitelist:
                     variant_target = variant_target.GlobBlacklist(
                         'Reduce default build variants')
