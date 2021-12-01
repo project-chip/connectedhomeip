@@ -258,6 +258,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
             ChipLogError(DeviceLayer, "MDNS failed to join multicast group on %s for address type %s: %s", interfaceName,
                          AddressTypeStr(addressType), chip::ErrorStr(err));
             ShutdownEndpoint(mEndpoints[endpointIndex]);
+            continue;
         }
         else
         {
