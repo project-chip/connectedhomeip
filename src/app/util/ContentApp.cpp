@@ -47,7 +47,7 @@ EmberAfStatus ContentApp::HandleReadAttribute(ClusterId clusterId, chip::Attribu
                                               uint16_t maxReadLength)
 {
     ChipLogProgress(DeviceLayer, "Read Attribute for device %s cluster %d attribute=%d)",
-                    GetApplicationBasic()->GetApplicationName(), clusterId, attributeId);
+                    GetApplicationBasic()->GetApplicationName(), clusterId, static_cast<int>(attributeId));
 
     EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
     if (clusterId == ZCL_APPLICATION_BASIC_CLUSTER_ID)
@@ -64,7 +64,7 @@ EmberAfStatus ContentApp::HandleReadAttribute(ClusterId clusterId, chip::Attribu
 EmberAfStatus ContentApp::HandleWriteAttribute(ClusterId clusterId, chip::AttributeId attributeId, uint8_t * buffer)
 {
     ChipLogProgress(DeviceLayer, "Read Attribute for device %s cluster %d attribute=%d)",
-                    GetApplicationBasic()->GetApplicationName(), clusterId, attributeId);
+                    GetApplicationBasic()->GetApplicationName(), clusterId, static_cast<int>(attributeId));
 
     EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
 
@@ -81,7 +81,8 @@ EmberAfStatus ContentApp::HandleWriteAttribute(ClusterId clusterId, chip::Attrib
 
 EmberAfStatus ApplicationBasic::HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
 {
-    ChipLogProgress(DeviceLayer, "ApplicationBasic::HandleReadAttribute: attrId=%d, maxReadLength=%d", attributeId, maxReadLength);
+    ChipLogProgress(DeviceLayer, "ApplicationBasic::HandleReadAttribute: attrId=%d, maxReadLength=%d",
+                    static_cast<int>(attributeId), maxReadLength);
 
     if ((attributeId == ZCL_APPLICATION_VENDOR_NAME_ATTRIBUTE_ID) && (maxReadLength == 32))
     {
@@ -123,7 +124,7 @@ EmberAfStatus ApplicationBasic::HandleReadAttribute(chip::AttributeId attributeI
 
 EmberAfStatus ApplicationBasic::HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer)
 {
-    ChipLogProgress(DeviceLayer, "ApplicationBasic::HandleWriteAttribute: attrId=%d", attributeId);
+    ChipLogProgress(DeviceLayer, "ApplicationBasic::HandleWriteAttribute: attrId=%d", static_cast<int>(attributeId));
 
     if (attributeId == ZCL_APPLICATION_STATUS_ATTRIBUTE_ID)
     {
@@ -146,13 +147,14 @@ EmberAfStatus ApplicationBasic::HandleWriteAttribute(chip::AttributeId attribute
 
 EmberAfStatus AccountLogin::HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
 {
-    ChipLogProgress(DeviceLayer, "AccountLogin::HandleReadAttribute: attrId=%d, maxReadLength=%d", attributeId, maxReadLength);
+    ChipLogProgress(DeviceLayer, "AccountLogin::HandleReadAttribute: attrId=%d, maxReadLength=%d", static_cast<int>(attributeId),
+                    maxReadLength);
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
 EmberAfStatus AccountLogin::HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer)
 {
-    ChipLogProgress(DeviceLayer, "AccountLogin::HandleWriteAttribute: attrId=%d", attributeId);
+    ChipLogProgress(DeviceLayer, "AccountLogin::HandleWriteAttribute: attrId=%d", static_cast<int>(attributeId));
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
