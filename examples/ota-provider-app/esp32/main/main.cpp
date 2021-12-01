@@ -61,7 +61,7 @@ void OnTransferComplete(void * context);
 void OnTransferFailed(void * context, BdxSenderErrorTypes status);
 
 namespace {
-const char * TAG = "ota-provider-app";
+const char * TAG               = "ota-provider-app";
 const uint8_t kMaxImagePathlen = 35;
 static DeviceCallbacks EchoCallbacks;
 BdxOtaSender bdxServer;
@@ -183,9 +183,9 @@ extern "C" void app_main()
     bdxServer.SetCallbacks(callbacks);
 
     esp_vfs_spiffs_conf_t spiffs_conf = {
-        .base_path = "/spiffs",
-        .partition_label = NULL,
-        .max_files = 3,
+        .base_path              = "/spiffs",
+        .partition_label        = NULL,
+        .max_files              = 3,
         .format_if_mount_failed = false,
     };
 
@@ -197,7 +197,7 @@ extern "C" void app_main()
     }
     size_t total = 0, used = 0;
     err = esp_spiffs_info(NULL, &total, &used);
-    ESP_LOGI(TAG,"Partition size: total: %d, used: %d", total, used);
+    ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
     char otaImagePath[kMaxImagePathlen];
     sprintf(otaImagePath, "/spiffs/%s", otaFilename);
     otaImageFile = fopen(otaImagePath, "r");
@@ -206,10 +206,10 @@ extern "C" void app_main()
         ESP_LOGE(TAG, "Failed to open %s", otaFilename);
         return;
     }
-    fseek (otaImageFile , 0 , SEEK_END);
-    otaImageLen = ftell (otaImageFile);
+    fseek(otaImageFile, 0, SEEK_END);
+    otaImageLen = ftell(otaImageFile);
     rewind(otaImageFile);
-    ESP_LOGI(TAG,"The OTA image size: %d", otaImageLen);
+    ESP_LOGI(TAG, "The OTA image size: %d", otaImageLen);
     if (otaImageLen > 0)
     {
         otaProvider.SetQueryImageBehavior(OTAProviderExample::kRespondWithUpdateAvailable);
