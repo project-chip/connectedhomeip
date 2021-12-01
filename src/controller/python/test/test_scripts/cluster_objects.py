@@ -194,6 +194,11 @@ class ClusterObjectTests:
         ]
         _AssumeAttributesDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
+        logger.info("7: Reading Chunked List")
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListLongOctetString)])
+        if res.get('Attributes', {}).get(AttributePath(EndpointId=1, Attribute=Clusters.TestCluster.Attributes.ListLongOctetString)).Data.value != [b'0123456789abcdef' * 32] * 4:
+            raise AssertionError("Unexpected read result")
+
     @classmethod
     async def TestReadEventRequests(cls, devCtrl):
         logger.info("1: Reading Ex Cx Ex")
@@ -221,11 +226,6 @@ class ClusterObjectTests:
         _AssumeEventsDecodeSuccess(await devCtrl.ReadEvent(nodeid=NODE_ID, events=req))
 
         # TODO: Add more wildcard test for IM events.
-
-        logger.info("7: Reading Chunked List")
-        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListLongOctetString)])
-        if res[AttributePath(EndpointId=1, Attribute=Clusters.TestCluster.Attributes.ListLongOctetString)].Data.value != [b'0123456789abcdef' * 32] * 4:
-            raise AssertionError("Unexpected read result")
 
     @classmethod
     async def RunTest(cls, devCtrl):
