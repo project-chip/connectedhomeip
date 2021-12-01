@@ -229,7 +229,7 @@ CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuf
 
     Inet::TCPEndPoint * endPoint = nullptr;
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = mListenSocket->GetEndPointManager().NewEndPoint(&endPoint);
+    err                  = mListenSocket->GetEndPointManager().NewEndPoint(&endPoint);
     auto EndPointDeletor = [](Inet::TCPEndPoint * e) { e->Free(); };
     std::unique_ptr<Inet::TCPEndPoint, decltype(EndPointDeletor)> endPointHolder(endPoint, EndPointDeletor);
 #else
