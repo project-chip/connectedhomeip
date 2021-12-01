@@ -40,9 +40,9 @@
 
 namespace chip {
 namespace app {
-constexpr size_t kMaxEventSizeReserve  = 512;
-constexpr uint16_t kRequiredEventField = (1 << to_underlying(EventDataIB::Tag::kPriority)) |
-    (1 << to_underlying(EventDataIB::Tag::kDeltaSystemTimestamp)) | (1 << to_underlying(EventDataIB::Tag::kPath));
+constexpr size_t kMaxEventSizeReserve = 512;
+constexpr uint16_t kRequiredEventField =
+    (1 << to_underlying(EventDataIB::Tag::kPriority)) | (1 << to_underlying(EventDataIB::Tag::kPath));
 
 /**
  * @brief
@@ -137,10 +137,10 @@ public:
     EventNumber GetFirstEventNumber() { return mFirstEventNumber; }
     EventNumber GetLastEventNumber() { return mLastEventNumber; }
 
-    uint64_t GetFirstEventSystemTimestamp() { return mFirstEventSystemTimestamp.mValue; }
-    void SetFirstEventSystemTimestamp(uint64_t aValue) { mLastEventSystemTimestamp.mValue = aValue; }
+    uint64_t GetFirstEventTimestamp() { return mFirstEventTimestamp.mValue; }
+    void SetFirstEventTimestamp(uint64_t aValue) { mLastEventTimestamp.mValue = aValue; }
 
-    uint64_t GetLastEventSystemTimestamp() { return mLastEventSystemTimestamp.mValue; }
+    uint64_t GetLastEventTimestamp() { return mLastEventTimestamp.mValue; }
 
     virtual ~CircularEventBuffer() = default;
 
@@ -157,11 +157,11 @@ private:
     // The backup counter to use if no counter is provided for us.
     MonotonicallyIncreasingCounter mNonPersistedCounter;
 
-    size_t mRequiredSpaceForEvicted = 0;  ///< Required space for previous buffer to evict event to new buffer
-    EventNumber mFirstEventNumber   = 0;  ///< First event Number stored in the logging subsystem for this priority
-    EventNumber mLastEventNumber    = 0;  ///< Last event Number vended for this priority
-    Timestamp mFirstEventSystemTimestamp; ///< The timestamp of the first event in this buffer
-    Timestamp mLastEventSystemTimestamp;  ///< The timestamp of the last event in this buffer
+    size_t mRequiredSpaceForEvicted = 0; ///< Required space for previous buffer to evict event to new buffer
+    EventNumber mFirstEventNumber   = 0; ///< First event Number stored in the logging subsystem for this priority
+    EventNumber mLastEventNumber    = 0; ///< Last event Number vended for this priority
+    Timestamp mFirstEventTimestamp;      ///< The timestamp of the first event in this buffer
+    Timestamp mLastEventTimestamp;       ///< The timestamp of the last event in this buffer
 };
 
 class CircularEventReader;

@@ -63,7 +63,7 @@ public:
     CHIP_ERROR UserPrompt(const char * message);
 
 protected:
-    ChipDevice * mDevice;
+    std::map<std::string, ChipDevice *> mDevices;
     chip::NodeId mNodeId;
 
     static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);

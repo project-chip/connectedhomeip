@@ -41,6 +41,8 @@ namespace {
 
 constexpr uint32_t kTicksOverflowShift = (configUSE_16_BIT_TICKS) ? 16 : 32;
 
+uint64_t sBootTimeUS = 0;
+
 #ifdef __CORTEX_M
 BaseType_t sNumOfOverflows;
 #endif
@@ -98,6 +100,55 @@ Clock::Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
 Clock::Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
 {
     return Clock::Milliseconds64((FreeRTOSTicksSinceBoot() * kMillisecondsPerSecond) / configTICK_RATE_HZ);
+}
+
+uint64_t GetClock_Monotonic(void)
+{
+    return (FreeRTOSTicksSinceBoot() * kMicrosecondsPerSecond) / configTICK_RATE_HZ;
+}
+
+uint64_t GetClock_MonotonicMS(void)
+{
+    return (FreeRTOSTicksSinceBoot() * kMillisecondsPerSecond) / configTICK_RATE_HZ;
+}
+
+uint64_t GetClock_MonotonicHiRes(void)
+{
+    return GetClock_Monotonic();
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTime(Clock::Microseconds64 & aCurTime)
+{
+    if (sBootTimeUS == 0)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    aCurTime = Clock::Microseconds64(sBootTimeUS + GetClock_Monotonic());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Clock::Milliseconds64 & aCurTime)
+{
+    if (sBootTimeUS == 0)
+    {
+        return CHIP_ERROR_REAL_TIME_NOT_SYNCED;
+    }
+    aCurTime = Clock::Milliseconds64((sBootTimeUS + GetClock_Monotonic()) / 1000);
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(Clock::Microseconds64 aNewCurTime)
+{
+    uint64_t timeSinceBootUS = GetClock_Monotonic();
+    if (aNewCurTime.count() > timeSinceBootUS)
+    {
+        sBootTimeUS = aNewCurTime.count() - timeSinceBootUS;
+    }
+    else
+    {
+        sBootTimeUS = 0;
+    }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Clock

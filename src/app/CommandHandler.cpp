@@ -63,7 +63,7 @@ CHIP_ERROR CommandHandler::AllocateBuffer()
 }
 
 CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                                  System::PacketBufferHandle && payload)
+                                                  System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
     System::PacketBufferHandle response;
     VerifyOrReturnError(mState == CommandState::Idle, CHIP_ERROR_INCORRECT_STATE);
@@ -73,14 +73,18 @@ CHIP_ERROR CommandHandler::OnInvokeCommandRequest(Messaging::ExchangeContext * e
     mpExchangeCtx = ec;
 
     // Use the RAII feature, if this is the only Handle when this function returns, DecrementHoldOff will trigger sending response.
+    // TODO: This is broken!  If something under here returns error, we will try
+    // to SendCommandResponse(), and then our caller will try to send a status
+    // response too.  Figure out at what point it's our responsibility to
+    // handler errors vs our caller's.
     Handle workHandle(this);
     mpExchangeCtx->WillSendMessage();
-    ReturnErrorOnFailure(ProcessInvokeRequest(std::move(payload)));
+    ReturnErrorOnFailure(ProcessInvokeRequest(std::move(payload), isTimedInvoke));
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payload)
+CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
@@ -96,6 +100,29 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     ReturnErrorOnFailure(invokeRequestMessage.GetSuppressResponse(&mSuppressResponse));
     ReturnErrorOnFailure(invokeRequestMessage.GetTimedRequest(&mTimedRequest));
     ReturnErrorOnFailure(invokeRequestMessage.GetInvokeRequests(&invokeRequests));
+
+    if (mTimedRequest != isTimedInvoke)
+    {
+        // The message thinks it should be part of a timed interaction but it's
+        // not, or vice versa.  Spec says to Respond with UNSUPPORTED_ACCESS.
+        err = StatusResponse::SendStatusResponse(Protocols::InteractionModel::Status::UnsupportedAccess, mpExchangeCtx,
+                                                 /* aExpectResponse = */ false);
+
+        // Some unit tests call this function in an abnormal state when we don't
+        // even have an exchange.
+        if (err != CHIP_NO_ERROR && mpExchangeCtx)
+        {
+            // We have to manually close the exchange, because we called
+            // WillSendMessage already.
+            mpExchangeCtx->Close();
+        }
+
+        // Null out the (now-closed) exchange, so that when we try to
+        // SendCommandResponse() later (when our holdoff count drops to 0) it
+        // just fails and we don't double-respond.
+        mpExchangeCtx = nullptr;
+        return err;
+    }
 
     invokeRequests.GetReader(&invokeRequestsReader);
     while (CHIP_NO_ERROR == (err = invokeRequestsReader.Next()))

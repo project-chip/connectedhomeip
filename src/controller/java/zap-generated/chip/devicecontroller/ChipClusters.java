@@ -5432,6 +5432,14 @@ public class ChipClusters {
       readBasicCommissioningInfoListAttribute(chipClusterPtr, callback);
     }
 
+    public void readRegulatoryConfigAttribute(IntegerAttributeCallback callback) {
+      readRegulatoryConfigAttribute(chipClusterPtr, callback);
+    }
+
+    public void readLocationCapabilityAttribute(IntegerAttributeCallback callback) {
+      readLocationCapabilityAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -5459,6 +5467,12 @@ public class ChipClusters {
 
     private native void readBasicCommissioningInfoListAttribute(
         long chipClusterPtr, BasicCommissioningInfoListAttributeCallback callback);
+
+    private native void readRegulatoryConfigAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readLocationCapabilityAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

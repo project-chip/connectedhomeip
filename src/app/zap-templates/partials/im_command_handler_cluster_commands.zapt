@@ -1,4 +1,10 @@
 {{#if (isServer parent.side)}}
+{{#if mustUseTimedInvoke}}
+if (!apCommandObj->IsTimedInvoke()) {
+  apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+  return;
+}
+{{/if}}
 Commands::{{asUpperCamelCase name}}::DecodableType commandData;
 TLVError = DataModel::Decode(aDataTlv, commandData);
 if (TLVError == CHIP_NO_ERROR) {
