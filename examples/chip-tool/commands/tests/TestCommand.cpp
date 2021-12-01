@@ -40,7 +40,7 @@ void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDevicePro
     ChipLogProgress(chipTool, " **** Test Setup: Device Connected\n");
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
-    command->mDevice = device;
+    command->mDevices[command->GetIdentity()] = device;
 
     command->NextTest();
 }
