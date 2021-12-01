@@ -23,6 +23,7 @@ list(
     ${chip_dir}/src/app/EventManagement.cpp
     ${chip_dir}/src/app/ReadClient.cpp
     ${chip_dir}/src/app/ReadHandler.cpp
+    ${chip_dir}/src/app/TimedHandler.cpp
     ${chip_dir}/src/app/WriteClient.cpp
     ${chip_dir}/src/app/WriteHandler.cpp
     ${chip_dir}/src/app/util/CHIPDeviceCallbacksMgr.cpp
