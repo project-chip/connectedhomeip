@@ -213,9 +213,9 @@ CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuf
             // same destination exists.
             alreadyConnecting = true;
             pending->mPacketBuffer->AddToEnd(std::move(msg));
-            return false;
+            return Loop::Break;
         }
-        return true;
+        return Loop::Continue;
     });
 
     // If already connecting, buffer was just enqueued for more sending
@@ -378,7 +378,7 @@ void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, CHIP_ERROR inet
                 err = endPoint->Send(std::move(buffer));
             }
         }
-        return true;
+        return Loop::Continue;
     });
 
     if (err == CHIP_NO_ERROR)
