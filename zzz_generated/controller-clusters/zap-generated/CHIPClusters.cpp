@@ -17308,6 +17308,84 @@ CHIP_ERROR TestClusterCluster::ReportAttributeEnum16(Callback::Cancelable * onRe
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
+CHIP_ERROR TestClusterCluster::ReadAttributeFloatSingle(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000017;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<FloatAttributeCallback>);
+}
+
+CHIP_ERROR TestClusterCluster::WriteAttributeFloatSingle(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback, float value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::FloatSingle::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::SubscribeAttributeFloatSingle(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                             uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = TestCluster::Attributes::FloatSingle::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::ReportAttributeFloatSingle(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(TestCluster::Attributes::FloatSingle::Id, onReportCallback,
+                                     BasicAttributeFilter<FloatAttributeCallback>);
+}
+
+CHIP_ERROR TestClusterCluster::ReadAttributeFloatDouble(Callback::Cancelable * onSuccessCallback,
+                                                        Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00000018;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<DoubleAttributeCallback>);
+}
+
+CHIP_ERROR TestClusterCluster::WriteAttributeFloatDouble(Callback::Cancelable * onSuccessCallback,
+                                                         Callback::Cancelable * onFailureCallback, double value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::FloatDouble::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::SubscribeAttributeFloatDouble(Callback::Cancelable * onSuccessCallback,
+                                                             Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                             uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = TestCluster::Attributes::FloatDouble::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::ReportAttributeFloatDouble(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(TestCluster::Attributes::FloatDouble::Id, onReportCallback,
+                                     BasicAttributeFilter<DoubleAttributeCallback>);
+}
+
 CHIP_ERROR TestClusterCluster::ReadAttributeOctetString(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback)
 {
@@ -18737,6 +18815,84 @@ CHIP_ERROR TestClusterCluster::ReportAttributeNullableEnum16(Callback::Cancelabl
 {
     return RequestAttributeReporting(TestCluster::Attributes::NullableEnum16::Id, onReportCallback,
                                      BasicAttributeFilter<Int16uAttributeCallback>);
+}
+
+CHIP_ERROR TestClusterCluster::ReadAttributeNullableFloatSingle(Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00008017;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<FloatAttributeCallback>);
+}
+
+CHIP_ERROR TestClusterCluster::WriteAttributeNullableFloatSingle(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback, float value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::NullableFloatSingle::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableFloatSingle(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                     uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = TestCluster::Attributes::NullableFloatSingle::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::ReportAttributeNullableFloatSingle(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(TestCluster::Attributes::NullableFloatSingle::Id, onReportCallback,
+                                     BasicAttributeFilter<FloatAttributeCallback>);
+}
+
+CHIP_ERROR TestClusterCluster::ReadAttributeNullableFloatDouble(Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x00008018;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<DoubleAttributeCallback>);
+}
+
+CHIP_ERROR TestClusterCluster::WriteAttributeNullableFloatDouble(Callback::Cancelable * onSuccessCallback,
+                                                                 Callback::Cancelable * onFailureCallback, double value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, TestCluster::Attributes::NullableFloatDouble::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::SubscribeAttributeNullableFloatDouble(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                     uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = TestCluster::Attributes::NullableFloatDouble::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TestClusterCluster::ReportAttributeNullableFloatDouble(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(TestCluster::Attributes::NullableFloatDouble::Id, onReportCallback,
+                                     BasicAttributeFilter<DoubleAttributeCallback>);
 }
 
 CHIP_ERROR TestClusterCluster::ReadAttributeNullableOctetString(Callback::Cancelable * onSuccessCallback,

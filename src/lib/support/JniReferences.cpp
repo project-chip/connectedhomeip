@@ -253,4 +253,26 @@ jboolean JniReferences::BooleanToPrimitive(jobject boxedBoolean)
     return env->CallBooleanMethod(boxedBoolean, valueMethod);
 }
 
+jfloat JniReferences::FloatToPrimitive(jobject boxedFloat)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass boxedTypeCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Float", boxedTypeCls);
+    chip::JniClass jniClass(boxedTypeCls);
+
+    jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "floatValue", "()F");
+    return env->CallFloatMethod(boxedFloat, valueMethod);
+}
+
+jdouble JniReferences::DoubleToPrimitive(jobject boxedDouble)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass boxedTypeCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Double", boxedTypeCls);
+    chip::JniClass jniClass(boxedTypeCls);
+
+    jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "doubleValue", "()D");
+    return env->CallDoubleMethod(boxedDouble, valueMethod);
+}
+
 } // namespace chip
