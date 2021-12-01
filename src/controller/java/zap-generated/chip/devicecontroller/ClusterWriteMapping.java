@@ -1352,6 +1352,24 @@ public class ClusterWriteMapping {
     writeTestClusterInteractionInfo.put(
         "writeRangeRestrictedInt16sAttribute",
         writeTestClusterRangeRestrictedInt16sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> writeTestClusterTimedWriteBooleanCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo testClustertimedWriteBooleanCommandParameterInfo =
+        new CommandParameterInfo("value", boolean.class);
+    writeTestClusterTimedWriteBooleanCommandParams.put(
+        "value", testClustertimedWriteBooleanCommandParameterInfo);
+    InteractionInfo writeTestClusterTimedWriteBooleanAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .writeTimedWriteBooleanAttribute(
+                      (DefaultClusterCallback) callback, (Boolean) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeTestClusterTimedWriteBooleanCommandParams);
+    writeTestClusterInteractionInfo.put(
+        "writeTimedWriteBooleanAttribute",
+        writeTestClusterTimedWriteBooleanAttributeInteractionInfo);
     Map<String, CommandParameterInfo> writeTestClusterUnsupportedCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     CommandParameterInfo testClusterunsupportedCommandParameterInfo =

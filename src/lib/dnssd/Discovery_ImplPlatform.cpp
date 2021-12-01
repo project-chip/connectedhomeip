@@ -534,7 +534,7 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, DnssdService * res
 CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(InitImpl());
-    char serviceName[kMaxCommisisonableServiceNameSize];
+    char serviceName[kMaxCommissionableServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
     return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
@@ -544,7 +544,7 @@ CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter
 CHIP_ERROR DiscoveryImplPlatform::FindCommissioners(DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(InitImpl());
-    char serviceName[kMaxCommisisonerServiceNameSize];
+    char serviceName[kMaxCommissionerServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
 
     return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,

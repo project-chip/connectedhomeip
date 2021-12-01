@@ -14609,6 +14609,12 @@ bool emberAfTestClusterClusterSimpleStructEchoRequestCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::DecodableType & commandData);
 /**
+ * @brief Test Cluster Cluster TimedInvokeRequest Command callback (from client)
+ */
+bool emberAfTestClusterClusterTimedInvokeRequestCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::DecodableType & commandData);
+/**
  * @brief Messaging Cluster DisplayMessage Command callback (from server)
  */
 bool emberAfMessagingClusterDisplayMessageCallback(chip::EndpointId endpoint, chip::app::CommandSender * commandObj,

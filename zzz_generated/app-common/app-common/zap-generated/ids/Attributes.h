@@ -4638,6 +4638,10 @@ namespace RangeRestrictedInt16s {
 static constexpr AttributeId Id = 0x00000029;
 } // namespace RangeRestrictedInt16s
 
+namespace TimedWriteBoolean {
+static constexpr AttributeId Id = 0x00000030;
+} // namespace TimedWriteBoolean
+
 namespace Unsupported {
 static constexpr AttributeId Id = 0x000000FF;
 } // namespace Unsupported

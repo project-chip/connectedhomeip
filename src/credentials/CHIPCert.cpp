@@ -928,23 +928,25 @@ CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues &
 CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nodeId, FabricId * fabricId)
 {
     ChipCertificateSet certSet;
+    ChipCertificateData certData;
 
-    ReturnErrorOnFailure(certSet.Init(1));
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
 
     ReturnErrorOnFailure(certSet.LoadCert(opcert, BitFlags<CertDecodeFlags>()));
 
-    return ExtractNodeIdFabricIdFromOpCert(certSet.GetCertSet()[0], nodeId, fabricId);
+    return ExtractNodeIdFabricIdFromOpCert(certData, nodeId, fabricId);
 }
 
 CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKeySpan & publicKey)
 {
     ChipCertificateSet certSet;
+    ChipCertificateData certData;
 
-    ReturnErrorOnFailure(certSet.Init(1));
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
 
     ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
 
-    publicKey = certSet.GetLastCert()->mPublicKey;
+    publicKey = certData.mPublicKey;
 
     return CHIP_NO_ERROR;
 }
@@ -952,12 +954,13 @@ CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKey
 CHIP_ERROR ExtractSKIDFromChipCert(const ByteSpan & chipCert, CertificateKeyId & skid)
 {
     ChipCertificateSet certSet;
+    ChipCertificateData certData;
 
-    ReturnErrorOnFailure(certSet.Init(1));
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
 
     ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
 
-    skid = certSet.GetLastCert()->mSubjectKeyId;
+    skid = certData.mSubjectKeyId;
 
     return CHIP_NO_ERROR;
 }

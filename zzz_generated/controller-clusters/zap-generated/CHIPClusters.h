@@ -2304,6 +2304,7 @@ public:
                                          uint8_t a, bool b, uint8_t c, chip::ByteSpan d, chip::CharSpan e, uint8_t f, float g,
                                          double h);
     CHIP_ERROR TestUnknownCommand(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR TimedInvokeRequest(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
 
     // Cluster Attributes
     CHIP_ERROR ReadAttributeBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
@@ -2524,6 +2525,9 @@ public:
                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                        uint16_t maxInterval);
     CHIP_ERROR ReportAttributeRangeRestrictedInt16s(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ReadAttributeTimedWriteBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeTimedWriteBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               bool value);
     CHIP_ERROR ReadAttributeUnsupported(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeUnsupported(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          bool value);

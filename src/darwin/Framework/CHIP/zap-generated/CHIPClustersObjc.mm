@@ -16929,6 +16929,23 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)timedInvokeRequestWithCompletionHandler:(StatusCompletion)completionHandler
+{
+    ListFreer listFreer;
+    TestCluster::Commands::TimedInvokeRequest::Type request;
+
+    new CHIPCommandSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)readAttributeBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPBooleanAttributeCallbackBridge(
@@ -19000,6 +19017,40 @@ using namespace chip::app::Clusters;
             return self.cppCluster.ReportAttributeRangeRestrictedInt16s(success);
         },
         true);
+}
+
+- (void)readAttributeTimedWriteBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler
+{
+    new CHIPBooleanAttributeCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = TestCluster::Attributes::TimedWriteBoolean::TypeInfo;
+            auto successFn = Callback<BooleanAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)writeAttributeTimedWriteBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
+{
+    new CHIPDefaultSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable ignored) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            ListFreer listFreer;
+            using TypeInfo = TestCluster::Attributes::TimedWriteBoolean::TypeInfo;
+            TypeInfo::Type cppValue;
+            cppValue = value.boolValue;
+            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
 }
 
 - (void)readAttributeUnsupportedWithCompletionHandler:(void (^)(

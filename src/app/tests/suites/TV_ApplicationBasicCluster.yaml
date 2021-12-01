@@ -19,6 +19,10 @@ config:
     endpoint: 3
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Change Status Command"
       command: "ChangeStatus"
       arguments:
