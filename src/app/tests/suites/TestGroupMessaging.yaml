@@ -19,6 +19,10 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     #TODO : Add Group membership command when implemented Issue #11077
     # - label: "Add device to Group"
     #   command: "TODO"
