@@ -42,11 +42,17 @@ class TestTimedHandler
 {
 public:
     static void TestInvokeFastEnough(nlTestSuite * aSuite, void * aContext);
+    static void TestWriteFastEnough(nlTestSuite * aSuite, void * aContext);
+
     static void TestInvokeTooSlow(nlTestSuite * aSuite, void * aContext);
+    static void TestWriteTooSlow(nlTestSuite * aSuite, void * aContext);
 
     static void TestInvokeNeverComes(nlTestSuite * aSuite, void * aContext);
 
 private:
+    static void TestFollowingMessageFastEnough(nlTestSuite * aSuite, void * aContext, MsgType aMsgType);
+    static void TestFollowingMessageTooSlow(nlTestSuite * aSuite, void * aContext, MsgType aMsgType);
+
     static void GenerateTimedRequest(nlTestSuite * aSuite, uint16_t aTimeoutValue, System::PacketBufferHandle & aPayload);
 };
 
@@ -101,7 +107,7 @@ void TestTimedHandler::GenerateTimedRequest(nlTestSuite * aSuite, uint16_t aTime
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
 }
 
-void TestTimedHandler::TestInvokeFastEnough(nlTestSuite * aSuite, void * aContext)
+void TestTimedHandler::TestFollowingMessageFastEnough(nlTestSuite * aSuite, void * aContext, MsgType aMsgType)
 {
     TestContext & ctx = *static_cast<TestContext *>(aContext);
 
@@ -130,14 +136,24 @@ void TestTimedHandler::TestInvokeFastEnough(nlTestSuite * aSuite, void * aContex
     delegate.mKeepExchangeOpen   = false;
     delegate.mNewMessageReceived = false;
 
-    err = exchange->SendMessage(MsgType::InvokeCommandRequest, std::move(payload));
+    err = exchange->SendMessage(aMsgType, std::move(payload));
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
     NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus != Status::UnsupportedAccess);
 }
 
-void TestTimedHandler::TestInvokeTooSlow(nlTestSuite * aSuite, void * aContext)
+void TestTimedHandler::TestInvokeFastEnough(nlTestSuite * aSuite, void * aContext)
+{
+    TestFollowingMessageFastEnough(aSuite, aContext, MsgType::InvokeCommandRequest);
+}
+
+void TestTimedHandler::TestWriteFastEnough(nlTestSuite * aSuite, void * aContext)
+{
+    TestFollowingMessageFastEnough(aSuite, aContext, MsgType::WriteRequest);
+}
+
+void TestTimedHandler::TestFollowingMessageTooSlow(nlTestSuite * aSuite, void * aContext, MsgType aMsgType)
 {
     TestContext & ctx = *static_cast<TestContext *>(aContext);
 
@@ -169,11 +185,21 @@ void TestTimedHandler::TestInvokeTooSlow(nlTestSuite * aSuite, void * aContext)
     delegate.mKeepExchangeOpen   = false;
     delegate.mNewMessageReceived = false;
 
-    err = exchange->SendMessage(MsgType::InvokeCommandRequest, std::move(payload));
+    err = exchange->SendMessage(aMsgType, std::move(payload));
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
     NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus == Status::UnsupportedAccess);
+}
+
+void TestTimedHandler::TestInvokeTooSlow(nlTestSuite * aSuite, void * aContext)
+{
+    TestFollowingMessageTooSlow(aSuite, aContext, MsgType::InvokeCommandRequest);
+}
+
+void TestTimedHandler::TestWriteTooSlow(nlTestSuite * aSuite, void * aContext)
+{
+    TestFollowingMessageTooSlow(aSuite, aContext, MsgType::WriteRequest);
 }
 
 void TestTimedHandler::TestInvokeNeverComes(nlTestSuite * aSuite, void * aContext)
