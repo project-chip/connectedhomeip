@@ -1,0 +1,93 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: 3.1.3. [TC-DIAGETH-2.1] Attributes with server as DUT
+
+config:
+    cluster: "Ethernet Network Diagnostics"
+    endpoint: 0
+
+tests:
+    - label: "reset the counters"
+      optional: true
+      pics: PICS_CR_RESETCOUNTS
+      command: "ResetCounts"
+      response:
+        error: 0
+
+    - label:
+          "read the attribute: PacketRxCount"
+      disabled: true
+      optional: true
+      pics: PICS_A_PACKETRXCOUNT
+      command: "readAttribute"
+      attribute: "PacketRxCount"
+      response:
+        constraints:
+          type: uint64
+          minValue: 0
+          maxValue: 0
+
+    - label:
+          "read the attribute: PacketTxCount"
+      disabled: true
+      optional: true
+      pics: PICS_A_PACKETTXCOUNT
+      command: "readAttribute"
+      attribute: "PacketTxCount"
+      response:
+        constraints:
+          type: uint64
+          minValue: 0
+          maxValue: 0
+
+    - label:
+          "read the attribute: TxErrCount"
+      disabled: true
+      optional: true
+      pics: PICS_A_TXERRCOUNT
+      command: "readAttribute"
+      attribute: "TxErrCount"
+      response:
+        constraints:
+          type: uint64
+          minValue: 0
+          maxValue: 0
+
+    - label:
+          "read the attribute: CollisionCount"
+      disabled: true
+      optional: true
+      pics: PICS_A_COLLISIONCOUNT
+      command: "readAttribute"
+      attribute: "CollisionCount"
+      response:
+        constraints:
+          type: uint64
+          minValue: 0
+          maxValue: 0
+
+    - label:
+          "read the attribute: OverrunCount"
+      disabled: true
+      optional: true
+      pics: PICS_A_OVERRUNCOUNT
+      command: "readAttribute"
+      attribute: "OverrunCount"
+      response:
+        constraints:
+          type: uint64
+          minValue: 0
+          maxValue: 0
+ 

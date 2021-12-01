@@ -63,6 +63,11 @@ function getTests()
     'Test_TC_EMR_1_1',
   ];
 
+  const EthernetNetworkDiagnostics = [
+    'Test_TC_DIAGETH_1_1',
+    'Test_TC_DIAGETH_2_1',
+  ];
+
   const FlowMeasurement = [
     'Test_TC_FLW_1_1',
     'Test_TC_FLW_2_1',
@@ -191,6 +196,7 @@ function getTests()
     ColorControl, //
     DeviceManagement, //
     ElectricalMeasurement, //
+    EthernetNetworkDiagnostics, //
     FlowMeasurement, //
     IlluminanceMeasurement, //
     LevelControl, //
