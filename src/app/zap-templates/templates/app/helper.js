@@ -577,7 +577,6 @@ function isWeaklyTypedEnum(label)
     "SaturationStepMode",
     "SecurityType",
     "SetpointAdjustMode",
-    "SimpleEnum",
     "StartUpOnOffValue",
     "StatusCode",
     "StepMode",

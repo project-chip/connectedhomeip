@@ -28924,9 +28924,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace AccountLogin
 namespace TestCluster {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SimpleEnum
 enum class SimpleEnum : uint8_t
 {
@@ -28935,9 +28932,6 @@ enum class SimpleEnum : uint8_t
     kValueB      = 0x02,
     kValueC      = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SimpleEnum                      = EmberAfSimpleEnum;
-#endif
 
 // Bitmap for SimpleBitmap
 enum class SimpleBitmap : uint8_t
