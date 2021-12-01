@@ -70,8 +70,22 @@ private:
         {
             return true;
         }
-
-        return ((mQueryData.GetType() == QType::ANY) || (mQueryData.GetType() == qType));
+        if ((mQueryData.GetType() == QType::ANY) || (mQueryData.GetType() == qType))
+        {
+            return true;
+        }
+        // Per RFC 6763 section 12.1, PTR records should include relevant SRV, TXT and A/AAAA records
+        if (mQueryData.GetType() == QType::PTR)
+        {
+            return mSendingAdditionalItems &&
+                (qType == QType::SRV || qType == QType::TXT || qType == QType::A || qType == QType::AAAA);
+        }
+        // Per RFC 6763 section 12.2, SRV records should include relevant A/AAAA records
+        if (mQueryData.GetType() == QType::SRV)
+        {
+            return mSendingAdditionalItems && (qType == QType::A || qType == QType::AAAA);
+        }
+        return false;
     }
 
     bool AcceptableQueryClass(QClass qClass)
