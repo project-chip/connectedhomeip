@@ -12634,6 +12634,67 @@ struct TypeInfo
 } // namespace ClusterRevision
 } // namespace Attributes
 } // namespace FixedLabel
+namespace UserLabel {
+
+namespace Structs {
+namespace LabelStruct {
+enum class Fields
+{
+    kLabel = 1,
+    kValue = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan label;
+    chip::CharSpan value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace LabelStruct
+} // namespace Structs
+
+namespace Attributes {
+namespace LabelList {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const Structs::LabelStruct::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::LabelStruct::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::LabelStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LabelList::Id; }
+};
+} // namespace LabelList
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace UserLabel
 namespace BooleanState {
 
 namespace Attributes {

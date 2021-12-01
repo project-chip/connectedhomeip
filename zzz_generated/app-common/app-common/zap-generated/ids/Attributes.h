@@ -1831,6 +1831,24 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace FixedLabel
 
+namespace UserLabel {
+namespace Attributes {
+
+namespace LabelList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace LabelList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace UserLabel
+
 namespace BooleanState {
 namespace Attributes {
 

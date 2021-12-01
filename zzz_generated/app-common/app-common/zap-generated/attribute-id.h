@@ -569,6 +569,13 @@
 // Server attributes
 #define ZCL_LABEL_LIST_ATTRIBUTE_ID (0x0000)
 
+// Attribute ids for cluster: User Label
+
+// Client attributes
+
+// Server attributes
+#define ZCL_LABEL_LIST_ATTRIBUTE_ID (0x0000)
+
 // Attribute ids for cluster: Boolean State
 
 // Client attributes
