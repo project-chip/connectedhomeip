@@ -60,6 +60,7 @@ public:
         printf("Test_TC_DM_3_1\n");
         printf("Test_TC_DM_2_2\n");
         printf("Test_TC_EMR_1_1\n");
+        printf("Test_TC_DIAGETH_1_1\n");
         printf("Test_TC_FLW_1_1\n");
         printf("Test_TC_FLW_2_1\n");
         printf("Test_TC_FLW_2_2\n");
@@ -14256,6 +14257,379 @@ private:
     void OnSuccessResponse_3(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 3U));
+
+        NextTest();
+    }
+};
+
+class Test_TC_DIAGETH_1_1 : public TestCommand
+{
+public:
+    Test_TC_DIAGETH_1_1() : TestCommand("Test_TC_DIAGETH_1_1"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: Test_TC_DIAGETH_1_1\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: Test_TC_DIAGETH_1_1\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : read the attribute: FullDuplex\n");
+            err = TestReadTheAttributeFullDuplex_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : read the attribute: PacketRxCount\n");
+            err = TestReadTheAttributePacketRxCount_1();
+            break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : read the attribute: PacketTxCount\n");
+            err = TestReadTheAttributePacketTxCount_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : read the attribute: TxErrCount\n");
+            err = TestReadTheAttributeTxErrCount_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : read the attribute: CollisionCount\n");
+            err = TestReadTheAttributeCollisionCount_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool, " ***** Test Step 5 : read the attribute: OverrunCount\n");
+            err = TestReadTheAttributeOverrunCount_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool, " ***** Test Step 6 : read the attribute: CarrierDetect\n");
+            err = TestReadTheAttributeCarrierDetect_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : read the attribute: TimeSinceReset\n");
+            err = TestReadTheAttributeTimeSinceReset_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : read the attribute: TimeSinceReset\n");
+            err = TestReadTheAttributeTimeSinceReset_8();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 9;
+
+    static void OnFailureCallback_0(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnFailureResponse_0(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_0(void * context, bool fullDuplex)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnSuccessResponse_0(fullDuplex);
+    }
+
+    static void OnFailureCallback_1(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_1(void * context, uint64_t packetRxCount)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnSuccessResponse_1(packetRxCount);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_2(void * context, uint64_t packetTxCount)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnSuccessResponse_2(packetTxCount);
+    }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_3(void * context, uint64_t txErrCount)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnSuccessResponse_3(txErrCount);
+    }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_4(void * context, uint64_t collisionCount)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnSuccessResponse_4(collisionCount);
+    }
+
+    static void OnFailureCallback_5(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnFailureResponse_5(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_5(void * context, uint64_t overrunCount)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnSuccessResponse_5(overrunCount);
+    }
+
+    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnFailureResponse_6(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_6(void * context, bool carrierDetect)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnSuccessResponse_6(carrierDetect);
+    }
+
+    static void OnFailureCallback_7(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnFailureResponse_7(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_7(void * context, uint64_t timeSinceReset)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnSuccessResponse_7(timeSinceReset);
+    }
+
+    static void OnFailureCallback_8(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnFailureResponse_8(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_8(void * context, uint64_t timeSinceReset)
+    {
+        (static_cast<Test_TC_DIAGETH_1_1 *>(context))->OnSuccessResponse_8(timeSinceReset);
+    }
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestReadTheAttributeFullDuplex_0()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::EthernetNetworkDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo>(
+            this, OnSuccessCallback_0, OnFailureCallback_0);
+    }
+
+    void OnFailureResponse_0(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_0(bool fullDuplex)
+    {
+        VerifyOrReturn(CheckConstraintType("fullDuplex", "", "bool"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheAttributePacketRxCount_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::EthernetNetworkDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::PacketRxCount::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_1(uint64_t packetRxCount)
+    {
+        VerifyOrReturn(CheckConstraintType("packetRxCount", "", "uint64"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheAttributePacketTxCount_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::EthernetNetworkDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::PacketTxCount::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2);
+    }
+
+    void OnFailureResponse_2(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_2(uint64_t packetTxCount)
+    {
+        VerifyOrReturn(CheckConstraintType("packetTxCount", "", "uint64"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheAttributeTxErrCount_3()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::EthernetNetworkDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::TxErrCount::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3);
+    }
+
+    void OnFailureResponse_3(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_3(uint64_t txErrCount)
+    {
+        VerifyOrReturn(CheckConstraintType("txErrCount", "", "uint64"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheAttributeCollisionCount_4()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::EthernetNetworkDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::CollisionCount::TypeInfo>(
+            this, OnSuccessCallback_4, OnFailureCallback_4);
+    }
+
+    void OnFailureResponse_4(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_4(uint64_t collisionCount)
+    {
+        VerifyOrReturn(CheckConstraintType("collisionCount", "", "uint64"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheAttributeOverrunCount_5()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::EthernetNetworkDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::OverrunCount::TypeInfo>(
+            this, OnSuccessCallback_5, OnFailureCallback_5);
+    }
+
+    void OnFailureResponse_5(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_5(uint64_t overrunCount)
+    {
+        VerifyOrReturn(CheckConstraintType("overrunCount", "", "uint64"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheAttributeCarrierDetect_6()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::EthernetNetworkDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo>(
+            this, OnSuccessCallback_6, OnFailureCallback_6);
+    }
+
+    void OnFailureResponse_6(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_6(bool carrierDetect)
+    {
+        VerifyOrReturn(CheckConstraintType("carrierDetect", "", "bool"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheAttributeTimeSinceReset_7()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::EthernetNetworkDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::TimeSinceReset::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7);
+    }
+
+    void OnFailureResponse_7(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_7(uint64_t timeSinceReset)
+    {
+        VerifyOrReturn(CheckValue("timeSinceReset", timeSinceReset, 0ULL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadTheAttributeTimeSinceReset_8()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::EthernetNetworkDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevice, endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::TimeSinceReset::TypeInfo>(
+            this, OnSuccessCallback_8, OnFailureCallback_8);
+    }
+
+    void OnFailureResponse_8(uint8_t status)
+    {
+        (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
+    }
+
+    void OnSuccessResponse_8(uint64_t timeSinceReset)
+    {
+        VerifyOrReturn(CheckConstraintType("timeSinceReset", "", "uint64"));
+        VerifyOrReturn(CheckConstraintMaxValue<uint64_t>("timeSinceReset", timeSinceReset, 4294967295));
 
         NextTest();
     }
@@ -46238,6 +46612,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<Test_TC_DM_3_1>(),
         make_unique<Test_TC_DM_2_2>(),
         make_unique<Test_TC_EMR_1_1>(),
+        make_unique<Test_TC_DIAGETH_1_1>(),
         make_unique<Test_TC_FLW_1_1>(),
         make_unique<Test_TC_FLW_2_1>(),
         make_unique<Test_TC_FLW_2_2>(),
