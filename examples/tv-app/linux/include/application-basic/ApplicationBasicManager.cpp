@@ -161,7 +161,7 @@ bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatu
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
-    if (app == nullptr)
+    if (app == NULL)
     {
         if (endpoint == 3)
         {

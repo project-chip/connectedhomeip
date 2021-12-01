@@ -89,7 +89,7 @@ int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint1
     ChipLogProgress(DeviceLayer, "Adding device %s ", app->GetApplicationBasic()->GetApplicationName());
     uint8_t index = 0;
     // check if already loaded
-    while (index < sizeof(mContentApps))
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         if (mContentApps[index] == app)
         {
@@ -100,12 +100,10 @@ int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint1
     }
 
     index = 0;
-    while (index < sizeof(mContentApps))
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
-        ChipLogProgress(DeviceLayer, "Adding device 1");
         if (NULL == mContentApps[index])
         {
-            ChipLogProgress(DeviceLayer, "Adding device 2");
             mContentApps[index] = app;
             EmberAfStatus ret;
             while (1)
@@ -120,13 +118,12 @@ int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint1
                 }
                 else if (ret != EMBER_ZCL_STATUS_DUPLICATE_EXISTS)
                 {
-                    ChipLogProgress(DeviceLayer, "Adding device 3 ret=%d", ret);
+                    ChipLogProgress(DeviceLayer, "Adding device error=%d", ret);
                     return -1;
                 }
                 // Handle wrap condition
                 if (++mCurrentEndpointId < mFirstDynamicEndpointId)
                 {
-                    ChipLogProgress(DeviceLayer, "Adding device 4");
                     mCurrentEndpointId = mFirstDynamicEndpointId;
                 }
             }
@@ -140,7 +137,7 @@ int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint1
 int AppPlatform::RemoveContentApp(ContentApp * app)
 {
     uint8_t index = 0;
-    while (index < sizeof(mContentApps))
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         if (mContentApps[index] == app)
         {
@@ -160,8 +157,15 @@ int AppPlatform::RemoveContentApp(ContentApp * app)
 
 void AppPlatform::SetupAppPlatform()
 {
+    ChipLogProgress(DeviceLayer, "AppPlatform::SetupAppPlatform()");
+
     // Clear out the device database
-    memset(mContentApps, 0, sizeof(mContentApps));
+    uint8_t index = 0;
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
+    {
+        mContentApps[index] = NULL;
+        index++;
+    }
 
     // Set starting endpoint id where dynamic endpoints will be assigned, which
     // will be the next consecutive endpoint id after the last fixed endpoint.
@@ -193,7 +197,7 @@ void AppPlatform::SetupAppPlatform()
 void AppPlatform::UnloadContentAppByVendorId(uint16_t vendorId)
 {
     uint8_t index = 0;
-    while (index < sizeof(mContentApps))
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         ContentApp * app = mContentApps[index];
         if (app != NULL && app->GetApplicationBasic()->GetVendorId() == vendorId)
@@ -214,8 +218,9 @@ void AppPlatform::UnloadContentAppByVendorId(uint16_t vendorId)
 
 ContentApp * AppPlatform::GetLoadContentAppByVendorId(uint16_t vendorId)
 {
+    ChipLogProgress(DeviceLayer, "GetLoadContentAppByVendorId() - vendorId %d ", vendorId);
     uint8_t index = 0;
-    while (index < sizeof(mContentApps))
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         ContentApp * app = mContentApps[index];
         if (app != NULL && app->GetApplicationBasic()->GetVendorId() == vendorId)
@@ -224,17 +229,17 @@ ContentApp * AppPlatform::GetLoadContentAppByVendorId(uint16_t vendorId)
         }
         index++;
     }
-    if (mContentAppFactory != nullptr)
+    if (mContentAppFactory != NULL)
     {
         return mContentAppFactory->LoadContentAppByVendorId(vendorId);
     }
-    return nullptr;
+    return NULL;
 }
 
 ContentApp * AppPlatform::GetContentAppByEndpointId(chip::EndpointId id)
 {
     uint8_t index = 0;
-    while (index < sizeof(mContentApps))
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         ContentApp * app = mContentApps[index];
         if (app != NULL && app->GetEndpointId() == id)
@@ -244,7 +249,7 @@ ContentApp * AppPlatform::GetContentAppByEndpointId(chip::EndpointId id)
         index++;
     }
     ChipLogProgress(DeviceLayer, "GetContentAppByEndpointId() - endpoint %d not found ", id);
-    return nullptr;
+    return NULL;
 }
 
 } // namespace AppPlatform
