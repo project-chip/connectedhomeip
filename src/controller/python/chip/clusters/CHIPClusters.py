@@ -1867,6 +1867,16 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000002: {
+                "attributeName": "RegulatoryConfig",
+                "attributeId": 0x00000002,
+                "type": "int",
+            },
+            0x00000003: {
+                "attributeName": "LocationCapability",
+                "attributeId": 0x00000003,
+                "type": "int",
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
