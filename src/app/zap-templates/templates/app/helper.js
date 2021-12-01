@@ -283,13 +283,26 @@ function asTypedLiteral(value, type)
       case 'uint64_t':
         return value + (valueIsANumber ? 'ULL' : '');
       case 'float':
-        if (!valueIsANumber || value == 0) {
-          // "0f" is not a valid value, so don't output that; just leave it
-          // as "0".
+        if (!valueIsANumber) {
           return value;
+        }
+        if (value == Infinity || value == -Infinity) {
+          return `${(value < 0) ? '-' : ''}INFINITY`
+        }
+        // If the number looks like an integer, append ".0" to the end;
+        // otherwise adding an "f" suffix makes compilers complain.
+        value = value.toString();
+        if (value.match(/^[0-9]+$/)) {
+          value = value + ".0";
         }
         return value + 'f';
       default:
+        if (!valueIsANumber) {
+          return value;
+        }
+        if (value == Infinity || value == -Infinity) {
+          return `${(value < 0) ? '-' : ''}INFINITY`
+        }
         return value;
       }
     })
