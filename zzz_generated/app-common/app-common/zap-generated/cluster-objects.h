@@ -13374,6 +13374,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LabelList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LabelList
 namespace FeatureMap {
@@ -13385,6 +13386,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -13396,6 +13398,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
