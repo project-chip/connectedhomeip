@@ -24,8 +24,6 @@
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/Command.h>
-#include <app/server/Dnssd.h>
-#include <app/server/Server.h>
 #include <app/util/ContentAppPlatform.h>
 #include <cstdio>
 #include <inttypes.h>
@@ -89,7 +87,7 @@ int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint1
     ChipLogProgress(DeviceLayer, "Adding device %s ", app->GetApplicationBasic()->GetApplicationName());
     uint8_t index = 0;
     // check if already loaded
-    while (index < DYNAMIC_ENDPOINT_COUNT)
+    while (index < sizeof(mContentApps))
     {
         if (mContentApps[index] == app)
         {
@@ -100,7 +98,7 @@ int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint1
     }
 
     index = 0;
-    while (index < DYNAMIC_ENDPOINT_COUNT)
+    while (index < sizeof(mContentApps))
     {
         ChipLogProgress(DeviceLayer, "Adding device 1");
         if (NULL == mContentApps[index])
@@ -140,7 +138,7 @@ int AppPlatform::AddContentApp(ContentApp * app, EmberAfEndpointType * ep, uint1
 int AppPlatform::RemoveContentApp(ContentApp * app)
 {
     uint8_t index = 0;
-    while (index < DYNAMIC_ENDPOINT_COUNT)
+    while (index < sizeof(mContentApps))
     {
         if (mContentApps[index] == app)
         {
@@ -193,7 +191,7 @@ void AppPlatform::SetupAppPlatform()
 void AppPlatform::UnloadContentAppByVendorId(uint16_t vendorId)
 {
     uint8_t index = 0;
-    while (index < DYNAMIC_ENDPOINT_COUNT)
+    while (index < sizeof(mContentApps))
     {
         ContentApp * app = mContentApps[index];
         if (app != NULL && app->GetApplicationBasic()->GetVendorId() == vendorId)
@@ -215,7 +213,7 @@ void AppPlatform::UnloadContentAppByVendorId(uint16_t vendorId)
 ContentApp * AppPlatform::GetLoadContentAppByVendorId(uint16_t vendorId)
 {
     uint8_t index = 0;
-    while (index < DYNAMIC_ENDPOINT_COUNT)
+    while (index < sizeof(mContentApps))
     {
         ContentApp * app = mContentApps[index];
         if (app != NULL && app->GetApplicationBasic()->GetVendorId() == vendorId)
@@ -234,7 +232,7 @@ ContentApp * AppPlatform::GetLoadContentAppByVendorId(uint16_t vendorId)
 ContentApp * AppPlatform::GetContentAppByEndpointId(chip::EndpointId id)
 {
     uint8_t index = 0;
-    while (index < DYNAMIC_ENDPOINT_COUNT)
+    while (index < sizeof(mContentApps))
     {
         ContentApp * app = mContentApps[index];
         if (app != NULL && app->GetEndpointId() == id)
