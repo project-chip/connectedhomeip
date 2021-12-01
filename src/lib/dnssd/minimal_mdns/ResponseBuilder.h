@@ -80,7 +80,7 @@ public:
         chip::Encoding::BigEndian::BufferWriter out(mPacket->Start(), mPacket->DataLength() + mPacket->AvailableDataLength());
         out.Skip(mPacket->DataLength());
 
-        RecordWriter writer(out);
+        RecordWriter writer(&out);
 
         if (!record.Append(mHeader, type, writer))
         {

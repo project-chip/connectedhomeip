@@ -33,7 +33,7 @@ namespace Minimal {
 class RecordWriter
 {
 public:
-    RecordWriter(const chip::Encoding::BigEndian::BufferWriter & output) : mOutput(output) { Reset(); }
+    RecordWriter(chip::Encoding::BigEndian::BufferWriter * output) : mOutput(output) { Reset(); }
 
     void Reset()
     {
@@ -43,7 +43,7 @@ public:
         }
     }
 
-    chip::Encoding::BigEndian::BufferWriter & Writer() { return mOutput; }
+    chip::Encoding::BigEndian::BufferWriter & Writer() { return *mOutput; }
 
     /// Writes  the given qname into the underlying buffer, applying
     /// compression if possible
@@ -56,7 +56,7 @@ private:
     static constexpr uint16_t kInvalidOffset     = 0xFFFF;
 
     // Where the data is being outputted
-    chip::Encoding::BigEndian::BufferWriter mOutput;
+    chip::Encoding::BigEndian::BufferWriter * mOutput;
     uint16_t mPreviousQNames[kMaxCachedReferences];
 
     // Gets the iterator corresponding to the previous name

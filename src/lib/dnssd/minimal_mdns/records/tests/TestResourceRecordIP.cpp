@@ -43,6 +43,8 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
 
     {
         BufferWriter output(dataBuffer, sizeof(dataBuffer));
+        RecordWriter writer(&output);
+
         IPResourceRecord ipResourceRecord(kNames, ipAddress);
 
         ipResourceRecord.SetTtl(123);
@@ -61,7 +63,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
             10, 20,  30,  40             // IP Address
         };
 
-        NL_TEST_ASSERT(inSuite, ipResourceRecord.Append(header, ResourceType::kAnswer, output));
+        NL_TEST_ASSERT(inSuite, ipResourceRecord.Append(header, ResourceType::kAnswer, writer));
         NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
         NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
         NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
@@ -71,6 +73,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
 
     {
         BufferWriter output(dataBuffer, sizeof(dataBuffer));
+        RecordWriter writer(&output);
 
         IPResourceRecord ipResourceRecord(kNames, ipAddress);
 
@@ -90,7 +93,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
             10, 20,  30,  40             // IP Address
         };
 
-        NL_TEST_ASSERT(inSuite, ipResourceRecord.Append(header, ResourceType::kAuthority, output));
+        NL_TEST_ASSERT(inSuite, ipResourceRecord.Append(header, ResourceType::kAuthority, writer));
         NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 0);
         NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 1);
         NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
@@ -100,6 +103,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
 
     {
         BufferWriter output(dataBuffer, sizeof(dataBuffer));
+        RecordWriter writer(&output);
 
         IPResourceRecord ipResourceRecord(kNames, ipAddress);
 
@@ -119,7 +123,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
             10, 20,  30,   40              // IP Address
         };
 
-        NL_TEST_ASSERT(inSuite, ipResourceRecord.Append(header, ResourceType::kAdditional, output));
+        NL_TEST_ASSERT(inSuite, ipResourceRecord.Append(header, ResourceType::kAdditional, writer));
         NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 0);
         NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
         NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 1);
@@ -141,6 +145,7 @@ void WriteIPv6(nlTestSuite * inSuite, void * inContext)
     HeaderRef header(headerBuffer);
 
     BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
     IPResourceRecord ipResourceRecord(kNames, ipAddress);
 
     ipResourceRecord.SetTtl(0x12345678);
@@ -162,7 +167,7 @@ void WriteIPv6(nlTestSuite * inSuite, void * inContext)
                                        0xfe, 0x19, 0x35, 0x9b
     };
 
-    NL_TEST_ASSERT(inSuite, ipResourceRecord.Append(header, ResourceType::kAnswer, output));
+    NL_TEST_ASSERT(inSuite, ipResourceRecord.Append(header, ResourceType::kAnswer, writer));
     NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
     NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
     NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);

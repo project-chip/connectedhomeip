@@ -32,7 +32,8 @@ SerializedQNameIterator RecordWriter::PreviousName(size_t index)
         return SerializedQNameIterator();
     }
 
-    return SerializedQNameIterator(BytesRange(mOutput.Buffer(), mOutput.Buffer() + mOutput.WritePos()), mOutput.Buffer() + offset);
+    return SerializedQNameIterator(BytesRange(mOutput->Buffer(), mOutput->Buffer() + mOutput->WritePos()),
+                                   mOutput->Buffer() + offset);
 }
 
 void RecordWriter::WriteQName(const FullQName & qname)
@@ -42,10 +43,10 @@ void RecordWriter::WriteQName(const FullQName & qname)
     for (uint16_t i = 0; i < qname.nameCount; i++)
     {
 
-        mOutput.Put8(static_cast<uint8_t>(strlen(qname.names[i])));
-        mOutput.Put(qname.names[i]);
+        mOutput->Put8(static_cast<uint8_t>(strlen(qname.names[i])));
+        mOutput->Put(qname.names[i]);
     }
-    mOutput.Put8(0); // end of qnames
+    mOutput->Put8(0); // end of qnames
 }
 
 } // namespace Minimal
