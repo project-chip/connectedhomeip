@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2018 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,21 +17,32 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *          This is a place to put application or project-specific overrides
- *          to the default configuration values for general CHIP features.
- *
- */
-
 #pragma once
 
-#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION 1
-#define CHIP_DEVICE_CONFIG_ENABLE_WIFI_AP 0
+#include <app-common/zap-generated/cluster-objects.h>
+#include <cstdint>
 
-// Use a default pairing code if one hasn't been provisioned in flash.
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_PIN_CODE 20202021
-#define CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR 0xF00
+struct AppEvent;
+typedef void (*EventHandler)(AppEvent *);
 
-#define CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY 1
-#define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DISCOVERY 1
+struct AppEvent
+{
+    enum AppEventTypes
+    {
+        kEventType_ota_provider_connect = 0,
+    };
+
+    uint16_t Type;
+
+    union
+    {
+        struct
+        {
+            chip::NodeId nodeId;
+            chip::FabricIndex fabricIndex;
+            const char * ipAddress;
+        } OTAProviderConnectEvent;
+    };
+
+    EventHandler Handler;
+};

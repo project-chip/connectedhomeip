@@ -42,6 +42,7 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${GEN_DIR}/ota-requestor-app
                            ${APP_ROOT}/ota-requestor-common
                            ${MBED_COMMON}/util/include
+                           ${CHIP_ROOT}/src/app/clusters/ota-requestor
 )
 
 target_sources(${APP_TARGET} PRIVATE
@@ -49,6 +50,7 @@ target_sources(${APP_TARGET} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
     ${MBED_COMMON}/util/LEDWidget.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/main/OTARequestorImpl.cpp
 
     ${GEN_DIR}/ota-requestor-app/zap-generated/attribute-size.cpp
     ${GEN_DIR}/ota-requestor-app/zap-generated/callback-stub.cpp
