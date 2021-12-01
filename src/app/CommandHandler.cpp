@@ -105,8 +105,8 @@ CHIP_ERROR CommandHandler::ProcessInvokeRequest(System::PacketBufferHandle && pa
     {
         // The message thinks it should be part of a timed interaction but it's
         // not, or vice versa.  Spec says to Respond with UNSUPPORTED_ACCESS.
-        err = StatusResponse::SendStatusResponse(Protocols::InteractionModel::Status::UnsupportedAccess, mpExchangeCtx,
-                                                 /* aExpectResponse = */ false);
+        err = StatusResponse::Send(Protocols::InteractionModel::Status::UnsupportedAccess, mpExchangeCtx,
+                                   /* aExpectResponse = */ false);
 
         // Some unit tests call this function in an abnormal state when we don't
         // even have an exchange.

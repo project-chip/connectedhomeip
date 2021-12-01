@@ -462,7 +462,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 exit:
     if (status != Protocols::InteractionModel::Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
-        err = StatusResponse::SendStatusResponse(status, apExchangeContext, false /*aExpectResponse*/);
+        err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
     }
     return err;
 }
@@ -718,7 +718,7 @@ void InteractionModelEngine::OnTimedInvoke(TimedHandler * apTimedHandler, Messag
     OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ true, status);
     if (status != Status::Success)
     {
-        StatusResponse::SendStatusResponse(status, apExchangeContext, /* aExpectResponse = */ false);
+        StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
     }
 }
 
