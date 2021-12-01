@@ -208,7 +208,7 @@ class ClusterObjectTests:
         ]
         _AssumeEventsDecodeSuccess(await devCtrl.ReadEvent(nodeid=NODE_ID, events=req))
 
-        #TODO: Add more wildcard test for IM events.
+        # TODO: Add more wildcard test for IM events.
 
     @classmethod
     async def RunTest(cls, devCtrl):
