@@ -125,7 +125,7 @@ Once P6 is up and running, we need to set up a device controller on Raspberry Pi
 
 -   Resolve DNS-SD name and update address of the node in the device controller.
 
-         - chip-device-ctrl > resolve 0 1234
+         - chip-device-ctrl > resolve 1234
 
 <a name="Notes"></a>
 
@@ -153,4 +153,4 @@ commands. These power cycle the BlueTooth hardware and disable BR/EDR mode.
     This button is configured with `APP_LIGHT_BUTTON` in `include/AppConfig.h`.
     Press `USER_BTN1` on the board to toggle between Light ON and OFF states.
     Light ON and OFF can be observed with 'LED9' on the board. This LED is
-    configured with `LIGHT_STATE_LED` in `include/AppConfig.h`.
+    configured with `LIGHT_LED` in `include/AppConfig.h`.
