@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+
 #include "../../config/PersistentStorage.h"
 #include "Command.h"
 
@@ -65,6 +67,7 @@ protected:
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
     chip::SimpleFabricStorage mFabricStorage;
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
     // This method returns the commissioner instance to be used for running the command.
     // The default commissioner instance name is "alpha", but it can be overriden by passing

@@ -19,7 +19,6 @@
 #include "CHIPCommand.h"
 
 #include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/DeviceAttestationVerifier.h>
 #include <credentials/examples/DefaultDeviceAttestationVerifier.h>
@@ -40,8 +39,6 @@ constexpr chip::FabricId kCommissionerGammaFabricId = 3;
 
 CHIP_ERROR CHIPCommand::Run()
 {
-    chip::Controller::ExampleOperationalCredentialsIssuer opCredsIssuer;
-
 #if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
     // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
     ReturnLogErrorOnFailure(chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(0, true));
@@ -146,14 +143,14 @@ CHIP_ERROR CHIPCommand::InitializeCommissioner(std::string key, chip::FabricId f
     //        store the credentials in persistent storage, and
     //        generate when not available in the storage.
     ReturnLogErrorOnFailure(mCommissionerStorage.Init(key.c_str()));
-    ReturnLogErrorOnFailure(opCredsIssuer.Initialize(mCommissionerStorage));
-    ReturnLogErrorOnFailure(opCredsIssuer.GenerateNOCChainAfterValidation(mCommissionerStorage.GetLocalNodeId(), fabricId,
+    ReturnLogErrorOnFailure(mOpCredsIssuer.Initialize(mCommissionerStorage));
+    ReturnLogErrorOnFailure(mOpCredsIssuer.GenerateNOCChainAfterValidation(mCommissionerStorage.GetLocalNodeId(), fabricId,
                                                                            ephemeralKey.Pubkey(), rcacSpan, icacSpan, nocSpan));
 
     std::unique_ptr<ChipDeviceCommissioner> commissioner = std::make_unique<ChipDeviceCommissioner>();
     chip::Controller::SetupParams commissionerParams;
     commissionerParams.storageDelegate                = &mCommissionerStorage;
-    commissionerParams.operationalCredentialsDelegate = &opCredsIssuer;
+    commissionerParams.operationalCredentialsDelegate = &mOpCredsIssuer;
     commissionerParams.ephemeralKeypair               = &ephemeralKey;
     commissionerParams.controllerRCAC                 = rcacSpan;
     commissionerParams.controllerICAC                 = icacSpan;
