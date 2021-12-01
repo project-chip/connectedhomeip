@@ -57,7 +57,8 @@ EventPathIBstruct = Struct(
     "EndpointId" / Int16ul,
     "ClusterId" / Int32ul,
     "EventId" / Int32ul,
-    )
+)
+
 
 @dataclass
 class AttributePath:

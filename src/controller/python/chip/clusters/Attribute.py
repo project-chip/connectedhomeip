@@ -598,6 +598,7 @@ def ReadAttributes(future: Future, eventLoop, device, devCtrl, attributes: List[
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res
 
+
 def ReadEvents(future: Future, eventLoop, device, devCtrl, events: List[EventPath], subscriptionParameters: SubscriptionParameters = None) -> int:
     handle = chip.native.GetLibraryHandle()
     transaction = AsyncReadTransaction(future, eventLoop, devCtrl)
@@ -629,6 +630,7 @@ def ReadEvents(future: Future, eventLoop, device, devCtrl, events: List[EventPat
     if res != 0:
         ctypes.pythonapi.Py_DecRef(ctypes.py_object(transaction))
     return res
+
 
 def Init():
     handle = chip.native.GetLibraryHandle()
