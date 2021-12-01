@@ -1,0 +1,116 @@
+/*
+ *
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
+#include <lib/support/UnitTestRegistration.h>
+
+#include <nlunit-test.h>
+
+namespace {
+
+using namespace mdns::Minimal;
+using namespace chip::Encoding::BigEndian;
+
+void BasicWriteTest(nlTestSuite * inSuite, void * inContext)
+{
+    const QNamePart kName1[] = { "some", "name" };
+    const QNamePart kName2[] = { "abc", "xyz", "here" };
+
+    uint8_t dataBuffer[128];
+
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    writer.WriteQName(FullQName(kName1));
+    writer.WriteQName(FullQName(kName2));
+
+    // clang-format off
+    const uint8_t expectedOutput[] = {
+        //
+        4, 's', 'o', 'm', 'e', // QNAME part: some
+        4, 'n', 'a', 'm', 'e', // QNAME part: name
+        0,                    // QNAME ends
+        3, 'a', 'b', 'c',     // QNAME part: abc
+        3, 'x', 'y', 'z',     // QNAME part: xyz
+        4, 'h', 'e', 'r', 'e', // QNAME part: here
+        0,  // QNAME ends
+    };
+    // clang-format on
+
+    NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
+    NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
+}
+
+void SimpleDedup(nlTestSuite * inSuite, void * inContext)
+{
+    const QNamePart kName1[] = { "some", "name" };
+    const QNamePart kName2[] = { "other", "name" };
+
+    uint8_t dataBuffer[128];
+
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    writer.WriteQName(FullQName(kName1));
+    writer.WriteQName(FullQName(kName2));
+
+    // clang-format off
+    const uint8_t expectedOutput[] = {
+        //
+        4, 's', 'o', 'm', 'e',      // QNAME part: some
+        4, 'n', 'a', 'm', 'e',      // QNAME part: name
+        0,                          // QNAME ends
+        5, 'o', 't', 'h', 'e', 'r', // QNAME part: other
+        0xC0, 5                     // POINTER: "name" is at offset 5
+    };
+    // clang-format on
+
+    NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
+    NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
+}
+
+} // namespace
+
+// clang-format off
+static const nlTest sTests[] =
+{
+    NL_TEST_DEF("BasicWriteTest", BasicWriteTest),
+    NL_TEST_DEF("SimpleDedup", SimpleDedup),
+
+    NL_TEST_SENTINEL()
+};
+// clang-format on
+
+int TestRecordWriter(void)
+{
+    // clang-format off
+    nlTestSuite theSuite =
+    {
+        "RecordWriter",
+        &sTests[0],
+        nullptr,
+        nullptr
+    };
+    // clang-format on
+
+    nlTestRunner(&theSuite, nullptr);
+
+    return (nlTestRunnerStats(&theSuite));
+}
+
+CHIP_REGISTER_TEST_SUITE(TestRecordWriter)

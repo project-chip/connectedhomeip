@@ -54,17 +54,24 @@ private:
     // and make use of them
     static constexpr size_t kMaxCachedReferences = 8;
     static constexpr uint16_t kInvalidOffset     = 0xFFFF;
+    static constexpr uint16_t kMaxReuseOffset    = 0x3FFF;
 
     // Where the data is being outputted
     chip::Encoding::BigEndian::BufferWriter * mOutput;
     uint16_t mPreviousQNames[kMaxCachedReferences];
 
-    // Gets the iterator corresponding to the previous name
-    // with the given index.
-    //
-    // Will return an iterator  that is not valid if
-    // lookbehind index is not valid
+    /// Find the offset at which this qname was previously seen (if any)
+    chip::Optional<uint16_t> FindPreviousName(const FullQName & name);
+
+    /// Gets the iterator corresponding to the previous name
+    /// with the given index.
+    ///
+    /// Will return an iterator  that is not valid if
+    /// lookbehind index is not valid
     SerializedQNameIterator PreviousName(size_t index);
+
+    /// Keep track that a qname was written at the given offset
+    void RememberWrittenQnameOffset(size_t offset);
 };
 
 } // namespace Minimal

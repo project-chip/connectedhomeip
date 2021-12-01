@@ -120,6 +120,8 @@ public:
         out.Put8(0); // end of qnames
     }
 
+    size_t OffsetInCurrentValidData() const { return mCurrentPosition - mValidData.Start(); }
+
 private:
     static constexpr size_t kMaxValueSize = 63;
     static constexpr uint8_t kPtrMask     = 0xC0;

@@ -36,17 +36,84 @@ SerializedQNameIterator RecordWriter::PreviousName(size_t index)
                                    mOutput->Buffer() + offset);
 }
 
+chip::Optional<uint16_t> RecordWriter::FindPreviousName(const FullQName & name)
+{
+    for (size_t i = 0; i < kMaxCachedReferences; i++)
+    {
+        SerializedQNameIterator previous = PreviousName(i);
+
+        // Any of the sub-segments may match
+        while (previous.IsValid())
+        {
+            if (previous == name)
+            {
+                return chip::Optional<uint16_t>::Value(previous.OffsetInCurrentValidData());
+            }
+
+            if (!previous.Next())
+            {
+                break;
+            }
+        }
+    }
+
+    return chip::Optional<uint16_t>::Missing();
+}
+
 void RecordWriter::WriteQName(const FullQName & qname)
 {
-    // Brain dead q name writing
-    // TODO: update
+    size_t qNameWriteStart = mOutput->WritePos();
+
     for (uint16_t i = 0; i < qname.nameCount; i++)
     {
+
+        // find out if the record part remaining already is located somewhere
+        FullQName remaining;
+        remaining.names     = qname.names + i;
+        remaining.nameCount = qname.nameCount - i;
+
+        // Try to find a valid offset
+        chip::Optional<uint16_t> offset = FindPreviousName(remaining);
+
+        if (offset.HasValue())
+        {
+            // Pointer to offset: set the highest 2 bits
+            mOutput->Put16(offset.Value() | 0xC000);
+
+            if (mOutput->Fit())
+            {
+                RememberWrittenQnameOffset(qNameWriteStart);
+            }
+            return;
+        }
 
         mOutput->Put8(static_cast<uint8_t>(strlen(qname.names[i])));
         mOutput->Put(qname.names[i]);
     }
     mOutput->Put8(0); // end of qnames
+
+    if (mOutput->Fit())
+    {
+        RememberWrittenQnameOffset(qNameWriteStart);
+    }
+}
+
+void RecordWriter::RememberWrittenQnameOffset(size_t offset)
+{
+    if (offset > kMaxReuseOffset)
+    {
+        // cannot represent this offset properly
+        return;
+    }
+
+    for (size_t i = 0; i < kMaxCachedReferences; i++)
+    {
+        if (mPreviousQNames[i] == kInvalidOffset)
+        {
+            mPreviousQNames[i] = offset;
+            return;
+        }
+    }
 }
 
 } // namespace Minimal
