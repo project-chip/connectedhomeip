@@ -40,7 +40,8 @@ public:
     template <typename Function>
     Loop ForEachActiveObject(Function && function)
     {
-        static_assert(std::is_same<Loop, decltype(function(std::declval<U*>()))>::value, "The function must take T* and return Loop");
+        static_assert(std::is_same<Loop, decltype(function(std::declval<U *>()))>::value,
+                      "The function must take T* and return Loop");
         auto proxy = [&](U * target) -> Loop { return function(target); };
         return ForEachActiveObjectInner(
             &proxy, [](void * context, U * target) -> Loop { return (*static_cast<decltype(proxy) *>(context))(target); });

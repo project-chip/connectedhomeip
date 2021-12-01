@@ -243,7 +243,8 @@ public:
     template <typename Function>
     Loop ForEachActiveObject(Function && function)
     {
-        static_assert(std::is_same<Loop, decltype(function(std::declval<T*>()))>::value, "The function must take T* and return Loop");
+        static_assert(std::is_same<Loop, decltype(function(std::declval<T *>()))>::value,
+                      "The function must take T* and return Loop");
         internal::LambdaProxy<T, Function> proxy(std::forward<Function>(function));
         return ForEachActiveObjectInner(&proxy, &internal::LambdaProxy<T, Function>::Call);
     }
@@ -328,7 +329,8 @@ public:
     template <typename Function>
     Loop ForEachActiveObject(Function && function)
     {
-        static_assert(std::is_same<Loop, decltype(function(std::declval<T*>()))>::value, "The function must take T* and return Loop");
+        static_assert(std::is_same<Loop, decltype(function(std::declval<T *>()))>::value,
+                      "The function must take T* and return Loop");
         internal::LambdaProxy<T, Function> proxy(std::forward<Function>(function));
         return mObjects.ForEachNode(&proxy, &internal::LambdaProxy<T, Function>::Call);
     }
