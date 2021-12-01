@@ -52,3 +52,17 @@ tests:
       attribute: "location"
       response:
           value: ""
+
+    - label: "Turn On the light to see attribute change"
+      cluster: "On/Off"
+      command: "On"
+      groupId: "1234"
+      disabled: true
+
+    - label: "Check on/off attribute value is true after on command"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      disabled: true
+      response:
+          value: 1

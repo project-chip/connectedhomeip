@@ -139,6 +139,10 @@ function setDefaultTypeForCommand(test)
   default:
     test.commandName = test.command;
     test.isCommand   = true;
+    if ((kGroupId in test)) {
+      test.isGroupCommand = true;
+      test.groupId        = parseInt(test[kGroupId], 10);
+    }
     break;
   }
 
