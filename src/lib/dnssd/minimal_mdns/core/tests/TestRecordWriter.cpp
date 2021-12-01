@@ -84,6 +84,49 @@ void SimpleDedup(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
 }
 
+void ComplexDedup(nlTestSuite * inSuite, void * inContext)
+{
+    const QNamePart kName1[] = { "some", "name" };
+    const QNamePart kName2[] = { "other", "name" };
+    const QNamePart kName3[] = { "prefix", "of", "other", "name" };
+    const QNamePart kName4[] = { "some", "name", "suffix" };
+    const QNamePart kName5[] = { "more", "suffix" };
+
+    uint8_t dataBuffer[128];
+
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    writer.WriteQName(FullQName(kName1));
+    writer.WriteQName(FullQName(kName2));
+    writer.WriteQName(FullQName(kName3));
+    writer.WriteQName(FullQName(kName4));
+    writer.WriteQName(FullQName(kName5));
+
+    // clang-format off
+    const uint8_t expectedOutput[] = {
+        //
+        4, 's', 'o', 'm', 'e',      // QNAME part: some
+        4, 'n', 'a', 'm', 'e',      // QNAME part: name
+        0,                          // QNAME ends
+        5, 'o', 't', 'h', 'e', 'r', // QNAME part: other
+        0xC0, 5,                    // POINTER: "name" is at offset 5
+        6, 'p', 'r', 'e', 'f', 'i', 'x',
+        2, 'o', 'f',
+        0xC0, 11,                   // POINTER: "otner.name" is at offset 11
+        4, 's', 'o', 'm', 'e',            // QNAME part: some
+        4, 'n', 'a', 'm', 'e',            // QNAME part: name
+        6, 's', 'u', 'f', 'f', 'i', 'x',  // suffix which prevents reuse
+        0,
+        4, 'm', 'o', 'r', 'e',
+        0xC0, 41
+    };
+    // clang-format on
+
+    NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
+    NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
+}
+
 } // namespace
 
 // clang-format off
@@ -91,6 +134,7 @@ static const nlTest sTests[] =
 {
     NL_TEST_DEF("BasicWriteTest", BasicWriteTest),
     NL_TEST_DEF("SimpleDedup", SimpleDedup),
+    NL_TEST_DEF("ComplexDedup", ComplexDedup),
 
     NL_TEST_SENTINEL()
 };
