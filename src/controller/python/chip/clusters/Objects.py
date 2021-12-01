@@ -25705,7 +25705,7 @@ class TestCluster(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=bool)
 
-            value: 'bool' = None
+            value: 'bool' = False
 
         @dataclass
         class Unsupported(ClusterAttributeDescriptor):
