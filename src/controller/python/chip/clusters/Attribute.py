@@ -25,12 +25,25 @@ from .ClusterObjects import Cluster, ClusterAttributeDescriptor, ClusterEventDes
 import chip.exceptions
 import chip.interaction_model
 import chip.tlv
-
+from enum import Enum, unique
 import inspect
 import sys
 import logging
 import threading
 import builtins
+
+
+@unique
+class EventTimestampType(Enum):
+    SYSTEM = 1
+    EPOCH = 2
+
+
+@unique
+class EventPriority(Enum):
+    DEBUG = 1
+    INFO = 2
+    CRITICAL = 3
 
 
 @dataclass
@@ -108,9 +121,9 @@ class EventHeader:
     ClusterId: int = None
     EventId: int = None
     EventNumber: int = None
-    Priority: int = None
+    Priority: EventPriority = None
     Timestamp: int = None
-    TimestampType: int = None
+    TimestampType: EventTimestampType = None
 
     def __init__(self, EndpointId: int = None, Cluster=None, Event=None, ClusterId=None, EventId=None, EventNumber=None, Priority=None, Timestamp=None, TimestampType=None):
         self.EndpointId = EndpointId
@@ -247,12 +260,6 @@ class SubscriptionTransaction:
         '''
         return self._read_transaction.GetAttributeValue(AttributePath(path[0], Attribute=path[1]))
 
-    def GetEventValue(self, path: Tuple[int, Type[ClusterEventDescriptor]]):
-        '''
-        Gets the attribute from cache, returns the value and the timestamp when it was updated last time.
-        '''
-        return self._read_transaction.GetEventValue(EventPath(path[0], Event=path[1]))
-
     def GetAllAttributeValues(self):
         return self._read_transaction.GetAllAttributeValues()
 
@@ -307,7 +314,7 @@ class AsyncReadTransaction:
         self._event_loop = eventLoop
         self._future = future
         self._subscription_handler = None
-        self._res = {'Attributes': {}, 'Events': {}}
+        self._res = {'Attributes': {}, 'Events': []}
         self._devCtrl = devCtrl
         # For subscriptions, the data comes from CHIP Thread, whild the value will be accessed from Python's thread, so a lock is required here.
         self._resLock = threading.Lock()
@@ -315,10 +322,6 @@ class AsyncReadTransaction:
     def GetAttributeValue(self, path: AttributePath):
         with self._resLock:
             return self._res['Attributes'].get(path)
-
-    def GetEventValue(self, path: EventPath):
-        with self._resLock:
-            return self._res['Events'].get(path)
 
     def GetAllAttributeValues(self):
         return self._res['Attributes']
@@ -381,7 +384,7 @@ class AsyncReadTransaction:
             tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
             if eventType is None:
                 eventValue = ValueDecodeFailure(
-                    tlvData, LookupError("attribute schema not found"))
+                    tlvData, LookupError("event schema not found"))
             else:
                 try:
                     eventValue = eventType(eventType.FromTLV(data))
@@ -399,13 +402,8 @@ class AsyncReadTransaction:
                         raise
 
             with self._resLock:
-                if self._res['Events'].has_key(path):
-                    self._res['Events'][path].append[EventPath(
-                        ClusterId=header.ClusterId, EventId=header.EventId)] = EventReadResult(
-                        Header=header, Data=eventValue)
-                else:
-                    self._res['Events'][path] = [EventReadResult(
-                        Header=header, Data=eventValue)]
+                self._res['Events'].append[EventReadResult(
+                    Header=header, Data=eventValue)]
         except Exception as ex:
             logging.exception(ex)
 
@@ -499,7 +497,7 @@ def _OnReadAttributeDataCallback(closure, endpoint: int, cluster: int, attribute
 def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: int, number: int, priority: int, timestamp: int, timestampType: int, data, len):
     dataBytes = ctypes.string_at(data, len)
     closure.handleEventData(EventHeader(
-        EndpointId=endpoint, ClusterId=cluster, EventId=event, EventNumber=number, Priority=priority, Timestamp=timestamp, TimestampType=timestampType), dataBytes[:])
+        EndpointId=endpoint, ClusterId=cluster, EventId=event, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), dataBytes[:])
 
 
 @_OnSubscriptionEstablishedCallbackFunct
