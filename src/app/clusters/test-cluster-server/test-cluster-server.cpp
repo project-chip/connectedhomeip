@@ -78,6 +78,8 @@ private:
     CHIP_ERROR WriteListStructOctetStringAttribute(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadListNullablesAndOptionalsStructAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteListNullablesAndOptionalsStructAttribute(AttributeValueDecoder & aDecoder);
+    CHIP_ERROR ReadStructAttribute(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteStructAttribute(AttributeValueDecoder & aDecoder);
 };
 
 TestAttrAccess gAttrAccess;
@@ -85,6 +87,9 @@ uint8_t gListUint8Data[kAttributeListLength];
 OctetStringData gListOctetStringData[kAttributeListLength];
 OctetStringData gListOperationalCert[kAttributeListLength];
 Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLength];
+Structs::SimpleStruct::Type gStructAttributeValue = { 0,          false,      SimpleEnum::EMBER_ZCL_SIMPLE_ENUM_VALUE_A,
+                                                      ByteSpan(), CharSpan(), BitFlags<SimpleBitmap>(),
+                                                      0,          0 };
 
 CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -101,6 +106,9 @@ CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, Attribu
     }
     case ListNullablesAndOptionalsStruct::Id: {
         return ReadListNullablesAndOptionalsStructAttribute(aEncoder);
+    }
+    case Struct::Id: {
+        return ReadStructAttribute(aEncoder);
     }
     default: {
         break;
@@ -125,6 +133,9 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     }
     case ListNullablesAndOptionalsStruct::Id: {
         return WriteListNullablesAndOptionalsStructAttribute(aDecoder);
+    }
+    case Struct::Id: {
+        return WriteStructAttribute(aDecoder);
     }
     default: {
         break;
@@ -260,6 +271,17 @@ CHIP_ERROR TestAttrAccess::WriteListNullablesAndOptionalsStructAttribute(Attribu
     // TODO Add yaml test case for NullablesAndOptionalsStruct list
     return CHIP_NO_ERROR;
 }
+
+CHIP_ERROR TestAttrAccess::ReadStructAttribute(AttributeValueEncoder & aEncoder)
+{
+    return aEncoder.Encode(gStructAttributeValue);
+}
+
+CHIP_ERROR TestAttrAccess::WriteStructAttribute(AttributeValueDecoder & aDecoder)
+{
+    return aDecoder.Decode(gStructAttributeValue);
+}
+
 } // namespace
 
 bool emberAfTestClusterClusterTestCallback(app::CommandHandler *, const app::ConcreteCommandPath & commandPath,
@@ -523,6 +545,13 @@ bool emberAfTestClusterClusterSimpleStructEchoRequestCallback(CommandHandler * c
     {
         emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_FAILURE);
     }
+    return true;
+}
+
+bool emberAfTestClusterClusterTimedInvokeRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                         const Commands::TimedInvokeRequest::DecodableType & commandData)
+{
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
     return true;
 }
 

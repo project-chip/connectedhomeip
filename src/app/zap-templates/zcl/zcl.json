@@ -53,6 +53,7 @@
         "thread-network-diagnostics-cluster.xml",
         "time-synchronization-cluster.xml",
         "tv-channel-cluster.xml",
+        "user-label-cluster.xml",
         "wake-on-lan-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "window-covering.xml",

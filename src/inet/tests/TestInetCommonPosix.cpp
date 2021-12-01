@@ -81,6 +81,8 @@ using namespace chip::Inet;
 System::LayerImpl gSystemLayer;
 
 Inet::InetLayer gInet;
+Inet::UDPEndPointManagerImpl gUDP;
+Inet::TCPEndPointManagerImpl gTCP;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 static sys_mbox_t * sLwIPEventQueue   = NULL;
@@ -220,8 +222,6 @@ static void PrintNetworkState()
 
 void InitNetwork()
 {
-    void * lContext = nullptr;
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // If an tap device name hasn't been specified, derive one from the IPv6 interface id.
@@ -417,11 +417,11 @@ void InitNetwork()
     PrintNetworkState();
 
     AcquireLwIP();
-    lContext = sLwIPEventQueue;
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    gInet.Init(gSystemLayer, lContext);
+    gInet.Init(gSystemLayer, &gUDP);
+    gInet.InitTCP(&gTCP);
 }
 
 void ServiceEvents(uint32_t aSleepTimeMilliseconds)
@@ -504,6 +504,7 @@ static void OnLwIPInitComplete(void * arg)
 
 void ShutdownNetwork()
 {
+    gInet.ShutdownTCP();
     gInet.Shutdown();
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     ReleaseLwIP();

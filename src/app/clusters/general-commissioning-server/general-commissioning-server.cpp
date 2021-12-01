@@ -21,16 +21,82 @@
  *******************************************************************************
  ******************************************************************************/
 
+#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/Span.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <platform/CHIPDeviceConfig.h>
+#include <platform/ConfigurationManager.h>
 #include <platform/internal/DeviceControlServer.h>
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralCommissioning;
+using namespace chip::app::Clusters::GeneralCommissioning::Attributes;
+using namespace chip::DeviceLayer;
+
+namespace {
+
+class GeneralCommissioningAttrAccess : public AttributeAccessInterface
+{
+public:
+    // Register for the GeneralCommissioning cluster on all endpoints.
+    GeneralCommissioningAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralCommissioning::Id) {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+private:
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &), AttributeValueEncoder & aEncoder);
+};
+
+GeneralCommissioningAttrAccess gAttrAccess;
+
+CHIP_ERROR GeneralCommissioningAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    if (aPath.mClusterId != GeneralCommissioning::Id)
+    {
+        // We shouldn't have been called at all.
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
+    switch (aPath.mAttributeId)
+    {
+    case RegulatoryConfig::Id: {
+        return ReadIfSupported(&ConfigurationManager::GetRegulatoryConfig, aEncoder);
+    }
+    case LocationCapability::Id: {
+        return ReadIfSupported(&ConfigurationManager::GetLocationCapability, aEncoder);
+    }
+    default: {
+        break;
+    }
+    }
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR GeneralCommissioningAttrAccess::ReadIfSupported(CHIP_ERROR (ConfigurationManager::*getter)(uint8_t &),
+                                                           AttributeValueEncoder & aEncoder)
+{
+    uint8_t data;
+    CHIP_ERROR err = (DeviceLayer::ConfigurationMgr().*getter)(data);
+    if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
+    {
+        data = 0;
+    }
+    else if (err != CHIP_NO_ERROR)
+    {
+        return err;
+    }
+
+    return aEncoder.Encode(data);
+}
+
+} // anonymous namespace
 
 bool emberAfGeneralCommissioningClusterArmFailSafeCallback(app::CommandHandler * commandObj,
                                                            const app::ConcreteCommandPath & commandPath,
@@ -70,4 +136,7 @@ bool emberAfGeneralCommissioningClusterSetRegulatoryConfigCallback(app::CommandH
     return true;
 }
 
-void MatterGeneralCommissioningPluginServerInitCallback() {}
+void MatterGeneralCommissioningPluginServerInitCallback()
+{
+    registerAttributeAccessOverride(&gAttrAccess);
+}

@@ -265,6 +265,12 @@
 #define CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER
 #endif
 
+#if defined(ZCL_USING_USER_LABEL_CLUSTER_SERVER) || defined(ZCL_USING_USER_LABEL_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_USER_LABEL_CLUSTER { ZCL_USER_LABEL_CLUSTER_ID, 65, "User Label" },
+#else
+#define CHIP_PRINTCLUSTER_USER_LABEL_CLUSTER
+#endif
+
 #if defined(ZCL_USING_BOOLEAN_STATE_CLUSTER_SERVER) || defined(ZCL_USING_BOOLEAN_STATE_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER { ZCL_BOOLEAN_STATE_CLUSTER_ID, 69, "Boolean State" },
 #else
@@ -810,6 +816,7 @@
     CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER                                                                          \
     CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \
     CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER                                                                                          \
+    CHIP_PRINTCLUSTER_USER_LABEL_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
     CHIP_PRINTCLUSTER_MODE_SELECT_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_SHADE_CONFIG_CLUSTER                                                                                         \

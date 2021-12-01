@@ -30,6 +30,7 @@ import inspect
 import sys
 import logging
 import threading
+import builtins
 
 
 @dataclass
@@ -95,6 +96,16 @@ AttributeReadRequest = AttributeDescriptorWithEndpoint
 @dataclass
 class AttributeReadResult(AttributeStatus):
     Data: Any = None
+
+
+@dataclass
+class ValueDecodeFailure:
+    ''' Encapsulates a failure to decode a TLV value into a cluster object.
+        Some exceptions have custom fields, so run str(ReasonException) to get more info.
+    '''
+
+    TLVValue: Any = None
+    Reason: Exception = None
 
 
 _AttributeIndex = {}
@@ -199,21 +210,29 @@ class AsyncReadTransaction:
             attributeType = _AttributeIndex.get(str(AttributePath(
                 ClusterId=path.ClusterId, AttributeId=path.AttributeId)), None)
             attributeValue = None
+            tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
             if attributeType is None:
-                attributeValue = chip.tlv.TLVReader(data).get().get("Any", {})
+                attributeValue = ValueDecodeFailure(
+                    tlvData, LookupError("attribute schema not found"))
             else:
                 try:
-                    attributeValue = attributeType.FromTLV(data)
-                except:
+                    attributeValue = attributeType(attributeType.FromTLV(data))
+                except Exception as ex:
                     logging.error(
                         f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Attribute = {path.AttributeId}")
                     logging.error(
                         f"Failed Cluster Object: {str(attributeType)}")
-                    raise
+                    logging.error(ex)
+                    attributeValue = ValueDecodeFailure(
+                        tlvData, ex)
+
+                    # If we're in debug mode, raise the exception so that we can better debug what's happening.
+                    if (builtins.enableDebugMode):
+                        raise
 
             with self._resLock:
                 self._res[path] = AttributeReadResult(
-                    Path=path, Status=imStatus, Data=attributeType(attributeValue))
+                    Path=path, Status=imStatus, Data=attributeValue)
                 if self._subscription_handler is not None:
                     self._subscription_handler.OnUpdate(
                         path, attributeType(attributeValue))

@@ -72,6 +72,8 @@ static_library("inet") {
     "IPAddress-StringFuncts.cpp",
     "IPAddress.cpp",
     "IPAddress.h",
+    "IPPacketInfo.cpp",
+    "IPPacketInfo.h",
     "IPPrefix.cpp",
     "IPPrefix.h",
     "Inet.h",

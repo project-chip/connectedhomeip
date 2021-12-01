@@ -86,6 +86,11 @@ public:
 
     FabricIndex GetAccessingFabricIndex() const;
 
+    /**
+     * Check whether the WriteRequest we are handling is a timed write.
+     */
+    bool IsTimedWrite() const { return mIsTimedRequest; }
+
 private:
     enum class State
     {

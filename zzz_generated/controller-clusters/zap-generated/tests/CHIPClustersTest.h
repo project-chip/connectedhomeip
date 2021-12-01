@@ -473,6 +473,10 @@ public:
     GeneralCommissioningClusterTest() : GeneralCommissioningCluster() {}
     ~GeneralCommissioningClusterTest() {}
 
+    CHIP_ERROR WriteAttributeRegulatoryConfig(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                              uint8_t value);
+    CHIP_ERROR WriteAttributeLocationCapability(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                uint8_t value);
     CHIP_ERROR WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                              uint16_t value);
 };

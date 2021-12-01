@@ -77,6 +77,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})
 }
 {{/chip_cluster_commands}}
 {{#chip_server_cluster_attributes}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#if isWritableAttribute}}
 {{! TODO: Lists not supported in attribute writes yet. }}
 {{#unless isList}}
@@ -148,6 +149,7 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, report{{asCamelCased nam
 }
 {{/unless}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 {{/if}}

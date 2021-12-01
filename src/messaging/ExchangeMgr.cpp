@@ -100,7 +100,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
     mContextPool.ForEachActiveObject([](auto * ec) {
         // There should be no active object in the pool
-        assert(false);
+        VerifyOrDie(false);
         return true;
     });
 
@@ -222,6 +222,9 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                 {
                     ec->SetMsgRcvdFromPeer(true);
                 }
+
+                ChipLogDetail(ExchangeManager, "Found matching exchange: " ChipLogFormatExchange ", Delegate: 0x%p",
+                              ChipLogValueExchange(ec), ec->GetDelegate());
 
                 // Matched ExchangeContext; send to message handler.
                 ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));

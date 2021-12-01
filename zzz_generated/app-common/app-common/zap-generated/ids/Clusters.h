@@ -142,6 +142,9 @@ static constexpr ClusterId Id = 0x0000003E;
 namespace FixedLabel {
 static constexpr ClusterId Id = 0x00000040;
 } // namespace FixedLabel
+namespace UserLabel {
+static constexpr ClusterId Id = 0x00000041;
+} // namespace UserLabel
 namespace BooleanState {
 static constexpr ClusterId Id = 0x00000045;
 } // namespace BooleanState

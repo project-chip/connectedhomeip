@@ -440,6 +440,19 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPUserLabelClusterLabelStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _value = @"";
+    }
+    return self;
+}
+@end
+
 @implementation CHIPModeSelectClusterModeOptionStruct
 - (instancetype)init
 {

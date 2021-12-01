@@ -410,9 +410,9 @@ exit:
     if (!suppressResponse)
     {
         bool noResponseExpected = IsSubscriptionIdle() && !mPendingMoreChunks;
-        err = StatusResponse::SendStatusResponse(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
-                                                                      : Protocols::InteractionModel::Status::InvalidSubscription,
-                                                 mpExchangeCtx, !noResponseExpected);
+        err                     = StatusResponse::Send(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
+                                                        : Protocols::InteractionModel::Status::InvalidSubscription,
+                                   mpExchangeCtx, !noResponseExpected);
 
         if (noResponseExpected || (err != CHIP_NO_ERROR))
         {
