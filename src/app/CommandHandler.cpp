@@ -233,7 +233,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     // Issue 11075
 
     // Using endpoint 1 for test purposes
-    if (mpExchangeCtx->IsGroupExchangeContext())
+    if (mpExchangeCtx != nullptr && mpExchangeCtx->IsGroupExchangeContext())
     {
         endpointId = 1;
         err        = CHIP_NO_ERROR;
