@@ -89,8 +89,8 @@ public:
         // callback. If we do, that's a bug.
         //
         VerifyOrDie(!aPath.IsListItemOperation());
-        size_t bufferLen                  = apData->GetRemainingLength() + apData->GetLengthRead();
-        std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(new uint8_t[bufferLen]);
+        size_t bufferLen                  = (apData == nullptr ? 0 : apData->GetRemainingLength() + apData->GetLengthRead());
+        std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(apData == nullptr ? nullptr : new uint8_t[bufferLen]);
         uint32_t size                     = 0;
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
