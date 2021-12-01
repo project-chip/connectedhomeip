@@ -73,6 +73,7 @@ if [[ ${*/--no-cache//} != "${*}" ]]; then
 fi
 
 docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
+docker image prune --force
 
 [[ ${*/--latest//} != "${*}" ]] && {
     docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
