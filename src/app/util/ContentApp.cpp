@@ -23,17 +23,11 @@
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
-#include <app/Command.h>
-#include <app/server/Dnssd.h>
-#include <app/server/Server.h>
 #include <app/util/ContentAppPlatform.h>
 #include <cstdio>
 #include <inttypes.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/DataModelTypes.h>
-#include <lib/shell/Commands.h>
-#include <lib/shell/Engine.h>
-#include <lib/shell/commands/Help.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CodeUtils.h>
