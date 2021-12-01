@@ -8220,6 +8220,19 @@ public class ClusterInfoMapping {
             testClustertestUnknownCommandCommandParams);
     testClusterClusterInteractionInfoMap.put(
         "testUnknownCommand", testClustertestUnknownCommandInteractionInfo);
+    Map<String, CommandParameterInfo> testClustertimedInvokeRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    // Populate commands
+    InteractionInfo testClustertimedInvokeRequestInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .timedInvokeRequest((DefaultClusterCallback) callback);
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            testClustertimedInvokeRequestCommandParams);
+    testClusterClusterInteractionInfoMap.put(
+        "timedInvokeRequest", testClustertimedInvokeRequestInteractionInfo);
     commandMap.put("testCluster", testClusterClusterInteractionInfoMap);
     Map<String, InteractionInfo> thermostatClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> thermostatclearWeeklyScheduleCommandParams =

@@ -4369,6 +4369,11 @@ EmberAfStatus Get(chip::EndpointId endpoint, int16_t * value); // int16s
 EmberAfStatus Set(chip::EndpointId endpoint, int16_t value);
 } // namespace RangeRestrictedInt16s
 
+namespace TimedWriteBoolean {
+EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
+EmberAfStatus Set(chip::EndpointId endpoint, bool value);
+} // namespace TimedWriteBoolean
+
 namespace Unsupported {
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);

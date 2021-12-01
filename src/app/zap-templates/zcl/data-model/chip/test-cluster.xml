@@ -144,6 +144,8 @@ limitations under the License.
     <attribute side="server" code="0x0027" define="RANGE_RESTRICTED_INT8s" type="int8s" min="-40" max="50" writable="true" optional="false" default="-5">range_restricted_int8s</attribute>
     <attribute side="server" code="0x0028" define="RANGE_RESTRICTED_INT16U" type="int16u" min="100" max="1000" writable="true" optional="false" default="200">range_restricted_int16u</attribute>
     <attribute side="server" code="0x0029" define="RANGE_RESTRICTED_INT16s" type="int16s" min="-150" max="200" writable="true" optional="false" default="-5">range_restricted_int16s</attribute>
+    <attribute side="server" code="0x0030" define="TIMED_WRITE_BOOLEAN"
+               type="BOOLEAN" writable="true" mustUseTimedWrite="true">timed_write_boolean</attribute>
 
     <attribute side="server" code="0x8000" define="NULLABLE_BOOLEAN" type="BOOLEAN" writable="true" default="false" isNullable="true" optional="false">nullable_boolean</attribute>
     <attribute side="server" code="0x8001" define="NULLABLE_BITMAP8" type="BITMAP8" writable="true" default="0" isNullable="true" optional="false">nullable_bitmap8</attribute>
@@ -350,6 +352,14 @@ limitations under the License.
         the struct back.
       </description>
       <arg name="arg1" type="SimpleStruct"/>
+    </command>
+
+    <command source="client" code="0x12" name="TimedInvokeRequest"
+             mustUseTimedInvoke="true" optional="false">
+      <description>
+        Command that just responds with a success status if the timed invoke
+        conditions are met.
+      </description>
     </command>
 
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">

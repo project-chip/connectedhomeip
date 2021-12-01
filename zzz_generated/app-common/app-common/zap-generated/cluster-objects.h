@@ -49,6 +49,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MainsVoltage
 namespace MainsFrequency {
@@ -60,6 +61,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsFrequency::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MainsFrequency
 namespace MainsAlarmMask {
@@ -71,6 +73,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsAlarmMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MainsAlarmMask
 namespace MainsVoltageMinThreshold {
@@ -82,6 +85,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltageMinThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MainsVoltageMinThreshold
 namespace MainsVoltageMaxThreshold {
@@ -93,6 +97,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltageMaxThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MainsVoltageMaxThreshold
 namespace MainsVoltageDwellTrip {
@@ -104,6 +109,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MainsVoltageDwellTrip::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MainsVoltageDwellTrip
 namespace BatteryVoltage {
@@ -115,6 +121,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryVoltage
 namespace BatteryPercentageRemaining {
@@ -126,6 +133,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageRemaining::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryPercentageRemaining
 namespace BatteryManufacturer {
@@ -137,6 +145,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryManufacturer::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryManufacturer
 namespace BatterySize {
@@ -148,6 +157,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatterySize::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatterySize
 namespace BatteryAhrRating {
@@ -159,6 +169,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAhrRating::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryAhrRating
 namespace BatteryQuantity {
@@ -170,6 +181,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryQuantity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryQuantity
 namespace BatteryRatedVoltage {
@@ -181,6 +193,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryRatedVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryRatedVoltage
 namespace BatteryAlarmMask {
@@ -192,6 +205,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAlarmMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryAlarmMask
 namespace BatteryVoltageMinThreshold {
@@ -203,6 +217,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageMinThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryVoltageMinThreshold
 namespace BatteryVoltageThreshold1 {
@@ -214,6 +229,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageThreshold1::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryVoltageThreshold1
 namespace BatteryVoltageThreshold2 {
@@ -225,6 +241,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageThreshold2::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryVoltageThreshold2
 namespace BatteryVoltageThreshold3 {
@@ -236,6 +253,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltageThreshold3::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryVoltageThreshold3
 namespace BatteryPercentageMinThreshold {
@@ -247,6 +265,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageMinThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryPercentageMinThreshold
 namespace BatteryPercentageThreshold1 {
@@ -258,6 +277,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageThreshold1::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryPercentageThreshold1
 namespace BatteryPercentageThreshold2 {
@@ -269,6 +289,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageThreshold2::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryPercentageThreshold2
 namespace BatteryPercentageThreshold3 {
@@ -280,6 +301,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentageThreshold3::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryPercentageThreshold3
 namespace BatteryAlarmState {
@@ -291,6 +313,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryAlarmState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryAlarmState
 namespace Battery2Voltage {
@@ -302,6 +325,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Voltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2Voltage
 namespace Battery2PercentageRemaining {
@@ -313,6 +337,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageRemaining::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2PercentageRemaining
 namespace Battery2Manufacturer {
@@ -324,6 +349,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Manufacturer::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2Manufacturer
 namespace Battery2Size {
@@ -335,6 +361,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Size::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2Size
 namespace Battery2AhrRating {
@@ -346,6 +373,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AhrRating::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2AhrRating
 namespace Battery2Quantity {
@@ -357,6 +385,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2Quantity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2Quantity
 namespace Battery2RatedVoltage {
@@ -368,6 +397,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2RatedVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2RatedVoltage
 namespace Battery2AlarmMask {
@@ -379,6 +409,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AlarmMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2AlarmMask
 namespace Battery2VoltageMinThreshold {
@@ -390,6 +421,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageMinThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2VoltageMinThreshold
 namespace Battery2VoltageThreshold1 {
@@ -401,6 +433,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageThreshold1::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2VoltageThreshold1
 namespace Battery2VoltageThreshold2 {
@@ -412,6 +445,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageThreshold2::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2VoltageThreshold2
 namespace Battery2VoltageThreshold3 {
@@ -423,6 +457,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2VoltageThreshold3::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2VoltageThreshold3
 namespace Battery2PercentageMinThreshold {
@@ -434,6 +469,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageMinThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2PercentageMinThreshold
 namespace Battery2PercentageThreshold1 {
@@ -445,6 +481,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageThreshold1::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2PercentageThreshold1
 namespace Battery2PercentageThreshold2 {
@@ -456,6 +493,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageThreshold2::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2PercentageThreshold2
 namespace Battery2PercentageThreshold3 {
@@ -467,6 +505,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2PercentageThreshold3::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2PercentageThreshold3
 namespace Battery2AlarmState {
@@ -478,6 +517,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery2AlarmState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery2AlarmState
 namespace Battery3Voltage {
@@ -489,6 +529,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Voltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3Voltage
 namespace Battery3PercentageRemaining {
@@ -500,6 +541,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageRemaining::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3PercentageRemaining
 namespace Battery3Manufacturer {
@@ -511,6 +553,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Manufacturer::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3Manufacturer
 namespace Battery3Size {
@@ -522,6 +565,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Size::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3Size
 namespace Battery3AhrRating {
@@ -533,6 +577,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AhrRating::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3AhrRating
 namespace Battery3Quantity {
@@ -544,6 +589,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3Quantity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3Quantity
 namespace Battery3RatedVoltage {
@@ -555,6 +601,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3RatedVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3RatedVoltage
 namespace Battery3AlarmMask {
@@ -566,6 +613,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AlarmMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3AlarmMask
 namespace Battery3VoltageMinThreshold {
@@ -577,6 +625,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageMinThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3VoltageMinThreshold
 namespace Battery3VoltageThreshold1 {
@@ -588,6 +637,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageThreshold1::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3VoltageThreshold1
 namespace Battery3VoltageThreshold2 {
@@ -599,6 +649,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageThreshold2::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3VoltageThreshold2
 namespace Battery3VoltageThreshold3 {
@@ -610,6 +661,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3VoltageThreshold3::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3VoltageThreshold3
 namespace Battery3PercentageMinThreshold {
@@ -621,6 +673,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageMinThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3PercentageMinThreshold
 namespace Battery3PercentageThreshold1 {
@@ -632,6 +685,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageThreshold1::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3PercentageThreshold1
 namespace Battery3PercentageThreshold2 {
@@ -643,6 +697,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageThreshold2::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3PercentageThreshold2
 namespace Battery3PercentageThreshold3 {
@@ -654,6 +709,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3PercentageThreshold3::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3PercentageThreshold3
 namespace Battery3AlarmState {
@@ -665,6 +721,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Battery3AlarmState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Battery3AlarmState
 namespace FeatureMap {
@@ -676,6 +733,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -687,6 +745,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -703,6 +762,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentTemperature::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentTemperature
 namespace MinTempExperienced {
@@ -714,6 +774,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinTempExperienced::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinTempExperienced
 namespace MaxTempExperienced {
@@ -725,6 +786,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxTempExperienced::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxTempExperienced
 namespace OverTempTotalDwell {
@@ -736,6 +798,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverTempTotalDwell::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OverTempTotalDwell
 namespace DeviceTempAlarmMask {
@@ -747,6 +810,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DeviceTempAlarmMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DeviceTempAlarmMask
 namespace LowTempThreshold {
@@ -758,6 +822,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LowTempThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LowTempThreshold
 namespace HighTempThreshold {
@@ -769,6 +834,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HighTempThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HighTempThreshold
 namespace LowTempDwellTripPoint {
@@ -780,6 +846,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LowTempDwellTripPoint::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LowTempDwellTripPoint
 namespace HighTempDwellTripPoint {
@@ -791,6 +858,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HighTempDwellTripPoint::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HighTempDwellTripPoint
 namespace FeatureMap {
@@ -802,6 +870,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -813,6 +882,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DeviceTemperatureConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -906,6 +976,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -936,6 +1008,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -963,6 +1037,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -994,6 +1070,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1019,6 +1097,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IdentifyTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace IdentifyTime
 namespace IdentifyType {
@@ -1030,6 +1109,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IdentifyType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace IdentifyType
 namespace FeatureMap {
@@ -1041,6 +1121,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -1052,6 +1133,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Identify::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -1134,6 +1216,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Groups::Commands::AddGroupResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1167,6 +1251,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1198,6 +1284,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Groups::Commands::ViewGroupResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1232,6 +1320,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1264,6 +1354,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1296,6 +1388,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1327,6 +1421,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Groups::Commands::RemoveGroupResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1359,6 +1455,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1387,6 +1485,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1418,6 +1518,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1443,6 +1545,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NameSupport::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NameSupport
 namespace FeatureMap {
@@ -1454,6 +1557,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -1465,6 +1569,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Groups::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -1629,6 +1734,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Scenes::Commands::AddSceneResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1667,6 +1774,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1701,6 +1810,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Scenes::Commands::ViewSceneResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1742,6 +1853,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1779,6 +1892,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1814,6 +1929,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1846,6 +1963,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1878,6 +1997,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1911,6 +2032,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Scenes::Commands::StoreSceneResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1946,6 +2069,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -1982,6 +2107,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2014,6 +2141,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2052,6 +2181,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2094,6 +2225,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Scenes::Commands::EnhancedAddSceneResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2132,6 +2265,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2166,6 +2301,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Scenes::Commands::EnhancedViewSceneResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2207,6 +2344,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2250,6 +2389,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Scenes::Commands::CopySceneResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2288,6 +2429,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2314,6 +2457,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SceneCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SceneCount
 namespace CurrentScene {
@@ -2325,6 +2469,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentScene::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentScene
 namespace CurrentGroup {
@@ -2336,6 +2481,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentGroup::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentGroup
 namespace SceneValid {
@@ -2347,6 +2493,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SceneValid::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SceneValid
 namespace NameSupport {
@@ -2358,6 +2505,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NameSupport::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NameSupport
 namespace LastConfiguredBy {
@@ -2369,6 +2517,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LastConfiguredBy::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastConfiguredBy
 namespace FeatureMap {
@@ -2380,6 +2529,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -2391,6 +2541,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Scenes::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -2490,6 +2641,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2516,6 +2669,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2542,6 +2697,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2573,6 +2730,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2601,6 +2760,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2634,6 +2795,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2660,6 +2823,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnOff::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OnOff
 namespace GlobalSceneControl {
@@ -2671,6 +2835,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::GlobalSceneControl::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GlobalSceneControl
 namespace OnTime {
@@ -2682,6 +2847,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OnTime
 namespace OffWaitTime {
@@ -2693,6 +2859,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OffWaitTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OffWaitTime
 namespace StartUpOnOff {
@@ -2704,6 +2871,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpOnOff::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StartUpOnOff
 namespace FeatureMap {
@@ -2715,6 +2883,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -2726,6 +2895,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOff::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -2742,6 +2912,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SwitchType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SwitchType
 namespace SwitchActions {
@@ -2753,6 +2924,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SwitchActions::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SwitchActions
 namespace FeatureMap {
@@ -2764,6 +2936,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -2775,6 +2948,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OnOffSwitchConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -2875,6 +3049,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2914,6 +3090,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2955,6 +3133,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -2991,6 +3171,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -3024,6 +3206,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -3057,6 +3241,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -3092,6 +3278,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -3121,6 +3309,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -3144,6 +3334,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentLevel
 namespace RemainingTime {
@@ -3155,6 +3346,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RemainingTime
 namespace MinLevel {
@@ -3166,6 +3358,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinLevel
 namespace MaxLevel {
@@ -3177,6 +3370,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxLevel
 namespace CurrentFrequency {
@@ -3188,6 +3382,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentFrequency::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentFrequency
 namespace MinFrequency {
@@ -3199,6 +3394,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinFrequency::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinFrequency
 namespace MaxFrequency {
@@ -3210,6 +3406,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxFrequency::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxFrequency
 namespace Options {
@@ -3221,6 +3418,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Options::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Options
 namespace OnOffTransitionTime {
@@ -3232,6 +3430,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnOffTransitionTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OnOffTransitionTime
 namespace OnLevel {
@@ -3243,6 +3442,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OnLevel
 namespace OnTransitionTime {
@@ -3254,6 +3454,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnTransitionTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OnTransitionTime
 namespace OffTransitionTime {
@@ -3265,6 +3466,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OffTransitionTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OffTransitionTime
 namespace DefaultMoveRate {
@@ -3276,6 +3478,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DefaultMoveRate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DefaultMoveRate
 namespace StartUpCurrentLevel {
@@ -3287,6 +3490,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpCurrentLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StartUpCurrentLevel
 namespace FeatureMap {
@@ -3298,6 +3502,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -3309,6 +3514,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LevelControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -3371,6 +3577,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -3404,6 +3612,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -3432,6 +3642,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -3467,6 +3679,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -3497,6 +3711,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::Alarms::Commands::GetAlarmResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -3523,6 +3739,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -3546,6 +3764,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AlarmCount
 namespace FeatureMap {
@@ -3557,6 +3776,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -3568,6 +3788,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Alarms::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -3584,6 +3805,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Time::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Time
 namespace TimeStatus {
@@ -3595,6 +3817,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TimeStatus::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TimeStatus
 namespace TimeZone {
@@ -3606,6 +3829,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TimeZone::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TimeZone
 namespace DstStart {
@@ -3617,6 +3841,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DstStart::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DstStart
 namespace DstEnd {
@@ -3628,6 +3853,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DstEnd::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DstEnd
 namespace DstShift {
@@ -3639,6 +3865,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DstShift::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DstShift
 namespace StandardTime {
@@ -3650,6 +3877,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StandardTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StandardTime
 namespace LocalTime {
@@ -3661,6 +3889,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LocalTime
 namespace LastSetTime {
@@ -3672,6 +3901,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LastSetTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LastSetTime
 namespace ValidUntilTime {
@@ -3683,6 +3913,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ValidUntilTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ValidUntilTime
 namespace FeatureMap {
@@ -3694,6 +3925,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -3705,6 +3937,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Time::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -3721,6 +3954,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveText::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveText
 namespace Description {
@@ -3732,6 +3966,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Description
 namespace InactiveText {
@@ -3743,6 +3978,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InactiveText::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InactiveText
 namespace OutOfService {
@@ -3754,6 +3990,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OutOfService::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OutOfService
 namespace Polarity {
@@ -3765,6 +4002,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Polarity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Polarity
 namespace PresentValue {
@@ -3776,6 +4014,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PresentValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PresentValue
 namespace Reliability {
@@ -3787,6 +4026,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Reliability::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Reliability
 namespace StatusFlags {
@@ -3798,6 +4038,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StatusFlags::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StatusFlags
 namespace ApplicationType {
@@ -3809,6 +4050,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApplicationType
 namespace FeatureMap {
@@ -3820,6 +4062,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -3831,6 +4074,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BinaryInputBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -4041,6 +4285,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::PowerProfile::Commands::PowerProfileResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4077,6 +4323,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4107,6 +4355,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::PowerProfile::Commands::PowerProfileStateResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4142,6 +4392,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4181,6 +4433,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4216,6 +4470,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4251,6 +4507,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4283,6 +4541,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::PowerProfile::Commands::GetPowerProfilePriceResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4317,6 +4577,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4351,6 +4613,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4386,6 +4650,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4415,6 +4681,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::PowerProfile::Commands::GetOverallSchedulePriceResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4444,6 +4712,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::PowerProfile::Commands::PowerProfileScheduleConstraintsResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4474,6 +4744,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::PowerProfile::Commands::EnergyPhasesScheduleResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4504,6 +4776,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::PowerProfile::Commands::EnergyPhasesScheduleStateResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4538,6 +4812,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4576,6 +4852,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4613,6 +4891,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4649,6 +4929,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4685,6 +4967,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4721,6 +5005,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::PowerProfile::Commands::GetPowerProfilePriceExtendedResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4747,6 +5033,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalProfileNum::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TotalProfileNum
 namespace MultipleScheduling {
@@ -4758,6 +5045,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MultipleScheduling::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MultipleScheduling
 namespace EnergyFormatting {
@@ -4769,6 +5057,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnergyFormatting::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EnergyFormatting
 namespace EnergyRemote {
@@ -4780,6 +5069,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnergyRemote::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EnergyRemote
 namespace ScheduleMode {
@@ -4791,6 +5081,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScheduleMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ScheduleMode
 namespace FeatureMap {
@@ -4802,6 +5093,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -4813,6 +5105,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerProfile::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -4933,6 +5226,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4967,6 +5262,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -4996,6 +5293,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::ApplianceControl::Commands::SignalStateResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5029,6 +5328,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5065,6 +5366,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5094,6 +5397,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5120,6 +5425,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5149,6 +5456,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5173,6 +5482,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StartTime
 namespace FinishTime {
@@ -5184,6 +5494,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FinishTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FinishTime
 namespace RemainingTime {
@@ -5195,6 +5506,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RemainingTime
 namespace FeatureMap {
@@ -5206,6 +5518,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -5217,6 +5530,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -5256,6 +5570,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DeviceList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DeviceList
 namespace ServerList {
@@ -5267,6 +5582,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ServerList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ServerList
 namespace ClientList {
@@ -5278,6 +5594,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClientList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClientList
 namespace PartsList {
@@ -5289,6 +5606,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartsList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PartsList
 namespace FeatureMap {
@@ -5300,6 +5618,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -5311,6 +5630,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Descriptor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -5363,6 +5683,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::PollControl::Commands::CheckInResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5394,6 +5716,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5422,6 +5746,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5451,6 +5777,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5481,6 +5809,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5505,6 +5835,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CheckInInterval::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CheckInInterval
 namespace LongPollInterval {
@@ -5516,6 +5847,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LongPollInterval::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LongPollInterval
 namespace ShortPollInterval {
@@ -5527,6 +5859,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ShortPollInterval::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ShortPollInterval
 namespace FastPollTimeout {
@@ -5538,6 +5871,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FastPollTimeout::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FastPollTimeout
 namespace CheckInIntervalMin {
@@ -5549,6 +5883,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CheckInIntervalMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CheckInIntervalMin
 namespace LongPollIntervalMin {
@@ -5560,6 +5895,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LongPollIntervalMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LongPollIntervalMin
 namespace FastPollTimeoutMax {
@@ -5571,6 +5907,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FastPollTimeoutMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FastPollTimeoutMax
 namespace FeatureMap {
@@ -5582,6 +5919,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -5593,6 +5931,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PollControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -5796,6 +6135,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5831,6 +6172,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5865,6 +6208,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5900,6 +6245,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5934,6 +6281,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -5967,6 +6316,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6002,6 +6353,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6036,6 +6389,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6069,6 +6424,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6104,6 +6461,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6138,6 +6497,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6173,6 +6534,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6199,6 +6562,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActionList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActionList
 namespace EndpointList {
@@ -6210,6 +6574,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EndpointList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EndpointList
 namespace SetupUrl {
@@ -6221,6 +6586,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetupUrl::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SetupUrl
 namespace FeatureMap {
@@ -6232,6 +6598,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -6243,6 +6610,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -6290,6 +6658,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6316,6 +6686,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6342,6 +6714,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6368,6 +6742,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6391,6 +6767,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InteractionModelVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InteractionModelVersion
 namespace VendorName {
@@ -6402,6 +6779,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace VendorName
 namespace VendorID {
@@ -6413,6 +6791,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace VendorID
 namespace ProductName {
@@ -6424,6 +6803,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductName
 namespace ProductID {
@@ -6435,6 +6815,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductID::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductID
 namespace NodeLabel {
@@ -6446,6 +6827,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NodeLabel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NodeLabel
 namespace Location {
@@ -6457,6 +6839,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Location::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Location
 namespace HardwareVersion {
@@ -6468,6 +6851,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HardwareVersion
 namespace HardwareVersionString {
@@ -6479,6 +6863,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersionString::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HardwareVersionString
 namespace SoftwareVersion {
@@ -6490,6 +6875,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SoftwareVersion
 namespace SoftwareVersionString {
@@ -6501,6 +6887,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersionString::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SoftwareVersionString
 namespace ManufacturingDate {
@@ -6512,6 +6899,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ManufacturingDate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ManufacturingDate
 namespace PartNumber {
@@ -6523,6 +6911,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PartNumber
 namespace ProductURL {
@@ -6534,6 +6923,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductURL::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductURL
 namespace ProductLabel {
@@ -6545,6 +6935,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductLabel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductLabel
 namespace SerialNumber {
@@ -6556,6 +6947,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SerialNumber::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SerialNumber
 namespace LocalConfigDisabled {
@@ -6567,6 +6959,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalConfigDisabled::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LocalConfigDisabled
 namespace Reachable {
@@ -6578,6 +6971,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Reachable::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Reachable
 namespace UniqueID {
@@ -6589,6 +6983,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UniqueID::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UniqueID
 namespace FeatureMap {
@@ -6600,6 +6995,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -6611,6 +7007,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Basic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -6844,6 +7241,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6883,6 +7282,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6916,6 +7317,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -6961,6 +7364,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -7000,6 +7405,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -7025,6 +7432,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -7036,6 +7444,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateProvider::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -7124,6 +7533,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -7151,6 +7562,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DefaultOtaProvider::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DefaultOtaProvider
 namespace UpdatePossible {
@@ -7162,6 +7574,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UpdatePossible::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UpdatePossible
 namespace FeatureMap {
@@ -7173,6 +7586,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -7184,6 +7598,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OtaSoftwareUpdateRequestor::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -7322,6 +7737,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -7333,6 +7749,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -7349,6 +7766,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -7360,6 +7778,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationTimeFormat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -7376,6 +7795,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -7387,6 +7807,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LocalizationUnit::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -7403,6 +7824,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -7414,6 +7836,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -7430,6 +7853,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Status
 namespace Order {
@@ -7441,6 +7865,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Order::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Order
 namespace Description {
@@ -7452,6 +7877,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Description
 namespace WiredAssessedInputVoltage {
@@ -7463,6 +7889,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedInputVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WiredAssessedInputVoltage
 namespace WiredAssessedInputFrequency {
@@ -7474,6 +7901,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedInputFrequency::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WiredAssessedInputFrequency
 namespace WiredCurrentType {
@@ -7485,6 +7913,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredCurrentType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WiredCurrentType
 namespace WiredAssessedCurrent {
@@ -7496,6 +7925,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredAssessedCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WiredAssessedCurrent
 namespace WiredNominalVoltage {
@@ -7507,6 +7937,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredNominalVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WiredNominalVoltage
 namespace WiredMaximumCurrent {
@@ -7518,6 +7949,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredMaximumCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WiredMaximumCurrent
 namespace WiredPresent {
@@ -7529,6 +7961,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiredPresent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WiredPresent
 namespace ActiveWiredFaults {
@@ -7540,6 +7973,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveWiredFaults::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveWiredFaults
 namespace BatteryVoltage {
@@ -7551,6 +7985,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryVoltage
 namespace BatteryPercentRemaining {
@@ -7562,6 +7997,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPercentRemaining::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryPercentRemaining
 namespace BatteryTimeRemaining {
@@ -7573,6 +8009,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryTimeRemaining::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryTimeRemaining
 namespace BatteryChargeLevel {
@@ -7584,6 +8021,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargeLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryChargeLevel
 namespace BatteryReplacementNeeded {
@@ -7595,6 +8033,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplacementNeeded::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryReplacementNeeded
 namespace BatteryReplaceability {
@@ -7606,6 +8045,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplaceability::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryReplaceability
 namespace BatteryPresent {
@@ -7617,6 +8057,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryPresent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryPresent
 namespace ActiveBatteryFaults {
@@ -7628,6 +8069,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatteryFaults::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveBatteryFaults
 namespace BatteryReplacementDescription {
@@ -7639,6 +8081,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryReplacementDescription::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryReplacementDescription
 namespace BatteryCommonDesignation {
@@ -7650,6 +8093,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryCommonDesignation::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryCommonDesignation
 namespace BatteryANSIDesignation {
@@ -7661,6 +8105,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryANSIDesignation::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryANSIDesignation
 namespace BatteryIECDesignation {
@@ -7672,6 +8117,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryIECDesignation::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryIECDesignation
 namespace BatteryApprovedChemistry {
@@ -7683,6 +8129,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryApprovedChemistry::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryApprovedChemistry
 namespace BatteryCapacity {
@@ -7694,6 +8141,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryCapacity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryCapacity
 namespace BatteryQuantity {
@@ -7705,6 +8153,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryQuantity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryQuantity
 namespace BatteryChargeState {
@@ -7716,6 +8165,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargeState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryChargeState
 namespace BatteryTimeToFullCharge {
@@ -7727,6 +8177,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryTimeToFullCharge::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryTimeToFullCharge
 namespace BatteryFunctionalWhileCharging {
@@ -7738,6 +8189,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryFunctionalWhileCharging::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryFunctionalWhileCharging
 namespace BatteryChargingCurrent {
@@ -7749,6 +8201,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BatteryChargingCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BatteryChargingCurrent
 namespace ActiveBatteryChargeFaults {
@@ -7760,6 +8213,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveBatteryChargeFaults::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveBatteryChargeFaults
 namespace FeatureMap {
@@ -7771,6 +8225,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -7782,6 +8237,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSource::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -7888,6 +8344,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -7922,6 +8380,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -7959,6 +8419,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -7994,6 +8456,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8022,6 +8486,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8053,6 +8519,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8078,6 +8546,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Breadcrumb::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Breadcrumb
 namespace BasicCommissioningInfoList {
@@ -8089,6 +8558,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BasicCommissioningInfoList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BasicCommissioningInfoList
 namespace RegulatoryConfig {
@@ -8100,6 +8570,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RegulatoryConfig::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RegulatoryConfig
 namespace LocationCapability {
@@ -8111,6 +8582,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocationCapability::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LocationCapability
 namespace FeatureMap {
@@ -8122,6 +8594,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -8133,6 +8606,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -8324,6 +8798,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8362,6 +8838,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8401,6 +8879,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8436,6 +8916,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8473,6 +8955,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8508,6 +8992,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8543,6 +9029,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8577,6 +9065,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8612,6 +9102,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8646,6 +9138,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8681,6 +9175,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8715,6 +9211,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8750,6 +9248,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8784,6 +9284,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8819,6 +9321,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8853,6 +9357,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8878,6 +9384,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -8889,6 +9396,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NetworkCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -8955,6 +9463,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -8993,6 +9503,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -9020,6 +9532,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -9031,6 +9544,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DiagnosticLogs::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -9162,6 +9676,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NetworkInterfaces::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NetworkInterfaces
 namespace RebootCount {
@@ -9173,6 +9688,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RebootCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RebootCount
 namespace UpTime {
@@ -9184,6 +9700,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UpTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UpTime
 namespace TotalOperationalHours {
@@ -9195,6 +9712,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalOperationalHours::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TotalOperationalHours
 namespace BootReasons {
@@ -9206,6 +9724,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BootReasons::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BootReasons
 namespace ActiveHardwareFaults {
@@ -9217,6 +9736,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveHardwareFaults::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveHardwareFaults
 namespace ActiveRadioFaults {
@@ -9228,6 +9748,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveRadioFaults::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveRadioFaults
 namespace ActiveNetworkFaults {
@@ -9239,6 +9760,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveNetworkFaults::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveNetworkFaults
 namespace FeatureMap {
@@ -9250,6 +9772,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -9261,6 +9784,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GeneralDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -9487,6 +10011,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -9510,6 +10036,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ThreadMetrics::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ThreadMetrics
 namespace CurrentHeapFree {
@@ -9521,6 +10048,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHeapFree::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentHeapFree
 namespace CurrentHeapUsed {
@@ -9532,6 +10060,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHeapUsed::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentHeapUsed
 namespace CurrentHeapHighWatermark {
@@ -9543,6 +10072,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHeapHighWatermark::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentHeapHighWatermark
 namespace FeatureMap {
@@ -9554,6 +10084,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -9565,6 +10096,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SoftwareDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -9806,6 +10338,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -9829,6 +10363,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Channel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Channel
 namespace RoutingRole {
@@ -9840,6 +10375,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RoutingRole::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RoutingRole
 namespace NetworkName {
@@ -9851,6 +10387,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NetworkName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NetworkName
 namespace PanId {
@@ -9862,6 +10399,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PanId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PanId
 namespace ExtendedPanId {
@@ -9873,6 +10411,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ExtendedPanId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ExtendedPanId
 namespace MeshLocalPrefix {
@@ -9884,6 +10423,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeshLocalPrefix::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeshLocalPrefix
 namespace OverrunCount {
@@ -9895,6 +10435,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverrunCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OverrunCount
 namespace NeighborTableList {
@@ -9906,6 +10447,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NeighborTableList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NeighborTableList
 namespace RouteTableList {
@@ -9917,6 +10459,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RouteTableList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RouteTableList
 namespace PartitionId {
@@ -9928,6 +10471,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartitionId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PartitionId
 namespace Weighting {
@@ -9939,6 +10483,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Weighting::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Weighting
 namespace DataVersion {
@@ -9950,6 +10495,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DataVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DataVersion
 namespace StableDataVersion {
@@ -9961,6 +10507,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StableDataVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StableDataVersion
 namespace LeaderRouterId {
@@ -9972,6 +10519,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LeaderRouterId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LeaderRouterId
 namespace DetachedRoleCount {
@@ -9983,6 +10531,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DetachedRoleCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DetachedRoleCount
 namespace ChildRoleCount {
@@ -9994,6 +10543,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChildRoleCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ChildRoleCount
 namespace RouterRoleCount {
@@ -10005,6 +10555,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RouterRoleCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RouterRoleCount
 namespace LeaderRoleCount {
@@ -10016,6 +10567,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LeaderRoleCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LeaderRoleCount
 namespace AttachAttemptCount {
@@ -10027,6 +10579,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AttachAttemptCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AttachAttemptCount
 namespace PartitionIdChangeCount {
@@ -10038,6 +10591,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartitionIdChangeCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PartitionIdChangeCount
 namespace BetterPartitionAttachAttemptCount {
@@ -10049,6 +10603,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BetterPartitionAttachAttemptCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BetterPartitionAttachAttemptCount
 namespace ParentChangeCount {
@@ -10060,6 +10615,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ParentChangeCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ParentChangeCount
 namespace TxTotalCount {
@@ -10071,6 +10627,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxTotalCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxTotalCount
 namespace TxUnicastCount {
@@ -10082,6 +10639,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxUnicastCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxUnicastCount
 namespace TxBroadcastCount {
@@ -10093,6 +10651,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxBroadcastCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxBroadcastCount
 namespace TxAckRequestedCount {
@@ -10104,6 +10663,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxAckRequestedCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxAckRequestedCount
 namespace TxAckedCount {
@@ -10115,6 +10675,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxAckedCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxAckedCount
 namespace TxNoAckRequestedCount {
@@ -10126,6 +10687,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxNoAckRequestedCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxNoAckRequestedCount
 namespace TxDataCount {
@@ -10137,6 +10699,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxDataCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxDataCount
 namespace TxDataPollCount {
@@ -10148,6 +10711,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxDataPollCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxDataPollCount
 namespace TxBeaconCount {
@@ -10159,6 +10723,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxBeaconCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxBeaconCount
 namespace TxBeaconRequestCount {
@@ -10170,6 +10735,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxBeaconRequestCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxBeaconRequestCount
 namespace TxOtherCount {
@@ -10181,6 +10747,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxOtherCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxOtherCount
 namespace TxRetryCount {
@@ -10192,6 +10759,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxRetryCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxRetryCount
 namespace TxDirectMaxRetryExpiryCount {
@@ -10203,6 +10771,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxDirectMaxRetryExpiryCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxDirectMaxRetryExpiryCount
 namespace TxIndirectMaxRetryExpiryCount {
@@ -10214,6 +10783,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxIndirectMaxRetryExpiryCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxIndirectMaxRetryExpiryCount
 namespace TxErrCcaCount {
@@ -10225,6 +10795,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxErrCcaCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxErrCcaCount
 namespace TxErrAbortCount {
@@ -10236,6 +10807,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxErrAbortCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxErrAbortCount
 namespace TxErrBusyChannelCount {
@@ -10247,6 +10819,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxErrBusyChannelCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxErrBusyChannelCount
 namespace RxTotalCount {
@@ -10258,6 +10831,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxTotalCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxTotalCount
 namespace RxUnicastCount {
@@ -10269,6 +10843,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxUnicastCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxUnicastCount
 namespace RxBroadcastCount {
@@ -10280,6 +10855,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxBroadcastCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxBroadcastCount
 namespace RxDataCount {
@@ -10291,6 +10867,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxDataCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxDataCount
 namespace RxDataPollCount {
@@ -10302,6 +10879,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxDataPollCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxDataPollCount
 namespace RxBeaconCount {
@@ -10313,6 +10891,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxBeaconCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxBeaconCount
 namespace RxBeaconRequestCount {
@@ -10324,6 +10903,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxBeaconRequestCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxBeaconRequestCount
 namespace RxOtherCount {
@@ -10335,6 +10915,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxOtherCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxOtherCount
 namespace RxAddressFilteredCount {
@@ -10346,6 +10927,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxAddressFilteredCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxAddressFilteredCount
 namespace RxDestAddrFilteredCount {
@@ -10357,6 +10939,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxDestAddrFilteredCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxDestAddrFilteredCount
 namespace RxDuplicatedCount {
@@ -10368,6 +10951,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxDuplicatedCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxDuplicatedCount
 namespace RxErrNoFrameCount {
@@ -10379,6 +10963,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrNoFrameCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxErrNoFrameCount
 namespace RxErrUnknownNeighborCount {
@@ -10390,6 +10975,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrUnknownNeighborCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxErrUnknownNeighborCount
 namespace RxErrInvalidSrcAddrCount {
@@ -10401,6 +10987,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrInvalidSrcAddrCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxErrInvalidSrcAddrCount
 namespace RxErrSecCount {
@@ -10412,6 +10999,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrSecCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxErrSecCount
 namespace RxErrFcsCount {
@@ -10423,6 +11011,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrFcsCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxErrFcsCount
 namespace RxErrOtherCount {
@@ -10434,6 +11023,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RxErrOtherCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RxErrOtherCount
 namespace ActiveTimestamp {
@@ -10445,6 +11035,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveTimestamp::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveTimestamp
 namespace PendingTimestamp {
@@ -10456,6 +11047,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PendingTimestamp::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PendingTimestamp
 namespace Delay {
@@ -10467,6 +11059,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Delay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Delay
 namespace SecurityPolicy {
@@ -10478,6 +11071,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SecurityPolicy::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SecurityPolicy
 namespace ChannelMask {
@@ -10489,6 +11083,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ChannelMask
 namespace OperationalDatasetComponents {
@@ -10500,6 +11095,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalDatasetComponents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OperationalDatasetComponents
 namespace ActiveNetworkFaultsList {
@@ -10511,6 +11107,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveNetworkFaultsList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveNetworkFaultsList
 namespace FeatureMap {
@@ -10522,6 +11119,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -10533,6 +11131,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThreadNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -10646,6 +11245,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -10669,6 +11270,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bssid::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Bssid
 namespace SecurityType {
@@ -10680,6 +11282,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SecurityType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SecurityType
 namespace WiFiVersion {
@@ -10691,6 +11294,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WiFiVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WiFiVersion
 namespace ChannelNumber {
@@ -10702,6 +11306,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ChannelNumber::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ChannelNumber
 namespace Rssi {
@@ -10713,6 +11318,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Rssi::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Rssi
 namespace BeaconLostCount {
@@ -10724,6 +11330,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BeaconLostCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BeaconLostCount
 namespace BeaconRxCount {
@@ -10735,6 +11342,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BeaconRxCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BeaconRxCount
 namespace PacketMulticastRxCount {
@@ -10746,6 +11354,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketMulticastRxCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PacketMulticastRxCount
 namespace PacketMulticastTxCount {
@@ -10757,6 +11366,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketMulticastTxCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PacketMulticastTxCount
 namespace PacketUnicastRxCount {
@@ -10768,6 +11378,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketUnicastRxCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PacketUnicastRxCount
 namespace PacketUnicastTxCount {
@@ -10779,6 +11390,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketUnicastTxCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PacketUnicastTxCount
 namespace CurrentMaxRate {
@@ -10790,6 +11402,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMaxRate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentMaxRate
 namespace OverrunCount {
@@ -10801,6 +11414,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverrunCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OverrunCount
 namespace FeatureMap {
@@ -10812,6 +11426,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -10823,6 +11438,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WiFiNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -10979,6 +11595,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -11002,6 +11620,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PHYRate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PHYRate
 namespace FullDuplex {
@@ -11013,6 +11632,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FullDuplex::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FullDuplex
 namespace PacketRxCount {
@@ -11024,6 +11644,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketRxCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PacketRxCount
 namespace PacketTxCount {
@@ -11035,6 +11656,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PacketTxCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PacketTxCount
 namespace TxErrCount {
@@ -11046,6 +11668,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TxErrCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TxErrCount
 namespace CollisionCount {
@@ -11057,6 +11680,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CollisionCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CollisionCount
 namespace OverrunCount {
@@ -11068,6 +11692,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverrunCount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OverrunCount
 namespace CarrierDetect {
@@ -11079,6 +11704,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CarrierDetect::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CarrierDetect
 namespace TimeSinceReset {
@@ -11090,6 +11716,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TimeSinceReset::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TimeSinceReset
 namespace FeatureMap {
@@ -11101,6 +11728,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -11112,6 +11740,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthernetNetworkDiagnostics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -11128,6 +11757,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -11139,6 +11769,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TimeSynchronization::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -11186,6 +11817,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -11212,6 +11845,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -11238,6 +11873,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -11264,6 +11901,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -11287,6 +11926,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace VendorName
 namespace VendorID {
@@ -11298,6 +11938,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorID::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace VendorID
 namespace ProductName {
@@ -11309,6 +11950,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductName
 namespace NodeLabel {
@@ -11320,6 +11962,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NodeLabel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NodeLabel
 namespace HardwareVersion {
@@ -11331,6 +11974,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HardwareVersion
 namespace HardwareVersionString {
@@ -11342,6 +11986,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HardwareVersionString::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HardwareVersionString
 namespace SoftwareVersion {
@@ -11353,6 +11998,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SoftwareVersion
 namespace SoftwareVersionString {
@@ -11364,6 +12010,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareVersionString::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SoftwareVersionString
 namespace ManufacturingDate {
@@ -11375,6 +12022,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ManufacturingDate::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ManufacturingDate
 namespace PartNumber {
@@ -11386,6 +12034,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PartNumber
 namespace ProductURL {
@@ -11397,6 +12046,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductURL::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductURL
 namespace ProductLabel {
@@ -11408,6 +12058,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductLabel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductLabel
 namespace SerialNumber {
@@ -11419,6 +12070,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SerialNumber::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SerialNumber
 namespace Reachable {
@@ -11430,6 +12082,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Reachable::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Reachable
 namespace UniqueID {
@@ -11441,6 +12094,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UniqueID::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UniqueID
 namespace FeatureMap {
@@ -11452,6 +12106,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -11463,6 +12118,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BridgedDeviceBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -11479,6 +12135,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfPositions::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumberOfPositions
 namespace CurrentPosition {
@@ -11490,6 +12147,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPosition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentPosition
 namespace MultiPressMax {
@@ -11501,6 +12159,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MultiPressMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MultiPressMax
 namespace FeatureMap {
@@ -11512,6 +12171,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -11523,6 +12183,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Switch::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -11830,6 +12491,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -11865,6 +12528,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -11892,6 +12557,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -11915,6 +12582,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -11926,6 +12594,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -12092,6 +12761,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12124,6 +12795,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12155,6 +12828,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12185,6 +12860,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12215,6 +12892,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12247,6 +12926,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12286,6 +12967,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12322,6 +13005,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12357,6 +13042,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12389,6 +13076,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12419,6 +13108,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12449,6 +13140,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12479,6 +13172,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12503,6 +13198,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FabricsList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FabricsList
 namespace SupportedFabrics {
@@ -12514,6 +13210,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedFabrics::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SupportedFabrics
 namespace CommissionedFabrics {
@@ -12525,6 +13222,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CommissionedFabrics::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CommissionedFabrics
 namespace TrustedRootCertificates {
@@ -12536,6 +13234,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TrustedRootCertificates::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TrustedRootCertificates
 namespace CurrentFabricIndex {
@@ -12547,6 +13246,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentFabricIndex::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentFabricIndex
 namespace FeatureMap {
@@ -12558,6 +13258,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -12569,6 +13270,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OperationalCredentials::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -12608,6 +13310,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LabelList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LabelList
 namespace FeatureMap {
@@ -12619,6 +13322,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -12630,6 +13334,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FixedLabel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -12646,6 +13351,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StateValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StateValue
 namespace FeatureMap {
@@ -12657,6 +13363,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -12668,6 +13375,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BooleanState::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -12783,6 +13491,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -12807,6 +13517,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentMode
 namespace SupportedModes {
@@ -12818,6 +13529,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedModes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SupportedModes
 namespace OnMode {
@@ -12829,6 +13541,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OnMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OnMode
 namespace StartUpMode {
@@ -12840,6 +13553,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StartUpMode
 namespace Description {
@@ -12851,6 +13565,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Description::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Description
 namespace FeatureMap {
@@ -12862,6 +13577,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -12873,6 +13589,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ModeSelect::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -12889,6 +13606,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PhysicalClosedLimit
 namespace MotorStepSize {
@@ -12900,6 +13618,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MotorStepSize::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MotorStepSize
 namespace Status {
@@ -12911,6 +13630,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Status::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Status
 namespace ClosedLimit {
@@ -12922,6 +13642,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClosedLimit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClosedLimit
 namespace Mode {
@@ -12933,6 +13654,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Mode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Mode
 namespace FeatureMap {
@@ -12944,6 +13666,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -12955,6 +13678,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ShadeConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -13347,6 +14071,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::LockDoorResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13377,6 +14103,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13407,6 +14135,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13437,6 +14167,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13467,6 +14199,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::ToggleResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13497,6 +14231,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13529,6 +14265,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13560,6 +14298,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13590,6 +14330,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13632,6 +14374,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13674,6 +14418,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::SetPinResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13707,6 +14453,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13737,6 +14485,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::GetPinResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13773,6 +14523,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13806,6 +14558,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::ClearPinResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13836,6 +14590,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13863,6 +14619,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13892,6 +14650,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13924,6 +14684,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::SetUserStatusResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13955,6 +14717,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -13985,6 +14749,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::GetUserStatusResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14017,6 +14783,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14060,6 +14828,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14096,6 +14866,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14128,6 +14900,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14173,6 +14947,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14212,6 +14988,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14243,6 +15021,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14279,6 +15059,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14312,6 +15094,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14344,6 +15128,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14383,6 +15169,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14419,6 +15207,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14450,6 +15240,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14486,6 +15278,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14519,6 +15313,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14549,6 +15345,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14587,6 +15385,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14621,6 +15421,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14651,6 +15453,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14683,6 +15487,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14714,6 +15520,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14744,6 +15552,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14776,6 +15586,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14813,6 +15625,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::SetRfidResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14846,6 +15660,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14876,6 +15692,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::GetRfidResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14912,6 +15730,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14945,6 +15765,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -14975,6 +15797,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -15002,6 +15826,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -15031,6 +15857,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -15071,6 +15899,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -15120,6 +15950,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -15151,6 +15983,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LockState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LockState
 namespace LockType {
@@ -15162,6 +15995,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LockType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LockType
 namespace ActuatorEnabled {
@@ -15173,6 +16007,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActuatorEnabled::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActuatorEnabled
 namespace DoorState {
@@ -15184,6 +16019,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DoorState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DoorState
 namespace DoorOpenEvents {
@@ -15195,6 +16031,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DoorOpenEvents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DoorOpenEvents
 namespace DoorClosedEvents {
@@ -15206,6 +16043,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DoorClosedEvents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DoorClosedEvents
 namespace OpenPeriod {
@@ -15217,6 +16055,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OpenPeriod::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OpenPeriod
 namespace NumLockRecordsSupported {
@@ -15228,6 +16067,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumLockRecordsSupported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumLockRecordsSupported
 namespace NumTotalUsersSupported {
@@ -15239,6 +16079,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumTotalUsersSupported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumTotalUsersSupported
 namespace NumPinUsersSupported {
@@ -15250,6 +16091,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumPinUsersSupported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumPinUsersSupported
 namespace NumRfidUsersSupported {
@@ -15261,6 +16103,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumRfidUsersSupported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumRfidUsersSupported
 namespace NumWeekdaySchedulesSupportedPerUser {
@@ -15272,6 +16115,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumWeekdaySchedulesSupportedPerUser::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumWeekdaySchedulesSupportedPerUser
 namespace NumYeardaySchedulesSupportedPerUser {
@@ -15283,6 +16127,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumYeardaySchedulesSupportedPerUser::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumYeardaySchedulesSupportedPerUser
 namespace NumHolidaySchedulesSupportedPerUser {
@@ -15294,6 +16139,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumHolidaySchedulesSupportedPerUser::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumHolidaySchedulesSupportedPerUser
 namespace MaxPinLength {
@@ -15305,6 +16151,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxPinLength::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxPinLength
 namespace MinPinLength {
@@ -15316,6 +16163,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinPinLength::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinPinLength
 namespace MaxRfidCodeLength {
@@ -15327,6 +16175,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxRfidCodeLength::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxRfidCodeLength
 namespace MinRfidCodeLength {
@@ -15338,6 +16187,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinRfidCodeLength::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinRfidCodeLength
 namespace EnableLogging {
@@ -15349,6 +16199,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnableLogging::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EnableLogging
 namespace Language {
@@ -15360,6 +16211,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Language::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Language
 namespace LedSettings {
@@ -15371,6 +16223,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LedSettings::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LedSettings
 namespace AutoRelockTime {
@@ -15382,6 +16235,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AutoRelockTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AutoRelockTime
 namespace SoundVolume {
@@ -15393,6 +16247,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoundVolume::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SoundVolume
 namespace OperatingMode {
@@ -15404,6 +16259,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperatingMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OperatingMode
 namespace SupportedOperatingModes {
@@ -15415,6 +16271,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedOperatingModes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SupportedOperatingModes
 namespace DefaultConfigurationRegister {
@@ -15426,6 +16283,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DefaultConfigurationRegister::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DefaultConfigurationRegister
 namespace EnableLocalProgramming {
@@ -15437,6 +16295,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnableLocalProgramming::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EnableLocalProgramming
 namespace EnableOneTouchLocking {
@@ -15448,6 +16307,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnableOneTouchLocking::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EnableOneTouchLocking
 namespace EnableInsideStatusLed {
@@ -15459,6 +16319,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnableInsideStatusLed::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EnableInsideStatusLed
 namespace EnablePrivacyModeButton {
@@ -15470,6 +16331,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnablePrivacyModeButton::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EnablePrivacyModeButton
 namespace WrongCodeEntryLimit {
@@ -15481,6 +16343,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WrongCodeEntryLimit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WrongCodeEntryLimit
 namespace UserCodeTemporaryDisableTime {
@@ -15492,6 +16355,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UserCodeTemporaryDisableTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UserCodeTemporaryDisableTime
 namespace SendPinOverTheAir {
@@ -15503,6 +16367,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SendPinOverTheAir::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SendPinOverTheAir
 namespace RequirePinForRfOperation {
@@ -15514,6 +16379,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RequirePinForRfOperation::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RequirePinForRfOperation
 namespace ZigbeeSecurityLevel {
@@ -15525,6 +16391,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZigbeeSecurityLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ZigbeeSecurityLevel
 namespace AlarmMask {
@@ -15536,6 +16403,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AlarmMask
 namespace KeypadOperationEventMask {
@@ -15547,6 +16415,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::KeypadOperationEventMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace KeypadOperationEventMask
 namespace RfOperationEventMask {
@@ -15558,6 +16427,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RfOperationEventMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RfOperationEventMask
 namespace ManualOperationEventMask {
@@ -15569,6 +16439,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ManualOperationEventMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ManualOperationEventMask
 namespace RfidOperationEventMask {
@@ -15580,6 +16451,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RfidOperationEventMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RfidOperationEventMask
 namespace KeypadProgrammingEventMask {
@@ -15591,6 +16463,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::KeypadProgrammingEventMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace KeypadProgrammingEventMask
 namespace RfProgrammingEventMask {
@@ -15602,6 +16475,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RfProgrammingEventMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RfProgrammingEventMask
 namespace RfidProgrammingEventMask {
@@ -15613,6 +16487,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RfidProgrammingEventMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RfidProgrammingEventMask
 namespace FeatureMap {
@@ -15624,6 +16499,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -15635,6 +16511,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -15743,6 +16620,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -15769,6 +16648,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -15795,6 +16676,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -15824,6 +16707,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -15856,6 +16741,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -15887,6 +16774,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -15919,6 +16808,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -15944,6 +16835,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Type::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Type
 namespace PhysicalClosedLimitLift {
@@ -15955,6 +16847,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimitLift::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PhysicalClosedLimitLift
 namespace PhysicalClosedLimitTilt {
@@ -15966,6 +16859,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalClosedLimitTilt::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PhysicalClosedLimitTilt
 namespace CurrentPositionLift {
@@ -15977,6 +16871,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLift::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentPositionLift
 namespace CurrentPositionTilt {
@@ -15988,6 +16883,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTilt::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentPositionTilt
 namespace NumberOfActuationsLift {
@@ -15999,6 +16895,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfActuationsLift::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumberOfActuationsLift
 namespace NumberOfActuationsTilt {
@@ -16010,6 +16907,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfActuationsTilt::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumberOfActuationsTilt
 namespace ConfigStatus {
@@ -16021,6 +16919,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ConfigStatus::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ConfigStatus
 namespace CurrentPositionLiftPercentage {
@@ -16032,6 +16931,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLiftPercentage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentPositionLiftPercentage
 namespace CurrentPositionTiltPercentage {
@@ -16043,6 +16943,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTiltPercentage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentPositionTiltPercentage
 namespace OperationalStatus {
@@ -16054,6 +16955,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationalStatus::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OperationalStatus
 namespace TargetPositionLiftPercent100ths {
@@ -16065,6 +16967,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetPositionLiftPercent100ths::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TargetPositionLiftPercent100ths
 namespace TargetPositionTiltPercent100ths {
@@ -16076,6 +16979,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetPositionTiltPercent100ths::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TargetPositionTiltPercent100ths
 namespace EndProductType {
@@ -16087,6 +16991,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EndProductType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EndProductType
 namespace CurrentPositionLiftPercent100ths {
@@ -16098,6 +17003,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionLiftPercent100ths::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentPositionLiftPercent100ths
 namespace CurrentPositionTiltPercent100ths {
@@ -16109,6 +17015,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentPositionTiltPercent100ths::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentPositionTiltPercent100ths
 namespace InstalledOpenLimitLift {
@@ -16120,6 +17027,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstalledOpenLimitLift::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InstalledOpenLimitLift
 namespace InstalledClosedLimitLift {
@@ -16131,6 +17039,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstalledClosedLimitLift::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InstalledClosedLimitLift
 namespace InstalledOpenLimitTilt {
@@ -16142,6 +17051,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstalledOpenLimitTilt::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InstalledOpenLimitTilt
 namespace InstalledClosedLimitTilt {
@@ -16153,6 +17063,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstalledClosedLimitTilt::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InstalledClosedLimitTilt
 namespace VelocityLift {
@@ -16164,6 +17075,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VelocityLift::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace VelocityLift
 namespace AccelerationTimeLift {
@@ -16175,6 +17087,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AccelerationTimeLift::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AccelerationTimeLift
 namespace DecelerationTimeLift {
@@ -16186,6 +17099,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DecelerationTimeLift::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DecelerationTimeLift
 namespace Mode {
@@ -16197,6 +17111,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Mode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Mode
 namespace IntermediateSetpointsLift {
@@ -16208,6 +17123,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IntermediateSetpointsLift::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace IntermediateSetpointsLift
 namespace IntermediateSetpointsTilt {
@@ -16219,6 +17135,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IntermediateSetpointsTilt::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace IntermediateSetpointsTilt
 namespace SafetyStatus {
@@ -16230,6 +17147,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SafetyStatus::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SafetyStatus
 namespace FeatureMap {
@@ -16241,6 +17159,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16252,6 +17171,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WindowCovering::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16292,6 +17212,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -16319,6 +17241,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -16342,6 +17266,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierMovingState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BarrierMovingState
 namespace BarrierSafetyStatus {
@@ -16353,6 +17278,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierSafetyStatus::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BarrierSafetyStatus
 namespace BarrierCapabilities {
@@ -16364,6 +17290,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCapabilities::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BarrierCapabilities
 namespace BarrierOpenEvents {
@@ -16375,6 +17302,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierOpenEvents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BarrierOpenEvents
 namespace BarrierCloseEvents {
@@ -16386,6 +17314,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCloseEvents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BarrierCloseEvents
 namespace BarrierCommandOpenEvents {
@@ -16397,6 +17326,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCommandOpenEvents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BarrierCommandOpenEvents
 namespace BarrierCommandCloseEvents {
@@ -16408,6 +17338,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierCommandCloseEvents::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BarrierCommandCloseEvents
 namespace BarrierOpenPeriod {
@@ -16419,6 +17350,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierOpenPeriod::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BarrierOpenPeriod
 namespace BarrierClosePeriod {
@@ -16430,6 +17362,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierClosePeriod::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BarrierClosePeriod
 namespace BarrierPosition {
@@ -16441,6 +17374,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BarrierPosition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BarrierPosition
 namespace FeatureMap {
@@ -16452,6 +17386,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16463,6 +17398,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BarrierControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -16511,6 +17447,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxPressure::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxPressure
 namespace MaxSpeed {
@@ -16522,6 +17459,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxSpeed::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxSpeed
 namespace MaxFlow {
@@ -16533,6 +17471,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxFlow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxFlow
 namespace MinConstPressure {
@@ -16544,6 +17483,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinConstPressure::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinConstPressure
 namespace MaxConstPressure {
@@ -16555,6 +17495,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstPressure::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxConstPressure
 namespace MinCompPressure {
@@ -16566,6 +17507,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinCompPressure::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinCompPressure
 namespace MaxCompPressure {
@@ -16577,6 +17519,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxCompPressure::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxCompPressure
 namespace MinConstSpeed {
@@ -16588,6 +17531,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinConstSpeed::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinConstSpeed
 namespace MaxConstSpeed {
@@ -16599,6 +17543,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstSpeed::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxConstSpeed
 namespace MinConstFlow {
@@ -16610,6 +17555,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinConstFlow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinConstFlow
 namespace MaxConstFlow {
@@ -16621,6 +17567,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstFlow::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxConstFlow
 namespace MinConstTemp {
@@ -16632,6 +17579,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinConstTemp::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinConstTemp
 namespace MaxConstTemp {
@@ -16643,6 +17591,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxConstTemp::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxConstTemp
 namespace PumpStatus {
@@ -16654,6 +17603,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PumpStatus::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PumpStatus
 namespace EffectiveOperationMode {
@@ -16665,6 +17615,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EffectiveOperationMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EffectiveOperationMode
 namespace EffectiveControlMode {
@@ -16676,6 +17627,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EffectiveControlMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EffectiveControlMode
 namespace Capacity {
@@ -16687,6 +17639,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Capacity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Capacity
 namespace Speed {
@@ -16698,6 +17651,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Speed::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Speed
 namespace LifetimeRunningHours {
@@ -16709,6 +17663,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeRunningHours::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LifetimeRunningHours
 namespace Power {
@@ -16720,6 +17675,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Power::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Power
 namespace LifetimeEnergyConsumed {
@@ -16731,6 +17687,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LifetimeEnergyConsumed::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LifetimeEnergyConsumed
 namespace OperationMode {
@@ -16742,6 +17699,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperationMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OperationMode
 namespace ControlMode {
@@ -16753,6 +17711,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ControlMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ControlMode
 namespace AlarmMask {
@@ -16764,6 +17723,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AlarmMask
 namespace FeatureMap {
@@ -16775,6 +17735,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -16786,6 +17747,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PumpConfigurationAndControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -17364,6 +18326,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -17401,6 +18365,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -17440,6 +18406,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -17483,6 +18451,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -17520,6 +18490,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -17548,6 +18520,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -17574,6 +18548,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -17597,6 +18573,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalTemperature::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LocalTemperature
 namespace OutdoorTemperature {
@@ -17608,6 +18585,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OutdoorTemperature::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OutdoorTemperature
 namespace Occupancy {
@@ -17619,6 +18597,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Occupancy::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Occupancy
 namespace AbsMinHeatSetpointLimit {
@@ -17630,6 +18609,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AbsMinHeatSetpointLimit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AbsMinHeatSetpointLimit
 namespace AbsMaxHeatSetpointLimit {
@@ -17641,6 +18621,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AbsMaxHeatSetpointLimit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AbsMaxHeatSetpointLimit
 namespace AbsMinCoolSetpointLimit {
@@ -17652,6 +18633,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AbsMinCoolSetpointLimit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AbsMinCoolSetpointLimit
 namespace AbsMaxCoolSetpointLimit {
@@ -17663,6 +18645,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AbsMaxCoolSetpointLimit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AbsMaxCoolSetpointLimit
 namespace PiCoolingDemand {
@@ -17674,6 +18657,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PiCoolingDemand::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PiCoolingDemand
 namespace PiHeatingDemand {
@@ -17685,6 +18669,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PiHeatingDemand::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PiHeatingDemand
 namespace HvacSystemTypeConfiguration {
@@ -17696,6 +18681,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HvacSystemTypeConfiguration::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HvacSystemTypeConfiguration
 namespace LocalTemperatureCalibration {
@@ -17707,6 +18693,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LocalTemperatureCalibration::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LocalTemperatureCalibration
 namespace OccupiedCoolingSetpoint {
@@ -17718,6 +18705,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedCoolingSetpoint::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OccupiedCoolingSetpoint
 namespace OccupiedHeatingSetpoint {
@@ -17729,6 +18717,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupiedHeatingSetpoint::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OccupiedHeatingSetpoint
 namespace UnoccupiedCoolingSetpoint {
@@ -17740,6 +18729,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedCoolingSetpoint::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UnoccupiedCoolingSetpoint
 namespace UnoccupiedHeatingSetpoint {
@@ -17751,6 +18741,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UnoccupiedHeatingSetpoint::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UnoccupiedHeatingSetpoint
 namespace MinHeatSetpointLimit {
@@ -17762,6 +18753,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinHeatSetpointLimit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinHeatSetpointLimit
 namespace MaxHeatSetpointLimit {
@@ -17773,6 +18765,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxHeatSetpointLimit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxHeatSetpointLimit
 namespace MinCoolSetpointLimit {
@@ -17784,6 +18777,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinCoolSetpointLimit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinCoolSetpointLimit
 namespace MaxCoolSetpointLimit {
@@ -17795,6 +18789,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxCoolSetpointLimit::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxCoolSetpointLimit
 namespace MinSetpointDeadBand {
@@ -17806,6 +18801,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinSetpointDeadBand::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinSetpointDeadBand
 namespace RemoteSensing {
@@ -17817,6 +18813,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemoteSensing::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RemoteSensing
 namespace ControlSequenceOfOperation {
@@ -17828,6 +18825,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ControlSequenceOfOperation::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ControlSequenceOfOperation
 namespace SystemMode {
@@ -17839,6 +18837,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SystemMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SystemMode
 namespace AlarmMask {
@@ -17850,6 +18849,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AlarmMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AlarmMask
 namespace ThermostatRunningMode {
@@ -17861,6 +18861,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ThermostatRunningMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ThermostatRunningMode
 namespace StartOfWeek {
@@ -17872,6 +18873,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartOfWeek::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StartOfWeek
 namespace NumberOfWeeklyTransitions {
@@ -17883,6 +18885,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfWeeklyTransitions::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumberOfWeeklyTransitions
 namespace NumberOfDailyTransitions {
@@ -17894,6 +18897,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfDailyTransitions::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumberOfDailyTransitions
 namespace TemperatureSetpointHold {
@@ -17905,6 +18909,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpointHold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TemperatureSetpointHold
 namespace TemperatureSetpointHoldDuration {
@@ -17916,6 +18921,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureSetpointHoldDuration::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TemperatureSetpointHoldDuration
 namespace ThermostatProgrammingOperationMode {
@@ -17927,6 +18933,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ThermostatProgrammingOperationMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ThermostatProgrammingOperationMode
 namespace HvacRelayState {
@@ -17938,6 +18945,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HvacRelayState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HvacRelayState
 namespace SetpointChangeSource {
@@ -17949,6 +18957,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeSource::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SetpointChangeSource
 namespace SetpointChangeAmount {
@@ -17960,6 +18969,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeAmount::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SetpointChangeAmount
 namespace SetpointChangeSourceTimestamp {
@@ -17971,6 +18981,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SetpointChangeSourceTimestamp::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SetpointChangeSourceTimestamp
 namespace AcType {
@@ -17982,6 +18993,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcType
 namespace AcCapacity {
@@ -17993,6 +19005,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCapacity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcCapacity
 namespace AcRefrigerantType {
@@ -18004,6 +19017,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcRefrigerantType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcRefrigerantType
 namespace AcCompressor {
@@ -18015,6 +19029,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCompressor::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcCompressor
 namespace AcErrorCode {
@@ -18026,6 +19041,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcErrorCode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcErrorCode
 namespace AcLouverPosition {
@@ -18037,6 +19053,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcLouverPosition::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcLouverPosition
 namespace AcCoilTemperature {
@@ -18048,6 +19065,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCoilTemperature::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcCoilTemperature
 namespace AcCapacityFormat {
@@ -18059,6 +19077,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCapacityFormat::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcCapacityFormat
 namespace FeatureMap {
@@ -18070,6 +19089,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18081,6 +19101,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Thermostat::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18097,6 +19118,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FanMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FanMode
 namespace FanModeSequence {
@@ -18108,6 +19130,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FanModeSequence::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FanModeSequence
 namespace FeatureMap {
@@ -18119,6 +19142,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18130,6 +19154,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FanControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18146,6 +19171,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RelativeHumidity
 namespace DehumidificationCooling {
@@ -18157,6 +19183,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationCooling::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DehumidificationCooling
 namespace RhDehumidificationSetpoint {
@@ -18168,6 +19195,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RhDehumidificationSetpoint::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RhDehumidificationSetpoint
 namespace RelativeHumidityMode {
@@ -18179,6 +19207,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidityMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RelativeHumidityMode
 namespace DehumidificationLockout {
@@ -18190,6 +19219,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationLockout::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DehumidificationLockout
 namespace DehumidificationHysteresis {
@@ -18201,6 +19231,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationHysteresis::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DehumidificationHysteresis
 namespace DehumidificationMaxCool {
@@ -18212,6 +19243,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DehumidificationMaxCool::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DehumidificationMaxCool
 namespace RelativeHumidityDisplay {
@@ -18223,6 +19255,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RelativeHumidityDisplay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RelativeHumidityDisplay
 namespace FeatureMap {
@@ -18234,6 +19267,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18245,6 +19279,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DehumidificationControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18261,6 +19296,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TemperatureDisplayMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TemperatureDisplayMode
 namespace KeypadLockout {
@@ -18272,6 +19308,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::KeypadLockout::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace KeypadLockout
 namespace ScheduleProgrammingVisibility {
@@ -18283,6 +19320,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScheduleProgrammingVisibility::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ScheduleProgrammingVisibility
 namespace FeatureMap {
@@ -18294,6 +19332,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -18305,6 +19344,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ThermostatUserInterfaceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -18559,6 +19599,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -18599,6 +19641,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -18640,6 +19684,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -18680,6 +19726,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -18719,6 +19767,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -18760,6 +19810,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -18802,6 +19854,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -18844,6 +19898,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -18884,6 +19940,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -18925,6 +19983,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -18965,6 +20025,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -19006,6 +20068,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -19046,6 +20110,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -19087,6 +20153,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -19129,6 +20197,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -19175,6 +20245,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -19213,6 +20285,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -19254,6 +20328,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -19301,6 +20377,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -19331,6 +20409,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentHue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentHue
 namespace CurrentSaturation {
@@ -19342,6 +20421,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentSaturation::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentSaturation
 namespace RemainingTime {
@@ -19353,6 +20433,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RemainingTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RemainingTime
 namespace CurrentX {
@@ -19364,6 +20445,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentX::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentX
 namespace CurrentY {
@@ -19375,6 +20457,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentY::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentY
 namespace DriftCompensation {
@@ -19386,6 +20469,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DriftCompensation::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DriftCompensation
 namespace CompensationText {
@@ -19397,6 +20481,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompensationText::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CompensationText
 namespace ColorTemperature {
@@ -19408,6 +20493,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorTemperature::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorTemperature
 namespace ColorMode {
@@ -19419,6 +20505,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorMode
 namespace ColorControlOptions {
@@ -19430,6 +20517,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorControlOptions::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorControlOptions
 namespace NumberOfPrimaries {
@@ -19441,6 +20529,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfPrimaries::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumberOfPrimaries
 namespace Primary1X {
@@ -19452,6 +20541,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary1X::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary1X
 namespace Primary1Y {
@@ -19463,6 +20553,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary1Y::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary1Y
 namespace Primary1Intensity {
@@ -19474,6 +20565,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary1Intensity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary1Intensity
 namespace Primary2X {
@@ -19485,6 +20577,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary2X::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary2X
 namespace Primary2Y {
@@ -19496,6 +20589,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary2Y::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary2Y
 namespace Primary2Intensity {
@@ -19507,6 +20601,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary2Intensity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary2Intensity
 namespace Primary3X {
@@ -19518,6 +20613,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary3X::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary3X
 namespace Primary3Y {
@@ -19529,6 +20625,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary3Y::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary3Y
 namespace Primary3Intensity {
@@ -19540,6 +20637,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary3Intensity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary3Intensity
 namespace Primary4X {
@@ -19551,6 +20649,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary4X::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary4X
 namespace Primary4Y {
@@ -19562,6 +20661,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary4Y::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary4Y
 namespace Primary4Intensity {
@@ -19573,6 +20673,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary4Intensity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary4Intensity
 namespace Primary5X {
@@ -19584,6 +20685,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary5X::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary5X
 namespace Primary5Y {
@@ -19595,6 +20697,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary5Y::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary5Y
 namespace Primary5Intensity {
@@ -19606,6 +20709,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary5Intensity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary5Intensity
 namespace Primary6X {
@@ -19617,6 +20721,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary6X::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary6X
 namespace Primary6Y {
@@ -19628,6 +20733,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary6Y::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary6Y
 namespace Primary6Intensity {
@@ -19639,6 +20745,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Primary6Intensity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Primary6Intensity
 namespace WhitePointX {
@@ -19650,6 +20757,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WhitePointX::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WhitePointX
 namespace WhitePointY {
@@ -19661,6 +20769,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WhitePointY::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WhitePointY
 namespace ColorPointRX {
@@ -19672,6 +20781,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointRX::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorPointRX
 namespace ColorPointRY {
@@ -19683,6 +20793,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointRY::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorPointRY
 namespace ColorPointRIntensity {
@@ -19694,6 +20805,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointRIntensity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorPointRIntensity
 namespace ColorPointGX {
@@ -19705,6 +20817,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointGX::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorPointGX
 namespace ColorPointGY {
@@ -19716,6 +20829,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointGY::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorPointGY
 namespace ColorPointGIntensity {
@@ -19727,6 +20841,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointGIntensity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorPointGIntensity
 namespace ColorPointBX {
@@ -19738,6 +20853,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointBX::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorPointBX
 namespace ColorPointBY {
@@ -19749,6 +20865,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointBY::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorPointBY
 namespace ColorPointBIntensity {
@@ -19760,6 +20877,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorPointBIntensity::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorPointBIntensity
 namespace EnhancedCurrentHue {
@@ -19771,6 +20889,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnhancedCurrentHue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EnhancedCurrentHue
 namespace EnhancedColorMode {
@@ -19782,6 +20901,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnhancedColorMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EnhancedColorMode
 namespace ColorLoopActive {
@@ -19793,6 +20913,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopActive::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorLoopActive
 namespace ColorLoopDirection {
@@ -19804,6 +20925,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopDirection::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorLoopDirection
 namespace ColorLoopTime {
@@ -19815,6 +20937,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorLoopTime
 namespace ColorLoopStartEnhancedHue {
@@ -19826,6 +20949,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopStartEnhancedHue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorLoopStartEnhancedHue
 namespace ColorLoopStoredEnhancedHue {
@@ -19837,6 +20961,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorLoopStoredEnhancedHue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorLoopStoredEnhancedHue
 namespace ColorCapabilities {
@@ -19848,6 +20973,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorCapabilities::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorCapabilities
 namespace ColorTempPhysicalMin {
@@ -19859,6 +20985,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorTempPhysicalMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorTempPhysicalMin
 namespace ColorTempPhysicalMax {
@@ -19870,6 +20997,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ColorTempPhysicalMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ColorTempPhysicalMax
 namespace CoupleColorTempToLevelMinMireds {
@@ -19881,6 +21009,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CoupleColorTempToLevelMinMireds::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CoupleColorTempToLevelMinMireds
 namespace StartUpColorTemperatureMireds {
@@ -19892,6 +21021,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartUpColorTemperatureMireds::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StartUpColorTemperatureMireds
 namespace FeatureMap {
@@ -19903,6 +21033,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -19914,6 +21045,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ColorControl::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -19930,6 +21062,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalMinLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PhysicalMinLevel
 namespace PhysicalMaxLevel {
@@ -19941,6 +21074,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalMaxLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PhysicalMaxLevel
 namespace BallastStatus {
@@ -19952,6 +21086,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BallastStatus::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BallastStatus
 namespace MinLevel {
@@ -19963,6 +21098,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinLevel
 namespace MaxLevel {
@@ -19974,6 +21110,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxLevel
 namespace PowerOnLevel {
@@ -19985,6 +21122,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerOnLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PowerOnLevel
 namespace PowerOnFadeTime {
@@ -19996,6 +21134,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerOnFadeTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PowerOnFadeTime
 namespace IntrinsicBallastFactor {
@@ -20007,6 +21146,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IntrinsicBallastFactor::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace IntrinsicBallastFactor
 namespace BallastFactorAdjustment {
@@ -20018,6 +21158,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BallastFactorAdjustment::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BallastFactorAdjustment
 namespace LampQuality {
@@ -20029,6 +21170,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampQuality::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LampQuality
 namespace LampType {
@@ -20040,6 +21182,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LampType
 namespace LampManufacturer {
@@ -20051,6 +21194,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampManufacturer::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LampManufacturer
 namespace LampRatedHours {
@@ -20062,6 +21206,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampRatedHours::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LampRatedHours
 namespace LampBurnHours {
@@ -20073,6 +21218,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampBurnHours::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LampBurnHours
 namespace LampAlarmMode {
@@ -20084,6 +21230,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampAlarmMode::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LampAlarmMode
 namespace LampBurnHoursTripPoint {
@@ -20095,6 +21242,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LampBurnHoursTripPoint::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LampBurnHoursTripPoint
 namespace FeatureMap {
@@ -20106,6 +21254,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -20117,6 +21266,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BallastConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -20139,6 +21289,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -20150,6 +21301,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -20161,6 +21313,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -20172,6 +21325,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace LightSensorType {
@@ -20183,6 +21337,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LightSensorType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LightSensorType
 namespace FeatureMap {
@@ -20194,6 +21349,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -20205,6 +21361,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IlluminanceMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -20221,6 +21378,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -20232,6 +21390,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -20243,6 +21402,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -20254,6 +21414,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -20265,6 +21426,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -20276,6 +21438,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TemperatureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -20292,6 +21455,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -20303,6 +21467,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -20314,6 +21479,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -20325,6 +21491,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace ScaledValue {
@@ -20336,6 +21503,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScaledValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ScaledValue
 namespace MinScaledValue {
@@ -20347,6 +21515,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinScaledValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinScaledValue
 namespace MaxScaledValue {
@@ -20358,6 +21527,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxScaledValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxScaledValue
 namespace ScaledTolerance {
@@ -20369,6 +21539,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ScaledTolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ScaledTolerance
 namespace Scale {
@@ -20380,6 +21551,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Scale::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Scale
 namespace FeatureMap {
@@ -20391,6 +21563,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -20402,6 +21575,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PressureMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -20418,6 +21592,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -20429,6 +21604,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -20440,6 +21616,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -20451,6 +21628,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -20462,6 +21640,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -20473,6 +21652,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FlowMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -20489,6 +21669,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -20500,6 +21681,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -20511,6 +21693,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -20522,6 +21705,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -20533,6 +21717,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -20544,6 +21729,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::RelativeHumidityMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -20560,6 +21746,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Occupancy::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Occupancy
 namespace OccupancySensorType {
@@ -20571,6 +21758,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OccupancySensorType
 namespace OccupancySensorTypeBitmap {
@@ -20582,6 +21770,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OccupancySensorTypeBitmap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OccupancySensorTypeBitmap
 namespace PirOccupiedToUnoccupiedDelay {
@@ -20593,6 +21782,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PirOccupiedToUnoccupiedDelay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PirOccupiedToUnoccupiedDelay
 namespace PirUnoccupiedToOccupiedDelay {
@@ -20604,6 +21794,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PirUnoccupiedToOccupiedDelay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PirUnoccupiedToOccupiedDelay
 namespace PirUnoccupiedToOccupiedThreshold {
@@ -20615,6 +21806,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PirUnoccupiedToOccupiedThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PirUnoccupiedToOccupiedThreshold
 namespace UltrasonicOccupiedToUnoccupiedDelay {
@@ -20626,6 +21818,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UltrasonicOccupiedToUnoccupiedDelay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UltrasonicOccupiedToUnoccupiedDelay
 namespace UltrasonicUnoccupiedToOccupiedDelay {
@@ -20637,6 +21830,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UltrasonicUnoccupiedToOccupiedDelay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UltrasonicUnoccupiedToOccupiedDelay
 namespace UltrasonicUnoccupiedToOccupiedThreshold {
@@ -20648,6 +21842,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UltrasonicUnoccupiedToOccupiedThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UltrasonicUnoccupiedToOccupiedThreshold
 namespace PhysicalContactOccupiedToUnoccupiedDelay {
@@ -20659,6 +21854,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalContactOccupiedToUnoccupiedDelay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PhysicalContactOccupiedToUnoccupiedDelay
 namespace PhysicalContactUnoccupiedToOccupiedDelay {
@@ -20670,6 +21866,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalContactUnoccupiedToOccupiedDelay::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PhysicalContactUnoccupiedToOccupiedDelay
 namespace PhysicalContactUnoccupiedToOccupiedThreshold {
@@ -20681,6 +21878,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhysicalContactUnoccupiedToOccupiedThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PhysicalContactUnoccupiedToOccupiedThreshold
 namespace FeatureMap {
@@ -20692,6 +21890,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -20703,6 +21902,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OccupancySensing::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -20719,6 +21919,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -20730,6 +21931,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -20741,6 +21943,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -20752,6 +21955,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -20763,6 +21967,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -20774,6 +21979,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonMonoxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -20790,6 +21996,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -20801,6 +22008,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -20812,6 +22020,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -20823,6 +22032,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -20834,6 +22044,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -20845,6 +22056,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CarbonDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -20861,6 +22073,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -20872,6 +22085,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -20883,6 +22097,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -20894,6 +22109,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -20905,6 +22121,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -20916,6 +22133,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -20932,6 +22150,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -20943,6 +22162,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -20954,6 +22174,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -20965,6 +22186,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -20976,6 +22198,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -20987,6 +22210,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::EthyleneOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21003,6 +22227,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21014,6 +22239,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21025,6 +22251,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21036,6 +22263,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21047,6 +22275,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21058,6 +22287,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21074,6 +22304,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21085,6 +22316,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21096,6 +22328,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21107,6 +22340,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21118,6 +22352,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21129,6 +22364,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HydrogenSulphideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21145,6 +22381,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21156,6 +22393,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21167,6 +22405,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21178,6 +22417,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21189,6 +22429,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21200,6 +22441,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitricOxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21216,6 +22458,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21227,6 +22470,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21238,6 +22482,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21249,6 +22494,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21260,6 +22506,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21271,6 +22518,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::NitrogenDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21287,6 +22535,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21298,6 +22547,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21309,6 +22559,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21320,6 +22571,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21331,6 +22583,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21342,6 +22595,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21358,6 +22612,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21369,6 +22624,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21380,6 +22636,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21391,6 +22648,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21402,6 +22660,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21413,6 +22672,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::OzoneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21429,6 +22689,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21440,6 +22701,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21451,6 +22713,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21462,6 +22725,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21473,6 +22737,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21484,6 +22749,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfurDioxideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21500,6 +22766,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21511,6 +22778,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21522,6 +22790,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21533,6 +22802,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21544,6 +22814,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21555,6 +22826,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::DissolvedOxygenConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21571,6 +22843,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21582,6 +22855,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21593,6 +22867,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21604,6 +22879,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21615,6 +22891,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21626,6 +22903,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21642,6 +22920,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21653,6 +22932,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21664,6 +22944,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21675,6 +22956,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21686,6 +22968,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21697,6 +22980,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloraminesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21713,6 +22997,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21724,6 +23009,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21735,6 +23021,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21746,6 +23033,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21757,6 +23045,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21768,6 +23057,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorineConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21784,6 +23074,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21795,6 +23086,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21806,6 +23098,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21817,6 +23110,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21828,6 +23122,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21839,6 +23134,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FecalColiformAndEColiConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21855,6 +23151,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21866,6 +23163,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21877,6 +23175,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21888,6 +23187,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21899,6 +23199,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21910,6 +23211,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::FluorideConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21926,6 +23228,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -21937,6 +23240,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -21948,6 +23252,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -21959,6 +23264,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -21970,6 +23276,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -21981,6 +23288,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::HaloaceticAcidsConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -21997,6 +23305,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -22008,6 +23317,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -22019,6 +23329,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -22030,6 +23341,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -22041,6 +23353,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22052,6 +23365,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalTrihalomethanesConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22068,6 +23382,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -22079,6 +23394,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -22090,6 +23406,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -22101,6 +23418,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -22112,6 +23430,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22123,6 +23442,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TotalColiformBacteriaConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22139,6 +23459,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -22150,6 +23471,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -22161,6 +23483,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -22172,6 +23495,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -22183,6 +23507,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22194,6 +23519,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TurbidityConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22210,6 +23536,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -22221,6 +23548,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -22232,6 +23560,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -22243,6 +23572,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -22254,6 +23584,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22265,6 +23596,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::CopperConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22281,6 +23613,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -22292,6 +23625,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -22303,6 +23637,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -22314,6 +23649,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -22325,6 +23661,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22336,6 +23673,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LeadConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22352,6 +23690,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -22363,6 +23702,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -22374,6 +23714,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -22385,6 +23726,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -22396,6 +23738,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22407,6 +23750,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ManganeseConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22423,6 +23767,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -22434,6 +23779,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -22445,6 +23791,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -22456,6 +23803,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -22467,6 +23815,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22478,6 +23827,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SulfateConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22494,6 +23844,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -22505,6 +23856,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -22516,6 +23868,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -22527,6 +23880,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -22538,6 +23892,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22549,6 +23904,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromodichloromethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22565,6 +23921,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -22576,6 +23933,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -22587,6 +23945,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -22598,6 +23957,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -22609,6 +23969,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22620,6 +23981,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::BromoformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22636,6 +23998,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -22647,6 +24010,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -22658,6 +24022,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -22669,6 +24034,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -22680,6 +24046,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22691,6 +24058,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChlorodibromomethaneConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22707,6 +24075,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -22718,6 +24087,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -22729,6 +24099,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -22740,6 +24111,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -22751,6 +24123,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22762,6 +24135,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ChloroformConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22778,6 +24152,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredValue
 namespace MinMeasuredValue {
@@ -22789,6 +24164,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MinMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MinMeasuredValue
 namespace MaxMeasuredValue {
@@ -22800,6 +24176,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxMeasuredValue::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxMeasuredValue
 namespace Tolerance {
@@ -22811,6 +24188,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Tolerance::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Tolerance
 namespace FeatureMap {
@@ -22822,6 +24200,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -22833,6 +24212,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::SodiumConcentrationMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -22955,6 +24335,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -22992,6 +24374,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23022,6 +24406,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::IasZone::Commands::InitiateNormalOperationModeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23053,6 +24439,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::IasZone::Commands::ZoneEnrollResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23086,6 +24474,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::IasZone::Commands::InitiateTestModeResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23114,6 +24504,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23140,6 +24532,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23163,6 +24557,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ZoneState
 namespace ZoneType {
@@ -23174,6 +24569,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ZoneType
 namespace ZoneStatus {
@@ -23185,6 +24581,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneStatus::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ZoneStatus
 namespace IasCieAddress {
@@ -23196,6 +24593,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::IasCieAddress::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace IasCieAddress
 namespace ZoneId {
@@ -23207,6 +24605,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ZoneId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ZoneId
 namespace NumberOfZoneSensitivityLevelsSupported {
@@ -23218,6 +24617,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfZoneSensitivityLevelsSupported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NumberOfZoneSensitivityLevelsSupported
 namespace CurrentZoneSensitivityLevel {
@@ -23229,6 +24629,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentZoneSensitivityLevel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentZoneSensitivityLevel
 namespace FeatureMap {
@@ -23240,6 +24641,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -23251,6 +24653,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasZone::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -23505,6 +24908,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::IasAce::Commands::ArmResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23537,6 +24942,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23571,6 +24978,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::IasAce::Commands::BypassResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23633,6 +25042,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23675,6 +25086,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23710,6 +25123,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23740,6 +25155,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23775,6 +25192,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23805,6 +25224,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23840,6 +25261,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23870,6 +25293,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::IasAce::Commands::GetZoneIdMapResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23905,6 +25330,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23938,6 +25365,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::IasAce::Commands::GetZoneInformationResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23970,6 +25399,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -23998,6 +25429,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::IasAce::Commands::GetPanelStatusResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -24029,6 +25462,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -24057,6 +25492,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -24090,6 +25527,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -24128,6 +25567,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::IasAce::Commands::GetZoneStatusResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -24155,6 +25596,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -24166,6 +25608,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasAce::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -24228,6 +25671,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -24261,6 +25706,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -24285,6 +25732,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MaxDuration::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MaxDuration
 namespace FeatureMap {
@@ -24296,6 +25744,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -24307,6 +25756,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::IasWd::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -24323,6 +25773,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::WakeOnLanMacAddress::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace WakeOnLanMacAddress
 namespace FeatureMap {
@@ -24334,6 +25785,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -24345,6 +25797,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::WakeOnLan::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -24459,6 +25912,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -24491,6 +25946,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -24524,6 +25981,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -24555,6 +26014,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -24579,6 +26040,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TvChannelList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TvChannelList
 namespace TvChannelLineup {
@@ -24590,6 +26052,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TvChannelLineup::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TvChannelLineup
 namespace CurrentTvChannel {
@@ -24601,6 +26064,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentTvChannel::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentTvChannel
 namespace FeatureMap {
@@ -24612,6 +26076,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -24623,6 +26088,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -24695,6 +26161,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -24728,6 +26196,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -24753,6 +26223,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TargetNavigatorList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TargetNavigatorList
 namespace CurrentNavigatorTarget {
@@ -24764,6 +26235,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentNavigatorTarget::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentNavigatorTarget
 namespace FeatureMap {
@@ -24775,6 +26247,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -24786,6 +26259,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TargetNavigator::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -24976,6 +26450,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25005,6 +26481,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25032,6 +26510,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25061,6 +26541,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25088,6 +26570,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25117,6 +26601,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25144,6 +26630,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25173,6 +26661,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25200,6 +26690,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25229,6 +26721,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25256,6 +26750,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25285,6 +26781,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25312,6 +26810,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25341,6 +26841,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25368,6 +26870,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25397,6 +26901,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25427,6 +26933,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25457,6 +26965,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25487,6 +26997,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25517,6 +27029,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25547,6 +27061,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25577,6 +27093,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25601,6 +27119,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PlaybackState::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PlaybackState
 namespace StartTime {
@@ -25612,6 +27131,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::StartTime::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace StartTime
 namespace Duration {
@@ -25623,6 +27143,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Duration::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Duration
 namespace PositionUpdatedAt {
@@ -25634,6 +27155,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PositionUpdatedAt::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PositionUpdatedAt
 namespace Position {
@@ -25645,6 +27167,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Position::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Position
 namespace PlaybackSpeed {
@@ -25656,6 +27179,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PlaybackSpeed::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PlaybackSpeed
 namespace SeekRangeEnd {
@@ -25667,6 +27191,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SeekRangeEnd::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SeekRangeEnd
 namespace SeekRangeStart {
@@ -25678,6 +27203,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SeekRangeStart::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SeekRangeStart
 namespace FeatureMap {
@@ -25689,6 +27215,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -25700,6 +27227,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -25799,6 +27327,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25826,6 +27356,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25852,6 +27384,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25883,6 +27417,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25908,6 +27444,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MediaInputList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MediaInputList
 namespace CurrentMediaInput {
@@ -25919,6 +27456,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentMediaInput::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentMediaInput
 namespace FeatureMap {
@@ -25930,6 +27468,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -25941,6 +27480,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -25973,6 +27513,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -25996,6 +27538,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -26007,6 +27550,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::LowPower::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -26156,6 +27700,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -26186,6 +27732,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -26210,6 +27758,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -26221,6 +27770,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::KeypadInput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -26442,6 +27992,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -26475,6 +28027,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -26508,6 +28062,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -26541,6 +28097,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -26566,6 +28124,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcceptsHeaderList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptsHeaderList
 namespace SupportedStreamingTypes {
@@ -26577,6 +28136,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SupportedStreamingTypes::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SupportedStreamingTypes
 namespace FeatureMap {
@@ -26588,6 +28148,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -26599,6 +28160,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -26680,6 +28242,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -26712,6 +28276,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -26737,6 +28303,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AudioOutputList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AudioOutputList
 namespace CurrentAudioOutput {
@@ -26748,6 +28315,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentAudioOutput::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentAudioOutput
 namespace FeatureMap {
@@ -26759,6 +28327,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -26770,6 +28339,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::AudioOutput::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -26850,6 +28420,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -26884,6 +28456,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -26909,6 +28483,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationLauncherList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApplicationLauncherList
 namespace CatalogVendorId {
@@ -26920,6 +28495,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CatalogVendorId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CatalogVendorId
 namespace ApplicationId {
@@ -26931,6 +28507,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApplicationId
 namespace FeatureMap {
@@ -26942,6 +28519,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -26953,6 +28531,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -27002,6 +28581,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27026,6 +28607,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace VendorName
 namespace VendorId {
@@ -27037,6 +28619,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace VendorId
 namespace ApplicationName {
@@ -27048,6 +28631,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApplicationName
 namespace ProductId {
@@ -27059,6 +28643,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductId
 namespace ApplicationId {
@@ -27070,6 +28655,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApplicationId
 namespace CatalogVendorId {
@@ -27081,6 +28667,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CatalogVendorId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CatalogVendorId
 namespace ApplicationStatus {
@@ -27092,6 +28679,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationStatus::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApplicationStatus
 namespace FeatureMap {
@@ -27103,6 +28691,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -27114,6 +28703,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -27159,6 +28749,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27189,6 +28781,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27221,6 +28815,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27246,6 +28842,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -27257,6 +28854,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -27622,6 +29220,11 @@ struct Type;
 struct DecodableType;
 } // namespace SimpleStructEchoRequest
 
+namespace TimedInvokeRequest {
+struct Type;
+struct DecodableType;
+} // namespace TimedInvokeRequest
+
 } // namespace Commands
 
 namespace Commands {
@@ -27640,6 +29243,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27669,6 +29274,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27696,6 +29303,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27725,6 +29334,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27752,6 +29363,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27781,6 +29394,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27808,6 +29423,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27847,6 +29464,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27884,6 +29503,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27915,6 +29536,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27945,6 +29568,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::TestSimpleArgumentResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -27977,6 +29602,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28018,6 +29645,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::TestStructArrayArgumentResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28059,6 +29688,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28092,6 +29723,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28176,6 +29809,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28233,6 +29868,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28263,6 +29900,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28293,6 +29932,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28323,6 +29964,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28353,6 +29996,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28383,6 +30028,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28413,6 +30060,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::BooleanResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28443,6 +30092,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28475,6 +30126,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28506,6 +30159,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28558,6 +30213,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::TestComplexNullableOptionalResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28599,6 +30256,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -28611,6 +30270,34 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace SimpleStructEchoRequest
+namespace TimedInvokeRequest {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TimedInvokeRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return true; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TimedInvokeRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TimedInvokeRequest
 } // namespace Commands
 
 namespace Attributes {
@@ -28623,6 +30310,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Boolean::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Boolean
 namespace Bitmap8 {
@@ -28634,6 +30322,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap8::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Bitmap8
 namespace Bitmap16 {
@@ -28645,6 +30334,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap16::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Bitmap16
 namespace Bitmap32 {
@@ -28656,6 +30346,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap32::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Bitmap32
 namespace Bitmap64 {
@@ -28667,6 +30358,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Bitmap64::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Bitmap64
 namespace Int8u {
@@ -28678,6 +30370,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int8u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int8u
 namespace Int16u {
@@ -28689,6 +30382,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int16u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int16u
 namespace Int24u {
@@ -28700,6 +30394,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int24u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int24u
 namespace Int32u {
@@ -28711,6 +30406,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int32u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int32u
 namespace Int40u {
@@ -28722,6 +30418,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int40u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int40u
 namespace Int48u {
@@ -28733,6 +30430,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int48u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int48u
 namespace Int56u {
@@ -28744,6 +30442,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int56u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int56u
 namespace Int64u {
@@ -28755,6 +30454,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int64u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int64u
 namespace Int8s {
@@ -28766,6 +30466,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int8s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int8s
 namespace Int16s {
@@ -28777,6 +30478,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int16s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int16s
 namespace Int24s {
@@ -28788,6 +30490,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int24s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int24s
 namespace Int32s {
@@ -28799,6 +30502,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int32s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int32s
 namespace Int40s {
@@ -28810,6 +30514,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int40s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int40s
 namespace Int48s {
@@ -28821,6 +30526,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int48s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int48s
 namespace Int56s {
@@ -28832,6 +30538,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int56s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int56s
 namespace Int64s {
@@ -28843,6 +30550,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Int64s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Int64s
 namespace Enum8 {
@@ -28854,6 +30562,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Enum8::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Enum8
 namespace Enum16 {
@@ -28865,6 +30574,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Enum16::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Enum16
 namespace FloatSingle {
@@ -28876,6 +30586,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FloatSingle::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FloatSingle
 namespace FloatDouble {
@@ -28887,6 +30598,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FloatDouble::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FloatDouble
 namespace OctetString {
@@ -28898,6 +30610,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OctetString::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OctetString
 namespace ListInt8u {
@@ -28909,6 +30622,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ListInt8u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ListInt8u
 namespace ListOctetString {
@@ -28920,6 +30634,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ListOctetString::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ListOctetString
 namespace ListStructOctetString {
@@ -28931,6 +30646,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ListStructOctetString::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ListStructOctetString
 namespace LongOctetString {
@@ -28942,6 +30658,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LongOctetString::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LongOctetString
 namespace CharString {
@@ -28953,6 +30670,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CharString::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CharString
 namespace LongCharString {
@@ -28964,6 +30682,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LongCharString::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LongCharString
 namespace EpochUs {
@@ -28975,6 +30694,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EpochUs::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EpochUs
 namespace EpochS {
@@ -28986,6 +30706,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EpochS::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EpochS
 namespace VendorId {
@@ -28997,6 +30718,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VendorId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace VendorId
 namespace ListNullablesAndOptionalsStruct {
@@ -29008,6 +30730,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ListNullablesAndOptionalsStruct::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ListNullablesAndOptionalsStruct
 namespace EnumAttr {
@@ -29019,6 +30742,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::EnumAttr::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EnumAttr
 namespace Struct {
@@ -29030,6 +30754,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Struct::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Struct
 namespace RangeRestrictedInt8u {
@@ -29041,6 +30766,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RangeRestrictedInt8u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RangeRestrictedInt8u
 namespace RangeRestrictedInt8s {
@@ -29052,6 +30778,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RangeRestrictedInt8s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RangeRestrictedInt8s
 namespace RangeRestrictedInt16u {
@@ -29063,6 +30790,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RangeRestrictedInt16u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RangeRestrictedInt16u
 namespace RangeRestrictedInt16s {
@@ -29074,8 +30802,21 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RangeRestrictedInt16s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RangeRestrictedInt16s
+namespace TimedWriteBoolean {
+struct TypeInfo
+{
+    using Type             = bool;
+    using DecodableType    = bool;
+    using DecodableArgType = bool;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::TimedWriteBoolean::Id; }
+    static constexpr bool MustUseTimedWrite() { return true; }
+};
+} // namespace TimedWriteBoolean
 namespace Unsupported {
 struct TypeInfo
 {
@@ -29085,6 +30826,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Unsupported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Unsupported
 namespace NullableBoolean {
@@ -29096,6 +30838,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBoolean::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableBoolean
 namespace NullableBitmap8 {
@@ -29107,6 +30850,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap8::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableBitmap8
 namespace NullableBitmap16 {
@@ -29118,6 +30862,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap16::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableBitmap16
 namespace NullableBitmap32 {
@@ -29129,6 +30874,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap32::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableBitmap32
 namespace NullableBitmap64 {
@@ -29140,6 +30886,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableBitmap64::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableBitmap64
 namespace NullableInt8u {
@@ -29151,6 +30898,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt8u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt8u
 namespace NullableInt16u {
@@ -29162,6 +30910,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt16u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt16u
 namespace NullableInt24u {
@@ -29173,6 +30922,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt24u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt24u
 namespace NullableInt32u {
@@ -29184,6 +30934,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt32u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt32u
 namespace NullableInt40u {
@@ -29195,6 +30946,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt40u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt40u
 namespace NullableInt48u {
@@ -29206,6 +30958,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt48u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt48u
 namespace NullableInt56u {
@@ -29217,6 +30970,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt56u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt56u
 namespace NullableInt64u {
@@ -29228,6 +30982,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt64u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt64u
 namespace NullableInt8s {
@@ -29239,6 +30994,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt8s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt8s
 namespace NullableInt16s {
@@ -29250,6 +31006,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt16s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt16s
 namespace NullableInt24s {
@@ -29261,6 +31018,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt24s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt24s
 namespace NullableInt32s {
@@ -29272,6 +31030,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt32s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt32s
 namespace NullableInt40s {
@@ -29283,6 +31042,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt40s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt40s
 namespace NullableInt48s {
@@ -29294,6 +31054,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt48s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt48s
 namespace NullableInt56s {
@@ -29305,6 +31066,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt56s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt56s
 namespace NullableInt64s {
@@ -29316,6 +31078,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableInt64s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableInt64s
 namespace NullableEnum8 {
@@ -29327,6 +31090,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableEnum8::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableEnum8
 namespace NullableEnum16 {
@@ -29338,6 +31102,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableEnum16::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableEnum16
 namespace NullableFloatSingle {
@@ -29349,6 +31114,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableFloatSingle::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableFloatSingle
 namespace NullableFloatDouble {
@@ -29360,6 +31126,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableFloatDouble::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableFloatDouble
 namespace NullableOctetString {
@@ -29371,6 +31138,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableOctetString::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableOctetString
 namespace NullableCharString {
@@ -29382,6 +31150,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableCharString::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableCharString
 namespace NullableEnumAttr {
@@ -29393,6 +31162,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableEnumAttr::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableEnumAttr
 namespace NullableStruct {
@@ -29404,6 +31174,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableStruct::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableStruct
 namespace NullableRangeRestrictedInt8u {
@@ -29415,6 +31186,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableRangeRestrictedInt8u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableRangeRestrictedInt8u
 namespace NullableRangeRestrictedInt8s {
@@ -29426,6 +31198,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableRangeRestrictedInt8s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableRangeRestrictedInt8s
 namespace NullableRangeRestrictedInt16u {
@@ -29437,6 +31210,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableRangeRestrictedInt16u::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableRangeRestrictedInt16u
 namespace NullableRangeRestrictedInt16s {
@@ -29448,6 +31222,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NullableRangeRestrictedInt16s::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NullableRangeRestrictedInt16s
 namespace FeatureMap {
@@ -29459,6 +31234,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -29470,6 +31246,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -29730,6 +31507,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -29762,6 +31541,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -29793,6 +31574,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -29830,6 +31613,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -29873,6 +31658,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -29908,6 +31695,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -29938,6 +31727,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -29962,6 +31753,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -29973,6 +31765,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Messaging::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -29989,6 +31782,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BasicIdentification::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BasicIdentification
 namespace CompanyName {
@@ -30000,6 +31794,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompanyName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CompanyName
 namespace CompanyId {
@@ -30011,6 +31806,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompanyId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CompanyId
 namespace BrandName {
@@ -30022,6 +31818,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BrandName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BrandName
 namespace BrandId {
@@ -30033,6 +31830,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::BrandId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace BrandId
 namespace Model {
@@ -30044,6 +31842,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Model::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Model
 namespace PartNumber {
@@ -30055,6 +31854,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PartNumber
 namespace ProductRevision {
@@ -30066,6 +31866,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductRevision
 namespace SoftwareRevision {
@@ -30077,6 +31878,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SoftwareRevision
 namespace ProductTypeName {
@@ -30088,6 +31890,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductTypeName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductTypeName
 namespace ProductTypeId {
@@ -30099,6 +31902,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductTypeId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductTypeId
 namespace CecedSpecificationVersion {
@@ -30110,6 +31914,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CecedSpecificationVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CecedSpecificationVersion
 namespace FeatureMap {
@@ -30121,6 +31926,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -30132,6 +31938,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -30148,6 +31955,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CompanyName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CompanyName
 namespace MeterTypeId {
@@ -30159,6 +31967,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeterTypeId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeterTypeId
 namespace DataQualityId {
@@ -30170,6 +31979,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DataQualityId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DataQualityId
 namespace CustomerName {
@@ -30181,6 +31991,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CustomerName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CustomerName
 namespace Model {
@@ -30192,6 +32003,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Model::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Model
 namespace PartNumber {
@@ -30203,6 +32015,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PartNumber::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PartNumber
 namespace ProductRevision {
@@ -30214,6 +32027,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ProductRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductRevision
 namespace SoftwareRevision {
@@ -30225,6 +32039,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::SoftwareRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace SoftwareRevision
 namespace UtilityName {
@@ -30236,6 +32051,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::UtilityName::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UtilityName
 namespace Pod {
@@ -30247,6 +32063,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Pod::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Pod
 namespace AvailablePower {
@@ -30258,6 +32075,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AvailablePower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AvailablePower
 namespace PowerThreshold {
@@ -30269,6 +32087,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerThreshold::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PowerThreshold
 namespace FeatureMap {
@@ -30280,6 +32099,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -30291,6 +32111,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::MeterIdentification::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -30362,6 +32183,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::ApplianceEventsAndAlert::Commands::GetAlertsResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30393,6 +32216,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30426,6 +32251,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30459,6 +32286,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30484,6 +32313,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -30495,6 +32325,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceEventsAndAlert::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -30561,6 +32392,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30594,6 +32427,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::ApplianceStatistics::Commands::LogResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30630,6 +32465,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30660,6 +32497,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = Clusters::ApplianceStatistics::Commands::LogQueueResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30691,6 +32530,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30724,6 +32565,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30749,6 +32592,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LogMaxSize::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LogMaxSize
 namespace LogQueueMaxSize {
@@ -30760,6 +32604,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LogQueueMaxSize::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LogQueueMaxSize
 namespace FeatureMap {
@@ -30771,6 +32616,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -30782,6 +32628,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplianceStatistics::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -30838,6 +32685,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30868,6 +32717,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30907,6 +32758,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30946,6 +32799,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -30972,6 +32827,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasurementType::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasurementType
 namespace DcVoltage {
@@ -30983,6 +32839,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcVoltage
 namespace DcVoltageMin {
@@ -30994,6 +32851,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcVoltageMin
 namespace DcVoltageMax {
@@ -31005,6 +32863,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcVoltageMax
 namespace DcCurrent {
@@ -31016,6 +32875,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcCurrent
 namespace DcCurrentMin {
@@ -31027,6 +32887,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcCurrentMin
 namespace DcCurrentMax {
@@ -31038,6 +32899,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcCurrentMax
 namespace DcPower {
@@ -31049,6 +32911,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcPower
 namespace DcPowerMin {
@@ -31060,6 +32923,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcPowerMin
 namespace DcPowerMax {
@@ -31071,6 +32935,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcPowerMax
 namespace DcVoltageMultiplier {
@@ -31082,6 +32947,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageMultiplier::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcVoltageMultiplier
 namespace DcVoltageDivisor {
@@ -31093,6 +32959,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcVoltageDivisor::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcVoltageDivisor
 namespace DcCurrentMultiplier {
@@ -31104,6 +32971,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentMultiplier::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcCurrentMultiplier
 namespace DcCurrentDivisor {
@@ -31115,6 +32983,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcCurrentDivisor::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcCurrentDivisor
 namespace DcPowerMultiplier {
@@ -31126,6 +32995,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerMultiplier::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcPowerMultiplier
 namespace DcPowerDivisor {
@@ -31137,6 +33007,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DcPowerDivisor::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace DcPowerDivisor
 namespace AcFrequency {
@@ -31148,6 +33019,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequency::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcFrequency
 namespace AcFrequencyMin {
@@ -31159,6 +33031,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcFrequencyMin
 namespace AcFrequencyMax {
@@ -31170,6 +33043,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcFrequencyMax
 namespace NeutralCurrent {
@@ -31181,6 +33055,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::NeutralCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace NeutralCurrent
 namespace TotalActivePower {
@@ -31192,6 +33067,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalActivePower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TotalActivePower
 namespace TotalReactivePower {
@@ -31203,6 +33079,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalReactivePower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TotalReactivePower
 namespace TotalApparentPower {
@@ -31214,6 +33091,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::TotalApparentPower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace TotalApparentPower
 namespace Measured1stHarmonicCurrent {
@@ -31225,6 +33103,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured1stHarmonicCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Measured1stHarmonicCurrent
 namespace Measured3rdHarmonicCurrent {
@@ -31236,6 +33115,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured3rdHarmonicCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Measured3rdHarmonicCurrent
 namespace Measured5thHarmonicCurrent {
@@ -31247,6 +33127,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured5thHarmonicCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Measured5thHarmonicCurrent
 namespace Measured7thHarmonicCurrent {
@@ -31258,6 +33139,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured7thHarmonicCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Measured7thHarmonicCurrent
 namespace Measured9thHarmonicCurrent {
@@ -31269,6 +33151,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured9thHarmonicCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Measured9thHarmonicCurrent
 namespace Measured11thHarmonicCurrent {
@@ -31280,6 +33163,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Measured11thHarmonicCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Measured11thHarmonicCurrent
 namespace MeasuredPhase1stHarmonicCurrent {
@@ -31291,6 +33175,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase1stHarmonicCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredPhase1stHarmonicCurrent
 namespace MeasuredPhase3rdHarmonicCurrent {
@@ -31302,6 +33187,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase3rdHarmonicCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredPhase3rdHarmonicCurrent
 namespace MeasuredPhase5thHarmonicCurrent {
@@ -31313,6 +33199,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase5thHarmonicCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredPhase5thHarmonicCurrent
 namespace MeasuredPhase7thHarmonicCurrent {
@@ -31324,6 +33211,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase7thHarmonicCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredPhase7thHarmonicCurrent
 namespace MeasuredPhase9thHarmonicCurrent {
@@ -31335,6 +33223,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase9thHarmonicCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredPhase9thHarmonicCurrent
 namespace MeasuredPhase11thHarmonicCurrent {
@@ -31346,6 +33235,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::MeasuredPhase11thHarmonicCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace MeasuredPhase11thHarmonicCurrent
 namespace AcFrequencyMultiplier {
@@ -31357,6 +33247,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyMultiplier::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcFrequencyMultiplier
 namespace AcFrequencyDivisor {
@@ -31368,6 +33259,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcFrequencyDivisor::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcFrequencyDivisor
 namespace PowerMultiplier {
@@ -31379,6 +33271,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerMultiplier::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PowerMultiplier
 namespace PowerDivisor {
@@ -31390,6 +33283,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerDivisor::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PowerDivisor
 namespace HarmonicCurrentMultiplier {
@@ -31401,6 +33295,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::HarmonicCurrentMultiplier::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace HarmonicCurrentMultiplier
 namespace PhaseHarmonicCurrentMultiplier {
@@ -31412,6 +33307,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PhaseHarmonicCurrentMultiplier::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PhaseHarmonicCurrentMultiplier
 namespace InstantaneousVoltage {
@@ -31423,6 +33319,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InstantaneousVoltage
 namespace InstantaneousLineCurrent {
@@ -31434,6 +33331,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousLineCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InstantaneousLineCurrent
 namespace InstantaneousActiveCurrent {
@@ -31445,6 +33343,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousActiveCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InstantaneousActiveCurrent
 namespace InstantaneousReactiveCurrent {
@@ -31456,6 +33355,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousReactiveCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InstantaneousReactiveCurrent
 namespace InstantaneousPower {
@@ -31467,6 +33367,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::InstantaneousPower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace InstantaneousPower
 namespace RmsVoltage {
@@ -31478,6 +33379,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltage
 namespace RmsVoltageMin {
@@ -31489,6 +33391,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageMin
 namespace RmsVoltageMax {
@@ -31500,6 +33403,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageMax
 namespace RmsCurrent {
@@ -31511,6 +33415,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrent::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsCurrent
 namespace RmsCurrentMin {
@@ -31522,6 +33427,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsCurrentMin
 namespace RmsCurrentMax {
@@ -31533,6 +33439,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsCurrentMax
 namespace ActivePower {
@@ -31544,6 +33451,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActivePower
 namespace ActivePowerMin {
@@ -31555,6 +33463,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMin::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActivePowerMin
 namespace ActivePowerMax {
@@ -31566,6 +33475,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMax::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActivePowerMax
 namespace ReactivePower {
@@ -31577,6 +33487,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ReactivePower
 namespace ApparentPower {
@@ -31588,6 +33499,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPower::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApparentPower
 namespace PowerFactor {
@@ -31599,6 +33511,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactor::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PowerFactor
 namespace AverageRmsVoltageMeasurementPeriod {
@@ -31610,6 +33523,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriod::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AverageRmsVoltageMeasurementPeriod
 namespace AverageRmsUnderVoltageCounter {
@@ -31621,6 +33535,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounter::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AverageRmsUnderVoltageCounter
 namespace RmsExtremeOverVoltagePeriod {
@@ -31632,6 +33547,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriod::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsExtremeOverVoltagePeriod
 namespace RmsExtremeUnderVoltagePeriod {
@@ -31643,6 +33559,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriod::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsExtremeUnderVoltagePeriod
 namespace RmsVoltageSagPeriod {
@@ -31654,6 +33571,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriod::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageSagPeriod
 namespace RmsVoltageSwellPeriod {
@@ -31665,6 +33583,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriod::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageSwellPeriod
 namespace AcVoltageMultiplier {
@@ -31676,6 +33595,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageMultiplier::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcVoltageMultiplier
 namespace AcVoltageDivisor {
@@ -31687,6 +33607,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageDivisor::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcVoltageDivisor
 namespace AcCurrentMultiplier {
@@ -31698,6 +33619,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentMultiplier::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcCurrentMultiplier
 namespace AcCurrentDivisor {
@@ -31709,6 +33631,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentDivisor::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcCurrentDivisor
 namespace AcPowerMultiplier {
@@ -31720,6 +33643,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcPowerMultiplier::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcPowerMultiplier
 namespace AcPowerDivisor {
@@ -31731,6 +33655,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcPowerDivisor::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcPowerDivisor
 namespace OverloadAlarmsMask {
@@ -31742,6 +33667,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OverloadAlarmsMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OverloadAlarmsMask
 namespace VoltageOverload {
@@ -31753,6 +33679,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::VoltageOverload::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace VoltageOverload
 namespace CurrentOverload {
@@ -31764,6 +33691,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::CurrentOverload::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace CurrentOverload
 namespace AcOverloadAlarmsMask {
@@ -31775,6 +33703,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcOverloadAlarmsMask::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcOverloadAlarmsMask
 namespace AcVoltageOverload {
@@ -31786,6 +33715,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcVoltageOverload::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcVoltageOverload
 namespace AcCurrentOverload {
@@ -31797,6 +33727,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcCurrentOverload::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcCurrentOverload
 namespace AcActivePowerOverload {
@@ -31808,6 +33739,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcActivePowerOverload::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcActivePowerOverload
 namespace AcReactivePowerOverload {
@@ -31819,6 +33751,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AcReactivePowerOverload::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcReactivePowerOverload
 namespace AverageRmsOverVoltage {
@@ -31830,6 +33763,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AverageRmsOverVoltage
 namespace AverageRmsUnderVoltage {
@@ -31841,6 +33775,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AverageRmsUnderVoltage
 namespace RmsExtremeOverVoltage {
@@ -31852,6 +33787,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsExtremeOverVoltage
 namespace RmsExtremeUnderVoltage {
@@ -31863,6 +33799,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltage::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsExtremeUnderVoltage
 namespace RmsVoltageSag {
@@ -31874,6 +33811,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSag::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageSag
 namespace RmsVoltageSwell {
@@ -31885,6 +33823,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwell::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageSwell
 namespace LineCurrentPhaseB {
@@ -31896,6 +33835,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LineCurrentPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LineCurrentPhaseB
 namespace ActiveCurrentPhaseB {
@@ -31907,6 +33847,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCurrentPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveCurrentPhaseB
 namespace ReactiveCurrentPhaseB {
@@ -31918,6 +33859,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactiveCurrentPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ReactiveCurrentPhaseB
 namespace RmsVoltagePhaseB {
@@ -31929,6 +33871,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltagePhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltagePhaseB
 namespace RmsVoltageMinPhaseB {
@@ -31940,6 +33883,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMinPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageMinPhaseB
 namespace RmsVoltageMaxPhaseB {
@@ -31951,6 +33895,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMaxPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageMaxPhaseB
 namespace RmsCurrentPhaseB {
@@ -31962,6 +33907,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsCurrentPhaseB
 namespace RmsCurrentMinPhaseB {
@@ -31973,6 +33919,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMinPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsCurrentMinPhaseB
 namespace RmsCurrentMaxPhaseB {
@@ -31984,6 +33931,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMaxPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsCurrentMaxPhaseB
 namespace ActivePowerPhaseB {
@@ -31995,6 +33943,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActivePowerPhaseB
 namespace ActivePowerMinPhaseB {
@@ -32006,6 +33955,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMinPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActivePowerMinPhaseB
 namespace ActivePowerMaxPhaseB {
@@ -32017,6 +33967,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMaxPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActivePowerMaxPhaseB
 namespace ReactivePowerPhaseB {
@@ -32028,6 +33979,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePowerPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ReactivePowerPhaseB
 namespace ApparentPowerPhaseB {
@@ -32039,6 +33991,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPowerPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApparentPowerPhaseB
 namespace PowerFactorPhaseB {
@@ -32050,6 +34003,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactorPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PowerFactorPhaseB
 namespace AverageRmsVoltageMeasurementPeriodPhaseB {
@@ -32061,6 +34015,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriodPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AverageRmsVoltageMeasurementPeriodPhaseB
 namespace AverageRmsOverVoltageCounterPhaseB {
@@ -32072,6 +34027,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltageCounterPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AverageRmsOverVoltageCounterPhaseB
 namespace AverageRmsUnderVoltageCounterPhaseB {
@@ -32083,6 +34039,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounterPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AverageRmsUnderVoltageCounterPhaseB
 namespace RmsExtremeOverVoltagePeriodPhaseB {
@@ -32094,6 +34051,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriodPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsExtremeOverVoltagePeriodPhaseB
 namespace RmsExtremeUnderVoltagePeriodPhaseB {
@@ -32105,6 +34063,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriodPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsExtremeUnderVoltagePeriodPhaseB
 namespace RmsVoltageSagPeriodPhaseB {
@@ -32116,6 +34075,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriodPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageSagPeriodPhaseB
 namespace RmsVoltageSwellPeriodPhaseB {
@@ -32127,6 +34087,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriodPhaseB::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageSwellPeriodPhaseB
 namespace LineCurrentPhaseC {
@@ -32138,6 +34099,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LineCurrentPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace LineCurrentPhaseC
 namespace ActiveCurrentPhaseC {
@@ -32149,6 +34111,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActiveCurrentPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActiveCurrentPhaseC
 namespace ReactiveCurrentPhaseC {
@@ -32160,6 +34123,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactiveCurrentPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ReactiveCurrentPhaseC
 namespace RmsVoltagePhaseC {
@@ -32171,6 +34135,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltagePhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltagePhaseC
 namespace RmsVoltageMinPhaseC {
@@ -32182,6 +34147,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMinPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageMinPhaseC
 namespace RmsVoltageMaxPhaseC {
@@ -32193,6 +34159,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageMaxPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageMaxPhaseC
 namespace RmsCurrentPhaseC {
@@ -32204,6 +34171,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsCurrentPhaseC
 namespace RmsCurrentMinPhaseC {
@@ -32215,6 +34183,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMinPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsCurrentMinPhaseC
 namespace RmsCurrentMaxPhaseC {
@@ -32226,6 +34195,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsCurrentMaxPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsCurrentMaxPhaseC
 namespace ActivePowerPhaseC {
@@ -32237,6 +34207,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActivePowerPhaseC
 namespace ActivePowerMinPhaseC {
@@ -32248,6 +34219,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMinPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActivePowerMinPhaseC
 namespace ActivePowerMaxPhaseC {
@@ -32259,6 +34231,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ActivePowerMaxPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ActivePowerMaxPhaseC
 namespace ReactivePowerPhaseC {
@@ -32270,6 +34243,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ReactivePowerPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ReactivePowerPhaseC
 namespace ApparentPowerPhaseC {
@@ -32281,6 +34255,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ApparentPowerPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApparentPowerPhaseC
 namespace PowerFactorPhaseC {
@@ -32292,6 +34267,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PowerFactorPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace PowerFactorPhaseC
 namespace AverageRmsVoltageMeasurementPeriodPhaseC {
@@ -32303,6 +34279,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsVoltageMeasurementPeriodPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AverageRmsVoltageMeasurementPeriodPhaseC
 namespace AverageRmsOverVoltageCounterPhaseC {
@@ -32314,6 +34291,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsOverVoltageCounterPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AverageRmsOverVoltageCounterPhaseC
 namespace AverageRmsUnderVoltageCounterPhaseC {
@@ -32325,6 +34303,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::AverageRmsUnderVoltageCounterPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AverageRmsUnderVoltageCounterPhaseC
 namespace RmsExtremeOverVoltagePeriodPhaseC {
@@ -32336,6 +34315,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeOverVoltagePeriodPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsExtremeOverVoltagePeriodPhaseC
 namespace RmsExtremeUnderVoltagePeriodPhaseC {
@@ -32347,6 +34327,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsExtremeUnderVoltagePeriodPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsExtremeUnderVoltagePeriodPhaseC
 namespace RmsVoltageSagPeriodPhaseC {
@@ -32358,6 +34339,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSagPeriodPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageSagPeriodPhaseC
 namespace RmsVoltageSwellPeriodPhaseC {
@@ -32369,6 +34351,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::RmsVoltageSwellPeriodPhaseC::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RmsVoltageSwellPeriodPhaseC
 namespace FeatureMap {
@@ -32380,6 +34363,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -32391,6 +34375,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::ElectricalMeasurement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -32437,6 +34422,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -32476,6 +34463,8 @@ public:
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
     using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
 };
 
 struct DecodableType
@@ -32503,6 +34492,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -32514,6 +34504,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::Binding::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes
@@ -32587,6 +34578,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Groups::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Groups
 namespace GroupKeys {
@@ -32598,6 +34590,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::GroupKeys::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace GroupKeys
 namespace FeatureMap {
@@ -32609,6 +34602,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace FeatureMap
 namespace ClusterRevision {
@@ -32620,6 +34614,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ClusterRevision
 } // namespace Attributes

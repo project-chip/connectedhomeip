@@ -402,13 +402,6 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
 #define emberAfAttributeIsSingleton(metadata) (((metadata)->mask & ATTRIBUTE_MASK_SINGLETON) != 0)
 
 /**
- * @brief macro that returns true if attribute is manufacturer specific
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsManufacturerSpecific(metadata) (((metadata)->mask & ATTRIBUTE_MASK_MANUFACTURER_SPECIFIC) != 0)
-
-/**
  * @brief macro that returns size of attribute in bytes.
  *
  * @param metadata EmberAfAttributeMetadata* to consider.

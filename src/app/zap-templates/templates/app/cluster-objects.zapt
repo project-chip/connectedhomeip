@@ -138,6 +138,8 @@ public:
     {{else}}
       DataModel::NullObjectType;
     {{/if}}
+
+    static constexpr bool MustUseTimedInvoke() { return {{mustUseTimedInvoke}}; }
 };
 
 struct DecodableType {
@@ -176,6 +178,7 @@ namespace {{asUpperCamelCase label}} {
 
         static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
         static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
+        static constexpr bool MustUseTimedWrite() { return {{mustUseTimedWrite}}; }
     };
 } // namespace {{asUpperCamelCase label}}
 {{#last}}

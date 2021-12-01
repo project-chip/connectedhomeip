@@ -15319,6 +15319,14 @@
               "source": "client",
               "incoming": 1,
               "outgoing": 0
+            },
+            {
+              "name": "TimedInvokeRequest",
+              "code": 18,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -16022,6 +16030,21 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "timed_write_boolean",
+              "code": 48,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
               "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,

@@ -24941,6 +24941,18 @@ class TestCluster(Cluster):
 
             arg1: 'TestCluster.Structs.SimpleStruct' = None
 
+        @dataclass
+        class TimedInvokeRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0012
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                    ])
+
     class Attributes:
         @dataclass
         class Boolean(ClusterAttributeDescriptor):
@@ -25613,6 +25625,22 @@ class TestCluster(Cluster):
                 return ClusterObjectFieldDescriptor(Type=int)
 
             value: 'int' = None
+
+        @dataclass
+        class TimedWriteBoolean(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x050F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000030
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=bool)
+
+            value: 'bool' = None
 
         @dataclass
         class Unsupported(ClusterAttributeDescriptor):
