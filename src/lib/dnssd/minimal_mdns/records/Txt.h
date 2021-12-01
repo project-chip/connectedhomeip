@@ -57,7 +57,7 @@ protected:
         for (size_t i = 0; i < mEntryCount; i++)
         {
             size_t len = strlen(mEntries[i]);
-            if (len > kMaxQNamePartLength)
+            if (len > kMaxTxtRecordLength)
             {
                 return false;
             }
@@ -71,6 +71,8 @@ protected:
 private:
     const char * const * mEntries;
     const size_t mEntryCount;
+
+    static constexpr size_t kMaxTxtRecordLength = 63;
 };
 
 } // namespace Minimal
