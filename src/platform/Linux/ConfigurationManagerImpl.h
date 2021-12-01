@@ -43,6 +43,8 @@ public:
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
     CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
     CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
+    CHIP_ERROR GetRegulatoryConfig(uint8_t & location) override;
+    CHIP_ERROR GetLocationCapability(uint8_t & location) override;
     static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:

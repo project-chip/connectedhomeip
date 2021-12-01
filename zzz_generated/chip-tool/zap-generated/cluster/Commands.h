@@ -20333,6 +20333,8 @@ private:
 | Attributes:                                                         |        |
 | * Breadcrumb                                                        | 0x0000 |
 | * BasicCommissioningInfoList                                        | 0x0001 |
+| * RegulatoryConfig                                                  | 0x0002 |
+| * LocationCapability                                                | 0x0003 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -20560,6 +20562,74 @@ private:
     chip::Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>(
             OnGeneralCommissioningBasicCommissioningInfoListListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute RegulatoryConfig
+ */
+class ReadGeneralCommissioningRegulatoryConfig : public ModelCommand
+{
+public:
+    ReadGeneralCommissioningRegulatoryConfig() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "regulatory-config");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadGeneralCommissioningRegulatoryConfig()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0030) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GeneralCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeRegulatoryConfig(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute LocationCapability
+ */
+class ReadGeneralCommissioningLocationCapability : public ModelCommand
+{
+public:
+    ReadGeneralCommissioningLocationCapability() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "location-capability");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadGeneralCommissioningLocationCapability()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0030) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::GeneralCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeLocationCapability(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -56618,6 +56688,8 @@ void registerClusterGeneralCommissioning(Commands & commands)
         make_unique<WriteGeneralCommissioningBreadcrumb>(),                //
         make_unique<ReportGeneralCommissioningBreadcrumb>(),               //
         make_unique<ReadGeneralCommissioningBasicCommissioningInfoList>(), //
+        make_unique<ReadGeneralCommissioningRegulatoryConfig>(),           //
+        make_unique<ReadGeneralCommissioningLocationCapability>(),         //
         make_unique<ReadGeneralCommissioningClusterRevision>(),            //
         make_unique<ReportGeneralCommissioningClusterRevision>(),          //
     };
