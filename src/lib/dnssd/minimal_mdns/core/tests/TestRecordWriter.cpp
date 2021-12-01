@@ -100,6 +100,7 @@ void ComplexDedup(nlTestSuite * inSuite, void * inContext)
     writer.WriteQName(FullQName(kName1));
     writer.WriteQName(FullQName(kName2));
     writer.WriteQName(FullQName(kName3));
+    writer.Writer().Put("xyz"); // inject something that is NOT a qname
     writer.WriteQName(FullQName(kName4));
     writer.WriteQName(FullQName(kName5));
 
@@ -114,12 +115,13 @@ void ComplexDedup(nlTestSuite * inSuite, void * inContext)
         6, 'p', 'r', 'e', 'f', 'i', 'x',
         2, 'o', 'f',
         0xC0, 11,                   // POINTER: "otner.name" is at offset 11
+        'x', 'y', 'z',
         4, 's', 'o', 'm', 'e',            // QNAME part: some
         4, 'n', 'a', 'm', 'e',            // QNAME part: name
         6, 's', 'u', 'f', 'f', 'i', 'x',  // suffix which prevents reuse
         0,
         4, 'm', 'o', 'r', 'e',
-        0xC0, 41
+        0xC0, 44
     };
     // clang-format on
 
