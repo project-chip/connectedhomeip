@@ -53,7 +53,7 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
         {
             ChipLogError(DataManagement, "Failed to parse Timed Request action: handler %p exchange " ChipLogFormatExchange, this,
                          ChipLogValueExchange(aExchangeContext));
-            StatusResponse::SendStatusResponse(Status::InvalidAction, aExchangeContext, /* aExpectResponse = */ false);
+            StatusResponse::Send(Status::InvalidAction, aExchangeContext, /* aExpectResponse = */ false);
         }
         return err;
     }
@@ -65,7 +65,7 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
             // Time is up.  Spec says to send UNSUPPORTED_ACCESS.
             ChipLogError(DataManagement, "Timeout expired: handler %p exchange " ChipLogFormatExchange, this,
                          ChipLogValueExchange(aExchangeContext));
-            return StatusResponse::SendStatusResponse(Status::UnsupportedAccess, aExchangeContext, /* aExpectResponse = */ false);
+            return StatusResponse::Send(Status::UnsupportedAccess, aExchangeContext, /* aExpectResponse = */ false);
         }
 
         if (aPayloadHeader.HasMessageType(MsgType::InvokeCommandRequest))
@@ -86,7 +86,7 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
     ChipLogError(DataManagement, "Unexpected unknown message in tiemd interaction: handler %p exchange " ChipLogFormatExchange,
                  this, ChipLogValueExchange(aExchangeContext));
 
-    return StatusResponse::SendStatusResponse(Status::InvalidAction, aExchangeContext, /* aExpectResponse = */ false);
+    return StatusResponse::Send(Status::InvalidAction, aExchangeContext, /* aExpectResponse = */ false);
 }
 
 void TimedHandler::OnExchangeClosing(Messaging::ExchangeContext *)
@@ -120,7 +120,7 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
     // stuck waiting forever if the client never sends another message.
     auto delay = System::Clock::Milliseconds32(timeoutMs);
     aExchangeContext->SetResponseTimeout(delay);
-    ReturnErrorOnFailure(StatusResponse::SendStatusResponse(Status::Success, aExchangeContext, /* aExpectResponse = */ true));
+    ReturnErrorOnFailure(StatusResponse::Send(Status::Success, aExchangeContext, /* aExpectResponse = */ true));
 
     // Now just wait for the client.
     mState     = State::kExpectingFollowingAction;
