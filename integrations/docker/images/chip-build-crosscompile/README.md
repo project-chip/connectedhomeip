@@ -58,7 +58,7 @@ rebuilding a sysroot. It is located at:
 https://chrome-infra-packages.appspot.com/p/experimental/matter/sysroot/ubuntu-21.04-aarch64/+/
 
 and can be downloaded using the `cipd` script from
-[depot_tools][https://dev.chromium.org/developers/how-tos/depottools]:
+[depot_tools](https://dev.chromium.org/developers/how-tos/depottools):
 
 ```
 echo 'experimental/matter/sysroot/ubuntu-21.04-aarch64 latest' > ensure_file.txt
