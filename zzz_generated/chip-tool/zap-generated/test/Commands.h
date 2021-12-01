@@ -240,13 +240,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -265,7 +269,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
@@ -286,7 +290,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -501,13 +505,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeOutOfService_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -526,7 +534,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -545,7 +553,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         bool outOfServiceArgument;
         outOfServiceArgument = 0;
@@ -562,7 +570,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -581,7 +589,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5);
@@ -600,7 +608,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         bool presentValueArgument;
         presentValueArgument = 0;
@@ -617,7 +625,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7);
@@ -636,7 +644,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
             this, OnSuccessCallback_8, OnFailureCallback_8);
@@ -655,7 +663,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
             this, OnSuccessCallback_9, OnFailureCallback_9);
@@ -675,7 +683,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t statusFlagsArgument;
         statusFlagsArgument = 0;
@@ -696,7 +704,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
             this, OnSuccessCallback_11, OnFailureCallback_11);
@@ -875,13 +883,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsPresentValueAttributeFromDut_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -900,7 +912,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -919,7 +931,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -938,7 +950,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -957,7 +969,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5);
@@ -976,7 +988,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
@@ -995,7 +1007,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7);
@@ -1014,7 +1026,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
             this, OnSuccessCallback_8, OnFailureCallback_8);
@@ -1121,13 +1133,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -1146,7 +1162,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
@@ -1167,7 +1183,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -1288,13 +1304,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadMandatoryNonGlobalAttributeStateValue_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::StateValue::TypeInfo>(this, OnSuccessCallback_1,
                                                                                                           OnFailureCallback_1);
@@ -1313,7 +1333,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::StateValue::TypeInfo>(this, OnSuccessCallback_2,
                                                                                                           OnFailureCallback_2);
@@ -1332,7 +1352,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         bool stateValueArgument;
         stateValueArgument = 1;
@@ -1353,7 +1373,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::StateValue::TypeInfo>(this, OnSuccessCallback_4,
                                                                                                           OnFailureCallback_4);
@@ -1432,13 +1452,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 4U;
@@ -3429,13 +3453,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsMandatoryAttributeCurrentHue_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(this, OnSuccessCallback_1,
                                                                                                           OnFailureCallback_1);
@@ -3454,7 +3482,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(this, OnSuccessCallback_2,
                                                                                                           OnFailureCallback_2);
@@ -3474,7 +3502,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t currentHueArgument;
         currentHueArgument = 0;
@@ -3495,7 +3523,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(this, OnSuccessCallback_4,
                                                                                                           OnFailureCallback_4);
@@ -3514,7 +3542,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5);
@@ -3533,7 +3561,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
@@ -3553,7 +3581,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t currentSaturationArgument;
         currentSaturationArgument = 0;
@@ -3574,7 +3602,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::TypeInfo>(
             this, OnSuccessCallback_8, OnFailureCallback_8);
@@ -3593,7 +3621,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentX::TypeInfo>(this, OnSuccessCallback_9,
                                                                                                         OnFailureCallback_9);
@@ -3612,7 +3640,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentX::TypeInfo>(this, OnSuccessCallback_10,
                                                                                                         OnFailureCallback_10);
@@ -3632,7 +3660,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t currentXArgument;
         currentXArgument = 24939U;
@@ -3653,7 +3681,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentX::TypeInfo>(this, OnSuccessCallback_12,
                                                                                                         OnFailureCallback_12);
@@ -3672,7 +3700,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentY::TypeInfo>(this, OnSuccessCallback_13,
                                                                                                         OnFailureCallback_13);
@@ -3691,7 +3719,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentY::TypeInfo>(this, OnSuccessCallback_14,
                                                                                                         OnFailureCallback_14);
@@ -3711,7 +3739,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t currentYArgument;
         currentYArgument = 24701U;
@@ -3732,7 +3760,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentY::TypeInfo>(this, OnSuccessCallback_16,
                                                                                                         OnFailureCallback_16);
@@ -3751,7 +3779,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTemperature::TypeInfo>(
             this, OnSuccessCallback_17, OnFailureCallback_17);
@@ -3771,7 +3799,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorMode::TypeInfo>(this, OnSuccessCallback_18,
                                                                                                          OnFailureCallback_18);
@@ -3791,7 +3819,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(
             this, OnSuccessCallback_19, OnFailureCallback_19);
@@ -3810,7 +3838,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(
             this, OnSuccessCallback_20, OnFailureCallback_20);
@@ -3829,7 +3857,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t colorControlOptionsArgument;
         colorControlOptionsArgument = 0;
@@ -3846,7 +3874,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(
             this, OnSuccessCallback_22, OnFailureCallback_22);
@@ -3865,7 +3893,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
             this, OnSuccessCallback_23, OnFailureCallback_23);
@@ -3884,7 +3912,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
             this, OnSuccessCallback_24, OnFailureCallback_24);
@@ -3903,7 +3931,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t enhancedCurrentHueArgument;
         enhancedCurrentHueArgument = 0U;
@@ -3924,7 +3952,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
             this, OnSuccessCallback_26, OnFailureCallback_26);
@@ -3943,7 +3971,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedColorMode::TypeInfo>(
             this, OnSuccessCallback_27, OnFailureCallback_27);
@@ -3962,7 +3990,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_28, OnFailureCallback_28);
@@ -3981,7 +4009,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_29, OnFailureCallback_29);
@@ -4000,7 +4028,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t colorLoopActiveArgument;
         colorLoopActiveArgument = 0;
@@ -4021,7 +4049,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_31, OnFailureCallback_31);
@@ -4040,7 +4068,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
             this, OnSuccessCallback_32, OnFailureCallback_32);
@@ -4059,7 +4087,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
             this, OnSuccessCallback_33, OnFailureCallback_33);
@@ -4078,7 +4106,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t colorLoopDirectionArgument;
         colorLoopDirectionArgument = 0;
@@ -4099,7 +4127,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
             this, OnSuccessCallback_35, OnFailureCallback_35);
@@ -4118,7 +4146,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
             this, OnSuccessCallback_36, OnFailureCallback_36);
@@ -4137,7 +4165,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
             this, OnSuccessCallback_37, OnFailureCallback_37);
@@ -4156,7 +4184,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t colorLoopTimeArgument;
         colorLoopTimeArgument = 25U;
@@ -4177,7 +4205,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
             this, OnSuccessCallback_39, OnFailureCallback_39);
@@ -4196,7 +4224,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
             this, OnSuccessCallback_40, OnFailureCallback_40);
@@ -4215,7 +4243,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
             this, OnSuccessCallback_41, OnFailureCallback_41);
@@ -4234,7 +4262,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t colorLoopStartEnhancedHueArgument;
         colorLoopStartEnhancedHueArgument = 8960U;
@@ -4255,7 +4283,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
             this, OnSuccessCallback_43, OnFailureCallback_43);
@@ -4274,7 +4302,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
             this, OnSuccessCallback_44, OnFailureCallback_44);
@@ -4293,7 +4321,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
             this, OnSuccessCallback_45, OnFailureCallback_45);
@@ -4312,7 +4340,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t colorLoopStoredEnhancedHueArgument;
         colorLoopStoredEnhancedHueArgument = 0U;
@@ -4333,7 +4361,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
             this, OnSuccessCallback_47, OnFailureCallback_47);
@@ -4352,7 +4380,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo>(
             this, OnSuccessCallback_48, OnFailureCallback_48);
@@ -4371,7 +4399,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo>(
             this, OnSuccessCallback_49, OnFailureCallback_49);
@@ -4391,7 +4419,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t colorCapabilitiesArgument;
         colorCapabilitiesArgument = 0U;
@@ -4412,7 +4440,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo>(
             this, OnSuccessCallback_51, OnFailureCallback_51);
@@ -4431,7 +4459,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo>(
             this, OnSuccessCallback_52, OnFailureCallback_52);
@@ -4450,7 +4478,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo>(
             this, OnSuccessCallback_53, OnFailureCallback_53);
@@ -4470,7 +4498,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t colorTempPhysicalMinArgument;
         colorTempPhysicalMinArgument = 0U;
@@ -4491,7 +4519,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo>(
             this, OnSuccessCallback_55, OnFailureCallback_55);
@@ -4510,7 +4538,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo>(
             this, OnSuccessCallback_56, OnFailureCallback_56);
@@ -4529,7 +4557,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo>(
             this, OnSuccessCallback_57, OnFailureCallback_57);
@@ -4549,7 +4577,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t colorTempPhysicalMaxArgument;
         colorTempPhysicalMaxArgument = 65279U;
@@ -4570,7 +4598,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo>(
             this, OnSuccessCallback_59, OnFailureCallback_59);
@@ -4589,7 +4617,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo>(
             this, OnSuccessCallback_60, OnFailureCallback_60);
@@ -4608,7 +4636,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t coupleColorTempToLevelMinMiredsArgument;
         coupleColorTempToLevelMinMiredsArgument = 0U;
@@ -4629,7 +4657,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo>(
             this, OnSuccessCallback_62, OnFailureCallback_62);
@@ -4648,7 +4676,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(
             this, OnSuccessCallback_63, OnFailureCallback_63);
@@ -4668,7 +4696,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t startUpColorTemperatureMiredsArgument;
         startUpColorTemperatureMiredsArgument = 0U;
@@ -4685,7 +4713,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(
             this, OnSuccessCallback_65, OnFailureCallback_65);
@@ -4704,7 +4732,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::RemainingTime::TypeInfo>(
             this, OnSuccessCallback_66, OnFailureCallback_66);
@@ -4723,7 +4751,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::RemainingTime::TypeInfo>(
             this, OnSuccessCallback_67, OnFailureCallback_67);
@@ -4743,7 +4771,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t remainingTimeArgument;
         remainingTimeArgument = 0U;
@@ -4764,7 +4792,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::RemainingTime::TypeInfo>(
             this, OnSuccessCallback_69, OnFailureCallback_69);
@@ -4783,7 +4811,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo>(
             this, OnSuccessCallback_70, OnFailureCallback_70);
@@ -4803,7 +4831,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t driftCompensationArgument;
         driftCompensationArgument = static_cast<uint8_t>(0);
@@ -4824,7 +4852,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo>(
             this, OnSuccessCallback_72, OnFailureCallback_72);
@@ -4843,7 +4871,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CompensationText::TypeInfo>(
             this, OnSuccessCallback_73, OnFailureCallback_73);
@@ -4863,7 +4891,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::NumberOfPrimaries::TypeInfo>(
             this, OnSuccessCallback_74, OnFailureCallback_74);
@@ -4883,7 +4911,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t numberOfPrimariesArgument;
         numberOfPrimariesArgument = 0;
@@ -4904,7 +4932,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::NumberOfPrimaries::TypeInfo>(
             this, OnSuccessCallback_76, OnFailureCallback_76);
@@ -4923,7 +4951,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1X::TypeInfo>(this, OnSuccessCallback_77,
                                                                                                          OnFailureCallback_77);
@@ -4943,7 +4971,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t primary1XArgument;
         primary1XArgument = 0U;
@@ -4964,7 +4992,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1X::TypeInfo>(this, OnSuccessCallback_79,
                                                                                                          OnFailureCallback_79);
@@ -4983,7 +5011,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1Y::TypeInfo>(this, OnSuccessCallback_80,
                                                                                                          OnFailureCallback_80);
@@ -5003,7 +5031,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t primary1YArgument;
         primary1YArgument = 0U;
@@ -5024,7 +5052,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1Y::TypeInfo>(this, OnSuccessCallback_82,
                                                                                                          OnFailureCallback_82);
@@ -5043,7 +5071,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1Intensity::TypeInfo>(
             this, OnSuccessCallback_83, OnFailureCallback_83);
@@ -5062,7 +5090,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2X::TypeInfo>(this, OnSuccessCallback_84,
                                                                                                          OnFailureCallback_84);
@@ -5082,7 +5110,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t primary2XArgument;
         primary2XArgument = 0U;
@@ -5103,7 +5131,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2X::TypeInfo>(this, OnSuccessCallback_86,
                                                                                                          OnFailureCallback_86);
@@ -5122,7 +5150,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2Y::TypeInfo>(this, OnSuccessCallback_87,
                                                                                                          OnFailureCallback_87);
@@ -5142,7 +5170,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t primary2YArgument;
         primary2YArgument = 0U;
@@ -5163,7 +5191,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2Y::TypeInfo>(this, OnSuccessCallback_89,
                                                                                                          OnFailureCallback_89);
@@ -5182,7 +5210,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2Intensity::TypeInfo>(
             this, OnSuccessCallback_90, OnFailureCallback_90);
@@ -5201,7 +5229,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3X::TypeInfo>(this, OnSuccessCallback_91,
                                                                                                          OnFailureCallback_91);
@@ -5221,7 +5249,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t primary3XArgument;
         primary3XArgument = 0U;
@@ -5242,7 +5270,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3X::TypeInfo>(this, OnSuccessCallback_93,
                                                                                                          OnFailureCallback_93);
@@ -5261,7 +5289,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3Y::TypeInfo>(this, OnSuccessCallback_94,
                                                                                                          OnFailureCallback_94);
@@ -5281,7 +5309,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t primary3YArgument;
         primary3YArgument = 0U;
@@ -5302,7 +5330,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3Y::TypeInfo>(this, OnSuccessCallback_96,
                                                                                                          OnFailureCallback_96);
@@ -5321,7 +5349,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3Intensity::TypeInfo>(
             this, OnSuccessCallback_97, OnFailureCallback_97);
@@ -5340,7 +5368,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4X::TypeInfo>(this, OnSuccessCallback_98,
                                                                                                          OnFailureCallback_98);
@@ -5360,7 +5388,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t primary4XArgument;
         primary4XArgument = 0U;
@@ -5381,7 +5409,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4X::TypeInfo>(
             this, OnSuccessCallback_100, OnFailureCallback_100);
@@ -5400,7 +5428,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4Y::TypeInfo>(
             this, OnSuccessCallback_101, OnFailureCallback_101);
@@ -5420,7 +5448,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t primary4YArgument;
         primary4YArgument = 0U;
@@ -5441,7 +5469,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4Y::TypeInfo>(
             this, OnSuccessCallback_103, OnFailureCallback_103);
@@ -5460,7 +5488,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4Intensity::TypeInfo>(
             this, OnSuccessCallback_104, OnFailureCallback_104);
@@ -5479,7 +5507,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5X::TypeInfo>(
             this, OnSuccessCallback_105, OnFailureCallback_105);
@@ -5499,7 +5527,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t primary5XArgument;
         primary5XArgument = 0U;
@@ -5520,7 +5548,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5X::TypeInfo>(
             this, OnSuccessCallback_107, OnFailureCallback_107);
@@ -5539,7 +5567,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5Y::TypeInfo>(
             this, OnSuccessCallback_108, OnFailureCallback_108);
@@ -5559,7 +5587,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t primary5YArgument;
         primary5YArgument = 0U;
@@ -5580,7 +5608,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5Y::TypeInfo>(
             this, OnSuccessCallback_110, OnFailureCallback_110);
@@ -5599,7 +5627,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5Intensity::TypeInfo>(
             this, OnSuccessCallback_111, OnFailureCallback_111);
@@ -5618,7 +5646,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6X::TypeInfo>(
             this, OnSuccessCallback_112, OnFailureCallback_112);
@@ -5638,7 +5666,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t primary6XArgument;
         primary6XArgument = 0U;
@@ -5659,7 +5687,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6X::TypeInfo>(
             this, OnSuccessCallback_114, OnFailureCallback_114);
@@ -5678,7 +5706,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6Y::TypeInfo>(
             this, OnSuccessCallback_115, OnFailureCallback_115);
@@ -5698,7 +5726,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t primary6YArgument;
         primary6YArgument = 0U;
@@ -5719,7 +5747,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6Y::TypeInfo>(
             this, OnSuccessCallback_117, OnFailureCallback_117);
@@ -5738,7 +5766,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6Intensity::TypeInfo>(
             this, OnSuccessCallback_118, OnFailureCallback_118);
@@ -5757,7 +5785,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(
             this, OnSuccessCallback_119, OnFailureCallback_119);
@@ -5777,7 +5805,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t whitePointXArgument;
         whitePointXArgument = 0U;
@@ -5794,7 +5822,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(
             this, OnSuccessCallback_121, OnFailureCallback_121);
@@ -5813,7 +5841,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(
             this, OnSuccessCallback_122, OnFailureCallback_122);
@@ -5833,7 +5861,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t whitePointYArgument;
         whitePointYArgument = 0U;
@@ -5850,7 +5878,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(
             this, OnSuccessCallback_124, OnFailureCallback_124);
@@ -5869,7 +5897,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(
             this, OnSuccessCallback_125, OnFailureCallback_125);
@@ -5889,7 +5917,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t colorPointRXArgument;
         colorPointRXArgument = 0U;
@@ -5906,7 +5934,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(
             this, OnSuccessCallback_127, OnFailureCallback_127);
@@ -5925,7 +5953,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(
             this, OnSuccessCallback_128, OnFailureCallback_128);
@@ -5945,7 +5973,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t colorPointRYArgument;
         colorPointRYArgument = 0U;
@@ -5962,7 +5990,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(
             this, OnSuccessCallback_130, OnFailureCallback_130);
@@ -5981,7 +6009,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo>(
             this, OnSuccessCallback_131, OnFailureCallback_131);
@@ -6000,7 +6028,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(
             this, OnSuccessCallback_132, OnFailureCallback_132);
@@ -6020,7 +6048,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t colorPointGXArgument;
         colorPointGXArgument = 0U;
@@ -6037,7 +6065,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(
             this, OnSuccessCallback_134, OnFailureCallback_134);
@@ -6056,7 +6084,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(
             this, OnSuccessCallback_135, OnFailureCallback_135);
@@ -6076,7 +6104,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t colorPointGYArgument;
         colorPointGYArgument = 0U;
@@ -6093,7 +6121,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(
             this, OnSuccessCallback_137, OnFailureCallback_137);
@@ -6112,7 +6140,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo>(
             this, OnSuccessCallback_138, OnFailureCallback_138);
@@ -6131,7 +6159,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(
             this, OnSuccessCallback_139, OnFailureCallback_139);
@@ -6151,7 +6179,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t colorPointBXArgument;
         colorPointBXArgument = 0U;
@@ -6168,7 +6196,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(
             this, OnSuccessCallback_141, OnFailureCallback_141);
@@ -6187,7 +6215,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(
             this, OnSuccessCallback_142, OnFailureCallback_142);
@@ -6207,7 +6235,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t colorPointBYArgument;
         colorPointBYArgument = 0U;
@@ -6224,7 +6252,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(
             this, OnSuccessCallback_144, OnFailureCallback_144);
@@ -6243,7 +6271,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo>(
             this, OnSuccessCallback_145, OnFailureCallback_145);
@@ -6362,7 +6390,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -6379,7 +6411,7 @@ private:
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -6391,7 +6423,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -6426,7 +6458,7 @@ private:
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -6454,7 +6486,7 @@ private:
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -6482,7 +6514,7 @@ private:
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -6510,7 +6542,7 @@ private:
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_6(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -6533,7 +6565,7 @@ private:
             (static_cast<Test_TC_CC_3_1 *>(context))->OnFailureResponse_7(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -6545,7 +6577,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_8,
                                                                                               OnFailureCallback_8);
@@ -6664,7 +6696,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -6681,7 +6717,7 @@ private:
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -6693,7 +6729,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -6727,7 +6763,7 @@ private:
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -6754,7 +6790,7 @@ private:
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -6781,7 +6817,7 @@ private:
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -6808,7 +6844,7 @@ private:
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_6(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -6831,7 +6867,7 @@ private:
             (static_cast<Test_TC_CC_3_2 *>(context))->OnFailureResponse_7(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -6843,7 +6879,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_8,
                                                                                               OnFailureCallback_8);
@@ -6954,7 +6990,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -6971,7 +7011,7 @@ private:
             (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -6983,7 +7023,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -7018,7 +7058,7 @@ private:
             (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7046,7 +7086,7 @@ private:
             (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7069,7 +7109,7 @@ private:
             (static_cast<Test_TC_CC_3_3 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7081,7 +7121,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_6,
                                                                                               OnFailureCallback_6);
@@ -7188,7 +7228,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -7205,7 +7249,7 @@ private:
             (static_cast<Test_TC_CC_4_1 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7217,7 +7261,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -7251,7 +7295,7 @@ private:
             (static_cast<Test_TC_CC_4_1 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7274,7 +7318,7 @@ private:
             (static_cast<Test_TC_CC_4_1 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7286,7 +7330,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_5,
                                                                                               OnFailureCallback_5);
@@ -7397,7 +7441,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -7414,7 +7462,7 @@ private:
             (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7426,7 +7474,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -7460,7 +7508,7 @@ private:
             (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7487,7 +7535,7 @@ private:
             (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7510,7 +7558,7 @@ private:
             (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7522,7 +7570,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_6,
                                                                                               OnFailureCallback_6);
@@ -7633,7 +7681,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -7650,7 +7702,7 @@ private:
             (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7662,7 +7714,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -7697,7 +7749,7 @@ private:
             (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7725,7 +7777,7 @@ private:
             (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7748,7 +7800,7 @@ private:
             (static_cast<Test_TC_CC_4_3 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7760,7 +7812,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_6,
                                                                                               OnFailureCallback_6);
@@ -7867,7 +7919,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -7884,7 +7940,7 @@ private:
             (static_cast<Test_TC_CC_4_4 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7896,7 +7952,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -7931,7 +7987,7 @@ private:
             (static_cast<Test_TC_CC_4_4 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7954,7 +8010,7 @@ private:
             (static_cast<Test_TC_CC_4_4 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -7966,7 +8022,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_5,
                                                                                               OnFailureCallback_5);
@@ -8073,7 +8129,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -8090,7 +8150,7 @@ private:
             (static_cast<Test_TC_CC_5_1 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8102,7 +8162,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -8137,7 +8197,7 @@ private:
             (static_cast<Test_TC_CC_5_1 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8160,7 +8220,7 @@ private:
             (static_cast<Test_TC_CC_5_1 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8172,7 +8232,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_5,
                                                                                               OnFailureCallback_5);
@@ -8283,7 +8343,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -8300,7 +8364,7 @@ private:
             (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8312,7 +8376,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -8346,7 +8410,7 @@ private:
             (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8371,7 +8435,7 @@ private:
             (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8394,7 +8458,7 @@ private:
             (static_cast<Test_TC_CC_5_2 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8406,7 +8470,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_6,
                                                                                               OnFailureCallback_6);
@@ -8513,7 +8577,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -8530,7 +8598,7 @@ private:
             (static_cast<Test_TC_CC_5_3 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8542,7 +8610,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -8577,7 +8645,7 @@ private:
             (static_cast<Test_TC_CC_5_3 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8600,7 +8668,7 @@ private:
             (static_cast<Test_TC_CC_5_3 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8612,7 +8680,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_5,
                                                                                               OnFailureCallback_5);
@@ -8719,7 +8787,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -8736,7 +8808,7 @@ private:
             (static_cast<Test_TC_CC_6_1 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8748,7 +8820,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -8782,7 +8854,7 @@ private:
             (static_cast<Test_TC_CC_6_1 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8805,7 +8877,7 @@ private:
             (static_cast<Test_TC_CC_6_1 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8817,7 +8889,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_5,
                                                                                               OnFailureCallback_5);
@@ -8932,7 +9004,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -8949,7 +9025,7 @@ private:
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -8961,7 +9037,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -8997,7 +9073,7 @@ private:
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9026,7 +9102,7 @@ private:
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9055,7 +9131,7 @@ private:
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9078,7 +9154,7 @@ private:
             (static_cast<Test_TC_CC_6_2 *>(context))->OnFailureResponse_6(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9090,7 +9166,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_7,
                                                                                               OnFailureCallback_7);
@@ -9201,7 +9277,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -9218,7 +9298,7 @@ private:
             (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9230,7 +9310,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -9267,7 +9347,7 @@ private:
             (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9297,7 +9377,7 @@ private:
             (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9320,7 +9400,7 @@ private:
             (static_cast<Test_TC_CC_6_3 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9332,7 +9412,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_6,
                                                                                               OnFailureCallback_6);
@@ -9454,7 +9534,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -9471,7 +9555,7 @@ private:
             (static_cast<Test_TC_CC_7_1 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9483,7 +9567,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -9518,7 +9602,7 @@ private:
             (static_cast<Test_TC_CC_7_1 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9530,7 +9614,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::RemainingTime::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -9560,7 +9644,7 @@ private:
             (static_cast<Test_TC_CC_7_1 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9572,7 +9656,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_6,
                                                                                               OnFailureCallback_6);
@@ -9691,7 +9775,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -9708,7 +9796,7 @@ private:
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9720,7 +9808,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -9754,7 +9842,7 @@ private:
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9781,7 +9869,7 @@ private:
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9808,7 +9896,7 @@ private:
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9835,7 +9923,7 @@ private:
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_6(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9858,7 +9946,7 @@ private:
             (static_cast<Test_TC_CC_7_2 *>(context))->OnFailureResponse_7(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -9870,7 +9958,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_8,
                                                                                               OnFailureCallback_8);
@@ -9981,7 +10069,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -9998,7 +10090,7 @@ private:
             (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -10010,7 +10102,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -10045,7 +10137,7 @@ private:
             (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -10073,7 +10165,7 @@ private:
             (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -10096,7 +10188,7 @@ private:
             (static_cast<Test_TC_CC_7_3 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -10108,7 +10200,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_6,
                                                                                               OnFailureCallback_6);
@@ -10215,7 +10307,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -10232,7 +10328,7 @@ private:
             (static_cast<Test_TC_CC_7_4 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -10244,7 +10340,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -10279,7 +10375,7 @@ private:
             (static_cast<Test_TC_CC_7_4 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -10302,7 +10398,7 @@ private:
             (static_cast<Test_TC_CC_7_4 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -10314,7 +10410,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_5,
                                                                                               OnFailureCallback_5);
@@ -10545,7 +10641,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestTurnOnLightForColorControlTests_1()
     {
@@ -10562,7 +10662,7 @@ private:
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -10574,7 +10674,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -10611,7 +10711,7 @@ private:
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -10623,7 +10723,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -10642,7 +10742,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5);
@@ -10661,7 +10761,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
@@ -10680,7 +10780,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7);
@@ -10717,7 +10817,7 @@ private:
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_8(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -10729,7 +10829,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_9, OnFailureCallback_9);
@@ -10766,7 +10866,7 @@ private:
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_10(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -10778,7 +10878,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
             this, OnSuccessCallback_11, OnFailureCallback_11);
@@ -10797,7 +10897,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
             this, OnSuccessCallback_12, OnFailureCallback_12);
@@ -10834,7 +10934,7 @@ private:
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_13(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -10846,7 +10946,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
             this, OnSuccessCallback_14, OnFailureCallback_14);
@@ -10876,7 +10976,7 @@ private:
             (static_cast<Test_TC_CC_8_1 *>(context))->OnFailureResponse_15(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -10888,7 +10988,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_16,
                                                                                               OnFailureCallback_16);
@@ -11269,7 +11369,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_1()
     {
@@ -11286,7 +11390,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11298,7 +11402,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -11335,7 +11439,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11347,7 +11451,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -11384,7 +11488,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11396,7 +11500,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
@@ -11433,7 +11537,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_7(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11445,7 +11549,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
             this, OnSuccessCallback_8, OnFailureCallback_8);
@@ -11482,7 +11586,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_9(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11494,7 +11598,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
             this, OnSuccessCallback_10, OnFailureCallback_10);
@@ -11531,7 +11635,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_11(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11543,7 +11647,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_12, OnFailureCallback_12);
@@ -11580,7 +11684,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_13(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11592,7 +11696,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_14, OnFailureCallback_14);
@@ -11629,7 +11733,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_15(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11641,7 +11745,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
             this, OnSuccessCallback_16, OnFailureCallback_16);
@@ -11678,7 +11782,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_17(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11690,7 +11794,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_18, OnFailureCallback_18);
@@ -11727,7 +11831,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_19(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11739,7 +11843,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_20, OnFailureCallback_20);
@@ -11774,7 +11878,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_21(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11782,13 +11886,17 @@ private:
 
     void OnSuccessResponse_21() { NextTest(); }
 
-    CHIP_ERROR TestWait2000ms_22() { return WaitForMs(2000); }
+    CHIP_ERROR TestWait2000ms_22()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(2000);
+    }
 
     CHIP_ERROR TestReadEnhancedCurrentHueAttributeFromDut_23()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
             this, OnSuccessCallback_23, OnFailureCallback_23);
@@ -11825,7 +11933,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_24(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11837,7 +11945,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
             this, OnSuccessCallback_25, OnFailureCallback_25);
@@ -11874,7 +11982,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_26(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11886,7 +11994,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_27, OnFailureCallback_27);
@@ -11923,7 +12031,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_28(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11935,7 +12043,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_29, OnFailureCallback_29);
@@ -11972,7 +12080,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_30(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -11984,7 +12092,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
             this, OnSuccessCallback_31, OnFailureCallback_31);
@@ -12021,7 +12129,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_32(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -12033,7 +12141,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_33, OnFailureCallback_33);
@@ -12070,7 +12178,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_34(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -12082,7 +12190,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_35, OnFailureCallback_35);
@@ -12112,7 +12220,7 @@ private:
             (static_cast<Test_TC_CC_9_1 *>(context))->OnFailureResponse_36(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -12308,7 +12416,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_1()
     {
@@ -12325,7 +12437,7 @@ private:
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -12337,7 +12449,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -12374,7 +12486,7 @@ private:
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -12386,7 +12498,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -12405,7 +12517,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5);
@@ -12424,7 +12536,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
@@ -12443,7 +12555,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7);
@@ -12480,7 +12592,7 @@ private:
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_8(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -12492,7 +12604,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_9, OnFailureCallback_9);
@@ -12529,7 +12641,7 @@ private:
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_10(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -12541,7 +12653,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
             this, OnSuccessCallback_11, OnFailureCallback_11);
@@ -12578,7 +12690,7 @@ private:
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_12(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -12590,7 +12702,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_13, OnFailureCallback_13);
@@ -12620,7 +12732,7 @@ private:
             (static_cast<Test_TC_CC_9_2 *>(context))->OnFailureResponse_14(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -12816,7 +12928,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestPreconditionTurnOnLightForColorControlTests_1()
     {
@@ -12833,7 +12949,7 @@ private:
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -12845,7 +12961,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -12882,7 +12998,7 @@ private:
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -12894,7 +13010,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -12913,7 +13029,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5);
@@ -12932,7 +13048,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
@@ -12951,7 +13067,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7);
@@ -12988,7 +13104,7 @@ private:
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_8(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -13000,7 +13116,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_9, OnFailureCallback_9);
@@ -13037,7 +13153,7 @@ private:
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_10(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -13049,7 +13165,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
             this, OnSuccessCallback_11, OnFailureCallback_11);
@@ -13086,7 +13202,7 @@ private:
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_12(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -13098,7 +13214,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
             this, OnSuccessCallback_13, OnFailureCallback_13);
@@ -13128,7 +13244,7 @@ private:
             (static_cast<Test_TC_CC_9_3 *>(context))->OnFailureResponse_14(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -13454,13 +13570,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestQueryInteractionModelVersion_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::InteractionModelVersion::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -13479,7 +13599,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::VendorName::TypeInfo>(this, OnSuccessCallback_2,
                                                                                                    OnFailureCallback_2);
@@ -13499,7 +13619,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, OnSuccessCallback_3,
                                                                                                  OnFailureCallback_3);
@@ -13518,7 +13638,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductName::TypeInfo>(this, OnSuccessCallback_4,
                                                                                                     OnFailureCallback_4);
@@ -13538,7 +13658,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductID::TypeInfo>(this, OnSuccessCallback_5,
                                                                                                   OnFailureCallback_5);
@@ -13557,7 +13677,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::NodeLabel::TypeInfo>(this, OnSuccessCallback_6,
                                                                                                   OnFailureCallback_6);
@@ -13577,7 +13697,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(this, OnSuccessCallback_7,
                                                                                                  OnFailureCallback_7);
@@ -13598,7 +13718,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::HardwareVersion::TypeInfo>(this, OnSuccessCallback_8,
                                                                                                         OnFailureCallback_8);
@@ -13617,7 +13737,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::HardwareVersionString::TypeInfo>(
             this, OnSuccessCallback_9, OnFailureCallback_9);
@@ -13638,7 +13758,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersion::TypeInfo>(this, OnSuccessCallback_10,
                                                                                                         OnFailureCallback_10);
@@ -13657,7 +13777,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersionString::TypeInfo>(
             this, OnSuccessCallback_11, OnFailureCallback_11);
@@ -13679,7 +13799,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ManufacturingDate::TypeInfo>(
             this, OnSuccessCallback_12, OnFailureCallback_12);
@@ -13704,7 +13824,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::PartNumber::TypeInfo>(this, OnSuccessCallback_13,
                                                                                                    OnFailureCallback_13);
@@ -13727,7 +13847,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductURL::TypeInfo>(this, OnSuccessCallback_14,
                                                                                                    OnFailureCallback_14);
@@ -13751,7 +13871,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductLabel::TypeInfo>(this, OnSuccessCallback_15,
                                                                                                      OnFailureCallback_15);
@@ -13774,7 +13894,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::SerialNumber::TypeInfo>(this, OnSuccessCallback_16,
                                                                                                      OnFailureCallback_16);
@@ -13797,7 +13917,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo>(
             this, OnSuccessCallback_17, OnFailureCallback_17);
@@ -13819,7 +13939,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Reachable::TypeInfo>(this, OnSuccessCallback_18,
                                                                                                   OnFailureCallback_18);
@@ -13841,7 +13961,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::UniqueID::TypeInfo>(this, OnSuccessCallback_19,
                                                                                                  OnFailureCallback_19);
@@ -13912,7 +14032,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class Test_TC_DM_2_2 : public TestCommand
@@ -14026,13 +14150,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestQueryFabricsList_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::FabricsList::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -14054,7 +14182,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::SupportedFabrics::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -14073,7 +14201,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::CommissionedFabrics::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -14092,7 +14220,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::TrustedRootCertificates::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -14199,13 +14327,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ElectricalMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -14224,7 +14356,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ElectricalMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
@@ -14245,7 +14377,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ElectricalMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -14324,13 +14456,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 2U;
@@ -14505,13 +14641,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -14530,7 +14670,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -14549,7 +14689,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -14568,7 +14708,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minMeasuredValueArgument;
         minMeasuredValueArgument = 0;
@@ -14589,7 +14729,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxMeasuredValueArgument;
         maxMeasuredValueArgument = 0;
@@ -14610,7 +14750,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
@@ -14629,7 +14769,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7);
@@ -14648,7 +14788,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
             this, OnSuccessCallback_8, OnFailureCallback_8);
@@ -14743,13 +14883,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -14768,7 +14912,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -14875,13 +15019,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::IlluminanceMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -14900,7 +15048,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::IlluminanceMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
@@ -14921,7 +15069,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::IlluminanceMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -15000,13 +15148,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 4U;
@@ -15177,13 +15329,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -15217,7 +15373,7 @@ private:
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -15225,13 +15381,17 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestWait100ms_3() { return WaitForMs(100); }
+    CHIP_ERROR TestWait100ms_3()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -15265,7 +15425,7 @@ private:
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -15273,13 +15433,17 @@ private:
 
     void OnSuccessResponse_5() { NextTest(); }
 
-    CHIP_ERROR TestWait200ms_6() { return WaitForMs(200); }
+    CHIP_ERROR TestWait200ms_6()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(200);
+    }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_7()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7);
@@ -15298,7 +15462,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
             this, OnSuccessCallback_8, OnFailureCallback_8);
@@ -15332,7 +15496,7 @@ private:
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_9(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -15340,13 +15504,17 @@ private:
 
     void OnSuccessResponse_9() { NextTest(); }
 
-    CHIP_ERROR TestWait10ms_10() { return WaitForMs(10); }
+    CHIP_ERROR TestWait10ms_10()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(10);
+    }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_11()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
             this, OnSuccessCallback_11, OnFailureCallback_11);
@@ -15380,7 +15548,7 @@ private:
             (static_cast<Test_TC_LVL_2_1 *>(context))->OnFailureResponse_12(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -15388,7 +15556,11 @@ private:
 
     void OnSuccessResponse_12() { NextTest(); }
 
-    CHIP_ERROR TestWait100ms_13() { return WaitForMs(100); }
+    CHIP_ERROR TestWait100ms_13()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
 };
 
 class Test_TC_LVL_3_1 : public TestCommand
@@ -15575,13 +15747,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -15600,7 +15776,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo>(this, OnSuccessCallback_2,
                                                                                                         OnFailureCallback_2);
@@ -15634,7 +15810,7 @@ private:
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -15642,13 +15818,17 @@ private:
 
     void OnSuccessResponse_3() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_4() { return WaitForMs(3000); }
+    CHIP_ERROR TestWait3000ms_4()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(3000);
+    }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_5()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5);
@@ -15667,7 +15847,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo>(this, OnSuccessCallback_6,
                                                                                                         OnFailureCallback_6);
@@ -15701,7 +15881,7 @@ private:
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_7(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -15709,13 +15889,17 @@ private:
 
     void OnSuccessResponse_7() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_8() { return WaitForMs(3000); }
+    CHIP_ERROR TestWait3000ms_8()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(3000);
+    }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_9()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
             this, OnSuccessCallback_9, OnFailureCallback_9);
@@ -15734,7 +15918,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint8_t> defaultMoveRateArgument;
         defaultMoveRateArgument.SetNonNull() = 20;
@@ -15751,7 +15935,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
             this, OnSuccessCallback_11, OnFailureCallback_11);
@@ -15786,7 +15970,7 @@ private:
             (static_cast<Test_TC_LVL_3_1 *>(context))->OnFailureResponse_12(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -15794,13 +15978,17 @@ private:
 
     void OnSuccessResponse_12() { NextTest(); }
 
-    CHIP_ERROR TestWait100ms_13() { return WaitForMs(100); }
+    CHIP_ERROR TestWait100ms_13()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_14()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
             this, OnSuccessCallback_14, OnFailureCallback_14);
@@ -15941,7 +16129,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestSendingOnCommand_1()
     {
@@ -15958,7 +16150,7 @@ private:
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -15986,7 +16178,7 @@ private:
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -15994,13 +16186,17 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_3() { return WaitForMs(3000); }
+    CHIP_ERROR TestWait3000ms_3()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(3000);
+    }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -16035,7 +16231,7 @@ private:
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -16043,13 +16239,17 @@ private:
 
     void OnSuccessResponse_5() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_6() { return WaitForMs(3000); }
+    CHIP_ERROR TestWait3000ms_6()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(3000);
+    }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_7()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7);
@@ -16084,7 +16284,7 @@ private:
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_8(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -16092,13 +16292,17 @@ private:
 
     void OnSuccessResponse_8() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_9() { return WaitForMs(3000); }
+    CHIP_ERROR TestWait3000ms_9()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(3000);
+    }
 
     CHIP_ERROR TestReadsCurrentLevelAttributeFromDut_10()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
             this, OnSuccessCallback_10, OnFailureCallback_10);
@@ -16128,7 +16332,7 @@ private:
             (static_cast<Test_TC_LVL_4_1 *>(context))->OnFailureResponse_11(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -16216,7 +16420,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestSendingOnCommand_1()
     {
@@ -16233,7 +16441,7 @@ private:
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -16261,7 +16469,7 @@ private:
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -16269,7 +16477,11 @@ private:
 
     void OnSuccessResponse_2() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_3() { return WaitForMs(3000); }
+    CHIP_ERROR TestWait3000ms_3()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(3000);
+    }
 
     CHIP_ERROR TestSendsAMoveUpCommandToDut_4()
     {
@@ -16290,7 +16502,7 @@ private:
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -16298,7 +16510,11 @@ private:
 
     void OnSuccessResponse_4() { NextTest(); }
 
-    CHIP_ERROR TestWait3000ms_5() { return WaitForMs(3000); }
+    CHIP_ERROR TestWait3000ms_5()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(3000);
+    }
 
     CHIP_ERROR TestSendsStopCommandToDut_6()
     {
@@ -16317,7 +16533,7 @@ private:
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_6(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -16340,7 +16556,7 @@ private:
             (static_cast<Test_TC_LVL_5_1 *>(context))->OnFailureResponse_7(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -16412,13 +16628,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
@@ -16491,7 +16711,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestPutTheDeviceIntoLowPowerMode_1()
     {
@@ -16508,7 +16732,7 @@ private:
             (static_cast<Test_TC_MC_2_1 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -16568,7 +16792,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class Test_TC_MC_3_2 : public TestCommand
@@ -16622,7 +16850,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class Test_TC_MC_3_3 : public TestCommand
@@ -16676,7 +16908,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class Test_TC_MC_3_4 : public TestCommand
@@ -16730,7 +16966,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class Test_TC_MC_3_5 : public TestCommand
@@ -16784,7 +17024,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class Test_TC_MC_3_6 : public TestCommand
@@ -16838,7 +17082,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class Test_TC_MC_3_7 : public TestCommand
@@ -16892,7 +17140,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class Test_TC_MC_3_8 : public TestCommand
@@ -16946,7 +17198,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class Test_TC_MC_3_9 : public TestCommand
@@ -17000,7 +17256,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class Test_TC_MC_3_10 : public TestCommand
@@ -17054,7 +17314,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class Test_TC_MC_3_11 : public TestCommand
@@ -17108,7 +17372,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class Test_TC_OCC_1_1 : public TestCommand
@@ -17188,13 +17456,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -17213,7 +17485,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 2U;
@@ -17403,13 +17675,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsMandatoryAttributeConstrainsOccupancy_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::Occupancy::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -17429,7 +17705,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t occupancyArgument;
         occupancyArgument = 0;
@@ -17450,7 +17726,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::Occupancy::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -17469,7 +17745,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorType::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -17489,7 +17765,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t occupancySensorTypeArgument;
         occupancySensorTypeArgument = static_cast<uint8_t>(0);
@@ -17510,7 +17786,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorType::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
@@ -17529,7 +17805,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorTypeBitmap::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7);
@@ -17550,7 +17826,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t occupancySensorTypeBitmapArgument;
         occupancySensorTypeBitmapArgument = 1;
@@ -17571,7 +17847,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorTypeBitmap::TypeInfo>(
             this, OnSuccessCallback_9, OnFailureCallback_9);
@@ -17666,13 +17942,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsOccupancyAttributeFromDut_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::Occupancy::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -17691,7 +17971,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::Occupancy::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -17841,15 +18121,23 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_1() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(this, OnSuccessCallback_2,
                                                                                                         OnFailureCallback_2);
@@ -17868,7 +18156,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 3U;
@@ -17889,7 +18177,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(this, OnSuccessCallback_4,
                                                                                                         OnFailureCallback_4);
@@ -17908,7 +18196,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(this, OnSuccessCallback_5,
                                                                                                    OnFailureCallback_5);
@@ -17927,7 +18215,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t featureMapArgument;
         featureMapArgument = 0UL;
@@ -17948,7 +18236,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(this, OnSuccessCallback_7,
                                                                                                    OnFailureCallback_7);
@@ -18174,13 +18462,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheMandatoryAttributeOnOff_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_1,
                                                                                               OnFailureCallback_1);
@@ -18199,7 +18491,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -18218,7 +18510,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -18237,7 +18529,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnSuccessCallback_4,
                                                                                                OnFailureCallback_4);
@@ -18256,7 +18548,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(this, OnSuccessCallback_5,
                                                                                                     OnFailureCallback_5);
@@ -18275,7 +18567,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(this, OnSuccessCallback_6,
                                                                                                      OnFailureCallback_6);
@@ -18294,7 +18586,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t onTimeArgument;
         onTimeArgument = 0U;
@@ -18311,7 +18603,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t offWaitTimeArgument;
         offWaitTimeArgument = 0U;
@@ -18328,7 +18620,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t startUpOnOffArgument;
         startUpOnOffArgument = static_cast<uint8_t>(0);
@@ -18345,7 +18637,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnSuccessCallback_10,
                                                                                                OnFailureCallback_10);
@@ -18364,7 +18656,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(this, OnSuccessCallback_11,
                                                                                                     OnFailureCallback_11);
@@ -18383,7 +18675,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(this, OnSuccessCallback_12,
                                                                                                      OnFailureCallback_12);
@@ -18576,7 +18868,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestSendOffCommand_1()
     {
@@ -18593,7 +18889,7 @@ private:
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -18605,7 +18901,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_2,
                                                                                               OnFailureCallback_2);
@@ -18635,7 +18931,7 @@ private:
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -18647,7 +18943,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_4,
                                                                                               OnFailureCallback_4);
@@ -18677,7 +18973,7 @@ private:
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -18689,7 +18985,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_6,
                                                                                               OnFailureCallback_6);
@@ -18719,7 +19015,7 @@ private:
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_7(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -18731,7 +19027,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_8,
                                                                                               OnFailureCallback_8);
@@ -18761,7 +19057,7 @@ private:
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_9(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -18773,7 +19069,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_10,
                                                                                               OnFailureCallback_10);
@@ -18803,7 +19099,7 @@ private:
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_11(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -18815,7 +19111,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_12,
                                                                                               OnFailureCallback_12);
@@ -18845,7 +19141,7 @@ private:
             (static_cast<Test_TC_OO_2_2 *>(context))->OnFailureResponse_13(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -18857,7 +19153,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_14,
                                                                                               OnFailureCallback_14);
@@ -19438,7 +19734,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestSendOnCommand_1()
     {
@@ -19455,7 +19755,7 @@ private:
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -19463,13 +19763,17 @@ private:
 
     void OnSuccessResponse_1() { NextTest(); }
 
-    CHIP_ERROR TestWait1000ms_2() { return WaitForMs(1000); }
+    CHIP_ERROR TestWait1000ms_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_3,
                                                                                               OnFailureCallback_3);
@@ -19488,7 +19792,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -19518,7 +19822,7 @@ private:
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -19526,13 +19830,17 @@ private:
 
     void OnSuccessResponse_5() { NextTest(); }
 
-    CHIP_ERROR TestWait1000ms_6() { return WaitForMs(1000); }
+    CHIP_ERROR TestWait1000ms_6()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_7()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_7,
                                                                                               OnFailureCallback_7);
@@ -19551,7 +19859,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
             this, OnSuccessCallback_8, OnFailureCallback_8);
@@ -19581,7 +19889,7 @@ private:
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_9(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -19589,13 +19897,17 @@ private:
 
     void OnSuccessResponse_9() { NextTest(); }
 
-    CHIP_ERROR TestWait1000ms_10() { return WaitForMs(1000); }
+    CHIP_ERROR TestWait1000ms_10()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(1000);
+    }
 
     CHIP_ERROR TestReadsOnOffAttributeFromDut_11()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_11,
                                                                                               OnFailureCallback_11);
@@ -19614,7 +19926,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
             this, OnSuccessCallback_12, OnFailureCallback_12);
@@ -19633,7 +19945,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnSuccessCallback_13,
                                                                                                OnFailureCallback_13);
@@ -19652,7 +19964,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(this, OnSuccessCallback_14,
                                                                                                     OnFailureCallback_14);
@@ -19682,7 +19994,7 @@ private:
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_15(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -19694,7 +20006,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_16,
                                                                                               OnFailureCallback_16);
@@ -19713,7 +20025,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnSuccessCallback_17,
                                                                                                OnFailureCallback_17);
@@ -19732,7 +20044,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(this, OnSuccessCallback_18,
                                                                                                     OnFailureCallback_18);
@@ -19762,7 +20074,7 @@ private:
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_19(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -19774,7 +20086,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_20,
                                                                                               OnFailureCallback_20);
@@ -19793,7 +20105,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnSuccessCallback_21,
                                                                                                OnFailureCallback_21);
@@ -19812,7 +20124,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_22,
                                                                                               OnFailureCallback_22);
@@ -19831,7 +20143,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnSuccessCallback_23,
                                                                                                OnFailureCallback_23);
@@ -19850,7 +20162,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(this, OnSuccessCallback_24,
                                                                                                     OnFailureCallback_24);
@@ -19880,7 +20192,7 @@ private:
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_25(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -19892,7 +20204,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnSuccessCallback_26,
                                                                                                OnFailureCallback_26);
@@ -19911,7 +20223,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(this, OnSuccessCallback_27,
                                                                                                     OnFailureCallback_27);
@@ -19941,7 +20253,7 @@ private:
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_28(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -19953,7 +20265,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_29,
                                                                                               OnFailureCallback_29);
@@ -19972,7 +20284,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnSuccessCallback_30,
                                                                                                OnFailureCallback_30);
@@ -19991,7 +20303,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_31,
                                                                                               OnFailureCallback_31);
@@ -20010,7 +20322,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnSuccessCallback_32,
                                                                                                OnFailureCallback_32);
@@ -20040,7 +20352,7 @@ private:
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_33(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -20052,7 +20364,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_34,
                                                                                               OnFailureCallback_34);
@@ -20071,7 +20383,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnSuccessCallback_35,
                                                                                                OnFailureCallback_35);
@@ -20090,7 +20402,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(this, OnSuccessCallback_36,
                                                                                                     OnFailureCallback_36);
@@ -20120,7 +20432,7 @@ private:
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_37(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -20132,7 +20444,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_38,
                                                                                               OnFailureCallback_38);
@@ -20151,7 +20463,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnSuccessCallback_39,
                                                                                                OnFailureCallback_39);
@@ -20170,7 +20482,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_40,
                                                                                               OnFailureCallback_40);
@@ -20189,7 +20501,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnSuccessCallback_41,
                                                                                                OnFailureCallback_41);
@@ -20208,7 +20520,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(this, OnSuccessCallback_42,
                                                                                                     OnFailureCallback_42);
@@ -20227,7 +20539,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_43,
                                                                                               OnFailureCallback_43);
@@ -20246,7 +20558,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnSuccessCallback_44,
                                                                                                OnFailureCallback_44);
@@ -20265,7 +20577,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(this, OnSuccessCallback_45,
                                                                                                     OnFailureCallback_45);
@@ -20295,7 +20607,7 @@ private:
             (static_cast<Test_TC_OO_2_3 *>(context))->OnFailureResponse_46(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -20409,13 +20721,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -20434,7 +20750,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -20453,7 +20769,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 2U;
@@ -20474,7 +20790,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -20658,13 +20974,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheMandatoryAttributeConstraintsMeasuredValue_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -20683,7 +21003,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t measuredValueArgument;
         measuredValueArgument = 0;
@@ -20704,7 +21024,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -20723,7 +21043,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -20742,7 +21062,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minMeasuredValueArgument;
         minMeasuredValueArgument = 0;
@@ -20763,7 +21083,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
@@ -20782,7 +21102,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7);
@@ -20801,7 +21121,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxMeasuredValueArgument;
         maxMeasuredValueArgument = 0;
@@ -20822,7 +21142,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
             this, OnSuccessCallback_9, OnFailureCallback_9);
@@ -20901,13 +21221,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 3U;
@@ -21088,13 +21412,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheMandatoryAttributeMaxPressure_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxPressure::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -21113,7 +21441,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster
             .ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
@@ -21133,7 +21461,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -21152,7 +21480,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -21171,7 +21499,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxPressure::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5);
@@ -21190,7 +21518,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster
             .ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
@@ -21210,7 +21538,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7);
@@ -21229,7 +21557,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo>(
             this, OnSuccessCallback_8, OnFailureCallback_8);
@@ -21329,13 +21657,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestWrite1ToTheOperationModeAttributeToDutOperationMode_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t operationModeArgument;
         operationModeArgument = static_cast<uint8_t>(1);
@@ -21352,7 +21684,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t operationModeArgument;
         operationModeArgument = static_cast<uint8_t>(2);
@@ -21369,7 +21701,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t operationModeArgument;
         operationModeArgument = static_cast<uint8_t>(3);
@@ -21459,13 +21791,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestWrite0ToTheOperationModeAttributeToDut_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t operationModeArgument;
         operationModeArgument = static_cast<uint8_t>(0);
@@ -21482,7 +21818,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster
             .ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
@@ -21562,13 +21898,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
@@ -21665,13 +22005,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsConstraintsOfAttributeMeasuredValue_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -21690,7 +22034,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -21786,13 +22130,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -21811,7 +22159,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -21918,13 +22266,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -21943,7 +22295,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 3U;
@@ -21964,7 +22316,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -22045,13 +22397,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheMandatoryAttributeMeasuredValue_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -22146,13 +22502,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsMeasuredValueAttributeFromDut_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -22171,7 +22531,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -22250,13 +22610,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 5U;
@@ -23163,13 +23527,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsConstraintsOfMandatoryAttributesFromDutLocalTemperature_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::LocalTemperature::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -23188,7 +23556,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -23207,7 +23575,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -23228,7 +23596,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t absMinHeatSetpointLimitArgument;
         absMinHeatSetpointLimitArgument = 700;
@@ -23249,7 +23617,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5);
@@ -23268,7 +23636,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
@@ -23287,7 +23655,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7);
@@ -23308,7 +23676,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t absMaxHeatSetpointLimitArgument;
         absMaxHeatSetpointLimitArgument = 3000;
@@ -23329,7 +23697,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_9, OnFailureCallback_9);
@@ -23348,7 +23716,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_10, OnFailureCallback_10);
@@ -23367,7 +23735,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_11, OnFailureCallback_11);
@@ -23388,7 +23756,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t absMinCoolSetpointLimitArgument;
         absMinCoolSetpointLimitArgument = 1600;
@@ -23409,7 +23777,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_13, OnFailureCallback_13);
@@ -23428,7 +23796,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_14, OnFailureCallback_14);
@@ -23447,7 +23815,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_15, OnFailureCallback_15);
@@ -23468,7 +23836,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t absMaxCoolSetpointLimitArgument;
         absMaxCoolSetpointLimitArgument = 3200;
@@ -23489,7 +23857,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_17, OnFailureCallback_17);
@@ -23508,7 +23876,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
             this, OnSuccessCallback_18, OnFailureCallback_18);
@@ -23527,7 +23895,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
             this, OnSuccessCallback_19, OnFailureCallback_19);
@@ -23548,7 +23916,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2600;
@@ -23565,7 +23933,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
             this, OnSuccessCallback_21, OnFailureCallback_21);
@@ -23584,7 +23952,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
             this, OnSuccessCallback_22, OnFailureCallback_22);
@@ -23603,7 +23971,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
             this, OnSuccessCallback_23, OnFailureCallback_23);
@@ -23624,7 +23992,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 2000;
@@ -23641,7 +24009,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
             this, OnSuccessCallback_25, OnFailureCallback_25);
@@ -23660,7 +24028,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_26, OnFailureCallback_26);
@@ -23679,7 +24047,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_27, OnFailureCallback_27);
@@ -23700,7 +24068,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minHeatSetpointLimitArgument;
         minHeatSetpointLimitArgument = 700;
@@ -23717,7 +24085,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_29, OnFailureCallback_29);
@@ -23736,7 +24104,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_30, OnFailureCallback_30);
@@ -23755,7 +24123,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_31, OnFailureCallback_31);
@@ -23776,7 +24144,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxHeatSetpointLimitArgument;
         maxHeatSetpointLimitArgument = 3000;
@@ -23793,7 +24161,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_33, OnFailureCallback_33);
@@ -23812,7 +24180,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_34, OnFailureCallback_34);
@@ -23831,7 +24199,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_35, OnFailureCallback_35);
@@ -23852,7 +24220,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minCoolSetpointLimitArgument;
         minCoolSetpointLimitArgument = 1600;
@@ -23869,7 +24237,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_37, OnFailureCallback_37);
@@ -23888,7 +24256,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_38, OnFailureCallback_38);
@@ -23907,7 +24275,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_39, OnFailureCallback_39);
@@ -23928,7 +24296,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxCoolSetpointLimitArgument;
         maxCoolSetpointLimitArgument = 3200;
@@ -23945,7 +24313,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_41, OnFailureCallback_41);
@@ -23964,7 +24332,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
             this, OnSuccessCallback_42, OnFailureCallback_42);
@@ -23983,7 +24351,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
             this, OnSuccessCallback_43, OnFailureCallback_43);
@@ -24003,7 +24371,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t controlSequenceOfOperationArgument;
         controlSequenceOfOperationArgument = static_cast<uint8_t>(4);
@@ -24020,7 +24388,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
             this, OnSuccessCallback_45, OnFailureCallback_45);
@@ -24039,7 +24407,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(this, OnSuccessCallback_46,
                                                                                                         OnFailureCallback_46);
@@ -24058,7 +24426,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(this, OnSuccessCallback_47,
                                                                                                         OnFailureCallback_47);
@@ -24078,7 +24446,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t systemModeArgument;
         systemModeArgument = static_cast<uint8_t>(1);
@@ -24095,7 +24463,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(this, OnSuccessCallback_49,
                                                                                                         OnFailureCallback_49);
@@ -24114,7 +24482,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
             this, OnSuccessCallback_50, OnFailureCallback_50);
@@ -24133,7 +24501,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
             this, OnSuccessCallback_51, OnFailureCallback_51);
@@ -24153,7 +24521,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int8_t minSetpointDeadBandArgument;
         minSetpointDeadBandArgument = 25;
@@ -24170,7 +24538,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
             this, OnSuccessCallback_53, OnFailureCallback_53);
@@ -24189,7 +24557,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::StartOfWeek::TypeInfo>(this, OnSuccessCallback_54,
                                                                                                          OnFailureCallback_54);
@@ -24209,7 +24577,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t startOfWeekArgument;
         startOfWeekArgument = static_cast<uint8_t>(0);
@@ -24230,7 +24598,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::StartOfWeek::TypeInfo>(this, OnSuccessCallback_56,
                                                                                                          OnFailureCallback_56);
@@ -24249,7 +24617,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfWeeklyTransitions::TypeInfo>(
             this, OnSuccessCallback_57, OnFailureCallback_57);
@@ -24268,7 +24636,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t numberOfWeeklyTransitionsArgument;
         numberOfWeeklyTransitionsArgument = 0;
@@ -24289,7 +24657,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfDailyTransitions::TypeInfo>(
             this, OnSuccessCallback_59, OnFailureCallback_59);
@@ -24308,7 +24676,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t numberOfDailyTransitionsArgument;
         numberOfDailyTransitionsArgument = 0;
@@ -25025,13 +25393,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsOccupiedCoolingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -25050,7 +25422,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2000;
@@ -25067,7 +25439,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -25086,7 +25458,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 1600;
@@ -25103,7 +25475,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2600;
@@ -25120,7 +25492,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
@@ -25139,7 +25511,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 2100;
@@ -25156,7 +25528,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
             this, OnSuccessCallback_8, OnFailureCallback_8);
@@ -25175,7 +25547,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 700;
@@ -25192,7 +25564,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 3000;
@@ -25209,7 +25581,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_11, OnFailureCallback_11);
@@ -25228,7 +25600,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minHeatSetpointLimitArgument;
         minHeatSetpointLimitArgument = 2000;
@@ -25245,7 +25617,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_13, OnFailureCallback_13);
@@ -25264,7 +25636,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minHeatSetpointLimitArgument;
         minHeatSetpointLimitArgument = 700;
@@ -25281,7 +25653,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minHeatSetpointLimitArgument;
         minHeatSetpointLimitArgument = 3000;
@@ -25298,7 +25670,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_16, OnFailureCallback_16);
@@ -25317,7 +25689,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxHeatSetpointLimitArgument;
         maxHeatSetpointLimitArgument = 2000;
@@ -25334,7 +25706,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_18, OnFailureCallback_18);
@@ -25353,7 +25725,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxHeatSetpointLimitArgument;
         maxHeatSetpointLimitArgument = 700;
@@ -25370,7 +25742,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxHeatSetpointLimitArgument;
         maxHeatSetpointLimitArgument = 3000;
@@ -25387,7 +25759,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_21, OnFailureCallback_21);
@@ -25406,7 +25778,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minCoolSetpointLimitArgument;
         minCoolSetpointLimitArgument = 2000;
@@ -25423,7 +25795,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_23, OnFailureCallback_23);
@@ -25442,7 +25814,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minCoolSetpointLimitArgument;
         minCoolSetpointLimitArgument = 1600;
@@ -25459,7 +25831,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minCoolSetpointLimitArgument;
         minCoolSetpointLimitArgument = 3200;
@@ -25476,7 +25848,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_26, OnFailureCallback_26);
@@ -25495,7 +25867,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxCoolSetpointLimitArgument;
         maxCoolSetpointLimitArgument = 2000;
@@ -25512,7 +25884,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
             this, OnSuccessCallback_28, OnFailureCallback_28);
@@ -25531,7 +25903,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxCoolSetpointLimitArgument;
         maxCoolSetpointLimitArgument = 1600;
@@ -25548,7 +25920,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxCoolSetpointLimitArgument;
         maxCoolSetpointLimitArgument = 3200;
@@ -25565,7 +25937,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minHeatSetpointLimitArgument;
         minHeatSetpointLimitArgument = 700;
@@ -25582,7 +25954,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minHeatSetpointLimitArgument;
         minHeatSetpointLimitArgument = 3000;
@@ -25599,7 +25971,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxHeatSetpointLimitArgument;
         maxHeatSetpointLimitArgument = 700;
@@ -25616,7 +25988,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxHeatSetpointLimitArgument;
         maxHeatSetpointLimitArgument = 3000;
@@ -25633,7 +26005,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minCoolSetpointLimitArgument;
         minCoolSetpointLimitArgument = 1600;
@@ -25650,7 +26022,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t minCoolSetpointLimitArgument;
         minCoolSetpointLimitArgument = 3200;
@@ -25667,7 +26039,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxCoolSetpointLimitArgument;
         maxCoolSetpointLimitArgument = 1600;
@@ -25684,7 +26056,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t maxCoolSetpointLimitArgument;
         maxCoolSetpointLimitArgument = 3200;
@@ -25701,7 +26073,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
             this, OnSuccessCallback_39, OnFailureCallback_39);
@@ -25720,7 +26092,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t controlSequenceOfOperationArgument;
         controlSequenceOfOperationArgument = static_cast<uint8_t>(2);
@@ -25737,7 +26109,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
             this, OnSuccessCallback_41, OnFailureCallback_41);
@@ -25756,7 +26128,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 2000;
@@ -25773,7 +26145,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 2000;
@@ -25790,7 +26162,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2600;
@@ -25807,7 +26179,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2600;
@@ -25824,7 +26196,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2600;
@@ -25841,7 +26213,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 2000;
@@ -25858,7 +26230,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2600;
@@ -25875,7 +26247,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 2000;
@@ -25952,13 +26324,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 2U;
@@ -26229,13 +26605,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheMandatoryAttributeTemperatureDisplayMode_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster
             .ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
@@ -26255,7 +26635,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster
             .ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
@@ -26275,7 +26655,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t temperatureDisplayModeArgument;
         temperatureDisplayModeArgument = static_cast<uint8_t>(0);
@@ -26293,7 +26673,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster
             .ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
@@ -26313,7 +26693,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster
             .ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
@@ -26333,7 +26713,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster
             .ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
@@ -26353,7 +26733,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster
             .ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
@@ -26373,7 +26753,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(0);
@@ -26391,7 +26771,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster
             .ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
@@ -26411,7 +26791,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster
             .ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
@@ -26431,7 +26811,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<
             chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
@@ -26451,7 +26831,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<
             chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
@@ -26471,7 +26851,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t scheduleProgrammingVisibilityArgument;
         scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(0);
@@ -26489,7 +26869,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<
             chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
@@ -26509,7 +26889,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<
             chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
@@ -26689,13 +27069,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestWritesAValueOf0ToTemperatureDisplayModeAttributeOfDut_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t temperatureDisplayModeArgument;
         temperatureDisplayModeArgument = static_cast<uint8_t>(0);
@@ -26713,7 +27097,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t temperatureDisplayModeArgument;
         temperatureDisplayModeArgument = static_cast<uint8_t>(1);
@@ -26731,7 +27115,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(0);
@@ -26749,7 +27133,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(1);
@@ -26767,7 +27151,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(2);
@@ -26785,7 +27169,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(3);
@@ -26803,7 +27187,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(4);
@@ -26821,7 +27205,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(5);
@@ -26839,7 +27223,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t scheduleProgrammingVisibilityArgument;
         scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(0);
@@ -26857,7 +27241,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t scheduleProgrammingVisibilityArgument;
         scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(1);
@@ -26963,13 +27347,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -26988,7 +27376,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
@@ -27009,7 +27397,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -27156,13 +27544,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR Test2ReadTheGlobalAttributeClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -27183,7 +27575,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 201U;
@@ -27204,7 +27596,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::ClusterRevision::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -27224,7 +27616,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::FeatureMap::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -27244,7 +27636,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t featureMapArgument;
         featureMapArgument = 32769UL;
@@ -27265,7 +27657,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::FeatureMap::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
@@ -28068,13 +28460,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR Test2ReadTheRoMandatoryAttributeDefaultType_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(this, OnSuccessCallback_1,
                                                                                                       OnFailureCallback_1);
@@ -28094,7 +28490,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t typeArgument;
         typeArgument = static_cast<uint8_t>(250);
@@ -28115,7 +28511,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(this, OnSuccessCallback_3,
                                                                                                       OnFailureCallback_3);
@@ -28135,7 +28531,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::ConfigStatus::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -28155,7 +28551,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t configStatusArgument;
         configStatusArgument = 128;
@@ -28176,7 +28572,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::ConfigStatus::TypeInfo>(
             this, OnSuccessCallback_6, OnFailureCallback_6);
@@ -28196,7 +28592,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
             this, OnSuccessCallback_7, OnFailureCallback_7);
@@ -28216,7 +28612,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t operationalStatusArgument;
         operationalStatusArgument = 128;
@@ -28237,7 +28633,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
             this, OnSuccessCallback_9, OnFailureCallback_9);
@@ -28257,7 +28653,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
             this, OnSuccessCallback_10, OnFailureCallback_10);
@@ -28277,7 +28673,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t endProductTypeArgument;
         endProductTypeArgument = static_cast<uint8_t>(250);
@@ -28298,7 +28694,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
             this, OnSuccessCallback_12, OnFailureCallback_12);
@@ -28318,7 +28714,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(this, OnSuccessCallback_13,
                                                                                                       OnFailureCallback_13);
@@ -28338,7 +28734,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t modeArgument;
         modeArgument = 8;
@@ -28355,7 +28751,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(this, OnSuccessCallback_15,
                                                                                                       OnFailureCallback_15);
@@ -28374,7 +28770,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
             this, OnSuccessCallback_16, OnFailureCallback_16);
@@ -28395,7 +28791,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t targetPositionLiftPercent100thsArgument;
         targetPositionLiftPercent100thsArgument = 20000U;
@@ -28416,7 +28812,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
             this, OnSuccessCallback_18, OnFailureCallback_18);
@@ -28436,7 +28832,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
             this, OnSuccessCallback_19, OnFailureCallback_19);
@@ -28457,7 +28853,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t targetPositionTiltPercent100thsArgument;
         targetPositionTiltPercent100thsArgument = 20000U;
@@ -28478,7 +28874,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
             this, OnSuccessCallback_21, OnFailureCallback_21);
@@ -28498,7 +28894,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
             this, OnSuccessCallback_22, OnFailureCallback_22);
@@ -28519,7 +28915,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t currentPositionLiftPercent100thsArgument;
         currentPositionLiftPercent100thsArgument = 20000U;
@@ -28540,7 +28936,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
             this, OnSuccessCallback_24, OnFailureCallback_24);
@@ -28560,7 +28956,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
             this, OnSuccessCallback_25, OnFailureCallback_25);
@@ -28581,7 +28977,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t currentPositionTiltPercent100thsArgument;
         currentPositionTiltPercent100thsArgument = 20000U;
@@ -28602,7 +28998,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
             this, OnSuccessCallback_27, OnFailureCallback_27);
@@ -28622,7 +29018,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitLift::TypeInfo>(
             this, OnSuccessCallback_28, OnFailureCallback_28);
@@ -28642,7 +29038,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t installedOpenLimitLiftArgument;
         installedOpenLimitLiftArgument = 255U;
@@ -28663,7 +29059,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitLift::TypeInfo>(
             this, OnSuccessCallback_30, OnFailureCallback_30);
@@ -28683,7 +29079,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitLift::TypeInfo>(
             this, OnSuccessCallback_31, OnFailureCallback_31);
@@ -28703,7 +29099,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t installedClosedLimitLiftArgument;
         installedClosedLimitLiftArgument = 255U;
@@ -28724,7 +29120,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitLift::TypeInfo>(
             this, OnSuccessCallback_33, OnFailureCallback_33);
@@ -28744,7 +29140,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitTilt::TypeInfo>(
             this, OnSuccessCallback_34, OnFailureCallback_34);
@@ -28764,7 +29160,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t installedOpenLimitTiltArgument;
         installedOpenLimitTiltArgument = 255U;
@@ -28785,7 +29181,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitTilt::TypeInfo>(
             this, OnSuccessCallback_36, OnFailureCallback_36);
@@ -28805,7 +29201,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitTilt::TypeInfo>(
             this, OnSuccessCallback_37, OnFailureCallback_37);
@@ -28825,7 +29221,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t installedClosedLimitTiltArgument;
         installedClosedLimitTiltArgument = 255U;
@@ -28846,7 +29242,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitTilt::TypeInfo>(
             this, OnSuccessCallback_39, OnFailureCallback_39);
@@ -28866,7 +29262,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::SafetyStatus::TypeInfo>(
             this, OnSuccessCallback_40, OnFailureCallback_40);
@@ -28886,7 +29282,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t safetyStatusArgument;
         safetyStatusArgument = 4096U;
@@ -28907,7 +29303,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::SafetyStatus::TypeInfo>(
             this, OnSuccessCallback_42, OnFailureCallback_42);
@@ -28927,7 +29323,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo>(
             this, OnSuccessCallback_43, OnFailureCallback_43);
@@ -28947,7 +29343,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t currentPositionLiftArgument;
         currentPositionLiftArgument = 255U;
@@ -28968,7 +29364,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo>(
             this, OnSuccessCallback_45, OnFailureCallback_45);
@@ -28988,7 +29384,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo>(
             this, OnSuccessCallback_46, OnFailureCallback_46);
@@ -29008,7 +29404,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t currentPositionTiltArgument;
         currentPositionTiltArgument = 255U;
@@ -29029,7 +29425,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo>(
             this, OnSuccessCallback_48, OnFailureCallback_48);
@@ -29049,7 +29445,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
             this, OnSuccessCallback_49, OnFailureCallback_49);
@@ -29069,7 +29465,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t currentPositionLiftPercentageArgument;
         currentPositionLiftPercentageArgument = 200;
@@ -29090,7 +29486,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
             this, OnSuccessCallback_51, OnFailureCallback_51);
@@ -29110,7 +29506,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
             this, OnSuccessCallback_52, OnFailureCallback_52);
@@ -29130,7 +29526,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t currentPositionTiltPercentageArgument;
         currentPositionTiltPercentageArgument = 200;
@@ -29151,7 +29547,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
             this, OnSuccessCallback_54, OnFailureCallback_54);
@@ -29219,7 +29615,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class Test_TC_WNCV_2_4 : public TestCommand
@@ -29301,13 +29701,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsTypeAttributeFromDut_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(this, OnSuccessCallback_1,
                                                                                                       OnFailureCallback_1);
@@ -29326,7 +29730,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(this, OnSuccessCallback_2,
                                                                                                       OnFailureCallback_2);
@@ -29422,13 +29826,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsEndProductTypeAttributeFromDut_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -29447,7 +29855,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -29537,7 +29945,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR Test1aThAdjustsTheTheDutToANonOpenPosition_1()
     {
@@ -29554,7 +29966,7 @@ private:
             (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -29577,7 +29989,7 @@ private:
             (static_cast<Test_TC_WNCV_3_1 *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -29589,7 +30001,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -29678,7 +30090,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR Test1aThAdjustsTheTheDutToANonClosedPosition_1()
     {
@@ -29695,7 +30111,7 @@ private:
             (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -29718,7 +30134,7 @@ private:
             (static_cast<Test_TC_WNCV_3_2 *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -29730,7 +30146,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -29819,7 +30235,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR Test1aThAdjustsTheTheDutToANonOpenPosition_1()
     {
@@ -29836,7 +30256,7 @@ private:
             (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -29859,7 +30279,7 @@ private:
             (static_cast<Test_TC_WNCV_3_3 *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -29871,7 +30291,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WindowCoveringClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -29959,13 +30379,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadAttributeTargetNavigatorList_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TargetNavigatorClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::TargetNavigatorList::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -30006,7 +30430,7 @@ private:
             (static_cast<TV_TargetNavigatorCluster *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -30091,13 +30515,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadAttributeAudioOutputList_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 2;
         chip::Controller::AudioOutputClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::AudioOutputList::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -30143,7 +30571,7 @@ private:
             (static_cast<TV_AudioOutputCluster *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -30168,7 +30596,7 @@ private:
             (static_cast<TV_AudioOutputCluster *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -30274,13 +30702,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadAttributeApplicationLauncherList_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ApplicationLauncherClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherList::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -30318,7 +30750,7 @@ private:
             (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -30334,7 +30766,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ApplicationLauncherClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -30353,7 +30785,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ApplicationLauncherClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationId::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -30424,7 +30856,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestSendKeyCommand_1()
     {
@@ -30442,7 +30878,7 @@ private:
             (static_cast<TV_KeypadInputCluster *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -30510,7 +30946,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestGetSetupPinCommand_1()
     {
@@ -30528,7 +30968,7 @@ private:
             (static_cast<TV_AccountLoginCluster *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -30553,7 +30993,7 @@ private:
             (static_cast<TV_AccountLoginCluster *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -30627,13 +31067,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadMacAddress_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::WakeOnLanClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::WakeOnLan::Attributes::WakeOnLanMacAddress::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -30746,7 +31190,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestChangeStatusCommand_1()
     {
@@ -30764,7 +31212,7 @@ private:
             (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -30776,7 +31224,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorId::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -30795,7 +31243,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductId::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -30814,7 +31262,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
         chip::Controller::ApplicationBasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::CatalogVendorId::TypeInfo>(
             this, OnSuccessCallback_4, OnFailureCallback_4);
@@ -30925,7 +31373,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestMediaPlaybackPlayCommand_1()
     {
@@ -30942,7 +31394,7 @@ private:
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -30970,7 +31422,7 @@ private:
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -30998,7 +31450,7 @@ private:
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31026,7 +31478,7 @@ private:
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31054,7 +31506,7 @@ private:
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31082,7 +31534,7 @@ private:
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_6(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31110,7 +31562,7 @@ private:
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_7(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31138,7 +31590,7 @@ private:
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_8(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31167,7 +31619,7 @@ private:
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_9(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31196,7 +31648,7 @@ private:
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_10(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31225,7 +31677,7 @@ private:
             (static_cast<TV_MediaPlaybackCluster *>(context))->OnFailureResponse_11(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31315,13 +31767,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadAttributeTvChannelList_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TvChannelClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo>(this, OnSuccessCallback_1,
                                                                                                           OnFailureCallback_1);
@@ -31372,7 +31828,7 @@ private:
             (static_cast<TV_TvChannelCluster *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31396,7 +31852,7 @@ private:
             (static_cast<TV_TvChannelCluster *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31460,7 +31916,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestSleepInputStatusCommand_1()
     {
@@ -31477,7 +31937,7 @@ private:
             (static_cast<TV_LowPowerCluster *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31584,13 +32044,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadAttributeMediaInputList_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::MediaInputClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::MediaInputList::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -31636,7 +32100,7 @@ private:
             (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31648,7 +32112,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::MediaInputClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::CurrentMediaInput::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -31678,7 +32142,7 @@ private:
             (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31701,7 +32165,7 @@ private:
             (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -31726,7 +32190,7 @@ private:
             (static_cast<TV_MediaInputCluster *>(context))->OnFailureResponse_6(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -34823,7 +35287,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestSendTestCommand_1()
     {
@@ -34840,7 +35308,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -34863,7 +35331,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -34890,7 +35358,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -34920,7 +35388,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -34950,7 +35418,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -34966,7 +35434,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(this, OnSuccessCallback_6,
                                                                                                       OnFailureCallback_6);
@@ -34985,7 +35453,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         bool booleanArgument;
         booleanArgument = 1;
@@ -35002,7 +35470,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(this, OnSuccessCallback_8,
                                                                                                       OnFailureCallback_8);
@@ -35021,7 +35489,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         bool booleanArgument;
         booleanArgument = 0;
@@ -35038,7 +35506,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(this, OnSuccessCallback_10,
                                                                                                       OnFailureCallback_10);
@@ -35057,7 +35525,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(this, OnSuccessCallback_11,
                                                                                                       OnFailureCallback_11);
@@ -35076,7 +35544,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t bitmap8Argument;
         bitmap8Argument = 255;
@@ -35093,7 +35561,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(this, OnSuccessCallback_13,
                                                                                                       OnFailureCallback_13);
@@ -35112,7 +35580,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t bitmap8Argument;
         bitmap8Argument = 0;
@@ -35129,7 +35597,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(this, OnSuccessCallback_15,
                                                                                                       OnFailureCallback_15);
@@ -35148,7 +35616,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(this, OnSuccessCallback_16,
                                                                                                        OnFailureCallback_16);
@@ -35167,7 +35635,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t bitmap16Argument;
         bitmap16Argument = 65535U;
@@ -35184,7 +35652,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(this, OnSuccessCallback_18,
                                                                                                        OnFailureCallback_18);
@@ -35203,7 +35671,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t bitmap16Argument;
         bitmap16Argument = 0U;
@@ -35220,7 +35688,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(this, OnSuccessCallback_20,
                                                                                                        OnFailureCallback_20);
@@ -35239,7 +35707,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(this, OnSuccessCallback_21,
                                                                                                        OnFailureCallback_21);
@@ -35258,7 +35726,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t bitmap32Argument;
         bitmap32Argument = 4294967295UL;
@@ -35275,7 +35743,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(this, OnSuccessCallback_23,
                                                                                                        OnFailureCallback_23);
@@ -35294,7 +35762,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t bitmap32Argument;
         bitmap32Argument = 0UL;
@@ -35311,7 +35779,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(this, OnSuccessCallback_25,
                                                                                                        OnFailureCallback_25);
@@ -35330,7 +35798,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(this, OnSuccessCallback_26,
                                                                                                        OnFailureCallback_26);
@@ -35349,7 +35817,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint64_t bitmap64Argument;
         bitmap64Argument = 18446744073709551615ULL;
@@ -35366,7 +35834,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(this, OnSuccessCallback_28,
                                                                                                        OnFailureCallback_28);
@@ -35385,7 +35853,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint64_t bitmap64Argument;
         bitmap64Argument = 0ULL;
@@ -35402,7 +35870,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(this, OnSuccessCallback_30,
                                                                                                        OnFailureCallback_30);
@@ -35421,7 +35889,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(this, OnSuccessCallback_31,
                                                                                                     OnFailureCallback_31);
@@ -35440,7 +35908,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t int8uArgument;
         int8uArgument = 255;
@@ -35457,7 +35925,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(this, OnSuccessCallback_33,
                                                                                                     OnFailureCallback_33);
@@ -35476,7 +35944,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t int8uArgument;
         int8uArgument = 0;
@@ -35493,7 +35961,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(this, OnSuccessCallback_35,
                                                                                                     OnFailureCallback_35);
@@ -35512,7 +35980,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(this, OnSuccessCallback_36,
                                                                                                      OnFailureCallback_36);
@@ -35531,7 +35999,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t int16uArgument;
         int16uArgument = 65535U;
@@ -35548,7 +36016,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(this, OnSuccessCallback_38,
                                                                                                      OnFailureCallback_38);
@@ -35567,7 +36035,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t int16uArgument;
         int16uArgument = 0U;
@@ -35584,7 +36052,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(this, OnSuccessCallback_40,
                                                                                                      OnFailureCallback_40);
@@ -35603,7 +36071,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(this, OnSuccessCallback_41,
                                                                                                      OnFailureCallback_41);
@@ -35622,7 +36090,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t int32uArgument;
         int32uArgument = 4294967295UL;
@@ -35639,7 +36107,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(this, OnSuccessCallback_43,
                                                                                                      OnFailureCallback_43);
@@ -35658,7 +36126,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t int32uArgument;
         int32uArgument = 0UL;
@@ -35675,7 +36143,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(this, OnSuccessCallback_45,
                                                                                                      OnFailureCallback_45);
@@ -35694,7 +36162,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(this, OnSuccessCallback_46,
                                                                                                      OnFailureCallback_46);
@@ -35713,7 +36181,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint64_t int64uArgument;
         int64uArgument = 18446744073709551615ULL;
@@ -35730,7 +36198,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(this, OnSuccessCallback_48,
                                                                                                      OnFailureCallback_48);
@@ -35749,7 +36217,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint64_t int64uArgument;
         int64uArgument = 0ULL;
@@ -35766,7 +36234,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(this, OnSuccessCallback_50,
                                                                                                      OnFailureCallback_50);
@@ -35785,7 +36253,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(this, OnSuccessCallback_51,
                                                                                                     OnFailureCallback_51);
@@ -35804,7 +36272,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int8_t int8sArgument;
         int8sArgument = 127;
@@ -35821,7 +36289,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(this, OnSuccessCallback_53,
                                                                                                     OnFailureCallback_53);
@@ -35840,7 +36308,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int8_t int8sArgument;
         int8sArgument = -128;
@@ -35857,7 +36325,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(this, OnSuccessCallback_55,
                                                                                                     OnFailureCallback_55);
@@ -35876,7 +36344,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int8_t int8sArgument;
         int8sArgument = 0;
@@ -35893,7 +36361,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(this, OnSuccessCallback_57,
                                                                                                     OnFailureCallback_57);
@@ -35912,7 +36380,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(this, OnSuccessCallback_58,
                                                                                                      OnFailureCallback_58);
@@ -35931,7 +36399,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t int16sArgument;
         int16sArgument = 32767;
@@ -35948,7 +36416,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(this, OnSuccessCallback_60,
                                                                                                      OnFailureCallback_60);
@@ -35967,7 +36435,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t int16sArgument;
         int16sArgument = -32768;
@@ -35984,7 +36452,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(this, OnSuccessCallback_62,
                                                                                                      OnFailureCallback_62);
@@ -36003,7 +36471,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t int16sArgument;
         int16sArgument = 0;
@@ -36020,7 +36488,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(this, OnSuccessCallback_64,
                                                                                                      OnFailureCallback_64);
@@ -36039,7 +36507,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(this, OnSuccessCallback_65,
                                                                                                      OnFailureCallback_65);
@@ -36058,7 +36526,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int32_t int32sArgument;
         int32sArgument = 2147483647L;
@@ -36075,7 +36543,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(this, OnSuccessCallback_67,
                                                                                                      OnFailureCallback_67);
@@ -36094,7 +36562,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int32_t int32sArgument;
         int32sArgument = -2147483648L;
@@ -36111,7 +36579,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(this, OnSuccessCallback_69,
                                                                                                      OnFailureCallback_69);
@@ -36130,7 +36598,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int32_t int32sArgument;
         int32sArgument = 0L;
@@ -36147,7 +36615,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(this, OnSuccessCallback_71,
                                                                                                      OnFailureCallback_71);
@@ -36166,7 +36634,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(this, OnSuccessCallback_72,
                                                                                                      OnFailureCallback_72);
@@ -36185,7 +36653,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int64_t int64sArgument;
         int64sArgument = 9223372036854775807LL;
@@ -36202,7 +36670,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(this, OnSuccessCallback_74,
                                                                                                      OnFailureCallback_74);
@@ -36221,7 +36689,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int64_t int64sArgument;
         int64sArgument = -9223372036854775807LL;
@@ -36238,7 +36706,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(this, OnSuccessCallback_76,
                                                                                                      OnFailureCallback_76);
@@ -36257,7 +36725,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int64_t int64sArgument;
         int64sArgument = 0LL;
@@ -36274,7 +36742,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(this, OnSuccessCallback_78,
                                                                                                      OnFailureCallback_78);
@@ -36293,7 +36761,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(this, OnSuccessCallback_79,
                                                                                                     OnFailureCallback_79);
@@ -36312,7 +36780,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t enum8Argument;
         enum8Argument = static_cast<uint8_t>(255);
@@ -36329,7 +36797,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(this, OnSuccessCallback_81,
                                                                                                     OnFailureCallback_81);
@@ -36348,7 +36816,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t enum8Argument;
         enum8Argument = static_cast<uint8_t>(0);
@@ -36365,7 +36833,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(this, OnSuccessCallback_83,
                                                                                                     OnFailureCallback_83);
@@ -36384,7 +36852,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(this, OnSuccessCallback_84,
                                                                                                      OnFailureCallback_84);
@@ -36403,7 +36871,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t enum16Argument;
         enum16Argument = static_cast<uint16_t>(65535);
@@ -36420,7 +36888,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(this, OnSuccessCallback_86,
                                                                                                      OnFailureCallback_86);
@@ -36439,7 +36907,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t enum16Argument;
         enum16Argument = static_cast<uint16_t>(0);
@@ -36456,7 +36924,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(this, OnSuccessCallback_88,
                                                                                                      OnFailureCallback_88);
@@ -36475,7 +36943,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
             this, OnSuccessCallback_89, OnFailureCallback_89);
@@ -36494,7 +36962,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::ByteSpan octetStringArgument;
         octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("Tes\x00ti\x00nggarbage: not in length on purpose"), 9);
@@ -36511,7 +36979,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
             this, OnSuccessCallback_91, OnFailureCallback_91);
@@ -36531,7 +36999,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::ByteSpan octetStringArgument;
         octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("TestValuegarbage: not in length on purpose"), 9);
@@ -36548,7 +37016,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
             this, OnSuccessCallback_93, OnFailureCallback_93);
@@ -36568,7 +37036,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::ByteSpan octetStringArgument;
         octetStringArgument =
@@ -36590,7 +37058,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
             this, OnSuccessCallback_95, OnFailureCallback_95);
@@ -36610,7 +37078,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::ByteSpan octetStringArgument;
         octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
@@ -36627,7 +37095,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
             this, OnSuccessCallback_97, OnFailureCallback_97);
@@ -36646,7 +37114,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::ByteSpan longOctetStringArgument;
         longOctetStringArgument = chip::ByteSpan(
@@ -36668,7 +37136,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
             this, OnSuccessCallback_99, OnFailureCallback_99);
@@ -36694,7 +37162,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::ByteSpan longOctetStringArgument;
         longOctetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
@@ -36711,7 +37179,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
             this, OnSuccessCallback_101, OnFailureCallback_101);
@@ -36730,7 +37198,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan charStringArgument;
         charStringArgument = chip::Span<const char>("☉T☉garbage: not in length on purpose", 7);
@@ -36747,7 +37215,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
             this, OnSuccessCallback_103, OnFailureCallback_103);
@@ -36766,7 +37234,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan charStringArgument;
         charStringArgument = chip::Span<const char>("☉TestValueLongerThan10☉garbage: not in length on purpose", 27);
@@ -36787,7 +37255,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
             this, OnSuccessCallback_105, OnFailureCallback_105);
@@ -36806,7 +37274,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan charStringArgument;
         charStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
@@ -36823,7 +37291,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
             this, OnSuccessCallback_107, OnFailureCallback_107);
@@ -36842,7 +37310,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan longCharStringArgument;
         longCharStringArgument = chip::Span<const char>(
@@ -36863,7 +37331,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
             this, OnSuccessCallback_109, OnFailureCallback_109);
@@ -36887,7 +37355,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan longCharStringArgument;
         longCharStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
@@ -36904,7 +37372,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_111,
                                                                                                       OnFailureCallback_111);
@@ -36923,7 +37391,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint64_t epochUsArgument;
         epochUsArgument = 18446744073709551615ULL;
@@ -36940,7 +37408,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_113,
                                                                                                       OnFailureCallback_113);
@@ -36959,7 +37427,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint64_t epochUsArgument;
         epochUsArgument = 0ULL;
@@ -36976,7 +37444,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_115,
                                                                                                       OnFailureCallback_115);
@@ -36995,7 +37463,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_116,
                                                                                                      OnFailureCallback_116);
@@ -37014,7 +37482,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t epochSArgument;
         epochSArgument = 4294967295UL;
@@ -37031,7 +37499,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_118,
                                                                                                      OnFailureCallback_118);
@@ -37050,7 +37518,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t epochSArgument;
         epochSArgument = 0UL;
@@ -37067,7 +37535,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_120,
                                                                                                      OnFailureCallback_120);
@@ -37086,7 +37554,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(
             this, OnSuccessCallback_121, OnFailureCallback_121);
@@ -37108,7 +37576,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         bool unsupportedArgument;
         unsupportedArgument = 0;
@@ -37139,7 +37607,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_123(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37166,7 +37634,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_124(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37182,7 +37650,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnSuccessCallback_125,
                                                                                                        OnFailureCallback_125);
@@ -37201,7 +37669,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::VendorId vendorIdArgument;
         vendorIdArgument = static_cast<chip::VendorId>(17);
@@ -37218,7 +37686,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnSuccessCallback_127,
                                                                                                        OnFailureCallback_127);
@@ -37237,7 +37705,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::VendorId vendorIdArgument;
         vendorIdArgument = static_cast<chip::VendorId>(0);
@@ -37267,7 +37735,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_129(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37306,7 +37774,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_130(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37343,7 +37811,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_131(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37383,7 +37851,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_132(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37423,7 +37891,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_133(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37502,7 +37970,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_134(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37581,7 +38049,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_135(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37618,7 +38086,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_136(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37665,7 +38133,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_137(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37706,7 +38174,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_138(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37746,7 +38214,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_139(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37795,7 +38263,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_140(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37846,7 +38314,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_141(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37896,7 +38364,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_142(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -37979,7 +38447,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_143(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -38062,7 +38530,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_144(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -38079,7 +38547,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::List<const uint8_t> listInt8uArgument;
 
@@ -38102,7 +38570,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_146,
                                                                                                         OnFailureCallback_146);
@@ -38130,7 +38598,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::List<const chip::ByteSpan> listOctetStringArgument;
 
@@ -38153,7 +38621,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo>(
             this, OnSuccessCallback_148, OnFailureCallback_148);
@@ -38185,7 +38653,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::List<const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::Type>
             listStructOctetStringArgument;
@@ -38222,7 +38690,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(
             this, OnSuccessCallback_150, OnFailureCallback_150);
@@ -38273,7 +38741,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_151(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -38313,7 +38781,7 @@ private:
             (static_cast<TestCluster *>(context))->OnFailureResponse_152(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -38331,7 +38799,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<bool> nullableBooleanArgument;
         nullableBooleanArgument.SetNull();
@@ -38348,7 +38816,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
             this, OnSuccessCallback_154, OnFailureCallback_154);
@@ -38367,7 +38835,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<bool> nullableBooleanArgument;
         nullableBooleanArgument.SetNonNull() = true;
@@ -38384,7 +38852,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
             this, OnSuccessCallback_156, OnFailureCallback_156);
@@ -38404,7 +38872,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint8_t> nullableBitmap8Argument;
         nullableBitmap8Argument.SetNonNull() = 254;
@@ -38421,7 +38889,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
             this, OnSuccessCallback_158, OnFailureCallback_158);
@@ -38441,7 +38909,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint8_t> nullableBitmap8Argument;
         nullableBitmap8Argument.SetNonNull() = 255;
@@ -38462,7 +38930,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
             this, OnSuccessCallback_160, OnFailureCallback_160);
@@ -38482,7 +38950,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint8_t> nullableBitmap8Argument;
         nullableBitmap8Argument.SetNull();
@@ -38499,7 +38967,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
             this, OnSuccessCallback_162, OnFailureCallback_162);
@@ -38518,7 +38986,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
         nullableBitmap16Argument.SetNonNull() = 65534U;
@@ -38535,7 +39003,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
             this, OnSuccessCallback_164, OnFailureCallback_164);
@@ -38555,7 +39023,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
         nullableBitmap16Argument.SetNonNull() = 65535U;
@@ -38576,7 +39044,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
             this, OnSuccessCallback_166, OnFailureCallback_166);
@@ -38596,7 +39064,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
         nullableBitmap16Argument.SetNull();
@@ -38613,7 +39081,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
             this, OnSuccessCallback_168, OnFailureCallback_168);
@@ -38632,7 +39100,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
         nullableBitmap32Argument.SetNonNull() = 4294967294UL;
@@ -38649,7 +39117,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
             this, OnSuccessCallback_170, OnFailureCallback_170);
@@ -38669,7 +39137,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
         nullableBitmap32Argument.SetNonNull() = 4294967295UL;
@@ -38690,7 +39158,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
             this, OnSuccessCallback_172, OnFailureCallback_172);
@@ -38710,7 +39178,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
         nullableBitmap32Argument.SetNull();
@@ -38727,7 +39195,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
             this, OnSuccessCallback_174, OnFailureCallback_174);
@@ -38746,7 +39214,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
         nullableBitmap64Argument.SetNonNull() = 18446744073709551614ULL;
@@ -38763,7 +39231,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
             this, OnSuccessCallback_176, OnFailureCallback_176);
@@ -38783,7 +39251,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
         nullableBitmap64Argument.SetNonNull() = 18446744073709551615ULL;
@@ -38804,7 +39272,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
             this, OnSuccessCallback_178, OnFailureCallback_178);
@@ -38824,7 +39292,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
         nullableBitmap64Argument.SetNull();
@@ -38841,7 +39309,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
             this, OnSuccessCallback_180, OnFailureCallback_180);
@@ -38860,7 +39328,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint8_t> nullableInt8uArgument;
         nullableInt8uArgument.SetNonNull() = 254;
@@ -38877,7 +39345,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
             this, OnSuccessCallback_182, OnFailureCallback_182);
@@ -38897,7 +39365,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint8_t> nullableInt8uArgument;
         nullableInt8uArgument.SetNonNull() = 255;
@@ -38918,7 +39386,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
             this, OnSuccessCallback_184, OnFailureCallback_184);
@@ -38938,7 +39406,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint8_t> nullableInt8uArgument;
         nullableInt8uArgument.SetNull();
@@ -38955,7 +39423,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
             this, OnSuccessCallback_186, OnFailureCallback_186);
@@ -38974,7 +39442,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint16_t> nullableInt16uArgument;
         nullableInt16uArgument.SetNonNull() = 65534U;
@@ -38991,7 +39459,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
             this, OnSuccessCallback_188, OnFailureCallback_188);
@@ -39011,7 +39479,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint16_t> nullableInt16uArgument;
         nullableInt16uArgument.SetNonNull() = 65535U;
@@ -39032,7 +39500,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
             this, OnSuccessCallback_190, OnFailureCallback_190);
@@ -39052,7 +39520,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint16_t> nullableInt16uArgument;
         nullableInt16uArgument.SetNull();
@@ -39069,7 +39537,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
             this, OnSuccessCallback_192, OnFailureCallback_192);
@@ -39088,7 +39556,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint32_t> nullableInt32uArgument;
         nullableInt32uArgument.SetNonNull() = 4294967294UL;
@@ -39105,7 +39573,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
             this, OnSuccessCallback_194, OnFailureCallback_194);
@@ -39125,7 +39593,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint32_t> nullableInt32uArgument;
         nullableInt32uArgument.SetNonNull() = 4294967295UL;
@@ -39146,7 +39614,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
             this, OnSuccessCallback_196, OnFailureCallback_196);
@@ -39166,7 +39634,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint32_t> nullableInt32uArgument;
         nullableInt32uArgument.SetNull();
@@ -39183,7 +39651,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
             this, OnSuccessCallback_198, OnFailureCallback_198);
@@ -39202,7 +39670,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint64_t> nullableInt64uArgument;
         nullableInt64uArgument.SetNonNull() = 18446744073709551614ULL;
@@ -39219,7 +39687,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
             this, OnSuccessCallback_200, OnFailureCallback_200);
@@ -39239,7 +39707,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint64_t> nullableInt64uArgument;
         nullableInt64uArgument.SetNonNull() = 18446744073709551615ULL;
@@ -39260,7 +39728,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
             this, OnSuccessCallback_202, OnFailureCallback_202);
@@ -39280,7 +39748,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint64_t> nullableInt64uArgument;
         nullableInt64uArgument.SetNull();
@@ -39297,7 +39765,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
             this, OnSuccessCallback_204, OnFailureCallback_204);
@@ -39316,7 +39784,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<int8_t> nullableInt8sArgument;
         nullableInt8sArgument.SetNonNull() = -127;
@@ -39333,7 +39801,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
             this, OnSuccessCallback_206, OnFailureCallback_206);
@@ -39353,7 +39821,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<int8_t> nullableInt8sArgument;
         nullableInt8sArgument.SetNonNull() = -128;
@@ -39374,7 +39842,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
             this, OnSuccessCallback_208, OnFailureCallback_208);
@@ -39394,7 +39862,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<int8_t> nullableInt8sArgument;
         nullableInt8sArgument.SetNull();
@@ -39411,7 +39879,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
             this, OnSuccessCallback_210, OnFailureCallback_210);
@@ -39430,7 +39898,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<int16_t> nullableInt16sArgument;
         nullableInt16sArgument.SetNonNull() = -32767;
@@ -39447,7 +39915,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
             this, OnSuccessCallback_212, OnFailureCallback_212);
@@ -39467,7 +39935,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<int16_t> nullableInt16sArgument;
         nullableInt16sArgument.SetNonNull() = -32768;
@@ -39488,7 +39956,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
             this, OnSuccessCallback_214, OnFailureCallback_214);
@@ -39508,7 +39976,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<int16_t> nullableInt16sArgument;
         nullableInt16sArgument.SetNull();
@@ -39525,7 +39993,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
             this, OnSuccessCallback_216, OnFailureCallback_216);
@@ -39544,7 +40012,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<int32_t> nullableInt32sArgument;
         nullableInt32sArgument.SetNonNull() = -2147483647L;
@@ -39561,7 +40029,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
             this, OnSuccessCallback_218, OnFailureCallback_218);
@@ -39581,7 +40049,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<int32_t> nullableInt32sArgument;
         nullableInt32sArgument.SetNonNull() = -2147483648L;
@@ -39602,7 +40070,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
             this, OnSuccessCallback_220, OnFailureCallback_220);
@@ -39622,7 +40090,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<int32_t> nullableInt32sArgument;
         nullableInt32sArgument.SetNull();
@@ -39639,7 +40107,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
             this, OnSuccessCallback_222, OnFailureCallback_222);
@@ -39658,7 +40126,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<int64_t> nullableInt64sArgument;
         nullableInt64sArgument.SetNonNull() = -9223372036854775807LL;
@@ -39675,7 +40143,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
             this, OnSuccessCallback_224, OnFailureCallback_224);
@@ -39695,7 +40163,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<int64_t> nullableInt64sArgument;
         nullableInt64sArgument.SetNonNull() = -9223372036854775807LL - 1;
@@ -39716,7 +40184,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
             this, OnSuccessCallback_226, OnFailureCallback_226);
@@ -39736,7 +40204,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<int64_t> nullableInt64sArgument;
         nullableInt64sArgument.SetNull();
@@ -39753,7 +40221,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
             this, OnSuccessCallback_228, OnFailureCallback_228);
@@ -39772,7 +40240,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
         nullableEnum8Argument.SetNonNull() = static_cast<uint8_t>(254);
@@ -39789,7 +40257,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
             this, OnSuccessCallback_230, OnFailureCallback_230);
@@ -39809,7 +40277,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
         nullableEnum8Argument.SetNonNull() = static_cast<uint8_t>(255);
@@ -39830,7 +40298,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
             this, OnSuccessCallback_232, OnFailureCallback_232);
@@ -39850,7 +40318,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
         nullableEnum8Argument.SetNull();
@@ -39867,7 +40335,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
             this, OnSuccessCallback_234, OnFailureCallback_234);
@@ -39886,7 +40354,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint16_t> nullableEnum16Argument;
         nullableEnum16Argument.SetNonNull() = static_cast<uint16_t>(65534);
@@ -39903,7 +40371,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
             this, OnSuccessCallback_236, OnFailureCallback_236);
@@ -39923,7 +40391,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint16_t> nullableEnum16Argument;
         nullableEnum16Argument.SetNonNull() = static_cast<uint16_t>(65535);
@@ -39944,7 +40412,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
             this, OnSuccessCallback_238, OnFailureCallback_238);
@@ -39964,7 +40432,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<uint16_t> nullableEnum16Argument;
         nullableEnum16Argument.SetNull();
@@ -39981,7 +40449,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
             this, OnSuccessCallback_240, OnFailureCallback_240);
@@ -40000,7 +40468,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
             this, OnSuccessCallback_241, OnFailureCallback_241);
@@ -40021,7 +40489,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<chip::ByteSpan> nullableOctetStringArgument;
         nullableOctetStringArgument.SetNonNull() =
@@ -40039,7 +40507,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
             this, OnSuccessCallback_243, OnFailureCallback_243);
@@ -40060,7 +40528,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<chip::ByteSpan> nullableOctetStringArgument;
         nullableOctetStringArgument.SetNull();
@@ -40077,7 +40545,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
             this, OnSuccessCallback_245, OnFailureCallback_245);
@@ -40096,7 +40564,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<chip::ByteSpan> nullableOctetStringArgument;
         nullableOctetStringArgument.SetNonNull() =
@@ -40114,7 +40582,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
             this, OnSuccessCallback_247, OnFailureCallback_247);
@@ -40135,7 +40603,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
             this, OnSuccessCallback_248, OnFailureCallback_248);
@@ -40155,7 +40623,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<chip::CharSpan> nullableCharStringArgument;
         nullableCharStringArgument.SetNonNull() = chip::Span<const char>("☉T☉garbage: not in length on purpose", 7);
@@ -40172,7 +40640,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
             this, OnSuccessCallback_250, OnFailureCallback_250);
@@ -40192,7 +40660,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<chip::CharSpan> nullableCharStringArgument;
         nullableCharStringArgument.SetNull();
@@ -40209,7 +40677,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
             this, OnSuccessCallback_252, OnFailureCallback_252);
@@ -40228,7 +40696,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::app::DataModel::Nullable<chip::CharSpan> nullableCharStringArgument;
         nullableCharStringArgument.SetNonNull() = chip::Span<const char>("garbage: not in length on purpose", 0);
@@ -40245,7 +40713,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
             this, OnSuccessCallback_254, OnFailureCallback_254);
@@ -40265,7 +40733,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 200;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_255,
                                                                                                         OnFailureCallback_255);
@@ -40283,7 +40751,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_256,
                                                                                                         OnFailureCallback_256);
@@ -40353,7 +40821,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestSendTestCommandWithOptionalArgSetToNull_1()
     {
@@ -40372,7 +40844,7 @@ private:
             (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -40586,13 +41058,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestWriteAttributeInt32uValue_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t int32uArgument;
         int32uArgument = 5UL;
@@ -40609,7 +41085,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(this, OnSuccessCallback_2,
                                                                                                      OnFailureCallback_2);
@@ -40628,7 +41104,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(this, OnSuccessCallback_3,
                                                                                                      OnFailureCallback_3);
@@ -40647,7 +41123,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(this, OnSuccessCallback_4,
                                                                                                      OnFailureCallback_4);
@@ -40666,7 +41142,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t int32uArgument;
         int32uArgument = 0UL;
@@ -40683,7 +41159,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan charStringArgument;
         charStringArgument = chip::Span<const char>("** Test **garbage: not in length on purpose", 10);
@@ -40700,7 +41176,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(this, OnSuccessCallback_7,
                                                                                                          OnFailureCallback_7);
@@ -40719,7 +41195,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(this, OnSuccessCallback_8,
                                                                                                          OnFailureCallback_8);
@@ -40738,7 +41214,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(this, OnSuccessCallback_9,
                                                                                                          OnFailureCallback_9);
@@ -40757,7 +41233,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(this, OnSuccessCallback_10,
                                                                                                          OnFailureCallback_10);
@@ -40776,7 +41252,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan charStringArgument;
         charStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
@@ -40845,9 +41321,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
-    CHIP_ERROR TestWait100ms_1() { return WaitForMs(100); }
+    CHIP_ERROR TestWait100ms_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForMs(100);
+    }
 };
 
 class TestLogCommands : public TestCommand
@@ -40909,11 +41393,23 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
-    CHIP_ERROR TestLogASimpleMessage_1() { return Log("This is a simple message"); }
+    CHIP_ERROR TestLogASimpleMessage_1()
+    {
+        SetIdentity(kIdentityAlpha);
+        return Log("This is a simple message");
+    }
 
-    CHIP_ERROR TestDoASimpleUserPromptMessage_2() { return UserPrompt("This is a simple message"); }
+    CHIP_ERROR TestDoASimpleUserPromptMessage_2()
+    {
+        SetIdentity(kIdentityAlpha);
+        return UserPrompt("This is a simple message");
+    }
 };
 
 class TestSaveAs : public TestCommand
@@ -42151,7 +42647,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestSendTestAddArgumentsCommand_1()
     {
@@ -42170,7 +42670,7 @@ private:
             (static_cast<TestSaveAs *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -42201,7 +42701,7 @@ private:
             (static_cast<TestSaveAs *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -42231,7 +42731,7 @@ private:
             (static_cast<TestSaveAs *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -42248,7 +42748,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(this, OnSuccessCallback_4,
                                                                                                       OnFailureCallback_4);
@@ -42268,7 +42768,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         bool booleanArgument;
         booleanArgument = 1;
@@ -42285,7 +42785,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(this, OnSuccessCallback_6,
                                                                                                       OnFailureCallback_6);
@@ -42304,7 +42804,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         bool booleanArgument;
         booleanArgument = readAttributeBooleanDefaultValue;
@@ -42321,7 +42821,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(this, OnSuccessCallback_8,
                                                                                                       OnFailureCallback_8);
@@ -42340,7 +42840,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(this, OnSuccessCallback_9,
                                                                                                       OnFailureCallback_9);
@@ -42360,7 +42860,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t bitmap8Argument;
         bitmap8Argument = 1;
@@ -42377,7 +42877,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(this, OnSuccessCallback_11,
                                                                                                       OnFailureCallback_11);
@@ -42396,7 +42896,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t bitmap8Argument;
         bitmap8Argument = readAttributeBitmap8DefaultValue;
@@ -42413,7 +42913,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(this, OnSuccessCallback_13,
                                                                                                       OnFailureCallback_13);
@@ -42432,7 +42932,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(this, OnSuccessCallback_14,
                                                                                                        OnFailureCallback_14);
@@ -42452,7 +42952,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t bitmap16Argument;
         bitmap16Argument = 1U;
@@ -42469,7 +42969,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(this, OnSuccessCallback_16,
                                                                                                        OnFailureCallback_16);
@@ -42488,7 +42988,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t bitmap16Argument;
         bitmap16Argument = readAttributeBitmap16DefaultValue;
@@ -42505,7 +43005,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(this, OnSuccessCallback_18,
                                                                                                        OnFailureCallback_18);
@@ -42524,7 +43024,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(this, OnSuccessCallback_19,
                                                                                                        OnFailureCallback_19);
@@ -42544,7 +43044,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t bitmap32Argument;
         bitmap32Argument = 1UL;
@@ -42561,7 +43061,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(this, OnSuccessCallback_21,
                                                                                                        OnFailureCallback_21);
@@ -42580,7 +43080,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t bitmap32Argument;
         bitmap32Argument = readAttributeBitmap32DefaultValue;
@@ -42597,7 +43097,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(this, OnSuccessCallback_23,
                                                                                                        OnFailureCallback_23);
@@ -42616,7 +43116,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(this, OnSuccessCallback_24,
                                                                                                        OnFailureCallback_24);
@@ -42636,7 +43136,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint64_t bitmap64Argument;
         bitmap64Argument = 1ULL;
@@ -42653,7 +43153,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(this, OnSuccessCallback_26,
                                                                                                        OnFailureCallback_26);
@@ -42672,7 +43172,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint64_t bitmap64Argument;
         bitmap64Argument = readAttributeBitmap64DefaultValue;
@@ -42689,7 +43189,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(this, OnSuccessCallback_28,
                                                                                                        OnFailureCallback_28);
@@ -42708,7 +43208,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(this, OnSuccessCallback_29,
                                                                                                     OnFailureCallback_29);
@@ -42728,7 +43228,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t int8uArgument;
         int8uArgument = 1;
@@ -42745,7 +43245,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(this, OnSuccessCallback_31,
                                                                                                     OnFailureCallback_31);
@@ -42764,7 +43264,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t int8uArgument;
         int8uArgument = readAttributeInt8uDefaultValue;
@@ -42781,7 +43281,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(this, OnSuccessCallback_33,
                                                                                                     OnFailureCallback_33);
@@ -42800,7 +43300,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(this, OnSuccessCallback_34,
                                                                                                      OnFailureCallback_34);
@@ -42820,7 +43320,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t int16uArgument;
         int16uArgument = 1U;
@@ -42837,7 +43337,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(this, OnSuccessCallback_36,
                                                                                                      OnFailureCallback_36);
@@ -42856,7 +43356,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t int16uArgument;
         int16uArgument = readAttributeInt16uDefaultValue;
@@ -42873,7 +43373,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(this, OnSuccessCallback_38,
                                                                                                      OnFailureCallback_38);
@@ -42892,7 +43392,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(this, OnSuccessCallback_39,
                                                                                                      OnFailureCallback_39);
@@ -42912,7 +43412,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t int32uArgument;
         int32uArgument = 1UL;
@@ -42929,7 +43429,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(this, OnSuccessCallback_41,
                                                                                                      OnFailureCallback_41);
@@ -42948,7 +43448,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t int32uArgument;
         int32uArgument = readAttributeInt32uDefaultValue;
@@ -42965,7 +43465,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(this, OnSuccessCallback_43,
                                                                                                      OnFailureCallback_43);
@@ -42984,7 +43484,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(this, OnSuccessCallback_44,
                                                                                                      OnFailureCallback_44);
@@ -43004,7 +43504,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint64_t int64uArgument;
         int64uArgument = 1ULL;
@@ -43021,7 +43521,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(this, OnSuccessCallback_46,
                                                                                                      OnFailureCallback_46);
@@ -43040,7 +43540,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint64_t int64uArgument;
         int64uArgument = readAttributeInt64uDefaultValue;
@@ -43057,7 +43557,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(this, OnSuccessCallback_48,
                                                                                                      OnFailureCallback_48);
@@ -43076,7 +43576,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(this, OnSuccessCallback_49,
                                                                                                     OnFailureCallback_49);
@@ -43096,7 +43596,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int8_t int8sArgument;
         int8sArgument = 1;
@@ -43113,7 +43613,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(this, OnSuccessCallback_51,
                                                                                                     OnFailureCallback_51);
@@ -43132,7 +43632,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int8_t int8sArgument;
         int8sArgument = readAttributeInt8sDefaultValue;
@@ -43149,7 +43649,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(this, OnSuccessCallback_53,
                                                                                                     OnFailureCallback_53);
@@ -43168,7 +43668,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(this, OnSuccessCallback_54,
                                                                                                      OnFailureCallback_54);
@@ -43188,7 +43688,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t int16sArgument;
         int16sArgument = 1;
@@ -43205,7 +43705,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(this, OnSuccessCallback_56,
                                                                                                      OnFailureCallback_56);
@@ -43224,7 +43724,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int16_t int16sArgument;
         int16sArgument = readAttributeInt16sDefaultValue;
@@ -43241,7 +43741,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(this, OnSuccessCallback_58,
                                                                                                      OnFailureCallback_58);
@@ -43260,7 +43760,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(this, OnSuccessCallback_59,
                                                                                                      OnFailureCallback_59);
@@ -43280,7 +43780,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int32_t int32sArgument;
         int32sArgument = 1L;
@@ -43297,7 +43797,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(this, OnSuccessCallback_61,
                                                                                                      OnFailureCallback_61);
@@ -43316,7 +43816,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int32_t int32sArgument;
         int32sArgument = readAttributeInt32sDefaultValue;
@@ -43333,7 +43833,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(this, OnSuccessCallback_63,
                                                                                                      OnFailureCallback_63);
@@ -43352,7 +43852,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(this, OnSuccessCallback_64,
                                                                                                      OnFailureCallback_64);
@@ -43372,7 +43872,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int64_t int64sArgument;
         int64sArgument = 1LL;
@@ -43389,7 +43889,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(this, OnSuccessCallback_66,
                                                                                                      OnFailureCallback_66);
@@ -43408,7 +43908,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         int64_t int64sArgument;
         int64sArgument = readAttributeInt64sDefaultValue;
@@ -43425,7 +43925,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(this, OnSuccessCallback_68,
                                                                                                      OnFailureCallback_68);
@@ -43444,7 +43944,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(this, OnSuccessCallback_69,
                                                                                                     OnFailureCallback_69);
@@ -43464,7 +43964,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t enum8Argument;
         enum8Argument = static_cast<uint8_t>(1);
@@ -43481,7 +43981,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(this, OnSuccessCallback_71,
                                                                                                     OnFailureCallback_71);
@@ -43500,7 +44000,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint8_t enum8Argument;
         enum8Argument = static_cast<uint8_t>(readAttributeEnum8DefaultValue);
@@ -43517,7 +44017,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(this, OnSuccessCallback_73,
                                                                                                     OnFailureCallback_73);
@@ -43536,7 +44036,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(this, OnSuccessCallback_74,
                                                                                                      OnFailureCallback_74);
@@ -43556,7 +44056,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t enum16Argument;
         enum16Argument = static_cast<uint16_t>(1);
@@ -43573,7 +44073,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(this, OnSuccessCallback_76,
                                                                                                      OnFailureCallback_76);
@@ -43592,7 +44092,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t enum16Argument;
         enum16Argument = static_cast<uint16_t>(readAttributeEnum16DefaultValue);
@@ -43609,7 +44109,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(this, OnSuccessCallback_78,
                                                                                                      OnFailureCallback_78);
@@ -43628,7 +44128,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_79,
                                                                                                       OnFailureCallback_79);
@@ -43648,7 +44148,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint64_t epochUsArgument;
         epochUsArgument = 1ULL;
@@ -43665,7 +44165,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_81,
                                                                                                       OnFailureCallback_81);
@@ -43684,7 +44184,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint64_t epochUsArgument;
         epochUsArgument = readAttributeEpochUSDefaultValue;
@@ -43701,7 +44201,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_83,
                                                                                                       OnFailureCallback_83);
@@ -43720,7 +44220,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_84,
                                                                                                      OnFailureCallback_84);
@@ -43740,7 +44240,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t epochSArgument;
         epochSArgument = 1UL;
@@ -43757,7 +44257,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_86,
                                                                                                      OnFailureCallback_86);
@@ -43776,7 +44276,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint32_t epochSArgument;
         epochSArgument = readAttributeEpochSDefaultValue;
@@ -43793,7 +44293,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_88,
                                                                                                      OnFailureCallback_88);
@@ -43812,7 +44312,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnSuccessCallback_89,
                                                                                                        OnFailureCallback_89);
@@ -43832,7 +44332,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::VendorId vendorIdArgument;
         vendorIdArgument = static_cast<chip::VendorId>(1);
@@ -43849,7 +44349,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnSuccessCallback_91,
                                                                                                        OnFailureCallback_91);
@@ -43868,7 +44368,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::VendorId vendorIdArgument;
         vendorIdArgument = static_cast<chip::VendorId>(readAttributeVendorIdDefaultValue);
@@ -43885,7 +44385,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnSuccessCallback_93,
                                                                                                        OnFailureCallback_93);
@@ -44010,13 +44510,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadAttributeDeviceList_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::DescriptorClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::DeviceList::TypeInfo>(this, OnSuccessCallback_1,
                                                                                                         OnFailureCallback_1);
@@ -44040,7 +44544,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::DescriptorClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::ServerList::TypeInfo>(this, OnSuccessCallback_2,
                                                                                                         OnFailureCallback_2);
@@ -44096,7 +44600,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::DescriptorClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::ClientList::TypeInfo>(this, OnSuccessCallback_3,
                                                                                                         OnFailureCallback_3);
@@ -44116,7 +44620,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::DescriptorClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::PartsList::TypeInfo>(this, OnSuccessCallback_4,
                                                                                                        OnFailureCallback_4);
@@ -44238,13 +44742,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadLocation_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(this, OnSuccessCallback_1,
                                                                                                  OnFailureCallback_1);
@@ -44263,7 +44771,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan locationArgument;
         locationArgument = chip::Span<const char>("usgarbage: not in length on purpose", 2);
@@ -44280,7 +44788,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(this, OnSuccessCallback_3,
                                                                                                  OnFailureCallback_3);
@@ -44299,7 +44807,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         chip::CharSpan locationArgument;
         locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
@@ -44368,7 +44876,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestSendIdentifyCommandAndExpectSuccessResponse_1()
     {
@@ -44386,7 +44898,7 @@ private:
             (static_cast<TestIdentifyCluster *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44506,7 +45018,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestViewGroup0Invalid_1()
     {
@@ -44524,7 +45040,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44555,7 +45071,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_2(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44587,7 +45103,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_3(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44618,7 +45134,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44651,7 +45167,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_5(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44682,7 +45198,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_6(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44713,7 +45229,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_7(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44746,7 +45262,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_8(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44777,7 +45293,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_9(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44808,7 +45324,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_10(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44841,7 +45357,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_11(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44871,7 +45387,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_12(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44895,7 +45411,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_13(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44926,7 +45442,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_14(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -44957,7 +45473,7 @@ private:
             (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_15(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -45066,13 +45582,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadNumberOfSupportedFabrics_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::SupportedFabrics::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -45092,7 +45612,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::CommissionedFabrics::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -45112,7 +45632,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::OperationalCredentialsClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::CurrentFabricIndex::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -45275,13 +45795,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadCurrentMode_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::CurrentMode::TypeInfo>(this, OnSuccessCallback_1,
                                                                                                          OnFailureCallback_1);
@@ -45300,7 +45824,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo>(this, OnSuccessCallback_2,
                                                                                                     OnFailureCallback_2);
@@ -45319,7 +45843,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::StartUpMode::TypeInfo>(this, OnSuccessCallback_3,
                                                                                                          OnFailureCallback_3);
@@ -45338,7 +45862,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::Description::TypeInfo>(this, OnSuccessCallback_4,
                                                                                                          OnFailureCallback_4);
@@ -45357,7 +45881,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::SupportedModes::TypeInfo>(
             this, OnSuccessCallback_5, OnFailureCallback_5);
@@ -45403,7 +45927,7 @@ private:
             (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_6(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -45415,7 +45939,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ModeSelectClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::CurrentMode::TypeInfo>(this, OnSuccessCallback_7,
                                                                                                          OnFailureCallback_7);
@@ -45446,7 +45970,7 @@ private:
             (static_cast<TestModeSelectCluster *>(context))->OnFailureResponse_8(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -45564,13 +46088,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestGroupWriteAttribute_1()
     {
         const chip::GroupId groupId = 1234;
         chip::Controller::BasicClusterTest cluster;
-        cluster.AssociateWithGroup(mDevice, groupId);
+        cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
 
         chip::CharSpan locationArgument;
         locationArgument = chip::Span<const char>("usgarbage: not in length on purpose", 2);
@@ -45589,7 +46117,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(this, OnSuccessCallback_2,
                                                                                                  OnFailureCallback_2);
@@ -45608,7 +46136,7 @@ private:
     {
         const chip::GroupId groupId = 1234;
         chip::Controller::BasicClusterTest cluster;
-        cluster.AssociateWithGroup(mDevice, groupId);
+        cluster.AssociateWithGroup(mDevices[kIdentityAlpha], groupId);
 
         chip::CharSpan locationArgument;
         locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
@@ -45627,7 +46155,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::BasicClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(this, OnSuccessCallback_4,
                                                                                                  OnFailureCallback_4);
@@ -45736,13 +46264,17 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestReadsCurrentHeapFreeNonGlobalAttributeValueFromDut_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapFree::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1);
@@ -45764,7 +46296,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
             this, OnSuccessCallback_2, OnFailureCallback_2);
@@ -45786,7 +46318,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::SoftwareDiagnosticsClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
             this, OnSuccessCallback_3, OnFailureCallback_3);
@@ -45904,7 +46436,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 };
 
 class TestSubscribe_OnOff : public TestCommand
@@ -46041,7 +46577,11 @@ private:
     // Tests methods
     //
 
-    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0() { return WaitForCommissionee(); }
+    CHIP_ERROR TestWaitForTheCommissionedDeviceToBeRetrieved_0()
+    {
+        SetIdentity(kIdentityAlpha);
+        return WaitForCommissionee();
+    }
 
     CHIP_ERROR TestSetOnOffAttributeToFalse_1()
     {
@@ -46058,7 +46598,7 @@ private:
             (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_1(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -46070,7 +46610,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         ReturnErrorOnFailure(cluster.ReportAttributeOnOff(mOnSuccessCallback_2.Cancel()));
 
@@ -46091,7 +46631,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t minIntervalArgument;
         minIntervalArgument = 2U;
@@ -46126,7 +46666,7 @@ private:
             (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_4(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -46138,7 +46678,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReportAttributeOnOff(mOnSuccessCallback_5.Cancel());
     }
@@ -46170,7 +46710,7 @@ private:
             (static_cast<TestSubscribe_OnOff *>(context))->OnFailureResponse_6(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
@@ -46182,7 +46722,7 @@ private:
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReportAttributeOnOff(mOnSuccessCallback_7.Cancel());
     }
