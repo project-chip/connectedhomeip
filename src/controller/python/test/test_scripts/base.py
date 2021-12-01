@@ -107,6 +107,7 @@ class TestResult:
                 f"{self.operationName}: expected value {expected}, got {self.result.value['Events']}")
         return self
 
+
 class BaseTestHelper:
     def __init__(self, nodeid: int):
         self.devCtrl = ChipDeviceCtrl.ChipDeviceController(
