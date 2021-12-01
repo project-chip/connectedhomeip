@@ -38,7 +38,6 @@
 #define RADIO_CONFIG_2P4GHZ_OQPSK_SUPPORT 1
 #define RADIO_CONFIG_915MHZ_OQPSK_SUPPORT 0
 
-
 /// The PA(s) is(are) fed from the DCDC
 #if (BRD4166A)
 #define RADIO_CONFIG_PA_USES_DCDC 1
