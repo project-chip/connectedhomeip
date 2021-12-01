@@ -63,17 +63,17 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
         err = aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
             uint16_t clusterCount = 0;
 
-            for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+            for (uint16_t endpointIndex = 0; endpointIndex < emberAfEndpointCount(); endpointIndex++)
             {
-                clusterCount = emberAfClusterCount(index, true);
+                clusterCount = emberAfClusterCount(endpointIndex, true);
 
                 for (uint8_t clusterIndex = 0; clusterIndex < clusterCount; clusterIndex++)
                 {
-                    EmberAfCluster * cluster = emberAfGetNthCluster(index, clusterIndex, true);
+                    EmberAfCluster * cluster = emberAfGetNthCluster(endpointIndex, clusterIndex, true);
 
                     if (cluster->clusterId == PowerSource::Id)
                     {
-                        ReturnErrorOnFailure(encoder.Encode(index));
+                        ReturnErrorOnFailure(encoder.Encode(endpointIndex));
                         break; // There is only 1 server cluster per endpoint
                     }
                 }
