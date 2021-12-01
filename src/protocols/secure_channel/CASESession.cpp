@@ -1,3 +1,4 @@
+
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
@@ -91,6 +92,7 @@ static constexpr ExchangeContext::Timeout kSigma_Response_Timeout = System::Cloc
 
 CASESession::CASESession()
 {
+    SetSecureSessionType(Transport::SecureSession::Type::kCASE);
     mTrustedRootId = CertificateKeyId();
 }
 
@@ -174,8 +176,12 @@ CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
     serializable.mMessageDigestLen = LittleEndian::HostSwap16(static_cast<uint16_t>(sizeof(mMessageDigest)));
     serializable.mVersion          = kCASESessionVersion;
     serializable.mPeerNodeId       = LittleEndian::HostSwap64(peerNodeId);
-    serializable.mLocalSessionId   = LittleEndian::HostSwap16(GetLocalSessionId());
-    serializable.mPeerSessionId    = LittleEndian::HostSwap16(GetPeerSessionId());
+    for (size_t i = 0; i < serializable.mPeerCATs.size(); i++)
+    {
+        serializable.mPeerCATs.val[i] = LittleEndian::HostSwap32(GetPeerCATs().val[i]);
+    }
+    serializable.mLocalSessionId = LittleEndian::HostSwap16(GetLocalSessionId());
+    serializable.mPeerSessionId  = LittleEndian::HostSwap16(GetPeerSessionId());
 
     memcpy(serializable.mResumptionId, mResumptionId, sizeof(mResumptionId));
     memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
@@ -198,6 +204,12 @@ CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & seriali
     memcpy(mMessageDigest, serializable.mMessageDigest, length);
 
     SetPeerNodeId(LittleEndian::HostSwap64(serializable.mPeerNodeId));
+    Credentials::CATValues peerCATs;
+    for (size_t i = 0; i < serializable.mPeerCATs.size(); i++)
+    {
+        peerCATs.val[i] = LittleEndian::HostSwap32(serializable.mPeerCATs.val[i]);
+    }
+    SetPeerCATs(peerCATs);
     SetLocalSessionId(LittleEndian::HostSwap16(serializable.mLocalSessionId));
     SetPeerSessionId(LittleEndian::HostSwap16(serializable.mPeerSessionId));
 
@@ -863,6 +875,11 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     SuccessOrExit(err = decryptedDataTlvReader.Next(TLV::kTLVType_ByteString, TLV::ContextTag(kTag_TBEData_ResumptionID)));
     SuccessOrExit(err = decryptedDataTlvReader.GetBytes(mResumptionId, static_cast<uint32_t>(sizeof(mResumptionId))));
 
+    // Retrieve peer CASE Authenticated Tags (CATs) from peer's NOC.
+    Credentials::CATValues peerCATs;
+    SuccessOrExit(err = ExtractCATsFromOpCert(responderNOC, peerCATs));
+    SetPeerCATs(peerCATs);
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
@@ -1119,6 +1136,11 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     SuccessOrExit(err = remoteCredential.ECDSA_validate_msg_signature(msg_R3_Signed.Get(), msg_r3_signed_len, tbsData3Signature));
 
     SuccessOrExit(err = mCommissioningHash.Finish(messageDigestSpan));
+
+    // Retrieve peer CASE Authenticated Tags (CATs) from peer's NOC.
+    Credentials::CATValues peerCATs;
+    SuccessOrExit(err = ExtractCATsFromOpCert(initiatorNOC, peerCATs));
+    SetPeerCATs(peerCATs);
 
     SendStatusReport(mExchangeCtxt, kProtocolCodeSuccess);
 

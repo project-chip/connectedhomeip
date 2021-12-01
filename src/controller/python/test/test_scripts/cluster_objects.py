@@ -18,14 +18,23 @@
 
 import chip.clusters as Clusters
 import logging
-from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus
+from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure
 import chip.interaction_model
+import asyncio
 
 logger = logging.getLogger('PythonMatterControllerTEST')
 logger.setLevel(logging.INFO)
 
 NODE_ID = 1
 LIGHTING_ENDPOINT_ID = 1
+
+
+def _AssumeDecodeSuccess(values):
+    for k, v in values.items():
+        print(f"{k} = {v}")
+        if isinstance(v.Data, ValueDecodeFailure):
+            raise AssertionError(
+                f"Cannot decode value for path {k}, got error: '{str(v.Data.Reason)}', raw TLV data: '{v.Data.TLVValue}'")
 
 
 class ClusterObjectTests:
@@ -96,6 +105,28 @@ class ClusterObjectTests:
             raise AssertionError("Read returned unexpected result.")
 
     @classmethod
+    async def TestSubscribeAttribute(cls, devCtrl):
+        logger.info("Test Subscription")
+        sub = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], reportInterval=(3, 10))
+        updated = False
+
+        def subUpdate(path, value):
+            nonlocal updated
+            logger.info(
+                f"Received attribute update path {path}, New value {value}")
+            updated = True
+        sub.SetAttributeUpdateCallback(subUpdate)
+        req = Clusters.OnOff.Commands.On()
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+        await asyncio.sleep(5)
+        req = Clusters.OnOff.Commands.Off()
+        await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=1, payload=req)
+        await asyncio.sleep(5)
+
+        if not updated:
+            raise AssertionError("Did not receive updated attribute")
+
+    @classmethod
     async def TestReadRequests(cls, devCtrl):
         '''
         Tests out various permutations of endpoint, cluster and attribute ID (with wildcards) to validate
@@ -115,36 +146,37 @@ class ClusterObjectTests:
         if (len(res) != 3):
             raise AssertionError(
                 f"Got back {len(res)} data items instead of 3")
+        _AssumeDecodeSuccess(res)
 
         logger.info("2: Reading Ex Cx A*")
         req = [
             (0, Clusters.Basic),
         ]
-        await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
+        _AssumeDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
         logger.info("3: Reading E* Cx Ax")
         req = [
             Clusters.Descriptor.Attributes.ServerList
         ]
-        await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
+        _AssumeDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
         logger.info("4: Reading Ex C* A*")
         req = [
             0
         ]
-        await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
+        _AssumeDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
         logger.info("5: Reading E* Cx A*")
         req = [
             Clusters.Descriptor
         ]
-        await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
+        _AssumeDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
         logger.info("6: Reading E* C* A*")
         req = [
             '*'
         ]
-        await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
+        _AssumeDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
     @classmethod
     async def RunTest(cls, devCtrl):
@@ -155,6 +187,7 @@ class ClusterObjectTests:
             await cls.SendCommandWithResponse(devCtrl)
             await cls.SendWriteRequest(devCtrl)
             await cls.TestReadRequests(devCtrl)
+            await cls.TestSubscribeAttribute(devCtrl)
         except Exception as ex:
             logger.error(
                 f"Unexpected error occurred when running tests: {ex}")

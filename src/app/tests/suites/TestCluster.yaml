@@ -19,13 +19,17 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Send Test Command"
       command: "test"
 
     - label: "Send Test Not Handled Command"
       command: "testNotHandled"
       response:
-          error: 1
+          error: INVALID_COMMAND
 
     - label: "Send Test Specific Command"
       command: "testSpecific"
@@ -56,7 +60,7 @@ tests:
               - name: "arg2"
                 value: 6
       response:
-          error: 1
+          error: INVALID_COMMAND
 
     # Tests for Boolean attribute
 
@@ -624,7 +628,7 @@ tests:
       arguments:
           value: "TestValueLongerThan10"
       response:
-          error: true
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute OCTET_STRING"
       command: "readAttribute"
@@ -690,7 +694,7 @@ tests:
       arguments:
           value: "☉TestValueLongerThan10☉"
       response:
-          error: true
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
@@ -814,8 +818,17 @@ tests:
       command: "test"
       endpoint: 200
       response:
-          # No cluster on that endpoint, so expect an error.
-          error: 1
+          # No such endpoint, so expect an error.
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_ENDPOINT
+
+    - label: "Send Test Command to unsupported cluster"
+      command: "test"
+      endpoint: 0
+      response:
+          # No TestCluster on that, so expect an error.
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_CLUSTER
 
     # Tests for vendor id
 
@@ -903,7 +916,6 @@ tests:
 
     - label:
           "Send Test Command With Nested Struct Argument and arg1.c.b is true"
-      disabled: true
       command: "testNestedStructArgumentRequest"
       arguments:
           values:
@@ -930,7 +942,6 @@ tests:
                 value: true
 
     - label: "Send Test Command With Nested Struct Argument arg1.c.b is false"
-      disabled: true
       command: "testNestedStructArgumentRequest"
       arguments:
           values:
@@ -959,7 +970,6 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and all fields b
           of arg1.d are true"
-      disabled: true
       command: "testNestedStructListArgumentRequest"
       arguments:
           values:
@@ -1014,12 +1024,11 @@ tests:
       response:
           values:
               - name: "value"
-                value: false
+                value: true
 
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
           of arg1.d are false"
-      disabled: true
       command: "testNestedStructListArgumentRequest"
       arguments:
           values:
@@ -1227,7 +1236,6 @@ tests:
     - label:
           "Send Test Command With List of Nested Struct List Argument and all
           fields b of elements of arg1.d are true"
-      disabled: true
       command: "testListNestedStructListArgumentRequest"
       arguments:
           values:
@@ -1289,7 +1297,6 @@ tests:
     - label:
           "Send Test Command With Nested Struct List Argument and some fields b
           of elements of arg1.d are false"
-      disabled: true
       command: "testListNestedStructListArgumentRequest"
       arguments:
           values:
@@ -1471,7 +1478,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP8 unchanged Value"
       command: "readAttribute"
@@ -1511,7 +1518,7 @@ tests:
       arguments:
           value: 65535
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP16 unchanged Value"
       command: "readAttribute"
@@ -1551,7 +1558,7 @@ tests:
       arguments:
           value: 4294967295
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP32 unchanged Value"
       command: "readAttribute"
@@ -1591,7 +1598,7 @@ tests:
       arguments:
           value: "18446744073709551615"
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_BITMAP64 unchanged Value"
       command: "readAttribute"
@@ -1631,7 +1638,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT8U unchanged Value"
       command: "readAttribute"
@@ -1671,7 +1678,7 @@ tests:
       arguments:
           value: 65535
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT16U unchanged Value"
       command: "readAttribute"
@@ -1711,7 +1718,7 @@ tests:
       arguments:
           value: 4294967295
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT32U unchanged Value"
       command: "readAttribute"
@@ -1751,7 +1758,7 @@ tests:
       arguments:
           value: "18446744073709551615"
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT64U unchanged Value"
       command: "readAttribute"
@@ -1791,7 +1798,7 @@ tests:
       arguments:
           value: -128
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT8S unchanged Value"
       command: "readAttribute"
@@ -1831,7 +1838,7 @@ tests:
       arguments:
           value: -32768
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT16S unchanged Value"
       command: "readAttribute"
@@ -1871,7 +1878,7 @@ tests:
       arguments:
           value: -2147483648
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT32S unchanged Value"
       command: "readAttribute"
@@ -1914,7 +1921,7 @@ tests:
           # work around that.
           value: "-9223372036854775807LL - 1"
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_INT64S unchanged Value"
       command: "readAttribute"
@@ -1954,7 +1961,7 @@ tests:
       arguments:
           value: 255
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_ENUM8 unchanged Value"
       command: "readAttribute"
@@ -1994,7 +2001,7 @@ tests:
       arguments:
           value: 65535
       response:
-          error: 1
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute NULLABLE_ENUM16 unchanged Value"
       command: "readAttribute"
@@ -2075,7 +2082,6 @@ tests:
     - label: "Read attribute NULLABLE_CHAR_STRING"
       command: "readAttribute"
       attribute: "nullable_char_string"
-      disabled: true
       response:
           value: "☉T☉"
 
@@ -2103,9 +2109,18 @@ tests:
       response:
           value: ""
 
-    - label: "Read nonexistent attribute."
+    - label: "Read attribute from nonexistent endpoint."
       endpoint: 200
       command: "readAttribute"
       attribute: "list_int8u"
       response:
-          error: 0x86 # UNSUPPORTED_ATTRIBUTE
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_ENDPOINT
+
+    - label: "Read attribute from nonexistent cluster."
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_CLUSTER

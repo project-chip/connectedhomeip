@@ -11,6 +11,8 @@
 #include <platform/PlatformManager.h>
 
 {{#chip_server_global_responses}}
+{{! TODO: Add support for struct-typed attributes }}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 
 CHIP{{chipCallback.name}}AttributeCallback::CHIP{{chipCallback.name}}AttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -78,10 +80,13 @@ void CHIP{{chipCallback.name}}AttributeCallback::CallbackFn(void * context, {{ch
     env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
     {{/if}}
 }
+{{/unless}}
 {{/chip_server_global_responses}}
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
+{{! TODO: Add support for struct-typed attributes }}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 
 {{! NOTE: Some of our helpers rely on broken ZAP APIs that sniff for "isArray"
     when we are just trying to work with the type of an array element.  Fix
@@ -181,7 +186,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         {{/if}}
 
         {{#if isOptional}}
-        {{chipType}} {{asLowerCamelCase name}}Value;
+        {{zapTypeToDecodableClusterObjectType type forceNotOptional=true forceNotNullable=true ns=parent.parent.name}} {{asLowerCamelCase name}}Value;
         {{#if isNullable}}
         {{asLowerCamelCase name}}HasValue = entry.{{asLowerCamelCase name}}.HasValue();
         if ({{asLowerCamelCase name}}HasValue) {
@@ -201,7 +206,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
 
         {{#unless isOptional}}
         {{#unless isNullable}}
-        {{chipType}} {{asLowerCamelCase name}}Value = entry.{{asLowerCamelCase name}};
+        {{zapTypeToDecodableClusterObjectType type ns=parent.parent.name}} {{asLowerCamelCase name}}Value = entry.{{asLowerCamelCase name}};
         {{/unless}}
         {{/unless}}
 
@@ -265,13 +270,13 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         bool entryNull = false;
         {{#unless isStruct}}
         {{#if isNullable}}
-        {{chipType}} entryValue;
+        {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotList=true}} entryValue;
         entryNull = entry.IsNull();
         if (!entryNull) {
             entryValue = entry.Value();
         }
         {{else}}
-        {{chipType}} entryValue = entry;
+        {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotList=true}} entryValue = entry;
         {{/if}}
         {{/unless}}
 
@@ -341,6 +346,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
     }
   {{/if_in_global_responses}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 

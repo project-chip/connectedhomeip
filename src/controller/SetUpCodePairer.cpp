@@ -73,7 +73,8 @@ CHIP_ERROR SetUpCodePairer::Connect(RendezvousInformationFlag rendezvousInformat
 
     // We always want to search on network because any node that has already been commissioned will use on-network regardless of the
     // QR code flag.
-    if (CHIP_NO_ERROR == (err = StartDiscoverOverIP(discriminator, isShort)))
+    if (CHIP_NO_ERROR ==
+        (err = StartDiscoverOverIP(isShort ? static_cast<uint16_t>((discriminator >> 8) & 0x0F) : discriminator, isShort)))
     {
         isRunning = true;
     }

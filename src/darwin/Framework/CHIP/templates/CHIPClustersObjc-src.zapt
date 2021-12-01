@@ -77,6 +77,8 @@ using namespace chip::app::Clusters;
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{! TODO: Need to add support for struct-type attibutes here, and enum-typed ones }}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 {{#*inline "callbackName"}}
   {{~#if isList~}}
@@ -158,6 +160,7 @@ using namespace chip::app::Clusters;
 
 {{/unless}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 
 @end

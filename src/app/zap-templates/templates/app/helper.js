@@ -511,6 +511,87 @@ async function getResponseCommandName(responseRef, options)
   return queryCommand.selectCommandById(db, responseRef, pkgId).then(response => asUpperCamelCase(response.name));
 }
 
+// Allow-list of enums that we generate as enums, not enum classes.  The goal is
+// to drive this down to 0.
+function isWeaklyTypedEnum(label)
+{
+  return [
+    "ApplicationBasicStatus",
+    "ApplicationLauncherStatus",
+    "AttributeWritePermission",
+    "AudioOutputType",
+    "BarrierControlBarrierPosition",
+    "BarrierControlMovingState",
+    "BootReasonType",
+    "ChangeReasonEnum",
+    "ColorControlOptions",
+    "ColorLoopAction",
+    "ColorLoopDirection",
+    "ColorMode",
+    "ContentLaunchStatus",
+    "ContentLaunchStreamingType",
+    "DoorLockEventSource",
+    "DoorLockEventType",
+    "DoorLockOperatingMode",
+    "DoorLockOperationEventCode",
+    "DoorLockProgrammingEventCode",
+    "DoorLockState",
+    "DoorLockUserStatus",
+    "DoorLockUserType",
+    "DoorState",
+    "EnhancedColorMode",
+    "HardwareFaultType",
+    "HueDirection",
+    "HueMoveMode",
+    "HueStepMode",
+    "IasEnrollResponseCode",
+    "IasZoneState",
+    "IasZoneType",
+    "IdentifyEffectIdentifier",
+    "IdentifyEffectVariant",
+    "IdentifyIdentifyType",
+    "InterfaceType",
+    "KeypadInputCecKeyCode",
+    "KeypadInputStatus",
+    "KeypadLockout",
+    "LevelControlOptions",
+    "MediaInputType",
+    "MediaPlaybackState",
+    "MediaPlaybackStatus",
+    "MoveMode",
+    "NetworkCommissioningError",
+    "NetworkFaultType",
+    "NodeOperationalCertStatus",
+    "OTAAnnouncementReason",
+    "OTAApplyUpdateAction",
+    "OTADownloadProtocol",
+    "OTAQueryStatus",
+    "OnOffDelayedAllOffEffectVariant",
+    "OnOffDyingLightEffectVariant",
+    "OnOffEffectIdentifier",
+    "PHYRateType",
+    "RadioFaultType",
+    "RoutingRole",
+    "RegulatoryLocationType",
+    "SaturationMoveMode",
+    "SaturationStepMode",
+    "SecurityType",
+    "SetpointAdjustMode",
+    "SimpleEnum",
+    "StartUpOnOffValue",
+    "StatusCode",
+    "StepMode",
+    "TemperatureDisplayMode",
+    "ThermostatControlSequence",
+    "ThermostatRunningMode",
+    "ThermostatSystemMode",
+    "UpdateStateEnum",
+    "WcEndProductType",
+    "WcType",
+    "WiFiVersionType",
+  ].includes(label);
+}
+
 //
 // Module exports
 //
@@ -527,3 +608,4 @@ exports.zapTypeToEncodableClusterObjectType = zapTypeToEncodableClusterObjectTyp
 exports.zapTypeToDecodableClusterObjectType = zapTypeToDecodableClusterObjectType;
 exports.zapTypeToPythonClusterObjectType    = zapTypeToPythonClusterObjectType;
 exports.getResponseCommandName              = getResponseCommandName;
+exports.isWeaklyTypedEnum                   = isWeaklyTypedEnum;

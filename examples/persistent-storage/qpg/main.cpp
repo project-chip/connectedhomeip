@@ -30,10 +30,15 @@
 #include <platform/KeyValueStoreManager.h>
 
 #define APP_NAME "KVS-Test"
+#define APP_TASK_STACK_SIZE (3 * 1024)
 
 #define LOG_MODULE_ID 1
 
 static TaskHandle_t sTestTaskHandle;
+
+StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
+StaticTask_t appTaskStruct;
+
 void TestTask(void * pvParameter)
 {
     while (1)
@@ -62,7 +67,7 @@ int main(void)
     qvCHIP_Printf(LOG_MODULE_ID, "============================");
 
     // Run tests
-    xTaskCreate(TestTask, "Test", 2048, NULL, 1, &sTestTaskHandle);
+    xTaskCreateStatic(TestTask, APP_NAME, 2048, NULL, 1, appStack, &appTaskStruct);
     qvCHIP_Printf(LOG_MODULE_ID, "Starting FreeRTOS scheduler");
     vTaskStartScheduler();
 

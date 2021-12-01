@@ -32,10 +32,9 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "TCPEndPoint.h"
+#include <inet/TCPEndPoint.h>
 
 #include <inet/InetFaultInjection.h>
-#include <inet/InetLayer.h>
 #include <inet/arpa-inet-compatibility.h>
 
 #include <lib/support/CodeUtils.h>
@@ -88,8 +87,6 @@ namespace chip {
 namespace Inet {
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-
-BitMapObjectPool<TCPEndPointImplLwIP, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPointImplLwIP::sPool;
 
 namespace {
 
@@ -954,8 +951,7 @@ err_t TCPEndPointImplLwIP::LwIPHandleConnectComplete(void * arg, struct tcp_pcb 
 
     if (arg != NULL)
     {
-        TCPEndPointImplLwIP * ep     = static_cast<TCPEndPointImplLwIP *>(arg);
-        System::Layer * lSystemLayer = ep->Layer().SystemLayer();
+        TCPEndPointImplLwIP * ep = static_cast<TCPEndPointImplLwIP *>(arg);
 
         if (lwipErr == ERR_OK)
         {
@@ -966,7 +962,7 @@ err_t TCPEndPointImplLwIP::LwIPHandleConnectComplete(void * arg, struct tcp_pcb 
 
         // Post callback to HandleConnectComplete.
         ep->Retain();
-        CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, conErr = System::MapErrorLwIP(lwipErr)] {
+        CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, conErr = System::MapErrorLwIP(lwipErr)] {
             ep->HandleConnectComplete(conErr);
             ep->Release();
         });
@@ -993,7 +989,7 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
     {
         TCPEndPointImplLwIP * listenEP = static_cast<TCPEndPointImplLwIP *>(arg);
         TCPEndPointImplLwIP * conEP    = NULL;
-        System::Layer * lSystemLayer   = listenEP->Layer().SystemLayer();
+        System::Layer & lSystemLayer   = listenEP->GetSystemLayer();
 
         // Tell LwIP we've accepted the connection so it can decrement the listen PCB's pending_accepts counter.
         tcp_accepted(listenEP->mTCP);
@@ -1007,10 +1003,8 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
         //
         if (err == CHIP_NO_ERROR)
         {
-            InetLayer & lInetLayer = listenEP->Layer();
-
             TCPEndPoint * connectEndPoint = nullptr;
-            err                           = lInetLayer.NewTCPEndPoint(&connectEndPoint);
+            err                           = listenEP->GetEndPointManager().NewEndPoint(&connectEndPoint);
             conEP                         = static_cast<TCPEndPointImplLwIP *>(connectEndPoint);
         }
 
@@ -1042,7 +1036,7 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
             // Post a callback to the HandleConnectionReceived() function, passing it the new end point.
             listenEP->Retain();
             conEP->Retain();
-            err = lSystemLayer->ScheduleLambda([listenEP, conEP] {
+            err = lSystemLayer.ScheduleLambda([listenEP, conEP] {
                 listenEP->HandleIncomingConnection(conEP);
                 conEP->Release();
                 listenEP->Release();
@@ -1053,7 +1047,7 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
                 listenEP->Release();
                 err = CHIP_ERROR_CONNECTION_ABORTED;
                 conEP->Release(); // for the Retain() above
-                conEP->Release(); // for the Retain() in NewTCPEndPoint()
+                conEP->Release(); // for the implied Retain() on construction
             }
         }
 
@@ -1061,7 +1055,7 @@ err_t TCPEndPointImplLwIP::LwIPHandleIncomingConnection(void * arg, struct tcp_p
         else
         {
             listenEP->Retain();
-            err = lSystemLayer->ScheduleLambda([listenEP, err] {
+            err = lSystemLayer.ScheduleLambda([listenEP, err] {
                 listenEP->HandleError(err);
                 listenEP->Release();
             });
@@ -1091,12 +1085,11 @@ err_t TCPEndPointImplLwIP::LwIPHandleDataReceived(void * arg, struct tcp_pcb * t
 
     if (arg != NULL)
     {
-        TCPEndPointImplLwIP * ep     = static_cast<TCPEndPointImplLwIP *>(arg);
-        System::Layer * lSystemLayer = ep->Layer().SystemLayer();
+        TCPEndPointImplLwIP * ep = static_cast<TCPEndPointImplLwIP *>(arg);
 
         // Post callback to HandleDataReceived.
         ep->Retain();
-        CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, p] {
+        CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p] {
             ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
             ep->Release();
         });
@@ -1127,12 +1120,11 @@ err_t TCPEndPointImplLwIP::LwIPHandleDataSent(void * arg, struct tcp_pcb * tpcb,
 
     if (arg != NULL)
     {
-        TCPEndPointImplLwIP * ep     = static_cast<TCPEndPointImplLwIP *>(arg);
-        System::Layer * lSystemLayer = ep->Layer().SystemLayer();
+        TCPEndPointImplLwIP * ep = static_cast<TCPEndPointImplLwIP *>(arg);
 
         // Post callback to HandleDataReceived.
         ep->Retain();
-        CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, len] {
+        CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, len] {
             ep->HandleDataSent(len);
             ep->Release();
         });
@@ -1156,7 +1148,7 @@ void TCPEndPointImplLwIP::LwIPHandleError(void * arg, err_t lwipErr)
     if (arg != NULL)
     {
         TCPEndPointImplLwIP * ep         = static_cast<TCPEndPointImplLwIP *>(arg);
-        System::LayerLwIP * lSystemLayer = static_cast<System::LayerLwIP *>(ep->Layer().SystemLayer());
+        System::LayerLwIP & lSystemLayer = static_cast<System::LayerLwIP &>(ep->GetSystemLayer());
 
         // At this point LwIP has already freed the PCB.  Since the thread that owns the TCPEndPoint may
         // try to use the PCB before it receives the TCPError event posted below, we set the PCB to NULL
@@ -1168,7 +1160,7 @@ void TCPEndPointImplLwIP::LwIPHandleError(void * arg, err_t lwipErr)
 
         // Post callback to HandleError.
         ep->Retain();
-        CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, conErr = System::MapErrorLwIP(lwipErr)] {
+        CHIP_ERROR err = lSystemLayer.ScheduleLambda([ep, conErr = System::MapErrorLwIP(lwipErr)] {
             ep->HandleError(conErr);
             ep->Release();
         });
@@ -1180,8 +1172,6 @@ void TCPEndPointImplLwIP::LwIPHandleError(void * arg, err_t lwipErr)
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-
-BitMapObjectPool<TCPEndPointImplSockets, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPointImplSockets::sPool;
 
 CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr)
 {
@@ -1249,7 +1239,7 @@ CHIP_ERROR TCPEndPointImplSockets::BindImpl(IPAddressType addrType, const IPAddr
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = static_cast<System::LayerSocketsLoop *>(Layer().SystemLayer())->GetDispatchQueue();
+    dispatch_queue_t dispatchQueue = static_cast<System::LayerSocketsLoop &>(GetSystemLayer()).GetDispatchQueue();
     if (dispatchQueue != nullptr)
     {
         unsigned long fd = static_cast<unsigned long>(mSocket);
@@ -1287,11 +1277,11 @@ CHIP_ERROR TCPEndPointImplSockets::ListenImpl(uint16_t backlog)
     fcntl(mSocket, F_SETFL, flags | O_NONBLOCK);
 
     // Wait for ability to read on this endpoint.
-    CHIP_ERROR res = static_cast<System::LayerSockets *>(Layer().SystemLayer())
-                         ->SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this));
+    CHIP_ERROR res = static_cast<System::LayerSockets &>(GetSystemLayer())
+                         .SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this));
     if (res == CHIP_NO_ERROR)
     {
-        res = static_cast<System::LayerSockets *>(Layer().SystemLayer())->RequestCallbackOnPendingRead(mWatch);
+        res = static_cast<System::LayerSockets &>(GetSystemLayer()).RequestCallbackOnPendingRead(mWatch);
     }
 
     return res;
@@ -1398,8 +1388,8 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
         return res;
     }
 
-    ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())
-                             ->SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
+    ReturnErrorOnFailure(static_cast<System::LayerSockets &>(GetSystemLayer())
+                             .SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
 
     // Once Connecting or Connected, bump the reference count.  The corresponding Release() will happen in DoClose().
     Retain();
@@ -1408,7 +1398,7 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
     {
         mState = State::kConnected;
         // Wait for ability to read on this endpoint.
-        ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->RequestCallbackOnPendingRead(mWatch));
+        ReturnErrorOnFailure(static_cast<System::LayerSockets &>(GetSystemLayer()).RequestCallbackOnPendingRead(mWatch));
         if (OnConnectComplete != nullptr)
         {
             OnConnectComplete(this, CHIP_NO_ERROR);
@@ -1418,7 +1408,7 @@ CHIP_ERROR TCPEndPointImplSockets::ConnectImpl(const IPAddress & addr, uint16_t 
     {
         mState = State::kConnecting;
         // Wait for ability to write on this endpoint.
-        ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->RequestCallbackOnPendingWrite(mWatch));
+        ReturnErrorOnFailure(static_cast<System::LayerSockets &>(GetSystemLayer()).RequestCallbackOnPendingWrite(mWatch));
     }
 
     return CHIP_NO_ERROR;
@@ -1512,7 +1502,7 @@ CHIP_ERROR TCPEndPointImplSockets::SendQueuedImpl(bool queueWasEmpty)
     if (queueWasEmpty)
     {
         // Wait for ability to write on this endpoint.
-        return static_cast<System::LayerSockets *>(Layer().SystemLayer())->RequestCallbackOnPendingWrite(mWatch);
+        return static_cast<System::LayerSockets &>(GetSystemLayer()).RequestCallbackOnPendingWrite(mWatch);
     }
     return CHIP_NO_ERROR;
 }
@@ -1659,7 +1649,7 @@ CHIP_ERROR TCPEndPointImplSockets::DriveSendingImpl()
             if (mSendQueue.IsNull())
             {
                 // Do not wait for ability to write on this endpoint.
-                err = static_cast<System::LayerSockets *>(Layer().SystemLayer())->ClearCallbackOnPendingWrite(mWatch);
+                err = static_cast<System::LayerSockets &>(GetSystemLayer()).ClearCallbackOnPendingWrite(mWatch);
                 if (err != CHIP_NO_ERROR)
                 {
                     break;
@@ -1729,10 +1719,10 @@ CHIP_ERROR TCPEndPointImplSockets::DriveSendingImpl()
 void TCPEndPointImplSockets::HandleConnectCompleteImpl()
 {
     // Wait for ability to read or write on this endpoint.
-    CHIP_ERROR err = static_cast<System::LayerSockets *>(Layer().SystemLayer())->RequestCallbackOnPendingRead(mWatch);
+    CHIP_ERROR err = static_cast<System::LayerSockets &>(GetSystemLayer()).RequestCallbackOnPendingRead(mWatch);
     if (err == CHIP_NO_ERROR)
     {
-        err = static_cast<System::LayerSockets *>(Layer().SystemLayer())->RequestCallbackOnPendingWrite(mWatch);
+        err = static_cast<System::LayerSockets &>(GetSystemLayer()).RequestCallbackOnPendingWrite(mWatch);
     }
     if (err != CHIP_NO_ERROR)
     {
@@ -1765,7 +1755,7 @@ void TCPEndPointImplSockets::DoCloseImpl(CHIP_ERROR err, State oldState)
                 }
             }
 
-            static_cast<System::LayerSockets *>(Layer().SystemLayer())->StopWatchingSocket(&mWatch);
+            static_cast<System::LayerSockets &>(GetSystemLayer()).StopWatchingSocket(&mWatch);
             close(mSocket);
             mSocket = kInvalidSocketFd;
         }
@@ -1930,7 +1920,7 @@ CHIP_ERROR TCPEndPointImplSockets::GetSocket(IPAddressType addrType)
         {
             return CHIP_ERROR_POSIX(errno);
         }
-        ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->StartWatchingSocket(mSocket, &mWatch));
+        ReturnErrorOnFailure(static_cast<System::LayerSockets &>(GetSystemLayer()).StartWatchingSocket(mSocket, &mWatch));
         mAddrType = addrType;
 
         // If creating an IPv6 socket, tell the kernel that it will be IPv6 only.  This makes it
@@ -2138,7 +2128,7 @@ void TCPEndPointImplSockets::ReceiveData()
                 mState = State::kClosing;
             }
             // Do not wait for ability to read on this endpoint.
-            (void) static_cast<System::LayerSockets *>(Layer().SystemLayer())->ClearCallbackOnPendingRead(mWatch);
+            (void) static_cast<System::LayerSockets &>(GetSystemLayer()).ClearCallbackOnPendingRead(mWatch);
             // Call the app's OnPeerClose.
             if (OnPeerClose != nullptr)
             {
@@ -2231,10 +2221,8 @@ void TCPEndPointImplSockets::HandleIncomingConnection()
     // Attempt to allocate an end point object.
     if (err == CHIP_NO_ERROR)
     {
-        InetLayer & lInetLayer = Layer();
-
         TCPEndPoint * connectEndPoint = nullptr;
-        err                           = lInetLayer.NewTCPEndPoint(&connectEndPoint);
+        err                           = GetEndPointManager().NewEndPoint(&connectEndPoint);
         conEP                         = static_cast<TCPEndPointImplSockets *>(connectEndPoint);
     }
 
@@ -2243,7 +2231,7 @@ void TCPEndPointImplSockets::HandleIncomingConnection()
     {
         // Put the new end point into the Connected state.
         conEP->mSocket = conSocket;
-        err            = static_cast<System::LayerSockets *>(Layer().SystemLayer())->StartWatchingSocket(conSocket, &conEP->mWatch);
+        err            = static_cast<System::LayerSockets &>(GetSystemLayer()).StartWatchingSocket(conSocket, &conEP->mWatch);
         if (err == CHIP_NO_ERROR)
         {
             conEP->mState = State::kConnected;
@@ -2255,11 +2243,11 @@ void TCPEndPointImplSockets::HandleIncomingConnection()
             conEP->Retain();
 
             // Wait for ability to read on this endpoint.
-            auto conEPLayer = static_cast<System::LayerSockets *>(conEP->Layer().SystemLayer());
-            err             = conEPLayer->SetCallback(conEP->mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(conEP));
+            auto & conEPLayer = static_cast<System::LayerSockets &>(conEP->GetSystemLayer());
+            err               = conEPLayer.SetCallback(conEP->mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(conEP));
             if (err == CHIP_NO_ERROR)
             {
-                err = conEPLayer->RequestCallbackOnPendingRead(conEP->mWatch);
+                err = conEPLayer.RequestCallbackOnPendingRead(conEP->mWatch);
             }
             if (err == CHIP_NO_ERROR)
             {
@@ -2513,8 +2501,7 @@ void TCPEndPoint::Free()
 void TCPEndPoint::SetIdleTimeout(uint32_t timeoutMS)
 {
     uint32_t newIdleTimeout = (timeoutMS + (INET_TCP_IDLE_CHECK_INTERVAL - 1)) / INET_TCP_IDLE_CHECK_INTERVAL;
-    InetLayer & lInetLayer  = Layer();
-    bool isIdleTimerRunning = lInetLayer.IsIdleTimerRunning();
+    bool isIdleTimerRunning = IsIdleTimerRunning(GetEndPointManager());
 
     if (newIdleTimeout > UINT16_MAX)
     {
@@ -2524,10 +2511,48 @@ void TCPEndPoint::SetIdleTimeout(uint32_t timeoutMS)
 
     if (!isIdleTimerRunning && mIdleTimeout)
     {
-        Layer().SystemLayer()->StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL),
-                                          InetLayer::HandleTCPInactivityTimer, &lInetLayer);
+        GetSystemLayer().StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL), HandleIdleTimer,
+                                    &GetEndPointManager());
     }
 }
+
+// static
+void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAppState)
+{
+    auto & endPointManager = *reinterpret_cast<EndPointManager<TCPEndPoint> *>(aAppState);
+    bool lTimerRequired    = IsIdleTimerRunning(endPointManager);
+
+    endPointManager.ForEachEndPoint([](TCPEndPoint * lEndPoint) -> bool {
+        if (!lEndPoint->IsConnected())
+            return true;
+        if (lEndPoint->mIdleTimeout == 0)
+            return true;
+
+        if (lEndPoint->mRemainingIdleTime == 0)
+        {
+            lEndPoint->DoClose(INET_ERROR_IDLE_TIMEOUT, false);
+        }
+        else
+        {
+            --lEndPoint->mRemainingIdleTime;
+        }
+
+        return true;
+    });
+
+    if (lTimerRequired)
+    {
+        aSystemLayer->StartTimer(System::Clock::Milliseconds32(INET_TCP_IDLE_CHECK_INTERVAL), HandleIdleTimer, &endPointManager);
+    }
+}
+
+// static
+bool TCPEndPoint::IsIdleTimerRunning(EndPointManager<TCPEndPoint> & endPointManager)
+{
+    // See if there are any TCP connections with the idle timer check in use.
+    return !endPointManager.ForEachEndPoint([](TCPEndPoint * lEndPoint) { return (lEndPoint->mIdleTimeout == 0); });
+}
+
 #endif // INET_TCP_IDLE_CHECK_INTERVAL > 0
 
 CHIP_ERROR TCPEndPoint::SetUserTimeout(uint32_t userTimeoutMillis)
@@ -2553,13 +2578,13 @@ void TCPEndPoint::StartConnectTimerIfSet()
 {
     if (mConnectTimeoutMsecs > 0)
     {
-        Layer().SystemLayer()->StartTimer(System::Clock::Milliseconds32(mConnectTimeoutMsecs), TCPConnectTimeoutHandler, this);
+        GetSystemLayer().StartTimer(System::Clock::Milliseconds32(mConnectTimeoutMsecs), TCPConnectTimeoutHandler, this);
     }
 }
 
 void TCPEndPoint::StopConnectTimer()
 {
-    Layer().SystemLayer()->CancelTimer(TCPConnectTimeoutHandler, this);
+    GetSystemLayer().CancelTimer(TCPConnectTimeoutHandler, this);
 }
 
 void TCPEndPoint::TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState)
@@ -2721,7 +2746,7 @@ CHIP_ERROR TCPEndPoint::DoClose(CHIP_ERROR err, bool suppressCallback)
 
 void TCPEndPoint::ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut)
 {
-    Layer().SystemLayer()->StartTimer(System::Clock::Milliseconds32(aTimeOut), TCPUserTimeoutHandler, this);
+    GetSystemLayer().StartTimer(System::Clock::Milliseconds32(aTimeOut), TCPUserTimeoutHandler, this);
 }
 
 #if INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS
@@ -2763,7 +2788,7 @@ void TCPEndPoint::StartTCPUserTimeoutTimer()
 
 void TCPEndPoint::StopTCPUserTimeoutTimer()
 {
-    Layer().SystemLayer()->CancelTimer(TCPUserTimeoutHandler, this);
+    GetSystemLayer().CancelTimer(TCPUserTimeoutHandler, this);
     mUserTimeoutTimerRunning = false;
 }
 

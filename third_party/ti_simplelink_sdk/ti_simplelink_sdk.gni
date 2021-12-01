@@ -87,6 +87,8 @@ template("ti_sysconfig") {
       "gcc",
       "--board",
       "/ti/boards/" + ti_simplelink_board,
+      "--rtos",
+      "freertos",
     ]
 
     foreach(source, sources) {
@@ -316,6 +318,8 @@ template("ti_simplelink_sdk") {
       "${ti_simplelink_sdk_root}/source/ti/",
       "${ti_simplelink_sdk_root}/source/ti/dmm/",
       "${ti_simplelink_sdk_root}/source/ti/dmm/apps/",
+      "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/thread/",
+      "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/thread/source/activity/",
       "${ti_simplelink_sdk_root}/source/ti/common/nv",
 
       "${ti_simplelink_sdk_root}/source/ti/devices/cc13x2x7_cc26x2x7",
@@ -374,7 +378,7 @@ template("ti_simplelink_sdk") {
 
     if (ti_simplelink_device_family == "cc13x2x7_26x2x7") {
       libs += [
-        "${ti_simplelink_sdk_root}/source/ti/dmm/library/freertos/gcc/bin/dmmlib_cc26x2.a",
+        "${ti_simplelink_sdk_root}/source/ti/dmm/lib/gcc/m4f/libdmmlib_freertos.a",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/libraries/cc26x2r1/OneLib.a",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/libraries/cc26x2r1/StackWrapper.a",
         "${ti_simplelink_sdk_root}/source/ti/ble5stack/libraries/cc26x2r1/ble_r2.symbols",
@@ -391,8 +395,10 @@ template("ti_simplelink_sdk") {
 
   source_set("${sdk_target_name}_dmm") {
     defines = []
-    include_dirs = []
-
+    include_dirs = [
+      "${chip_root}/third_party/openthread/repo/include/",
+      "${chip_root}/src/",
+    ]
     configs -=
         [ "${build_root}/config/compiler:warnings_default" ]  # removed for
                                                               # -Wshadow
@@ -409,7 +415,6 @@ template("ti_simplelink_sdk") {
       "${ti_simplelink_sdk_root}/source/ti/ble5stack/common/cc26xx/rcosc/rcosc_calibration.c",
       "${ti_simplelink_sdk_root}/source/ti/ble5stack/host/gatt_uuid.c",
       "${ti_simplelink_sdk_root}/source/ti/ble5stack/host/gattservapp_util.c",
-      "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/app/ble_user_config.c",
       "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/app/icall_api_lite.c",
       "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/src/icall_cc2650.c",
       "${ti_simplelink_sdk_root}/source/ti/ble5stack/icall/src/icall_user_config.c",
@@ -418,11 +423,12 @@ template("ti_simplelink_sdk") {
       "${ti_simplelink_sdk_root}/source/ti/ble5stack/rom/agama_r1/rom_init.c",
       "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/ble_remote_display/stack/osal_icall_ble.c",
       "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/icall_FreeRTOS.c",
-      "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/itm/itm.c",
       "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/freertos/util.c",
+      "${ti_simplelink_sdk_root}/source/ti/dmm/apps/common/thread/source/activity/dmm_thread_activity.c",
       "${ti_simplelink_sdk_root}/source/ti/dmm/dmm_priority_ble_thread.c",
 
       # Move this into the SDK
+      "${chip_root}/src/platform/cc13x2_26x2/ble_user_config.c",
       "${chip_root}/src/platform/cc13x2_26x2/chipOBleProfile.c",
     ]
 

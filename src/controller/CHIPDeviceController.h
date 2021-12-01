@@ -188,6 +188,7 @@ typedef void (*OnOpenCommissioningWindow)(void * context, NodeId deviceId, CHIP_
  *   relevant information when the application tries to communicate with the device
  */
 class DLL_EXPORT DeviceController : public SessionReleaseDelegate,
+                                    public SessionRecoveryDelegate,
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
                                     public AbstractDnssdDiscoveryController,
 #endif
@@ -378,6 +379,9 @@ protected:
 
     //////////// SessionReleaseDelegate Implementation ///////////////
     void OnSessionReleased(SessionHandle session) override;
+
+    //////////// SessionRecoveryDelegate Implementation ///////////////
+    void OnFirstMessageDeliveryFailed(const SessionHandle & session) override;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     //////////// ResolverDelegate Implementation ///////////////
@@ -591,7 +595,7 @@ private:
     DevicePairingDelegate * mPairingDelegate;
 
     CommissioneeDeviceProxy * mDeviceBeingCommissioned = nullptr;
-    DeviceProxy * mDeviceOperational                   = nullptr;
+    OperationalDeviceProxy * mDeviceOperational        = nullptr;
 
     Credentials::CertificateType mCertificateTypeBeingRequested = Credentials::CertificateType::kUnknown;
 
@@ -688,7 +692,7 @@ private:
     /* Callback called when adding root cert to device results in failure */
     static void OnRootCertFailureResponse(void * context, uint8_t status);
 
-    static void OnDeviceConnectedFn(void * context, DeviceProxy * device);
+    static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 
     static void OnDeviceNOCChainGeneration(void * context, CHIP_ERROR status, const ByteSpan & noc, const ByteSpan & icac,

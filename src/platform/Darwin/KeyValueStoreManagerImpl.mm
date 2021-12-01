@@ -184,7 +184,7 @@ namespace DeviceLayer {
             }
 
             // create Managed Object context
-            gContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+            gContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
             [gContext setPersistentStoreCoordinator:coordinator];
 
             return CHIP_NO_ERROR;

@@ -30,6 +30,8 @@
 #include <type_traits>
 #include <zap-generated/tests/CHIPClustersTest.h>
 
+constexpr uint16_t kTimeoutInSeconds = 30;
+
 class TestCommand : public CHIPCommand
 {
 public:
@@ -39,28 +41,36 @@ public:
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("delayInMs", 0, UINT64_MAX, &mDelayInMs);
+        AddArgument("timeout", 0, UINT16_MAX, &mTimeout);
         AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndpointId);
         AddArgument("PICS", &mPICSFilePath);
     }
 
     /////////// CHIPCommand Interface /////////
     CHIP_ERROR RunCommand() override;
-    chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(30); }
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mTimeout.HasValue() ? mTimeout.Value() : kTimeoutInSeconds);
+    }
 
     virtual void NextTest() = 0;
 
     /////////// GlobalCommands Interface /////////
     CHIP_ERROR Wait(chip::System::Clock::Timeout ms);
     CHIP_ERROR WaitForMs(uint16_t ms) { return Wait(chip::System::Clock::Milliseconds32(ms)); }
+    CHIP_ERROR WaitForCommissionee();
     CHIP_ERROR Log(const char * message);
+    CHIP_ERROR UserPrompt(const char * message);
 
 protected:
     ChipDevice * mDevice;
     chip::NodeId mNodeId;
 
-    static void OnDeviceConnectedFn(void * context, chip::DeviceProxy * device);
+    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
     static void OnWaitForMsFn(chip::System::Layer * systemLayer, void * context);
+
+    CHIP_ERROR ContinueOnChipMainThread() { return WaitForMs(0); };
 
     void Exit(std::string message);
     void ThrowFailureResponse();
@@ -261,5 +271,6 @@ protected:
     chip::Optional<uint64_t> mDelayInMs;
     chip::Optional<char *> mPICSFilePath;
     chip::Optional<chip::EndpointId> mEndpointId;
+    chip::Optional<uint16_t> mTimeout;
     chip::Optional<std::map<std::string, bool>> PICS;
 };

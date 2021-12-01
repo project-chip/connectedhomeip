@@ -19,7 +19,7 @@
 #pragma once
 
 #include "CommissionedListCommand.h"
-#include "ConfigureFabricCommand.h"
+#include "OpenCommissioningWindowCommand.h"
 #include "PairingCommand.h"
 
 #include <app/server/Dnssd.h>
@@ -144,14 +144,6 @@ public:
     Ethernet() : PairingCommand("ethernet", PairingMode::Ethernet, PairingNetworkType::Ethernet) {}
 };
 
-class OpenCommissioningWindow : public PairingCommand
-{
-public:
-    OpenCommissioningWindow() :
-        PairingCommand("open-commissioning-window", PairingMode::OpenCommissioningWindow, PairingNetworkType::None)
-    {}
-};
-
 class StartUdcServerCommand : public CHIPCommand
 {
 public:
@@ -186,11 +178,10 @@ void registerCommandsPairing(Commands & commands)
         make_unique<PairOnNetworkDeviceType>(),
         make_unique<PairOnNetworkDeviceType>(),
         make_unique<PairOnNetworkInstanceName>(),
-        make_unique<OpenCommissioningWindow>(),
         // TODO - enable CommissionedListCommand once DNS Cache is implemented
         //        make_unique<CommissionedListCommand>(),
-        make_unique<ConfigureFabricCommand>(),
         make_unique<StartUdcServerCommand>(),
+        make_unique<OpenCommissioningWindowCommand>(),
     };
 
     commands.Register(clusterName, clusterCommands);

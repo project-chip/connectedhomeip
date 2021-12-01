@@ -25,27 +25,25 @@ public:
 
     // Cluster Commands
     {{/first}}
-    CHIP_ERROR {{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}});
+    CHIP_ERROR {{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}, {{chipType}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}});
     {{/chip_cluster_commands}}
 
     // Cluster Attributes
     {{#chip_server_cluster_attributes}}
+    {{#unless (isStrEqual chipCallback.name "Unsupported")}}
     CHIP_ERROR ReadAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    {{/chip_server_cluster_attributes}}
-    {{#chip_server_cluster_attributes}}
     {{#if isWritableAttribute}}
     {{#unless isList}}
     CHIP_ERROR WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value);
     {{/unless}}
     {{/if}}
-    {{/chip_server_cluster_attributes}}
-    {{#chip_server_cluster_attributes}}
     {{#if isReportableAttribute}}
     {{#unless isList}}
     CHIP_ERROR SubscribeAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onReportCallback);
     {{/unless}}
     {{/if}}
+    {{/unless}}
     {{/chip_server_cluster_attributes}}
     {{#chip_cluster_commands}}
     {{#first}}

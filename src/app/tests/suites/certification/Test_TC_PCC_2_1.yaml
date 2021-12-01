@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "read the mandatory attribute: MaxPressure"
       disabled: true
       command: "readAttribute"
@@ -112,7 +116,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the mandatory attribute: MaxSpeed"
       disabled: true
@@ -121,7 +125,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the mandatory attribute: MaxFlow"
       disabled: true
@@ -130,7 +134,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the mandatory attribute: EffectiveOperationMode"
       disabled: true
@@ -139,7 +143,7 @@ tests:
       arguments:
           value: desc
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the mandatory attribute: EffectiveControlMode"
       disabled: true
@@ -148,7 +152,7 @@ tests:
       arguments:
           value: desc
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the mandatory attribute: Capacity"
       disabled: true
@@ -157,7 +161,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "read the mandatory attribute: MaxPressure"
       disabled: true
@@ -479,7 +483,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the optional attribute: MaxConstPressure"
       disabled: true
@@ -488,7 +492,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the optional attribute: MinCompPressure"
       disabled: true
@@ -497,7 +501,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the optional attribute: MaxCompPressure"
       disabled: true
@@ -506,7 +510,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the optional attribute: MinConstSpeed"
       disabled: true
@@ -515,7 +519,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the optional attribute: MaxConstSpeed"
       disabled: true
@@ -524,7 +528,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the optional attribute: MinConstFlow"
       disabled: true
@@ -533,7 +537,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the optional attribute: MaxConstFlow"
       disabled: true
@@ -542,7 +546,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the optional attribute: MinConstTemp"
       disabled: true
@@ -551,7 +555,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the optional attribute: MaxConstTemp"
       disabled: true
@@ -560,7 +564,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the optional attribute: PumpStatus"
       disabled: true
@@ -569,7 +573,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the optional attribute: Speed"
       disabled: true
@@ -578,7 +582,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the optional attribute: LifetimeRunningHours"
       disabled: true
@@ -586,8 +590,6 @@ tests:
       attribute: "LifetimeRunningHours"
       arguments:
           value: 0
-      response:
-          error: 0
 
     - label: "write to the optional attribute: Power"
       disabled: true
@@ -596,7 +598,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "write to the optional attribute: LifetimeEnergyConsumed"
       disabled: true
@@ -604,8 +606,6 @@ tests:
       attribute: "LifetimeEnergyConsumed"
       arguments:
           value: 0
-      response:
-          error: 0
 
     - label: "read the optional attribute: MinConstPressure"
       disabled: true

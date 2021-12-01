@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -44,10 +44,13 @@ public:
     /**
      * Allocates a new secure session out of the internal resource pool.
      *
+     * @param sessionType secure session type
      * @param localSessionId represents the encryption key ID assigned by local node
      * @param peerNodeId represents peer Node's ID
+     * @param peerCATs represents peer CASE Authenticated Tags
      * @param peerSessionId represents the encryption key ID assigned by peer node
      * @param fabric represents fabric ID for the session
+     * @param config represents the reliable message protocol configuration
      *
      * @note the newly created state will have an 'active' time set based on the current time source.
      *
@@ -55,10 +58,11 @@ public:
      *          has been reached (with CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    SecureSession * CreateNewSecureSession(uint16_t localSessionId, NodeId peerNodeId, uint16_t peerSessionId, FabricIndex fabric,
+    SecureSession * CreateNewSecureSession(SecureSession::Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId,
+                                           Credentials::CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
                                            const ReliableMessageProtocolConfig & config)
     {
-        return mEntries.CreateObject(localSessionId, peerNodeId, peerSessionId, fabric, config,
+        return mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, peerCATs, peerSessionId, fabric, config,
                                      mTimeSource.GetMonotonicTimestamp());
     }
 

@@ -269,6 +269,13 @@ void DeviceController::OnSessionReleased(SessionHandle session)
     mCASESessionManager->OnSessionReleased(session);
 }
 
+void DeviceController::OnFirstMessageDeliveryFailed(const SessionHandle & session)
+{
+    VerifyOrReturn(mState == State::Initialized,
+                   ChipLogError(Controller, "OnFirstMessageDeliveryFailed was called in incorrect state"));
+    UpdateDevice(session.GetPeerNodeId());
+}
+
 CHIP_ERROR DeviceController::InitializePairedDeviceList()
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
@@ -543,6 +550,7 @@ CHIP_ERROR DeviceCommissioner::Init(CommissionerInitParams params)
 
     params.systemState->SessionMgr()->RegisterCreationDelegate(*this);
     params.systemState->SessionMgr()->RegisterReleaseDelegate(*this);
+    params.systemState->SessionMgr()->RegisterRecoveryDelegate(*this);
 
     uint16_t nextKeyID = 0;
     uint16_t size      = sizeof(nextKeyID);
@@ -676,12 +684,6 @@ CHIP_ERROR DeviceCommissioner::GetDeviceBeingCommissioned(NodeId deviceId, Commi
 CHIP_ERROR DeviceCommissioner::GetConnectedDevice(NodeId deviceId, Callback::Callback<OnDeviceConnected> * onConnection,
                                                   Callback::Callback<OnDeviceConnectionFailure> * onFailure)
 {
-    if (mDeviceBeingCommissioned != nullptr && mDeviceBeingCommissioned->GetDeviceId() == deviceId &&
-        mDeviceBeingCommissioned->IsSecureConnected())
-    {
-        onConnection->mCall(onConnection->mContext, mDeviceBeingCommissioned);
-        return CHIP_NO_ERROR;
-    }
     return DeviceController::GetConnectedDevice(deviceId, onConnection, onFailure);
 }
 
@@ -1554,7 +1556,7 @@ void DeviceCommissioner::OnNodeIdResolutionFailed(const chip::PeerId & peer, CHI
 
 #endif
 
-void DeviceCommissioner::OnDeviceConnectedFn(void * context, DeviceProxy * device)
+void DeviceCommissioner::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
 {
     DeviceCommissioner * commissioner = static_cast<DeviceCommissioner *>(context);
     VerifyOrReturn(commissioner != nullptr, ChipLogProgress(Controller, "Device connected callback with null context. Ignoring"));

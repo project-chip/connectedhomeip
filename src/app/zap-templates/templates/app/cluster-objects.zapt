@@ -23,18 +23,22 @@ namespace Clusters {
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
 {{#zcl_enums}}
+{{#if (isWeaklyTypedEnum label)}}
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+{{/if}}
 // Enum for {{label}}
 enum class {{asType label}} : {{asUnderlyingZclType type}} {
 {{#zcl_enum_items}}
 k{{asUpperCamelCase label}} = {{asHex value 2}},
 {{/zcl_enum_items}}
 };
+{{#if (isWeaklyTypedEnum label)}}
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using {{asType label}} = EmberAf{{asType label}};
 #endif
+{{/if}}
 {{/zcl_enums}}
 
 {{#zcl_bitmaps}}
@@ -134,6 +138,8 @@ public:
     {{else}}
       DataModel::NullObjectType;
     {{/if}}
+
+    static constexpr bool MustUseTimedInvoke() { return {{mustUseTimedInvoke}}; }
 };
 
 struct DecodableType {
@@ -172,6 +178,7 @@ namespace {{asUpperCamelCase label}} {
 
         static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
         static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
+        static constexpr bool MustUseTimedWrite() { return {{mustUseTimedWrite}}; }
     };
 } // namespace {{asUpperCamelCase label}}
 {{#last}}

@@ -4,6 +4,11 @@ aarch
 abcdef
 abfb
 ABI
+AES
+DMM
+ECDH
+ECDSA
+SHA
 ABIs
 ables
 accessor
@@ -51,6 +56,7 @@ armeabi
 ARMmbed
 armv
 asdk
+AssertionError
 ASYNC
 att
 attId
@@ -387,6 +393,7 @@ FOTA
 FreeRTOS
 FreeRTOSConfig
 fsl
+fstab
 fsync
 fullclean
 gcloud
@@ -542,6 +549,7 @@ lightin
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
+LinuxOTARequestorDriver
 LocalConfigDisabled
 localhost
 localstatedir
@@ -694,9 +702,13 @@ optionsMask
 optionsOverride
 orgs
 OTA
+OTADownloader
+OTAImageProcessorDriver
 OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
+OTARequestor
+OTARequestorDriver
 OTARequesterImpl
 OTARequestorSerialPort
 OTBR
@@ -768,6 +780,7 @@ PyFunction
 pylint
 PyObject
 PyRun
+pytest
 QEMU
 Qorvo
 QPG
@@ -781,6 +794,7 @@ qvCHIP
 RADVD
 raspberryPi
 RasPi
+rAv
 RCP
 ReadConfigValue
 readelf
@@ -851,7 +865,10 @@ SERIALDEVICE
 SerialNumber
 ServiceId
 SetDns
+SetImageProcessorDelegate
+SetOtaRequestorDriver
 SetpointRaiseLower
+SetRequestorInstance
 SetUpPINCode
 SetupQRCode
 sexualized
@@ -866,6 +883,7 @@ SLAAC
 SLTB
 SLWSTK
 SmartThings
+smoketest
 SMP
 socat
 socio

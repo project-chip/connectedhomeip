@@ -22,6 +22,7 @@
 #include "FabricTable.h"
 
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/BufferWriter.h>
 #include <lib/support/CHIPMem.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/SafeInt.h>

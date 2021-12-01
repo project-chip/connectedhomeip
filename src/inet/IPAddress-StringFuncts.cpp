@@ -30,7 +30,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include <inet/InetLayer.h>
+#include <inet/IPAddress.h>
 #include <lib/support/CodeUtils.h>
 
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP

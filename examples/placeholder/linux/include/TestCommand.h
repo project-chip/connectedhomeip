@@ -51,6 +51,13 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    CHIP_ERROR UserPrompt(const char * message)
+    {
+        ChipLogProgress(chipTool, "USER_PROMPT: %s", message);
+        NextTest();
+        return CHIP_NO_ERROR;
+    }
+
     CHIP_ERROR WaitForCommissioning()
     {
         isRunning = false;

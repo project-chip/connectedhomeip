@@ -57,6 +57,7 @@ template("gen_flashing_script") {
                          [
                            "flashing_script_generator",
                            "flashing_script_name",
+                           "flashing_script_inputs",
                            "flashing_options",
                            "deps",
                            "data_deps",
@@ -72,6 +73,7 @@ template("gen_flashing_script") {
     ]
 
     script = flashing_script_generator
+    inputs = flashing_script_inputs
   }
 }
 
@@ -131,6 +133,7 @@ template("flashable_executable") {
 
     gen_flashing_script("$target_name.flashing") {
       flashing_script_generator = invoker.flashing_script_generator
+      flashing_script_inputs = invoker.flashing_script_inputs
       flashing_script_name = "$root_out_dir/${invoker.flashing_script_name}"
       if (defined(invoker.flashing_options)) {
         flashing_options = invoker.flashing_options

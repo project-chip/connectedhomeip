@@ -46,7 +46,7 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
         Close();
     }
 
-    err = params.GetInetLayer()->NewUDPEndPoint(&mUDPEndPoint);
+    err = params.GetEndPointManager()->NewEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
 
     ChipLogDetail(Inet, "UDP::Init bind&listen port=%d", params.GetListenPort());

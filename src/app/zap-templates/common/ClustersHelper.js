@@ -28,7 +28,6 @@ const zclQuery          = require(zapPath + 'db/query-zcl.js')
 const { Deferred }    = require('./Deferred.js');
 const ListHelper      = require('./ListHelper.js');
 const StringHelper    = require('./StringHelper.js');
-const StructHelper    = require('./StructHelper.js');
 const ChipTypesHelper = require('./ChipTypesHelper.js');
 
 //
@@ -161,8 +160,14 @@ function asChipCallback(item)
     return { name : 'CharString', type : 'const chip::CharSpan' };
   }
 
-  if (ListHelper.isList(item.type)) {
+  if (item.isList) {
     return { name : 'List', type : null };
+  }
+
+  if (item.isEnum) {
+    // Unsupported or now, until we figure out what to do for callbacks for
+    // strongly typed enums.
+    return { name : 'Unsupported', type : null };
   }
 
   const basicType = ChipTypesHelper.asBasicType(item.chipType);
@@ -179,6 +184,7 @@ function asChipCallback(item)
     return { name : 'Int' + basicType.replace(/[^0-9]/g, '') + 'u', type : basicType };
   case 'bool':
     return { name : 'Boolean', type : 'bool' };
+  // TODO: Add float and double
   default:
     return { name : 'Unsupported', type : null };
   }

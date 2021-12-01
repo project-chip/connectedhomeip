@@ -692,8 +692,8 @@ static CHIP_ERROR PrepareTransportForSend()
     {
         if (sTCPIPEndPoint == nullptr)
         {
-            lStatus = gInet.NewTCPEndPoint(&sTCPIPEndPoint);
-            INET_FAIL_ERROR(lStatus, "InetLayer::NewTCPEndPoint failed");
+            lStatus = gInet.GetTCPEndPointManager()->NewEndPoint(&sTCPIPEndPoint);
+            INET_FAIL_ERROR(lStatus, "InetLayer::GetTCPEndPointManager()->NewEndPoint failed");
 
             sTCPIPEndPoint->OnConnectComplete  = HandleTCPConnectionComplete;
             sTCPIPEndPoint->OnConnectionClosed = HandleTCPConnectionClosed;
@@ -820,8 +820,8 @@ static void StartTest()
 
     if (gOptFlags & kOptFlagUseUDPIP)
     {
-        lStatus = gInet.NewUDPEndPoint(&sUDPIPEndPoint);
-        INET_FAIL_ERROR(lStatus, "InetLayer::NewUDPEndPoint failed");
+        lStatus = gInet.GetUDPEndPointManager()->NewEndPoint(&sUDPIPEndPoint);
+        INET_FAIL_ERROR(lStatus, "InetLayer::GetUDPEndPointManager()->NewEndPoint failed");
 
         if (gInterfaceId.IsPresent())
         {
@@ -845,8 +845,8 @@ static void StartTest()
             const uint16_t lConnectionBacklogMax = 1;
             const bool lReuseAddress             = true;
 
-            lStatus = gInet.NewTCPEndPoint(&sTCPIPListenEndPoint);
-            INET_FAIL_ERROR(lStatus, "InetLayer::NewTCPEndPoint failed");
+            lStatus = gInet.GetTCPEndPointManager()->NewEndPoint(&sTCPIPListenEndPoint);
+            INET_FAIL_ERROR(lStatus, "InetLayer::GetTCPEndPointManager()->NewEndPoint failed");
 
             sTCPIPListenEndPoint->OnConnectionReceived = HandleTCPConnectionReceived;
             sTCPIPListenEndPoint->OnAcceptError        = HandleTCPAcceptError;

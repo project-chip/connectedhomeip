@@ -26,7 +26,7 @@ concurrency:
 jobs:
     infineon:
         name: Infineon examples building
-        timeout-minutes: 30
+        timeout-minutes: 60
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -72,7 +72,14 @@ jobs:
                 .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     p6 default all-clusters-app \
                     out/infineon-p6-all-clusters/chip-p6-clusters-example.out
-
+            - name: Build lighting-app example
+              timeout-minutes: 10
+              run: |
+                scripts/run_in_build_env.sh \
+                  "scripts/build/build_examples.py --no-log-timestamps --target 'infineon-p6-light' build"
+                .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    p6 default light-app \
+                    out/infineon-p6-light/chip-p6-lighting-example.out
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}

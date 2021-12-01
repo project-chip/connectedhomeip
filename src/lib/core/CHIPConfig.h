@@ -2703,5 +2703,14 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
+ * @def CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
+ *
+ * @brief Defines the max number of SessionRecoveryDelegate
+ */
+#ifndef CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
+#define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 3
+#endif
+
+/**
  * @}
  */

@@ -5,6 +5,8 @@
 #import "CHIPStructsObjc.h"
 #import "CHIPCommandPayloadsObjc.h"
 
+#include <lib/support/TypeTraits.h>
+
 {{#>CHIPCallbackBridge partial-type="Status"                         }}DefaultSuccessCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge partial-type="CommandStatus"                  }}CommandSuccessCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge type="Octet_String" isNullable=false ns="chip"}}OctetStringAttributeCallback{{/CHIPCallbackBridge}}

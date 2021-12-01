@@ -242,7 +242,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
         info->addressType   = addressType;
         info->interfaceId   = interfaceId;
 
-        ReturnErrorOnFailure(inetLayer->NewUDPEndPoint(&info->listen_udp));
+        ReturnErrorOnFailure(inetLayer->GetUDPEndPointManager()->NewEndPoint(&info->listen_udp));
 
         ReturnErrorOnFailure(info->listen_udp->Bind(addressType, chip::Inet::IPAddress::Any, port, interfaceId));
 
@@ -269,7 +269,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
         //   - helps in not having conflicts on port 5353, will receive unicast replies directly
         //   - has a *DRAWBACK* of unicast queries being considered LEGACY by mdns since they do
         //     not originate from 5353 and the answers will include a query section.
-        ReturnErrorOnFailure(inetLayer->NewUDPEndPoint(&info->unicast_query_udp));
+        ReturnErrorOnFailure(inetLayer->GetUDPEndPointManager()->NewEndPoint(&info->unicast_query_udp));
         ReturnErrorOnFailure(info->unicast_query_udp->Bind(addressType, chip::Inet::IPAddress::Any, 0, interfaceId));
         ReturnErrorOnFailure(info->unicast_query_udp->Listen(OnUdpPacketReceived, nullptr /*OnReceiveError*/, this));
 #endif

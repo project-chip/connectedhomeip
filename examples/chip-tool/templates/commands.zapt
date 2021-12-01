@@ -429,6 +429,8 @@ private:
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{! TODO: Various types (floats, structs) not supported here. }}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 /*
  * Attribute {{asUpperCamelCase name}}
  */
@@ -475,7 +477,11 @@ public:
     Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("write")
     {
         AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
-        {{#if (isString type)}}
+        {{#if isArray}}
+        // {{label}} Array parsing is not supported yet
+        {{else if isStruct}}
+        // {{label}} Struct parsing is not supported yet
+        {{else if (isString type)}}
         AddArgument("attr-value", &mValue);
         {{else}}
         AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue);
@@ -558,6 +564,7 @@ private:
 
 {{/unless}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 
@@ -574,6 +581,8 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
         {{/chip_cluster_commands}}
         {{#chip_server_cluster_attributes}}
+        {{! TODO: Various types (floats, structs) not supported here. }}
+        {{#unless (isStrEqual chipCallback.name "Unsupported")}}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{#if isWritableAttribute}}
         {{! No list support for writing yet.  Need to figure out how to
@@ -587,6 +596,7 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         make_unique<Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{/unless}}
         {{/if}}
+        {{/unless}}
         {{/chip_server_cluster_attributes}}
     };
 
