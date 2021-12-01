@@ -17,9 +17,8 @@
  *    limitations under the License.
  */
 
+#include <lib/support/CodeUtils.h>
 #include <lib/support/Pool.h>
-
-#include <nlassert.h>
 
 namespace chip {
 
@@ -68,20 +67,20 @@ void StaticAllocatorBitmap::Deallocate(void * element)
     size_t offset = index - (word * kBitChunkSize);
 
     // ensure the element is in the pool
-    assert(index < Capacity());
+    VerifyOrDie(index < Capacity());
 
     auto value = mUsage[word].fetch_and(~(kBit1 << offset));
-    nlASSERT((value & (kBit1 << offset)) != 0); // assert fail when free an unused slot
+    VerifyOrDie((value & (kBit1 << offset)) != 0); // assert fail when free an unused slot
     DecreaseUsage();
 }
 
 size_t StaticAllocatorBitmap::IndexOf(void * element)
 {
     std::ptrdiff_t diff = static_cast<uint8_t *>(element) - static_cast<uint8_t *>(mElements);
-    assert(diff >= 0);
-    assert(static_cast<size_t>(diff) % mElementSize == 0);
+    VerifyOrDie(diff >= 0);
+    VerifyOrDie(static_cast<size_t>(diff) % mElementSize == 0);
     auto index = static_cast<size_t>(diff) / mElementSize;
-    assert(index < Capacity());
+    VerifyOrDie(index < Capacity());
     return index;
 }
 

@@ -100,7 +100,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
     mContextPool.ForEachActiveObject([](auto * ec) {
         // There should be no active object in the pool
-        assert(false);
+        VerifyOrDie(false);
         return true;
     });
 
