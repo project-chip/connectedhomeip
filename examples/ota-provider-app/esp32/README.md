@@ -7,6 +7,18 @@ A prototype application that demonstrates OTA provider capabilities.
 -   This example supports ESP32 and ESP32C3. For details please check
     [here](https://github.com/shubhamdp/connectedhomeip/tree/shubhamdp-patch-1/examples/all-clusters-app/esp32#supported-devices).
 
+## Copy the OTA image
+
+-   Copy the binary file which you are going to send to the OTA Requestor to
+    `./spiffs` path and make sure the `OTA_IMAGE_NAME` is the same as the name
+    of the image file you placed in `./spiffs`.
+
+```
+idf.py menuconfig
+```
+
+-   Edit the `OTA_IMAGE_NAME` through `Demo`->`OTA image file name`.
+
 ## Building the Example Application
 
 -   If you are building for the first time please check
@@ -18,27 +30,6 @@ A prototype application that demonstrates OTA provider capabilities.
 
 ```
 idf.py -p <OTAProviderSerialPort> flash
-```
-
-## Flashing the hello-world.bin OTA image
-
-Flash hello-world OTA image on OTA Provider's "ota_data" flash partition. Please
-find hello-world.bin
-[here](http://shubhamdp.github.io/esp_ota/esp32/hello-world-flash-in-ota-provider-partition.bin).
-This OTA image is built for ESP32, it will not work on other devices. This is
-the OTA upgrade image and will be sent to OTA requestor.
-
-```
-esptool.py -p <OTAProviderSerialPort> write_flash 0x206400 hello-world-flash-in-ota-provider-partition.bin
-```
-
-NOTE: This is a modified binary which contains the size of OTA image at first 4
-bytes.
-
-Run the idf monitor
-
-```
-idf.py -p <OTAProviderSerialPort> monitor
 ```
 
 ## Commissioning over BLE using chip-tool

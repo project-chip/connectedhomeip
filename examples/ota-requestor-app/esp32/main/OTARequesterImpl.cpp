@@ -38,6 +38,7 @@ using chip::FabricIndex;
 using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
+using chip::OperationalDeviceProxy;
 using chip::Optional;
 using chip::PeerId;
 using chip::Server;
