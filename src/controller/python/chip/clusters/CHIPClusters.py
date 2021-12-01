@@ -1867,6 +1867,16 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000002: {
+                "attributeName": "RegulatoryConfig",
+                "attributeId": 0x00000002,
+                "type": "int",
+            },
+            0x00000003: {
+                "attributeName": "LocationCapability",
+                "attributeId": 0x00000003,
+                "type": "int",
+            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -3775,6 +3785,12 @@ class ChipClusters:
                 "args": {
                 },
             },
+            0x00000012: {
+                "commandId": 0x00000012,
+                "commandName": "TimedInvokeRequest",
+                "args": {
+                },
+            },
         },
         "attributes": {
             0x00000000: {
@@ -4068,6 +4084,12 @@ class ChipClusters:
                 "attributeId": 0x00000029,
                 "type": "int",
                 "reportable": True,
+                "writable": True,
+            },
+            0x00000030: {
+                "attributeName": "TimedWriteBoolean",
+                "attributeId": 0x00000030,
+                "type": "bool",
                 "writable": True,
             },
             0x000000FF: {

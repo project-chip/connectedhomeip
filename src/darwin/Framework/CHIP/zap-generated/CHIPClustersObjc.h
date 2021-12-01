@@ -1651,6 +1651,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeBasicCommissioningInfoListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeRegulatoryConfigWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeLocationCapabilityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -3295,6 +3301,7 @@ NS_ASSUME_NONNULL_BEGIN
                           completionHandler:(void (^)(CHIPTestClusterClusterBooleanResponseParams * _Nullable data,
                                                 NSError * _Nullable error))completionHandler;
 - (void)testUnknownCommandWithCompletionHandler:(StatusCompletion)completionHandler;
+- (void)timedInvokeRequestWithCompletionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeBooleanWithCompletionHandler:(void (^)(
                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -3576,6 +3583,10 @@ NS_ASSUME_NONNULL_BEGIN
                                                responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeRangeRestrictedInt16sWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeTimedWriteBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                NSError * _Nullable error))completionHandler;
+- (void)writeAttributeTimedWriteBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeUnsupportedWithCompletionHandler:(void (^)(
                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;

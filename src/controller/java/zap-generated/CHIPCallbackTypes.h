@@ -437,6 +437,10 @@ typedef void (*CHIPGeneralCommissioningClusterBreadcrumbAttributeCallbackType)(
     void *, chip::app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralCommissioningClusterBasicCommissioningInfoListAttributeCallbackType)(
     void *, const chip::app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfoList::TypeInfo::DecodableType &);
+typedef void (*CHIPGeneralCommissioningClusterRegulatoryConfigAttributeCallbackType)(
+    void *, chip::app::Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::TypeInfo::DecodableArgType);
+typedef void (*CHIPGeneralCommissioningClusterLocationCapabilityAttributeCallbackType)(
+    void *, chip::app::Clusters::GeneralCommissioning::Attributes::LocationCapability::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralCommissioningClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::GeneralCommissioning::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -960,6 +964,8 @@ typedef void (*CHIPTestClusterClusterRangeRestrictedInt16uAttributeCallbackType)
     void *, chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterRangeRestrictedInt16sAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterTimedWriteBooleanAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterUnsupportedAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableBooleanAttributeCallbackType)(

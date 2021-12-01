@@ -5432,6 +5432,14 @@ public class ChipClusters {
       readBasicCommissioningInfoListAttribute(chipClusterPtr, callback);
     }
 
+    public void readRegulatoryConfigAttribute(IntegerAttributeCallback callback) {
+      readRegulatoryConfigAttribute(chipClusterPtr, callback);
+    }
+
+    public void readLocationCapabilityAttribute(IntegerAttributeCallback callback) {
+      readLocationCapabilityAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -5459,6 +5467,12 @@ public class ChipClusters {
 
     private native void readBasicCommissioningInfoListAttribute(
         long chipClusterPtr, BasicCommissioningInfoListAttributeCallback callback);
+
+    private native void readRegulatoryConfigAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readLocationCapabilityAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -10827,6 +10841,10 @@ public class ChipClusters {
       testUnknownCommand(chipClusterPtr, callback);
     }
 
+    public void timedInvokeRequest(DefaultClusterCallback callback) {
+      timedInvokeRequest(chipClusterPtr, callback);
+    }
+
     private native void simpleStructEchoRequest(
         long chipClusterPtr,
         SimpleStructResponseCallback Callback,
@@ -10906,6 +10924,8 @@ public class ChipClusters {
         Double h);
 
     private native void testUnknownCommand(long chipClusterPtr, DefaultClusterCallback Callback);
+
+    private native void timedInvokeRequest(long chipClusterPtr, DefaultClusterCallback Callback);
 
     public interface BooleanResponseCallback {
       void onSuccess(Boolean value);
@@ -11812,6 +11832,14 @@ public class ChipClusters {
 
     public void reportRangeRestrictedInt16sAttribute(IntegerAttributeCallback callback) {
       reportRangeRestrictedInt16sAttribute(chipClusterPtr, callback);
+    }
+
+    public void readTimedWriteBooleanAttribute(BooleanAttributeCallback callback) {
+      readTimedWriteBooleanAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeTimedWriteBooleanAttribute(DefaultClusterCallback callback, Boolean value) {
+      writeTimedWriteBooleanAttribute(chipClusterPtr, callback, value);
     }
 
     public void readUnsupportedAttribute(BooleanAttributeCallback callback) {
@@ -12757,6 +12785,12 @@ public class ChipClusters {
 
     private native void reportRangeRestrictedInt16sAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readTimedWriteBooleanAttribute(
+        long chipClusterPtr, BooleanAttributeCallback callback);
+
+    private native void writeTimedWriteBooleanAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, Boolean value);
 
     private native void readUnsupportedAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);

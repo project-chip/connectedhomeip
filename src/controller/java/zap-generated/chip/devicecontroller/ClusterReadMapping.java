@@ -2170,6 +2170,33 @@ public class ClusterReadMapping {
     readGeneralCommissioningInteractionInfo.put(
         "readBasicCommissioningInfoListAttribute",
         readGeneralCommissioningBasicCommissioningInfoListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readGeneralCommissioningRegulatoryConfigCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readGeneralCommissioningRegulatoryConfigAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GeneralCommissioningCluster) cluster)
+                  .readRegulatoryConfigAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readGeneralCommissioningRegulatoryConfigCommandParams);
+    readGeneralCommissioningInteractionInfo.put(
+        "readRegulatoryConfigAttribute",
+        readGeneralCommissioningRegulatoryConfigAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readGeneralCommissioningLocationCapabilityCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readGeneralCommissioningLocationCapabilityAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GeneralCommissioningCluster) cluster)
+                  .readLocationCapabilityAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readGeneralCommissioningLocationCapabilityCommandParams);
+    readGeneralCommissioningInteractionInfo.put(
+        "readLocationCapabilityAttribute",
+        readGeneralCommissioningLocationCapabilityAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readGeneralCommissioningClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readGeneralCommissioningClusterRevisionAttributeInteractionInfo =
@@ -4760,6 +4787,18 @@ public class ClusterReadMapping {
     readTestClusterInteractionInfo.put(
         "readRangeRestrictedInt16sAttribute",
         readTestClusterRangeRestrictedInt16sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterTimedWriteBooleanCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterTimedWriteBooleanAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readTimedWriteBooleanAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readTestClusterTimedWriteBooleanCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readTimedWriteBooleanAttribute", readTestClusterTimedWriteBooleanAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterUnsupportedCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterUnsupportedAttributeInteractionInfo =

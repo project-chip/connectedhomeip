@@ -20,6 +20,18 @@
 
 CHIP_ERROR TestCommand::RunCommand()
 {
+    if (mPICSFilePath.HasValue())
+    {
+        PICS.SetValue(PICSBooleanReader::Read(mPICSFilePath.Value()));
+    }
+
+    NextTest();
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TestCommand::WaitForCommissionee()
+{
     return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
 }
 
@@ -28,12 +40,8 @@ void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDevicePro
     ChipLogProgress(chipTool, " **** Test Setup: Device Connected\n");
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
-    command->mDevice = device;
+    command->mDevices[command->GetIdentity()] = device;
 
-    if (command->mPICSFilePath.HasValue())
-    {
-        command->PICS.SetValue(PICSBooleanReader::Read(command->mPICSFilePath.Value()));
-    }
     command->NextTest();
 }
 

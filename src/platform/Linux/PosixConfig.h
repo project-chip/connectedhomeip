@@ -80,6 +80,8 @@ public:
     static const Key kCounterKey_UpTime;
     static const Key kCounterKey_TotalOperationalHours;
     static const Key kCounterKey_BootReason;
+    static const Key kCounterKey_RegulatoryConfig;
+    static const Key kCounterKey_LocationCapability;
 
     static const char kGroupKeyNamePrefix[];
 

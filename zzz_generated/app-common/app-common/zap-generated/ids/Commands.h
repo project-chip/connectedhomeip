@@ -1688,6 +1688,10 @@ namespace SimpleStructEchoRequest {
 static constexpr CommandId Id = 0x00000011;
 } // namespace SimpleStructEchoRequest
 
+namespace TimedInvokeRequest {
+static constexpr CommandId Id = 0x00000012;
+} // namespace TimedInvokeRequest
+
 } // namespace Commands
 } // namespace TestCluster
 

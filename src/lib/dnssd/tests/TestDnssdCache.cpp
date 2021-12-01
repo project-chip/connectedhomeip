@@ -39,7 +39,7 @@ using namespace chip;
 using namespace chip::Dnssd;
 
 namespace {
-class FakeClock : public System::Clock::ClockBase
+class FakeClock : public System::Clock::ClockImpl
 {
 public:
     System::Clock::Microseconds64 GetMonotonicMicroseconds64() override { return mTime; }

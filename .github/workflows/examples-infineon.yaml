@@ -88,3 +88,4 @@ jobs:
                   path: |
                     out/infineon-p6-lock/p6-default-lock-app-sizes.json
                     out/infineon-p6-all-clusters/p6-default-all-clusters-app-sizes.json
+                    out/infineon-p6-light/p6-default-light-app-sizes.json

@@ -548,6 +548,13 @@ bool emberAfTestClusterClusterSimpleStructEchoRequestCallback(CommandHandler * c
     return true;
 }
 
+bool emberAfTestClusterClusterTimedInvokeRequestCallback(CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+                                                         const Commands::TimedInvokeRequest::DecodableType & commandData)
+{
+    commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+    return true;
+}
+
 // -----------------------------------------------------------------------------
 // Plugin initialization
 

@@ -27,6 +27,7 @@
 
 #include <lib/support/Pool.h>
 #include <lib/support/UnitTestRegistration.h>
+#include <system/SystemConfig.h>
 
 #include <nlunit-test.h>
 

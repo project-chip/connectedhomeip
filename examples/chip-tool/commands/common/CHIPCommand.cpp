@@ -29,13 +29,9 @@
 
 using DeviceControllerFactory = chip::Controller::DeviceControllerFactory;
 
-constexpr const char kCommissionerAlpha[] = "alpha";
-constexpr const char kCommissionerBeta[]  = "beta";
-constexpr const char kCommissionerGamma[] = "gamma";
-
-constexpr chip::FabricId kCommissionerAlphaFabricId = 1;
-constexpr chip::FabricId kCommissionerBetaFabricId  = 2;
-constexpr chip::FabricId kCommissionerGammaFabricId = 3;
+constexpr chip::FabricId kIdentityAlphaFabricId = 1;
+constexpr chip::FabricId kIdentityBetaFabricId  = 2;
+constexpr chip::FabricId kIdentityGammaFabricId = 3;
 
 CHIP_ERROR CHIPCommand::Run()
 {
@@ -52,7 +48,7 @@ CHIP_ERROR CHIPCommand::Run()
     factoryInitParams.listenPort    = static_cast<uint16_t>(mDefaultStorage.GetListenPort() + CurrentCommissionerIndex());
     ReturnLogErrorOnFailure(DeviceControllerFactory::GetInstance().Init(factoryInitParams));
 
-    ReturnLogErrorOnFailure(InitializeCommissioner(CurrentCommissionerName(), CurrentCommissionerIndex()));
+    ReturnLogErrorOnFailure(InitializeCommissioner(GetIdentity(), CurrentCommissionerIndex()));
 
     chip::DeviceLayer::PlatformMgr().ScheduleWork(RunQueuedCommand, reinterpret_cast<intptr_t>(this));
     ReturnLogErrorOnFailure(StartWaiting(GetWaitDuration()));
@@ -64,18 +60,31 @@ CHIP_ERROR CHIPCommand::Run()
     // since the CHIP thread and event queue have been stopped, preventing any thread
     // races.
     //
-    ReturnLogErrorOnFailure(ShutdownCommissioner(CurrentCommissionerName()));
+    ReturnLogErrorOnFailure(ShutdownCommissioner(GetIdentity()));
 
     return CHIP_NO_ERROR;
 }
 
-std::string CHIPCommand::CurrentCommissionerName()
+void CHIPCommand::SetIdentity(const char * identity)
 {
-    std::string name = mCommissionerName.HasValue() ? mCommissionerName.Value() : kCommissionerAlpha;
-    if (name.compare(kCommissionerAlpha) != 0 && name.compare(kCommissionerBeta) != 0 && name.compare(kCommissionerGamma) != 0)
+    std::string name = std::string(identity);
+    if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0)
     {
-        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kCommissionerAlpha,
-                     kCommissionerBeta, kCommissionerGamma);
+        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
+                     kIdentityBeta, kIdentityGamma);
+        chipDie();
+    }
+
+    mCommissionerName.SetValue(const_cast<char *>(identity));
+}
+
+std::string CHIPCommand::GetIdentity()
+{
+    std::string name = mCommissionerName.HasValue() ? mCommissionerName.Value() : kIdentityAlpha;
+    if (name.compare(kIdentityAlpha) != 0 && name.compare(kIdentityBeta) != 0 && name.compare(kIdentityGamma) != 0)
+    {
+        ChipLogError(chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(), kIdentityAlpha,
+                     kIdentityBeta, kIdentityGamma);
         chipDie();
     }
 
@@ -86,28 +95,28 @@ uint16_t CHIPCommand::CurrentCommissionerIndex()
 {
     uint16_t index = 0;
 
-    std::string name = CurrentCommissionerName();
-    if (name.compare(kCommissionerAlpha) == 0)
+    std::string name = GetIdentity();
+    if (name.compare(kIdentityAlpha) == 0)
     {
-        index = kCommissionerAlphaFabricId;
+        index = kIdentityAlphaFabricId;
     }
-    else if (name.compare(kCommissionerBeta) == 0)
+    else if (name.compare(kIdentityBeta) == 0)
     {
-        index = kCommissionerBetaFabricId;
+        index = kIdentityBetaFabricId;
     }
-    else if (name.compare(kCommissionerGamma) == 0)
+    else if (name.compare(kIdentityGamma) == 0)
     {
-        index = kCommissionerGammaFabricId;
+        index = kIdentityGammaFabricId;
     }
 
     VerifyOrDieWithMsg(index != 0, chipTool, "Unknown commissioner name: %s. Supported names are [%s, %s, %s]", name.c_str(),
-                       kCommissionerAlpha, kCommissionerBeta, kCommissionerGamma);
+                       kIdentityAlpha, kIdentityBeta, kIdentityGamma);
     return index;
 }
 
 chip::Controller::DeviceCommissioner & CHIPCommand::CurrentCommissioner()
 {
-    auto item = mCommissioners.find(CurrentCommissionerName());
+    auto item = mCommissioners.find(GetIdentity());
     return *item->second.get();
 }
 
