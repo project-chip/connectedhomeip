@@ -32,7 +32,6 @@
 
 using chip::ByteSpan;
 using chip::CharSpan;
-using chip::OperationalDeviceProxy;
 using chip::EndpointId;
 using chip::FabricIndex;
 using chip::NodeId;
