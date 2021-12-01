@@ -1106,6 +1106,7 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
 
     // Test empty report
     delegate.mpReadHandler->mHoldReport = false;
+    delegate.mpReadHandler->mHoldSync   = false;
     delegate.mGotReport                 = false;
     delegate.mNumAttributeResponse      = 0;
     engine->GetReportingEngine().Run();
