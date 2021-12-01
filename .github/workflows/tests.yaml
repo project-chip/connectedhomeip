@@ -158,7 +158,6 @@ jobs:
                      "./scripts/build/build_examples.py \
                         --target darwin-x64-chip-tool-${BUILD_VARIANT}${CHIP_TOOL_VARIANT} \
                         --target darwin-x64-all-clusters-${BUILD_VARIANT} \
-                        --target darwin-x64-tv-app-${BUILD_VARIANT} \
                         build \
                         --copy-artifacts-to objdir-clone \
                      "
@@ -168,10 +167,10 @@ jobs:
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
                      --chip-tool ./out/darwin-x64-chip-tool-${BUILD_VARIANT}${CHIP_TOOL_VARIANT}/chip-tool \
+                     --target-skip-glob 'TV*' \
                      run \
                      --iterations 2 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
-                     --tv-app ./out/darwin-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v2
