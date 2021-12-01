@@ -62,24 +62,47 @@ CHIP_ERROR CommandSender::AllocateBuffer()
 
 CHIP_ERROR CommandSender::SendCommandRequest(const SessionHandle & session, System::Clock::Timeout timeout)
 {
-    VerifyOrReturnError(mState == State::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    bool isGroupCommand = false;
+    VerifyOrExit(mState == State::AddedCommand, err = CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(Finalize(mPendingInvokeData));
+    err = Finalize(mPendingInvokeData);
+    SuccessOrExit(err);
 
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
-    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
+    isGroupCommand = mpExchangeCtx->IsGroupExchangeContext();
     mpExchangeCtx->SetResponseTimeout(timeout);
 
     if (mTimedInvokeTimeoutMs.HasValue())
     {
-        ReturnErrorOnFailure(TimedRequest::Send(mpExchangeCtx, mTimedInvokeTimeoutMs.Value()));
+        err = TimedRequest::Send(mpExchangeCtx, mTimedInvokeTimeoutMs.Value());
+        SuccessOrExit(err);
         MoveToState(State::AwaitingTimedStatus);
-        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        err = SendInvokeRequest();
+    }
+    SuccessOrExit(err);
+
+exit:
+    if (mpCallback != nullptr)
+    {
+        if (err != CHIP_NO_ERROR)
+        {
+            mpCallback->OnError(this, StatusIB(Protocols::InteractionModel::Status::Failure), err);
+        }
     }
 
-    return SendInvokeRequest();
+    if (isGroupCommand)
+    {
+        Close();
+    }
+
+    return err;
 }
 
 CHIP_ERROR CommandSender::SendInvokeRequest()

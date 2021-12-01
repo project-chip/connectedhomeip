@@ -233,7 +233,13 @@ class {{filename}}: public TestCommand
             (static_cast<{{filename}} *>(context))->{{>failureResponse}}(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::{{#if isGroupCommand}}InvokeGroupCommand{{else}}InvokeCommand{{/if}}({{>device}}, this, success, failure,
+        {{#if isGroupCommand}}
+        auto done = [](void * context) {
+            (static_cast<{{filename}} *>(context))->OnDoneResponse_{{index}}();
+        };
+        {{/if}}
+
+        ReturnErrorOnFailure(chip::Controller::{{#if isGroupCommand}}InvokeGroupCommand{{else}}InvokeCommand{{/if}}({{>device}}, this, success, failure, {{#if isGroupCommand}}done,{{/if}}
           {{#if isGroupCommand}}groupId{{else}}endpoint{{/if}},
           request
           {{> maybeTimedInteractionTimeout }}
