@@ -55,7 +55,7 @@ void OnQueryImageFailure(void * context, EmberAfStatus status);
 void OnApplyUpdateResponse(void * context, const ApplyUpdateResponse::DecodableType & response);
 void OnApplyUpdateRequestFailure(void * context, EmberAfStatus status);
 
-void OnConnected(void * context, chip::DeviceProxy * deviceProxy);
+void OnConnected(void * context, chip::OperationalDeviceProxy * deviceProxy);
 void OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error);
 
 void OnBlockReceived(void * context, const chip::bdx::TransferSession::BlockData & blockdata);
@@ -174,7 +174,7 @@ void OnApplyUpdateRequestFailure(void * context, EmberAfStatus status)
     ChipLogDetail(SoftwareUpdate, "ApplyUpdateRequest failure response %" PRIu8, status);
 }
 
-void OnConnected(void * context, chip::DeviceProxy * deviceProxy)
+void OnConnected(void * context, chip::OperationalDeviceProxy * deviceProxy)
 {
     ChipLogDetail(SoftwareUpdate, "Callback OnConnected");
     uint8_t * command = reinterpret_cast<uint8_t *>(context);
