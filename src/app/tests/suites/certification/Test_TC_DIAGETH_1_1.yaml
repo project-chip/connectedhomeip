@@ -26,8 +26,8 @@ tests:
       command: "readAttribute"
       attribute: "PHYRate"
       response:
-        constraints:
-          type: enum8
+          constraints:
+              type: enum8
 
     - label: "read the attribute: FullDuplex"
       optional: true
@@ -35,58 +35,53 @@ tests:
       command: "readAttribute"
       attribute: "FullDuplex"
       response:
-        constraints:
-          type: bool
+          constraints:
+              type: bool
 
-    - label:
-          "read the attribute: PacketRxCount"
+    - label: "read the attribute: PacketRxCount"
       optional: true
       pics: PICS_A_PACKETRXCOUNT
       command: "readAttribute"
       attribute: "PacketRxCount"
       response:
-        constraints:
-            type: uint64
+          constraints:
+              type: uint64
 
-    - label:
-          "read the attribute: PacketTxCount"
+    - label: "read the attribute: PacketTxCount"
       optional: true
       pics: PICS_A_PACKETTXCOUNT
       command: "readAttribute"
       attribute: "PacketTxCount"
       response:
-        constraints:
-            type: uint64
+          constraints:
+              type: uint64
 
-    - label:
-          "read the attribute: TxErrCount"
+    - label: "read the attribute: TxErrCount"
       optional: true
       pics: PICS_A_TXERRCOUNT
       command: "readAttribute"
       attribute: "TxErrCount"
       response:
-        constraints:
-            type: uint64
+          constraints:
+              type: uint64
 
-    - label:
-          "read the attribute: CollisionCount"
+    - label: "read the attribute: CollisionCount"
       optional: true
       pics: PICS_A_COLLISIONCOUNT
       command: "readAttribute"
       attribute: "CollisionCount"
       response:
-        constraints:
-            type: uint64
+          constraints:
+              type: uint64
 
-    - label:
-          "read the attribute: OverrunCount"
+    - label: "read the attribute: OverrunCount"
       optional: true
       pics: PICS_A_OVERRUNCOUNT
       command: "readAttribute"
       attribute: "OverrunCount"
       response:
-        constraints:
-            type: uint64
+          constraints:
+              type: uint64
 
     - label: "read the attribute: CarrierDetect"
       optional: true
@@ -94,8 +89,8 @@ tests:
       command: "readAttribute"
       attribute: "CarrierDetect"
       response:
-        constraints:
-          type: bool
+          constraints:
+              type: bool
 
     - label: "read the attribute: TimeSinceReset"
       optional: true
@@ -103,7 +98,7 @@ tests:
       command: "readAttribute"
       attribute: "TimeSinceReset"
       response:
-        value: 0
+          value: 0
 
     - label: "read the attribute: TimeSinceReset"
       optional: true
@@ -111,8 +106,8 @@ tests:
       command: "readAttribute"
       attribute: "TimeSinceReset"
       response:
-        constraints:
-          # Looks a bit like uint64 contraints are maxing out at uint32
-          type: uint64
-          minValue: 0
-          maxValue: 0xFFFFFFFF
+          constraints:
+              # Looks a bit like uint64 contraints are maxing out at uint32
+              type: uint64
+              minValue: 0
+              maxValue: 0xFFFFFFFF

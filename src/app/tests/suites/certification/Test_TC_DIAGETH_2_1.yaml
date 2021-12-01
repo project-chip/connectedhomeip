@@ -24,70 +24,64 @@ tests:
       pics: PICS_CR_RESETCOUNTS
       command: "ResetCounts"
       response:
-        error: 0
+          error: 0
 
-    - label:
-          "read the attribute: PacketRxCount"
+    - label: "read the attribute: PacketRxCount"
       disabled: true
       optional: true
       pics: PICS_A_PACKETRXCOUNT
       command: "readAttribute"
       attribute: "PacketRxCount"
       response:
-        constraints:
-          type: uint64
-          minValue: 0
-          maxValue: 0
+          constraints:
+              type: uint64
+              minValue: 0
+              maxValue: 0
 
-    - label:
-          "read the attribute: PacketTxCount"
+    - label: "read the attribute: PacketTxCount"
       disabled: true
       optional: true
       pics: PICS_A_PACKETTXCOUNT
       command: "readAttribute"
       attribute: "PacketTxCount"
       response:
-        constraints:
-          type: uint64
-          minValue: 0
-          maxValue: 0
+          constraints:
+              type: uint64
+              minValue: 0
+              maxValue: 0
 
-    - label:
-          "read the attribute: TxErrCount"
+    - label: "read the attribute: TxErrCount"
       disabled: true
       optional: true
       pics: PICS_A_TXERRCOUNT
       command: "readAttribute"
       attribute: "TxErrCount"
       response:
-        constraints:
-          type: uint64
-          minValue: 0
-          maxValue: 0
+          constraints:
+              type: uint64
+              minValue: 0
+              maxValue: 0
 
-    - label:
-          "read the attribute: CollisionCount"
+    - label: "read the attribute: CollisionCount"
       disabled: true
       optional: true
       pics: PICS_A_COLLISIONCOUNT
       command: "readAttribute"
       attribute: "CollisionCount"
       response:
-        constraints:
-          type: uint64
-          minValue: 0
-          maxValue: 0
+          constraints:
+              type: uint64
+              minValue: 0
+              maxValue: 0
 
-    - label:
-          "read the attribute: OverrunCount"
+    - label: "read the attribute: OverrunCount"
       disabled: true
       optional: true
       pics: PICS_A_OVERRUNCOUNT
       command: "readAttribute"
       attribute: "OverrunCount"
       response:
-        constraints:
-          type: uint64
-          minValue: 0
-          maxValue: 0
- 
+          constraints:
+              type: uint64
+              minValue: 0
+              maxValue: 0
