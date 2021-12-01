@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,17 +17,17 @@
  */
 
 /**
- * @brief Registers shell commands for a commissionee (eg. end device) related to commissioning.
+ *    @file
+ *          Example project configuration file for CHIP.
+ *
+ *          This is a place to put application or project-specific overrides
+ *          to the default configuration values for general CHIP features.
+ *
  */
 
-#include <platform/CHIPDeviceLayer.h>
+#pragma once
 
-#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
-namespace chip {
-namespace Shell {
+// include the CHIPProjectConfig from config/standalone
+#include <CHIPProjectConfig.h>
 
-void RegisterAppPlatformCommands();
-
-} // namespace Shell
-} // namespace chip
-#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 16

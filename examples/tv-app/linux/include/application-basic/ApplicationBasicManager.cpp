@@ -159,6 +159,7 @@ bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatu
 {
     ChipLogProgress(Zcl, "Sent an application status change request %d for endpoint %d", status, endpoint);
 
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
     if (app == nullptr)
     {
@@ -171,6 +172,7 @@ bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatu
         return false;
     }
     app->GetApplicationBasic()->SetApplicationStatus(status);
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
     return true;
 }

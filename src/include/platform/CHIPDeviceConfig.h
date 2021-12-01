@@ -1269,3 +1269,23 @@
 #ifndef CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION
 #define CHIP_DEVICE_CONFIG_PAIRING_SECONDARY_INSTRUCTION ""
 #endif
+
+// -------------------- App Platform Configuration --------------------
+
+/**
+ * CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+ *
+ * Does this device support an app platform 1=Yes, 0=No
+ */
+#ifndef CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#define CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+ *
+ * When app platform is enabled, max number of endpoints
+ */
+#ifndef CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
+#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 0
+#endif

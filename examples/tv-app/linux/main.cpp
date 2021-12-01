@@ -56,7 +56,9 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     chip::AppPlatform::ContentAppFactoryImpl factory;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
     // Init Keypad Input manager
     err = KeypadInputManager().Init();
@@ -92,11 +94,15 @@ int main(int argc, char * argv[])
 
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
 
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     chip::AppPlatform::AppPlatform::GetInstance().SetupAppPlatform();
     chip::AppPlatform::AppPlatform::GetInstance().SetContentAppFactory(&factory);
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
 #if defined(ENABLE_CHIP_SHELL)
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     chip::Shell::RegisterAppPlatformCommands();
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 #endif
 
     ChipLinuxAppMainLoop();

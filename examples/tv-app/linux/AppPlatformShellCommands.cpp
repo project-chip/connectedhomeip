@@ -36,6 +36,8 @@
 using namespace ::chip::Controller;
 using namespace chip::AppPlatform;
 
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
 namespace chip {
 namespace Shell {
 
@@ -196,3 +198,5 @@ void RegisterAppPlatformCommands()
 
 } // namespace Shell
 } // namespace chip
+
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

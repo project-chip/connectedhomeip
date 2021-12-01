@@ -45,6 +45,7 @@
 #include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/util/af.h>
+#include <platform/CHIPDeviceLayer.h>
 
 #if !defined(EMBER_SCRIPTED_TEST)
 #include <app-common/zap-generated/att-storage.h>
@@ -67,11 +68,7 @@
 
 // If we have fixed number of endpoints, then max is the same.
 #ifdef FIXED_ENDPOINT_COUNT
-#ifdef DYNAMIC_ENDPOINT_COUNT
-#define MAX_ENDPOINT_COUNT (FIXED_ENDPOINT_COUNT + DYNAMIC_ENDPOINT_COUNT)
-#else
-#define MAX_ENDPOINT_COUNT FIXED_ENDPOINT_COUNT
-#endif
+#define MAX_ENDPOINT_COUNT (FIXED_ENDPOINT_COUNT + CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
 #endif
 
 #include <app-common/zap-generated/attribute-type.h>

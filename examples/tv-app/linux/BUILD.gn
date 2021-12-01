@@ -66,9 +66,6 @@ executable("chip-tv-app") {
 
   cflags = [ "-Wconversion" ]
 
-  # TODO: the definition of DYNAMIC_ENDPOINT_COUNT needs find a common home!
-  cflags += [ "-DDYNAMIC_ENDPOINT_COUNT=16" ]
-
   if (chip_build_libshell) {
     cflags += [ "-DENABLE_CHIP_SHELL" ]
   }

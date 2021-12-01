@@ -45,6 +45,8 @@
 using namespace chip;
 using namespace chip::AppPlatform;
 
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
 namespace chip {
 namespace AppPlatform {
 
@@ -213,3 +215,5 @@ ContentApp * ContentAppFactoryImpl::LoadContentAppByVendorId(uint16_t vendorId)
 
 } // namespace AppPlatform
 } // namespace chip
+
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

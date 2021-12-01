@@ -50,7 +50,7 @@ static const int kFixedLabelAttributeArraySize = 254;
 
 static EndpointId gCurrentEndpointId;
 static EndpointId gFirstDynamicEndpointId;
-static Device * gDevices[DYNAMIC_ENDPOINT_COUNT]; // number of dynamic endpoints count
+static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT]; // number of dynamic endpoints count
 
 // 4 Bridged devices
 static Device gLight1("Light 1", "Office");
@@ -116,7 +116,7 @@ DECLARE_DYNAMIC_ENDPOINT(bridgedLightEndpoint, bridgedLightClusters);
 CHIP_ERROR AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceType)
 {
     uint8_t index = 0;
-    while (index < DYNAMIC_ENDPOINT_COUNT)
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         if (NULL == gDevices[index])
         {
@@ -144,7 +144,7 @@ CHIP_ERROR AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t de
 
 CHIP_ERROR RemoveDeviceEndpoint(Device * dev)
 {
-    for (uint8_t index = 0; index < DYNAMIC_ENDPOINT_COUNT; index++)
+    for (uint8_t index = 0; index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT; index++)
     {
         if (gDevices[index] == dev)
         {
@@ -264,7 +264,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
-    if ((endpointIndex < DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != NULL))
+    if ((endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != NULL))
     {
         Device * dev = gDevices[endpointIndex];
 
@@ -291,7 +291,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
-    if (endpointIndex < DYNAMIC_ENDPOINT_COUNT)
+    if (endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         Device * dev = gDevices[endpointIndex];
 

@@ -26,13 +26,11 @@
 #include <app/util/ContentApp.h>
 #include <app/util/attribute-storage.h>
 #include <functional>
+#include <platform/CHIPDeviceLayer.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifndef DYNAMIC_ENDPOINT_COUNT
-#define DYNAMIC_ENDPOINT_COUNT 0
-#endif // DYNAMIC_ENDPOINT_COUNT
-
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 namespace chip {
 namespace AppPlatform {
 
@@ -72,8 +70,9 @@ protected:
     ContentAppFactory * mContentAppFactory = nullptr;
     EndpointId mCurrentEndpointId;
     EndpointId mFirstDynamicEndpointId;
-    ContentApp * mContentApps[DYNAMIC_ENDPOINT_COUNT];
+    ContentApp * mContentApps[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 };
 
 } // namespace AppPlatform
 } // namespace chip
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED

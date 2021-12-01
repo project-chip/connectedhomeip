@@ -145,7 +145,7 @@ void emberAfEndpointConfigure(void)
         emAfEndpoints[ep].bitmask       = EMBER_AF_ENDPOINT_ENABLED;
     }
 
-#ifdef DYNAMIC_ENDPOINT_COUNT
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
     if (MAX_ENDPOINT_COUNT > FIXED_ENDPOINT_COUNT)
     {
         // This is assuming that EMBER_AF_ENDPOINT_DISABLED is 0

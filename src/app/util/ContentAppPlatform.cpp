@@ -38,6 +38,8 @@
 using namespace chip;
 using namespace chip::AppPlatform;
 
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
 // Device Version for dynamic endpoints:
 #define DEVICE_VERSION_DEFAULT 1
 
@@ -247,3 +249,5 @@ ContentApp * AppPlatform::GetContentAppByEndpointId(chip::EndpointId id)
 
 } // namespace AppPlatform
 } // namespace chip
+
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
