@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "AppEvent.h"
+
 class AppTask
 {
 public:
@@ -28,6 +30,14 @@ private:
     friend AppTask & GetAppTask(void);
 
     int Init();
+
+    void PostEvent(AppEvent * aEvent);
+    void DispatchEvent(const AppEvent * event);
+
+    static void OnConnectProviderHandler(AppEvent * aEvent);
+
+    static void OnConnectProviderCallback(chip::NodeId nodeId, chip::FabricIndex fabricIndex,
+                                          chip::Optional<chip::ByteSpan> ipAddress);
 
     static AppTask sAppTask;
 };

@@ -45,6 +45,8 @@
 #include "events/EventQueue.h"
 #include "platform/Callback.h"
 
+#include "OTARequestorImpl.h"
+
 static bool sIsWiFiStationProvisioned = false;
 static bool sIsWiFiStationEnabled     = false;
 static bool sIsWiFiStationConnected   = false;
@@ -53,6 +55,7 @@ static bool sHaveBLEConnections       = false;
 
 static events::EventQueue sAppEventQueue;
 
+using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
@@ -83,6 +86,8 @@ int AppTask::Init()
         ChipLogProgress(NotSpecified, "Enabling BLE advertising.");
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
+
+    OTARequestorImpl::GetInstance().Init(OnConnectProviderCallback);
 
     chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
 
@@ -155,5 +160,46 @@ int AppTask::StartApp()
         }
 
         sStatusLED.Animate();
+    }
+}
+
+void AppTask::OnConnectProviderHandler(AppEvent * aEvent)
+{
+    ChipLogProgress(NotSpecified, "OnConnectProviderHandler");
+
+    OTARequestorImpl::GetInstance().ConnectProvider(aEvent->OTAProviderConnectEvent.nodeId,
+                                                    aEvent->OTAProviderConnectEvent.fabricIndex,
+                                                    aEvent->OTAProviderConnectEvent.ipAddress);
+}
+
+void AppTask::OnConnectProviderCallback(NodeId nodeId, FabricIndex fabricIndex, chip::Optional<chip::ByteSpan> ipAddress)
+{
+    AppEvent ota_connect_provider_event;
+    ota_connect_provider_event.Type                                = AppEvent::kEventType_ota_provider_connect;
+    ota_connect_provider_event.OTAProviderConnectEvent.nodeId      = nodeId;
+    ota_connect_provider_event.OTAProviderConnectEvent.fabricIndex = fabricIndex;
+    ota_connect_provider_event.OTAProviderConnectEvent.ipAddress   = reinterpret_cast<const char *>(ipAddress.Value().data());
+    ota_connect_provider_event.Handler                             = OnConnectProviderHandler;
+    sAppTask.PostEvent(&ota_connect_provider_event);
+}
+
+void AppTask::PostEvent(AppEvent * aEvent)
+{
+    auto handle = sAppEventQueue.call([event = *aEvent, this] { DispatchEvent(&event); });
+    if (!handle)
+    {
+        ChipLogError(NotSpecified, "Failed to post event to app task event queue: Not enough memory");
+    }
+}
+
+void AppTask::DispatchEvent(const AppEvent * aEvent)
+{
+    if (aEvent->Handler)
+    {
+        aEvent->Handler(const_cast<AppEvent *>(aEvent));
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Event received with no handler. Dropping event.");
     }
 }
