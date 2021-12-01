@@ -35,10 +35,10 @@ public:
     FakeResourceRecord(const char * data) : ResourceRecord(QType::ANY, kNames), mData(data) {}
 
 protected:
-    bool WriteData(BufferWriter & out) const override
+    bool WriteData(RecordWriter & out) const override
     {
-        out.Put(mData);
-        return out.Fit();
+        out.Writer().Put(mData);
+        return out.Writer().Fit();
     }
 
 private:

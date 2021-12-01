@@ -30,10 +30,10 @@ public:
     const FullQName & GetPtr() const { return mPtrName; }
 
 protected:
-    bool WriteData(chip::Encoding::BigEndian::BufferWriter & out) const override
+    bool WriteData(RecordWriter & out) const override
     {
-        mPtrName.Output(out);
-        return out.Fit();
+        out.WriteQName(mPtrName);
+        return out.Writer().Fit();
     }
 
 private:

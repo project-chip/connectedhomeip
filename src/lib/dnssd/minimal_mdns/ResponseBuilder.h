@@ -77,15 +77,18 @@ public:
             return *this;
         }
 
-        chip::Encoding::BigEndian::BufferWriter out(mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength());
+        chip::Encoding::BigEndian::BufferWriter out(mPacket->Start(), mPacket->DataLength() + mPacket->AvailableDataLength());
+        out.Skip(mPacket->DataLength());
 
-        if (!record.Append(mHeader, type, out))
+        RecordWriter writer(out);
+
+        if (!record.Append(mHeader, type, writer))
         {
             mBuildOk = false;
         }
         else
         {
-            mPacket->SetDataLength(static_cast<uint16_t>(mPacket->DataLength() + out.Needed()));
+            mPacket->SetDataLength(static_cast<uint16_t>(out.Needed()));
         }
         return *this;
     }

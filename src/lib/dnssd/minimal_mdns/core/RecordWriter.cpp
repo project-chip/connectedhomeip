@@ -14,25 +14,38 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "IP.h"
+#include "RecordWriter.h"
 
 namespace mdns {
 namespace Minimal {
 
-bool IPResourceRecord::WriteData(RecordWriter & out) const
+SerializedQNameIterator RecordWriter::PreviousName(size_t index)
 {
-    // IP address is already stored in network byte order, hence raw bytes put
-    if (mIPAddress.IsIPv6())
+    if (index >= kMaxCachedReferences)
     {
-        out.Writer().Put(mIPAddress.Addr, 16);
-    }
-    else
-    {
-        out.Writer().Put(mIPAddress.Addr + 3, 4);
+        return SerializedQNameIterator();
     }
 
-    return out.Writer().Fit();
+    uint16_t offset = mPreviousQNames[index];
+    if (offset == kInvalidOffset)
+    {
+        return SerializedQNameIterator();
+    }
+
+    return SerializedQNameIterator(BytesRange(mOutput.Buffer(), mOutput.Buffer() + mOutput.WritePos()), mOutput.Buffer() + offset);
+}
+
+void RecordWriter::WriteQName(const FullQName & qname)
+{
+    // Brain dead q name writing
+    // TODO: update
+    for (uint16_t i = 0; i < qname.nameCount; i++)
+    {
+
+        mOutput.Put8(static_cast<uint8_t>(strlen(qname.names[i])));
+        mOutput.Put(qname.names[i]);
+    }
+    mOutput.Put8(0); // end of qnames
 }
 
 } // namespace Minimal

@@ -40,14 +40,15 @@ public:
     void SetWeight(uint16_t value) { mWeight = value; }
 
 protected:
-    bool WriteData(chip::Encoding::BigEndian::BufferWriter & out) const override
+    bool WriteData(RecordWriter & out) const override
     {
-        out.Put16(mPriority);
-        out.Put16(mWeight);
-        out.Put16(mPort);
-        mServerName.Output(out);
+        out.Writer().Put16(mPriority);
+        out.Writer().Put16(mWeight);
+        out.Writer().Put16(mPort);
 
-        return out.Fit();
+        out.WriteQName(mServerName);
+
+        return out.Writer().Fit();
     }
 
 private:

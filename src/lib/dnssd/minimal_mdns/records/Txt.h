@@ -52,7 +52,7 @@ public:
     const char * const * GetEntries() const { return mEntries; }
 
 protected:
-    bool WriteData(chip::Encoding::BigEndian::BufferWriter & out) const override
+    bool WriteData(RecordWriter & out) const override
     {
         for (size_t i = 0; i < mEntryCount; i++)
         {
@@ -62,10 +62,10 @@ protected:
                 return false;
             }
 
-            out.Put8(static_cast<uint8_t>(len));
-            out.Put(mEntries[i]);
+            out.Writer().Put8(static_cast<uint8_t>(len));
+            out.Writer().Put(mEntries[i]);
         }
-        return out.Fit();
+        return out.Writer().Fit();
     }
 
 private:
