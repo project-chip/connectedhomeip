@@ -114,7 +114,7 @@ CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & block
         isEof = false;
         return CHIP_ERROR_READ_FAILED;
     }
-    ESP_LOGI(TAG, "Read %d bytes from %s", size, otaFilename);    
+    ESP_LOGI(TAG, "Read %d bytes from %s", size, otaFilename);
     return CHIP_NO_ERROR;
 }
 
@@ -181,14 +181,14 @@ extern "C" void app_main()
     callbacks.onTransferComplete = &onTransferCompleteCallback;
     callbacks.onTransferFailed   = &onTransferFailedCallback;
     bdxServer.SetCallbacks(callbacks);
-    
+
     esp_vfs_spiffs_conf_t spiffs_conf = {
         .base_path = "/spiffs",
         .partition_label = NULL,
         .max_files = 3,
         .format_if_mount_failed = false,
     };
-    
+
     err = esp_vfs_spiffs_register(&spiffs_conf);
     if (err != ESP_OK)
     {
