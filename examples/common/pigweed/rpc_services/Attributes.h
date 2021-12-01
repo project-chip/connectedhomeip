@@ -32,7 +32,7 @@ namespace rpc {
 class Attributes : public generated::Attributes<Attributes>
 {
 public:
-    ::pw::Status Write(ServerContext &, const chip_rpc_AttributeWrite & request, pw_protobuf_Empty & response)
+    ::pw::Status Write(const chip_rpc_AttributeWrite & request, pw_protobuf_Empty & response)
     {
         const void * data;
         switch (request.data.which_data)
@@ -70,7 +70,7 @@ public:
         return pw::OkStatus();
     }
 
-    ::pw::Status Read(ServerContext &, const chip_rpc_AttributeMetadata & request, chip_rpc_AttributeData & response)
+    ::pw::Status Read(const chip_rpc_AttributeMetadata & request, chip_rpc_AttributeData & response)
     {
         void * data;
         size_t size = 0;

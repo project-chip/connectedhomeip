@@ -32,14 +32,14 @@ class Locking final : public generated::Locking<Locking>
 public:
     virtual ~Locking() = default;
 
-    virtual pw::Status Set(ServerContext &, const chip_rpc_LockingState & request, pw_protobuf_Empty & response)
+    virtual pw::Status Set(const chip_rpc_LockingState & request, pw_protobuf_Empty & response)
     {
         bool locked = request.locked;
         RETURN_STATUS_IF_NOT_OK(app::Clusters::OnOff::Attributes::OnOff::Set(kEndpoint, locked));
         return pw::OkStatus();
     }
 
-    virtual pw::Status Get(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_LockingState & response)
+    virtual pw::Status Get(const pw_protobuf_Empty & request, chip_rpc_LockingState & response)
     {
         bool locked;
         RETURN_STATUS_IF_NOT_OK(app::Clusters::OnOff::Attributes::OnOff::Get(kEndpoint, &locked));
