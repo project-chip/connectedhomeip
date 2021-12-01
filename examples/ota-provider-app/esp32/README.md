@@ -10,8 +10,8 @@ A prototype application that demonstrates OTA provider capabilities.
 ## Copy the OTA image
 
 -   Copy the binary file which you are going to send to the OTA Requestor to
-    `./spiffs_image` path and make sure the `OTA_IMAGE_NAME` is the same as the name
-    of the image file you placed in `./spiffs_image`.
+    `./spiffs_image` path and make sure the `OTA_IMAGE_NAME` is the same as the
+    name of the image file you placed in `./spiffs_image`.
 
 ```
 idf.py menuconfig
