@@ -55,14 +55,49 @@ struct NumericAttributeTraits
     // interesting things here.
     static constexpr WorkingType StorageToWorking(StorageType storageValue) { return storageValue; }
 
+private:
+    // We need to make sure we never look like we are assigning NaN to an
+    // integer, even in a not-reached branch.  Without "if constexpr", the best
+    // we can do is these functions using enable_if.
+    template <typename U = T, typename std::enable_if_t<std::is_floating_point<U>::value, int> = 0>
+    static constexpr StorageType GetNullValue()
+    {
+        return std::numeric_limits<T>::quiet_NaN();
+    }
+
+    template <typename U = T, typename std::enable_if_t<std::is_integral<U>::value, int> = 0>
+    static constexpr StorageType GetNullValue()
+    {
+        return std::is_signed<T>::value ? std::numeric_limits<T>::min() : std::numeric_limits<T>::max();
+    }
+
+    template <typename U = T, typename std::enable_if_t<std::is_enum<U>::value, int> = 0>
+    static constexpr StorageType GetNullValue()
+    {
+        return GetNullValue<std::underlying_type_t<T>>();
+    }
+
+public:
     // The value reserved in the value space of StorageType to represent null,
     // for cases when we have a nullable value.  This value must match the value
     // excluded from the valid value range in the spec, so that we don't confuse
     // valid values with null.
-    static constexpr StorageType kNullValue =
-        std::is_signed<T>::value ? std::numeric_limits<T>::min() : std::numeric_limits<T>::max();
+    static constexpr StorageType kNullValue = NumericAttributeTraits::GetNullValue();
 
-    static constexpr bool IsNullValue(StorageType value) { return value == kNullValue; }
+    template <typename U = T, typename std::enable_if_t<!std::is_floating_point<U>::value, int> = 0>
+    static constexpr bool IsNullValue(StorageType value)
+    {
+        return value == kNullValue;
+    }
+
+    template <typename U = T, typename std::enable_if_t<std::is_floating_point<U>::value, int> = 0>
+    static constexpr bool IsNullValue(StorageType value)
+    {
+        // Trying to include math.h (to use isnan()) fails on EFR32, both when
+        // included as "cmath" and when included as "math.h".  For lack of
+        // isnan(), just fall back on the NaN != NaN thing.
+        return value != value;
+    }
 
     static constexpr void SetNull(StorageType & value) { value = kNullValue; }
 
