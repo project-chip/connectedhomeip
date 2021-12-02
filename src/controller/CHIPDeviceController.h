@@ -72,6 +72,7 @@
 #include <controller/DeviceAddressUpdateDelegate.h>
 #include <controller/DeviceDiscoveryDelegate.h>
 #include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 #endif
 
 namespace chip {

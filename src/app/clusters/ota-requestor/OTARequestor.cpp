@@ -235,6 +235,7 @@ CHIP_ERROR OTARequestor::SetupCASESessionManager(FabricIndex fabricIndex)
             .sessionInitParams = initParams,
             .dnsCache          = nullptr,
             .devicePool        = mServer->GetDevicePool(),
+            .dnsResolver       = nullptr,
         };
 
         mCASESessionManager = Platform::New<CASESessionManager>(sessionManagerConfig);
