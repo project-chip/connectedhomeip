@@ -170,7 +170,7 @@ private:
     CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessAttributePathList(AttributePathIBs::Parser & aAttributePathListParser);
-    CHIP_ERROR ProcessEventPaths(EventPaths::Parser & aEventPathsParser);
+    CHIP_ERROR ProcessEventPaths(EventPathIBs::Parser & aEventPathsParser);
     CHIP_ERROR OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;

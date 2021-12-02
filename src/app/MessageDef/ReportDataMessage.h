@@ -31,7 +31,7 @@
 #include <lib/support/logging/CHIPLogging.h>
 
 #include "AttributeReportIBs.h"
-#include "EventReports.h"
+#include "EventReportIBs.h"
 #include "StructBuilder.h"
 #include "StructParser.h"
 
@@ -100,7 +100,7 @@ public:
     CHIP_ERROR GetAttributeReportIBs(AttributeReportIBs::Parser * const apAttributeReportIBs) const;
 
     /**
-     *  @brief Get a TLVReader for the EventReports. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the EventReportIBs. Next() must be called before accessing them.
      *
      *  @param [in] apEventReports    A pointer to apEventReports
      *
@@ -108,7 +108,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Array
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetEventReports(EventReports::Parser * const apEventReports) const;
+    CHIP_ERROR GetEventReports(EventReportIBs::Parser * const apEventReports) const;
 
     /**
      *  @brief Check whether there are more chunked messages in a transaction. Next() must be called before accessing them.
@@ -155,11 +155,11 @@ public:
     AttributeReportIBs::Builder & CreateAttributeReportIBs();
 
     /**
-     *  @brief Initialize a EventReports::Builder for writing into the TLV stream
+     *  @brief Initialize a EventReportIBs::Builder for writing into the TLV stream
      *
-     *  @return A reference to EventReports::Builder
+     *  @return A reference to EventReportIBs::Builder
      */
-    EventReports::Builder & CreateEventReports();
+    EventReportIBs::Builder & CreateEventReports();
 
     /**
      *  @brief This flag is set to ‘true’ when there are more chunked messages in a transaction.
@@ -177,7 +177,7 @@ public:
 
 private:
     AttributeReportIBs::Builder mAttributeReportIBsBuilder;
-    EventReports::Builder mEventReportsBuilder;
+    EventReportIBs::Builder mEventReportsBuilder;
 };
 }; // namespace ReportDataMessage
 

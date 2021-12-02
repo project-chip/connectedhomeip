@@ -24,7 +24,7 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "InvokeResponses.h"
+#include "InvokeResponseIBs.h"
 #include "StructBuilder.h"
 #include "StructParser.h"
 
@@ -73,7 +73,7 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetInvokeResponses(InvokeResponses::Parser * const apInvokeResponses) const;
+    CHIP_ERROR GetInvokeResponses(InvokeResponseIBs::Parser * const apInvokeResponses) const;
 };
 
 class Builder : public StructBuilder
@@ -86,18 +86,18 @@ public:
     InvokeResponseMessage::Builder & SuppressResponse(const bool aSuppressResponse);
 
     /**
-     *  @brief Initialize a InvokeResponses::Builder for writing into the TLV stream
+     *  @brief Initialize a InvokeResponseIBs::Builder for writing into the TLV stream
      *
-     *  @return A reference to InvokeResponses::Builder
+     *  @return A reference to InvokeResponseIBs::Builder
      */
-    InvokeResponses::Builder & CreateInvokeResponses();
+    InvokeResponseIBs::Builder & CreateInvokeResponses();
 
     /**
-     *  @brief Get reference to InvokeResponses::Builder
+     *  @brief Get reference to InvokeResponseIBs::Builder
      *
-     *  @return A reference to InvokeResponses::Builder
+     *  @return A reference to InvokeResponseIBs::Builder
      */
-    InvokeResponses::Builder & GetInvokeResponses() { return mInvokeResponses; }
+    InvokeResponseIBs::Builder & GetInvokeResponses() { return mInvokeResponses; }
 
     /**
      *  @brief Mark the end of this InvokeResponseMessage
@@ -107,7 +107,7 @@ public:
     InvokeResponseMessage::Builder & EndOfInvokeResponseMessage();
 
 private:
-    InvokeResponses::Builder mInvokeResponses;
+    InvokeResponseIBs::Builder mInvokeResponses;
 };
 } // namespace InvokeResponseMessage
 } // namespace app
