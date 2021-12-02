@@ -171,13 +171,13 @@ void GetPairingInstruction(const ByteSpan & value, char * pairingInstruction)
     Platform::CopyString(pairingInstruction, kMaxPairingInstructionLen + 1, value);
 }
 
-Optional<uint32_t> GetRetryInterval(const ByteSpan & value)
+Optional<System::Clock::Milliseconds32> GetRetryInterval(const ByteSpan & value)
 {
     const auto undefined     = std::numeric_limits<uint32_t>::max();
     const auto retryInterval = MakeU32FromAsciiDecimal(value, undefined);
 
-    if (retryInterval != undefined && retryInterval <= kMaxRetryInterval)
-        return MakeOptional(retryInterval);
+    if (retryInterval != undefined && retryInterval <= kMaxRetryInterval.count())
+        return MakeOptional(System::Clock::Milliseconds32(retryInterval));
 
     return NullOptional;
 }

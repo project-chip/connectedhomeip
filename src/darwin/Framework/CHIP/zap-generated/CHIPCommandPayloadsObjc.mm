@@ -4120,6 +4120,17 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = nil;
+    }
+    return self;
+}
+@end
+
 @implementation CHIPMessagingClusterDisplayMessageParams
 - (instancetype)init
 {

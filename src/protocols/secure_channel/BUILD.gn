@@ -8,6 +8,8 @@ static_library("secure_channel") {
     "CASEServer.h",
     "CASESession.cpp",
     "CASESession.h",
+    "CASESessionCache.cpp",
+    "CASESessionCache.h",
     "PASESession.cpp",
     "PASESession.h",
     "RendezvousParameters.h",

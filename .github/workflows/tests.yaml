@@ -90,7 +90,7 @@ jobs:
                   "./scripts/tests/run_test_suite.py \
                      --chip-tool ./out/debug/standalone/chip-tool \
                      run \
-                     --iterations 2 \
+                     --iterations 1 \
                      --all-clusters-app ./out/debug/standalone/chip-all-clusters-app \
                      --tv-app ./out/debug/standalone/chip-tv-app \
                   "
@@ -180,7 +180,7 @@ jobs:
                      --chip-tool ./out/debug/standalone/chip-tool \
                      --target-skip-glob 'TV_*' \
                      run \
-                     --iterations 2 \
+                     --iterations 1 \
                      --all-clusters-app ./out/debug/standalone/chip-all-clusters-app \
                      --tv-app ./out/debug/standalone/chip-tv-app \
                   "

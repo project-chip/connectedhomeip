@@ -39,7 +39,7 @@ size_t GetNumObjectsInUse(POOL & pool)
     size_t count = 0;
     pool.ForEachActiveObject([&count](void *) {
         ++count;
-        return true;
+        return Loop::Continue;
     });
     return count;
 }
@@ -240,17 +240,17 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
         objIds.erase(object->mId);
         ++count;
         sum += object->mId;
-        return true;
+        return Loop::Continue;
     });
     NL_TEST_ASSERT(inSuite, count == kSize);
     NL_TEST_ASSERT(inSuite, sum == kSize * (kSize - 1) / 2);
     NL_TEST_ASSERT(inSuite, objIds.size() == 0);
 
-    // Verify that returning false stops iterating.
+    // Verify that returning Loop::Break stops iterating.
     count = 0;
     pool.ForEachActiveObject([&](S * object) {
         objIds.insert(object->mId);
-        return ++count != kSize / 2;
+        return ++count != kSize / 2 ? Loop::Continue : Loop::Break;
     });
     NL_TEST_ASSERT(inSuite, count == kSize / 2);
     NL_TEST_ASSERT(inSuite, objIds.size() == kSize / 2);
@@ -269,10 +269,10 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
                 {
                     ++count;
                 }
-                return true;
+                return Loop::Continue;
             });
         }
-        return true;
+        return Loop::Continue;
     });
     NL_TEST_ASSERT(inSuite, count == (kSize - 1) * kSize / 2);
     NL_TEST_ASSERT(inSuite, objIds.size() == 0);
@@ -289,7 +289,7 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
         {
             objIds.insert(object->mId);
         }
-        return true;
+        return Loop::Continue;
     });
     NL_TEST_ASSERT(inSuite, count == kSize);
     NL_TEST_ASSERT(inSuite, objIds.size() == kSize / 2);
@@ -316,7 +316,7 @@ void TestForEachActiveObject(nlTestSuite * inSuite, void * inContext)
             objArray[id] = pool.CreateObject(id);
             NL_TEST_ASSERT(inSuite, objArray[id] != nullptr);
         }
-        return true;
+        return Loop::Continue;
     });
     for (size_t i = 0; i < kSize; ++i)
     {

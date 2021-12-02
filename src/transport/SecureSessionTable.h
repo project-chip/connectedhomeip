@@ -69,7 +69,7 @@ public:
     void ReleaseSession(SecureSession * session) { mEntries.ReleaseObject(session); }
 
     template <typename Function>
-    bool ForEachSession(Function && function)
+    Loop ForEachSession(Function && function)
     {
         return mEntries.ForEachActiveObject(std::forward<Function>(function));
     }
@@ -89,9 +89,9 @@ public:
             if (session->GetLocalSessionId() == localSessionId)
             {
                 result = session;
-                return false;
+                return Loop::Break;
             }
-            return true;
+            return Loop::Continue;
         });
         return result;
     }
@@ -115,7 +115,7 @@ public:
                 callback(*session);
                 ReleaseSession(session);
             }
-            return true;
+            return Loop::Continue;
         });
     }
 
