@@ -19,6 +19,7 @@ import sys
 import threading
 import time
 import pty
+import re
 
 from dataclasses import dataclass
 
@@ -48,6 +49,13 @@ class LogPipe(threading.Thread):
 
     def CapturedLogContains(self, txt: str):
         return any(txt in l for l in self.captured_logs)
+
+    def FindLastMatchingLine(self, matcher):
+        for l in reversed(self.captured_logs):
+            match = re.match(matcher, l)
+            if match:
+                return match
+        return None
 
     def fileno(self):
         """Return the write file descriptor of the pipe"""
