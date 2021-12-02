@@ -36429,6 +36429,7 @@ private:
 | * TestNestedStructListArgumentRequest                               |   0x0B |
 | * TestNotHandled                                                    |   0x01 |
 | * TestNullableOptionalRequest                                       |   0x0F |
+| * TestSimpleOptionalArgumentRequest                                 |   0x13 |
 | * TestSpecific                                                      |   0x02 |
 | * TestStructArgumentRequest                                         |   0x07 |
 | * TestUnknownCommand                                                |   0x03 |
@@ -36793,6 +36794,29 @@ public:
 
 private:
     chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type mRequest;
+};
+
+/*
+ * Command TestSimpleOptionalArgumentRequest
+ */
+class TestClusterTestSimpleOptionalArgumentRequest : public ModelCommand
+{
+public:
+    TestClusterTestSimpleOptionalArgumentRequest() : ModelCommand("test-simple-optional-argument-request")
+    {
+        AddArgument("Arg1", 0, 1, &mRequest.arg1);
+        ModelCommand::AddArguments();
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000013) on endpoint %" PRIu8, endpointId);
+
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+    }
+
+private:
+    chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type mRequest;
 };
 
 /*
@@ -57887,6 +57911,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<TestClusterTestNestedStructListArgumentRequest>(),     //
         make_unique<TestClusterTestNotHandled>(),                          //
         make_unique<TestClusterTestNullableOptionalRequest>(),             //
+        make_unique<TestClusterTestSimpleOptionalArgumentRequest>(),       //
         make_unique<TestClusterTestSpecific>(),                            //
         make_unique<TestClusterTestStructArgumentRequest>(),               //
         make_unique<TestClusterTestUnknownCommand>(),                      //
