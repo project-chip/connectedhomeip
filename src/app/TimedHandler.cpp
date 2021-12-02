@@ -71,14 +71,20 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
         if (aPayloadHeader.HasMessageType(MsgType::InvokeCommandRequest))
         {
             auto * imEngine = InteractionModelEngine::GetInstance();
-            aExchangeContext->SetDelegate(imEngine);
             ChipLogDetail(DataManagement, "Handing timed invoke to IM engine: handler %p exchange " ChipLogFormatExchange, this,
                           ChipLogValueExchange(aExchangeContext));
             imEngine->OnTimedInvoke(this, aExchangeContext, aPayloadHeader, std::move(aPayload));
             return CHIP_NO_ERROR;
         }
 
-        // TODO: Add handling of MsgType::WriteRequest here.
+        if (aPayloadHeader.HasMessageType(MsgType::WriteRequest))
+        {
+            auto * imEngine = InteractionModelEngine::GetInstance();
+            ChipLogDetail(DataManagement, "Handing timed write to IM engine: handler %p exchange " ChipLogFormatExchange, this,
+                          ChipLogValueExchange(aExchangeContext));
+            imEngine->OnTimedWrite(this, aExchangeContext, aPayloadHeader, std::move(aPayload));
+            return CHIP_NO_ERROR;
+        }
     }
 
     // Not an expected message.  Send an error response.  The exchange will
