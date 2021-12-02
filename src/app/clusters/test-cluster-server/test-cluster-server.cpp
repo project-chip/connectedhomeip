@@ -87,7 +87,7 @@ uint8_t gListUint8Data[kAttributeListLength];
 OctetStringData gListOctetStringData[kAttributeListLength];
 OctetStringData gListOperationalCert[kAttributeListLength];
 Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLength];
-Structs::SimpleStruct::Type gStructAttributeValue = { 0,          false,      SimpleEnum::EMBER_ZCL_SIMPLE_ENUM_VALUE_A,
+Structs::SimpleStruct::Type gStructAttributeValue = { 0,          false,      SimpleEnum::kValueA,
                                                       ByteSpan(), CharSpan(), BitFlags<SimpleBitmap>(),
                                                       0,          0 };
 
