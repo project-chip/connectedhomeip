@@ -58,20 +58,15 @@ constexpr size_t kCASEResumptionIDSize = 16;
 #define CASE_EPHEMERAL_KEY 0xCA5EECD0
 #endif
 
-struct CASESessionSerialized;
-
-struct CASESessionSerializable
+struct CASESessionCachable
 {
-    uint8_t mVersion;
     uint16_t mSharedSecretLen;
     uint8_t mSharedSecret[Crypto::kMax_ECDH_Secret_Length];
-    uint16_t mMessageDigestLen;
-    uint8_t mMessageDigest[Crypto::kSHA256_Hash_Length];
+    FabricIndex mLocalFabricIndex;
     NodeId mPeerNodeId;
     Credentials::CATValues mPeerCATs;
-    uint16_t mLocalSessionId;
-    uint16_t mPeerSessionId;
     uint8_t mResumptionId[kCASEResumptionIDSize];
+    uint64_t mSessionSetupTimeStamp;
 };
 
 class DLL_EXPORT CASESession : public Messaging::ExchangeDelegate, public PairingSession
@@ -154,24 +149,14 @@ public:
     const char * GetR2ISessionInfo() const override { return "Sigma R2I Key"; }
 
     /**
-     * @brief Serialize the Pairing Session to a string.
+     * @brief Serialize the CASESession to the given cachableSession data structure for secure pairing
      **/
-    CHIP_ERROR Serialize(CASESessionSerialized & output);
+    CHIP_ERROR ToCachable(CASESessionCachable & output);
 
     /**
-     * @brief Deserialize the Pairing Session from the string.
+     * @brief Reconstruct secure pairing class from the cachableSession data structure.
      **/
-    CHIP_ERROR Deserialize(CASESessionSerialized & input);
-
-    /**
-     * @brief Serialize the CASESession to the given serializable data structure for secure pairing
-     **/
-    CHIP_ERROR ToSerializable(CASESessionSerializable & output);
-
-    /**
-     * @brief Reconstruct secure pairing class from the serializable data structure.
-     **/
-    CHIP_ERROR FromSerializable(const CASESessionSerializable & output);
+    CHIP_ERROR FromCachable(const CASESessionCachable & output);
 
     SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
 
@@ -277,6 +262,9 @@ private:
 
     State mState;
 
+    uint8_t mLocalFabricIndex       = 0;
+    uint64_t mSessionSetupTimeStamp = 0;
+
 protected:
     bool mCASESessionEstablished = false;
 
@@ -290,12 +278,8 @@ protected:
         return ipkListSpan;
     }
     virtual size_t GetIPKListEntries() const { return 1; }
-};
 
-typedef struct CASESessionSerialized
-{
-    // Extra uint64_t to account for padding bytes (NULL termination, and some decoding overheads)
-    uint8_t inner[BASE64_ENCODED_LEN(sizeof(CASESessionSerializable) + sizeof(uint64_t))];
-} CASESessionSerialized;
+    void SetSessionTimeStamp(uint64_t timestamp) { mSessionSetupTimeStamp = timestamp; }
+};
 
 } // namespace chip

@@ -3295,6 +3295,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testNullableOptionalRequestWithParams:(CHIPTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
                             completionHandler:(void (^)(CHIPTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler;
+- (void)testSimpleOptionalArgumentRequestWithParams:
+            (CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
+                                  completionHandler:(StatusCompletion)completionHandler;
 - (void)testSpecificWithCompletionHandler:(void (^)(CHIPTestClusterClusterTestSpecificResponseParams * _Nullable data,
                                               NSError * _Nullable error))completionHandler;
 - (void)testStructArgumentRequestWithParams:(CHIPTestClusterClusterTestStructArgumentRequestParams *)params

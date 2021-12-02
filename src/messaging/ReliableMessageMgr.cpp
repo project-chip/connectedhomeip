@@ -67,7 +67,7 @@ void ReliableMessageMgr::Shutdown()
     // Clear the retransmit table
     mRetransTable.ForEachActiveObject([&](auto * entry) {
         mRetransTable.ReleaseObject(entry);
-        return true;
+        return Loop::Continue;
     });
 
     mSystemLayer = nullptr;
@@ -83,7 +83,7 @@ void ReliableMessageMgr::TicklessDebugDumpRetransTable(const char * log)
                       "EC:" ChipLogFormatExchange " MessageCounter:" ChipLogFormatMessageCounter " NextRetransTimeCtr:%" PRIu64,
                       ChipLogValueExchange(&entry->ec.Get()), entry->retainedBuf.GetMessageCounter(),
                       entry->nextRetransTime.count());
-        return true;
+        return Loop::Continue;
     });
 }
 #else
@@ -117,7 +117,7 @@ void ReliableMessageMgr::ExecuteActions()
     // Retransmit / cancel anything in the retrans table whose retrans timeout has expired
     mRetransTable.ForEachActiveObject([&](auto * entry) {
         if (entry->nextRetransTime > now)
-            return true;
+            return Loop::Continue;
 
         VerifyOrDie(!entry->retainedBuf.IsNull());
 
@@ -133,7 +133,7 @@ void ReliableMessageMgr::ExecuteActions()
 
             // Do not StartTimer, we will schedule the timer at the end of the timer handler.
             mRetransTable.ReleaseObject(entry);
-            return true;
+            return Loop::Continue;
         }
 
         ChipLogDetail(ExchangeManager,
@@ -145,7 +145,7 @@ void ReliableMessageMgr::ExecuteActions()
         SendFromRetransTable(entry);
         // For test not using async IO loop, the entry may have been removed after send, do not use entry below
 
-        return true;
+        return Loop::Continue;
     });
 
     TicklessDebugDumpRetransTable("ReliableMessageMgr::ExecuteActions Dumping mRetransTable entries after processing");
@@ -203,9 +203,9 @@ bool ReliableMessageMgr::CheckAndRemRetransTable(ReliableMessageContext * rc, ui
                           " from Retrans Table on exchange " ChipLogFormatExchange,
                           ackMessageCounter, ChipLogValueExchange(rc->GetExchangeContext()));
             removed = true;
-            return false;
+            return Loop::Break;
         }
-        return true;
+        return Loop::Continue;
     });
 
     return removed;
@@ -265,9 +265,9 @@ void ReliableMessageMgr::ClearRetransTable(ReliableMessageContext * rc)
         if (entry->ec->GetReliableMessageContext() == rc)
         {
             ClearRetransTable(*entry);
-            return false;
+            return Loop::Break;
         }
-        return true;
+        return Loop::Continue;
     });
 }
 
@@ -296,7 +296,7 @@ void ReliableMessageMgr::StartTimer()
         {
             nextWakeTime = entry->nextRetransTime;
         }
-        return true;
+        return Loop::Continue;
     });
 
     if (nextWakeTime != System::Clock::Timestamp::max())
@@ -330,7 +330,7 @@ int ReliableMessageMgr::TestGetCountRetransTable()
     int count = 0;
     mRetransTable.ForEachActiveObject([&](auto * entry) {
         count++;
-        return true;
+        return Loop::Continue;
     });
     return count;
 }

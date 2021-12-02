@@ -189,13 +189,17 @@ public:
             err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_3();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_4();
             break;
         }
 
@@ -208,7 +212,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 5;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -225,16 +229,26 @@ private:
         (static_cast<Test_TC_BI_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_BI_1_1 *>(context))->OnSuccessResponse_2(); }
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_BI_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_BI_1_1 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_3(void * context, uint16_t clusterRevision)
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_BI_1_1 *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_BI_1_1 *>(context))->OnSuccessResponse_3(clusterRevision);
+        (static_cast<Test_TC_BI_1_1 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_4(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_BI_1_1 *>(context))->OnSuccessResponse_4(clusterRevision);
     }
 
     //
@@ -266,7 +280,26 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::BinaryInputBasicClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
@@ -276,30 +309,30 @@ private:
         clusterRevisionArgument = 1U;
 
         return cluster.WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
     }
 
-    void OnFailureResponse_2(uint8_t status)
+    void OnFailureResponse_3(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_3()
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BinaryInputBasicClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3);
+            this, OnSuccessCallback_4, OnFailureCallback_4);
     }
 
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(uint16_t clusterRevision)
+    void OnSuccessResponse_4(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 1U));
 
@@ -1082,13 +1115,17 @@ public:
             err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_3();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_4();
             break;
         }
 
@@ -1101,7 +1138,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 5;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -1118,16 +1155,26 @@ private:
         (static_cast<Test_TC_BOOL_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_BOOL_1_1 *>(context))->OnSuccessResponse_2(); }
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_BOOL_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_BOOL_1_1 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_3(void * context, uint16_t clusterRevision)
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_BOOL_1_1 *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_BOOL_1_1 *>(context))->OnSuccessResponse_3(clusterRevision);
+        (static_cast<Test_TC_BOOL_1_1 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_4(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_BOOL_1_1 *>(context))->OnSuccessResponse_4(clusterRevision);
     }
 
     //
@@ -1159,7 +1206,26 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::BooleanStateClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
@@ -1169,30 +1235,30 @@ private:
         clusterRevisionArgument = 1U;
 
         return cluster.WriteAttribute<chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
     }
 
-    void OnFailureResponse_2(uint8_t status)
+    void OnFailureResponse_3(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_3()
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::BooleanStateClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3);
+            this, OnSuccessCallback_4, OnFailureCallback_4);
     }
 
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(uint16_t clusterRevision)
+    void OnSuccessResponse_4(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 1U));
 
@@ -1425,9 +1491,13 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints : ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            break;
+        case 2:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 1 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1();
+                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
             break;
         }
 
@@ -1440,14 +1510,24 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 3;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_CC_1_1 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_CC_1_1 *>(context))->OnSuccessResponse_1(); }
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_CC_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_CC_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_CC_1_1 *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -1459,7 +1539,26 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ColorControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ColorControlClusterTest cluster;
@@ -1469,16 +1568,16 @@ private:
         clusterRevisionArgument = 4U;
 
         return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
     }
 
-    void OnFailureResponse_1(uint8_t status)
+    void OnFailureResponse_2(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_1() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_CC_2_1 : public TestCommand
@@ -7398,12 +7497,28 @@ public:
             err = TestMoveSaturationDownCommand_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : Turn off light that we turned on\n");
-            err = TestTurnOffLightThatWeTurnedOn_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : Move saturation up command\n");
+            err = TestMoveSaturationUpCommand_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : Check on/off attribute value is false after off command\n");
-            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Move saturation stop command\n");
+            err = TestMoveSaturationStopCommand_6();
+            break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Move saturation down command\n");
+            err = TestMoveSaturationDownCommand_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Move saturation stop command\n");
+            err = TestMoveSaturationStopCommand_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Turn off light that we turned on\n");
+            err = TestTurnOffLightThatWeTurnedOn_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Check on/off attribute value is false after off command\n");
+            err = TestCheckOnOffAttributeValueIsFalseAfterOffCommand_10();
             break;
         }
 
@@ -7416,7 +7531,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 11;
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
@@ -7428,14 +7543,14 @@ private:
         (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_2(onOff);
     }
 
-    static void OnFailureCallback_6(void * context, EmberAfStatus status)
+    static void OnFailureCallback_10(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_6(chip::to_underlying(status));
+        (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_10(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_6(void * context, bool onOff)
+    static void OnSuccessCallback_10(void * context, bool onOff)
     {
-        (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_6(onOff);
+        (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_10(onOff);
     }
 
     //
@@ -7544,12 +7659,16 @@ private:
 
     void OnSuccessResponse_4() { NextTest(); }
 
-    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_5()
+    CHIP_ERROR TestMoveSaturationUpCommand_5()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
 
         RequestType request;
+        request.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(1);
+        request.rate            = 5;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_5();
@@ -7567,19 +7686,123 @@ private:
 
     void OnSuccessResponse_5() { NextTest(); }
 
-    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_6()
+    CHIP_ERROR TestMoveSaturationStopCommand_6()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
+
+        RequestType request;
+        request.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(0);
+        request.rate            = 5;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_6();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_6(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_6() { NextTest(); }
+
+    CHIP_ERROR TestMoveSaturationDownCommand_7()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
+
+        RequestType request;
+        request.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(3);
+        request.rate            = 5;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_7();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_7(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7() { NextTest(); }
+
+    CHIP_ERROR TestMoveSaturationStopCommand_8()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::ColorControl::Commands::MoveSaturation::Type;
+
+        RequestType request;
+        request.moveMode        = static_cast<chip::app::Clusters::ColorControl::SaturationMoveMode>(0);
+        request.rate            = 5;
+        request.optionsMask     = 0;
+        request.optionsOverride = 0;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_8();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_8(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_8() { NextTest(); }
+
+    CHIP_ERROR TestTurnOffLightThatWeTurnedOn_9()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::OnOff::Commands::Off::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<Test_TC_CC_4_2 *>(context))->OnSuccessResponse_9();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<Test_TC_CC_4_2 *>(context))->OnFailureResponse_9(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9() { NextTest(); }
+
+    CHIP_ERROR TestCheckOnOffAttributeValueIsFalseAfterOffCommand_10()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_6,
-                                                                                              OnFailureCallback_6);
+        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnSuccessCallback_10,
+                                                                                              OnFailureCallback_10);
     }
 
-    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(bool onOff)
+    void OnSuccessResponse_10(bool onOff)
     {
         VerifyOrReturn(CheckValue("onOff", onOff, 0));
 
@@ -14276,13 +14499,17 @@ public:
             err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_3();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_4();
             break;
         }
 
@@ -14295,7 +14522,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 5;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -14312,16 +14539,26 @@ private:
         (static_cast<Test_TC_EMR_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_EMR_1_1 *>(context))->OnSuccessResponse_2(); }
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_EMR_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_EMR_1_1 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_3(void * context, uint16_t clusterRevision)
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_EMR_1_1 *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_EMR_1_1 *>(context))->OnSuccessResponse_3(clusterRevision);
+        (static_cast<Test_TC_EMR_1_1 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_4(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_EMR_1_1 *>(context))->OnSuccessResponse_4(clusterRevision);
     }
 
     //
@@ -14353,7 +14590,26 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ElectricalMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ElectricalMeasurementClusterTest cluster;
@@ -14363,30 +14619,30 @@ private:
         clusterRevisionArgument = 1U;
 
         return cluster.WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
     }
 
-    void OnFailureResponse_2(uint8_t status)
+    void OnFailureResponse_3(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_3()
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ElectricalMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3);
+            this, OnSuccessCallback_4, OnFailureCallback_4);
     }
 
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(uint16_t clusterRevision)
+    void OnSuccessResponse_4(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 3U));
 
@@ -14429,9 +14685,13 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            break;
+        case 2:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 1 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1();
+                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
             break;
         }
 
@@ -14444,14 +14704,24 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 3;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_FLW_1_1 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_FLW_1_1 *>(context))->OnSuccessResponse_1(); }
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_FLW_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_FLW_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_FLW_1_1 *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -14463,7 +14733,26 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::FlowMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::FlowMeasurementClusterTest cluster;
@@ -14473,16 +14762,16 @@ private:
         clusterRevisionArgument = 2U;
 
         return cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
     }
 
-    void OnFailureResponse_1(uint8_t status)
+    void OnFailureResponse_2(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_1() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_FLW_2_1 : public TestCommand
@@ -14968,13 +15257,17 @@ public:
             err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_3();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_4();
             break;
         }
 
@@ -14987,7 +15280,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 5;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -15004,16 +15297,26 @@ private:
         (static_cast<Test_TC_ILL_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_ILL_1_1 *>(context))->OnSuccessResponse_2(); }
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_ILL_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_ILL_1_1 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_3(void * context, uint16_t clusterRevision)
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_ILL_1_1 *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_ILL_1_1 *>(context))->OnSuccessResponse_3(clusterRevision);
+        (static_cast<Test_TC_ILL_1_1 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_4(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_ILL_1_1 *>(context))->OnSuccessResponse_4(clusterRevision);
     }
 
     //
@@ -15045,7 +15348,26 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::IlluminanceMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::IlluminanceMeasurementClusterTest cluster;
@@ -15055,30 +15377,30 @@ private:
         clusterRevisionArgument = 1U;
 
         return cluster.WriteAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
     }
 
-    void OnFailureResponse_2(uint8_t status)
+    void OnFailureResponse_3(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_3()
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::IlluminanceMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3);
+            this, OnSuccessCallback_4, OnFailureCallback_4);
     }
 
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(uint16_t clusterRevision)
+    void OnSuccessResponse_4(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 2U));
 
@@ -15121,9 +15443,13 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            break;
+        case 2:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 1 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1();
+                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
             break;
         }
 
@@ -15136,14 +15462,24 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 3;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_LVL_1_1 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_LVL_1_1 *>(context))->OnSuccessResponse_1(); }
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_LVL_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_LVL_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_LVL_1_1 *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -15155,7 +15491,26 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::LevelControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::LevelControlClusterTest cluster;
@@ -15165,16 +15520,16 @@ private:
         clusterRevisionArgument = 4U;
 
         return cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
     }
 
-    void OnFailureResponse_1(uint8_t status)
+    void OnFailureResponse_2(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_1() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_LVL_2_1 : public TestCommand
@@ -16601,9 +16956,13 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            break;
+        case 2:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 1 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1();
+                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
             break;
         }
 
@@ -16616,14 +16975,24 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 3;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_MC_1_1 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_MC_1_1 *>(context))->OnSuccessResponse_1(); }
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_MC_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_MC_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_MC_1_1 *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -16635,26 +17004,45 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
+        chip::Controller::MediaInputClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::MediaInputClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+        return cluster.WriteAttribute<chip::app::Clusters::MediaInput::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
     }
 
-    void OnFailureResponse_1(uint8_t status)
+    void OnFailureResponse_2(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_1() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_MC_2_1 : public TestCommand
@@ -17419,9 +17807,13 @@ public:
             err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
+            break;
+        case 3:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+                            " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
             break;
         }
 
@@ -17434,7 +17826,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 3;
+    const uint16_t mTestCount = 4;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -17451,7 +17843,17 @@ private:
         (static_cast<Test_TC_OCC_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_OCC_1_1 *>(context))->OnSuccessResponse_2(); }
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_OCC_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_OCC_1_1 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_OCC_1_1 *>(context))->OnSuccessResponse_3(); }
 
     //
     // Tests methods
@@ -17482,7 +17884,26 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::OccupancySensingClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OccupancySensingClusterTest cluster;
@@ -17492,16 +17913,16 @@ private:
         clusterRevisionArgument = 2U;
 
         return cluster.WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
     }
 
-    void OnFailureResponse_2(uint8_t status)
+    void OnFailureResponse_3(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_OCC_2_1 : public TestCommand
@@ -18031,25 +18452,33 @@ public:
             err = TestReadTheGlobalAttributeClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_3();
             break;
         case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_4();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 4 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_4();
             break;
         case 5:
-            ChipLogProgress(chipTool, " ***** Test Step 5 : read the optional global attribute: FeatureMap\n");
-            err = TestReadTheOptionalGlobalAttributeFeatureMap_5();
+            ChipLogProgress(chipTool, " ***** Test Step 5 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : write the default values to optional global attribute: FeatureMap\n");
-            err = TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : read the optional global attribute: FeatureMap\n");
+            err = TestReadTheOptionalGlobalAttributeFeatureMap_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : reads back optional global attribute: FeatureMap\n");
-            err = TestReadsBackOptionalGlobalAttributeFeatureMap_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read the optional global attribute : FeatureMap\n");
+            err = TestReadTheOptionalGlobalAttributeFeatureMap_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : write the default values to optional global attribute: FeatureMap\n");
+            err = TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : reads back optional global attribute: FeatureMap\n");
+            err = TestReadsBackOptionalGlobalAttributeFeatureMap_9();
             break;
         }
 
@@ -18062,7 +18491,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 8;
+    const uint16_t mTestCount = 10;
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
@@ -18079,26 +18508,26 @@ private:
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_3(); }
+    static void OnSuccessCallback_3(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_3(clusterRevision);
+    }
 
     static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_4(void * context, uint16_t clusterRevision)
-    {
-        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_4(clusterRevision);
-    }
+    static void OnSuccessCallback_4(void * context) { (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_4(); }
 
     static void OnFailureCallback_5(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_5(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_5(void * context, uint32_t featureMap)
+    static void OnSuccessCallback_5(void * context, uint16_t clusterRevision)
     {
-        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_5(featureMap);
+        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_5(clusterRevision);
     }
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
@@ -18106,7 +18535,10 @@ private:
         (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_6(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_6(void * context) { (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_6(); }
+    static void OnSuccessCallback_6(void * context, uint32_t featureMap)
+    {
+        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_6(featureMap);
+    }
 
     static void OnFailureCallback_7(void * context, EmberAfStatus status)
     {
@@ -18116,6 +18548,23 @@ private:
     static void OnSuccessCallback_7(void * context, uint32_t featureMap)
     {
         (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_7(featureMap);
+    }
+
+    static void OnFailureCallback_8(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_8(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_8(void * context) { (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_8(); }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_OO_1_1 *>(context))->OnFailureResponse_9(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_9(void * context, uint32_t featureMap)
+    {
+        (static_cast<Test_TC_OO_1_1 *>(context))->OnSuccessResponse_9(featureMap);
     }
 
     //
@@ -18153,7 +18602,26 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_3()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(this, OnSuccessCallback_3,
+                                                                                                        OnFailureCallback_3);
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
@@ -18163,77 +18631,56 @@ private:
         clusterRevisionArgument = 3U;
 
         return cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+            clusterRevisionArgument, this, OnSuccessCallback_4, OnFailureCallback_4);
     }
 
-    void OnFailureResponse_3(uint8_t status)
+    void OnFailureResponse_4(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_4() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_5()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(this, OnSuccessCallback_4,
-                                                                                                        OnFailureCallback_4);
+        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(this, OnSuccessCallback_5,
+                                                                                                        OnFailureCallback_5);
     }
 
-    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_4(uint16_t clusterRevision)
+    void OnSuccessResponse_5(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 4U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_5()
+    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_6()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(this, OnSuccessCallback_5,
-                                                                                                   OnFailureCallback_5);
+        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(this, OnSuccessCallback_6,
+                                                                                                   OnFailureCallback_6);
     }
 
-    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_5(uint32_t featureMap)
+    void OnSuccessResponse_6(uint32_t featureMap)
     {
         VerifyOrReturn(CheckValue("featureMap", featureMap, 0UL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_6()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::OnOffClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        uint32_t featureMapArgument;
-        featureMapArgument = 0UL;
-
-        return cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(
-            featureMapArgument, this, OnSuccessCallback_6, OnFailureCallback_6);
-    }
-
-    void OnFailureResponse_6(uint8_t status)
-    {
-        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
-        NextTest();
-    }
-
-    void OnSuccessResponse_6() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackOptionalGlobalAttributeFeatureMap_7()
+    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_7()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::OnOffClusterTest cluster;
@@ -18246,6 +18693,46 @@ private:
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_7(uint32_t featureMap)
+    {
+        VerifyOrReturn(CheckConstraintType("featureMap", "", "map32"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToOptionalGlobalAttributeFeatureMap_8()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        uint32_t featureMapArgument;
+        featureMapArgument = 0UL;
+
+        return cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(
+            featureMapArgument, this, OnSuccessCallback_8, OnFailureCallback_8);
+    }
+
+    void OnFailureResponse_8(uint8_t status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadsBackOptionalGlobalAttributeFeatureMap_9()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::OnOffClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(this, OnSuccessCallback_9,
+                                                                                                   OnFailureCallback_9);
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(uint32_t featureMap)
     {
         VerifyOrReturn(CheckValue("featureMap", featureMap, 0UL));
 
@@ -20652,21 +21139,13 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
-            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeClusterRevision_1();
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
-            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
-            break;
-        case 3:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 3 : Write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_4();
+                            " ***** Test Step 2 : Write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
             break;
         }
 
@@ -20679,7 +21158,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 3;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -20696,27 +21175,7 @@ private:
         (static_cast<Test_TC_PRS_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
-    {
-        (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
-    }
-
-    static void OnFailureCallback_3(void * context, EmberAfStatus status)
-    {
-        (static_cast<Test_TC_PRS_1_1 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_3(); }
-
-    static void OnFailureCallback_4(void * context, EmberAfStatus status)
-    {
-        (static_cast<Test_TC_PRS_1_1 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_4(void * context, uint16_t clusterRevision)
-    {
-        (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_4(clusterRevision);
-    }
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_PRS_1_1 *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -20728,7 +21187,7 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestReadTheGlobalAttributeClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
@@ -20742,69 +21201,31 @@ private:
 
     void OnSuccessResponse_1(uint16_t clusterRevision)
     {
-        VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 2U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_2, OnFailureCallback_2);
-    }
-
-    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_2(uint16_t clusterRevision)
-    {
         VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PressureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         uint16_t clusterRevisionArgument;
-        clusterRevisionArgument = 2U;
+        clusterRevisionArgument = 3U;
 
         return cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
     }
 
-    void OnFailureResponse_3(uint8_t status)
+    void OnFailureResponse_2(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::PressureMeasurementClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4);
-    }
-
-    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_4(uint16_t clusterRevision)
-    {
-        VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 2U));
-
-        NextTest();
-    }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_PRS_2_1 : public TestCommand
@@ -21194,9 +21615,17 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            break;
+        case 2:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 1 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1();
+                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : read the optional global attribute: FeatureMap\n");
+            err = TestReadTheOptionalGlobalAttributeFeatureMap_3();
             break;
         }
 
@@ -21209,14 +21638,34 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 4;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_PCC_1_1 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_PCC_1_1 *>(context))->OnSuccessResponse_1(); }
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_PCC_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_PCC_1_1 *>(context))->OnSuccessResponse_2(); }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_PCC_1_1 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_3(void * context, uint32_t featureMap)
+    {
+        (static_cast<Test_TC_PCC_1_1 *>(context))->OnSuccessResponse_3(featureMap);
+    }
 
     //
     // Tests methods
@@ -21228,7 +21677,26 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::PumpConfigurationAndControlClusterTest cluster;
@@ -21238,16 +21706,35 @@ private:
         clusterRevisionArgument = 3U;
 
         return cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
     }
 
-    void OnFailureResponse_1(uint8_t status)
+    void OnFailureResponse_2(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_1() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadTheOptionalGlobalAttributeFeatureMap_3()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::PumpConfigurationAndControlClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::FeatureMap::TypeInfo>(
+            this, OnSuccessCallback_3, OnFailureCallback_3);
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint32_t featureMap)
+    {
+        VerifyOrReturn(CheckConstraintType("featureMap", "", "map32"));
+
+        NextTest();
+    }
 };
 
 class Test_TC_PCC_2_1 : public TestCommand
@@ -21871,9 +22358,13 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            break;
+        case 2:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 1 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1();
+                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
             break;
         }
 
@@ -21886,14 +22377,24 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 3;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_RH_1_1 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_RH_1_1 *>(context))->OnSuccessResponse_1(); }
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_RH_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_RH_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_RH_1_1 *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -21905,7 +22406,26 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::RelativeHumidityMeasurementClusterTest cluster;
@@ -21915,16 +22435,16 @@ private:
         clusterRevisionArgument = 1U;
 
         return cluster.WriteAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
     }
 
-    void OnFailureResponse_1(uint8_t status)
+    void OnFailureResponse_2(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_1() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_RH_2_1 : public TestCommand
@@ -22215,13 +22735,17 @@ public:
             err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_3();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_4();
             break;
         }
 
@@ -22234,7 +22758,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 5;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -22251,16 +22775,26 @@ private:
         (static_cast<Test_TC_TM_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_TM_1_1 *>(context))->OnSuccessResponse_2(); }
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_TM_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_TM_1_1 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_3(void * context, uint16_t clusterRevision)
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_TM_1_1 *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_TM_1_1 *>(context))->OnSuccessResponse_3(clusterRevision);
+        (static_cast<Test_TC_TM_1_1 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_4(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_TM_1_1 *>(context))->OnSuccessResponse_4(clusterRevision);
     }
 
     //
@@ -22292,7 +22826,26 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TemperatureMeasurementClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
@@ -22302,30 +22855,30 @@ private:
         clusterRevisionArgument = 3U;
 
         return cluster.WriteAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
     }
 
-    void OnFailureResponse_2(uint8_t status)
+    void OnFailureResponse_3(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_3()
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TemperatureMeasurementClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3);
+            this, OnSuccessCallback_4, OnFailureCallback_4);
     }
 
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(uint16_t clusterRevision)
+    void OnSuccessResponse_4(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 3U));
 
@@ -22583,9 +23136,17 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            break;
+        case 2:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 1 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1();
+                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Read the optional global attribute constraints: FeatureMap\n");
+            err = TestReadTheOptionalGlobalAttributeConstraintsFeatureMap_3();
             break;
         }
 
@@ -22598,14 +23159,34 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 4;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_TSTAT_1_1 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_TSTAT_1_1 *>(context))->OnSuccessResponse_1(); }
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_TSTAT_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_TSTAT_1_1 *>(context))->OnSuccessResponse_2(); }
+
+    static void OnFailureCallback_3(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSTAT_1_1 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_3(void * context, uint32_t featureMap)
+    {
+        (static_cast<Test_TC_TSTAT_1_1 *>(context))->OnSuccessResponse_3(featureMap);
+    }
 
     //
     // Tests methods
@@ -22617,7 +23198,26 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_1, OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatClusterTest cluster;
@@ -22627,16 +23227,35 @@ private:
         clusterRevisionArgument = 5U;
 
         return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
     }
 
-    void OnFailureResponse_1(uint8_t status)
+    void OnFailureResponse_2(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_1() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadTheOptionalGlobalAttributeConstraintsFeatureMap_3()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::FeatureMap::TypeInfo>(this, OnSuccessCallback_3,
+                                                                                                        OnFailureCallback_3);
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3(uint32_t featureMap)
+    {
+        VerifyOrReturn(CheckConstraintType("featureMap", "", "map32"));
+
+        NextTest();
+    }
 };
 
 class Test_TC_TSTAT_2_1 : public TestCommand
@@ -26297,9 +26916,13 @@ public:
             err = TestWaitForTheCommissionedDeviceToBeRetrieved_0();
             break;
         case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_1();
+            break;
+        case 2:
             ChipLogProgress(chipTool,
-                            " ***** Test Step 1 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1();
+                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
             break;
         }
 
@@ -26312,14 +26935,24 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 3;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_TSUIC_1_1 *>(context))->OnFailureResponse_1(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_1(void * context) { (static_cast<Test_TC_TSUIC_1_1 *>(context))->OnSuccessResponse_1(); }
+    static void OnSuccessCallback_1(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_TSUIC_1_1 *>(context))->OnSuccessResponse_1(clusterRevision);
+    }
+
+    static void OnFailureCallback_2(void * context, EmberAfStatus status)
+    {
+        (static_cast<Test_TC_TSUIC_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_TSUIC_1_1 *>(context))->OnSuccessResponse_2(); }
 
     //
     // Tests methods
@@ -26331,7 +26964,27 @@ private:
         return WaitForCommissionee();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_1()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster
+            .ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ClusterRevision::TypeInfo>(
+                this, OnSuccessCallback_1, OnFailureCallback_1);
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::ThermostatUserInterfaceConfigurationClusterTest cluster;
@@ -26342,16 +26995,16 @@ private:
 
         return cluster
             .WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ClusterRevision::TypeInfo>(
-                clusterRevisionArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+                clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
     }
 
-    void OnFailureResponse_1(uint8_t status)
+    void OnFailureResponse_2(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_1() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
 };
 
 class Test_TC_TSUIC_2_1 : public TestCommand
@@ -27296,13 +27949,17 @@ public:
             err = TestReadTheGlobalAttributeClusterRevision_1();
             break;
         case 2:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 2 : write the default values to mandatory global attribute: ClusterRevision\n");
-            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2();
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Read the global attribute constraints: ClusterRevision\n");
+            err = TestReadTheGlobalAttributeConstraintsClusterRevision_2();
             break;
         case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : reads back global attribute: ClusterRevision\n");
-            err = TestReadsBackGlobalAttributeClusterRevision_3();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 3 : write the default values to mandatory global attribute: ClusterRevision\n");
+            err = TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : reads back global attribute: ClusterRevision\n");
+            err = TestReadsBackGlobalAttributeClusterRevision_4();
             break;
         }
 
@@ -27315,7 +27972,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 4;
+    const uint16_t mTestCount = 5;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -27332,16 +27989,26 @@ private:
         (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnFailureResponse_2(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_2(void * context) { (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnSuccessResponse_2(); }
+    static void OnSuccessCallback_2(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnSuccessResponse_2(clusterRevision);
+    }
 
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
         (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnFailureResponse_3(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_3(void * context, uint16_t clusterRevision)
+    static void OnSuccessCallback_3(void * context) { (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnSuccessResponse_3(); }
+
+    static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
-        (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnSuccessResponse_3(clusterRevision);
+        (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnFailureResponse_4(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_4(void * context, uint16_t clusterRevision)
+    {
+        (static_cast<Test_TC_DIAGTH_1_1 *>(context))->OnSuccessResponse_4(clusterRevision);
     }
 
     //
@@ -27373,7 +28040,26 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_2()
+    CHIP_ERROR TestReadTheGlobalAttributeConstraintsClusterRevision_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo>(
+            this, OnSuccessCallback_2, OnFailureCallback_2);
+    }
+
+    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_2(uint16_t clusterRevision)
+    {
+        VerifyOrReturn(CheckConstraintType("clusterRevision", "", "uint16"));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteTheDefaultValuesToMandatoryGlobalAttributeClusterRevision_3()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
@@ -27383,30 +28069,30 @@ private:
         clusterRevisionArgument = 1U;
 
         return cluster.WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
     }
 
-    void OnFailureResponse_2(uint8_t status)
+    void OnFailureResponse_3(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_WRITE));
         NextTest();
     }
 
-    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_3() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_3()
+    CHIP_ERROR TestReadsBackGlobalAttributeClusterRevision_4()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::ThreadNetworkDiagnosticsClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3);
+            this, OnSuccessCallback_4, OnFailureCallback_4);
     }
 
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_3(uint16_t clusterRevision)
+    void OnSuccessResponse_4(uint16_t clusterRevision)
     {
         VerifyOrReturn(CheckValue("clusterRevision", clusterRevision, 1U));
 
@@ -33425,6 +34111,16 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 294 : Read attribute from nonexistent cluster.\n");
             err = TestReadAttributeFromNonexistentCluster_294();
             break;
+        case 295:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 295 : Send a command that takes an optional parameter but do not set it.\n");
+            err = TestSendACommandThatTakesAnOptionalParameterButDoNotSetIt_295();
+            break;
+        case 296:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 296 : Send a command that takes an optional parameter but do not set it.\n");
+            err = TestSendACommandThatTakesAnOptionalParameterButDoNotSetIt_296();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -33436,7 +34132,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 295;
+    const uint16_t mTestCount = 297;
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
     {
@@ -41937,6 +42633,57 @@ private:
     }
 
     void OnSuccessResponse_294(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestSendACommandThatTakesAnOptionalParameterButDoNotSetIt_295()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_295();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestCluster *>(context))->OnFailureResponse_295(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_295(uint8_t status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_INVALID_VALUE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_295() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestSendACommandThatTakesAnOptionalParameterButDoNotSetIt_296()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type;
+
+        RequestType request;
+        request.arg1.Emplace() = 1;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_296();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestCluster *>(context))->OnFailureResponse_296(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_296(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_296() { NextTest(); }
 };
 
 class TestClusterComplexTypes : public TestCommand
@@ -46135,44 +46882,88 @@ public:
             err = TestViewGroup2NotFound_5();
             break;
         case 6:
-            ChipLogProgress(chipTool, " ***** Test Step 6 : View Group 3 (not found)\n");
-            err = TestViewGroup3NotFound_6();
+            ChipLogProgress(chipTool, " ***** Test Step 6 : Get Group Membership 1 (all)\n");
+            err = TestGetGroupMembership1All_6();
             break;
         case 7:
-            ChipLogProgress(chipTool, " ***** Test Step 7 : View Group 1 (existing)\n");
-            err = TestViewGroup1Existing_7();
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Add Group 2 (new)\n");
+            err = TestAddGroup2New_7();
             break;
         case 8:
-            ChipLogProgress(chipTool, " ***** Test Step 8 : Remove Group 0 (invalid)\n");
-            err = TestRemoveGroup0Invalid_8();
+            ChipLogProgress(chipTool, " ***** Test Step 8 : View Group 2 (new)\n");
+            err = TestViewGroup2New_8();
             break;
         case 9:
-            ChipLogProgress(chipTool, " ***** Test Step 9 : Remove Group 4 (not found)\n");
-            err = TestRemoveGroup4NotFound_9();
+            ChipLogProgress(chipTool, " ***** Test Step 9 : View Group 3 (not found)\n");
+            err = TestViewGroup3NotFound_9();
             break;
         case 10:
-            ChipLogProgress(chipTool, " ***** Test Step 10 : View Group 1 (not removed)\n");
-            err = TestViewGroup1NotRemoved_10();
+            ChipLogProgress(chipTool, " ***** Test Step 10 : Add Group 3 (new)\n");
+            err = TestAddGroup3New_10();
             break;
         case 11:
-            ChipLogProgress(chipTool, " ***** Test Step 11 : View Group 2 (removed)\n");
-            err = TestViewGroup2Removed_11();
+            ChipLogProgress(chipTool, " ***** Test Step 11 : View Group 1 (existing)\n");
+            err = TestViewGroup1Existing_11();
             break;
         case 12:
-            ChipLogProgress(chipTool, " ***** Test Step 12 : Remove All\n");
-            err = TestRemoveAll_12();
+            ChipLogProgress(chipTool, " ***** Test Step 12 : View Group 2 (existing)\n");
+            err = TestViewGroup2Existing_12();
             break;
         case 13:
-            ChipLogProgress(chipTool, " ***** Test Step 13 : View Group 1 (removed)\n");
-            err = TestViewGroup1Removed_13();
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Get Group Membership 2\n");
+            err = TestGetGroupMembership2_13();
             break;
         case 14:
-            ChipLogProgress(chipTool, " ***** Test Step 14 : View Group 2 (still removed)\n");
-            err = TestViewGroup2StillRemoved_14();
+            ChipLogProgress(chipTool, " ***** Test Step 14 : View Group 3 (new)\n");
+            err = TestViewGroup3New_14();
             break;
         case 15:
-            ChipLogProgress(chipTool, " ***** Test Step 15 : View Group 3 (removed)\n");
-            err = TestViewGroup3Removed_15();
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Remove Group 0 (invalid)\n");
+            err = TestRemoveGroup0Invalid_15();
+            break;
+        case 16:
+            ChipLogProgress(chipTool, " ***** Test Step 16 : Remove Group 4 (not found)\n");
+            err = TestRemoveGroup4NotFound_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Remove Group 2 (existing)\n");
+            err = TestRemoveGroup2Existing_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool, " ***** Test Step 18 : View Group 1 (not removed)\n");
+            err = TestViewGroup1NotRemoved_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : View Group 2 (removed)\n");
+            err = TestViewGroup2Removed_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : View Group 3 (not removed)\n");
+            err = TestViewGroup3NotRemoved_20();
+            break;
+        case 21:
+            ChipLogProgress(chipTool, " ***** Test Step 21 : Get Group Membership 3\n");
+            err = TestGetGroupMembership3_21();
+            break;
+        case 22:
+            ChipLogProgress(chipTool, " ***** Test Step 22 : Remove All\n");
+            err = TestRemoveAll_22();
+            break;
+        case 23:
+            ChipLogProgress(chipTool, " ***** Test Step 23 : View Group 1 (removed)\n");
+            err = TestViewGroup1Removed_23();
+            break;
+        case 24:
+            ChipLogProgress(chipTool, " ***** Test Step 24 : View Group 2 (still removed)\n");
+            err = TestViewGroup2StillRemoved_24();
+            break;
+        case 25:
+            ChipLogProgress(chipTool, " ***** Test Step 25 : View Group 3 (removed)\n");
+            err = TestViewGroup3Removed_25();
+            break;
+        case 26:
+            ChipLogProgress(chipTool, " ***** Test Step 26 : Get Group Membership 4\n");
+            err = TestGetGroupMembership4_26();
             break;
         }
 
@@ -46185,7 +46976,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 16;
+    const uint16_t mTestCount = 27;
 
     //
     // Tests methods
@@ -46355,16 +47146,17 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestViewGroup3NotFound_6()
+    CHIP_ERROR TestGetGroupMembership1All_6()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::GetGroupMembership::Type;
 
         RequestType request;
-        request.groupId = 32767U;
+
+        request.groupList = chip::app::DataModel::List<uint16_t>();
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_6(data.status, data.groupId, data.groupName);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_6(data.capacity, data.groupList);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -46377,25 +47169,29 @@ private:
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_6(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_6(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
     {
-        VerifyOrReturn(CheckValue("status", status, 139));
+        VerifyOrReturn(CheckValue("capacity", capacity, 255));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 32767U));
+        auto iter = groupList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(groupList)>("groupList", iter, 0));
+        VerifyOrReturn(CheckValue("groupList[0]", iter.GetValue(), 1U));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(groupList)>("groupList", iter, 1));
 
         NextTest();
     }
 
-    CHIP_ERROR TestViewGroup1Existing_7()
+    CHIP_ERROR TestAddGroup2New_7()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
 
         RequestType request;
-        request.groupId = 1U;
+        request.groupId   = 4369U;
+        request.groupName = chip::Span<const char>("Group #2garbage: not in length on purpose", 8);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_7(data.status, data.groupId, data.groupName);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_7(data.status, data.groupId);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -46408,27 +47204,25 @@ private:
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_7(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_7(uint8_t status, uint16_t groupId)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
-
-        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #1", 8)));
+        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestRemoveGroup0Invalid_8()
+    CHIP_ERROR TestViewGroup2New_8()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
-        request.groupId = 0U;
+        request.groupId = 4369U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_8(data.status, data.groupId);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_8(data.status, data.groupId, data.groupName);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -46441,25 +47235,27 @@ private:
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_8(uint8_t status, uint16_t groupId)
+    void OnSuccessResponse_8(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
     {
-        VerifyOrReturn(CheckValue("status", status, 135));
+        VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 0U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #2", 8)));
 
         NextTest();
     }
 
-    CHIP_ERROR TestRemoveGroup4NotFound_9()
+    CHIP_ERROR TestViewGroup3NotFound_9()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
-        request.groupId = 4U;
+        request.groupId = 32767U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_9(data.status, data.groupId);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_9(data.status, data.groupId, data.groupName);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -46472,25 +47268,26 @@ private:
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_9(uint8_t status, uint16_t groupId)
+    void OnSuccessResponse_9(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 139));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 4U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 32767U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestViewGroup1NotRemoved_10()
+    CHIP_ERROR TestAddGroup3New_10()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::AddGroup::Type;
 
         RequestType request;
-        request.groupId = 1U;
+        request.groupId   = 32767U;
+        request.groupName = chip::Span<const char>("Group #3garbage: not in length on purpose", 8);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_10(data.status, data.groupId, data.groupName);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_10(data.status, data.groupId);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -46503,24 +47300,22 @@ private:
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_10(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_10(uint8_t status, uint16_t groupId)
     {
         VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
-
-        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #1", 8)));
+        VerifyOrReturn(CheckValue("groupId", groupId, 32767U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestViewGroup2Removed_11()
+    CHIP_ERROR TestViewGroup1Existing_11()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
-        request.groupId = 4369U;
+        request.groupId = 1U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_11(data.status, data.groupId, data.groupName);
@@ -46538,22 +47333,25 @@ private:
 
     void OnSuccessResponse_11(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
     {
-        VerifyOrReturn(CheckValue("status", status, 139));
+        VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #1", 8)));
 
         NextTest();
     }
 
-    CHIP_ERROR TestRemoveAll_12()
+    CHIP_ERROR TestViewGroup2Existing_12()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
+        request.groupId = 4369U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_12();
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_12(data.status, data.groupId, data.groupName);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -46566,18 +47364,32 @@ private:
 
     void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_12() { NextTest(); }
+    void OnSuccessResponse_12(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
 
-    CHIP_ERROR TestViewGroup1Removed_13()
+        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #2", 8)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetGroupMembership2_13()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::GetGroupMembership::Type;
 
         RequestType request;
-        request.groupId = 1U;
+
+        uint16_t groupListList[3];
+        groupListList[0]  = 2U;
+        groupListList[1]  = 3U;
+        groupListList[2]  = 32767U;
+        request.groupList = groupListList;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_13(data.status, data.groupId, data.groupName);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_13(data.capacity, data.groupList);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -46590,22 +47402,25 @@ private:
 
     void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_13(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_13(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
     {
-        VerifyOrReturn(CheckValue("status", status, 139));
+        VerifyOrReturn(CheckValue("capacity", capacity, 255));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
+        auto iter = groupList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(groupList)>("groupList", iter, 0));
+        VerifyOrReturn(CheckValue("groupList[0]", iter.GetValue(), 32767U));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(groupList)>("groupList", iter, 1));
 
         NextTest();
     }
 
-    CHIP_ERROR TestViewGroup2StillRemoved_14()
+    CHIP_ERROR TestViewGroup3New_14()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
 
         RequestType request;
-        request.groupId = 4369U;
+        request.groupId = 32767U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_14(data.status, data.groupId, data.groupName);
@@ -46623,23 +47438,25 @@ private:
 
     void OnSuccessResponse_14(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
     {
-        VerifyOrReturn(CheckValue("status", status, 139));
+        VerifyOrReturn(CheckValue("status", status, 0));
 
-        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
+        VerifyOrReturn(CheckValue("groupId", groupId, 32767U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #3", 8)));
 
         NextTest();
     }
 
-    CHIP_ERROR TestViewGroup3Removed_15()
+    CHIP_ERROR TestRemoveGroup0Invalid_15()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
 
         RequestType request;
-        request.groupId = 32767U;
+        request.groupId = 0U;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_15(data.status, data.groupId, data.groupName);
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_15(data.status, data.groupId);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
@@ -46652,11 +47469,365 @@ private:
 
     void OnFailureResponse_15(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_15(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    void OnSuccessResponse_15(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue("status", status, 135));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 0U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestRemoveGroup4NotFound_16()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
+
+        RequestType request;
+        request.groupId = 4U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_16(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_16(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_16(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 4U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestRemoveGroup2Existing_17()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveGroup::Type;
+
+        RequestType request;
+        request.groupId = 4369U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_17(data.status, data.groupId);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_17(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_17(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_17(uint8_t status, uint16_t groupId)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup1NotRemoved_18()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_18(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_18(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_18(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_18(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #1", 8)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup2Removed_19()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 4369U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_19(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_19(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_19(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_19(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup3NotRemoved_20()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 32767U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_20(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_20(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_20(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_20(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue("status", status, 0));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 32767U));
+
+        VerifyOrReturn(CheckValueAsString("groupName", groupName, chip::CharSpan("Group #3", 8)));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetGroupMembership3_21()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::GetGroupMembership::Type;
+
+        RequestType request;
+
+        uint16_t groupListList[4];
+        groupListList[0]  = 1U;
+        groupListList[1]  = 2U;
+        groupListList[2]  = 4369U;
+        groupListList[3]  = 3U;
+        request.groupList = groupListList;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_21(data.capacity, data.groupList);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_21(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_21(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_21(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
+    {
+        VerifyOrReturn(CheckValue("capacity", capacity, 255));
+
+        auto iter = groupList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(groupList)>("groupList", iter, 0));
+        VerifyOrReturn(CheckValue("groupList[0]", iter.GetValue(), 1U));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(groupList)>("groupList", iter, 1));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestRemoveAll_22()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::RemoveAllGroups::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_22();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_22(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_22(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_22() { NextTest(); }
+
+    CHIP_ERROR TestViewGroup1Removed_23()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 1U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_23(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_23(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_23(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_23(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 1U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup2StillRemoved_24()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 4369U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_24(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_24(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_24(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_24(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
+    {
+        VerifyOrReturn(CheckValue("status", status, 139));
+
+        VerifyOrReturn(CheckValue("groupId", groupId, 4369U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestViewGroup3Removed_25()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::ViewGroup::Type;
+
+        RequestType request;
+        request.groupId = 32767U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_25(data.status, data.groupId, data.groupName);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_25(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_25(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_25(uint8_t status, uint16_t groupId, chip::CharSpan groupName)
     {
         VerifyOrReturn(CheckValue("status", status, 139));
 
         VerifyOrReturn(CheckValue("groupId", groupId, 32767U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestGetGroupMembership4_26()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::Groups::Commands::GetGroupMembership::Type;
+
+        RequestType request;
+
+        uint16_t groupListList[5];
+        groupListList[0]  = 1U;
+        groupListList[1]  = 2U;
+        groupListList[2]  = 4369U;
+        groupListList[3]  = 3U;
+        groupListList[4]  = 32767U;
+        request.groupList = groupListList;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupsCluster *>(context))->OnSuccessResponse_26(data.capacity, data.groupList);
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupsCluster *>(context))->OnFailureResponse_26(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_26(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_26(uint8_t capacity, const chip::app::DataModel::DecodableList<uint16_t> & groupList)
+    {
+        VerifyOrReturn(CheckValue("capacity", capacity, 255));
+
+        auto iter = groupList.begin();
+        VerifyOrReturn(CheckNoMoreListItems<decltype(groupList)>("groupList", iter, 0));
 
         NextTest();
     }

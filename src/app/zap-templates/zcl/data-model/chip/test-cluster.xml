@@ -362,6 +362,13 @@ limitations under the License.
       </description>
     </command>
 
+    <command source="client" code="0x13" name="TestSimpleOptionalArgumentRequest" optional="false">
+      <description>
+        Command that takes an optional argument which is bool. It responds with a success value if the optional is set to any value.
+      </description>
+      <arg name="arg1" type="BOOLEAN" optional="true"/>
+    </command>
+
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
       <description>
         Simple response for TestWithResponse with a simple return value

@@ -50,7 +50,7 @@ class EndPointManager
 {
 public:
     using EndPoint        = EndPointType;
-    using EndPointVisitor = bool (*)(EndPoint *);
+    using EndPointVisitor = Loop (*)(EndPoint *);
 
     EndPointManager() {}
     virtual ~EndPointManager() {}
@@ -83,7 +83,7 @@ public:
 
     virtual EndPoint * CreateEndPoint()                         = 0;
     virtual void DeleteEndPoint(EndPoint * endPoint)            = 0;
-    virtual bool ForEachEndPoint(const EndPointVisitor visitor) = 0;
+    virtual Loop ForEachEndPoint(const EndPointVisitor visitor) = 0;
 
 private:
     System::Layer * mSystemLayer;
@@ -101,9 +101,9 @@ public:
 
     EndPoint * CreateEndPoint() override { return sEndPointPool.CreateObject(*this); }
     void DeleteEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }
-    bool ForEachEndPoint(const typename Manager::EndPointVisitor visitor) override
+    Loop ForEachEndPoint(const typename Manager::EndPointVisitor visitor) override
     {
-        return sEndPointPool.ForEachActiveObject([&](EndPoint * endPoint) -> bool { return visitor(endPoint); });
+        return sEndPointPool.ForEachActiveObject([&](EndPoint * endPoint) -> Loop { return visitor(endPoint); });
     }
 
 private:

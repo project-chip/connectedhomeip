@@ -25023,6 +25023,22 @@ class TestCluster(Cluster):
                     Fields=[
                     ])
 
+        @dataclass
+        class TestSimpleOptionalArgumentRequest(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x050F
+            command_id: typing.ClassVar[int] = 0x0013
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="arg1", Tag=0, Type=typing.Optional[bool]),
+                    ])
+
+            arg1: 'typing.Optional[bool]' = None
+
     class Attributes:
         @dataclass
         class Boolean(ClusterAttributeDescriptor):

@@ -261,7 +261,7 @@ void SessionManager::ExpireAllPairings(NodeId peerNodeId, FabricIndex fabric)
             HandleConnectionExpired(*session);
             mSecureSessions.ReleaseSession(session);
         }
-        return true;
+        return Loop::Continue;
     });
 }
 
@@ -274,7 +274,7 @@ void SessionManager::ExpireAllPairingsForFabric(FabricIndex fabric)
             HandleConnectionExpired(*session);
             mSecureSessions.ReleaseSession(session);
         }
-        return true;
+        return Loop::Continue;
     });
 }
 
@@ -319,7 +319,7 @@ CHIP_ERROR SessionManager::NewPairing(const Optional<Transport::PeerAddress> & p
     SessionHandle sessionHandle(session->GetPeerNodeId(), session->GetLocalSessionId(), session->GetPeerSessionId(), fabric);
     mSessionCreationDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionCreationDelegate> * cb) {
         cb->get().OnNewSession(sessionHandle);
-        return true;
+        return Loop::Continue;
     });
 
     return CHIP_NO_ERROR;
@@ -369,7 +369,7 @@ void SessionManager::RegisterRecoveryDelegate(SessionRecoveryDelegate & cb)
 #ifndef NDEBUG
     mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * i) {
         VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
-        return true;
+        return Loop::Continue;
     });
 #endif
     std::reference_wrapper<SessionRecoveryDelegate> * slot = mSessionRecoveryDelegates.CreateObject(cb);
@@ -382,9 +382,9 @@ void SessionManager::UnregisterRecoveryDelegate(SessionRecoveryDelegate & cb)
         if (std::addressof(cb) == std::addressof(i->get()))
         {
             mSessionRecoveryDelegates.ReleaseObject(i);
-            return false;
+            return Loop::Break;
         }
-        return true;
+        return Loop::Continue;
     });
 }
 
@@ -392,7 +392,7 @@ void SessionManager::RefreshSessionOperationalData(const SessionHandle & session
 {
     mSessionRecoveryDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionRecoveryDelegate> * cb) {
         cb->get().OnFirstMessageDeliveryFailed(sessionHandle);
-        return true;
+        return Loop::Continue;
     });
 }
 
@@ -595,7 +595,7 @@ void SessionManager::HandleConnectionExpired(const Transport::SecureSession & se
                                 session.GetFabricIndex());
     mSessionReleaseDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionReleaseDelegate> * cb) {
         cb->get().OnSessionReleased(sessionHandle);
-        return true;
+        return Loop::Continue;
     });
 
     mTransportMgr->Disconnect(session.GetPeerAddress());
@@ -632,9 +632,9 @@ SessionHandle SessionManager::FindSecureSessionForNode(NodeId peerNodeId)
         if (session->GetPeerNodeId() == peerNodeId)
         {
             found = session;
-            return false;
+            return Loop::Break;
         }
-        return true;
+        return Loop::Continue;
     });
 
     VerifyOrDie(found != nullptr);
