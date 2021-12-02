@@ -294,12 +294,12 @@ private:
      * our exchange and don't need to manually close it.
      */
     void ShutdownInternal(CHIP_ERROR aError);
-    bool IsInitialReport() { return mInitialReport; }
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback * mpCallback                      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
-    bool mInitialReport                        = true;
+    bool mIsInitialReport                      = true;
+    bool mIsPrimingReports                     = true;
     bool mPendingMoreChunks                    = false;
     uint16_t mMinIntervalFloorSeconds          = 0;
     uint16_t mMaxIntervalCeilingSeconds        = 0;

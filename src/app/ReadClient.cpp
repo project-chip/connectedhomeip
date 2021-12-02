@@ -44,7 +44,8 @@ CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callback
     mMinIntervalFloorSeconds   = 0;
     mMaxIntervalCeilingSeconds = 0;
     mSubscriptionId            = 0;
-    mInitialReport             = true;
+    mIsInitialReport           = true;
+    mIsPrimingReports          = true;
     mInteractionType           = aInteractionType;
     AbortExistingExchangeContext();
 
@@ -79,7 +80,8 @@ void ReadClient::ShutdownInternal(CHIP_ERROR aError)
     mInteractionType           = InteractionType::Read;
     mpExchangeMgr              = nullptr;
     mpExchangeCtx              = nullptr;
-    mInitialReport             = true;
+    mIsInitialReport           = true;
+    mIsPrimingReports          = true;
     mPeerNodeId                = kUndefinedNodeId;
     mFabricIndex               = kUndefinedFabricIndex;
     MoveToState(ClientState::Uninitialized);
@@ -322,7 +324,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     err = report.GetSubscriptionId(&subscriptionId);
     if (CHIP_NO_ERROR == err)
     {
-        if (IsInitialReport())
+        if (mIsPrimingReports)
         {
             mSubscriptionId = subscriptionId;
         }
@@ -380,9 +382,10 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         TLV::TLVReader attributeReportIBsReader;
         attributeReportIBs.GetReader(&attributeReportIBsReader);
 
-        if (IsInitialReport())
+        if (mIsInitialReport)
         {
             mpCallback->OnReportBegin(this);
+            mIsInitialReport = false;
         }
 
         err = ProcessAttributeReportIBs(attributeReportIBsReader);
@@ -391,6 +394,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         if (!mPendingMoreChunks)
         {
             mpCallback->OnReportEnd(this);
+            mIsInitialReport = true;
         }
     }
 
@@ -420,7 +424,7 @@ exit:
         }
     }
 
-    mInitialReport = false;
+    mIsPrimingReports = false;
     return err;
 }
 

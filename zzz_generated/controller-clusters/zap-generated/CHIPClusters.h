@@ -2459,6 +2459,18 @@ public:
     CHIP_ERROR SubscribeAttributeEnum16(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                         uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeEnum16(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ReadAttributeFloatSingle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeFloatSingle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         float value);
+    CHIP_ERROR SubscribeAttributeFloatSingle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeFloatSingle(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ReadAttributeFloatDouble(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeFloatDouble(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         double value);
+    CHIP_ERROR SubscribeAttributeFloatDouble(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                             uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeFloatDouble(Callback::Cancelable * onReportCallback);
     CHIP_ERROR ReadAttributeOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                          chip::ByteSpan value);
@@ -2689,6 +2701,20 @@ public:
     CHIP_ERROR SubscribeAttributeNullableEnum16(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                 uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeNullableEnum16(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ReadAttributeNullableFloatSingle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeNullableFloatSingle(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 float value);
+    CHIP_ERROR SubscribeAttributeNullableFloatSingle(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                     uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeNullableFloatSingle(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ReadAttributeNullableFloatDouble(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR WriteAttributeNullableFloatDouble(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 double value);
+    CHIP_ERROR SubscribeAttributeNullableFloatDouble(Callback::Cancelable * onSuccessCallback,
+                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                     uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeNullableFloatDouble(Callback::Cancelable * onReportCallback);
     CHIP_ERROR ReadAttributeNullableOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeNullableOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  chip::ByteSpan value);

@@ -25,23 +25,10 @@
  */
 #pragma once
 
+#include <system/SystemClock.h>
 #include <system/SystemConfig.h>
 
-#include <stdint.h>
-
 namespace chip {
-
-/**
- *  @def CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
- *
- *  @brief
- *    The default ReliableMessageProtocol timer tick interval shift in
- *    milliseconds. 6 bit equals 64 milliseconds
- *
- */
-#ifndef CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
-#define CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT 6
-#endif // CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
 
 /**
  *  @def CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
@@ -55,7 +42,7 @@ namespace chip {
  *
  */
 #ifndef CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
-#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (300)
+#define CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL (300_ms32)
 #endif // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
 
 /**
@@ -69,19 +56,19 @@ namespace chip {
  * needs (e.g. sleeping period) using Service Discovery TXT record CRI key.
  */
 #ifndef CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-#define CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL (5000)
+#define CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL (5000_ms32)
 #endif // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
 
 /**
- *  @def CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
+ *  @def CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
  *
  *  @brief
  *    The default acknowledgment timeout in milliseconds.
  *
  */
-#ifndef CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
-#define CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK (1)
-#endif // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
+#ifndef CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
+#define CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT (200_ms32)
+#endif // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
 
 /**
  *  @def CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
@@ -119,12 +106,15 @@ namespace chip {
  */
 struct ReliableMessageProtocolConfig
 {
-    ReliableMessageProtocolConfig(uint32_t idleInterval, uint32_t activeInterval) :
-        mIdleRetransTimeoutTick(idleInterval), mActiveRetransTimeoutTick(activeInterval)
+    ReliableMessageProtocolConfig(System::Clock::Milliseconds32 idleInterval, System::Clock::Milliseconds32 activeInterval) :
+        mIdleRetransTimeout(idleInterval), mActiveRetransTimeout(activeInterval)
     {}
 
-    uint32_t mIdleRetransTimeoutTick;   /**< Configurable timeout in msec for retransmission of the first sent message. */
-    uint32_t mActiveRetransTimeoutTick; /**< Configurable timeout in msec for retransmission of all subsequent messages. */
+    // Configurable timeout in msec for retransmission of the first sent message.
+    System::Clock::Milliseconds32 mIdleRetransTimeout;
+
+    // Configurable timeout in msec for retransmission of all subsequent messages.
+    System::Clock::Milliseconds32 mActiveRetransTimeout;
 };
 
 extern const ReliableMessageProtocolConfig gDefaultMRPConfig;

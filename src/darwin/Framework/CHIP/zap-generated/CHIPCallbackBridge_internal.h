@@ -426,6 +426,46 @@ public:
     static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value);
 };
 
+class CHIPFloatAttributeCallbackBridge : public CHIPCallbackBridge<FloatAttributeCallback>
+{
+public:
+    CHIPFloatAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                     bool keepAlive = false) :
+        CHIPCallbackBridge<FloatAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, float value);
+};
+
+class CHIPNullableFloatAttributeCallbackBridge : public CHIPCallbackBridge<NullableFloatAttributeCallback>
+{
+public:
+    CHIPNullableFloatAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                             bool keepAlive = false) :
+        CHIPCallbackBridge<NullableFloatAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<float> & value);
+};
+
+class CHIPDoubleAttributeCallbackBridge : public CHIPCallbackBridge<DoubleAttributeCallback>
+{
+public:
+    CHIPDoubleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                      bool keepAlive = false) :
+        CHIPCallbackBridge<DoubleAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, double value);
+};
+
+class CHIPNullableDoubleAttributeCallbackBridge : public CHIPCallbackBridge<NullableDoubleAttributeCallback>
+{
+public:
+    CHIPNullableDoubleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableDoubleAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<double> & value);
+};
+
 class CHIPVendorIdAttributeCallbackBridge : public CHIPCallbackBridge<VendorIdAttributeCallback>
 {
 public:

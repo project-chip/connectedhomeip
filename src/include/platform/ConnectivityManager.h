@@ -275,15 +275,13 @@ protected:
  */
 struct ConnectivityManager::SEDPollingConfig
 {
-    uint32_t FastPollingIntervalMS; /**< Interval at which the device polls its parent
-                                           when there are active chip exchanges in progress. Only meaningful
-                                           when the device is acting as a sleepy end node. */
+    /** Interval at which the device polls its parent when there are active chip exchanges in progress. Only meaningful when the
+     * device is acting as a sleepy end node.  */
+    System::Clock::Milliseconds32 FastPollingIntervalMS;
 
-    uint32_t SlowPollingIntervalMS; /**< Interval at which the device polls its parent
-                                             when there are NO active chip exchanges in progress. Only meaningful
-                                             when the device is acting as a sleepy end node. */
-
-    void Clear() { memset(this, 0, sizeof(*this)); }
+    /** Interval at which the device polls its parent when there are NO active chip exchanges in progress. Only meaningful when the
+     * device is acting as a sleepy end node. */
+    System::Clock::Milliseconds32 SlowPollingIntervalMS;
 };
 
 /**
