@@ -170,7 +170,31 @@
                     "${workspaceFolder}/src/test_driver/mbed/unit_tests/build"
                 ]
             }
-        }
+        },
+        {
+            "label": "Build specific EFR32 example",
+            "type": "shell",
+            "command": "scripts/run_in_build_env.sh",
+            "args": [
+                "./scripts/build/build_examples.py --target efr32-${input:efr32Board}-${input:efr32App}  build"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
+        {
+            "label": "Flash EFR32 board",
+            "type": "shell",
+            "command": "python3",
+            "args": [
+                "${workspaceFolder}/out/efr32-${input:efr32Board}-${input:efr32App}/chip-efr32-*.flash.py"
+            ],
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc"
+            }
+        },
     ],
     "inputs": [
         {
@@ -292,6 +316,35 @@
                 "telink-tlsr9518adk80d-light",
                 "tizen-arm-light"
             ]
-        }
+        },
+        {
+            "type": "pickString",
+            "id": "efr32App",
+            "description": "What mbed application do you want to use?",
+            "options": [
+                "light",
+                "light-rpc",
+                "lock",
+                "unit-test",
+                "window-covering",
+            ],
+            "default": "light"
+        },
+        {
+            "type": "pickString",
+            "id": "efr32Board",
+            "description": "What EFR32 board are you building for?",
+            "options": [ 
+                "brd4161a",
+                "brd4163a",
+                "brd4164a",
+                "brd4166a",
+                "brd4170a",
+                "brd4186a",
+                "brd4187a",
+                "brd4304a",
+            ],
+            "default": "brd4161a"
+        },
     ]
 }
