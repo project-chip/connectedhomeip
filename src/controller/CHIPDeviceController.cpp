@@ -45,7 +45,6 @@
 
 #include <app/InteractionModelEngine.h>
 #include <app/OperationalDeviceProxy.h>
-#include <app/util/DataModelHandler.h>
 #include <app/util/error-mapping.h>
 #include <credentials/CHIPCert.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
@@ -132,13 +131,10 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     VerifyOrReturnError(params.systemState->TransportMgr() != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    Dnssd::Resolver::Instance().Init(params.systemState->InetLayer());
-    Dnssd::Resolver::Instance().SetResolverDelegate(this);
+    mDNSResolver.Init();
     RegisterDeviceAddressUpdateDelegate(params.deviceAddressUpdateDelegate);
     RegisterDeviceDiscoveryDelegate(params.deviceDiscoveryDelegate);
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-
-    InitDataModelHandler(params.systemState->ExchangeMgr());
 
     VerifyOrReturnError(params.operationalCredentialsDelegate != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     mOperationalCredentialsDelegate = params.operationalCredentialsDelegate;
@@ -156,6 +152,11 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
 
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+        .dnsResolver       = &mDNSResolver,
+#else
+        .dnsResolver       = nullptr,
+#endif
         .dnsCache          = &mDNSCache,
     };
 
@@ -224,10 +225,6 @@ CHIP_ERROR DeviceController::Shutdown()
 
     mState = State::NotInitialized;
 
-#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    Dnssd::Resolver::Instance().Shutdown();
-#endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-
     mStorageDelegate = nullptr;
 
     mSystemState->Fabrics()->ReleaseFabricIndex(mFabricIndex);
@@ -235,7 +232,7 @@ CHIP_ERROR DeviceController::Shutdown()
     mSystemState = nullptr;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    Dnssd::Resolver::Instance().SetResolverDelegate(nullptr);
+    mDNSResolver.Shutdown();
     mDeviceAddressUpdateDelegate = nullptr;
     mDeviceDiscoveryDelegate     = nullptr;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -1518,7 +1515,7 @@ void DeviceCommissioner::OnSessionEstablishmentTimeoutCallback(System::Layer * a
 CHIP_ERROR DeviceCommissioner::DiscoverCommissionableNodes(Dnssd::DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
-    return chip::Dnssd::Resolver::Instance().FindCommissionableNodes(filter);
+    return mDNSResolver.FindCommissionableNodes(filter);
 }
 
 const Dnssd::DiscoveredNodeData * DeviceCommissioner::GetDiscoveredDevice(int idx)
@@ -1837,7 +1834,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
         RendezvousCleanup(CHIP_NO_ERROR);
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
         ChipLogProgress(Controller, "Finding node on operational network");
-        Dnssd::Resolver::Instance().ResolveNodeId(peerId, Inet::IPAddressType::kAny);
+        mDNSResolver.ResolveNodeId(peerId, Inet::IPAddressType::kAny);
 #endif
     }
     break;

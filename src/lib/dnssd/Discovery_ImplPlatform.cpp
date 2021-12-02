@@ -36,10 +36,94 @@
 namespace chip {
 namespace Dnssd {
 
-DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
+namespace {
+
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> DiscoveryImplPlatform::sDnssdCache;
+static DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> sDnssdCache;
 #endif
+
+static void HandleNodeResolve(void * context, DnssdService * result, CHIP_ERROR error)
+{
+    VerifyOrReturn(CHIP_NO_ERROR == error);
+
+    DiscoveredNodeData nodeData;
+    Platform::CopyString(nodeData.hostName, result->mHostName);
+    Platform::CopyString(nodeData.instanceName, result->mName);
+
+    if (result->mAddress.HasValue() && nodeData.numIPs < DiscoveredNodeData::kMaxIPAddresses)
+    {
+        nodeData.ipAddress[nodeData.numIPs]   = result->mAddress.Value();
+        nodeData.interfaceId[nodeData.numIPs] = result->mInterface;
+        nodeData.numIPs++;
+    }
+
+    nodeData.port = result->mPort;
+
+    for (size_t i = 0; i < result->mTextEntrySize; ++i)
+    {
+        ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
+        ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
+        FillNodeDataFromTxt(key, val, nodeData);
+    }
+
+    ResolverProxy * proxy = static_cast<ResolverProxy *>(context);
+    proxy->OnNodeDiscoveryComplete(nodeData);
+}
+
+static void HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERROR error)
+{
+    ResolverProxy * proxy = static_cast<ResolverProxy *>(context);
+    VerifyOrReturn(CHIP_NO_ERROR == error, proxy->OnNodeIdResolutionFailed(PeerId(), error));
+    VerifyOrReturn(result != nullptr, proxy->OnNodeIdResolutionFailed(PeerId(), CHIP_ERROR_UNKNOWN_RESOURCE_ID));
+
+    PeerId peerId;
+    VerifyOrReturn(CHIP_NO_ERROR == ExtractIdFromInstanceName(result->mName, &peerId),
+                   proxy->OnNodeIdResolutionFailed(PeerId(), error));
+
+    ResolvedNodeData nodeData;
+    Platform::CopyString(nodeData.mHostName, result->mHostName);
+    nodeData.mInterfaceId = result->mInterface;
+    nodeData.mAddress[0]  = result->mAddress.ValueOr({});
+    nodeData.mPort        = result->mPort;
+    nodeData.mNumIPs      = 1;
+    nodeData.mPeerId      = peerId;
+    // TODO: Use seconds?
+    const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
+
+    nodeData.mExpiryTime = currentTime + System::Clock::Seconds16(result->mTtlSeconds);
+
+    for (size_t i = 0; i < result->mTextEntrySize; ++i)
+    {
+        ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
+        ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
+        FillNodeDataFromTxt(key, val, nodeData);
+    }
+
+    nodeData.LogNodeIdResolved();
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+    LogErrorOnFailure(sDnssdCache.Insert(nodeData));
+#endif
+    proxy->OnNodeIdResolved(nodeData);
+}
+
+static void HandleNodeBrowse(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error)
+{
+    for (size_t i = 0; i < servicesSize; ++i)
+    {
+        // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
+        if (!services[i].mAddress.HasValue())
+        {
+            ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
+        }
+        else
+        {
+            HandleNodeResolve(context, &services[i], error);
+        }
+    }
+}
+} // namespace
+
+DiscoveryImplPlatform DiscoveryImplPlatform::sManager;
 
 DiscoveryImplPlatform::DiscoveryImplPlatform() = default;
 
@@ -460,6 +544,39 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
                                                 Resolver::CacheBypass dnssdCacheBypass)
 {
     ReturnErrorOnFailure(InitImpl());
+    return mResolverProxy.ResolveNodeId(peerId, type, dnssdCacheBypass);
+}
+
+CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter)
+{
+    ReturnErrorOnFailure(InitImpl());
+    return mResolverProxy.FindCommissionableNodes(filter);
+}
+
+CHIP_ERROR DiscoveryImplPlatform::FindCommissioners(DiscoveryFilter filter)
+{
+    ReturnErrorOnFailure(InitImpl());
+    return mResolverProxy.FindCommissioners(filter);
+}
+
+DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
+{
+    return sManager;
+}
+
+ServiceAdvertiser & chip::Dnssd::ServiceAdvertiser::Instance()
+{
+    return DiscoveryImplPlatform::GetInstance();
+}
+
+Resolver & chip::Dnssd::Resolver::Instance()
+{
+    return DiscoveryImplPlatform::GetInstance();
+}
+
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
+{
+    ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(nullptr));
 
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
     if (dnssdCacheBypass == Resolver::CacheBypass::Off)
@@ -483,54 +600,10 @@ CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPA
     return ChipDnssdResolve(&service, Inet::InterfaceId::Null(), HandleNodeIdResolve, this);
 }
 
-void DiscoveryImplPlatform::HandleNodeBrowse(void * context, DnssdService * services, size_t servicesSize, CHIP_ERROR error)
+CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
 {
-    for (size_t i = 0; i < servicesSize; ++i)
-    {
-        // For some platforms browsed services are already resolved, so verify if resolve is really needed or call resolve callback
-        if (!services[i].mAddress.HasValue())
-        {
-            ChipDnssdResolve(&services[i], services[i].mInterface, HandleNodeResolve, context);
-        }
-        else
-        {
-            HandleNodeResolve(context, &services[i], error);
-        }
-    }
-}
+    ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(nullptr));
 
-void DiscoveryImplPlatform::HandleNodeResolve(void * context, DnssdService * result, CHIP_ERROR error)
-{
-    if (error != CHIP_NO_ERROR)
-    {
-        return;
-    }
-    DiscoveryImplPlatform * mgr = static_cast<DiscoveryImplPlatform *>(context);
-    DiscoveredNodeData data;
-    Platform::CopyString(data.hostName, result->mHostName);
-    Platform::CopyString(data.instanceName, result->mName);
-
-    if (result->mAddress.HasValue() && data.numIPs < DiscoveredNodeData::kMaxIPAddresses)
-    {
-        data.ipAddress[data.numIPs]   = result->mAddress.Value();
-        data.interfaceId[data.numIPs] = result->mInterface;
-        data.numIPs++;
-    }
-
-    data.port = result->mPort;
-
-    for (size_t i = 0; i < result->mTextEntrySize; ++i)
-    {
-        ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
-        ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, data);
-    }
-    mgr->mResolverDelegate->OnNodeDiscoveryComplete(data);
-}
-
-CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter)
-{
-    ReturnErrorOnFailure(InitImpl());
     char serviceName[kMaxCommissionableServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
@@ -538,92 +611,15 @@ CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter
                            Inet::InterfaceId::Null(), HandleNodeBrowse, this);
 }
 
-CHIP_ERROR DiscoveryImplPlatform::FindCommissioners(DiscoveryFilter filter)
+CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
 {
-    ReturnErrorOnFailure(InitImpl());
+    ReturnErrorOnFailure(chip::Dnssd::Resolver::Instance().Init(nullptr));
+
     char serviceName[kMaxCommissionerServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
 
     return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
                            Inet::InterfaceId::Null(), HandleNodeBrowse, this);
-}
-
-void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * result, CHIP_ERROR error)
-{
-    DiscoveryImplPlatform * mgr = static_cast<DiscoveryImplPlatform *>(context);
-
-    if (mgr->mResolverDelegate == nullptr)
-    {
-        return;
-    }
-
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
-        mgr->mResolverDelegate->OnNodeIdResolutionFailed(PeerId(), error);
-        return;
-    }
-
-    if (result == nullptr)
-    {
-        ChipLogError(Discovery, "Node ID resolve not found");
-        mgr->mResolverDelegate->OnNodeIdResolutionFailed(PeerId(), CHIP_ERROR_UNKNOWN_RESOURCE_ID);
-        return;
-    }
-
-    ResolvedNodeData nodeData;
-
-    error = ExtractIdFromInstanceName(result->mName, &nodeData.mPeerId);
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
-        mgr->mResolverDelegate->OnNodeIdResolutionFailed(PeerId(), error);
-        return;
-    }
-
-    // TODO: Expand the results to include all the addresses.
-    Platform::CopyString(nodeData.mHostName, result->mHostName);
-    nodeData.mInterfaceId = result->mInterface;
-    nodeData.mAddress[0]  = result->mAddress.ValueOr({});
-    nodeData.mPort        = result->mPort;
-    nodeData.mNumIPs      = 1;
-    // TODO: Use seconds?
-    const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
-
-    nodeData.mExpiryTime = currentTime + System::Clock::Seconds16(result->mTtlSeconds);
-
-    for (size_t i = 0; i < result->mTextEntrySize; ++i)
-    {
-        ByteSpan key(reinterpret_cast<const uint8_t *>(result->mTextEntries[i].mKey), strlen(result->mTextEntries[i].mKey));
-        ByteSpan val(result->mTextEntries[i].mData, result->mTextEntries[i].mDataSize);
-        FillNodeDataFromTxt(key, val, nodeData);
-    }
-
-    nodeData.LogNodeIdResolved();
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    error = mgr->sDnssdCache.Insert(nodeData);
-
-    if (CHIP_NO_ERROR != error)
-    {
-        ChipLogError(Discovery, "DnssdCache insert failed with %s", chip::ErrorStr(error));
-    }
-#endif
-    mgr->mResolverDelegate->OnNodeIdResolved(nodeData);
-}
-
-DiscoveryImplPlatform & DiscoveryImplPlatform::GetInstance()
-{
-    return sManager;
-}
-
-ServiceAdvertiser & chip::Dnssd::ServiceAdvertiser::Instance()
-{
-    return DiscoveryImplPlatform::GetInstance();
-}
-
-Resolver & chip::Dnssd::Resolver::Instance()
-{
-    return DiscoveryImplPlatform::GetInstance();
 }
 
 } // namespace Dnssd

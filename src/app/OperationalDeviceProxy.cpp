@@ -41,7 +41,8 @@ using namespace chip::Callback;
 namespace chip {
 
 CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure)
+                                           Callback::Callback<OnDeviceConnectionFailure> * onFailure,
+                                           Dnssd::ResolverProxy * resolver)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -52,7 +53,7 @@ CHIP_ERROR OperationalDeviceProxy::Connect(Callback::Callback<OnDeviceConnected>
         break;
 
     case State::NeedsAddress:
-        err = Dnssd::Resolver::Instance().ResolveNodeId(mPeerId, chip::Inet::IPAddressType::kAny);
+        err = resolver->ResolveNodeId(mPeerId, chip::Inet::IPAddressType::kAny);
         EnqueueConnectionCallbacks(onConnection, onFailure);
         break;
 

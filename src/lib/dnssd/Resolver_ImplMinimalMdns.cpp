@@ -23,6 +23,7 @@
 #include <inet/IPPacketInfo.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
+#include <lib/dnssd/ResolverProxy.h>
 #include <lib/dnssd/ServiceNaming.h>
 #include <lib/dnssd/TxtFields.h>
 #include <lib/dnssd/minimal_mdns/ActiveResolveAttempts.h>
@@ -592,6 +593,24 @@ MinMdnsResolver gResolver;
 Resolver & chip::Dnssd::Resolver::Instance()
 {
     return gResolver;
+}
+
+CHIP_ERROR ResolverProxy::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
+{
+    chip::Dnssd::Resolver::Instance().SetResolverDelegate(this);
+    return chip::Dnssd::Resolver::Instance().ResolveNodeId(peerId, type, dnssdCacheBypass);
+}
+
+CHIP_ERROR ResolverProxy::FindCommissionableNodes(DiscoveryFilter filter)
+{
+    chip::Dnssd::Resolver::Instance().SetResolverDelegate(this);
+    return chip::Dnssd::Resolver::Instance().FindCommissionableNodes(filter);
+}
+
+CHIP_ERROR ResolverProxy::FindCommissioners(DiscoveryFilter filter)
+{
+    chip::Dnssd::Resolver::Instance().SetResolverDelegate(this);
+    return chip::Dnssd::Resolver::Instance().FindCommissioners(filter);
 }
 
 } // namespace Dnssd

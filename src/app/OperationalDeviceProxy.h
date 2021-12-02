@@ -40,7 +40,7 @@
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
 
-#include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 
 namespace chip {
 
@@ -103,7 +103,7 @@ public:
      * If the session already exists, `onConnection` will be called immediately.
      */
     CHIP_ERROR Connect(Callback::Callback<OnDeviceConnected> * onConnection,
-                       Callback::Callback<OnDeviceConnectionFailure> * onFailure);
+                       Callback::Callback<OnDeviceConnectionFailure> * onFailure, Dnssd::ResolverProxy * resolver);
 
     bool IsConnected() const { return mState == State::SecureConnected; }
 

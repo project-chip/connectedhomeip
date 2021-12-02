@@ -25,13 +25,14 @@
 #include <lib/support/Pool.h>
 #include <transport/SessionDelegate.h>
 
-#include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 
 namespace chip {
 
 struct CASESessionManagerConfig
 {
     DeviceProxyInitParams sessionInitParams;
+    Dnssd::ResolverProxy * dnsResolver                        = nullptr;
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> * dnsCache = nullptr;
 };
 

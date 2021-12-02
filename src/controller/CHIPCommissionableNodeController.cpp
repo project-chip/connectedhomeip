@@ -19,6 +19,10 @@
 // module header, comes first
 #include <controller/CHIPCommissionableNodeController.h>
 
+#if CONFIG_DEVICE_LAYER
+#include <platform/CHIPDeviceLayer.h>
+#endif
+
 #include <lib/support/CodeUtils.h>
 
 namespace chip {
@@ -27,7 +31,18 @@ namespace Controller {
 CHIP_ERROR CommissionableNodeController::DiscoverCommissioners(Dnssd::DiscoveryFilter discoveryFilter)
 {
     ReturnErrorOnFailure(SetUpNodeDiscovery());
-    return mResolver->FindCommissioners(discoveryFilter);
+
+    if (mResolver == nullptr)
+    {
+        return mDNSResolver.FindCommissioners(discoveryFilter);
+    }
+    else
+    {
+#if CONFIG_DEVICE_LAYER
+        ReturnErrorOnFailure(mResolver->Init(&DeviceLayer::InetLayer()));
+#endif
+        return mResolver->FindCommissioners(discoveryFilter);
+    }
 }
 
 const Dnssd::DiscoveredNodeData * CommissionableNodeController::GetDiscoveredCommissioner(int idx)

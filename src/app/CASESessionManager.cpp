@@ -53,7 +53,7 @@ CHIP_ERROR CASESessionManager::FindOrEstablishSession(NodeId nodeId, Callback::C
         session->OnNodeIdResolved(resolutionData);
     }
 
-    CHIP_ERROR err = session->Connect(onConnection, onFailure);
+    CHIP_ERROR err = session->Connect(onConnection, onFailure, mConfig.dnsResolver);
     if (err != CHIP_NO_ERROR)
     {
         ReleaseSession(session);
@@ -69,8 +69,8 @@ void CASESessionManager::ReleaseSession(NodeId nodeId)
 
 CHIP_ERROR CASESessionManager::ResolveDeviceAddress(NodeId nodeId)
 {
-    return Dnssd::Resolver::Instance().ResolveNodeId(GetFabricInfo()->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny,
-                                                     Dnssd::Resolver::CacheBypass::On);
+    return mConfig.dnsResolver->ResolveNodeId(GetFabricInfo()->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny,
+                                              Dnssd::Resolver::CacheBypass::On);
 }
 
 void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)

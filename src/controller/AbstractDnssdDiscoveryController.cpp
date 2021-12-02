@@ -19,10 +19,6 @@
 // module header, comes first
 #include <controller/AbstractDnssdDiscoveryController.h>
 
-#if CONFIG_DEVICE_LAYER
-#include <platform/CHIPDeviceLayer.h>
-#endif
-
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/logging/CHIPLogging.h>
 
@@ -66,11 +62,6 @@ void AbstractDnssdDiscoveryController::OnNodeDiscoveryComplete(const chip::Dnssd
 
 CHIP_ERROR AbstractDnssdDiscoveryController::SetUpNodeDiscovery()
 {
-#if CONFIG_DEVICE_LAYER
-    ReturnErrorOnFailure(mResolver->Init(&DeviceLayer::InetLayer()));
-#endif
-    mResolver->SetResolverDelegate(this);
-
     auto discoveredNodes = GetDiscoveredNodes();
     for (auto & discoveredNode : discoveredNodes)
     {
