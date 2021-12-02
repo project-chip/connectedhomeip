@@ -65,14 +65,17 @@ private:
     uint16_t mPreviousQNames[kMaxCachedReferences];
 
     /// Find the offset at which this qname was previously seen (if any)
-    chip::Optional<uint16_t> FindPreviousName(const FullQName & name);
+    chip::Optional<uint16_t> FindPreviousName(const FullQName & name) const;
+
+    /// Find the offset at which this qname was previously seen (if any)
+    chip::Optional<uint16_t> FindPreviousName(const SerializedQNameIterator & name) const;
 
     /// Gets the iterator corresponding to the previous name
     /// with the given index.
     ///
     /// Will return an iterator  that is not valid if
     /// lookbehind index is not valid
-    SerializedQNameIterator PreviousName(size_t index);
+    SerializedQNameIterator PreviousName(size_t index) const;
 
     /// Keep track that a qname was written at the given offset
     void RememberWrittenQnameOffset(size_t offset);

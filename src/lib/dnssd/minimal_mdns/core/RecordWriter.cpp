@@ -19,7 +19,7 @@
 namespace mdns {
 namespace Minimal {
 
-SerializedQNameIterator RecordWriter::PreviousName(size_t index)
+SerializedQNameIterator RecordWriter::PreviousName(size_t index) const
 {
     if (index >= kMaxCachedReferences)
     {
@@ -36,7 +36,31 @@ SerializedQNameIterator RecordWriter::PreviousName(size_t index)
                                    mOutput->Buffer() + offset);
 }
 
-chip::Optional<uint16_t> RecordWriter::FindPreviousName(const FullQName & name)
+chip::Optional<uint16_t> RecordWriter::FindPreviousName(const FullQName & name) const
+{
+    for (size_t i = 0; i < kMaxCachedReferences; i++)
+    {
+        SerializedQNameIterator previous = PreviousName(i);
+
+        // Any of the sub-segments may match
+        while (previous.IsValid())
+        {
+            if (previous == name)
+            {
+                return chip::Optional<uint16_t>::Value(previous.OffsetInCurrentValidData());
+            }
+
+            if (!previous.Next())
+            {
+                break;
+            }
+        }
+    }
+
+    return chip::Optional<uint16_t>::Missing();
+}
+
+chip::Optional<uint16_t> RecordWriter::FindPreviousName(const SerializedQNameIterator & name) const
 {
     for (size_t i = 0; i < kMaxCachedReferences; i++)
     {
@@ -100,16 +124,44 @@ void RecordWriter::WriteQName(const FullQName & qname)
 
 void RecordWriter::WriteQName(const SerializedQNameIterator & qname)
 {
-    // FIXME: Make this work
+    size_t qNameWriteStart = mOutput->WritePos();
 
     SerializedQNameIterator copy = qname;
-    while (copy.Next())
+    while (true)
     {
+        chip::Optional<uint16_t> offset = FindPreviousName(copy);
+
+        if (offset.HasValue())
+        {
+            // Pointer to offset: set the highest 2 bits
+            mOutput->Put16(offset.Value() | 0xC000);
+
+            if (mOutput->Fit())
+            {
+                RememberWrittenQnameOffset(qNameWriteStart);
+            }
+            return;
+        }
+
+        if (!copy.Next())
+        {
+            break;
+        }
+
+        if (!copy.IsValid())
+        {
+            break;
+        }
 
         mOutput->Put8(static_cast<uint8_t>(strlen(copy.Value())));
         mOutput->Put(copy.Value());
     }
     mOutput->Put8(0); // end of qnames
+
+    if (mOutput->Fit())
+    {
+        RememberWrittenQnameOffset(qNameWriteStart);
+    }
 }
 
 void RecordWriter::RememberWrittenQnameOffset(size_t offset)
