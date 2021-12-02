@@ -407,7 +407,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestGroupKeyManagement : CHIPGroupKeyManagement
 
 - (void)writeAttributeGroupsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeGroupKeysWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 @end

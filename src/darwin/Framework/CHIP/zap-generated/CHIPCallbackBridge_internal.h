@@ -93,6 +93,10 @@ typedef void (*CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallb
     void *, const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType &);
 typedef void (*CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType)(
     void *, const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType &);
+typedef void (*CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType)(
+    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &);
+typedef void (*CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType)(
+    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &);
 typedef void (*CHIPGroupsClusterAddGroupResponseCallbackType)(
     void *, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType &);
 typedef void (*CHIPGroupsClusterGetGroupMembershipResponseCallbackType)(
@@ -695,20 +699,6 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> &
-            value);
-};
-
-class CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge
-    : public CHIPCallbackBridge<GroupKeyManagementGroupKeysListAttributeCallback>
-{
-public:
-    CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GroupKeyManagementGroupKeysListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
             value);
 };
 
@@ -1315,6 +1305,33 @@ public:
     static void
     OnSuccessFn(void * context,
                 const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
+};
+
+class CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>
+{
+public:
+    CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                            CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>(queue, handler, action,
+                                                                                                  OnSuccessFn, keepAlive){};
+
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
+};
+
+class CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>
+{
+public:
+    CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data);
 };
 
 class CHIPGroupsClusterAddGroupResponseCallbackBridge : public CHIPCallbackBridge<CHIPGroupsClusterAddGroupResponseCallbackType>

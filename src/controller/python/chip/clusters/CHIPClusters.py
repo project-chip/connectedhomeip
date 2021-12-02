@@ -1949,27 +1949,54 @@ class ChipClusters:
     }
     _GROUP_KEY_MANAGEMENT_CLUSTER_INFO = {
         "clusterName": "GroupKeyManagement",
-        "clusterId": 0x0000F004,
+        "clusterId": 0x0000003F,
         "commands": {
+            0x00000001: {
+                "commandId": 0x00000001,
+                "commandName": "KeySetRead",
+                "args": {
+                    "groupKeySetID": "int",
+                },
+            },
+            0x00000004: {
+                "commandId": 0x00000004,
+                "commandName": "KeySetReadAllIndices",
+                "args": {
+                    "groupKeySetIDs": "int",
+                },
+            },
+            0x00000003: {
+                "commandId": 0x00000003,
+                "commandName": "KeySetRemove",
+                "args": {
+                    "groupKeySetID": "int",
+                },
+            },
+            0x00000000: {
+                "commandId": 0x00000000,
+                "commandName": "KeySetWrite",
+                "args": {
+                    "groupKeySetID": "int",
+                    "groupKeySecurityPolicy": "int",
+                    "epochKey0": "bytes",
+                    "epochStartTime0": "int",
+                    "epochKey1": "bytes",
+                    "epochStartTime1": "int",
+                    "epochKey2": "bytes",
+                    "epochStartTime2": "int",
+                },
+            },
         },
         "attributes": {
             0x00000000: {
                 "attributeName": "Groups",
                 "attributeId": 0x00000000,
                 "type": "",
-                "reportable": True,
-            },
-            0x00000001: {
-                "attributeName": "GroupKeys",
-                "attributeId": 0x00000001,
-                "type": "",
-                "reportable": True,
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
                 "type": "int",
-                "reportable": True,
             },
         },
     }
@@ -5277,7 +5304,7 @@ class ChipClusters:
         0x00000404: _FLOW_MEASUREMENT_CLUSTER_INFO,
         0x00000030: _GENERAL_COMMISSIONING_CLUSTER_INFO,
         0x00000033: _GENERAL_DIAGNOSTICS_CLUSTER_INFO,
-        0x0000F004: _GROUP_KEY_MANAGEMENT_CLUSTER_INFO,
+        0x0000003F: _GROUP_KEY_MANAGEMENT_CLUSTER_INFO,
         0x00000004: _GROUPS_CLUSTER_INFO,
         0x00000003: _IDENTIFY_CLUSTER_INFO,
         0x00000400: _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,

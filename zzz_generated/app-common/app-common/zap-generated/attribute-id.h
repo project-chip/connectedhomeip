@@ -562,6 +562,13 @@
 #define ZCL_TRUSTED_ROOTS_ATTRIBUTE_ID (0x0004)
 #define ZCL_CURRENT_FABRIC_INDEX_ATTRIBUTE_ID (0x0005)
 
+// Attribute ids for cluster: Group Key Management
+
+// Client attributes
+
+// Server attributes
+#define ZCL_GROUPS_ATTRIBUTE_ID (0x0000)
+
 // Attribute ids for cluster: Fixed Label
 
 // Client attributes
@@ -1673,11 +1680,3 @@
 // Client attributes
 
 // Server attributes
-
-// Attribute ids for cluster: Group Key Management
-
-// Client attributes
-
-// Server attributes
-#define ZCL_GROUPS_ATTRIBUTE_ID (0x0000)
-#define ZCL_GROUPKEYS_ATTRIBUTE_ID (0x0001)

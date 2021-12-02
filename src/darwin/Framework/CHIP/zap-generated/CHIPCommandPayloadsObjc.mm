@@ -1813,6 +1813,72 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPGroupKeyManagementClusterKeySetWriteParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetReadParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySetID = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetReadResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySet = [CHIPGroupKeyManagementClusterGroupKeySet new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetRemoveParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySetID = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySetIDs = [NSArray array];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _groupKeySetIDs = [NSArray array];
+    }
+    return self;
+}
+@end
+
 @implementation CHIPModeSelectClusterChangeToModeParams
 - (instancetype)init
 {

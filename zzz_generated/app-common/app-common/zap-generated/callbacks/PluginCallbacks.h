@@ -93,6 +93,8 @@ void __attribute__((weak)) MatterAdministratorCommissioningPluginClientInitCallb
 void MatterAdministratorCommissioningPluginServerInitCallback();
 void __attribute__((weak)) MatterOperationalCredentialsPluginClientInitCallback() {}
 void MatterOperationalCredentialsPluginServerInitCallback();
+void __attribute__((weak)) MatterGroupKeyManagementPluginClientInitCallback() {}
+void MatterGroupKeyManagementPluginServerInitCallback();
 void __attribute__((weak)) MatterFixedLabelPluginClientInitCallback() {}
 void MatterFixedLabelPluginServerInitCallback();
 void __attribute__((weak)) MatterUserLabelPluginClientInitCallback() {}
@@ -241,5 +243,3 @@ void __attribute__((weak)) MatterElectricalMeasurementPluginClientInitCallback()
 void MatterElectricalMeasurementPluginServerInitCallback();
 void __attribute__((weak)) MatterBindingPluginClientInitCallback() {}
 void MatterBindingPluginServerInitCallback();
-void __attribute__((weak)) MatterGroupKeyManagementPluginClientInitCallback() {}
-void MatterGroupKeyManagementPluginServerInitCallback();

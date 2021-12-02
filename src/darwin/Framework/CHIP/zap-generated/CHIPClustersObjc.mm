@@ -8630,6 +8630,115 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
+- (void)keySetReadWithParams:(CHIPGroupKeyManagementClusterKeySetReadParams *)params
+           completionHandler:(void (^)(CHIPGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    GroupKeyManagement::Commands::KeySetRead::Type request;
+    request.groupKeySetID = params.groupKeySetID.unsignedShortValue;
+
+    new CHIPGroupKeyManagementClusterKeySetReadResponseCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)keySetReadAllIndicesWithParams:(CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
+                     completionHandler:(void (^)(CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    GroupKeyManagement::Commands::KeySetReadAllIndices::Type request;
+    {
+        using ListType_0 = std::remove_reference_t<decltype(request.groupKeySetIDs)>;
+        using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
+        if (params.groupKeySetIDs.count != 0) {
+            auto * listHolder_0 = new ListHolder<ListMemberType_0>(params.groupKeySetIDs.count);
+            if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
+                return;
+            }
+            listFreer.add(listHolder_0);
+            for (size_t i_0 = 0; i_0 < params.groupKeySetIDs.count; ++i_0) {
+                if (![params.groupKeySetIDs[i_0] isKindOfClass:[NSNumber class]]) {
+                    // Wrong kind of value.
+                    return;
+                }
+                auto element_0 = (NSNumber *) params.groupKeySetIDs[i_0];
+                listHolder_0->mList[i_0] = element_0.unsignedShortValue;
+            }
+            request.groupKeySetIDs = ListType_0(listHolder_0->mList, params.groupKeySetIDs.count);
+        } else {
+            request.groupKeySetIDs = ListType_0();
+        }
+    }
+
+    new CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            auto successFn
+                = Callback<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)keySetRemoveWithParams:(CHIPGroupKeyManagementClusterKeySetRemoveParams *)params
+             completionHandler:(StatusCompletion)completionHandler
+{
+    ListFreer listFreer;
+    GroupKeyManagement::Commands::KeySetRemove::Type request;
+    request.groupKeySetID = params.groupKeySetID.unsignedShortValue;
+
+    new CHIPCommandSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)keySetWriteWithParams:(CHIPGroupKeyManagementClusterKeySetWriteParams *)params
+            completionHandler:(StatusCompletion)completionHandler
+{
+    ListFreer listFreer;
+    GroupKeyManagement::Commands::KeySetWrite::Type request;
+    request.groupKeySet.groupKeySetID = params.groupKeySet.groupKeySetID.unsignedShortValue;
+    request.groupKeySet.groupKeySecurityPolicy
+        = static_cast<std::remove_reference_t<decltype(request.groupKeySet.groupKeySecurityPolicy)>>(
+            params.groupKeySet.groupKeySecurityPolicy.unsignedCharValue);
+    request.groupKeySet.epochKey0 = [self asByteSpan:params.groupKeySet.epochKey0];
+    request.groupKeySet.epochStartTime0 = params.groupKeySet.epochStartTime0.unsignedLongLongValue;
+    request.groupKeySet.epochKey1 = [self asByteSpan:params.groupKeySet.epochKey1];
+    request.groupKeySet.epochStartTime1 = params.groupKeySet.epochStartTime1.unsignedLongLongValue;
+    request.groupKeySet.epochKey2 = [self asByteSpan:params.groupKeySet.epochKey2];
+    request.groupKeySet.epochStartTime2 = params.groupKeySet.epochStartTime2.unsignedLongLongValue;
+
+    new CHIPCommandSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)readAttributeGroupsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler
 {
     new CHIPGroupKeyManagementGroupsListAttributeCallbackBridge(
@@ -8640,22 +8749,6 @@ using namespace chip::app::Clusters;
         ^(Cancelable * success, Cancelable * failure) {
             using TypeInfo = GroupKeyManagement::Attributes::Groups::TypeInfo;
             auto successFn = Callback<GroupKeyManagementGroupsListAttributeCallback>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)readAttributeGroupKeysWithCompletionHandler:(void (^)(
-                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler
-{
-    new CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            using TypeInfo = GroupKeyManagement::Attributes::GroupKeys::TypeInfo;
-            auto successFn = Callback<GroupKeyManagementGroupKeysListAttributeCallback>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -8675,29 +8768,6 @@ using namespace chip::app::Clusters;
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
         });
-}
-
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
-                                         responseHandler:(ResponseHandler)responseHandler
-{
-    new CHIPInt16uAttributeCallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.SubscribeAttributeClusterRevision(success, failure, minInterval, maxInterval);
-    });
-}
-
-- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(
-                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler
-{
-    new CHIPInt16uAttributeCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            responseHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            return self.cppCluster.ReportAttributeClusterRevision(success);
-        },
-        true);
 }
 
 @end

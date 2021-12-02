@@ -1,0 +1,163 @@
+# Copyright (c) 2021 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#`
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: GroupKeyManagement Cluster Tests
+
+config:
+    cluster: "Group Key Management"
+    endpoint: 0
+
+tests:
+    - label: "KeySetWrite, Set 1"
+      disabled: true
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "groupKeySet"
+                value:
+                    - name: "GroupKeySetID"
+                      value: 0x1111
+                    - name: "GroupKeySecurityPolicy"
+                      value: 0
+                    - name: "EpochKey0"
+                      value: [0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17]
+                    - name: "EpochKey1"
+                      value: [0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f]
+                    - name: "EpochKey2"
+                      value: [0xf1, 0xe1, 0xd1, 0xc1, 0xb1, 0xa1, 0x91, 0x81]
+      response:
+          error: 0x00
+
+    - label: "KeySetWrite, Set 2"
+      disabled: true
+      command: "KeySetWrite"
+      arguments:
+          values:
+              - name: "groupKeySet"
+                value:
+                    - name: "GroupKeySetID"
+                      value: 0x2222
+                    - name: "GroupKeySecurityPolicy"
+                      value: 1
+                    - name: "EpochKey0"
+                      value: [0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27]
+                    - name: "EpochKey1"
+                      value: [0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f]
+                    - name: "EpochKey2"
+                      value: [0xf2, 0xe2, 0xd2, 0xc2, 0xb2, 0xa2, 0x92, 0x81]
+      response:
+          error: 0x00
+
+    - label: "KeySetRead, Set 1"
+      disabled: true
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 0x1111
+      response:
+          values:
+              - name: "groupKeySet"
+                value:
+                    - name: "GroupKeySetID"
+                      value: 0x1111
+                    - name: "GroupKeySecurityPolicy"
+                      value: 0
+                    - name: "EpochKey0"
+                      value: [0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27]
+                    - name: "EpochKey1"
+                      value: [0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f]
+                    - name: "EpochKey2"
+                      value: [0xf2, 0xe2, 0xd2, 0xc2, 0xb2, 0xa2, 0x92, 0x81]
+
+    - label: "KeySetRead, Set 2"
+      disabled: true
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 0x2222
+      response:
+          values:
+              - name: "groupKeySet"
+                value:
+                    - name: "GroupKeySetID"
+                      value: 0x2222
+                    - name: "GroupKeySecurityPolicy"
+                      value: 1
+                    - name: "EpochKey0"
+                      value: [0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27]
+                    - name: "EpochKey1"
+                      value: [0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f]
+                    - name: "EpochKey2"
+                      value: [0xf2, 0xe2, 0xd2, 0xc2, 0xb2, 0xa2, 0x92, 0x81]
+
+    - label: "KeySetRemove (not found)"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 0x3333
+      response:
+          error: 0x8B
+
+    - label: "KeySetRemove (existing)"
+      command: "KeySetRemove"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 0x1111
+      response:
+          error: 0x00
+
+    - label: "KeySetRead, Set 1 (not found)"
+      disabled: true
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 0x2222
+      response:
+          error: 0x8B
+
+    - label: "KeySetRead, Set 2 (not removed)"
+      disabled: true
+      command: "KeySetRead"
+      arguments:
+          values:
+              - name: "groupKeySetID"
+                value: 0x2222
+      response:
+          values:
+              - name: "groupKeySet"
+                value:
+                    - name: "GroupKeySetID"
+                      value: 0x2222
+                    - name: "GroupKeySecurityPolicy"
+                      value: 1
+                    - name: "EpochKey0"
+                      value: [0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27]
+                    - name: "EpochKey1"
+                      value: [0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f]
+                    - name: "EpochKey2"
+                      value: [0xf2, 0xe2, 0xd2, 0xc2, 0xb2, 0xa2, 0x92, 0x81]
+
+    - label: "KeySetReadAllIndices"
+      disabled: true
+      command: "KeySetReadAllIndices"
+      arguments: {}
+      response:
+          values:
+              - name: "groupKeySetIDs"
+                value: [0x2222]

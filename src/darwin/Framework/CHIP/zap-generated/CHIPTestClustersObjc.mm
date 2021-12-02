@@ -3596,54 +3596,32 @@ using namespace chip::app::Clusters;
                             return CHIP_ERROR_INVALID_ARGUMENT;
                         }
                         auto element_0 = (CHIPGroupKeyManagementClusterGroupState *) value[i_0];
-                        listHolder_0->mList[i_0].vendorId = element_0.vendorId.unsignedShortValue;
-                        listHolder_0->mList[i_0].vendorGroupId = element_0.vendorGroupId.unsignedShortValue;
-                        listHolder_0->mList[i_0].groupKeySetIndex = element_0.groupKeySetIndex.unsignedShortValue;
-                    }
-                    cppValue = ListType_0(listHolder_0->mList, value.count);
-                } else {
-                    cppValue = ListType_0();
-                }
-            }
-            auto successFn = Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)writeAttributeGroupKeysWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler
-{
-    new CHIPDefaultSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable ignored) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            ListFreer listFreer;
-            using TypeInfo = GroupKeyManagement::Attributes::GroupKeys::TypeInfo;
-            TypeInfo::Type cppValue;
-            {
-                using ListType_0 = std::remove_reference_t<decltype(cppValue)>;
-                using ListMemberType_0 = ListMemberTypeGetter<ListType_0>::Type;
-                if (value.count != 0) {
-                    auto * listHolder_0 = new ListHolder<ListMemberType_0>(value.count);
-                    if (listHolder_0 == nullptr || listHolder_0->mList == nullptr) {
-                        return CHIP_ERROR_INVALID_ARGUMENT;
-                    }
-                    listFreer.add(listHolder_0);
-                    for (size_t i_0 = 0; i_0 < value.count; ++i_0) {
-                        if (![value[i_0] isKindOfClass:[CHIPGroupKeyManagementClusterGroupKey class]]) {
-                            // Wrong kind of value.
-                            return CHIP_ERROR_INVALID_ARGUMENT;
+                        listHolder_0->mList[i_0].fabricIndex = element_0.fabricIndex.unsignedShortValue;
+                        listHolder_0->mList[i_0].groupId = element_0.groupId.unsignedShortValue;
+                        listHolder_0->mList[i_0].groupKeySetID = element_0.groupKeySetID.unsignedShortValue;
+                        {
+                            using ListType_2 = std::remove_reference_t<decltype(listHolder_0->mList[i_0].endpoints)>;
+                            using ListMemberType_2 = ListMemberTypeGetter<ListType_2>::Type;
+                            if (element_0.endpoints.count != 0) {
+                                auto * listHolder_2 = new ListHolder<ListMemberType_2>(element_0.endpoints.count);
+                                if (listHolder_2 == nullptr || listHolder_2->mList == nullptr) {
+                                    return CHIP_ERROR_INVALID_ARGUMENT;
+                                }
+                                listFreer.add(listHolder_2);
+                                for (size_t i_2 = 0; i_2 < element_0.endpoints.count; ++i_2) {
+                                    if (![element_0.endpoints[i_2] isKindOfClass:[NSNumber class]]) {
+                                        // Wrong kind of value.
+                                        return CHIP_ERROR_INVALID_ARGUMENT;
+                                    }
+                                    auto element_2 = (NSNumber *) element_0.endpoints[i_2];
+                                    listHolder_2->mList[i_2] = element_2.unsignedShortValue;
+                                }
+                                listHolder_0->mList[i_0].endpoints = ListType_2(listHolder_2->mList, element_0.endpoints.count);
+                            } else {
+                                listHolder_0->mList[i_0].endpoints = ListType_2();
+                            }
                         }
-                        auto element_0 = (CHIPGroupKeyManagementClusterGroupKey *) value[i_0];
-                        listHolder_0->mList[i_0].vendorId = element_0.vendorId.unsignedShortValue;
-                        listHolder_0->mList[i_0].groupKeyIndex = element_0.groupKeyIndex.unsignedShortValue;
-                        listHolder_0->mList[i_0].groupKeyRoot = [self asByteSpan:element_0.groupKeyRoot];
-                        listHolder_0->mList[i_0].groupKeyEpochStartTime = element_0.groupKeyEpochStartTime.unsignedLongLongValue;
-                        listHolder_0->mList[i_0].groupKeySecurityPolicy
-                            = static_cast<std::remove_reference_t<decltype(listHolder_0->mList[i_0].groupKeySecurityPolicy)>>(
-                                element_0.groupKeySecurityPolicy.unsignedCharValue);
+                        listHolder_0->mList[i_0].groupName = [self asCharSpan:element_0.groupName];
                     }
                     cppValue = ListType_0(listHolder_0->mList, value.count);
                 } else {

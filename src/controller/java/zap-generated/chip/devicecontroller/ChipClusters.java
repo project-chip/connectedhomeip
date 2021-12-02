@@ -5729,36 +5729,116 @@ public class ChipClusters {
     }
 
     public static long clusterId() {
-      return Long.parseUnsignedLong("61444");
+      return Long.parseUnsignedLong("63");
     }
 
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public static class GroupsAttribute {
-      public Integer vendorId;
-      public Integer vendorGroupId;
-      public Integer groupKeySetIndex;
+    public void keySetRead(KeySetReadResponseCallback callback, Integer groupKeySetID) {
+      keySetRead(chipClusterPtr, callback, groupKeySetID);
+    }
 
-      public GroupsAttribute(Integer vendorId, Integer vendorGroupId, Integer groupKeySetIndex) {
-        this.vendorId = vendorId;
-        this.vendorGroupId = vendorGroupId;
-        this.groupKeySetIndex = groupKeySetIndex;
+    public void keySetReadAllIndices(
+        KeySetReadAllIndicesResponseCallback callback, Integer groupKeySetIDs) {
+      keySetReadAllIndices(chipClusterPtr, callback, groupKeySetIDs);
+    }
+
+    public void keySetRemove(DefaultClusterCallback callback, Integer groupKeySetID) {
+      keySetRemove(chipClusterPtr, callback, groupKeySetID);
+    }
+
+    public void keySetWrite(
+        DefaultClusterCallback callback,
+        Integer groupKeySetID,
+        Integer groupKeySecurityPolicy,
+        byte[] epochKey0,
+        Long epochStartTime0,
+        byte[] epochKey1,
+        Long epochStartTime1,
+        byte[] epochKey2,
+        Long epochStartTime2) {
+      keySetWrite(
+          chipClusterPtr,
+          callback,
+          groupKeySetID,
+          groupKeySecurityPolicy,
+          epochKey0,
+          epochStartTime0,
+          epochKey1,
+          epochStartTime1,
+          epochKey2,
+          epochStartTime2);
+    }
+
+    private native void keySetRead(
+        long chipClusterPtr, KeySetReadResponseCallback Callback, Integer groupKeySetID);
+
+    private native void keySetReadAllIndices(
+        long chipClusterPtr, KeySetReadAllIndicesResponseCallback Callback, Integer groupKeySetIDs);
+
+    private native void keySetRemove(
+        long chipClusterPtr, DefaultClusterCallback Callback, Integer groupKeySetID);
+
+    private native void keySetWrite(
+        long chipClusterPtr,
+        DefaultClusterCallback Callback,
+        Integer groupKeySetID,
+        Integer groupKeySecurityPolicy,
+        byte[] epochKey0,
+        Long epochStartTime0,
+        byte[] epochKey1,
+        Long epochStartTime1,
+        byte[] epochKey2,
+        Long epochStartTime2);
+
+    public interface KeySetReadAllIndicesResponseCallback {
+      void onSuccess( // groupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
+          // Conversion from this type to Java is not properly implemented yet
+          );
+
+      void onError(Exception error);
+    }
+
+    public interface KeySetReadResponseCallback {
+      void onSuccess( // groupKeySet: Struct GroupKeySet
+          // Conversion from this type to Java is not properly implemented yet
+          );
+
+      void onError(Exception error);
+    }
+
+    public static class GroupsAttribute {
+      public Integer fabricIndex;
+      public Integer groupId;
+      public Integer groupKeySetID;
+      public String groupName;
+
+      public GroupsAttribute(
+          Integer fabricIndex, Integer groupId, Integer groupKeySetID, String groupName) {
+        this.fabricIndex = fabricIndex;
+        this.groupId = groupId;
+        this.groupKeySetID = groupKeySetID;
+        this.groupName = groupName;
       }
 
       @Override
       public String toString() {
         StringBuilder output = new StringBuilder("");
-        output.append("int vendorId: ");
-        output.append(this.vendorId);
+        output.append("int fabricIndex: ");
+        output.append(this.fabricIndex);
         output.append("\n");
 
-        output.append("int vendorGroupId: ");
-        output.append(this.vendorGroupId);
+        output.append("int groupId: ");
+        output.append(this.groupId);
         output.append("\n");
 
-        output.append("int groupKeySetIndex: ");
-        output.append(this.groupKeySetIndex);
+        output.append("int groupKeySetID: ");
+        output.append(this.groupKeySetID);
+        output.append("\n");
+
+        output.append("String groupName: ");
+        output.append(this.groupName);
         output.append("\n");
 
         return output.toString();
@@ -5771,92 +5851,17 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
-    public static class GroupKeysAttribute {
-      public Integer vendorId;
-      public Integer groupKeyIndex;
-      public byte[] groupKeyRoot;
-      public Long groupKeyEpochStartTime;
-      public Integer groupKeySecurityPolicy;
-
-      public GroupKeysAttribute(
-          Integer vendorId,
-          Integer groupKeyIndex,
-          byte[] groupKeyRoot,
-          Long groupKeyEpochStartTime,
-          Integer groupKeySecurityPolicy) {
-        this.vendorId = vendorId;
-        this.groupKeyIndex = groupKeyIndex;
-        this.groupKeyRoot = groupKeyRoot;
-        this.groupKeyEpochStartTime = groupKeyEpochStartTime;
-        this.groupKeySecurityPolicy = groupKeySecurityPolicy;
-      }
-
-      @Override
-      public String toString() {
-        StringBuilder output = new StringBuilder("");
-        output.append("int vendorId: ");
-        output.append(this.vendorId);
-        output.append("\n");
-
-        output.append("int groupKeyIndex: ");
-        output.append(this.groupKeyIndex);
-        output.append("\n");
-
-        output.append("byte[] ");
-        output.append(Arrays.toString(groupKeyRoot));
-        output.append("\n");
-
-        output.append("long groupKeyEpochStartTime: ");
-        output.append(this.groupKeyEpochStartTime);
-        output.append("\n");
-
-        output.append("int groupKeySecurityPolicy: ");
-        output.append(this.groupKeySecurityPolicy);
-        output.append("\n");
-
-        return output.toString();
-      }
-    }
-
-    public interface GroupKeysAttributeCallback {
-      void onSuccess(List<GroupKeysAttribute> valueList);
-
-      void onError(Exception ex);
-    }
-
     public void readGroupsAttribute(GroupsAttributeCallback callback) {
       readGroupsAttribute(chipClusterPtr, callback);
-    }
-
-    public void readGroupKeysAttribute(GroupKeysAttributeCallback callback) {
-      readGroupKeysAttribute(chipClusterPtr, callback);
     }
 
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
 
-    public void subscribeClusterRevisionAttribute(
-        DefaultClusterCallback callback, int minInterval, int maxInterval) {
-      subscribeClusterRevisionAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void reportClusterRevisionAttribute(IntegerAttributeCallback callback) {
-      reportClusterRevisionAttribute(chipClusterPtr, callback);
-    }
-
     private native void readGroupsAttribute(long chipClusterPtr, GroupsAttributeCallback callback);
 
-    private native void readGroupKeysAttribute(
-        long chipClusterPtr, GroupKeysAttributeCallback callback);
-
     private native void readClusterRevisionAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void subscribeClusterRevisionAttribute(
-        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
-
-    private native void reportClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
   }
 

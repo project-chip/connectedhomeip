@@ -1731,18 +1731,21 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPGroupKeyManagement : CHIPCluster
 
-- (void)readAttributeGroupsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)keySetReadWithParams:(CHIPGroupKeyManagementClusterKeySetReadParams *)params
+           completionHandler:(void (^)(CHIPGroupKeyManagementClusterKeySetReadResponseParams * _Nullable data,
+                                 NSError * _Nullable error))completionHandler;
+- (void)keySetReadAllIndicesWithParams:(CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams *)params
+                     completionHandler:(void (^)(CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams * _Nullable data,
+                                           NSError * _Nullable error))completionHandler;
+- (void)keySetRemoveWithParams:(CHIPGroupKeyManagementClusterKeySetRemoveParams *)params
+             completionHandler:(StatusCompletion)completionHandler;
+- (void)keySetWriteWithParams:(CHIPGroupKeyManagementClusterKeySetWriteParams *)params
+            completionHandler:(StatusCompletion)completionHandler;
 
-- (void)readAttributeGroupKeysWithCompletionHandler:(void (^)(
-                                                        NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)readAttributeGroupsWithCompletionHandler:(void (^)(NSArray * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
-                                             maxInterval:(uint16_t)maxInterval
-                                         responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeClusterRevisionWithResponseHandler:(void (^)(NSNumber * _Nullable value,
-                                                              NSError * _Nullable error))responseHandler;
 
 @end
 

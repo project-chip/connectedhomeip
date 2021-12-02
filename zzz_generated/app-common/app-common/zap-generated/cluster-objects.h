@@ -13275,6 +13275,352 @@ struct TypeInfo
 } // namespace ClusterRevision
 } // namespace Attributes
 } // namespace OperationalCredentials
+namespace GroupKeyManagement {
+// Enum for GroupKeySecurityPolicy
+enum class GroupKeySecurityPolicy : uint8_t
+{
+    kStandard   = 0x00,
+    kLowLatency = 0x01,
+};
+
+namespace Structs {
+namespace GroupKeySet {
+enum class Fields
+{
+    kGroupKeySetID          = 1,
+    kGroupKeySecurityPolicy = 2,
+    kEpochKey0              = 3,
+    kEpochStartTime0        = 4,
+    kEpochKey1              = 5,
+    kEpochStartTime1        = 6,
+    kEpochKey2              = 7,
+    kEpochStartTime2        = 8,
+};
+
+struct Type
+{
+public:
+    uint16_t groupKeySetID;
+    GroupKeySecurityPolicy groupKeySecurityPolicy;
+    chip::ByteSpan epochKey0;
+    uint64_t epochStartTime0;
+    chip::ByteSpan epochKey1;
+    uint64_t epochStartTime1;
+    chip::ByteSpan epochKey2;
+    uint64_t epochStartTime2;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace GroupKeySet
+namespace GroupState {
+enum class Fields
+{
+    kFabricIndex   = 1,
+    kGroupId       = 2,
+    kGroupKeySetID = 3,
+    kEndpoints     = 4,
+    kGroupName     = 5,
+};
+
+struct Type
+{
+public:
+    uint16_t fabricIndex;
+    uint16_t groupId;
+    uint16_t groupKeySetID;
+    DataModel::List<const uint16_t> endpoints;
+    chip::CharSpan groupName;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    uint16_t fabricIndex;
+    uint16_t groupId;
+    uint16_t groupKeySetID;
+    DataModel::DecodableList<uint16_t> endpoints;
+    chip::CharSpan groupName;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+} // namespace GroupState
+} // namespace Structs
+
+namespace Commands {
+// Forward-declarations so we can reference these later.
+
+namespace KeySetWrite {
+struct Type;
+struct DecodableType;
+} // namespace KeySetWrite
+
+namespace KeySetRead {
+struct Type;
+struct DecodableType;
+} // namespace KeySetRead
+
+namespace KeySetReadResponse {
+struct Type;
+struct DecodableType;
+} // namespace KeySetReadResponse
+
+namespace KeySetRemove {
+struct Type;
+struct DecodableType;
+} // namespace KeySetRemove
+
+namespace KeySetReadAllIndices {
+struct Type;
+struct DecodableType;
+} // namespace KeySetReadAllIndices
+
+namespace KeySetReadAllIndicesResponse {
+struct Type;
+struct DecodableType;
+} // namespace KeySetReadAllIndicesResponse
+
+} // namespace Commands
+
+namespace Commands {
+namespace KeySetWrite {
+enum class Fields
+{
+    kGroupKeySet = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    Structs::GroupKeySet::Type groupKeySet;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetWrite::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    Structs::GroupKeySet::DecodableType groupKeySet;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetWrite
+namespace KeySetRead {
+enum class Fields
+{
+    kGroupKeySetID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetRead::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    uint16_t groupKeySetID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetRead::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    uint16_t groupKeySetID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetRead
+namespace KeySetReadResponse {
+enum class Fields
+{
+    kGroupKeySet = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    Structs::GroupKeySet::Type groupKeySet;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    Structs::GroupKeySet::DecodableType groupKeySet;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetReadResponse
+namespace KeySetRemove {
+enum class Fields
+{
+    kGroupKeySetID = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetRemove::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    uint16_t groupKeySetID;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetRemove::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    uint16_t groupKeySetID;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetRemove
+namespace KeySetReadAllIndices {
+enum class Fields
+{
+    kGroupKeySetIDs = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    DataModel::List<const uint16_t> groupKeySetIDs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndices::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    DataModel::DecodableList<uint16_t> groupKeySetIDs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetReadAllIndices
+namespace KeySetReadAllIndicesResponse {
+enum class Fields
+{
+    kGroupKeySetIDs = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndicesResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    DataModel::List<const uint16_t> groupKeySetIDs;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::KeySetReadAllIndicesResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+
+    DataModel::DecodableList<uint16_t> groupKeySetIDs;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace KeySetReadAllIndicesResponse
+} // namespace Commands
+
+namespace Attributes {
+namespace Groups {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const Structs::GroupState::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::GroupState::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::GroupState::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Groups::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Groups
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace GroupKeyManagement
 namespace FixedLabel {
 
 namespace Structs {
@@ -34598,116 +34944,6 @@ struct TypeInfo
 } // namespace ClusterRevision
 } // namespace Attributes
 } // namespace Binding
-namespace GroupKeyManagement {
-// Enum for GroupKeySecurityPolicy
-enum class GroupKeySecurityPolicy : uint8_t
-{
-    kStandard   = 0x00,
-    kLowLatency = 0x01,
-};
-
-namespace Structs {
-namespace GroupKey {
-enum class Fields
-{
-    kVendorId               = 1,
-    kGroupKeyIndex          = 2,
-    kGroupKeyRoot           = 3,
-    kGroupKeyEpochStartTime = 4,
-    kGroupKeySecurityPolicy = 5,
-};
-
-struct Type
-{
-public:
-    uint16_t vendorId;
-    uint16_t groupKeyIndex;
-    chip::ByteSpan groupKeyRoot;
-    uint64_t groupKeyEpochStartTime;
-    GroupKeySecurityPolicy groupKeySecurityPolicy;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-
-using DecodableType = Type;
-
-} // namespace GroupKey
-namespace GroupState {
-enum class Fields
-{
-    kVendorId         = 1,
-    kVendorGroupId    = 2,
-    kGroupKeySetIndex = 3,
-};
-
-struct Type
-{
-public:
-    uint16_t vendorId;
-    uint16_t vendorGroupId;
-    uint16_t groupKeySetIndex;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-
-using DecodableType = Type;
-
-} // namespace GroupState
-} // namespace Structs
-
-namespace Attributes {
-namespace Groups {
-struct TypeInfo
-{
-    using Type             = DataModel::List<const Structs::GroupState::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::GroupState::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::GroupState::DecodableType> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::Groups::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace Groups
-namespace GroupKeys {
-struct TypeInfo
-{
-    using Type             = DataModel::List<const Structs::GroupKey::Type>;
-    using DecodableType    = DataModel::DecodableList<Structs::GroupKey::DecodableType>;
-    using DecodableArgType = const DataModel::DecodableList<Structs::GroupKey::DecodableType> &;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::GroupKeys::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace GroupKeys
-namespace FeatureMap {
-struct TypeInfo
-{
-    using Type             = uint32_t;
-    using DecodableType    = uint32_t;
-    using DecodableArgType = uint32_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace FeatureMap
-namespace ClusterRevision {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::GroupKeyManagement::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ClusterRevision
-} // namespace Attributes
-} // namespace GroupKeyManagement
 
 } // namespace Clusters
 } // namespace app

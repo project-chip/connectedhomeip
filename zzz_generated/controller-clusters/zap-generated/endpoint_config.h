@@ -206,6 +206,9 @@
             /* Endpoint: 1, Cluster: Operational Credentials (client) */                                                           \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */         \
                                                                                                                                    \
+            /* Endpoint: 1, Cluster: Group Key Management (client) */                                                              \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */              \
+                                                                                                                                   \
             /* Endpoint: 1, Cluster: Fixed Label (client) */                                                                       \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */         \
                                                                                                                                    \
@@ -299,9 +302,6 @@
                                                                                                                                    \
             /* Endpoint: 1, Cluster: Binding (client) */                                                                           \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */         \
-                                                                                                                                   \
-            /* Endpoint: 1, Cluster: Group Key Management (client) */                                                              \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */         \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -377,6 +377,9 @@
             {                                                                                                                      \
                 0x003E, ZAP_ATTRIBUTE_INDEX(28), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Operational Credentials (client) */                                                        \
+            {                                                                                                                      \
+                0x003F, ZAP_ATTRIBUTE_INDEX(28), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Group Key Management (client) */                                                           \
             {                                                                                                                      \
                 0x0040, ZAP_ATTRIBUTE_INDEX(29), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Fixed Label (client) */                                                                    \
@@ -470,9 +473,6 @@
             {                                                                                                                      \
                 0xF000, ZAP_ATTRIBUTE_INDEX(60), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
             }, /* Endpoint: 1, Cluster: Binding (client) */                                                                        \
-            {                                                                                                                      \
-                0xF004, ZAP_ATTRIBUTE_INDEX(61), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
-            }, /* Endpoint: 1, Cluster: Group Key Management (client) */                                                           \
     }
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster *) (&generatedClusters[index]))

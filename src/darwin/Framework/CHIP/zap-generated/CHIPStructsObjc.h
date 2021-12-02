@@ -194,6 +194,27 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPGroupKeyManagementClusterGroupKeySet : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySecurityPolicy;
+@property (strong, nonatomic) NSData * _Nonnull epochKey0;
+@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime0;
+@property (strong, nonatomic) NSData * _Nonnull epochKey1;
+@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime1;
+@property (strong, nonatomic) NSData * _Nonnull epochKey2;
+@property (strong, nonatomic) NSNumber * _Nonnull epochStartTime2;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterGroupState : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull groupId;
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
+@property (strong, nonatomic) NSArray * _Nonnull endpoints;
+@property (strong, nonatomic) NSString * _Nonnull groupName;
+- (instancetype)init;
+@end
+
 @interface CHIPFixedLabelClusterLabelStruct : NSObject
 @property (strong, nonatomic) NSString * _Nonnull label;
 @property (strong, nonatomic) NSString * _Nonnull value;
@@ -366,22 +387,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestClusterClusterTestListStructOctet : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSData * _Nonnull operationalCert;
-- (instancetype)init;
-@end
-
-@interface CHIPGroupKeyManagementClusterGroupKey : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull vendorId;
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeyIndex;
-@property (strong, nonatomic) NSData * _Nonnull groupKeyRoot;
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeyEpochStartTime;
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeySecurityPolicy;
-- (instancetype)init;
-@end
-
-@interface CHIPGroupKeyManagementClusterGroupState : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull vendorId;
-@property (strong, nonatomic) NSNumber * _Nonnull vendorGroupId;
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetIndex;
 - (instancetype)init;
 @end
 

@@ -2145,6 +2145,126 @@ void CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallback::Callbac
 
     env->CallVoidMethod(javaCallbackRef, javaMethod, errorCode, debugText);
 }
+CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback::
+    CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback(jobject javaCallback) :
+    Callback::Callback<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>(CallbackFn, this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback::
+    ~CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+};
+
+void CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback::CallbackFn(
+    void * context,
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    std::unique_ptr<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback,
+                    void (*)(CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback>);
+    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
+
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    // Java callback is allowed to be null, exit early if this is the case.
+    VerifyOrReturn(javaCallbackRef != nullptr);
+
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject groupKeySetIDs;
+
+    groupKeySetIDs = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, groupKeySetIDs);
+}
+CHIPGroupKeyManagementClusterKeySetReadResponseCallback::CHIPGroupKeyManagementClusterKeySetReadResponseCallback(
+    jobject javaCallback) :
+    Callback::Callback<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>(CallbackFn, this)
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+        return;
+    }
+
+    javaCallbackRef = env->NewGlobalRef(javaCallback);
+    if (javaCallbackRef == nullptr)
+    {
+        ChipLogError(Zcl, "Could not create global reference for Java callback");
+    }
+}
+
+CHIPGroupKeyManagementClusterKeySetReadResponseCallback::~CHIPGroupKeyManagementClusterKeySetReadResponseCallback()
+{
+    JNIEnv * env = JniReferences::GetInstance().GetEnvForCurrentThread();
+    if (env == nullptr)
+    {
+        ChipLogError(Zcl, "Could not delete global reference for Java callback");
+        return;
+    }
+    env->DeleteGlobalRef(javaCallbackRef);
+};
+
+void CHIPGroupKeyManagementClusterKeySetReadResponseCallback::CallbackFn(
+    void * context, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & dataResponse)
+{
+    chip::DeviceLayer::StackUnlock unlock;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    JNIEnv * env   = JniReferences::GetInstance().GetEnvForCurrentThread();
+    jobject javaCallbackRef;
+    jmethodID javaMethod;
+
+    VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Error invoking Java callback: no JNIEnv"));
+
+    std::unique_ptr<CHIPGroupKeyManagementClusterKeySetReadResponseCallback,
+                    void (*)(CHIPGroupKeyManagementClusterKeySetReadResponseCallback *)>
+        cppCallback(reinterpret_cast<CHIPGroupKeyManagementClusterKeySetReadResponseCallback *>(context),
+                    chip::Platform::Delete<CHIPGroupKeyManagementClusterKeySetReadResponseCallback>);
+    VerifyOrReturn(cppCallback != nullptr, ChipLogError(Zcl, "Error invoking Java callback: failed to cast native callback"));
+
+    javaCallbackRef = cppCallback->javaCallbackRef;
+    // Java callback is allowed to be null, exit early if this is the case.
+    VerifyOrReturn(javaCallbackRef != nullptr);
+
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "()V", &javaMethod);
+    VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
+
+    jobject groupKeySet;
+
+    groupKeySet = nullptr; /* Struct - conversion from this type to Java is not properly implemented yet */
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, groupKeySet);
+}
 CHIPGroupsClusterAddGroupResponseCallback::CHIPGroupsClusterAddGroupResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPGroupsClusterAddGroupResponseCallbackType>(CallbackFn, this)
 {

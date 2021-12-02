@@ -342,6 +342,14 @@ void emberAfAdministratorCommissioningClusterInitCallback(chip::EndpointId endpo
  */
 void emberAfOperationalCredentialsClusterInitCallback(chip::EndpointId endpoint);
 
+/** @brief Group Key Management Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfGroupKeyManagementClusterInitCallback(chip::EndpointId endpoint);
+
 /** @brief Fixed Label Cluster Init
  *
  * Cluster Init
@@ -933,14 +941,6 @@ void emberAfElectricalMeasurementClusterInitCallback(chip::EndpointId endpoint);
  * @param endpoint    Endpoint that is being initialized
  */
 void emberAfBindingClusterInitCallback(chip::EndpointId endpoint);
-
-/** @brief Group Key Management Cluster Init
- *
- * Cluster Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfGroupKeyManagementClusterInitCallback(chip::EndpointId endpoint);
 
 // Cluster Server/Client Init Functions
 
@@ -4803,6 +4803,110 @@ void emberAfOperationalCredentialsClusterServerTickCallback(chip::EndpointId end
  * @param endpoint  Endpoint that is being served
  */
 void emberAfOperationalCredentialsClusterClientTickCallback(chip::EndpointId endpoint);
+
+//
+// Group Key Management Cluster
+//
+
+/** @brief Group Key Management Cluster Server Init
+ *
+ * Server Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfGroupKeyManagementClusterServerInitCallback(chip::EndpointId endpoint);
+
+/** @brief Group Key Management Cluster Client Init
+ *
+ * Client Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAfGroupKeyManagementClusterClientInitCallback(chip::EndpointId endpoint);
+
+/** @brief Group Key Management Cluster Server Attribute Changed
+ *
+ * Server Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterGroupKeyManagementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Group Key Management Cluster Client Attribute Changed
+ *
+ * Client Attribute Changed
+ *
+ * @param attributePath Concrete attribute path that changed
+ */
+void MatterGroupKeyManagementClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
+
+/** @brief Group Key Management Cluster Server Message Sent
+ *
+ * Server Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfGroupKeyManagementClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                               EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                               EmberStatus status);
+
+/** @brief Group Key Management Cluster Client Message Sent
+ *
+ * Client Message Sent
+ *
+ * @param destination        The destination to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAfGroupKeyManagementClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
+                                                               EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                               EmberStatus status);
+
+/** @brief Group Key Management Cluster Server Pre Attribute Changed
+ *
+ * Server Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterGroupKeyManagementClusterServerPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Group Key Management Cluster Client Pre Attribute Changed
+ *
+ * Client Pre Attribute Changed
+ *
+ * @param attributePath Concrete attribute path to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+chip::Protocols::InteractionModel::Status MatterGroupKeyManagementClusterClientPreAttributeChangedCallback(
+    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
+
+/** @brief Group Key Management Cluster Server Tick
+ *
+ * Server Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfGroupKeyManagementClusterServerTickCallback(chip::EndpointId endpoint);
+
+/** @brief Group Key Management Cluster Client Tick
+ *
+ * Client Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAfGroupKeyManagementClusterClientTickCallback(chip::EndpointId endpoint);
 
 //
 // Fixed Label Cluster
@@ -12588,110 +12692,6 @@ void emberAfBindingClusterServerTickCallback(chip::EndpointId endpoint);
  */
 void emberAfBindingClusterClientTickCallback(chip::EndpointId endpoint);
 
-//
-// Group Key Management Cluster
-//
-
-/** @brief Group Key Management Cluster Server Init
- *
- * Server Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfGroupKeyManagementClusterServerInitCallback(chip::EndpointId endpoint);
-
-/** @brief Group Key Management Cluster Client Init
- *
- * Client Init
- *
- * @param endpoint    Endpoint that is being initialized
- */
-void emberAfGroupKeyManagementClusterClientInitCallback(chip::EndpointId endpoint);
-
-/** @brief Group Key Management Cluster Server Attribute Changed
- *
- * Server Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterGroupKeyManagementClusterServerAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Group Key Management Cluster Client Attribute Changed
- *
- * Client Attribute Changed
- *
- * @param attributePath Concrete attribute path that changed
- */
-void MatterGroupKeyManagementClusterClientAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath);
-
-/** @brief Group Key Management Cluster Server Message Sent
- *
- * Server Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfGroupKeyManagementClusterServerMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                               EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                               EmberStatus status);
-
-/** @brief Group Key Management Cluster Client Message Sent
- *
- * Client Message Sent
- *
- * @param destination        The destination to which the message was sent
- * @param apsFrame           The APS frame for the message
- * @param msgLen             The length of the message
- * @param message            The message that was sent
- * @param status             The status of the sent message
- */
-void emberAfGroupKeyManagementClusterClientMessageSentCallback(const chip::MessageSendDestination & destination,
-                                                               EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                               EmberStatus status);
-
-/** @brief Group Key Management Cluster Server Pre Attribute Changed
- *
- * Server Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status MatterGroupKeyManagementClusterServerPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Group Key Management Cluster Client Pre Attribute Changed
- *
- * Client Pre Attribute Changed
- *
- * @param attributePath Concrete attribute path to be changed
- * @param attributeType Attribute type
- * @param size          Attribute size
- * @param value         Attribute value
- */
-chip::Protocols::InteractionModel::Status MatterGroupKeyManagementClusterClientPreAttributeChangedCallback(
-    const chip::app::ConcreteAttributePath & attributePath, EmberAfAttributeType attributeType, uint16_t size, uint8_t * value);
-
-/** @brief Group Key Management Cluster Server Tick
- *
- * Server Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfGroupKeyManagementClusterServerTickCallback(chip::EndpointId endpoint);
-
-/** @brief Group Key Management Cluster Client Tick
- *
- * Client Tick
- *
- * @param endpoint  Endpoint that is being served
- */
-void emberAfGroupKeyManagementClusterClientTickCallback(chip::EndpointId endpoint);
-
 // Cluster Commands Callback
 
 /**
@@ -13604,6 +13604,42 @@ bool emberAfOperationalCredentialsClusterAddTrustedRootCertificateCallback(
 bool emberAfOperationalCredentialsClusterRemoveTrustedRootCertificateCallback(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OperationalCredentials::Commands::RemoveTrustedRootCertificate::DecodableType & commandData);
+/**
+ * @brief Group Key Management Cluster KeySetWrite Command callback (from client)
+ */
+bool emberAfGroupKeyManagementClusterKeySetWriteCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetWrite::DecodableType & commandData);
+/**
+ * @brief Group Key Management Cluster KeySetRead Command callback (from client)
+ */
+bool emberAfGroupKeyManagementClusterKeySetReadCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRead::DecodableType & commandData);
+/**
+ * @brief Group Key Management Cluster KeySetReadResponse Command callback (from server)
+ */
+bool emberAfGroupKeyManagementClusterKeySetReadResponseCallback(
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+    chip::app::Clusters::GroupKeyManagement::Structs::GroupKeySet::DecodableType groupKeySet);
+/**
+ * @brief Group Key Management Cluster KeySetRemove Command callback (from client)
+ */
+bool emberAfGroupKeyManagementClusterKeySetRemoveCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::DecodableType & commandData);
+/**
+ * @brief Group Key Management Cluster KeySetReadAllIndices Command callback (from client)
+ */
+bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndices::DecodableType & commandData);
+/**
+ * @brief Group Key Management Cluster KeySetReadAllIndicesResponse Command callback (from server)
+ */
+bool emberAfGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback(
+    chip::EndpointId endpoint, chip::app::CommandSender * commandObj,
+    /* TYPE WARNING: array array defaults to */ uint8_t * groupKeySetIDs);
 /**
  * @brief Mode Select Cluster ChangeToMode Command callback (from client)
  */

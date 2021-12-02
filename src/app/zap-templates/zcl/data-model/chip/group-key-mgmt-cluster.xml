@@ -18,23 +18,28 @@ limitations under the License.
   <domain name="CHIP"/>
 
   <struct name="GroupState">
-    <cluster code="0xF004"/>
-    <item name="VendorId" type="INT16U"/>
-    <item name="VendorGroupId" type="INT16U"/>
-    <item name="GroupKeySetIndex" type="INT16U"/>
+    <cluster code="0x003F"/>
+    <item name="FabricIndex" type="INT16U"/>
+    <item name="GroupId" type="INT16U"/>
+    <item name="GroupKeySetID" type="INT16U"/>
+    <item name="Endpoints" type="INT16U" array="true"/>
+    <item name="GroupName" type="CHAR_STRING" length="16" />
   </struct>
 
-  <struct name="GroupKey">
-    <cluster code="0xF004"/>
-    <item name="VendorId" type="INT16U"/>
-    <item name="GroupKeyIndex" type="INT16U"/>
-    <item name="GroupKeyRoot" type="OCTET_STRING" length="16"/>
-    <item name="GroupKeyEpochStartTime" type="INT64U"/>
+  <struct name="GroupKeySet">
+    <cluster code="0x003F"/>
+    <item name="GroupKeySetID" type="INT16U"/>
     <item name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicy"/>
+    <item name="EpochKey0" type="OCTET_STRING" length="16"/>
+    <item name="EpochStartTime0" type="INT64U"/>
+    <item name="EpochKey1" type="OCTET_STRING" length="16"/>
+    <item name="EpochStartTime1" type="INT64U"/>
+    <item name="EpochKey2" type="OCTET_STRING" length="16"/>
+    <item name="EpochStartTime2" type="INT64U"/>
   </struct>
 
   <enum name="GroupKeySecurityPolicy" type="ENUM8">
-    <cluster code="0xF004"/>
+    <cluster code="0x003F"/>
     <item name="Standard" value="0x00"/>
     <item name="LowLatency" value="0x01"/>
   </enum>
@@ -42,10 +47,44 @@ limitations under the License.
   <cluster>
     <domain>General</domain>
     <name>Group Key Management</name>
-    <code>0xF004</code>
+    <code>0x003F</code>
     <define>GROUP_KEY_MANAGEMENT_CLUSTER</define>
     <description>The Group Key Management Cluster is the mechanism by which group keys are managed.</description>
     <attribute side="server" code="0x0000" define="GROUPS" type="ARRAY" entryType="GroupState" length="254" writable="false" optional="false">groups</attribute>
-    <attribute side="server" code="0x0001" define="GROUPKEYS" type="ARRAY" entryType="GroupKey" length="254" writable="false" optional="false">group keys</attribute>
+
+    <command source="client" code="0x00" name="KeySetWrite" optional="false" cli="zcl GroupKeyManagement KeySetWrite">
+      <description>Revoke a Root Key from a Group</description>
+      <arg name="groupKeySet" type="GroupKeySet"/>
+    </command>
+
+    <command source="client" code="0x01" name="KeySetRead" optional="false" cli="zcl GroupKeyManagement KeySetRead">
+      <description>Revoke a Root Key from a Group</description>
+      <arg name="groupKeySetID" type="INT16U"/>
+    </command>
+
+    <command source="server" code="0x02" name="KeySetReadResponse" optional="false" disableDefaultResponse="true">
+      <description>
+       Response to KeySetRead
+      </description>
+      <arg name="groupKeySet" type="GroupKeySet"/>
+    </command>
+
+    <command source="client" code="0x03" name="KeySetRemove" optional="false" cli="zcl GroupKeyManagement KeySetRemove">
+      <description>Revoke a Root Key from a Group</description>
+      <arg name="groupKeySetID" type="INT16U"/>
+    </command>
+
+    <command source="client" code="0x04" name="KeySetReadAllIndices" optional="false" cli="zcl GroupKeyManagement KeySetReadAllIndices">
+      <description>Revoke a Root Key from a Group</description>
+      <arg name="groupKeySetIDs" type="INT16U" array="true"/>
+    </command>
+
+    <command source="server" code="0x05" name="KeySetReadAllIndicesResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Reseponse to KeySetReadAllIndices
+      </description>
+        <arg name="groupKeySetIDs" type="INT16U" array="true"/>
+    </command>
+
   </cluster>
 </configurator>

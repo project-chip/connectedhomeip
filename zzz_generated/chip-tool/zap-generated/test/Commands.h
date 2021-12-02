@@ -141,6 +141,7 @@ public:
         printf("TestBasicInformation\n");
         printf("TestIdentifyCluster\n");
         printf("TestGroupsCluster\n");
+        printf("TestGroupKeyManagementCluster\n");
         printf("TestOperationalCredentialsCluster\n");
         printf("TestModeSelectCluster\n");
         printf("TestGroupMessaging\n");
@@ -48006,6 +48007,114 @@ private:
     }
 };
 
+class TestGroupKeyManagementCluster : public TestCommand
+{
+public:
+    TestGroupKeyManagementCluster() : TestCommand("TestGroupKeyManagementCluster"), mTestIndex(0) {}
+
+    /////////// TestCommand Interface /////////
+    void NextTest() override
+    {
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (0 == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Start: TestGroupKeyManagementCluster\n");
+        }
+
+        if (mTestCount == mTestIndex)
+        {
+            ChipLogProgress(chipTool, " **** Test Complete: TestGroupKeyManagementCluster\n");
+            SetCommandExitStatus(CHIP_NO_ERROR);
+            return;
+        }
+
+        Wait();
+
+        // Ensure we increment mTestIndex before we start running the relevant
+        // command.  That way if we lose the timeslice after we send the message
+        // but before our function call returns, we won't end up with an
+        // incorrect mTestIndex value observed when we get the response.
+        switch (mTestIndex++)
+        {
+        case 0:
+            ChipLogProgress(chipTool, " ***** Test Step 0 : KeySetRemove (not found)\n");
+            err = TestKeySetRemoveNotFound_0();
+            break;
+        case 1:
+            ChipLogProgress(chipTool, " ***** Test Step 1 : KeySetRemove (existing)\n");
+            err = TestKeySetRemoveExisting_1();
+            break;
+        }
+
+        if (CHIP_NO_ERROR != err)
+        {
+            ChipLogError(chipTool, " ***** Test Failure: %s\n", chip::ErrorStr(err));
+            SetCommandExitStatus(err);
+        }
+    }
+
+private:
+    std::atomic_uint16_t mTestIndex;
+    const uint16_t mTestCount = 2;
+
+    //
+    // Tests methods
+    //
+
+    CHIP_ERROR TestKeySetRemoveNotFound_0()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type;
+
+        RequestType request;
+        request.groupKeySetID = 13107U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_0();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_0(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_0(uint8_t status)
+    {
+        VerifyOrReturn(CheckValue("status", status, 139));
+        NextTest();
+    }
+
+    void OnSuccessResponse_0() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestKeySetRemoveExisting_1()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
+        using RequestType               = chip::app::Clusters::GroupKeyManagement::Commands::KeySetRemove::Type;
+
+        RequestType request;
+        request.groupKeySetID = 4369U;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnSuccessResponse_1();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestGroupKeyManagementCluster *>(context))->OnFailureResponse_1(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_1() { NextTest(); }
+};
+
 class TestOperationalCredentialsCluster : public TestCommand
 {
 public:
@@ -49372,6 +49481,7 @@ void registerCommandsTests(Commands & commands)
         make_unique<TestBasicInformation>(),
         make_unique<TestIdentifyCluster>(),
         make_unique<TestGroupsCluster>(),
+        make_unique<TestGroupKeyManagementCluster>(),
         make_unique<TestOperationalCredentialsCluster>(),
         make_unique<TestModeSelectCluster>(),
         make_unique<TestGroupMessaging>(),

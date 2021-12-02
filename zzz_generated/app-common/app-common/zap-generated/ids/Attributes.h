@@ -1813,6 +1813,24 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace OperationalCredentials
 
+namespace GroupKeyManagement {
+namespace Attributes {
+
+namespace Groups {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Groups
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace GroupKeyManagement
+
 namespace FixedLabel {
 namespace Attributes {
 
@@ -5520,28 +5538,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace Binding
-
-namespace GroupKeyManagement {
-namespace Attributes {
-
-namespace Groups {
-static constexpr AttributeId Id = 0x00000000;
-} // namespace Groups
-
-namespace GroupKeys {
-static constexpr AttributeId Id = 0x00000001;
-} // namespace GroupKeys
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace GroupKeyManagement
 
 } // namespace Clusters
 } // namespace app

@@ -133,6 +133,9 @@ static constexpr chip::ClusterId ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_ID = 0x
 // Definitions for cluster: Operational Credentials
 static constexpr chip::ClusterId ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID = 0x003E;
 
+// Definitions for cluster: Group Key Management
+static constexpr chip::ClusterId ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID = 0x003F;
+
 // Definitions for cluster: Fixed Label
 static constexpr chip::ClusterId ZCL_FIXED_LABEL_CLUSTER_ID = 0x0040;
 
@@ -354,6 +357,3 @@ static constexpr chip::ClusterId ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID = 0x0B04;
 
 // Definitions for cluster: Binding
 static constexpr chip::ClusterId ZCL_BINDING_CLUSTER_ID = 0xF000;
-
-// Definitions for cluster: Group Key Management
-static constexpr chip::ClusterId ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID = 0xF004;

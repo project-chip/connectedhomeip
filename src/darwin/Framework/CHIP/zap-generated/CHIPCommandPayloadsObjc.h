@@ -858,6 +858,36 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPGroupKeyManagementClusterKeySetWriteParams : NSObject
+@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySet * _Nonnull groupKeySet;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetReadParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetReadResponseParams : NSObject
+@property (strong, nonatomic) CHIPGroupKeyManagementClusterGroupKeySet * _Nonnull groupKeySet;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetRemoveParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetID;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetReadAllIndicesParams : NSObject
+@property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseParams : NSObject
+@property (strong, nonatomic) NSArray * _Nonnull groupKeySetIDs;
+- (instancetype)init;
+@end
+
 @interface CHIPModeSelectClusterChangeToModeParams : NSObject
 @property (strong, nonatomic, getter=getNewMode) NSNumber * _Nonnull newMode;
 - (instancetype)init;

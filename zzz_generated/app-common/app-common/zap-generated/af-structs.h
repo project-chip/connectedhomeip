@@ -199,22 +199,27 @@ typedef struct _FabricDescriptor
     chip::CharSpan Label;
 } FabricDescriptor;
 
-// Struct for GroupKey
-typedef struct _GroupKey
+// Struct for GroupKeySet
+typedef struct _GroupKeySet
 {
-    uint16_t VendorId;
-    uint16_t GroupKeyIndex;
-    chip::ByteSpan GroupKeyRoot;
-    uint64_t GroupKeyEpochStartTime;
+    uint16_t GroupKeySetID;
     uint8_t GroupKeySecurityPolicy;
-} GroupKey;
+    chip::ByteSpan EpochKey0;
+    uint64_t EpochStartTime0;
+    chip::ByteSpan EpochKey1;
+    uint64_t EpochStartTime1;
+    chip::ByteSpan EpochKey2;
+    uint64_t EpochStartTime2;
+} GroupKeySet;
 
 // Struct for GroupState
 typedef struct _GroupState
 {
-    uint16_t VendorId;
-    uint16_t VendorGroupId;
-    uint16_t GroupKeySetIndex;
+    uint16_t FabricIndex;
+    uint16_t GroupId;
+    uint16_t GroupKeySetID;
+    /* TYPE WARNING: array array defaults to */ uint8_t * Endpoints;
+    chip::CharSpan GroupName;
 } GroupState;
 
 // Struct for IasAceZoneStatusResult

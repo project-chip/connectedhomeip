@@ -462,11 +462,13 @@ typedef void (*CHIPGeneralDiagnosticsClusterActiveNetworkFaultsAttributeCallback
     void *, const chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveNetworkFaults::TypeInfo::DecodableType &);
 typedef void (*CHIPGeneralDiagnosticsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::GeneralDiagnostics::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
+typedef void (*CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType)(
+    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType &);
+typedef void (*CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType)(
+    void *, const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType &);
 
 typedef void (*CHIPGroupKeyManagementClusterGroupsAttributeCallbackType)(
     void *, const chip::app::Clusters::GroupKeyManagement::Attributes::Groups::TypeInfo::DecodableType &);
-typedef void (*CHIPGroupKeyManagementClusterGroupKeysAttributeCallbackType)(
-    void *, const chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeys::TypeInfo::DecodableType &);
 typedef void (*CHIPGroupKeyManagementClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::GroupKeyManagement::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPGroupsClusterAddGroupResponseCallbackType)(

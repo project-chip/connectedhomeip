@@ -793,6 +793,36 @@ static constexpr CommandId Id = 0x0000000C;
 } // namespace Commands
 } // namespace OperationalCredentials
 
+namespace GroupKeyManagement {
+namespace Commands {
+
+namespace KeySetWrite {
+static constexpr CommandId Id = 0x00000000;
+} // namespace KeySetWrite
+
+namespace KeySetRead {
+static constexpr CommandId Id = 0x00000001;
+} // namespace KeySetRead
+
+namespace KeySetReadResponse {
+static constexpr CommandId Id = 0x00000002;
+} // namespace KeySetReadResponse
+
+namespace KeySetRemove {
+static constexpr CommandId Id = 0x00000003;
+} // namespace KeySetRemove
+
+namespace KeySetReadAllIndices {
+static constexpr CommandId Id = 0x00000004;
+} // namespace KeySetReadAllIndices
+
+namespace KeySetReadAllIndicesResponse {
+static constexpr CommandId Id = 0x00000005;
+} // namespace KeySetReadAllIndicesResponse
+
+} // namespace Commands
+} // namespace GroupKeyManagement
+
 namespace ModeSelect {
 namespace Commands {
 

@@ -253,6 +253,12 @@
 #define CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER
 #endif
 
+#if defined(ZCL_USING_GROUP_KEY_MANAGEMENT_CLUSTER_SERVER) || defined(ZCL_USING_GROUP_KEY_MANAGEMENT_CLUSTER_CLIENT)
+#define CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER { ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID, 63, "Group Key Management" },
+#else
+#define CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER
+#endif
+
 #if defined(ZCL_USING_FIXED_LABEL_CLUSTER_SERVER) || defined(ZCL_USING_FIXED_LABEL_CLUSTER_CLIENT)
 #define CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER { ZCL_FIXED_LABEL_CLUSTER_ID, 64, "Fixed Label" },
 #else
@@ -764,12 +770,6 @@
 #define CHIP_PRINTCLUSTER_BINDING_CLUSTER
 #endif
 
-#if defined(ZCL_USING_GROUP_KEY_MANAGEMENT_CLUSTER_SERVER) || defined(ZCL_USING_GROUP_KEY_MANAGEMENT_CLUSTER_CLIENT)
-#define CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER { ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID, 61444, "Group Key Management" },
-#else
-#define CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER
-#endif
-
 #define CLUSTER_IDS_TO_NAMES                                                                                                       \
     CHIP_PRINTCLUSTER_POWER_CONFIG_CLUSTER                                                                                         \
     CHIP_PRINTCLUSTER_DEVICE_TEMP_CLUSTER                                                                                          \
@@ -808,6 +808,7 @@
     CHIP_PRINTCLUSTER_SWITCH_CLUSTER                                                                                               \
     CHIP_PRINTCLUSTER_ADMINISTRATOR_COMMISSIONING_CLUSTER                                                                          \
     CHIP_PRINTCLUSTER_OPERATIONAL_CREDENTIALS_CLUSTER                                                                              \
+    CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_FIXED_LABEL_CLUSTER                                                                                          \
     CHIP_PRINTCLUSTER_USER_LABEL_CLUSTER                                                                                           \
     CHIP_PRINTCLUSTER_BOOLEAN_STATE_CLUSTER                                                                                        \
@@ -881,7 +882,6 @@
     CHIP_PRINTCLUSTER_APPLIANCE_EVENTS_AND_ALERT_CLUSTER                                                                           \
     CHIP_PRINTCLUSTER_APPLIANCE_STATISTICS_CLUSTER                                                                                 \
     CHIP_PRINTCLUSTER_ELECTRICAL_MEASUREMENT_CLUSTER                                                                               \
-    CHIP_PRINTCLUSTER_BINDING_CLUSTER                                                                                              \
-    CHIP_PRINTCLUSTER_GROUP_KEY_MANAGEMENT_CLUSTER
+    CHIP_PRINTCLUSTER_BINDING_CLUSTER
 
 #define MAX_CLUSTER_NAME_LENGTH 52

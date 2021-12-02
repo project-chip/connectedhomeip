@@ -2350,19 +2350,6 @@ public class ClusterReadMapping {
             readGroupKeyManagementGroupsCommandParams);
     readGroupKeyManagementInteractionInfo.put(
         "readGroupsAttribute", readGroupKeyManagementGroupsAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readGroupKeyManagementGroupKeysCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readGroupKeyManagementGroupKeysAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.GroupKeyManagementCluster) cluster)
-                  .readGroupKeysAttribute(
-                      (ChipClusters.GroupKeyManagementCluster.GroupKeysAttributeCallback) callback);
-            },
-            () -> new ClusterInfoMapping.DelegatedGroupKeysAttributeCallback(),
-            readGroupKeyManagementGroupKeysCommandParams);
-    readGroupKeyManagementInteractionInfo.put(
-        "readGroupKeysAttribute", readGroupKeyManagementGroupKeysAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readGroupKeyManagementClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readGroupKeyManagementClusterRevisionAttributeInteractionInfo =

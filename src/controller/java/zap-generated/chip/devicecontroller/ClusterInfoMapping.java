@@ -1493,6 +1493,58 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedKeySetReadAllIndicesResponseCallback
+      implements ChipClusters.GroupKeyManagementCluster.KeySetReadAllIndicesResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess( // groupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
+        // Conversion from this type to Java is not properly implemented yet
+        ) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      // groupKeySetIDs: /* TYPE WARNING: array array defaults to */ uint8_t *
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedKeySetReadResponseCallback
+      implements ChipClusters.GroupKeyManagementCluster.KeySetReadResponseCallback,
+          DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess( // groupKeySet: Struct GroupKeySet
+        // Conversion from this type to Java is not properly implemented yet
+        ) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      // groupKeySet: Struct GroupKeySet
+      // Conversion from this type to Java is not properly implemented yet
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedGroupsAttributeCallback
       implements ChipClusters.GroupKeyManagementCluster.GroupsAttributeCallback,
           DelegatedClusterCallback {
@@ -1509,34 +1561,6 @@ public class ClusterInfoMapping {
       CommandResponseInfo commandResponseInfo =
           new CommandResponseInfo(
               "valueList", "List<ChipClusters.GroupKeyManagementCluster.GroupsAttribute>");
-
-      responseValues.put(commandResponseInfo, valueList);
-      callback.onSuccess(responseValues);
-    }
-
-    @Override
-    public void onError(Exception ex) {
-      callback.onFailure(ex);
-    }
-  }
-
-  public static class DelegatedGroupKeysAttributeCallback
-      implements ChipClusters.GroupKeyManagementCluster.GroupKeysAttributeCallback,
-          DelegatedClusterCallback {
-    private ClusterCommandCallback callback;
-
-    @Override
-    public void setCallbackDelegate(ClusterCommandCallback callback) {
-      this.callback = callback;
-    }
-
-    @Override
-    public void onSuccess(
-        List<ChipClusters.GroupKeyManagementCluster.GroupKeysAttribute> valueList) {
-      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
-      CommandResponseInfo commandResponseInfo =
-          new CommandResponseInfo(
-              "valueList", "List<ChipClusters.GroupKeyManagementCluster.GroupKeysAttribute>");
 
       responseValues.put(commandResponseInfo, valueList);
       callback.onSuccess(responseValues);
@@ -5976,6 +6000,130 @@ public class ClusterInfoMapping {
     commandMap.put("generalDiagnostics", generalDiagnosticsClusterInteractionInfoMap);
     Map<String, InteractionInfo> groupKeyManagementClusterInteractionInfoMap =
         new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> groupKeyManagementkeySetReadCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo groupKeyManagementkeySetReadgroupKeySetIDCommandParameterInfo =
+        new CommandParameterInfo("groupKeySetID", int.class);
+    groupKeyManagementkeySetReadCommandParams.put(
+        "groupKeySetID", groupKeyManagementkeySetReadgroupKeySetIDCommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo groupKeyManagementkeySetReadInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GroupKeyManagementCluster) cluster)
+                  .keySetRead(
+                      (ChipClusters.GroupKeyManagementCluster.KeySetReadResponseCallback) callback,
+                      (Integer) commandArguments.get("groupKeySetID"));
+            },
+            () -> new DelegatedKeySetReadResponseCallback(),
+            groupKeyManagementkeySetReadCommandParams);
+    groupKeyManagementClusterInteractionInfoMap.put(
+        "keySetRead", groupKeyManagementkeySetReadInteractionInfo);
+    Map<String, CommandParameterInfo> groupKeyManagementkeySetReadAllIndicesCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo =
+        new CommandParameterInfo("groupKeySetIDs", int.class);
+    groupKeyManagementkeySetReadAllIndicesCommandParams.put(
+        "groupKeySetIDs", groupKeyManagementkeySetReadAllIndicesgroupKeySetIDsCommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo groupKeyManagementkeySetReadAllIndicesInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GroupKeyManagementCluster) cluster)
+                  .keySetReadAllIndices(
+                      (ChipClusters.GroupKeyManagementCluster.KeySetReadAllIndicesResponseCallback)
+                          callback,
+                      (Integer) commandArguments.get("groupKeySetIDs"));
+            },
+            () -> new DelegatedKeySetReadAllIndicesResponseCallback(),
+            groupKeyManagementkeySetReadAllIndicesCommandParams);
+    groupKeyManagementClusterInteractionInfoMap.put(
+        "keySetReadAllIndices", groupKeyManagementkeySetReadAllIndicesInteractionInfo);
+    Map<String, CommandParameterInfo> groupKeyManagementkeySetRemoveCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo groupKeyManagementkeySetRemovegroupKeySetIDCommandParameterInfo =
+        new CommandParameterInfo("groupKeySetID", int.class);
+    groupKeyManagementkeySetRemoveCommandParams.put(
+        "groupKeySetID", groupKeyManagementkeySetRemovegroupKeySetIDCommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo groupKeyManagementkeySetRemoveInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GroupKeyManagementCluster) cluster)
+                  .keySetRemove(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("groupKeySetID"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            groupKeyManagementkeySetRemoveCommandParams);
+    groupKeyManagementClusterInteractionInfoMap.put(
+        "keySetRemove", groupKeyManagementkeySetRemoveInteractionInfo);
+    Map<String, CommandParameterInfo> groupKeyManagementkeySetWriteCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo groupKeyManagementkeySetWritegroupKeySetIDCommandParameterInfo =
+        new CommandParameterInfo("groupKeySetID", int.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "groupKeySetID", groupKeyManagementkeySetWritegroupKeySetIDCommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWritegroupKeySecurityPolicyCommandParameterInfo =
+        new CommandParameterInfo("groupKeySecurityPolicy", int.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "groupKeySecurityPolicy",
+        groupKeyManagementkeySetWritegroupKeySecurityPolicyCommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochKey0CommandParameterInfo =
+        new CommandParameterInfo("epochKey0", byte[].class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochKey0", groupKeyManagementkeySetWriteepochKey0CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochStartTime0CommandParameterInfo =
+        new CommandParameterInfo("epochStartTime0", long.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochStartTime0", groupKeyManagementkeySetWriteepochStartTime0CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochKey1CommandParameterInfo =
+        new CommandParameterInfo("epochKey1", byte[].class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochKey1", groupKeyManagementkeySetWriteepochKey1CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochStartTime1CommandParameterInfo =
+        new CommandParameterInfo("epochStartTime1", long.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochStartTime1", groupKeyManagementkeySetWriteepochStartTime1CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochKey2CommandParameterInfo =
+        new CommandParameterInfo("epochKey2", byte[].class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochKey2", groupKeyManagementkeySetWriteepochKey2CommandParameterInfo);
+
+    CommandParameterInfo groupKeyManagementkeySetWriteepochStartTime2CommandParameterInfo =
+        new CommandParameterInfo("epochStartTime2", long.class);
+    groupKeyManagementkeySetWriteCommandParams.put(
+        "epochStartTime2", groupKeyManagementkeySetWriteepochStartTime2CommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo groupKeyManagementkeySetWriteInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GroupKeyManagementCluster) cluster)
+                  .keySetWrite(
+                      (DefaultClusterCallback) callback,
+                      (Integer) commandArguments.get("groupKeySetID"),
+                      (Integer) commandArguments.get("groupKeySecurityPolicy"),
+                      (byte[]) commandArguments.get("epochKey0"),
+                      (Long) commandArguments.get("epochStartTime0"),
+                      (byte[]) commandArguments.get("epochKey1"),
+                      (Long) commandArguments.get("epochStartTime1"),
+                      (byte[]) commandArguments.get("epochKey2"),
+                      (Long) commandArguments.get("epochStartTime2"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            groupKeyManagementkeySetWriteCommandParams);
+    groupKeyManagementClusterInteractionInfoMap.put(
+        "keySetWrite", groupKeyManagementkeySetWriteInteractionInfo);
     commandMap.put("groupKeyManagement", groupKeyManagementClusterInteractionInfoMap);
     Map<String, InteractionInfo> groupsClusterInteractionInfoMap = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> groupsaddGroupCommandParams =

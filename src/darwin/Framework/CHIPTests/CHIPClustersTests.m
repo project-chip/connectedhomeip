@@ -30824,6 +30824,50 @@ uint16_t readAttributeVendorIdDefaultValue;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
+- (void)testSendClusterTestGroupKeyManagementCluster_000000_KeySetRemove
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"KeySetRemove (not found)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetRemoveParams alloc] init];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:13107U];
+    [cluster keySetRemoveWithParams:params
+                  completionHandler:^(NSError * _Nullable err) {
+                      NSLog(@"KeySetRemove (not found) Error: %@", err);
+
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 139);
+                      [expectation fulfill];
+                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupKeyManagementCluster_000001_KeySetRemove
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"KeySetRemove (existing)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroupKeyManagement * cluster = [[CHIPTestGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupKeyManagementClusterKeySetRemoveParams alloc] init];
+    params.groupKeySetID = [NSNumber numberWithUnsignedShort:4369U];
+    [cluster keySetRemoveWithParams:params
+                  completionHandler:^(NSError * _Nullable err) {
+                      NSLog(@"KeySetRemove (existing) Error: %@", err);
+
+                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                      [expectation fulfill];
+                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
 - (void)testSendClusterTestIdentifyCluster_000000_WaitForCommissionee
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
@@ -35869,31 +35913,6 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
 
     [cluster readAttributeGroupsWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"GroupKeyManagement Groups Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterGroupKeyManagementReadAttributeGroupKeysWithCompletionHandler
-{
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    XCTestExpectation * connectedExpectation =
-        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-    WaitForCommissionee(connectedExpectation, queue);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-
-    CHIPDevice * device = GetConnectedDevice();
-    CHIPGroupKeyManagement * cluster = [[CHIPGroupKeyManagement alloc] initWithDevice:device endpoint:0 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"GroupKeyManagementReadAttributeGroupKeysWithCompletionHandler"];
-
-    [cluster readAttributeGroupKeysWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"GroupKeyManagement GroupKeys Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

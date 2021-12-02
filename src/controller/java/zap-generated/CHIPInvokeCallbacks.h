@@ -473,6 +473,37 @@ private:
     jobject javaCallbackRef;
 };
 
+class CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback
+    : public Callback::Callback<CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallbackType>
+{
+public:
+    CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback(jobject javaCallback);
+
+    ~CHIPGroupKeyManagementClusterKeySetReadAllIndicesResponseCallback();
+
+    static void
+    CallbackFn(void * context,
+               const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadAllIndicesResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
+class CHIPGroupKeyManagementClusterKeySetReadResponseCallback
+    : public Callback::Callback<CHIPGroupKeyManagementClusterKeySetReadResponseCallbackType>
+{
+public:
+    CHIPGroupKeyManagementClusterKeySetReadResponseCallback(jobject javaCallback);
+
+    ~CHIPGroupKeyManagementClusterKeySetReadResponseCallback();
+
+    static void CallbackFn(void * context,
+                           const chip::app::Clusters::GroupKeyManagement::Commands::KeySetReadResponse::DecodableType & data);
+
+private:
+    jobject javaCallbackRef;
+};
+
 class CHIPGroupsClusterAddGroupResponseCallback : public Callback::Callback<CHIPGroupsClusterAddGroupResponseCallbackType>
 {
 public:

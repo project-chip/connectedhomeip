@@ -136,6 +136,9 @@ static constexpr ClusterId Id = 0x0000003C;
 namespace OperationalCredentials {
 static constexpr ClusterId Id = 0x0000003E;
 } // namespace OperationalCredentials
+namespace GroupKeyManagement {
+static constexpr ClusterId Id = 0x0000003F;
+} // namespace GroupKeyManagement
 namespace FixedLabel {
 static constexpr ClusterId Id = 0x00000040;
 } // namespace FixedLabel
@@ -358,9 +361,6 @@ static constexpr ClusterId Id = 0x00000B04;
 namespace Binding {
 static constexpr ClusterId Id = 0x0000F000;
 } // namespace Binding
-namespace GroupKeyManagement {
-static constexpr ClusterId Id = 0x0000F004;
-} // namespace GroupKeyManagement
 
 } // namespace Clusters
 } // namespace app

@@ -739,33 +739,6 @@ private:
     bool keepAlive;
 };
 
-class CHIPGroupKeyManagementGroupKeysAttributeCallback
-    : public chip::Callback::Callback<CHIPGroupKeyManagementClusterGroupKeysAttributeCallbackType>
-{
-public:
-    CHIPGroupKeyManagementGroupKeysAttributeCallback(jobject javaCallback, bool keepAlive = false);
-
-    ~CHIPGroupKeyManagementGroupKeysAttributeCallback();
-
-    static void maybeDestroy(CHIPGroupKeyManagementGroupKeysAttributeCallback * callback)
-    {
-        if (!callback->keepAlive)
-        {
-            callback->Cancel();
-            chip::Platform::Delete<CHIPGroupKeyManagementGroupKeysAttributeCallback>(callback);
-        }
-    }
-
-    static void CallbackFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
-            list);
-
-private:
-    jobject javaCallbackRef;
-    bool keepAlive;
-};
-
 class CHIPIlluminanceMeasurementMeasuredValueAttributeCallback
     : public chip::Callback::Callback<CHIPIlluminanceMeasurementClusterMeasuredValueAttributeCallbackType>
 {

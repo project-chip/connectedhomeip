@@ -10652,6 +10652,220 @@ class OperationalCredentials(Cluster):
 
 
 @dataclass
+class GroupKeyManagement(Cluster):
+    id: typing.ClassVar[int] = 0x003F
+
+    class Enums:
+        class GroupKeySecurityPolicy(IntEnum):
+            kStandard = 0x00
+            kLowLatency = 0x01
+
+    class Structs:
+        @dataclass
+        class GroupKeySet(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeySetID", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeySecurityPolicy", Tag=2, Type=GroupKeyManagement.Enums.GroupKeySecurityPolicy),
+                        ClusterObjectFieldDescriptor(
+                            Label="epochKey0", Tag=3, Type=bytes),
+                        ClusterObjectFieldDescriptor(
+                            Label="epochStartTime0", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="epochKey1", Tag=5, Type=bytes),
+                        ClusterObjectFieldDescriptor(
+                            Label="epochStartTime1", Tag=6, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="epochKey2", Tag=7, Type=bytes),
+                        ClusterObjectFieldDescriptor(
+                            Label="epochStartTime2", Tag=8, Type=uint),
+                    ])
+
+            groupKeySetID: 'uint' = None
+            groupKeySecurityPolicy: 'GroupKeyManagement.Enums.GroupKeySecurityPolicy' = None
+            epochKey0: 'bytes' = None
+            epochStartTime0: 'uint' = None
+            epochKey1: 'bytes' = None
+            epochStartTime1: 'uint' = None
+            epochKey2: 'bytes' = None
+            epochStartTime2: 'uint' = None
+
+        @dataclass
+        class GroupState(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="fabricIndex", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="groupId", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeySetID", Tag=3, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="endpoints", Tag=4, Type=typing.List[uint]),
+                        ClusterObjectFieldDescriptor(
+                            Label="groupName", Tag=5, Type=str),
+                    ])
+
+            fabricIndex: 'uint' = None
+            groupId: 'uint' = None
+            groupKeySetID: 'uint' = None
+            endpoints: 'typing.List[uint]' = None
+            groupName: 'str' = None
+
+    class Commands:
+        @dataclass
+        class KeySetWrite(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x003F
+            command_id: typing.ClassVar[int] = 0x0000
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeySet", Tag=0, Type=GroupKeyManagement.Structs.GroupKeySet),
+                    ])
+
+            groupKeySet: 'GroupKeyManagement.Structs.GroupKeySet' = None
+
+        @dataclass
+        class KeySetRead(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x003F
+            command_id: typing.ClassVar[int] = 0x0001
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeySetID", Tag=0, Type=uint),
+                    ])
+
+            groupKeySetID: 'uint' = None
+
+        @dataclass
+        class KeySetReadResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x003F
+            command_id: typing.ClassVar[int] = 0x0002
+            is_client: typing.ClassVar[bool] = False
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeySet", Tag=0, Type=GroupKeyManagement.Structs.GroupKeySet),
+                    ])
+
+            groupKeySet: 'GroupKeyManagement.Structs.GroupKeySet' = None
+
+        @dataclass
+        class KeySetRemove(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x003F
+            command_id: typing.ClassVar[int] = 0x0003
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeySetID", Tag=0, Type=uint),
+                    ])
+
+            groupKeySetID: 'uint' = None
+
+        @dataclass
+        class KeySetReadAllIndices(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x003F
+            command_id: typing.ClassVar[int] = 0x0004
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeySetIDs", Tag=0, Type=typing.List[uint]),
+                    ])
+
+            groupKeySetIDs: 'typing.List[uint]' = None
+
+        @dataclass
+        class KeySetReadAllIndicesResponse(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x003F
+            command_id: typing.ClassVar[int] = 0x0005
+            is_client: typing.ClassVar[bool] = False
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeySetIDs", Tag=0, Type=typing.List[uint]),
+                    ])
+
+            groupKeySetIDs: 'typing.List[uint]' = None
+
+    class Attributes:
+        @dataclass
+        class Groups(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[GroupKeyManagement.Structs.GroupState])
+
+            value: 'typing.List[GroupKeyManagement.Structs.GroupState]' = None
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = None
+
+
+@dataclass
 class FixedLabel(Cluster):
     id: typing.ClassVar[int] = 0x0040
 
@@ -29646,124 +29860,6 @@ class Binding(Cluster):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0xF000
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFFD
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-            value: 'uint' = None
-
-
-@dataclass
-class GroupKeyManagement(Cluster):
-    id: typing.ClassVar[int] = 0xF004
-
-    class Enums:
-        class GroupKeySecurityPolicy(IntEnum):
-            kStandard = 0x00
-            kLowLatency = 0x01
-
-    class Structs:
-        @dataclass
-        class GroupKey(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(
-                            Label="vendorId", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupKeyIndex", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupKeyRoot", Tag=3, Type=bytes),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupKeyEpochStartTime", Tag=4, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupKeySecurityPolicy", Tag=5, Type=GroupKeyManagement.Enums.GroupKeySecurityPolicy),
-                    ])
-
-            vendorId: 'uint' = None
-            groupKeyIndex: 'uint' = None
-            groupKeyRoot: 'bytes' = None
-            groupKeyEpochStartTime: 'uint' = None
-            groupKeySecurityPolicy: 'GroupKeyManagement.Enums.GroupKeySecurityPolicy' = None
-
-        @dataclass
-        class GroupState(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(
-                            Label="vendorId", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="vendorGroupId", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupKeySetIndex", Tag=3, Type=uint),
-                    ])
-
-            vendorId: 'uint' = None
-            vendorGroupId: 'uint' = None
-            groupKeySetIndex: 'uint' = None
-
-    class Attributes:
-        @dataclass
-        class Groups(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0xF004
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000000
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[GroupKeyManagement.Structs.GroupState])
-
-            value: 'typing.List[GroupKeyManagement.Structs.GroupState]' = None
-
-        @dataclass
-        class GroupKeys(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0xF004
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000001
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[GroupKeyManagement.Structs.GroupKey])
-
-            value: 'typing.List[GroupKeyManagement.Structs.GroupKey]' = None
-
-        @dataclass
-        class FeatureMap(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0xF004
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFFC
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class ClusterRevision(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0xF004
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:

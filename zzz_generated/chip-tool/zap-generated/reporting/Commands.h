@@ -187,7 +187,6 @@ public:
         delete onReportGeneralDiagnosticsTotalOperationalHoursCallback;
         delete onReportGeneralDiagnosticsBootReasonsCallback;
         delete onReportGeneralDiagnosticsClusterRevisionCallback;
-        delete onReportGroupKeyManagementClusterRevisionCallback;
         delete onReportGroupsNameSupportCallback;
         delete onReportGroupsClusterRevisionCallback;
         delete onReportIdentifyIdentifyTimeCallback;
@@ -911,9 +910,6 @@ public:
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0033, 0xFFFD,
                                        onReportGeneralDiagnosticsClusterRevisionCallback->Cancel(),
-                                       BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0xF004, 0xFFFD,
-                                       onReportGroupKeyManagementClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0004, 0x0000, onReportGroupsNameSupportCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
@@ -2101,8 +2097,6 @@ private:
     chip::Callback::Callback<Int8uAttributeCallback> * onReportGeneralDiagnosticsBootReasonsCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportGeneralDiagnosticsClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportGroupKeyManagementClusterRevisionCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportGroupsNameSupportCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);

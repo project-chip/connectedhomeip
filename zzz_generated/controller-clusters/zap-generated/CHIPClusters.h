@@ -1195,13 +1195,23 @@ public:
     GroupKeyManagementCluster() : ClusterBase(app::Clusters::GroupKeyManagement::Id) {}
     ~GroupKeyManagementCluster() {}
 
+    // Cluster Commands
+    CHIP_ERROR KeySetRead(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                          uint16_t groupKeySetID);
+    CHIP_ERROR KeySetReadAllIndices(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    uint16_t groupKeySetIDs);
+    CHIP_ERROR KeySetRemove(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                            uint16_t groupKeySetID);
+    CHIP_ERROR KeySetWrite(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                           uint16_t groupKeySetID, uint8_t groupKeySecurityPolicy, chip::ByteSpan epochKey0,
+                           uint64_t epochStartTime0, chip::ByteSpan epochKey1, uint64_t epochStartTime1, chip::ByteSpan epochKey2,
+                           uint64_t epochStartTime2);
+
     // Cluster Attributes
     CHIP_ERROR ReadAttributeGroups(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeGroupKeys(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
+
+private:
 };
 
 class DLL_EXPORT GroupsCluster : public ClusterBase
