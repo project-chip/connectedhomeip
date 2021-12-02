@@ -19,7 +19,7 @@
 #pragma once
 
 #include <controller/DeviceDiscoveryDelegate.h>
-#include <lib/dnssd/Resolver.h>
+#include <lib/dnssd/ResolverProxy.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceConfig.h>
 
@@ -39,11 +39,7 @@ namespace Controller {
 class DLL_EXPORT AbstractDnssdDiscoveryController : public Dnssd::ResolverDelegate
 {
 public:
-    AbstractDnssdDiscoveryController(chip::Dnssd::Resolver * resolver = &chip::Dnssd::Resolver::Instance())
-    {
-        mResolver = resolver;
-    }
-
+    AbstractDnssdDiscoveryController() {}
     virtual ~AbstractDnssdDiscoveryController() {}
 
     void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
@@ -52,9 +48,9 @@ protected:
     using DiscoveredNodeList = FixedSpan<Dnssd::DiscoveredNodeData, CHIP_DEVICE_CONFIG_MAX_DISCOVERED_NODES>;
     CHIP_ERROR SetUpNodeDiscovery();
     const Dnssd::DiscoveredNodeData * GetDiscoveredNode(int idx);
-    virtual DiscoveredNodeList GetDiscoveredNodes() = 0;
-    chip::Dnssd::Resolver * mResolver;
+    virtual DiscoveredNodeList GetDiscoveredNodes()    = 0;
     DeviceDiscoveryDelegate * mDeviceDiscoveryDelegate = nullptr;
+    Dnssd::ResolverProxy mDNSResolver{ this };
 };
 
 } // namespace Controller
