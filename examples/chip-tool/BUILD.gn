@@ -76,9 +76,7 @@ static_library("chip-tool-utils") {
 }
 
 executable("chip-tool") {
-  sources = [
-    "main.cpp",
-  ]
+  sources = [ "main.cpp" ]
 
   deps = [
     ":chip-tool-utils",
