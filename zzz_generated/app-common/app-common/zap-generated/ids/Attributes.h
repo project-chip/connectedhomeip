@@ -4782,6 +4782,10 @@ namespace RangeRestrictedInt16s {
 static constexpr AttributeId Id = 0x00000029;
 } // namespace RangeRestrictedInt16s
 
+namespace ListLongOctetString {
+static constexpr AttributeId Id = 0x0000002A;
+} // namespace ListLongOctetString
+
 namespace TimedWriteBoolean {
 static constexpr AttributeId Id = 0x00000030;
 } // namespace TimedWriteBoolean

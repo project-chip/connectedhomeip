@@ -2495,6 +2495,7 @@ public:
                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                        uint16_t maxInterval);
     CHIP_ERROR ReportAttributeRangeRestrictedInt16s(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ReadAttributeListLongOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeTimedWriteBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeTimedWriteBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                bool value);

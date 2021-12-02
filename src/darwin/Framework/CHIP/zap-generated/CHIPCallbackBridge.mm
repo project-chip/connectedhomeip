@@ -1261,6 +1261,26 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPTestClusterListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSData * newElement_0;
+        newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+        [array_0 addObject:newElement_0];
+    }
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
 void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value)
