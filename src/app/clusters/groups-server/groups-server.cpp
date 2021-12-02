@@ -85,28 +85,6 @@ static bool GroupExists(FabricIndex fabricIndex, EndpointId endpointId, GroupId 
     return provider->GroupMappingExists(fabricIndex, mapping);
 }
 
-static bool GroupFind(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId, CharSpan & name)
-{
-    GroupDataProvider * provider = GetGroupDataProvider();
-    VerifyOrReturnError(nullptr != provider, false);
-
-    auto * groupIt = provider->IterateGroupMappings(fabricIndex, endpointId);
-    VerifyOrReturnError(nullptr != groupIt, false);
-
-    GroupDataProvider::GroupMapping mapping;
-    bool found = false;
-    while (!found && groupIt->Next(mapping))
-    {
-        if (mapping.group == groupId)
-        {
-            name  = mapping.name;
-            found = true;
-        }
-    }
-    groupIt->Release();
-    return found;
-}
-
 static EmberAfStatus GroupAdd(FabricIndex fabricIndex, EndpointId endpointId, GroupId groupId, const CharSpan & groupName)
 {
     VerifyOrReturnError(IsFabricGroupId(groupId), EMBER_ZCL_STATUS_INVALID_VALUE);
@@ -217,22 +195,38 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
     auto groupId     = commandData.groupId;
     auto endpointId  = commandPath.mEndpointId;
 
+    GroupDataProvider::GroupMapping mapping;
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     CHIP_ERROR err       = CHIP_NO_ERROR;
-    CharSpan groupName;
+    size_t nameSize      = 0;
 
     if (emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST && emberAfCurrentCommand()->type != EMBER_INCOMING_UNICAST_REPLY)
     {
         return true;
     }
 
-    if (!IsFabricGroupId(groupId))
+    if (IsFabricGroupId(groupId))
+    {
+        GroupDataProvider * provider = GetGroupDataProvider();
+        VerifyOrReturnError(nullptr != provider, false);
+
+        auto * groupIt = provider->IterateGroupMappings(fabricIndex, endpointId);
+        VerifyOrReturnError(nullptr != groupIt, false);
+
+        while (groupIt->Next(mapping))
+        {
+            if (mapping.group == groupId)
+            {
+                nameSize = strnlen(mapping.name, GroupDataProvider::GroupMapping::kGroupNameMax);
+                status   = EMBER_ZCL_STATUS_SUCCESS;
+                break;
+            }
+        }
+        groupIt->Release();
+    }
+    else
     {
         status = EMBER_ZCL_STATUS_INVALID_VALUE;
-    }
-    else if (GroupFind(fabricIndex, endpointId, groupId, groupName))
-    {
-        status = EMBER_ZCL_STATUS_SUCCESS;
     }
 
     {
@@ -243,7 +237,7 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
-        SuccessOrExit(err = writer->PutString(TLV::ContextTag(2), groupName.data(), static_cast<uint32_t>(groupName.size())));
+        SuccessOrExit(err = writer->PutString(TLV::ContextTag(2), mapping.name, static_cast<uint32_t>(nameSize)));
         SuccessOrExit(err = commandObj->FinishCommand());
     }
 exit:
