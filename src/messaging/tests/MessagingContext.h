@@ -161,6 +161,8 @@ public:
         return ctx->Shutdown() == CHIP_NO_ERROR ? SUCCESS : FAILURE;
     }
 
+    Transport & GetLoopback() { return mTransportManager.GetTransport().template GetImplAtIndex<0>(); }
+
     /*
      * For unit-tests that simulate end-to-end transmission and reception of messages in loopback mode,
      * this mode better replicates a real-functioning stack that correctly handles the processing
@@ -173,7 +175,7 @@ public:
      */
     void EnableAsyncDispatch()
     {
-        auto & impl = mTransportManager.GetTransport().template GetImplAtIndex<0>();
+        auto & impl = GetLoopback();
         impl.EnableAsyncDispatch(&mIOContext.GetSystemLayer());
     }
 
@@ -191,7 +193,7 @@ public:
      */
     void DrainAndServiceIO(System::Clock::Timeout maxWait = chip::System::Clock::Seconds16(5))
     {
-        auto & impl                        = mTransportManager.GetTransport().template GetImplAtIndex<0>();
+        auto & impl                        = GetLoopback();
         System::Clock::Timestamp startTime = System::SystemClock().GetMonotonicTimestamp();
 
         while (impl.HasPendingMessages())
