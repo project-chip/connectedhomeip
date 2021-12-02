@@ -105,7 +105,7 @@ private:
     int32_t mStatus;
 };
 
-void GenerateEvents(nlTestSuite * apSuite, void * apContext)
+void GenerateEvents(nlTestSuite * apSuite, void * apContext, bool aIsUrgent = false)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2;
@@ -117,8 +117,12 @@ void GenerateEvents(nlTestSuite * apSuite, void * apContext)
     chip::app::EventOptions options2;
     TestEventGenerator testEventGenerator;
 
-    options1.mpEventSchema               = &schema1;
-    options2.mpEventSchema               = &schema2;
+    options1.mpEventSchema = &schema1;
+    options2.mpEventSchema = &schema2;
+    if (aIsUrgent)
+    {
+        options2.mUrgent = chip::app::EventOptions::Type::kUrgent;
+    }
     chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
     testEventGenerator.SetStatus(0);
     err = logMgmt.LogEvent(&testEventGenerator, options1, eid1);
@@ -974,8 +978,6 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     // Shouldn't have anything in the retransmit table when starting the test.
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 
-    GenerateEvents(apSuite, apContext);
-
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
     err           = engine->Init(&ctx.GetExchangeManager(), &delegate);
@@ -1024,6 +1026,9 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
     NL_TEST_ASSERT(apSuite, delegate.mNumSubscriptions == 1);
 
+    GenerateEvents(apSuite, apContext, true /*aIsUrgent*/);
+    NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
+    NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
     chip::app::ClusterInfo dirtyPath1;
     dirtyPath1.mClusterId   = kTestClusterId;
     dirtyPath1.mEndpointId  = kTestEndpointId;
