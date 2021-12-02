@@ -48,7 +48,10 @@ CHIP_ERROR InetLayer::Shutdown()
 {
     VerifyOrReturnError(mLayerState.SetShuttingDown(), CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mTCPEndPointManager == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mUDPEndPointManager != nullptr, CHIP_ERROR_INCORRECT_STATE);
     ReturnErrorOnFailure(mUDPEndPointManager->Shutdown());
+    mUDPEndPointManager = nullptr;
+    mSystemLayer        = nullptr;
     mLayerState.ResetFromShuttingDown(); // Return to uninitialized state to permit re-initialization.
     return CHIP_NO_ERROR;
 }

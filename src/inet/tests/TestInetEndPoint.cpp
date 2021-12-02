@@ -319,16 +319,19 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: err is not validated EXCEPT the last call
-    for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS + 1; i++)
+    for (int i = INET_CONFIG_NUM_UDP_ENDPOINTS; i >= 0; --i)
+    {
         err = gInet.GetUDPEndPointManager()->NewEndPoint(&testUDPEP[i]);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
+        NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+    }
 
-    // TODO: err is not validated EXCEPT the last call
-    for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS + 1; i++)
+    for (int i = INET_CONFIG_NUM_TCP_ENDPOINTS; i >= 0; --i)
+    {
         err = gInet.GetTCPEndPointManager()->NewEndPoint(&testTCPEP[i]);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
+        NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+    }
 
+#if CHIP_SYSTEM_CONFIG_NUM_TIMERS
     // Verify same aComplete and aAppState args do not exhaust timer pool
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
     {
@@ -336,18 +339,14 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
 
-#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
     char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
         err = gSystemLayer.StartTimer(10_ms32, HandleTimer, &numTimersTest[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
-#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
-
-    ShutdownNetwork();
-    ShutdownSystemLayer();
+#endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
 
     // Release UDP endpoints
-    for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS; i++)
+    for (int i = 0; i <= INET_CONFIG_NUM_UDP_ENDPOINTS; i++)
     {
         if (testUDPEP[i] != nullptr)
         {
@@ -356,13 +355,16 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     }
 
     // Release TCP endpoints
-    for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
+    for (int i = 0; i <= INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
     {
         if (testTCPEP[i] != nullptr)
         {
             testTCPEP[i]->Free();
         }
     }
+
+    ShutdownNetwork();
+    ShutdownSystemLayer();
 }
 #endif
 

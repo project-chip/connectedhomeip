@@ -41,6 +41,8 @@
 #include <platform/Linux/dbus/wpa/DBusWpaBss.h>
 #include <platform/Linux/dbus/wpa/DBusWpaInterface.h>
 #include <platform/Linux/dbus/wpa/DBusWpaNetwork.h>
+
+#include <mutex>
 #endif
 
 namespace chip {
