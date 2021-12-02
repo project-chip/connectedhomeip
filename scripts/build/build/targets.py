@@ -215,16 +215,16 @@ def Esp32Targets():
 
 def Efr32Targets():
     efr_target = Target('efr32', Efr32Builder)
-    
+
     board_targets = [
-        efr_target.Extend('brd4161a',board=Efr32Board.BRD4161A),
-        efr_target.Extend('brd4163a',board=Efr32Board.BRD4163A),
-        efr_target.Extend('brd4164a',board=Efr32Board.BRD4164A),
-        efr_target.Extend('brd4166a',board=Efr32Board.BRD4166A),
-        efr_target.Extend('brd4170a',board=Efr32Board.BRD4170A),
-        efr_target.Extend('brd4186a',board=Efr32Board.BRD4186A),
-        efr_target.Extend('brd4187a',board=Efr32Board.BRD4187A),
-        efr_target.Extend('brd4304a',board=Efr32Board.BRD4304A)
+        efr_target.Extend('brd4161a', board=Efr32Board.BRD4161A),
+        efr_target.Extend('brd4163a', board=Efr32Board.BRD4163A),
+        efr_target.Extend('brd4164a', board=Efr32Board.BRD4164A),
+        efr_target.Extend('brd4166a', board=Efr32Board.BRD4166A),
+        efr_target.Extend('brd4170a', board=Efr32Board.BRD4170A),
+        efr_target.Extend('brd4186a', board=Efr32Board.BRD4186A),
+        efr_target.Extend('brd4187a', board=Efr32Board.BRD4187A),
+        efr_target.Extend('brd4304a', board=Efr32Board.BRD4304A)
     ]
 
     for board_target in board_targets:

@@ -194,7 +194,7 @@
             "problemMatcher": {
                 "base": "$gcc"
             }
-        },
+        }
     ],
     "inputs": [
         {
@@ -326,7 +326,7 @@
                 "light-rpc",
                 "lock",
                 "unit-test",
-                "window-covering",
+                "window-covering"
             ],
             "default": "light"
         },
@@ -334,7 +334,7 @@
             "type": "pickString",
             "id": "efr32Board",
             "description": "What EFR32 board are you building for?",
-            "options": [ 
+            "options": [
                 "brd4161a",
                 "brd4163a",
                 "brd4164a",
@@ -342,9 +342,9 @@
                 "brd4170a",
                 "brd4186a",
                 "brd4187a",
-                "brd4304a",
+                "brd4304a"
             ],
             "default": "brd4161a"
-        },
+        }
     ]
 }
