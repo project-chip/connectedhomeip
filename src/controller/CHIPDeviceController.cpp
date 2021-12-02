@@ -1206,6 +1206,8 @@ CHIP_ERROR DeviceCommissioner::SendOperationalCertificateSigningRequestCommand(C
     Callback::Cancelable * successCallback = mOpCSRResponseCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnCSRFailureCallback.Cancel();
 
+    MutableByteSpan csrNonce = device->GetCSRNonce();
+    ReturnErrorOnFailure(mOperationalCredentialsDelegate->GenerateNOCSR(csrNonce));
     ReturnErrorOnFailure(cluster.OpCSRRequest(successCallback, failureCallback, device->GetCSRNonce()));
 
     ChipLogDetail(Controller, "Sent OpCSR request, waiting for the CSR");
@@ -1313,7 +1315,7 @@ CHIP_ERROR DeviceCommissioner::ProcessOpCSR(const ByteSpan & NOCSRElements, cons
     FabricInfo * fabric = mSystemState->Fabrics()->FindFabricWithIndex(mFabricIndex);
     mOperationalCredentialsDelegate->SetFabricIdForNextNOCRequest(fabric->GetFabricId());
 
-    return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, AttestationSignature, ByteSpan(), ByteSpan(),
+    return mOperationalCredentialsDelegate->GenerateNOCChain(NOCSRElements, AttestationSignature, device->GetDAC(), ByteSpan(),
                                                              ByteSpan(), &mDeviceNOCChainCallback);
 }
 

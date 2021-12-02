@@ -237,6 +237,7 @@ public:
     }
 
     ByteSpan GetCSRNonce() const { return ByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
+    MutableByteSpan GetCSRNonce() { return MutableByteSpan(mCSRNonce, sizeof(mCSRNonce)); }
 
     CHIP_ERROR SetAttestationNonce(ByteSpan attestationNonce)
     {

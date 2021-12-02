@@ -76,6 +76,12 @@ public:
      *   fabric ID.
      */
     virtual void SetFabricIdForNextNOCRequest(FabricId fabricId) {}
+
+    virtual CHIP_ERROR GenerateNOCSR(MutableByteSpan & csrNonce)
+    {
+        ReturnErrorOnFailure(Crypto::DRBG_get_bytes(csrNonce.data(), csrNonce.size()));
+        return CHIP_NO_ERROR;
+    }
 };
 
 } // namespace Controller

@@ -23,37 +23,46 @@
 #include "PairingCommand.h"
 
 #include <app/server/Dnssd.h>
+#include <commands/common/CredentialIssuerCommands.h>
 #include <lib/dnssd/Resolver.h>
 
 class Unpair : public PairingCommand
 {
 public:
-    Unpair() : PairingCommand("unpair", PairingMode::None, PairingNetworkType::None) {}
+    Unpair(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("unpair", PairingMode::None, PairingNetworkType::None, credIssuerCommands)
+    {}
 };
 
 class PairQRCode : public PairingCommand
 {
 public:
-    PairQRCode() : PairingCommand("qrcode", PairingMode::QRCode, PairingNetworkType::None) {}
+    PairQRCode(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("qrcode", PairingMode::QRCode, PairingNetworkType::None, credIssuerCommands)
+    {}
 };
 
 class PairManualCode : public PairingCommand
 {
 public:
-    PairManualCode() : PairingCommand("manualcode", PairingMode::ManualCode, PairingNetworkType::None) {}
+    PairManualCode(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("manualcode", PairingMode::ManualCode, PairingNetworkType::None, credIssuerCommands)
+    {}
 };
 
 class PairOnNetwork : public PairingCommand
 {
 public:
-    PairOnNetwork() : PairingCommand("onnetwork", PairingMode::OnNetwork, PairingNetworkType::None) {}
+    PairOnNetwork(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("onnetwork", PairingMode::OnNetwork, PairingNetworkType::None, credIssuerCommands)
+    {}
 };
 
 class PairOnNetworkShort : public PairingCommand
 {
 public:
-    PairOnNetworkShort() :
-        PairingCommand("onnetwork-short", PairingMode::OnNetwork, PairingNetworkType::None,
+    PairOnNetworkShort(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("onnetwork-short", PairingMode::OnNetwork, PairingNetworkType::None, credIssuerCommands,
                        chip::Dnssd::DiscoveryFilterType::kShort)
     {}
 };
@@ -61,16 +70,17 @@ public:
 class PairOnNetworkLong : public PairingCommand
 {
 public:
-    PairOnNetworkLong() :
-        PairingCommand("onnetwork-long", PairingMode::OnNetwork, PairingNetworkType::None, chip::Dnssd::DiscoveryFilterType::kLong)
+    PairOnNetworkLong(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("onnetwork-long", PairingMode::OnNetwork, PairingNetworkType::None, credIssuerCommands,
+                       chip::Dnssd::DiscoveryFilterType::kLong)
     {}
 };
 
 class PairOnNetworkVendor : public PairingCommand
 {
 public:
-    PairOnNetworkVendor() :
-        PairingCommand("onnetwork-vendor", PairingMode::OnNetwork, PairingNetworkType::None,
+    PairOnNetworkVendor(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("onnetwork-vendor", PairingMode::OnNetwork, PairingNetworkType::None, credIssuerCommands,
                        chip::Dnssd::DiscoveryFilterType::kVendor)
     {}
 };
@@ -78,8 +88,8 @@ public:
 class PairOnNetworkFabric : public PairingCommand
 {
 public:
-    PairOnNetworkFabric() :
-        PairingCommand("onnetwork-fabric", PairingMode::OnNetwork, PairingNetworkType::None,
+    PairOnNetworkFabric(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("onnetwork-fabric", PairingMode::OnNetwork, PairingNetworkType::None, credIssuerCommands,
                        chip::Dnssd::DiscoveryFilterType::kCompressedFabricId)
     {}
 };
@@ -87,8 +97,8 @@ public:
 class PairOnNetworkCommissioningMode : public PairingCommand
 {
 public:
-    PairOnNetworkCommissioningMode() :
-        PairingCommand("onnetwork-commissioning-mode", PairingMode::OnNetwork, PairingNetworkType::None,
+    PairOnNetworkCommissioningMode(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("onnetwork-commissioning-mode", PairingMode::OnNetwork, PairingNetworkType::None, credIssuerCommands,
                        chip::Dnssd::DiscoveryFilterType::kCommissioningMode)
     {}
 };
@@ -96,8 +106,8 @@ public:
 class PairOnNetworkCommissioner : public PairingCommand
 {
 public:
-    PairOnNetworkCommissioner() :
-        PairingCommand("onnetwork-commissioner", PairingMode::OnNetwork, PairingNetworkType::None,
+    PairOnNetworkCommissioner(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("onnetwork-commissioner", PairingMode::OnNetwork, PairingNetworkType::None, credIssuerCommands,
                        chip::Dnssd::DiscoveryFilterType::kCommissioner)
     {}
 };
@@ -105,8 +115,8 @@ public:
 class PairOnNetworkDeviceType : public PairingCommand
 {
 public:
-    PairOnNetworkDeviceType() :
-        PairingCommand("onnetwork-device-type", PairingMode::OnNetwork, PairingNetworkType::None,
+    PairOnNetworkDeviceType(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("onnetwork-device-type", PairingMode::OnNetwork, PairingNetworkType::None, credIssuerCommands,
                        chip::Dnssd::DiscoveryFilterType::kDeviceType)
     {}
 };
@@ -114,8 +124,8 @@ public:
 class PairOnNetworkInstanceName : public PairingCommand
 {
 public:
-    PairOnNetworkInstanceName() :
-        PairingCommand("onnetwork-instance-name", PairingMode::OnNetwork, PairingNetworkType::None,
+    PairOnNetworkInstanceName(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("onnetwork-instance-name", PairingMode::OnNetwork, PairingNetworkType::None, credIssuerCommands,
                        chip::Dnssd::DiscoveryFilterType::kInstanceName)
     {}
 };
@@ -123,25 +133,33 @@ public:
 class PairBleWiFi : public PairingCommand
 {
 public:
-    PairBleWiFi() : PairingCommand("ble-wifi", PairingMode::Ble, PairingNetworkType::WiFi) {}
+    PairBleWiFi(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("ble-wifi", PairingMode::Ble, PairingNetworkType::WiFi, credIssuerCommands)
+    {}
 };
 
 class PairBleThread : public PairingCommand
 {
 public:
-    PairBleThread() : PairingCommand("ble-thread", PairingMode::Ble, PairingNetworkType::Thread) {}
+    PairBleThread(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("ble-thread", PairingMode::Ble, PairingNetworkType::Thread, credIssuerCommands)
+    {}
 };
 
 class PairSoftAP : public PairingCommand
 {
 public:
-    PairSoftAP() : PairingCommand("softap", PairingMode::SoftAP, PairingNetworkType::WiFi) {}
+    PairSoftAP(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("softap", PairingMode::SoftAP, PairingNetworkType::WiFi, credIssuerCommands)
+    {}
 };
 
 class Ethernet : public PairingCommand
 {
 public:
-    Ethernet() : PairingCommand("ethernet", PairingMode::Ethernet, PairingNetworkType::Ethernet) {}
+    Ethernet(CredentialIssuerCommands * credIssuerCommands) :
+        PairingCommand("ethernet", PairingMode::Ethernet, PairingNetworkType::Ethernet, credIssuerCommands)
+    {}
 };
 
 class StartUdcServerCommand : public CHIPCommand
@@ -157,31 +175,31 @@ public:
     }
 };
 
-void registerCommandsPairing(Commands & commands)
+void registerCommandsPairing(Commands & commands, CredentialIssuerCommands * credIssuerCommands)
 {
     const char * clusterName = "Pairing";
 
     commands_list clusterCommands = {
-        make_unique<Unpair>(),
-        make_unique<PairQRCode>(),
-        make_unique<PairManualCode>(),
-        make_unique<PairBleWiFi>(),
-        make_unique<PairBleThread>(),
-        make_unique<PairSoftAP>(),
-        make_unique<Ethernet>(),
-        make_unique<PairOnNetwork>(),
-        make_unique<PairOnNetworkShort>(),
-        make_unique<PairOnNetworkLong>(),
-        make_unique<PairOnNetworkVendor>(),
-        make_unique<PairOnNetworkCommissioningMode>(),
-        make_unique<PairOnNetworkCommissioner>(),
-        make_unique<PairOnNetworkDeviceType>(),
-        make_unique<PairOnNetworkDeviceType>(),
-        make_unique<PairOnNetworkInstanceName>(),
+        make_unique<Unpair>(credIssuerCommands),
+        make_unique<PairQRCode>(credIssuerCommands),
+        make_unique<PairManualCode>(credIssuerCommands),
+        make_unique<PairBleWiFi>(credIssuerCommands),
+        make_unique<PairBleThread>(credIssuerCommands),
+        make_unique<PairSoftAP>(credIssuerCommands),
+        make_unique<Ethernet>(credIssuerCommands),
+        make_unique<PairOnNetwork>(credIssuerCommands),
+        make_unique<PairOnNetworkShort>(credIssuerCommands),
+        make_unique<PairOnNetworkLong>(credIssuerCommands),
+        make_unique<PairOnNetworkVendor>(credIssuerCommands),
+        make_unique<PairOnNetworkCommissioningMode>(credIssuerCommands),
+        make_unique<PairOnNetworkCommissioner>(credIssuerCommands),
+        make_unique<PairOnNetworkDeviceType>(credIssuerCommands),
+        make_unique<PairOnNetworkDeviceType>(credIssuerCommands),
+        make_unique<PairOnNetworkInstanceName>(credIssuerCommands),
         // TODO - enable CommissionedListCommand once DNS Cache is implemented
         //        make_unique<CommissionedListCommand>(),
         make_unique<StartUdcServerCommand>(),
-        make_unique<OpenCommissioningWindowCommand>(),
+        make_unique<OpenCommissioningWindowCommand>(credIssuerCommands),
     };
 
     commands.Register(clusterName, clusterCommands);
