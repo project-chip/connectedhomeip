@@ -131,6 +131,8 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
     err = ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                            SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(inSuite, !receiveDelegate.IsOnMessageReceivedCalled);
     ec1->Close();
 
@@ -147,6 +149,8 @@ void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
 
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
 
     // Expire the session this exchange is supposedly on.  This should close the
@@ -200,6 +204,8 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     // send a malicious packet
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST2, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     ec1 = ctx.NewExchangeToAlice(&mockSolicitedAppDelegate);
@@ -207,6 +213,8 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     // send a good packet
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
@@ -236,7 +244,7 @@ nlTestSuite sSuite =
 {
     "Test-CHIP-ExchangeManager",
     &sTests[0],
-    TestContext::Initialize,
+    TestContext::InitializeAsync,
     TestContext::Finalize
 };
 // clang-format on
