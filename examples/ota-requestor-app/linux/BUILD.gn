@@ -17,6 +17,7 @@ import("//build_overrides/chip.gni")
 
 executable("chip-ota-requestor-app") {
   sources = [
+    "LinuxOTAImageProcessor.cpp",
     "LinuxOTARequestorDriver.cpp",
     "main.cpp",
   ]
