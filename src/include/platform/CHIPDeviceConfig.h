@@ -897,16 +897,6 @@
 #endif
 
 /**
- *  @def CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_PROD_EIDC_KEY
- *
- *  @brief
- *    The production event id counter (eidc) persisted storage key.
- */
-#ifndef CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_PROD_EIDC_KEY
-#define CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_PROD_EIDC_KEY "prod-eidc"
-#endif
-
-/**
  *  @def CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY
  *
  *  @brief
