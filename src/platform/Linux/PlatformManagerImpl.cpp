@@ -300,7 +300,16 @@ void PlatformManagerImpl::HandleSoftwareFault(uint32_t EventId)
 
     if (delegate != nullptr)
     {
-        delegate->OnSoftwareFaultDetected();
+        SoftwareDiagnostics::Structs::SoftwareFault::Type softwareFault;
+        char threadName[kMaxThreadNameLength + 1];
+
+        softwareFault.id = gettid();
+        strncpy(threadName, std::to_string(softwareFault.id).c_str(), kMaxThreadNameLength);
+        threadName[kMaxThreadNameLength] = '\0';
+        softwareFault.name               = CharSpan(threadName, strlen(threadName));
+        softwareFault.faultRecording     = ByteSpan(Uint8::from_const_char("FaultRecording"), strlen("FaultRecording"));
+
+        delegate->OnSoftwareFaultDetected(softwareFault);
     }
 }
 
