@@ -17,14 +17,112 @@
  */
 
 #include <app/Command.h>
+#include <app/clusters/door-lock-server/door-lock-server.h>
 #include <app/util/af.h>
 
 #include "AppMain.h"
+
+/* Current proposed DoorLockServer API:
+class DoorLockServer
+{
+    static DoorLockServer & Instance();
+
+    void InitServer();
+
+    bool SetLockState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState newLockState);
+    bool SetActuatorState(chip::EndpointId endpointId, bool actuatorState);
+    bool SetDoorState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState doorState);
+
+    // Also needs SetOperatingMode just to be sure
+    bool SetLanguage(chip::EndpointId endpointId, const char * newLanguage);
+    bool SetAutoRelockTime(chip::EndpointId, uint32_t newAutoRelockTimeSec);
+    bool SetSoundVolume(chip::EndpointId endpointId, uint8_t newSoundVolume);
+
+    bool SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled);
+    bool SetPrivacyModeButton(chip::EndpointId endpointId, bool isEnabled);
+
+    private:
+    static DoorLockServer instance;
+};
+
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const char * PINCode);
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const char * PINCode);
+
+bool emberAfPluginDoorLockGetUsers(chip::EndpointId endpointId, ...);
+bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, ...);
+bool emberAfPluginDoorLockClearUser(chip::EndpointId endpointId, ...);
+
+bool emberAfPluginDoorLockGetCredentials(chip::EndpointId endpointId, ...);
+bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, ...);
+bool emberAfPluginDoorLockClearCredential(chip::EndpointId endpointId, ...);
+*/
+
+// Many of these should just be implemented in src/app/clusters/door-lock-server/*. 
+bool emberAfPluginDoorLockOnDoorLockCommand(chip::EndpointId endpointId, const char * PINCode)
+{
+    // TODO: Set LockState, ActuatorEnabled
+    // call SetLockState
+    // call SetActuatorState
+    return true;
+}
+
+bool emberAfPluginDoorLockOnDoorUnlockCommand(chip::EndpointId endpointId, const char * PINCode)
+{
+    // TODO: Set LockState, ActuatorEnabled
+    // call SetLockState
+    // call SetActuatorState
+    return true;
+}
+
+
+bool emberAfPluginDoorLockGetUsers(chip::EndpointId endpointId, ...)
+{
+    // TODO: Get (how to get? send out msg somehow?) 
+    return true;
+}
+
+bool emberAfPluginDoorLockSetUser(chip::EndpointId endpointId, ...)
+{
+    // TODO: 
+    return true;
+}
+
+bool emberAfPluginDoorLockClearUser(chip::EndpointId endpointId, ...)
+{
+    // TODO: 
+    return true;
+}
+
+
+bool emberAfPluginDoorLockGetCredentials(chip::EndpointId endpointId, ...)
+{
+    // TODO: 
+    return true;
+}
+
+bool emberAfPluginDoorLockSetCredential(chip::EndpointId endpointId, ...)
+{
+    // TODO: 
+    return true;
+}
+
+bool emberAfPluginDoorLockClearCredential(chip::EndpointId endpointId, ...)
+{
+    // TODO: 
+    return true;
+}
+
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 {
     emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
     return true;
+}
+
+void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & attributePath, uint8_t mask, uint8_t type, uint16_t size, uint8_t * value)
+{
+    // Watch for LockState, DoorState, Mode, etc changes and trigger appropriate action
+
 }
 
 int main(int argc, char * argv[])
