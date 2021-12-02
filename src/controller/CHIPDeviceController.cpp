@@ -832,9 +832,6 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, fabric->GetFabricIndex());
 
-    err = device->GetPairing().MessageDispatch().Init(mSystemState->SessionMgr());
-    SuccessOrExit(err);
-
     mSystemState->SystemLayer()->StartTimer(chip::System::Clock::Milliseconds32(kSessionEstablishmentTimeout),
                                             OnSessionEstablishmentTimeoutCallback, this);
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)

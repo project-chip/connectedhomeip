@@ -203,8 +203,6 @@ public:
      **/
     void Clear();
 
-    SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
-
     //// ExchangeDelegate Implementation ////
     /**
      * @brief
@@ -231,10 +229,9 @@ public:
      */
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
-    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
-                                                            SessionManager * sessionManager) override
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override
     {
-        return &mMessageDispatch;
+        return SessionEstablishmentExchangeDispatch::Instance();
     }
 
 private:
@@ -301,8 +298,6 @@ private:
     uint8_t * mSalt          = nullptr;
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
-
-    SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     struct Spake2pErrorMsg
     {

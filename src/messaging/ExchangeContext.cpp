@@ -38,6 +38,7 @@
 #include <lib/support/Defer.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ApplicationExchangeDispatch.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
@@ -161,7 +162,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         }
 
         // Create a new scope for `err`, to avoid shadowing warning previous `err`.
-        CHIP_ERROR err = mDispatch->SendMessage(mSession.Value(), mExchangeId, IsInitiator(), GetReliableMessageContext(),
+        CHIP_ERROR err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), mSession.Value(), mExchangeId, IsInitiator(), GetReliableMessageContext(),
                                                 reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
         if (err != CHIP_NO_ERROR && IsResponseExpected())
         {
@@ -249,7 +250,7 @@ void ExchangeContextDeletor::Release(ExchangeContext * ec)
 }
 
 ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator,
-                                 ExchangeDelegate * delegate)
+                                 ExchangeDelegate * delegate) : mDispatch((delegate != nullptr) ? delegate->GetMessageDispatch() : ApplicationExchangeDispatch::Instance())
 {
     VerifyOrDie(mExchangeMgr == nullptr);
 
@@ -258,22 +259,6 @@ ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, Sess
     mSession.SetValue(session);
     mFlags.Set(Flags::kFlagInitiator, Initiator);
     mDelegate = delegate;
-
-    ExchangeMessageDispatch * dispatch = nullptr;
-    if (delegate != nullptr)
-    {
-        dispatch = delegate->GetMessageDispatch(em->GetReliableMessageMgr(), em->GetSessionManager());
-        if (dispatch == nullptr)
-        {
-            dispatch = &em->mDefaultExchangeDispatch;
-        }
-    }
-    else
-    {
-        dispatch = &em->mDefaultExchangeDispatch;
-    }
-    VerifyOrDie(dispatch != nullptr);
-    mDispatch = dispatch->Retain();
 
     SetDropAckDebug(false);
     SetAckPending(false);
@@ -299,12 +284,6 @@ ExchangeContext::~ExchangeContext()
 
     DoClose(false);
     mExchangeMgr = nullptr;
-
-    if (mDispatch != nullptr)
-    {
-        mDispatch->Release();
-        mDispatch = nullptr;
-    }
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogDetail(ExchangeManager, "ec-- id: " ChipLogFormatExchange, ChipLogValueExchange(this));
@@ -449,8 +428,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     // TODO : Remove this bypass for group as to perform the MessagePermitted function Issue # 12101
     if (!IsGroupExchangeContext())
     {
-        ReturnErrorOnFailure(
-            mDispatch->OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
+        ReturnErrorOnFailure(mDispatch.OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
     }
 
     if (IsAckPending() && !mDelegate)

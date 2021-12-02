@@ -148,8 +148,6 @@ CHIP_ERROR OperationalDeviceProxy::EstablishConnection()
     Messaging::ExchangeContext * exchange = mInitParams.exchangeMgr->NewContext(session.Value(), &mCASESession);
     VerifyOrReturnError(exchange != nullptr, CHIP_ERROR_INTERNAL);
 
-    ReturnErrorOnFailure(mCASESession.MessageDispatch().Init(mInitParams.sessionManager));
-
     uint16_t keyID = 0;
     ReturnErrorOnFailure(mInitParams.idAllocator->Allocate(keyID));
 

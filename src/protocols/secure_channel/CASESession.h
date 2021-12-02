@@ -173,16 +173,15 @@ public:
      **/
     CHIP_ERROR FromSerializable(const CASESessionSerializable & output);
 
-    SessionEstablishmentExchangeDispatch & MessageDispatch() { return mMessageDispatch; }
+    SessionEstablishmentExchangeDispatch MessageDispatch() { return SessionEstablishmentExchangeDispatch(); }
 
     //// ExchangeDelegate Implementation ////
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
                                  System::PacketBufferHandle && payload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
-    Messaging::ExchangeMessageDispatch * GetMessageDispatch(Messaging::ReliableMessageMgr * rmMgr,
-                                                            SessionManager * sessionManager) override
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override
     {
-        return &mMessageDispatch;
+        return SessionEstablishmentExchangeDispatch::Instance();
     }
 
     FabricIndex GetFabricIndex() const { return mFabricInfo != nullptr ? mFabricInfo->GetFabricIndex() : kUndefinedFabricIndex; }
@@ -266,7 +265,6 @@ private:
     uint8_t mIPK[kIPKSize];
 
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
-    SessionEstablishmentExchangeDispatch mMessageDispatch;
 
     FabricTable * mFabricsTable = nullptr;
     FabricInfo * mFabricInfo    = nullptr;

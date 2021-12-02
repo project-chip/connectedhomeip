@@ -23,44 +23,26 @@
 
 #pragma once
 
-#include <lib/core/ReferenceCounted.h>
 #include <messaging/Flags.h>
 #include <transport/SessionManager.h>
 
 namespace chip {
 namespace Messaging {
 
-class ReliableMessageMgr;
 class ReliableMessageContext;
 
-class ExchangeMessageDispatch : public ReferenceCounted<ExchangeMessageDispatch>
+class ExchangeMessageDispatch
 {
 public:
     ExchangeMessageDispatch() {}
     virtual ~ExchangeMessageDispatch() {}
 
-    CHIP_ERROR Init() { return CHIP_NO_ERROR; }
-
     virtual bool IsEncryptionRequired() const { return true; }
 
-    CHIP_ERROR SendMessage(SessionHandle session, uint16_t exchangeId, bool isInitiator,
+    CHIP_ERROR SendMessage(SessionManager * sessionManager, SessionHandle session, uint16_t exchangeId, bool isInitiator,
                            ReliableMessageContext * reliableMessageContext, bool isReliableTransmission, Protocols::Id protocol,
                            uint8_t type, System::PacketBufferHandle && message);
-
-    /**
-     * @brief
-     *   This interface takes the payload and returns the prepared message which can be send multiple times.
-     *
-     * @param session         Peer node to which the payload to be sent
-     * @param payloadHeader   The payloadHeader to be encoded into the packet
-     * @param message         The payload to be sent
-     * @param preparedMessage The handle to hold the prepared message
-     */
-    virtual CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
-                                      EncryptedPacketBufferHandle & preparedMessage)                                         = 0;
-    virtual CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & preparedMessage) const = 0;
-
-    virtual CHIP_ERROR OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
+    CHIP_ERROR OnMessageReceived(uint32_t messageCounter, const PayloadHeader & payloadHeader,
                                          const Transport::PeerAddress & peerAddress, MessageFlags msgFlags,
                                          ReliableMessageContext * reliableMessageContext);
 

@@ -26,7 +26,6 @@
 
 #include <lib/support/CodeUtils.h>
 #include <messaging/ExchangeMessageDispatch.h>
-#include <transport/SessionManager.h>
 
 namespace chip {
 namespace Messaging {
@@ -34,28 +33,16 @@ namespace Messaging {
 class ApplicationExchangeDispatch : public ExchangeMessageDispatch
 {
 public:
-    ApplicationExchangeDispatch() {}
-
-    virtual ~ApplicationExchangeDispatch() {}
-
-    CHIP_ERROR Init(SessionManager * sessionManager)
-    {
-        ReturnErrorCodeIf(sessionManager == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-        mSessionManager = sessionManager;
-        return ExchangeMessageDispatch::Init();
+    static ExchangeMessageDispatch & Instance() {
+        static ApplicationExchangeDispatch instance;
+        return instance;
     }
 
-    CHIP_ERROR PrepareMessage(SessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle && message,
-                              EncryptedPacketBufferHandle & preparedMessage) override;
-    CHIP_ERROR SendPreparedMessage(SessionHandle session, const EncryptedPacketBufferHandle & message) const override;
-
-    SessionManager * GetSessionManager() const { return mSessionManager; }
+    ApplicationExchangeDispatch() {}
+    virtual ~ApplicationExchangeDispatch() {}
 
 protected:
     bool MessagePermitted(uint16_t protocol, uint8_t type) override;
-
-private:
-    SessionManager * mSessionManager = nullptr;
 };
 
 } // namespace Messaging

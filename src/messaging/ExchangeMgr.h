@@ -232,8 +232,6 @@ private:
     SessionManager * mSessionManager;
     ReliableMessageMgr mReliableMessageMgr;
 
-    ApplicationExchangeDispatch mDefaultExchangeDispatch;
-
     FabricIndex mFabricIndex = 0;
 
     BitMapObjectPool<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
