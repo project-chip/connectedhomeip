@@ -94,6 +94,7 @@ public:
         }
         else
         {
+            VerifyOrDie(mEndianOutput.Fit()); // should be guaranteed because record Append succeeded
             mPacket->SetDataLength(static_cast<uint16_t>(mEndianOutput.Needed()));
         }
 
