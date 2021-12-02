@@ -24,8 +24,8 @@ added. It is defined by a [ZAP config]() file and tests can be added with a
 
 <hr>
 
--   [Building Prerequisites](https://github.com/project-chip/connectedhomeip/tree/master/docs/guides/BUILDING.md#prerequisitesn)
--   [Prepare For Bduiling](https://github.com/project-chip/connectedhomeip/tree/master/docs/guides/BUILDING.md#prepare-for-building)
+-   [Building Prerequisites](https://github.com/project-chip/connectedhomeip/tree/master/docs/guides/BUILDING.md#prerequisites)
+-   [Prepare For Building](https://github.com/project-chip/connectedhomeip/tree/master/docs/guides/BUILDING.md#prepare-for-building)
 
 <hr>
 
@@ -48,7 +48,7 @@ need to be specifically built.
 In order to utilize the app against a commissioner or controller, the app will
 need to be specifically built.
 
-1. To only buil the `chip-app1` binary completing the following steps:
+1. To only build the `chip-app1` binary completing the following steps:
 
     ```
     source scripts/activate.sh
@@ -83,7 +83,7 @@ binary can be executed on a linux os with test commands.
    following steps:
 
     ```
-    ./out/simulated/chip-app1 --command [TEST MAME]
+    ./out/simulated/chip-app1 --command [TEST NAME]
     ```
 
 ## Interacting with the simulated app
@@ -115,7 +115,7 @@ interact with it using chip-tool
     [chip-tool readme](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
     for additional commands.
 
-## Adding simulated Tests via TAML
+## Adding simulated Tests via YAML
 
 In order to validate commissioner/controller behavior, tests need to be added to
 the simulated device test framework. To achieve this, YAML files are created and
@@ -130,7 +130,7 @@ new code is generated.
     - <strong>`IMPORTANT`: The test name must end in Simulated with the
       capital.</strong>
 3. Available properties can be found in
-   [YAML Test Reame](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites/README.md)
+   [YAML Test Name](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites/README.md)
 4. An Additional property is as follows:
 
     | Name | Description                                                                 |
@@ -145,7 +145,7 @@ new code is generated.
     ```javascript
     const tests = ["Test_TC_DM_1_3_Simulated"];
     ```
-7. Then, the code will beed to generated using ZAP. Follow
+7. Then, the code will be generated using ZAP. Follow
    [Gen Script](#generating-and-building-the-default-simulated-app-with-script)
    to do so.
 8. When submitting code for review, create 2 commits. One for YAML changes and
