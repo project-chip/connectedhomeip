@@ -1,19 +1,28 @@
 # Simulated Device How-To (Linux)
 
-This README contains instructions on how to build, run, and interact with a simulated device. 
-All virtual accessories live in [examples/placeholder/linux/apps](https://github.com/project-chip/connectedhomeip/tree/master/examples/placeholder/linux/apps).
+This README contains instructions on how to build, run, and interact with a
+simulated device. All virtual accessories live in
+[examples/placeholder/linux/apps](https://github.com/project-chip/connectedhomeip/tree/master/examples/placeholder/linux/apps).
 
-Each accessory needs to be hosted into a subfolder. It will be the name of the application. For example `app1` will create a binary named `chip-app1`.
+Each accessory needs to be hosted into a subfolder. It will be the name of the
+application. For example `app1` will create a binary named `chip-app1`.
 
-If some parameters need to be overridden, a `CHIPProjectConfig.h` file can be placed under an ‘include’ folder into the app folder. For example ` examples/placeholder/linux/apps/app1/include/CHIPProjectConfig.h`
+If some parameters need to be overridden, a `CHIPProjectConfig.h` file can be
+placed under an ‘include’ folder into the app folder. For example
+`examples/placeholder/linux/apps/app1/include/CHIPProjectConfig.h`
 
-In order to generate specific tests for a given accessory, a [examples/placeholder/linux/apps/app1/tests.js](https://github.com/project-chip/connectedhomeip/tree/master/examples/placeholder/linux/apps/app1/tests.js) file can be added into the application directory. The tests listed there are the one that will be executed once the application has been commissioned.
-<br><br>Simulated Device:  simulation of an application in which tests can be added. It is defined by a [ZAP config]() file and tests can be added with a [YAML file](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites/certification/Test_TC_DM_1_3_Simulated.yaml).
+In order to generate specific tests for a given accessory, a
+[examples/placeholder/linux/apps/app1/tests.js](https://github.com/project-chip/connectedhomeip/tree/master/examples/placeholder/linux/apps/app1/tests.js)
+file can be added into the application directory. The tests listed there are the
+one that will be executed once the application has been commissioned.
+<br><br>Simulated Device: simulation of an application in which tests can be
+added. It is defined by a [ZAP config]() file and tests can be added with a
+[YAML file](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites/certification/Test_TC_DM_1_3_Simulated.yaml).
 <br><br>
 
 ### Prerequisite
-<hr>
 
+<hr>
 
 -   [Building Prerequisites](https://github.com/project-chip/connectedhomeip/tree/master/docs/guides/BUILDING.md#prerequisitesn)
 -   [Prepare For Bduiling](https://github.com/project-chip/connectedhomeip/tree/master/docs/guides/BUILDING.md#prepare-for-building)
@@ -24,9 +33,11 @@ In order to generate specific tests for a given accessory, a [examples/placehold
 
 ## Generating, and Building the default Simulated App with Script
 
-In order to utilize the app against a comissioner or controller, the app will need to be specifically built. 
+In order to utilize the app against a comissioner or controller, the app will
+need to be specifically built.
 
-1. To generate the ZAP files, and build the `chip-app1`  binary completing the following steps:
+1. To generate the ZAP files, and build the `chip-app1` binary completing the
+   following steps:
 
     ```
      ./scripts/examples/gn_build_test_example.sh app1
@@ -34,9 +45,10 @@ In order to utilize the app against a comissioner or controller, the app will ne
 
 ## Build the App only
 
-In order to utilize the app against a comissioner or controller, the app will need to be specifically built. 
+In order to utilize the app against a comissioner or controller, the app will
+need to be specifically built.
 
-1. To only buil the `chip-app1`  binary completing the following steps:
+1. To only buil the `chip-app1` binary completing the following steps:
 
     ```
     source scripts/activate.sh
@@ -52,9 +64,11 @@ In order to utilize the app against a comissioner or controller, the app will ne
 
 ## Running the app
 
-Now that the building is completed there is a `chip-app1` binary created. This binary can be executed on a linux os.
+Now that the building is completed there is a `chip-app1` binary created. This
+binary can be executed on a linux os.
 
-1. To generate the ZAP files, and build the `chip-app1`  binary completing the following steps:
+1. To generate the ZAP files, and build the `chip-app1` binary completing the
+   following steps:
 
     ```
     ./out/simulated/chip-app1
@@ -62,18 +76,23 @@ Now that the building is completed there is a `chip-app1` binary created. This b
 
 ## Running the app with test parameter
 
-Now that the building is completed there is a `chip-app1` binary created. This binary can be executed on a linux os with test commands.
+Now that the building is completed there is a `chip-app1` binary created. This
+binary can be executed on a linux os with test commands.
 
-1. To generate the ZAP files, and build the `chip-app1`  binary completing the following steps:
+1. To generate the ZAP files, and build the `chip-app1` binary completing the
+   following steps:
 
     ```
     ./out/simulated/chip-app1 --command [TEST MAME]
     ```
 
 ## Interacting with the simulated app
-Now that the building the app and starting it is complete, you will be able to interact with it using chip-tool
 
-1. Follow the instruction to build chip-tool in the [chip-tool readme](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool).
+Now that the building the app and starting it is complete, you will be able to
+interact with it using chip-tool
+
+1. Follow the instruction to build chip-tool in the
+   [chip-tool readme](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool).
 
 2. Run this command to initiate the pairing.
     ```
@@ -83,34 +102,51 @@ Now that the building the app and starting it is complete, you will be able to i
     ```
     ./out/debug/standalone/chip-tool generalcommissioning commissioning-complete 0x654321 0
     ```
-4. Most tests will start at this point and now an send cluster commands with chip-tool as follow. 
-     ```
-    ./out/debug/standalone/chip-tool onoff on 0x654321 1 
+4. Most tests will start at this point and now an send cluster commands with
+   chip-tool as follow.
+
+    ```
+    ./out/debug/standalone/chip-tool onoff on 0x654321 1
     ./out/debug/standalone/chip-tool onoff read on-off 0x654321 1
     ./out/debug/standalone/chip-tool onoff write on-time 1 0x654321 1
     ```
 
-    See [chip-tool readme](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool) for additional commands.
+    See
+    [chip-tool readme](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
+    for additional commands.
 
 ## Adding simulated Tests via TAML
-In order to validate commisioner/controller behavior, tests need to be added to the simulated device test framework. To acheive this, YAML files are created and new code is generated. 
-1. YAML test file are located in [YAML folder](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites/certification/)
-2. Test names must follow a strict format dues to CI of test recognition. The format is as follows:
-    - Test_TC_[`CATEGORY ABREVIATION`]_[`SECTION NUMBER`]_[`SUBSECTION NUMBER`]_Simulated.yaml
-    - <strong>`IMPORTANT`: The test name must end in Simulated with the capital.</strong>
-3. Available properties can be found in [YAML Test Reame](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites/README.md)
+
+In order to validate commisioner/controller behavior, tests need to be added to
+the simulated device test framework. To acheive this, YAML files are created and
+new code is generated.
+
+1. YAML test file are located in
+   [YAML folder](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites/certification/)
+2. Test names must follow a strict format dues to CI of test recognition. The
+   format is as follows:
+    - Test*TC*[`CATEGORY ABREVIATION`]_[`SECTION NUMBER`]_[`SUBSECTION
+      NUMBER`]\_Simulated.yaml
+    - <strong>`IMPORTANT`: The test name must end in Simulated with the
+      capital.</strong>
+3. Available properties can be found in
+   [YAML Test Reame](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites/README.md)
 4. An Addtional property is as follows:
 
-    | Name   | Description                                                                        |
-    | ------ | ---------------------------------------------------------------------------------- |
-    | wait   | The command that is expected to be received on the app from the controller.        |
+    | Name | Description                                                                 |
+    | ---- | --------------------------------------------------------------------------- |
+    | wait | The command that is expected to be received on the app from the controller. |
 
-5. [Test_TC_DM_1_3_Simulated](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/suites/certification/Test_TC_DM_1_3_Simulated.yaml) is an example of a written test that runs on the simulated device.
-6. Next, it will need to be added to [examples/placeholder/linux/apps/app1/tests.js](https://github.com/project-chip/connectedhomeip/tree/master/examples/placeholder/linux/apps/app1/tests.js). in the following array
+5. [Test_TC_DM_1_3_Simulated](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/suites/certification/Test_TC_DM_1_3_Simulated.yaml)
+   is an example of a written test that runs on the simulated device.
+6. Next, it will need to be added to
+   [examples/placeholder/linux/apps/app1/tests.js](https://github.com/project-chip/connectedhomeip/tree/master/examples/placeholder/linux/apps/app1/tests.js).
+   in the following array
     ```javascript
-    const tests = [
-        "Test_TC_DM_1_3_Simulated",
-    ];
-    ``` 
-6. Then, the code will beed to generated using ZAP. Follow [Gen Script](#generating-and-building-the-default-simulated-app-with-script) to do so.
-7. When submitting code for review, create 2 commits. One for YAML changes and second for generated code.
+    const tests = ["Test_TC_DM_1_3_Simulated"];
+    ```
+7. Then, the code will beed to generated using ZAP. Follow
+   [Gen Script](#generating-and-building-the-default-simulated-app-with-script)
+   to do so.
+8. When submitting code for review, create 2 commits. One for YAML changes and
+   second for generated code.
