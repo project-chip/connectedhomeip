@@ -87,6 +87,7 @@ chip::Optional<uint16_t> RecordWriter::FindPreviousName(const SerializedQNameIte
 void RecordWriter::WriteQName(const FullQName & qname)
 {
     size_t qNameWriteStart = mOutput->WritePos();
+    bool isFullyCompressed = true;
 
     for (uint16_t i = 0; i < qname.nameCount; i++)
     {
@@ -104,7 +105,7 @@ void RecordWriter::WriteQName(const FullQName & qname)
             // Pointer to offset: set the highest 2 bits
             mOutput->Put16(offset.Value() | 0xC000);
 
-            if (mOutput->Fit())
+            if (mOutput->Fit() && !isFullyCompressed)
             {
                 RememberWrittenQnameOffset(qNameWriteStart);
             }
@@ -113,6 +114,7 @@ void RecordWriter::WriteQName(const FullQName & qname)
 
         mOutput->Put8(static_cast<uint8_t>(strlen(qname.names[i])));
         mOutput->Put(qname.names[i]);
+        isFullyCompressed = false;
     }
     mOutput->Put8(0); // end of qnames
 
@@ -125,6 +127,7 @@ void RecordWriter::WriteQName(const FullQName & qname)
 void RecordWriter::WriteQName(const SerializedQNameIterator & qname)
 {
     size_t qNameWriteStart = mOutput->WritePos();
+    bool isFullyCompressed = true;
 
     SerializedQNameIterator copy = qname;
     while (true)
@@ -136,7 +139,7 @@ void RecordWriter::WriteQName(const SerializedQNameIterator & qname)
             // Pointer to offset: set the highest 2 bits
             mOutput->Put16(offset.Value() | 0xC000);
 
-            if (mOutput->Fit())
+            if (mOutput->Fit() && !isFullyCompressed)
             {
                 RememberWrittenQnameOffset(qNameWriteStart);
             }
@@ -155,6 +158,7 @@ void RecordWriter::WriteQName(const SerializedQNameIterator & qname)
 
         mOutput->Put8(static_cast<uint8_t>(strlen(copy.Value())));
         mOutput->Put(copy.Value());
+        isFullyCompressed = false;
     }
     mOutput->Put8(0); // end of qnames
 

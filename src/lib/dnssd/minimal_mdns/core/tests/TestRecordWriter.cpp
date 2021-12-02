@@ -129,6 +129,40 @@ void ComplexDedup(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
 }
 
+void TonsOfReferences(nlTestSuite * inSuite, void * inContext)
+{
+    const QNamePart kName1[] = { "some", "name" };
+    const QNamePart kName2[] = { "different", "name" };
+
+    uint8_t dataBuffer[512];
+
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
+    RecordWriter writer(&output);
+
+    // First name is 11 bytes (2*4 bytes + null terminator)
+    // all other entires are 2 bytes (back - references)
+    //
+    // TOTAL: 211 bytes written
+    for (int i = 0; i < 101; i++)
+    {
+        writer.WriteQName(FullQName(kName1));
+    }
+
+    // Extra size: 10 for "different" and 2 for "name" link
+    // TOTAL: 211 + 12 =  223
+    writer.WriteQName(FullQName(kName2));
+
+    // Another 200 bytes for references
+    // TOTAL: 423
+    for (int i = 0; i < 100; i++)
+    {
+        writer.WriteQName(FullQName(kName2));
+    }
+
+    NL_TEST_ASSERT(inSuite, output.Fit());
+    NL_TEST_ASSERT(inSuite, output.Needed() == 423);
+}
+
 } // namespace
 
 // clang-format off
@@ -137,6 +171,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("BasicWriteTest", BasicWriteTest),
     NL_TEST_DEF("SimpleDedup", SimpleDedup),
     NL_TEST_DEF("ComplexDedup", ComplexDedup),
+    NL_TEST_DEF("TonsOfReferences", TonsOfReferences),
 
     NL_TEST_SENTINEL()
 };
