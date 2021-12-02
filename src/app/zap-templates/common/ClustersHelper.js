@@ -184,7 +184,10 @@ function asChipCallback(item)
     return { name : 'Int' + basicType.replace(/[^0-9]/g, '') + 'u', type : basicType };
   case 'bool':
     return { name : 'Boolean', type : 'bool' };
-  // TODO: Add float and double
+  case 'float':
+    return { name : 'Float', type : 'float' };
+  case 'double':
+    return { name : 'Double', type : 'double' };
   default:
     return { name : 'Unsupported', type : null };
   }

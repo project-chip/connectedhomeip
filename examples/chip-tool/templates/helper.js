@@ -50,7 +50,7 @@ function asTypeMinValue(type)
         return '0';
       case 'float':
       case 'double':
-        return `-std::numeric_limits<${basicType}>::infinity`;
+        return `-std::numeric_limits<${basicType}>::infinity()`;
       default:
         error = 'asTypeMinValue: Unhandled underlying type ' + zclType + ' for original type ' + type;
         throw error;
@@ -87,7 +87,7 @@ function asTypeMaxValue(type)
         return 'UINT' + parseInt(basicType.slice(4)) + '_MAX';
       case 'float':
       case 'double':
-        return `std::numeric_limits<${basicType}>::infinity`;
+        return `std::numeric_limits<${basicType}>::infinity()`;
       default:
         return 'err';
         error = 'asTypeMaxValue: Unhandled underlying type ' + zclType + ' for original type ' + type;

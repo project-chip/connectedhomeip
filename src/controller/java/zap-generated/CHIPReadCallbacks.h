@@ -65,6 +65,50 @@ private:
     jobject javaCallbackRef;
     bool keepAlive;
 };
+class CHIPDoubleAttributeCallback : public chip::Callback::Callback<DoubleAttributeCallback>
+{
+public:
+    CHIPDoubleAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPDoubleAttributeCallback();
+
+    static void maybeDestroy(CHIPDoubleAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPDoubleAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, double value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+class CHIPFloatAttributeCallback : public chip::Callback::Callback<FloatAttributeCallback>
+{
+public:
+    CHIPFloatAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPFloatAttributeCallback();
+
+    static void maybeDestroy(CHIPFloatAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPFloatAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, float value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
 class CHIPInt8sAttributeCallback : public chip::Callback::Callback<Int8sAttributeCallback>
 {
 public:
@@ -1863,6 +1907,54 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPTestClusterNullableFloatSingleAttributeCallback
+    : public chip::Callback::Callback<CHIPTestClusterClusterNullableFloatSingleAttributeCallbackType>
+{
+public:
+    CHIPTestClusterNullableFloatSingleAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTestClusterNullableFloatSingleAttributeCallback();
+
+    static void maybeDestroy(CHIPTestClusterNullableFloatSingleAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTestClusterNullableFloatSingleAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<float> & value);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPTestClusterNullableFloatDoubleAttributeCallback
+    : public chip::Callback::Callback<CHIPTestClusterClusterNullableFloatDoubleAttributeCallbackType>
+{
+public:
+    CHIPTestClusterNullableFloatDoubleAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTestClusterNullableFloatDoubleAttributeCallback();
+
+    static void maybeDestroy(CHIPTestClusterNullableFloatDoubleAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTestClusterNullableFloatDoubleAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::Nullable<double> & value);
 
 private:
     jobject javaCallbackRef;

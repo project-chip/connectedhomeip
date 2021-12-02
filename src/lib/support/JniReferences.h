@@ -103,6 +103,16 @@ public:
     jboolean BooleanToPrimitive(jobject boxedObject);
 
     /**
+     * Get a primitive jfloat from the Java boxed type Float, using floatValue().
+     */
+    jfloat FloatToPrimitive(jobject boxedObject);
+
+    /**
+     * Get a primitive jfloat from the Java boxed type Double, using doubleValue().
+     */
+    jdouble DoubleToPrimitive(jobject boxedObject);
+
+    /**
      * Creates a boxed type (e.g. java.lang.Integer) based on the the class name ("java/lang/Integer"), constructor JNI signature
      * ("(I)V"), and value.
      */

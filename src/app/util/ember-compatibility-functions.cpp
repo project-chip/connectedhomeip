@@ -397,6 +397,16 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
             ReturnErrorOnFailure(attributeBufferToNumericTlvData<int64_t>(*writer, isNullable));
             break;
         }
+        case ZCL_SINGLE_ATTRIBUTE_TYPE: // 32-bit float
+        {
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<float>(*writer, isNullable));
+            break;
+        }
+        case ZCL_DOUBLE_ATTRIBUTE_TYPE: // 64-bit float
+        {
+            ReturnErrorOnFailure(attributeBufferToNumericTlvData<double>(*writer, isNullable));
+            break;
+        }
         case ZCL_CHAR_STRING_ATTRIBUTE_TYPE: // Char string
         {
             char * actualData  = reinterpret_cast<char *>(attributeData + 1);
@@ -640,6 +650,10 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * metadata, TLV::TLVR
     }
     case ZCL_INT64S_ATTRIBUTE_TYPE: // Signed 64-bit integer
         return numericTlvDataToAttributeBuffer<int64_t>(aReader, isNullable, dataLen);
+    case ZCL_SINGLE_ATTRIBUTE_TYPE: // 32-bit float
+        return numericTlvDataToAttributeBuffer<float>(aReader, isNullable, dataLen);
+    case ZCL_DOUBLE_ATTRIBUTE_TYPE: // 64-bit float
+        return numericTlvDataToAttributeBuffer<double>(aReader, isNullable, dataLen);
     case ZCL_OCTET_STRING_ATTRIBUTE_TYPE: // Octet string
     case ZCL_CHAR_STRING_ATTRIBUTE_TYPE:  // Char string
         return stringTlvDataToAttributeBuffer<uint8_t>(aReader, expectedType == ZCL_OCTET_STRING_ATTRIBUTE_TYPE, isNullable,
