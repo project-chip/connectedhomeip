@@ -22,16 +22,29 @@
 
 #pragma once
 
+#include <app/CASESessionManager.h>
+#include <app/server/Server.h>
+#include <protocols/bdx/BdxMessages.h>
+
 #include "BDXDownloader.h"
 #include "OTARequestorDriver.h"
 #include "OTARequestorInterface.h"
-#include <app/CASESessionManager.h>
-#include <protocols/bdx/BdxMessages.h>
+
+namespace chip {
 
 // This class implements all of the core logic of the OTA Requestor
 class OTARequestor : public OTARequestorInterface
 {
 public:
+    // Various actions to take when OnConnected callback is called
+    enum OnConnectedAction
+    {
+        kQueryImage = 0,
+        kStartBDX,
+    };
+
+    OTARequestor() : mOnConnectedCallback(OnConnected, this), mOnConnectionFailureCallback(OnConnectionFailure, this) {}
+
     // Application interface declarations -- start
 
     // Application directs the Requestor to start the Image Query process
@@ -55,36 +68,36 @@ public:
     // Virtual functions from OTARequestorInterface start
     // Handler for the AnnounceOTAProvider command
     EmberAfStatus HandleAnnounceOTAProvider(
-        chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-        const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData);
+        app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+        const app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData);
 
     // Virtual functions from OTARequestorInterface -- end
-    void ConnectToProvider();
 
-    void mOnConnected(void * context, chip::DeviceProxy * deviceProxy);
-    void mOnQueryImageResponse(
-        void * context,
-        const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & response);
+    /**
+     * Called to set the server instance which used to get access to the system resources necessary to open CASE sessions and drive
+     * BDX transfers
+     */
+    void SetServerInstance(Server * server) { mServer = server; }
 
-    // When the Requestor is used as a test tool (Tesm Mode) the Provider parameters may be supplied explicitly
-    void TestModeSetProviderParameters(chip::NodeId NodeId, chip::FabricIndex FabIndex)
+    /**
+     * Called to establish a session to mProviderNodeId on mProviderFabricIndex. This must be called from the same externally
+     * synchronized context as any other Matter stack method.
+     *
+     * @param onConnectedAction  The action to take once session to provider has been established
+     */
+    void ConnectToProvider(OnConnectedAction onConnectedAction);
+
+    /**
+     * Called to indicate test mode. This is when the Requestor is used as a test tool and the the provider parameters are supplied
+     * explicitly.
+     */
+    void TestModeSetProviderParameters(NodeId nodeId, FabricIndex fabIndex)
     {
-        mProviderNodeId      = NodeId;
-        mProviderFabricIndex = FabIndex;
+        mProviderNodeId      = nodeId;
+        mProviderFabricIndex = fabIndex;
     }
 
-    // Temporary until IP address resolution is implemented in the Exchange Layer
-    void SetIpAddress(chip::Inet::IPAddress IpAddress) { mIpAddress = IpAddress; }
-
 private:
-    // Enums
-    // Various cases for when OnConnected callback could be called
-    enum OnConnectedState
-    {
-        kQueryImage = 0,
-        kStartBDX,
-    };
-
     struct QueryImageRequest;
 
     // TODO: the application should define this, along with initializing the BDXDownloader
@@ -154,22 +167,42 @@ private:
         chip::BDXDownloader * mDownloader;
     };
 
-    // Variables
-    // TODO: align on variable naming standard
-    OTARequestorDriver * mOtaRequestorDriver;
-    chip::NodeId mProviderNodeId;
-    chip::FabricIndex mProviderFabricIndex;
-    uint32_t mOtaStartDelayMs                      = 0;
-    chip::CASESessionManager * mCASESessionManager = nullptr;
-    OnConnectedState onConnectedState              = kQueryImage;
-    chip::Messaging::ExchangeContext * exchangeCtx = nullptr;
-    chip::BDXDownloader * mBdxDownloader; // TODO: this should be OTADownloader
-    BDXMessenger mBdxMessenger;           // TODO: ideally this is held by the application
-
-    // TODO: Temporary until IP address resolution is implemented in the Exchange layer
-    chip::Inet::IPAddress mIpAddress;
-
-    // Functions
+    /**
+     * Setup CASESessionManager used to establish a session with the provider
+     */
     CHIP_ERROR SetupCASESessionManager(chip::FabricIndex fabricIndex);
+
+    /**
+     * Create a QueryImage request using values from the Basic cluster attributes
+     */
     CHIP_ERROR BuildQueryImageRequest(QueryImageRequest & req);
+
+    /**
+     * Session connection callbacks
+     */
+    static void OnConnected(void * context, OperationalDeviceProxy * deviceProxy);
+    static void OnConnectionFailure(void * context, NodeId deviceId, CHIP_ERROR error);
+    Callback::Callback<OnDeviceConnected> mOnConnectedCallback;
+    Callback::Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback;
+
+    /**
+     * QueryImage callbacks
+     */
+    static void
+    OnQueryImageResponse(void * context,
+                         const app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & response);
+    static void OnQueryImageFailure(void * context, EmberAfStatus status);
+
+    OTARequestorDriver * mOtaRequestorDriver  = nullptr;
+    NodeId mProviderNodeId                    = kUndefinedNodeId;
+    FabricIndex mProviderFabricIndex          = kUndefinedFabricIndex;
+    uint32_t mOtaStartDelayMs                 = 0;
+    CASESessionManager * mCASESessionManager  = nullptr;
+    OnConnectedAction mOnConnectedAction      = kQueryImage;
+    Messaging::ExchangeContext * mExchangeCtx = nullptr;
+    BDXDownloader * mBdxDownloader            = nullptr; // TODO: this should be OTADownloader
+    BDXMessenger mBdxMessenger;                          // TODO: ideally this is held by the application
+    Server * mServer = nullptr;
 };
+
+} // namespace chip
