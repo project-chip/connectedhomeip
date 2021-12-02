@@ -57,7 +57,7 @@ public:
         mChannelHandles.ForEachActiveObject([&](ChannelContextHandleAssociation * association) {
             if (association->mChannelContext == channel)
                 event(association->mChannelDelegate);
-            return true;
+            return Loop::Continue;
         });
     }
 
@@ -67,9 +67,9 @@ public:
             if (context->MatchesSession(session, mExchangeManager->GetSessionManager()))
             {
                 context->OnNewConnection(session);
-                return false;
+                return Loop::Break;
             }
-            return true;
+            return Loop::Continue;
         });
     }
 

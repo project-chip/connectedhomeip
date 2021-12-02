@@ -17111,6 +17111,31 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)testSimpleOptionalArgumentRequestWithParams:
+            (CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
+                                  completionHandler:(StatusCompletion)completionHandler
+{
+    ListFreer listFreer;
+    TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type request;
+    if (params != nil) {
+        if (params.arg1 != nil) {
+            auto & definedValue_0 = request.arg1.Emplace();
+            definedValue_0 = params.arg1.boolValue;
+        }
+    }
+
+    new CHIPCommandSuccessCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)testSpecificWithCompletionHandler:(void (^)(CHIPTestClusterClusterTestSpecificResponseParams * _Nullable data,
                                               NSError * _Nullable error))completionHandler
 {

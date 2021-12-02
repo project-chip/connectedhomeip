@@ -29431,6 +29431,11 @@ struct Type;
 struct DecodableType;
 } // namespace TimedInvokeRequest
 
+namespace TestSimpleOptionalArgumentRequest {
+struct Type;
+struct DecodableType;
+} // namespace TestSimpleOptionalArgumentRequest
+
 } // namespace Commands
 
 namespace Commands {
@@ -30504,6 +30509,38 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TimedInvokeRequest
+namespace TestSimpleOptionalArgumentRequest {
+enum class Fields
+{
+    kArg1 = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::TestSimpleOptionalArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    Optional<bool> arg1;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::TestSimpleOptionalArgumentRequest::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+
+    Optional<bool> arg1;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace TestSimpleOptionalArgumentRequest
 } // namespace Commands
 
 namespace Attributes {

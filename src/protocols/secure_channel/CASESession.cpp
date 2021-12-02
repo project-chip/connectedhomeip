@@ -69,8 +69,6 @@ constexpr uint8_t kTBEData3_Nonce[] =
 constexpr size_t kTBEDataNonceLength = sizeof(kTBEData2_Nonce);
 static_assert(sizeof(kTBEData2_Nonce) == sizeof(kTBEData3_Nonce), "TBEData2_Nonce and TBEData3_Nonce must be same size");
 
-constexpr uint8_t kCASESessionVersion = 1;
-
 enum
 {
     kTag_TBEData_SenderNOC    = 1,
@@ -124,96 +122,48 @@ void CASESession::CloseExchange()
     }
 }
 
-CHIP_ERROR CASESession::Serialize(CASESessionSerialized & output)
-{
-    uint16_t serializedLen = 0;
-    CASESessionSerializable serializable;
-
-    VerifyOrReturnError(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(ToSerializable(serializable));
-
-    serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
-                                       static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
-    VerifyOrReturnError(serializedLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(serializedLen < sizeof(output.inner), CHIP_ERROR_INVALID_ARGUMENT);
-    output.inner[serializedLen] = '\0';
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CASESession::Deserialize(CASESessionSerialized & input)
-{
-    CASESessionSerializable serializable;
-    size_t maxlen            = BASE64_ENCODED_LEN(sizeof(serializable));
-    size_t len               = strnlen(Uint8::to_char(input.inner), maxlen);
-    uint16_t deserializedLen = 0;
-
-    VerifyOrReturnError(len < sizeof(CASESessionSerialized), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(CanCastTo<uint16_t>(len), CHIP_ERROR_INVALID_ARGUMENT);
-
-    memset(&serializable, 0, sizeof(serializable));
-    deserializedLen =
-        Base64Decode(Uint8::to_const_char(input.inner), static_cast<uint16_t>(len), Uint8::to_uchar((uint8_t *) &serializable));
-
-    VerifyOrReturnError(deserializedLen > 0, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(deserializedLen <= sizeof(serializable), CHIP_ERROR_INVALID_ARGUMENT);
-
-    ReturnErrorOnFailure(FromSerializable(serializable));
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR CASESession::ToSerializable(CASESessionSerializable & serializable)
+CHIP_ERROR CASESession::ToCachable(CASESessionCachable & cachableSession)
 {
     const NodeId peerNodeId = GetPeerNodeId();
     VerifyOrReturnError(CanCastTo<uint16_t>(mSharedSecret.Length()), CHIP_ERROR_INTERNAL);
-    VerifyOrReturnError(CanCastTo<uint16_t>(sizeof(mMessageDigest)), CHIP_ERROR_INTERNAL);
     VerifyOrReturnError(CanCastTo<uint64_t>(peerNodeId), CHIP_ERROR_INTERNAL);
 
-    memset(&serializable, 0, sizeof(serializable));
-    serializable.mSharedSecretLen  = LittleEndian::HostSwap16(static_cast<uint16_t>(mSharedSecret.Length()));
-    serializable.mMessageDigestLen = LittleEndian::HostSwap16(static_cast<uint16_t>(sizeof(mMessageDigest)));
-    serializable.mVersion          = kCASESessionVersion;
-    serializable.mPeerNodeId       = LittleEndian::HostSwap64(peerNodeId);
-    for (size_t i = 0; i < serializable.mPeerCATs.size(); i++)
+    memset(&cachableSession, 0, sizeof(cachableSession));
+    cachableSession.mSharedSecretLen = LittleEndian::HostSwap16(static_cast<uint16_t>(mSharedSecret.Length()));
+    cachableSession.mPeerNodeId      = LittleEndian::HostSwap64(peerNodeId);
+    for (size_t i = 0; i < cachableSession.mPeerCATs.size(); i++)
     {
-        serializable.mPeerCATs.val[i] = LittleEndian::HostSwap32(GetPeerCATs().val[i]);
+        cachableSession.mPeerCATs.val[i] = LittleEndian::HostSwap32(GetPeerCATs().val[i]);
     }
-    serializable.mLocalSessionId = LittleEndian::HostSwap16(GetLocalSessionId());
-    serializable.mPeerSessionId  = LittleEndian::HostSwap16(GetPeerSessionId());
+    // TODO: Get the fabric index
+    cachableSession.mLocalFabricIndex      = 0;
+    cachableSession.mSessionSetupTimeStamp = LittleEndian::HostSwap64(mSessionSetupTimeStamp);
 
-    memcpy(serializable.mResumptionId, mResumptionId, sizeof(mResumptionId));
-    memcpy(serializable.mSharedSecret, mSharedSecret, mSharedSecret.Length());
-    memcpy(serializable.mMessageDigest, mMessageDigest, sizeof(mMessageDigest));
+    memcpy(cachableSession.mResumptionId, mResumptionId, sizeof(mResumptionId));
+    memcpy(cachableSession.mSharedSecret, mSharedSecret, mSharedSecret.Length());
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR CASESession::FromSerializable(const CASESessionSerializable & serializable)
+CHIP_ERROR CASESession::FromCachable(const CASESessionCachable & cachableSession)
 {
-    VerifyOrReturnError(serializable.mVersion == kCASESessionVersion, CHIP_ERROR_VERSION_MISMATCH);
-
-    uint16_t length = LittleEndian::HostSwap16(serializable.mSharedSecretLen);
+    uint16_t length = LittleEndian::HostSwap16(cachableSession.mSharedSecretLen);
     ReturnErrorOnFailure(mSharedSecret.SetLength(static_cast<size_t>(length)));
     memset(mSharedSecret, 0, sizeof(mSharedSecret.Capacity()));
-    memcpy(mSharedSecret, serializable.mSharedSecret, length);
+    memcpy(mSharedSecret, cachableSession.mSharedSecret, length);
 
-    length = LittleEndian::HostSwap16(serializable.mMessageDigestLen);
-    VerifyOrReturnError(length <= sizeof(mMessageDigest), CHIP_ERROR_INVALID_ARGUMENT);
-    memcpy(mMessageDigest, serializable.mMessageDigest, length);
-
-    SetPeerNodeId(LittleEndian::HostSwap64(serializable.mPeerNodeId));
+    SetPeerNodeId(LittleEndian::HostSwap64(cachableSession.mPeerNodeId));
     Credentials::CATValues peerCATs;
-    for (size_t i = 0; i < serializable.mPeerCATs.size(); i++)
+    for (size_t i = 0; i < cachableSession.mPeerCATs.size(); i++)
     {
-        peerCATs.val[i] = LittleEndian::HostSwap32(serializable.mPeerCATs.val[i]);
+        peerCATs.val[i] = LittleEndian::HostSwap32(cachableSession.mPeerCATs.val[i]);
     }
     SetPeerCATs(peerCATs);
-    SetLocalSessionId(LittleEndian::HostSwap16(serializable.mLocalSessionId));
-    SetPeerSessionId(LittleEndian::HostSwap16(serializable.mPeerSessionId));
+    SetSessionTimeStamp(LittleEndian::HostSwap64(cachableSession.mSessionSetupTimeStamp));
+    // TODO: Set the fabric index correctly
+    mLocalFabricIndex = cachableSession.mLocalFabricIndex;
 
-    memcpy(mResumptionId, serializable.mResumptionId, sizeof(mResumptionId));
+    memcpy(mResumptionId, cachableSession.mResumptionId, sizeof(mResumptionId));
 
     const ByteSpan * ipkListSpan = GetIPKList();
     VerifyOrReturnError(ipkListSpan->size() == sizeof(mIPK), CHIP_ERROR_INVALID_ARGUMENT);

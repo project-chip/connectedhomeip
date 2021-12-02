@@ -8238,6 +8238,27 @@ public class ClusterInfoMapping {
             testClustertestNullableOptionalRequestCommandParams);
     testClusterClusterInteractionInfoMap.put(
         "testNullableOptionalRequest", testClustertestNullableOptionalRequestInteractionInfo);
+    Map<String, CommandParameterInfo> testClustertestSimpleOptionalArgumentRequestCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo testClustertestSimpleOptionalArgumentRequestarg1CommandParameterInfo =
+        new CommandParameterInfo("arg1", boolean.class);
+    testClustertestSimpleOptionalArgumentRequestCommandParams.put(
+        "arg1", testClustertestSimpleOptionalArgumentRequestarg1CommandParameterInfo);
+
+    // Populate commands
+    InteractionInfo testClustertestSimpleOptionalArgumentRequestInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .testSimpleOptionalArgumentRequest(
+                      (DefaultClusterCallback) callback,
+                      (Optional<Boolean>) commandArguments.get("arg1"));
+            },
+            () -> new DelegatedDefaultClusterCallback(),
+            testClustertestSimpleOptionalArgumentRequestCommandParams);
+    testClusterClusterInteractionInfoMap.put(
+        "testSimpleOptionalArgumentRequest",
+        testClustertestSimpleOptionalArgumentRequestInteractionInfo);
     Map<String, CommandParameterInfo> testClustertestSpecificCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     // Populate commands

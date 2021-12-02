@@ -3786,6 +3786,13 @@ class ChipClusters:
                     "arg1": "int",
                 },
             },
+            0x00000013: {
+                "commandId": 0x00000013,
+                "commandName": "TestSimpleOptionalArgumentRequest",
+                "args": {
+                    "arg1": "bool",
+                },
+            },
             0x00000002: {
                 "commandId": 0x00000002,
                 "commandName": "TestSpecific",
