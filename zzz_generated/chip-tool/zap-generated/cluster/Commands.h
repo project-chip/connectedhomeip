@@ -36894,7 +36894,7 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000012) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest, 10000);
     }
 
 private:

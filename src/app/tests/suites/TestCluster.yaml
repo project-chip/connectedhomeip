@@ -982,6 +982,7 @@ tests:
                 value: 20003
               - name: "arg2"
                 value: 101
+
     # Tests for Struct
 
     - label: "Send Test Command With Struct Argument and arg1.b is true"
