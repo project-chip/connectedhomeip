@@ -125,7 +125,7 @@ new code is generated.
    [YAML folder](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites/certification/)
 2. Test names must follow a strict format dues to CI of test recognition. The
    format is as follows:
-    - Test\_TC\_[`CATEGORY ABBREVIATION`]\_[`SECTION NUMBER`]\_[`SUBSECTION
+    - Test_TC\_[`CATEGORY ABBREVIATION`]\_[`SECTION NUMBER`]\_[`SUBSECTION
       NUMBER`]\_Simulated.yaml
     - <strong>`IMPORTANT`: The test name must end in Simulated with the
       capital.</strong>
