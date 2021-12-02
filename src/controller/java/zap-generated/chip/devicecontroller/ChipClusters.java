@@ -11082,6 +11082,12 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
+    public interface ListLongOctetStringAttributeCallback {
+      void onSuccess(List<Object> valueList);
+
+      void onError(Exception ex);
+    }
+
     public interface NullableBooleanAttributeCallback {
       void onSuccess(@Nullable Boolean value);
 
@@ -11898,6 +11904,10 @@ public class ChipClusters {
 
     public void reportRangeRestrictedInt16sAttribute(IntegerAttributeCallback callback) {
       reportRangeRestrictedInt16sAttribute(chipClusterPtr, callback);
+    }
+
+    public void readListLongOctetStringAttribute(ListLongOctetStringAttributeCallback callback) {
+      readListLongOctetStringAttribute(chipClusterPtr, callback);
     }
 
     public void readTimedWriteBooleanAttribute(BooleanAttributeCallback callback) {
@@ -12911,6 +12921,9 @@ public class ChipClusters {
 
     private native void reportRangeRestrictedInt16sAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readListLongOctetStringAttribute(
+        long chipClusterPtr, ListLongOctetStringAttributeCallback callback);
 
     private native void readTimedWriteBooleanAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);

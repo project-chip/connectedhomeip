@@ -3605,6 +3605,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)reportAttributeRangeRestrictedInt16sWithResponseHandler:(void (^)(NSNumber * _Nullable value,
                                                                     NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeListLongOctetStringWithCompletionHandler:(void (^)(NSArray * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeTimedWriteBooleanWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                                 NSError * _Nullable error))completionHandler;
 - (void)writeAttributeTimedWriteBooleanWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;

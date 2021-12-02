@@ -30894,6 +30894,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace RangeRestrictedInt16s
+namespace ListLongOctetString {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const chip::ByteSpan>;
+    using DecodableType    = DataModel::DecodableList<chip::ByteSpan>;
+    using DecodableArgType = const DataModel::DecodableList<chip::ByteSpan> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ListLongOctetString::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ListLongOctetString
 namespace TimedWriteBoolean {
 struct TypeInfo
 {

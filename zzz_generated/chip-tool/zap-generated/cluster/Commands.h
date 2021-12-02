@@ -2586,6 +2586,15 @@ static void OnTestClusterListNullablesAndOptionalsStructListAttributeResponse(
     command->SetCommandExitStatus(err);
 }
 
+static void OnTestClusterListLongOctetStringListAttributeResponse(void * context,
+                                                                  const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
+{
+    CHIP_ERROR err = LogValue("OnTestClusterListLongOctetStringListAttributeResponse", 0, list);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(err);
+}
+
 static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(
     void * context,
     const chip::app::DataModel::DecodableList<
@@ -36554,6 +36563,7 @@ private:
 | * RangeRestrictedInt8s                                              | 0x0027 |
 | * RangeRestrictedInt16u                                             | 0x0028 |
 | * RangeRestrictedInt16s                                             | 0x0029 |
+| * ListLongOctetString                                               | 0x002A |
 | * TimedWriteBoolean                                                 | 0x0030 |
 | * Unsupported                                                       | 0x00FF |
 | * NullableBoolean                                                   | 0x8000 |
@@ -41407,6 +41417,41 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute ListLongOctetString
+ */
+class ReadTestClusterListLongOctetString : public ModelCommand
+{
+public:
+    ReadTestClusterListLongOctetString() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "list-long-octet-string");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTestClusterListLongOctetString()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050F) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TestClusterCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeListLongOctetString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<TestClusterListLongOctetStringListAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<TestClusterListLongOctetStringListAttributeCallback>(
+            OnTestClusterListLongOctetStringListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
 
 /*
@@ -58158,6 +58203,7 @@ void registerClusterTestCluster(Commands & commands)
         make_unique<ReadTestClusterRangeRestrictedInt16s>(),               //
         make_unique<WriteTestClusterRangeRestrictedInt16s>(),              //
         make_unique<ReportTestClusterRangeRestrictedInt16s>(),             //
+        make_unique<ReadTestClusterListLongOctetString>(),                 //
         make_unique<ReadTestClusterTimedWriteBoolean>(),                   //
         make_unique<WriteTestClusterTimedWriteBoolean>(),                  //
         make_unique<ReadTestClusterUnsupported>(),                         //

@@ -4811,6 +4811,21 @@ public class ClusterReadMapping {
     readTestClusterInteractionInfo.put(
         "readRangeRestrictedInt16sAttribute",
         readTestClusterRangeRestrictedInt16sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterListLongOctetStringCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterListLongOctetStringAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readListLongOctetStringAttribute(
+                      (ChipClusters.TestClusterCluster.ListLongOctetStringAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedListLongOctetStringAttributeCallback(),
+            readTestClusterListLongOctetStringCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readListLongOctetStringAttribute",
+        readTestClusterListLongOctetStringAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterTimedWriteBooleanCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterTimedWriteBooleanAttributeInteractionInfo =

@@ -17901,6 +17901,17 @@ CHIP_ERROR TestClusterCluster::ReportAttributeRangeRestrictedInt16s(Callback::Ca
                                      BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
+CHIP_ERROR TestClusterCluster::ReadAttributeListLongOctetString(Callback::Cancelable * onSuccessCallback,
+                                                                Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000002A;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             TestClusterClusterListLongOctetStringListAttributeFilter);
+}
+
 CHIP_ERROR TestClusterCluster::ReadAttributeTimedWriteBoolean(Callback::Cancelable * onSuccessCallback,
                                                               Callback::Cancelable * onFailureCallback)
 {
