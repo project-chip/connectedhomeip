@@ -118,38 +118,22 @@ class AttributePathWithListIndex(AttributePath):
 @dataclass
 class EventHeader:
     EndpointId: int = None
-    ClusterId: int = None
-    EventId: int = None
+    Event: ClusterEventDescriptor = None
     EventNumber: int = None
     Priority: EventPriority = None
     Timestamp: int = None
     TimestampType: EventTimestampType = None
 
-    def __init__(self, EndpointId: int = None, Cluster=None, Event=None, ClusterId=None, EventId=None, EventNumber=None, Priority=None, Timestamp=None, TimestampType=None):
+    def __init__(self, EndpointId: int = None, Event=None, EventNumber=None, Priority=None, Timestamp=None, TimestampType=None):
         self.EndpointId = EndpointId
-        if Cluster is not None:
-            # Wildcard read for a specific cluster
-            if (Event is not None) or (ClusterId is not None) or (EventId is not None):
-                raise Warning(
-                    "EventId, ClusterId and EventId is ignored when Cluster is specified")
-            self.ClusterId = Cluster.id
-            return
-        if Event is not None:
-            if (ClusterId is not None) or (EventId is not None):
-                raise Warning(
-                    "ClusterId and EventId is ignored when Event is specified")
-            self.ClusterId = Event.cluster_id
-            self.EventId = Event.event_id
-            return
-        self.ClusterId = ClusterId
-        self.EventId = EventId
+        self.Event = Event
         self.EventNumber = EventNumber
         self.Priority = Priority
         self.Timestamp = Timestamp
         self.Timestamp = TimestampType
 
     def __str__(self) -> str:
-        return f"{self.EndpointId}/{self.ClusterId}/{self.EventId}/{self.EventNumber}/{self.Priority}/{self.Timestamp}/{self.TimestampType}"
+        return f"{self.EndpointId}/{self.Event.cluster_id}/{self.Event.event_id}/{self.EventNumber}/{self.Priority}/{self.Timestamp}/{self.TimestampType}"
 
 
 @dataclass
@@ -161,7 +145,7 @@ class AttributeStatus:
 @dataclass
 class EventStatus:
     Header: EventHeader
-    Status: Union[chip.interaction_model.Status, int]
+    Status: chip.interaction_model.Status
 
 
 AttributeWriteResult = AttributeStatus
@@ -377,22 +361,17 @@ class AsyncReadTransaction:
 
     def _handleEventData(self, header: EventHeader, data: bytes):
         try:
-            path = EventPath(
-                ClusterId=header.ClusterId, EventId=header.EventId)
-            eventType = _EventIndex.get(str(path), None)
             eventValue = None
             tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
-            if eventType is None:
+            if header.Event is None:
                 eventValue = ValueDecodeFailure(
                     tlvData, LookupError("event schema not found"))
             else:
                 try:
-                    eventValue = eventType(eventType.FromTLV(data))
+                    eventValue = EventHeader.Event(header.Event.FromTLV(data))
                 except Exception as ex:
                     logging.error(
-                        f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Event = {path.EventId}")
-                    logging.error(
-                        f"Failed Cluster Object: {str(eventType)}")
+                        f"Failed Cluster Object: {str(EventHeader.Event)}")
                     logging.error(ex)
                     eventValue = ValueDecodeFailure(
                         tlvData, ex)
@@ -496,8 +475,10 @@ def _OnReadAttributeDataCallback(closure, endpoint: int, cluster: int, attribute
 @_OnReadEventDataCallbackFunct
 def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: int, number: int, priority: int, timestamp: int, timestampType: int, data, len):
     dataBytes = ctypes.string_at(data, len)
+    path = EventPath(ClusterId=cluster, EventId=event)
+    eventType = _EventIndex.get(str(path), None)
     closure.handleEventData(EventHeader(
-        EndpointId=endpoint, ClusterId=cluster, EventId=event, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), dataBytes[:])
+        EndpointId=endpoint, Event=eventType, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), dataBytes[:])
 
 
 @_OnSubscriptionEstablishedCallbackFunct
