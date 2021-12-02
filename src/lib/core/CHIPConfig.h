@@ -2427,6 +2427,7 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
  *      * #CHIP_IM_MAX_NUM_WRITE_HANDLER
  *      * #CHIP_IM_MAX_NUM_WRITE_CLIENT
+ *      * #CHIP_IM_MAX_NUM_TIMED_HANDLER
  *
  *  @{
  */
@@ -2492,6 +2493,16 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_WRITE_CLIENT
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_TIMED_HANDLER
+ *
+ * @brief Defines the maximum number of TimedHandler, limits the number of
+ *        active timed interactions waiting for the Invoke or Write.
+ */
+#ifndef CHIP_IM_MAX_NUM_TIMED_HANDLER
+#define CHIP_IM_MAX_NUM_TIMED_HANDLER 8
 #endif
 
 /**

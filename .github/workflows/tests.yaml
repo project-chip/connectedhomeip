@@ -84,7 +84,7 @@ jobs:
                   "./scripts/tests/run_test_suite.py \
                      --chip-tool ./out/linux-x64-chip-tool-${BUILD_VARIANT}${CHIP_TOOL_VARIANT}/chip-tool \
                      run \
-                     --iterations 2 \
+                     --iterations 1 \
                      --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                      --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
@@ -169,7 +169,7 @@ jobs:
                      --chip-tool ./out/darwin-x64-chip-tool-${BUILD_VARIANT}${CHIP_TOOL_VARIANT}/chip-tool \
                      --target-skip-glob 'TV*' \
                      run \
-                     --iterations 2 \
+                     --iterations 1 \
                      --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
             - name: Uploading core files

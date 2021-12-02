@@ -64,6 +64,18 @@ public class ChipClusters {
     void onError(Exception error);
   }
 
+  public interface FloatAttributeCallback {
+    void onSuccess(float value);
+
+    void onError(Exception error);
+  }
+
+  public interface DoubleAttributeCallback {
+    void onSuccess(double value);
+
+    void onError(Exception error);
+  }
+
   public abstract static class BaseChipCluster {
     protected long chipClusterPtr;
 
@@ -5432,6 +5444,14 @@ public class ChipClusters {
       readBasicCommissioningInfoListAttribute(chipClusterPtr, callback);
     }
 
+    public void readRegulatoryConfigAttribute(IntegerAttributeCallback callback) {
+      readRegulatoryConfigAttribute(chipClusterPtr, callback);
+    }
+
+    public void readLocationCapabilityAttribute(IntegerAttributeCallback callback) {
+      readLocationCapabilityAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -5459,6 +5479,12 @@ public class ChipClusters {
 
     private native void readBasicCommissioningInfoListAttribute(
         long chipClusterPtr, BasicCommissioningInfoListAttributeCallback callback);
+
+    private native void readRegulatoryConfigAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readLocationCapabilityAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
@@ -11186,6 +11212,18 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
+    public interface NullableFloatSingleAttributeCallback {
+      void onSuccess(@Nullable Float value);
+
+      void onError(Exception ex);
+    }
+
+    public interface NullableFloatDoubleAttributeCallback {
+      void onSuccess(@Nullable Double value);
+
+      void onError(Exception ex);
+    }
+
     public interface NullableOctetStringAttributeCallback {
       void onSuccess(@Nullable byte[] value);
 
@@ -11611,6 +11649,40 @@ public class ChipClusters {
 
     public void reportEnum16Attribute(IntegerAttributeCallback callback) {
       reportEnum16Attribute(chipClusterPtr, callback);
+    }
+
+    public void readFloatSingleAttribute(FloatAttributeCallback callback) {
+      readFloatSingleAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeFloatSingleAttribute(DefaultClusterCallback callback, Float value) {
+      writeFloatSingleAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void subscribeFloatSingleAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeFloatSingleAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportFloatSingleAttribute(FloatAttributeCallback callback) {
+      reportFloatSingleAttribute(chipClusterPtr, callback);
+    }
+
+    public void readFloatDoubleAttribute(DoubleAttributeCallback callback) {
+      readFloatDoubleAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeFloatDoubleAttribute(DefaultClusterCallback callback, Double value) {
+      writeFloatDoubleAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void subscribeFloatDoubleAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeFloatDoubleAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportFloatDoubleAttribute(DoubleAttributeCallback callback) {
+      reportFloatDoubleAttribute(chipClusterPtr, callback);
     }
 
     public void readOctetStringAttribute(OctetStringAttributeCallback callback) {
@@ -12259,6 +12331,42 @@ public class ChipClusters {
       reportNullableEnum16Attribute(chipClusterPtr, callback);
     }
 
+    public void readNullableFloatSingleAttribute(NullableFloatSingleAttributeCallback callback) {
+      readNullableFloatSingleAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableFloatSingleAttribute(
+        DefaultClusterCallback callback, @Nullable Float value) {
+      writeNullableFloatSingleAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void subscribeNullableFloatSingleAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeNullableFloatSingleAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportNullableFloatSingleAttribute(FloatAttributeCallback callback) {
+      reportNullableFloatSingleAttribute(chipClusterPtr, callback);
+    }
+
+    public void readNullableFloatDoubleAttribute(NullableFloatDoubleAttributeCallback callback) {
+      readNullableFloatDoubleAttribute(chipClusterPtr, callback);
+    }
+
+    public void writeNullableFloatDoubleAttribute(
+        DefaultClusterCallback callback, @Nullable Double value) {
+      writeNullableFloatDoubleAttribute(chipClusterPtr, callback, value);
+    }
+
+    public void subscribeNullableFloatDoubleAttribute(
+        DefaultClusterCallback callback, int minInterval, int maxInterval) {
+      subscribeNullableFloatDoubleAttribute(chipClusterPtr, callback, minInterval, maxInterval);
+    }
+
+    public void reportNullableFloatDoubleAttribute(DoubleAttributeCallback callback) {
+      reportNullableFloatDoubleAttribute(chipClusterPtr, callback);
+    }
+
     public void readNullableOctetStringAttribute(NullableOctetStringAttributeCallback callback) {
       readNullableOctetStringAttribute(chipClusterPtr, callback);
     }
@@ -12631,6 +12739,30 @@ public class ChipClusters {
 
     private native void reportEnum16Attribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readFloatSingleAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void writeFloatSingleAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, Float value);
+
+    private native void subscribeFloatSingleAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportFloatSingleAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void readFloatDoubleAttribute(
+        long chipClusterPtr, DoubleAttributeCallback callback);
+
+    private native void writeFloatDoubleAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, Double value);
+
+    private native void subscribeFloatDoubleAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportFloatDoubleAttribute(
+        long chipClusterPtr, DoubleAttributeCallback callback);
 
     private native void readOctetStringAttribute(
         long chipClusterPtr, OctetStringAttributeCallback callback);
@@ -13065,6 +13197,30 @@ public class ChipClusters {
 
     private native void reportNullableEnum16Attribute(
         long chipClusterPtr, IntegerAttributeCallback callback);
+
+    private native void readNullableFloatSingleAttribute(
+        long chipClusterPtr, NullableFloatSingleAttributeCallback callback);
+
+    private native void writeNullableFloatSingleAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, @Nullable Float value);
+
+    private native void subscribeNullableFloatSingleAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportNullableFloatSingleAttribute(
+        long chipClusterPtr, FloatAttributeCallback callback);
+
+    private native void readNullableFloatDoubleAttribute(
+        long chipClusterPtr, NullableFloatDoubleAttributeCallback callback);
+
+    private native void writeNullableFloatDoubleAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, @Nullable Double value);
+
+    private native void subscribeNullableFloatDoubleAttribute(
+        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
+
+    private native void reportNullableFloatDoubleAttribute(
+        long chipClusterPtr, DoubleAttributeCallback callback);
 
     private native void readNullableOctetStringAttribute(
         long chipClusterPtr, NullableOctetStringAttributeCallback callback);

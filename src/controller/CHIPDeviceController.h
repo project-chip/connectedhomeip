@@ -311,10 +311,16 @@ public:
      *                            the PIN code provied in the setupPayload).
      * @param[in] callback        The function to be called on success or failure of opening of commissioning window.
      *
+     * @param[in] readVIDPIDAttributes Should the API internally read VID and PID from the device while opening the
+     *                                 commissioning window. VID and PID is only needed for enchanced commissioning mode.
+     *                                 If this argument is `true`, and enhanced commissioning mode is used, the API will
+     *                                 read VID and PID from the device.
+     *
      * @return CHIP_ERROR         CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR OpenCommissioningWindowWithCallback(NodeId deviceId, uint16_t timeout, uint16_t iteration, uint16_t discriminator,
-                                                   uint8_t option, Callback::Callback<OnOpenCommissioningWindow> * callback);
+                                                   uint8_t option, Callback::Callback<OnOpenCommissioningWindow> * callback,
+                                                   bool readVIDPIDAttributes = false);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     void RegisterDeviceAddressUpdateDelegate(DeviceAddressUpdateDelegate * delegate) { mDeviceAddressUpdateDelegate = delegate; }
@@ -396,10 +402,21 @@ private:
     Callback::Callback<DefaultSuccessCallback> mOpenPairingSuccessCallback;
     Callback::Callback<DefaultFailureCallback> mOpenPairingFailureCallback;
 
+    static void OnPIDReadResponse(void * context, uint16_t value);
+    static void OnVIDReadResponse(void * context, uint16_t value);
+    static void OnVIDPIDReadFailureResponse(void * context, EmberAfStatus status);
+
+    CHIP_ERROR OpenCommissioningWindowInternal();
+
     // TODO - Support opening commissioning window simultaneously on multiple devices
     Callback::Callback<OnOpenCommissioningWindow> * mCommissioningWindowCallback = nullptr;
     SetupPayload mSetupPayload;
     NodeId mDeviceWithCommissioningWindowOpen;
+
+    uint16_t mCommissioningWindowTimeout;
+    uint16_t mCommissioningWindowIteration;
+
+    CommissioningWindowOption mCommissioningWindowOption;
 
     static void OnOpenPairingWindowSuccessResponse(void * context);
     static void OnOpenPairingWindowFailureResponse(void * context, uint8_t status);

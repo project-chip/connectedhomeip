@@ -85,7 +85,7 @@ void TestRealClock(nlTestSuite * inSuite, void * inContext)
 
 void TestMockClock(nlTestSuite * inSuite, void * inContext)
 {
-    class MockClock : public Clock::ClockBase
+    class MockClock : public Clock::ClockImpl
     {
     public:
         Clock::Microseconds64 GetMonotonicMicroseconds64() override { return mTime; }

@@ -35,24 +35,24 @@ class Device : public generated::Device<Device>
 public:
     virtual ~Device() = default;
 
-    virtual pw::Status FactoryReset(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    virtual pw::Status FactoryReset(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
         DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
         return pw::OkStatus();
     }
 
-    virtual pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    virtual pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
         return pw::Status::Unimplemented();
     }
 
-    virtual pw::Status TriggerOta(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    virtual pw::Status TriggerOta(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
         // TODO: auto err = DeviceLayer::SoftwareUpdateMgr().CheckNow();
         return pw::Status::Unimplemented();
     }
 
-    virtual pw::Status GetDeviceState(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceState & response)
+    virtual pw::Status GetDeviceState(const pw_protobuf_Empty & request, chip_rpc_DeviceState & response)
     {
         uint64_t time_since_boot_sec;
         DeviceLayer::GetDiagnosticDataProvider().GetUpTime(time_since_boot_sec);
@@ -71,7 +71,7 @@ public:
         return pw::OkStatus();
     }
 
-    virtual pw::Status GetDeviceInfo(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceInfo & response)
+    virtual pw::Status GetDeviceInfo(const pw_protobuf_Empty & request, chip_rpc_DeviceInfo & response)
     {
 
         uint16_t vendor_id;
@@ -127,7 +127,7 @@ public:
         return pw::OkStatus();
     }
 
-    virtual pw::Status SetPairingInfo(ServerContext &, const chip_rpc_PairingInfo & request, pw_protobuf_Empty & response)
+    virtual pw::Status SetPairingInfo(const chip_rpc_PairingInfo & request, pw_protobuf_Empty & response)
     {
         if (DeviceLayer::ConfigurationMgr().StoreSetupPinCode(request.code) != CHIP_NO_ERROR ||
             DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(request.discriminator) != CHIP_NO_ERROR)

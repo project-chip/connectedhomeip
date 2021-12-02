@@ -714,15 +714,6 @@ enum EmberAfSetpointAdjustMode : uint8_t
     EMBER_ZCL_SETPOINT_ADJUST_MODE_HEAT_AND_COOL_SETPOINTS = 2,
 };
 
-// Enum for SimpleEnum
-enum EmberAfSimpleEnum : uint8_t
-{
-    EMBER_ZCL_SIMPLE_ENUM_UNSPECIFIED = 0,
-    EMBER_ZCL_SIMPLE_ENUM_VALUE_A     = 1,
-    EMBER_ZCL_SIMPLE_ENUM_VALUE_B     = 2,
-    EMBER_ZCL_SIMPLE_ENUM_VALUE_C     = 3,
-};
-
 // Enum for StartUpOnOffValue
 enum EmberAfStartUpOnOffValue : uint8_t
 {

@@ -230,6 +230,42 @@ void CHIPNullableInt64sAttributeCallbackBridge::OnSuccessFn(void * context, cons
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPFloatAttributeCallbackBridge::OnSuccessFn(void * context, float value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithFloat:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableFloatAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<float> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithFloat:value.Value()];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPDoubleAttributeCallbackBridge::OnSuccessFn(void * context, double value)
+{
+    NSNumber * _Nonnull objCValue;
+    objCValue = [NSNumber numberWithDouble:value];
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPNullableDoubleAttributeCallbackBridge::OnSuccessFn(void * context, const chip::app::DataModel::Nullable<double> & value)
+{
+    NSNumber * _Nullable objCValue;
+    if (value.IsNull()) {
+        objCValue = nil;
+    } else {
+        objCValue = [NSNumber numberWithDouble:value.Value()];
+    }
+    DispatchSuccess(context, objCValue);
+};
+
 void CHIPVendorIdAttributeCallbackBridge::OnSuccessFn(void * context, chip::VendorId value)
 {
     NSNumber * _Nonnull objCValue;
@@ -493,6 +529,12 @@ void CHIPFixedLabelLabelListListAttributeCallbackBridge::OnSuccessFn(void * cont
         newElement_0 = [CHIPFixedLabelClusterLabelStruct new];
         newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
                                                       length:entry_0.label.size()
+                                                    encoding:NSUTF8StringEncoding];
+        newElement_0.label = [[NSString alloc] initWithBytes:entry_0.label.data()
+                                                      length:entry_0.label.size()
+                                                    encoding:NSUTF8StringEncoding];
+        newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
+                                                      length:entry_0.value.size()
                                                     encoding:NSUTF8StringEncoding];
         newElement_0.value = [[NSString alloc] initWithBytes:entry_0.value.data()
                                                       length:entry_0.value.size()

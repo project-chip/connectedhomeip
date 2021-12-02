@@ -309,6 +309,32 @@ static void OnInt64sAttributeResponse(void * context, int64_t value)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
+static void OnFloatAttributeReport(void * context, float value)
+{
+    ChipLogProgress(chipTool, "Float attribute Response: %f", value);
+}
+
+static void OnFloatAttributeResponse(void * context, float value)
+{
+    OnFloatAttributeReport(context, value);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnDoubleAttributeReport(void * context, double value)
+{
+    ChipLogProgress(chipTool, "Double attribute Response: %f", value);
+}
+
+static void OnDoubleAttributeResponse(void * context, double value)
+{
+    OnDoubleAttributeReport(context, value);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
 static void OnOctetStringAttributeReport(void * context, const chip::ByteSpan value)
 {
     char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];

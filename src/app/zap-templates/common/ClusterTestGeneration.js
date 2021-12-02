@@ -29,6 +29,7 @@ const templateUtil = require(zapPath + 'dist/src-electron/generator/template-uti
 const { getClusters, getCommands, getAttributes, isTestOnlyCluster } = require('./simulated-clusters/SimulatedClusters.js');
 const { asBlocks }                                                   = require('./ClustersHelper.js');
 
+const kIdentityName           = 'identity';
 const kClusterName            = 'cluster';
 const kEndpointName           = 'endpoint';
 const kGroupId                = 'groupId';
@@ -275,11 +276,13 @@ function setDefaultResponse(test)
 
 function setDefaults(test, defaultConfig)
 {
-  const defaultClusterName = defaultConfig[kClusterName] || null;
-  const defaultEndpointId  = kEndpointName in defaultConfig ? defaultConfig[kEndpointName] : null;
-  const defaultDisabled    = false;
+  const defaultIdentityName = kIdentityName in defaultConfig ? defaultConfig[kIdentityName] : "alpha";
+  const defaultClusterName  = defaultConfig[kClusterName] || null;
+  const defaultEndpointId   = kEndpointName in defaultConfig ? defaultConfig[kEndpointName] : null;
+  const defaultDisabled     = false;
 
   setDefaultType(test);
+  setDefault(test, kIdentityName, defaultIdentityName);
   setDefault(test, kClusterName, defaultClusterName);
   setDefault(test, kEndpointName, defaultEndpointId);
   setDefault(test, kDisabledName, defaultDisabled);

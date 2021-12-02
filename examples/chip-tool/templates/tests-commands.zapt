@@ -4,6 +4,7 @@
 
 #include <commands/tests/TestCommand.h>
 #include <commands/common/CommandInvoker.h>
+#include <math.h> // For INFINITY
 
 class TestList : public Command
 {

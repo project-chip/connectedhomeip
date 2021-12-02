@@ -371,6 +371,7 @@ target_include_directories(${APP_TARGET} PRIVATE
                     ${PIGWEED_ROOT}/pw_log_basic/public_overrides
                     ${PIGWEED_ROOT}/pw_span/public_overrides
                     ${PIGWEED_ROOT}/pw_span/public
+                    ${PIGWEED_ROOT}/pw_sync/public
                     ${PIGWEED_ROOT}/pw_polyfill/public
                     ${PIGWEED_ROOT}/pw_polyfill/standard_library_public
                     ${PIGWEED_ROOT}/pw_polyfill/public_overrides

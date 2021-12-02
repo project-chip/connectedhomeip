@@ -47,8 +47,6 @@ class ReliableMessageContext
 public:
     ReliableMessageContext();
 
-    void SetConfig(ReliableMessageProtocolConfig config) { mConfig = config; }
-
     /**
      * Flush the pending Ack for current exchange.
      *
@@ -73,22 +71,6 @@ public:
      * should be included as an ack in the message.
      */
     bool HasPiggybackAckPending() const;
-
-    /**
-     *  Get the idle retransmission interval. It would be the time to wait before
-     *  retransmission after first failure.
-     *
-     *  @return the idle retransmission interval.
-     */
-    uint64_t GetIdleRetransmitTimeoutTick();
-
-    /**
-     *  Get the active retransmit interval. It would be the time to wait before
-     *  retransmission after subsequent failures.
-     *
-     *  @return the active retransmission interval.
-     */
-    uint64_t GetActiveRetransmitTimeoutTick();
 
     /**
      *  Send a SecureChannel::StandaloneAck message.
@@ -241,8 +223,7 @@ private:
     friend class ExchangeContext;
     friend class ExchangeMessageDispatch;
 
-    ReliableMessageProtocolConfig mConfig;
-    uint16_t mNextAckTimeTick; // Next time for triggering Solo Ack
+    System::Clock::Timestamp mNextAckTime; // Next time for triggering Solo Ack
     uint32_t mPendingPeerAckMessageCounter;
 };
 

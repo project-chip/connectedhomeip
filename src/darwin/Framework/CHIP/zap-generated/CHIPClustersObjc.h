@@ -1651,6 +1651,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)readAttributeBasicCommissioningInfoListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
 
+- (void)readAttributeRegulatoryConfigWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeLocationCapabilityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
@@ -3463,6 +3469,24 @@ NS_ASSUME_NONNULL_BEGIN
                                 responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeEnum16WithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
+- (void)readAttributeFloatSingleWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeFloatSingleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeFloatSingleWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeFloatSingleWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeFloatDoubleWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeFloatDoubleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeFloatDoubleWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeFloatDoubleWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
 - (void)readAttributeOctetStringWithCompletionHandler:(void (^)(
                                                           NSData * _Nullable value, NSError * _Nullable error))completionHandler;
 - (void)writeAttributeOctetStringWithValue:(NSData * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -3797,6 +3821,26 @@ NS_ASSUME_NONNULL_BEGIN
                                         responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeNullableEnum16WithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableFloatSingleWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableFloatSingleWithValue:(NSNumber * _Nullable)value
+                                 completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableFloatSingleWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableFloatSingleWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableFloatDoubleWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableFloatDoubleWithValue:(NSNumber * _Nullable)value
+                                 completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableFloatDoubleWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableFloatDoubleWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
 - (void)readAttributeNullableOctetStringWithCompletionHandler:(void (^)(NSData * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
