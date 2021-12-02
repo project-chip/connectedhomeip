@@ -559,8 +559,8 @@ bool emberAfTestClusterClusterTestSimpleOptionalArgumentRequestCallback(
     CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
     const Commands::TestSimpleOptionalArgumentRequest::DecodableType & commandData)
 {
-    Protocols::InteractionModel::Status status =
-        commandData.arg1.HasValue() ? Protocols::InteractionModel::Status::Success : Protocols::InteractionModel::Status::InvalidValue;
+    Protocols::InteractionModel::Status status = commandData.arg1.HasValue() ? Protocols::InteractionModel::Status::Success
+                                                                             : Protocols::InteractionModel::Status::InvalidValue;
     commandObj->AddStatus(commandPath, status);
     return true;
 }
