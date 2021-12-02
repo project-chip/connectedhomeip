@@ -26755,6 +26755,52 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
+- (void)testSendClusterTestCluster_000295_TestSimpleOptionalArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send a command that takes an optional parameter but do not set it."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams alloc] init];
+    [cluster
+        testSimpleOptionalArgumentRequestWithParams:params
+                                  completionHandler:^(NSError * _Nullable err) {
+                                      NSLog(@"Send a command that takes an optional parameter but do not set it. Error: %@", err);
+
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_INVALID_VALUE);
+                                      [expectation fulfill];
+                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000296_TestSimpleOptionalArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send a command that takes an optional parameter but do not set it."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams alloc] init];
+    params.arg1 = [NSNumber numberWithBool:1];
+    [cluster
+        testSimpleOptionalArgumentRequestWithParams:params
+                                  completionHandler:^(NSError * _Nullable err) {
+                                      NSLog(@"Send a command that takes an optional parameter but do not set it. Error: %@", err);
+
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                      [expectation fulfill];
+                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
 
 - (void)testSendClusterTestSaveAs_000000_WaitForCommissionee
 {

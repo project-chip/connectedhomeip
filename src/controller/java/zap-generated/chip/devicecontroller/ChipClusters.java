@@ -10832,6 +10832,11 @@ public class ChipClusters {
       testNullableOptionalRequest(chipClusterPtr, callback, arg1);
     }
 
+    public void testSimpleOptionalArgumentRequest(
+        DefaultClusterCallback callback, Optional<Boolean> arg1) {
+      testSimpleOptionalArgumentRequest(chipClusterPtr, callback, arg1);
+    }
+
     public void testSpecific(TestSpecificResponseCallback callback) {
       testSpecific(chipClusterPtr, callback);
     }
@@ -10920,6 +10925,9 @@ public class ChipClusters {
 
     private native void testNullableOptionalRequest(
         long chipClusterPtr, TestNullableOptionalResponseCallback Callback, Optional<Integer> arg1);
+
+    private native void testSimpleOptionalArgumentRequest(
+        long chipClusterPtr, DefaultClusterCallback Callback, Optional<Boolean> arg1);
 
     private native void testSpecific(long chipClusterPtr, TestSpecificResponseCallback Callback);
 

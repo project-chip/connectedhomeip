@@ -33425,6 +33425,16 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 294 : Read attribute from nonexistent cluster.\n");
             err = TestReadAttributeFromNonexistentCluster_294();
             break;
+        case 295:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 295 : Send a command that takes an optional parameter but do not set it.\n");
+            err = TestSendACommandThatTakesAnOptionalParameterButDoNotSetIt_295();
+            break;
+        case 296:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 296 : Send a command that takes an optional parameter but do not set it.\n");
+            err = TestSendACommandThatTakesAnOptionalParameterButDoNotSetIt_296();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -33436,7 +33446,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 295;
+    const uint16_t mTestCount = 297;
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
     {
@@ -41937,6 +41947,57 @@ private:
     }
 
     void OnSuccessResponse_294(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u) { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestSendACommandThatTakesAnOptionalParameterButDoNotSetIt_295()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_295();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestCluster *>(context))->OnFailureResponse_295(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_295(uint8_t status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_INVALID_VALUE));
+        NextTest();
+    }
+
+    void OnSuccessResponse_295() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestSendACommandThatTakesAnOptionalParameterButDoNotSetIt_296()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::TestCluster::Commands::TestSimpleOptionalArgumentRequest::Type;
+
+        RequestType request;
+        request.arg1.Emplace() = 1;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_296();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestCluster *>(context))->OnFailureResponse_296(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_296(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_296() { NextTest(); }
 };
 
 class TestClusterComplexTypes : public TestCommand
