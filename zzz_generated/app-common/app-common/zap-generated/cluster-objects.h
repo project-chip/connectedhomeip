@@ -28601,9 +28601,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ApplicationBasicStatus
 enum class ApplicationBasicStatus : uint8_t
 {
@@ -28612,9 +28609,6 @@ enum class ApplicationBasicStatus : uint8_t
     kActiveHidden          = 0x02,
     kActiveVisibleNotFocus = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ApplicationBasicStatus          = EmberAfApplicationBasicStatus;
-#endif
 
 namespace Commands {
 // Forward-declarations so we can reference these later.

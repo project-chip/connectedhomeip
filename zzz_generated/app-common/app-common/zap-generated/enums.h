@@ -24,15 +24,6 @@
 
 // ZCL enums
 
-// Enum for ApplicationBasicStatus
-enum EmberAfApplicationBasicStatus : uint8_t
-{
-    EMBER_ZCL_APPLICATION_BASIC_STATUS_STOPPED                  = 0,
-    EMBER_ZCL_APPLICATION_BASIC_STATUS_ACTIVE_VISIBLE_FOCUS     = 1,
-    EMBER_ZCL_APPLICATION_BASIC_STATUS_ACTIVE_HIDDEN            = 2,
-    EMBER_ZCL_APPLICATION_BASIC_STATUS_ACTIVE_VISIBLE_NOT_FOCUS = 3,
-};
-
 // Enum for ApplicationLauncherStatus
 enum EmberAfApplicationLauncherStatus : uint8_t
 {
