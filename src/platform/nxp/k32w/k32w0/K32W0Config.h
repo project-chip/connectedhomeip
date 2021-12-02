@@ -94,7 +94,6 @@ public:
     static constexpr Key kCounterKey_TotalOperationalHours = K32WConfigKey(kPDMId_ChipConfig, 0x0C);
     static constexpr Key kCounterKey_BootReason            = K32WConfigKey(kPDMId_ChipConfig, 0x0D);
 
-
     // Set key id limits for each group.
     static constexpr Key kMinConfigKey_ChipFactory = K32WConfigKey(kPDMId_ChipFactory, 0x00);
     static constexpr Key kMaxConfigKey_ChipFactory = K32WConfigKey(kPDMId_ChipFactory, 0x08);

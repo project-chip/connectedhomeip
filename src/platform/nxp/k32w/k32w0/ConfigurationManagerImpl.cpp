@@ -30,8 +30,8 @@
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 #include <platform/nxp/k32w/k32w0/K32W0Config.h>
 
-#include "fsl_reset.h"
 #include "fsl_power.h"
+#include "fsl_reset.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -139,7 +139,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
     {
         bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET;
     }
-	else if (reason == RESET_WDT)
+    else if (reason == RESET_WDT)
     {
         bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET;
         /* Reboot can be due to hardware or software watchdog */
