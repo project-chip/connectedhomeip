@@ -78,6 +78,93 @@ tests:
               - name: "optionsOverride"
                 value: 0
 
+    - label: "Read CurrentSaturation attribute from DUT several times"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          value: 0
+
+    - label: "Move saturation up command"
+      command: "MoveSaturation"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 1
+              - name: "rate"
+                value: 5
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read CurrentSaturation attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          value: 0
+
+    - label: "Move saturation stop command"
+      command: "MoveSaturation"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 5
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read CurrentSaturation attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          value: 0
+
+    - label: "Move saturation down command"
+      command: "MoveSaturation"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 3
+              - name: "rate"
+                value: 5
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read CurrentSaturation attribute from DUT several times"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          value: 0
+
+    - label: "Move saturation stop command"
+      command: "MoveSaturation"
+      arguments:
+          values:
+              - name: "moveMode"
+                value: 0
+              - name: "rate"
+                value: 5
+              - name: "optionsMask"
+                value: 0
+              - name: "optionsOverride"
+                value: 0
+
+    - label: "Read CurrentSaturation attribute from DUT"
+      disabled: true
+      command: "readAttribute"
+      attribute: "current saturation"
+      response:
+          value: 0
+
     - label: "Turn off light that we turned on"
       cluster: "On/Off"
       command: "off"
