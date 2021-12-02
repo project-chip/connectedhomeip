@@ -227,14 +227,14 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
 
     VerifyOrExit(clusterInfoList != nullptr, );
     VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    // If the eventManager is not valid or has not been initialized,
+    // skip the rest of processing
+    VerifyOrExit(eventManager.IsValid(), ChipLogError(DataManagement, "EventManagement has not yet initialized"));
 
     EventReports = aReportDataBuilder.CreateEventReports();
     SuccessOrExit(err = EventReports.GetError());
 
     memcpy(initialEvents, eventNumberList, sizeof(initialEvents));
-    // If the eventManager is not valid or has not been initialized,
-    // skip the rest of processing
-    VerifyOrExit(eventManager.IsValid(), err = CHIP_ERROR_INCORRECT_STATE);
 
     for (size_t index = 0; index < kNumPriorityLevel; index++)
     {
