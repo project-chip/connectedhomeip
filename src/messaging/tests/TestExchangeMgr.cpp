@@ -49,7 +49,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
-using TestContext = chip::Test::MessagingContext;
+using TestContext = chip::Test::LoopbackMessagingContext<Test::LoopbackTransport>;
 
 enum : uint8_t
 {
@@ -58,9 +58,6 @@ enum : uint8_t
 };
 
 TestContext sContext;
-
-TransportMgr<Test::LoopbackTransport> gTransportMgr;
-Test::IOContext gIOContext;
 
 class MockAppDelegate : public ExchangeDelegate
 {
@@ -234,45 +231,15 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-int Initialize(void * aContext);
-int Finalize(void * aContext);
-
 // clang-format off
 nlTestSuite sSuite =
 {
     "Test-CHIP-ExchangeManager",
     &sTests[0],
-    Initialize,
-    Finalize
+    TestContext::Initialize,
+    TestContext::Finalize
 };
 // clang-format on
-
-/**
- *  Initialize the test suite.
- */
-int Initialize(void * aContext)
-{
-    // Initialize System memory and resources
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gIOContext.Init() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gTransportMgr.Init("LOOPBACK") == CHIP_NO_ERROR, FAILURE);
-
-    auto * ctx = static_cast<TestContext *>(aContext);
-    VerifyOrReturnError(ctx->Init(&gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
-
-    return SUCCESS;
-}
-
-/**
- *  Finalize the test suite.
- */
-int Finalize(void * aContext)
-{
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
-    gIOContext.Shutdown();
-    chip::Platform::MemoryShutdown();
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
-}
 
 } // namespace
 
