@@ -218,13 +218,20 @@ def Efr32Targets():
 
     board_targets = [
         efr_target.Extend('brd4161a', board=Efr32Board.BRD4161A),
-        efr_target.Extend('brd4163a', board=Efr32Board.BRD4163A).GlobBlacklist('only user requested'),
-        efr_target.Extend('brd4164a', board=Efr32Board.BRD4164A).GlobBlacklist('only user requested'),
-        efr_target.Extend('brd4166a', board=Efr32Board.BRD4166A).GlobBlacklist('only user requested'),
-        efr_target.Extend('brd4170a', board=Efr32Board.BRD4170A).GlobBlacklist('only user requested'),
-        efr_target.Extend('brd4186a', board=Efr32Board.BRD4186A).GlobBlacklist('only user requested'),
-        efr_target.Extend('brd4187a', board=Efr32Board.BRD4187A).GlobBlacklist('only user requested'),
-        efr_target.Extend('brd4304a', board=Efr32Board.BRD4304A).GlobBlacklist('only user requested')
+        efr_target.Extend('brd4163a', board=Efr32Board.BRD4163A).GlobBlacklist(
+            'only user requested'),
+        efr_target.Extend('brd4164a', board=Efr32Board.BRD4164A).GlobBlacklist(
+            'only user requested'),
+        efr_target.Extend('brd4166a', board=Efr32Board.BRD4166A).GlobBlacklist(
+            'only user requested'),
+        efr_target.Extend('brd4170a', board=Efr32Board.BRD4170A).GlobBlacklist(
+            'only user requested'),
+        efr_target.Extend('brd4186a', board=Efr32Board.BRD4186A).GlobBlacklist(
+            'only user requested'),
+        efr_target.Extend('brd4187a', board=Efr32Board.BRD4187A).GlobBlacklist(
+            'only user requested'),
+        efr_target.Extend('brd4304a', board=Efr32Board.BRD4304A).GlobBlacklist(
+            'only user requested')
     ]
 
     for board_target in board_targets:
