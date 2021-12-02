@@ -10773,8 +10773,8 @@ class UserLabel(Cluster):
                             Label="value", Tag=2, Type=str),
                     ])
 
-            label: 'str' = None
-            value: 'str' = None
+            label: 'str' = ""
+            value: 'str' = ""
 
     class Attributes:
         @dataclass
@@ -10791,7 +10791,8 @@ class UserLabel(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=typing.List[UserLabel.Structs.LabelStruct])
 
-            value: 'typing.List[UserLabel.Structs.LabelStruct]' = None
+            value: 'typing.List[UserLabel.Structs.LabelStruct]' = field(
+                default_factory=lambda: [])
 
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
@@ -10823,7 +10824,7 @@ class UserLabel(Cluster):
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:
                 return ClusterObjectFieldDescriptor(Type=uint)
 
-            value: 'uint' = None
+            value: 'uint' = 0
 
 
 @dataclass
