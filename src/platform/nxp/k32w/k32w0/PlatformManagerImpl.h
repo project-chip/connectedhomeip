@@ -62,7 +62,8 @@ private:
     CHIP_ERROR _GetRebootCount(uint16_t & rebootCount);
     CHIP_ERROR _GetUpTime(uint64_t & upTime);
     CHIP_ERROR _GetTotalOperationalHours(uint32_t & totalOperationalHours);
-    CHIP_ERROR _GetBootReasons(uint8_t & bootReasons);;
+    CHIP_ERROR _GetBootReasons(uint8_t & bootReasons);
+    ;
     // ===== Members for internal use by the following friends.
 
     friend PlatformManager & PlatformMgr(void);
