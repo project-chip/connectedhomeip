@@ -98,6 +98,20 @@ void RecordWriter::WriteQName(const FullQName & qname)
     }
 }
 
+void RecordWriter::WriteQName(const SerializedQNameIterator & qname)
+{
+    // FIXME: Make this work
+
+    SerializedQNameIterator copy = qname;
+    while (copy.Next())
+    {
+
+        mOutput->Put8(static_cast<uint8_t>(strlen(copy.Value())));
+        mOutput->Put(copy.Value());
+    }
+    mOutput->Put8(0); // end of qnames
+}
+
 void RecordWriter::RememberWrittenQnameOffset(size_t offset)
 {
     if (offset > kMaxReuseOffset)

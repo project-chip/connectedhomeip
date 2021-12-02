@@ -49,6 +49,10 @@ public:
     /// compression if possible
     void WriteQName(const FullQName & qname);
 
+    /// Writes  the given qname into the underlying buffer, applying
+    /// compression if possible
+    void WriteQName(const SerializedQNameIterator & qname);
+
 private:
     // How  many paths to remember as 'previously written'
     // and make use of them

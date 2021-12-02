@@ -107,7 +107,7 @@ public:
             return *this;
         }
 
-        if (!query.Append(mHeader, mEndianOutput))
+        if (!query.Append(mHeader, mWriter))
         {
             mBuildOk = false;
         }
