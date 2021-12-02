@@ -56,6 +56,9 @@ public:
         VerifyOrDie(params.sessionInitParams.Validate() == CHIP_NO_ERROR);
 
         mConfig = params;
+
+        // TODO: Revisit who should be set as the resolver delegate
+        Dnssd::Resolver::Instance().SetResolverDelegate(this);
     }
 
     virtual ~CASESessionManager() {}
