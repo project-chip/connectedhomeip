@@ -20,7 +20,7 @@
 
 #include <app/ConcreteEventPath.h>
 #include <app/EventLoggingDelegate.h>
-#include <app/data-model/Decode.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/List.h> // So we can encode lists
 
 namespace chip {
