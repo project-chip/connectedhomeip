@@ -21,9 +21,8 @@
  */
 #pragma once
 
-#include <lib/support/PersistedCounter.h>
 #include <crypto/RandUtils.h>
-
+#include <lib/support/PersistedCounter.h>
 
 namespace chip {
 
@@ -108,14 +107,12 @@ private:
 class LocalSessionMessageCounter : public MessageCounter
 {
 public:
-    static constexpr uint32_t kInitialValue = 1;    ///< Used for initializing peer counter
+    static constexpr uint32_t kInitialValue = 1; ///< Used for initializing peer counter
 
     /**
      * Initialize a local message counter with random value between [0, 2^28-1].
      */
-    LocalSessionMessageCounter() {
-        value = Crypto::GetRandU32() & 0x0FFFFFFF;
-    }
+    LocalSessionMessageCounter() { value = Crypto::GetRandU32() & 0x0FFFFFFF; }
 
     Type GetType() override { return Session; }
     uint32_t Value() override { return value; }
