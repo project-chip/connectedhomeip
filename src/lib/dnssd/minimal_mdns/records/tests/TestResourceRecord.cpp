@@ -108,17 +108,13 @@ void CanWriteMultipleRecords(nlTestSuite * inSuite, void * inContext)
         0x11, 0x22, 0x33, 0x44,                     // TTL
         0,    8,                                    // data size
         's',  'o',  'm',  'e',  'd', 'a', 't', 'a', //
-        3,    'f',  'o',  'o',                      // QNAME part: foo
-        3,    'b',  'a',  'r',                      // QNAME part: bar
-        0,                                          // QNAME ends
+        0xC0, 0x00,                                 // PTR: foo.bar
         0,    255,                                  // QType ANY (totally fake)
         0,    1,                                    // QClass IN
         0,    0,    0,    0,                        // TTL
         0,    8,                                    // data size
         'm',  'o',  'r',  'e',  'd', 'a', 't', 'a', //
-        3,    'f',  'o',  'o',                      // QNAME part: foo
-        3,    'b',  'a',  'r',                      // QNAME part: bar
-        0,                                          // QNAME ends
+        0xC0, 0x00,                                 // PTR: foo.bar
         0,    255,                                  // QType ANY (totally fake)
         0,    1,                                    // QClass IN
         0,    0,    0,    0xFF,                     // TTL
