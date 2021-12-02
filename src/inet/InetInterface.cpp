@@ -165,6 +165,16 @@ bool InterfaceIterator::HasBroadcastAddress()
     return HasCurrent() && (mCurNetif->flags & NETIF_FLAG_BROADCAST) != 0;
 }
 
+CHIP_ERROR InterfaceIterator::GetInterfaceType(InterfaceType & type)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR InterfaceIterator::GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 bool InterfaceAddressIterator::HasCurrent()
 {
     return mIntfIter.HasCurrent() && ((mCurAddrIndex != kBeforeStartIndex) || Next());
@@ -619,6 +629,16 @@ short InterfaceIterator::GetFlags()
     return mIntfFlags;
 }
 
+CHIP_ERROR InterfaceIterator::GetInterfaceType(InterfaceType & type)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR InterfaceIterator::GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 InterfaceAddressIterator::InterfaceAddressIterator()
 {
     mAddrsList = nullptr;
@@ -848,6 +868,52 @@ bool InterfaceIterator::HasBroadcastAddress()
 {
     // Zephyr seems to handle broadcast address for IPv4 implicitly
     return HasCurrent() && INET_CONFIG_ENABLE_IPV4;
+}
+
+CHIP_ERROR InterfaceIterator::GetInterfaceType(InterfaceType & type)
+{
+    VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
+
+    const net_linkaddr * linkAddr = net_if_get_link_addr(mCurrentInterface);
+    if (!linkAddr)
+        return CHIP_ERROR_INCORRECT_STATE;
+
+    // Do not consider other than WiFi and Thread for now.
+    if (linkAddr->type == NET_LINK_IEEE802154)
+    {
+        type = InterfaceType::Thread;
+    }
+    // Zephyr doesn't define WiFi address type, so it shares the same type as Ethernet.
+    else if (linkAddr->type == NET_LINK_ETHERNET)
+    {
+        type = InterfaceType::WiFi;
+    }
+    else
+    {
+        type = InterfaceType::Unknown;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR InterfaceIterator::GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize)
+{
+    VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
+
+    if (!addressBuffer)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    const net_linkaddr * linkAddr = net_if_get_link_addr(mCurrentInterface);
+    if (!linkAddr)
+        return CHIP_ERROR_INCORRECT_STATE;
+
+    if (linkAddr->len > addressBufferSize)
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+
+    addressSize = linkAddr->len;
+    memcpy(addressBuffer, linkAddr->addr, linkAddr->len);
+
+    return CHIP_NO_ERROR;
 }
 
 InterfaceAddressIterator::InterfaceAddressIterator() = default;

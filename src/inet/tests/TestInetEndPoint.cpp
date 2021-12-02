@@ -126,6 +126,12 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
     InterfaceId intId;
     IPAddress addr;
     IPPrefix addrWithPrefix;
+    InterfaceType intType;
+    // 64 bit IEEE MAC address
+    const uint8_t kMaxHardwareAddressSize = 8;
+    uint8_t intHwAddress[kMaxHardwareAddressSize];
+    uint8_t intHwAddressSize;
+
     CHIP_ERROR err;
 
 #ifndef __MBED__
@@ -165,12 +171,35 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
 
         intId.GetLinkLocalAddr(&addr);
         InterfaceId::MatchLocalIPv6Subnet(addr);
+
+        // Not all platforms support getting interface type and hardware address
+        err = intIterator.GetInterfaceType(intType);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED);
+
+        err = intIterator.GetHardwareAddress(intHwAddress, intHwAddressSize, sizeof(intHwAddress));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED);
+        if (err == CHIP_NO_ERROR)
+        {
+            NL_TEST_ASSERT(inSuite, intHwAddressSize == 6 || intHwAddressSize == 8);
+            NL_TEST_ASSERT(inSuite,
+                           intIterator.GetHardwareAddress(nullptr, intHwAddressSize, sizeof(intHwAddress)) ==
+                               CHIP_ERROR_INVALID_ARGUMENT);
+            NL_TEST_ASSERT(inSuite,
+                           intIterator.GetHardwareAddress(intHwAddress, intHwAddressSize, 4) == CHIP_ERROR_BUFFER_TOO_SMALL);
+        }
     }
+
     NL_TEST_ASSERT(inSuite, !intIterator.Next());
     NL_TEST_ASSERT(inSuite, intIterator.GetInterfaceId() == InterfaceId::Null());
     NL_TEST_ASSERT(inSuite, intIterator.GetInterfaceName(intName, sizeof(intName)) == CHIP_ERROR_INCORRECT_STATE);
     NL_TEST_ASSERT(inSuite, !intIterator.SupportsMulticast());
     NL_TEST_ASSERT(inSuite, !intIterator.HasBroadcastAddress());
+
+    // Not all platforms support getting interface type and hardware address
+    err = intIterator.GetInterfaceType(intType);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE || err == CHIP_ERROR_NOT_IMPLEMENTED);
+    err = intIterator.GetHardwareAddress(intHwAddress, intHwAddressSize, sizeof(intHwAddress));
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE || err == CHIP_ERROR_NOT_IMPLEMENTED);
 
     printf("    Addresses:\n");
     for (; addrIterator.HasCurrent(); addrIterator.Next())

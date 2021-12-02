@@ -35,6 +35,13 @@ using chip::DeviceLayer::ConnectivityMgr;
 using chip::DeviceLayer::DiagnosticDataProvider;
 using chip::DeviceLayer::GetDiagnosticDataProvider;
 
+static_assert(sizeof(DiagnosticDataProvider::BootReasonType) == sizeof(EmberAfBootReasonType),
+              "BootReasonType size doesn't match EmberAfBootReasonType size");
+static_assert(static_cast<uint8_t>(DiagnosticDataProvider::BootReasonType::Unspecified) == EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED &&
+                  static_cast<uint8_t>(DiagnosticDataProvider::BootReasonType::SoftwareReset) ==
+                      EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET,
+              "BootReasonType and EmberAfBootReasonType values does not match.");
+
 namespace {
 
 class GeneralDiagosticsAttrAccess : public AttributeAccessInterface

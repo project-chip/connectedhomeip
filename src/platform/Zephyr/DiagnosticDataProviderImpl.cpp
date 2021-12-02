@@ -27,6 +27,8 @@
 #include <platform/DiagnosticDataProvider.h>
 #include <platform/Zephyr/DiagnosticDataProviderImpl.h>
 
+#include <drivers/hwinfo.h>
+
 #include <malloc.h>
 
 namespace chip {
@@ -72,6 +74,131 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetCurrentHeapHighWatermark(uint64_t & cu
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetRebootCount(uint16_t & rebootCount)
+{
+    uint32_t count = 0;
+    CHIP_ERROR err = ConfigurationMgr().GetRebootCount(count);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        // If the value overflows, return UINT16 max value to provide best-effort number.
+        rebootCount = static_cast<uint16_t>(count <= UINT16_MAX ? count : UINT16_MAX);
+    }
+
+    return err;
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
+{
+#if CONFIG_HWINFO
+    uint32_t reason = 0;
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (hwinfo_get_reset_cause(&reason) != 0)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (reason & (RESET_POR | RESET_PIN))
+    {
+        bootReason = BootReasonType::PowerOnReboot;
+    }
+    else if (reason & RESET_WATCHDOG)
+    {
+        bootReason = BootReasonType::SoftwareWatchdogReset;
+    }
+    else if (reason & RESET_BROWNOUT)
+    {
+        bootReason = BootReasonType::BrownOutReset;
+    }
+    else if (reason & (RESET_SOFTWARE | RESET_CPU_LOCKUP | RESET_DEBUG))
+    {
+        bootReason = BootReasonType::SoftwareReset;
+    }
+    else
+    {
+        bootReason = BootReasonType::Unspecified;
+    }
+
+    return err;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+}
+
+CHIP_ERROR DiagnosticDataProviderImpl::GetNetworkInterfaces(NetworkInterface ** netifpp)
+{
+#if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+    NetworkInterface * head = NULL;
+
+    for (Inet::InterfaceIterator interfaceIterator; interfaceIterator.HasCurrent(); interfaceIterator.Next())
+    {
+        NetworkInterface * ifp = new NetworkInterface();
+
+        interfaceIterator.GetInterfaceName(ifp->Name, Inet::InterfaceId::kMaxIfNameLength);
+        ifp->name            = CharSpan(ifp->Name, strlen(ifp->Name));
+        ifp->fabricConnected = true;
+        Inet::InterfaceType interfaceType;
+        if (interfaceIterator.GetInterfaceType(interfaceType) == CHIP_NO_ERROR)
+        {
+            switch (interfaceType)
+            {
+            case Inet::InterfaceType::Unknown:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_UNSPECIFIED;
+                break;
+            case Inet::InterfaceType::WiFi:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_WI_FI;
+                break;
+            case Inet::InterfaceType::Ethernet:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_ETHERNET;
+                break;
+            case Inet::InterfaceType::Thread:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_THREAD;
+                break;
+            case Inet::InterfaceType::Cellular:
+                ifp->type = EMBER_ZCL_INTERFACE_TYPE_CELLULAR;
+                break;
+            }
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to get interface type");
+        }
+
+        ifp->offPremiseServicesReachableIPv4 = false;
+        ifp->offPremiseServicesReachableIPv6 = false;
+
+        uint8_t addressSize;
+        if (interfaceIterator.GetHardwareAddress(ifp->MacAddress, addressSize, sizeof(ifp->MacAddress)) != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "Failed to get network hardware address");
+        }
+        else
+        {
+            ifp->hardwareAddress = ByteSpan(ifp->MacAddress, addressSize);
+        }
+
+        head = ifp;
+    }
+
+    *netifpp = head;
+    return CHIP_NO_ERROR;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+}
+
+void DiagnosticDataProviderImpl::ReleaseNetworkInterfaces(NetworkInterface * netifp)
+{
+    while (netifp)
+    {
+        NetworkInterface * del = netifp;
+        netifp                 = netifp->Next;
+        delete del;
+    }
 }
 
 } // namespace DeviceLayer

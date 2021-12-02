@@ -42,6 +42,11 @@ public:
     CHIP_ERROR GetCurrentHeapFree(uint64_t & currentHeapFree) override;
     CHIP_ERROR GetCurrentHeapUsed(uint64_t & currentHeapUsed) override;
     CHIP_ERROR GetCurrentHeapHighWatermark(uint64_t & currentHeapHighWatermark) override;
+
+    CHIP_ERROR GetRebootCount(uint16_t & rebootCount) override;
+    CHIP_ERROR GetBootReason(uint8_t & bootReason) override;
+    CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp) override;
+    void ReleaseNetworkInterfaces(NetworkInterface * netifp) override;
 };
 
 } // namespace DeviceLayer

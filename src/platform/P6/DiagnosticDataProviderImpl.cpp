@@ -119,23 +119,23 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
     cyhal_reset_reason_t reset_reason = cyhal_system_get_reset_reason();
     if (reset_reason == CYHAL_SYSTEM_RESET_NONE)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT;
+        bootReason = BootReasonType::PowerOnReboot;
     }
     else if (reset_reason == CYHAL_SYSTEM_RESET_WDT)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET;
+        bootReason = BootReasonType::SoftwareWatchdogReset;
     }
     else if (reset_reason == CYHAL_SYSTEM_RESET_SOFT)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET;
+        bootReason = BootReasonType::SoftwareReset;
     }
     else if (reset_reason == CYHAL_SYSTEM_RESET_HIB_WAKEUP)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_HARDWARE_WATCHDOG_RESET;
+        bootReason = BootReasonType::HardwareWatchdogReset;
     }
     else
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+        bootReason = BootReasonType::Unspecified;
     }
     return CHIP_NO_ERROR;
 }
