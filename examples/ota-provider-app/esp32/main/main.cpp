@@ -21,6 +21,7 @@
 #include "esp_log.h"
 #include "esp_netif.h"
 #include "esp_spi_flash.h"
+#include "esp_spiffs.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
 #include "freertos/FreeRTOS.h"
@@ -60,7 +61,8 @@ void OnTransferComplete(void * context);
 void OnTransferFailed(void * context, BdxSenderErrorTypes status);
 
 namespace {
-const char * TAG = "ota-provider-app";
+const char * TAG               = "ota-provider-app";
+const uint8_t kMaxImagePathlen = 35;
 static DeviceCallbacks EchoCallbacks;
 BdxOtaSender bdxServer;
 
@@ -69,10 +71,11 @@ constexpr chip::EndpointId kOtaProviderEndpoint     = 0;
 constexpr uint32_t kMaxBdxBlockSize                 = 1024;
 constexpr chip::System::Clock::Timeout kBdxTimeout  = chip::System::Clock::Seconds16(5 * 60); // Specification mandates >= 5 minutes
 constexpr chip::System::Clock::Timeout kBdxPollFreq = chip::System::Clock::Milliseconds32(500);
-const char * otaFilename                            = "hello-world.bin";
-const esp_partition_t * otaPartition                = nullptr;
+const char * otaFilename                            = CONFIG_OTA_IMAGE_NAME;
+FILE * otaImageFile                                 = NULL;
 uint32_t otaImageLen                                = 0;
 uint32_t otaTransferInProgress                      = false;
+static OTAProviderExample otaProvider;
 
 chip::Callback::Callback<OnBdxBlockQuery> onBlockQueryCallback(OnBlockQuery, nullptr);
 chip::Callback::Callback<OnBdxTransferComplete> onTransferCompleteCallback(OnTransferComplete, nullptr);
@@ -83,22 +86,17 @@ CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & block
 {
     if (otaTransferInProgress == false)
     {
-        if (otaPartition == nullptr || otaImageLen == 0)
+        if (otaImageFile == NULL || otaImageLen == 0)
         {
-            ESP_LOGE(TAG, "OTA partition not found");
+            ESP_LOGE(TAG, "Failed to open the OTA image file");
             return CHIP_ERROR_OPEN_FAILED;
         }
         otaTransferInProgress = true;
     }
-
     uint16_t blockBufAvailableLength = blockBuf->AvailableDataLength();
     uint16_t transferBlockSize       = bdxServer.GetTransferBlockSize();
 
     size = (blockBufAvailableLength < transferBlockSize) ? blockBufAvailableLength : transferBlockSize;
-
-    // There are two types of messages requestor can use to query a block: `BlockQuery` and `BlockQueryWithSkip` so,
-    // to handle both case in a single callback offset is used which is managed by the `BdxOtaSender`.
-    // So, offset + size will not overflow and even if it overflows the esp_partition_read API will return an error.
     if (offset + size >= otaImageLen)
     {
         size  = otaImageLen - offset;
@@ -108,17 +106,15 @@ CHIP_ERROR OnBlockQuery(void * context, chip::System::PacketBufferHandle & block
     {
         isEof = false;
     }
-
-    esp_err_t err = esp_partition_read(otaPartition, offset + sizeof(otaImageLen), blockBuf->Start(), size);
-    if (err != ESP_OK)
+    size_t size_read = fread(blockBuf->Start(), 1, size, otaImageFile);
+    if (size_read != size)
     {
-        ESP_LOGI(TAG, "Failed to read %d bytes from offset %d", size, offset + sizeof(otaImageLen));
+        ESP_LOGE(TAG, "Failed to read %d bytes from %s", size, otaFilename);
         size  = 0;
         isEof = false;
         return CHIP_ERROR_READ_FAILED;
     }
-
-    ESP_LOGI(TAG, "Read %d bytes from offset %d", size, offset + sizeof(otaImageLen));
+    ESP_LOGI(TAG, "Read %d bytes from %s", size, otaFilename);
     return CHIP_NO_ERROR;
 }
 
@@ -157,8 +153,6 @@ extern "C" void app_main()
         return;
     }
 
-    OTAProviderExample otaProvider;
-
     CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     CHIP_ERROR error = deviceMgr.Init(&EchoCallbacks);
@@ -188,26 +182,34 @@ extern "C" void app_main()
     callbacks.onTransferFailed   = &onTransferFailedCallback;
     bdxServer.SetCallbacks(callbacks);
 
-    // If OTA image is available in flash storage then set to update available
-    otaPartition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_NVS, "ota_data");
-    if (otaPartition != nullptr)
-    {
-        ESP_LOGI(TAG, "Partition found %s address:0x%x size:0x%x", otaPartition->label, otaPartition->address, otaPartition->size);
+    esp_vfs_spiffs_conf_t spiffs_conf = {
+        .base_path              = "/spiffs",
+        .partition_label        = NULL,
+        .max_files              = 3,
+        .format_if_mount_failed = false,
+    };
 
-        // TODO: Use the OTA image header specified in the specification
-        //       Right now we are using just image length instead of full header
-        esp_partition_read(otaPartition, 0, &otaImageLen, sizeof(otaImageLen));
-        if (otaImageLen > otaPartition->size)
-        {
-            otaImageLen = 0;
-        }
-        ESP_LOGI(TAG, "OTA image length %d bytes", otaImageLen);
-    }
-    else
+    err = esp_vfs_spiffs_register(&spiffs_conf);
+    if (err != ESP_OK)
     {
-        ESP_LOGE(TAG, "OTA partition not found");
+        ESP_LOGE(TAG, "Failed to initialize SPIFFS (%s)", esp_err_to_name(err));
+        return;
     }
-
+    size_t total = 0, used = 0;
+    err = esp_spiffs_info(NULL, &total, &used);
+    ESP_LOGI(TAG, "Partition size: total: %d, used: %d", total, used);
+    char otaImagePath[kMaxImagePathlen];
+    sprintf(otaImagePath, "/spiffs/%s", otaFilename);
+    otaImageFile = fopen(otaImagePath, "r");
+    if (otaImageFile == NULL)
+    {
+        ESP_LOGE(TAG, "Failed to open %s", otaFilename);
+        return;
+    }
+    fseek(otaImageFile, 0, SEEK_END);
+    otaImageLen = ftell(otaImageFile);
+    rewind(otaImageFile);
+    ESP_LOGI(TAG, "The OTA image size: %d", otaImageLen);
     if (otaImageLen > 0)
     {
         otaProvider.SetQueryImageBehavior(OTAProviderExample::kRespondWithUpdateAvailable);
