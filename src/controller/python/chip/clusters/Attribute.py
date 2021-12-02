@@ -207,28 +207,36 @@ class AsyncReadTransaction:
                 imStatus = chip.interaction_model.Status(status)
             except:
                 pass
-            attributeType = _AttributeIndex.get(str(AttributePath(
-                ClusterId=path.ClusterId, AttributeId=path.AttributeId)), None)
-            attributeValue = None
-            tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
-            if attributeType is None:
-                attributeValue = ValueDecodeFailure(
-                    tlvData, LookupError("attribute schema not found"))
-            else:
-                try:
-                    attributeValue = attributeType(attributeType.FromTLV(data))
-                except Exception as ex:
-                    logging.error(
-                        f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Attribute = {path.AttributeId}")
-                    logging.error(
-                        f"Failed Cluster Object: {str(attributeType)}")
-                    logging.error(ex)
-                    attributeValue = ValueDecodeFailure(
-                        tlvData, ex)
 
-                    # If we're in debug mode, raise the exception so that we can better debug what's happening.
-                    if (builtins.enableDebugMode):
-                        raise
+            if (imStatus != chip.interaction_model.Status.Success):
+                logging.error(
+                    f"For path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Attribute = {path.AttributeId}, got IM Error: {str(imStatus)}")
+                attributeValue = ValueDecodeFailure(
+                    None, chip.interaction_model.InteractionModelError(imStatus))
+            else:
+                attributeType = _AttributeIndex.get(str(AttributePath(
+                    ClusterId=path.ClusterId, AttributeId=path.AttributeId)), None)
+                attributeValue = None
+                tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
+                if attributeType is None:
+                    attributeValue = ValueDecodeFailure(
+                        tlvData, LookupError("attribute schema not found"))
+                else:
+                    try:
+                        attributeValue = attributeType(
+                            attributeType.FromTLV(data))
+                    except Exception as ex:
+                        logging.error(
+                            f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Attribute = {path.AttributeId}")
+                        logging.error(
+                            f"Failed Cluster Object: {str(attributeType)}")
+                        logging.error(ex)
+                        attributeValue = ValueDecodeFailure(
+                            tlvData, ex)
+
+                        # If we're in debug mode, raise the exception so that we can better debug what's happening.
+                        if (builtins.enableDebugMode):
+                            raise
 
             with self._resLock:
                 self._res[path] = AttributeReadResult(
