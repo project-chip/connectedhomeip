@@ -529,7 +529,6 @@ async function getResponseCommandName(responseRef, options)
 function isWeaklyTypedEnum(label)
 {
   return [
-    "ApplicationBasicStatus",
     "ApplicationLauncherStatus",
     "AttributeWritePermission",
     "AudioOutputType",

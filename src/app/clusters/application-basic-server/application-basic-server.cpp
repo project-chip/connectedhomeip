@@ -32,7 +32,7 @@
 using namespace chip;
 using namespace chip::app::Clusters::ApplicationBasic;
 
-bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatus status, EndpointId endpoint);
+bool applicationBasicClusterChangeApplicationStatus(ApplicationBasicStatus status, EndpointId endpoint);
 
 bool emberAfApplicationBasicClusterChangeStatusCallback(app::CommandHandler * commandObj,
                                                         const app::ConcreteCommandPath & commandPath,
@@ -40,7 +40,7 @@ bool emberAfApplicationBasicClusterChangeStatusCallback(app::CommandHandler * co
 {
     auto & newApplicationStatus = commandData.status;
 
-    bool success = applicationBasicClusterChangeApplicationStatus(static_cast<EmberAfApplicationBasicStatus>(newApplicationStatus),
+    bool success = applicationBasicClusterChangeApplicationStatus(newApplicationStatus,
                                                                   emberAfCurrentEndpoint());
     EmberAfStatus status = success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
     emberAfSendImmediateDefaultResponse(status);
