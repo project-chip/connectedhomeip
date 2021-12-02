@@ -36,54 +36,6 @@ SerializedQNameIterator RecordWriter::PreviousName(size_t index) const
                                    mOutput->Buffer() + offset);
 }
 
-chip::Optional<uint16_t> RecordWriter::FindPreviousName(const FullQName & name) const
-{
-    for (size_t i = 0; i < kMaxCachedReferences; i++)
-    {
-        SerializedQNameIterator previous = PreviousName(i);
-
-        // Any of the sub-segments may match
-        while (previous.IsValid())
-        {
-            if (previous == name)
-            {
-                return chip::Optional<uint16_t>::Value(previous.OffsetInCurrentValidData());
-            }
-
-            if (!previous.Next())
-            {
-                break;
-            }
-        }
-    }
-
-    return chip::Optional<uint16_t>::Missing();
-}
-
-chip::Optional<uint16_t> RecordWriter::FindPreviousName(const SerializedQNameIterator & name) const
-{
-    for (size_t i = 0; i < kMaxCachedReferences; i++)
-    {
-        SerializedQNameIterator previous = PreviousName(i);
-
-        // Any of the sub-segments may match
-        while (previous.IsValid())
-        {
-            if (previous == name)
-            {
-                return chip::Optional<uint16_t>::Value(previous.OffsetInCurrentValidData());
-            }
-
-            if (!previous.Next())
-            {
-                break;
-            }
-        }
-    }
-
-    return chip::Optional<uint16_t>::Missing();
-}
-
 void RecordWriter::WriteQName(const FullQName & qname)
 {
     size_t qNameWriteStart = mOutput->WritePos();
@@ -137,6 +89,7 @@ void RecordWriter::WriteQName(const SerializedQNameIterator & qname)
         if (offset.HasValue())
         {
             // Pointer to offset: set the highest 2 bits
+            // We guarantee that offsets saved are <= kMaxReuseOffset
             mOutput->Put16(offset.Value() | 0xC000);
 
             if (mOutput->Fit() && !isFullyCompressed)

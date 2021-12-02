@@ -65,10 +65,31 @@ private:
     uint16_t mPreviousQNames[kMaxCachedReferences];
 
     /// Find the offset at which this qname was previously seen (if any)
-    chip::Optional<uint16_t> FindPreviousName(const FullQName & name) const;
+    /// works with QName and SerializedQNameIterator
+    template <class T>
+    chip::Optional<uint16_t> FindPreviousName(const T & name) const
+    {
+        for (size_t i = 0; i < kMaxCachedReferences; i++)
+        {
+            SerializedQNameIterator previous = PreviousName(i);
 
-    /// Find the offset at which this qname was previously seen (if any)
-    chip::Optional<uint16_t> FindPreviousName(const SerializedQNameIterator & name) const;
+            // Any of the sub-segments may match
+            while (previous.IsValid())
+            {
+                if (previous == name)
+                {
+                    return chip::Optional<uint16_t>::Value(previous.OffsetInCurrentValidData());
+                }
+
+                if (!previous.Next())
+                {
+                    break;
+                }
+            }
+        }
+
+        return chip::Optional<uint16_t>::Missing();
+    }
 
     /// Gets the iterator corresponding to the previous name
     /// with the given index.
