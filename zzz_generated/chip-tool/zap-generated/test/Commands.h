@@ -21,6 +21,7 @@
 
 #include <commands/common/CommandInvoker.h>
 #include <commands/tests/TestCommand.h>
+#include <math.h> // For INFINITY
 
 class TestList : public Command
 {
@@ -32546,731 +32547,883 @@ public:
             err = TestReadAttributeInt64sDefaultValue_78();
             break;
         case 79:
-            ChipLogProgress(chipTool, " ***** Test Step 79 : Read attribute ENUM8 Default Value\n");
-            err = TestReadAttributeEnum8DefaultValue_79();
+            ChipLogProgress(chipTool, " ***** Test Step 79 : Read attribute SINGLE Default Value\n");
+            err = TestReadAttributeSingleDefaultValue_79();
             break;
         case 80:
-            ChipLogProgress(chipTool, " ***** Test Step 80 : Write attribute ENUM8 Max Value\n");
-            err = TestWriteAttributeEnum8MaxValue_80();
+            ChipLogProgress(chipTool, " ***** Test Step 80 : Write attribute SINGLE medium Value\n");
+            err = TestWriteAttributeSingleMediumValue_80();
             break;
         case 81:
-            ChipLogProgress(chipTool, " ***** Test Step 81 : Read attribute ENUM8 Max Value\n");
-            err = TestReadAttributeEnum8MaxValue_81();
+            ChipLogProgress(chipTool, " ***** Test Step 81 : Read attribute SINGLE medium Value\n");
+            err = TestReadAttributeSingleMediumValue_81();
             break;
         case 82:
-            ChipLogProgress(chipTool, " ***** Test Step 82 : Write attribute ENUM8 Min Value\n");
-            err = TestWriteAttributeEnum8MinValue_82();
+            ChipLogProgress(chipTool, " ***** Test Step 82 : Write attribute SINGLE large Value\n");
+            err = TestWriteAttributeSingleLargeValue_82();
             break;
         case 83:
-            ChipLogProgress(chipTool, " ***** Test Step 83 : Read attribute ENUM8 Min Value\n");
-            err = TestReadAttributeEnum8MinValue_83();
+            ChipLogProgress(chipTool, " ***** Test Step 83 : Read attribute SINGLE large Value\n");
+            err = TestReadAttributeSingleLargeValue_83();
             break;
         case 84:
-            ChipLogProgress(chipTool, " ***** Test Step 84 : Read attribute ENUM16 Default Value\n");
-            err = TestReadAttributeEnum16DefaultValue_84();
+            ChipLogProgress(chipTool, " ***** Test Step 84 : Write attribute SINGLE small Value\n");
+            err = TestWriteAttributeSingleSmallValue_84();
             break;
         case 85:
-            ChipLogProgress(chipTool, " ***** Test Step 85 : Write attribute ENUM16 Max Value\n");
-            err = TestWriteAttributeEnum16MaxValue_85();
+            ChipLogProgress(chipTool, " ***** Test Step 85 : Read attribute SINGLE small Value\n");
+            err = TestReadAttributeSingleSmallValue_85();
             break;
         case 86:
-            ChipLogProgress(chipTool, " ***** Test Step 86 : Read attribute ENUM16 Max Value\n");
-            err = TestReadAttributeEnum16MaxValue_86();
+            ChipLogProgress(chipTool, " ***** Test Step 86 : Write attribute SINGLE Default Value\n");
+            err = TestWriteAttributeSingleDefaultValue_86();
             break;
         case 87:
-            ChipLogProgress(chipTool, " ***** Test Step 87 : Write attribute ENUM16 Min Value\n");
-            err = TestWriteAttributeEnum16MinValue_87();
+            ChipLogProgress(chipTool, " ***** Test Step 87 : Read attribute SINGLE Default Value\n");
+            err = TestReadAttributeSingleDefaultValue_87();
             break;
         case 88:
-            ChipLogProgress(chipTool, " ***** Test Step 88 : Read attribute ENUM16 Min Value\n");
-            err = TestReadAttributeEnum16MinValue_88();
+            ChipLogProgress(chipTool, " ***** Test Step 88 : Read attribute DOUBLE Default Value\n");
+            err = TestReadAttributeDoubleDefaultValue_88();
             break;
         case 89:
-            ChipLogProgress(chipTool, " ***** Test Step 89 : Read attribute OCTET_STRING Default Value\n");
-            err = TestReadAttributeOctetStringDefaultValue_89();
+            ChipLogProgress(chipTool, " ***** Test Step 89 : Write attribute DOUBLE medium Value\n");
+            err = TestWriteAttributeDoubleMediumValue_89();
             break;
         case 90:
-            ChipLogProgress(chipTool, " ***** Test Step 90 : Write attribute OCTET_STRING with embedded null\n");
-            err = TestWriteAttributeOctetStringWithEmbeddedNull_90();
+            ChipLogProgress(chipTool, " ***** Test Step 90 : Read attribute DOUBLE medium Value\n");
+            err = TestReadAttributeDoubleMediumValue_90();
             break;
         case 91:
-            ChipLogProgress(chipTool, " ***** Test Step 91 : Read attribute OCTET_STRING with embedded null\n");
-            err = TestReadAttributeOctetStringWithEmbeddedNull_91();
+            ChipLogProgress(chipTool, " ***** Test Step 91 : Write attribute DOUBLE large Value\n");
+            err = TestWriteAttributeDoubleLargeValue_91();
             break;
         case 92:
-            ChipLogProgress(chipTool, " ***** Test Step 92 : Write attribute OCTET_STRING\n");
-            err = TestWriteAttributeOctetString_92();
+            ChipLogProgress(chipTool, " ***** Test Step 92 : Read attribute DOUBLE large Value\n");
+            err = TestReadAttributeDoubleLargeValue_92();
             break;
         case 93:
-            ChipLogProgress(chipTool, " ***** Test Step 93 : Read attribute OCTET_STRING\n");
-            err = TestReadAttributeOctetString_93();
+            ChipLogProgress(chipTool, " ***** Test Step 93 : Write attribute DOUBLE small Value\n");
+            err = TestWriteAttributeDoubleSmallValue_93();
             break;
         case 94:
-            ChipLogProgress(chipTool, " ***** Test Step 94 : Write attribute OCTET_STRING\n");
-            err = TestWriteAttributeOctetString_94();
+            ChipLogProgress(chipTool, " ***** Test Step 94 : Read attribute DOUBLE small Value\n");
+            err = TestReadAttributeDoubleSmallValue_94();
             break;
         case 95:
-            ChipLogProgress(chipTool, " ***** Test Step 95 : Read attribute OCTET_STRING\n");
-            err = TestReadAttributeOctetString_95();
+            ChipLogProgress(chipTool, " ***** Test Step 95 : Write attribute DOUBLE Default Value\n");
+            err = TestWriteAttributeDoubleDefaultValue_95();
             break;
         case 96:
-            ChipLogProgress(chipTool, " ***** Test Step 96 : Write attribute OCTET_STRING\n");
-            err = TestWriteAttributeOctetString_96();
+            ChipLogProgress(chipTool, " ***** Test Step 96 : Read attribute DOUBLE Default Value\n");
+            err = TestReadAttributeDoubleDefaultValue_96();
             break;
         case 97:
-            ChipLogProgress(chipTool, " ***** Test Step 97 : Read attribute LONG_OCTET_STRING Default Value\n");
-            err = TestReadAttributeLongOctetStringDefaultValue_97();
+            ChipLogProgress(chipTool, " ***** Test Step 97 : Read attribute ENUM8 Default Value\n");
+            err = TestReadAttributeEnum8DefaultValue_97();
             break;
         case 98:
-            ChipLogProgress(chipTool, " ***** Test Step 98 : Write attribute LONG_OCTET_STRING\n");
-            err = TestWriteAttributeLongOctetString_98();
+            ChipLogProgress(chipTool, " ***** Test Step 98 : Write attribute ENUM8 Max Value\n");
+            err = TestWriteAttributeEnum8MaxValue_98();
             break;
         case 99:
-            ChipLogProgress(chipTool, " ***** Test Step 99 : Read attribute LONG_OCTET_STRING\n");
-            err = TestReadAttributeLongOctetString_99();
+            ChipLogProgress(chipTool, " ***** Test Step 99 : Read attribute ENUM8 Max Value\n");
+            err = TestReadAttributeEnum8MaxValue_99();
             break;
         case 100:
-            ChipLogProgress(chipTool, " ***** Test Step 100 : Write attribute LONG_OCTET_STRING\n");
-            err = TestWriteAttributeLongOctetString_100();
+            ChipLogProgress(chipTool, " ***** Test Step 100 : Write attribute ENUM8 Min Value\n");
+            err = TestWriteAttributeEnum8MinValue_100();
             break;
         case 101:
-            ChipLogProgress(chipTool, " ***** Test Step 101 : Read attribute CHAR_STRING Default Value\n");
-            err = TestReadAttributeCharStringDefaultValue_101();
+            ChipLogProgress(chipTool, " ***** Test Step 101 : Read attribute ENUM8 Min Value\n");
+            err = TestReadAttributeEnum8MinValue_101();
             break;
         case 102:
-            ChipLogProgress(chipTool, " ***** Test Step 102 : Write attribute CHAR_STRING\n");
-            err = TestWriteAttributeCharString_102();
+            ChipLogProgress(chipTool, " ***** Test Step 102 : Read attribute ENUM16 Default Value\n");
+            err = TestReadAttributeEnum16DefaultValue_102();
             break;
         case 103:
-            ChipLogProgress(chipTool, " ***** Test Step 103 : Read attribute CHAR_STRING\n");
-            err = TestReadAttributeCharString_103();
+            ChipLogProgress(chipTool, " ***** Test Step 103 : Write attribute ENUM16 Max Value\n");
+            err = TestWriteAttributeEnum16MaxValue_103();
             break;
         case 104:
-            ChipLogProgress(chipTool, " ***** Test Step 104 : Write attribute CHAR_STRING - Value too long\n");
-            err = TestWriteAttributeCharStringValueTooLong_104();
+            ChipLogProgress(chipTool, " ***** Test Step 104 : Read attribute ENUM16 Max Value\n");
+            err = TestReadAttributeEnum16MaxValue_104();
             break;
         case 105:
-            ChipLogProgress(chipTool, " ***** Test Step 105 : Read attribute CHAR_STRING\n");
-            err = TestReadAttributeCharString_105();
+            ChipLogProgress(chipTool, " ***** Test Step 105 : Write attribute ENUM16 Min Value\n");
+            err = TestWriteAttributeEnum16MinValue_105();
             break;
         case 106:
-            ChipLogProgress(chipTool, " ***** Test Step 106 : Write attribute CHAR_STRING - Empty\n");
-            err = TestWriteAttributeCharStringEmpty_106();
+            ChipLogProgress(chipTool, " ***** Test Step 106 : Read attribute ENUM16 Min Value\n");
+            err = TestReadAttributeEnum16MinValue_106();
             break;
         case 107:
-            ChipLogProgress(chipTool, " ***** Test Step 107 : Read attribute LONG_CHAR_STRING Default Value\n");
-            err = TestReadAttributeLongCharStringDefaultValue_107();
+            ChipLogProgress(chipTool, " ***** Test Step 107 : Read attribute OCTET_STRING Default Value\n");
+            err = TestReadAttributeOctetStringDefaultValue_107();
             break;
         case 108:
-            ChipLogProgress(chipTool, " ***** Test Step 108 : Write attribute LONG_CHAR_STRING\n");
-            err = TestWriteAttributeLongCharString_108();
+            ChipLogProgress(chipTool, " ***** Test Step 108 : Write attribute OCTET_STRING with embedded null\n");
+            err = TestWriteAttributeOctetStringWithEmbeddedNull_108();
             break;
         case 109:
-            ChipLogProgress(chipTool, " ***** Test Step 109 : Read attribute LONG_CHAR_STRING\n");
-            err = TestReadAttributeLongCharString_109();
+            ChipLogProgress(chipTool, " ***** Test Step 109 : Read attribute OCTET_STRING with embedded null\n");
+            err = TestReadAttributeOctetStringWithEmbeddedNull_109();
             break;
         case 110:
-            ChipLogProgress(chipTool, " ***** Test Step 110 : Write attribute LONG_CHAR_STRING\n");
-            err = TestWriteAttributeLongCharString_110();
+            ChipLogProgress(chipTool, " ***** Test Step 110 : Write attribute OCTET_STRING\n");
+            err = TestWriteAttributeOctetString_110();
             break;
         case 111:
-            ChipLogProgress(chipTool, " ***** Test Step 111 : Read attribute EPOCH_US Default Value\n");
-            err = TestReadAttributeEpochUsDefaultValue_111();
+            ChipLogProgress(chipTool, " ***** Test Step 111 : Read attribute OCTET_STRING\n");
+            err = TestReadAttributeOctetString_111();
             break;
         case 112:
-            ChipLogProgress(chipTool, " ***** Test Step 112 : Write attribute EPOCH_US Max Value\n");
-            err = TestWriteAttributeEpochUsMaxValue_112();
+            ChipLogProgress(chipTool, " ***** Test Step 112 : Write attribute OCTET_STRING\n");
+            err = TestWriteAttributeOctetString_112();
             break;
         case 113:
-            ChipLogProgress(chipTool, " ***** Test Step 113 : Read attribute EPOCH_US Max Value\n");
-            err = TestReadAttributeEpochUsMaxValue_113();
+            ChipLogProgress(chipTool, " ***** Test Step 113 : Read attribute OCTET_STRING\n");
+            err = TestReadAttributeOctetString_113();
             break;
         case 114:
-            ChipLogProgress(chipTool, " ***** Test Step 114 : Write attribute EPOCH_US Min Value\n");
-            err = TestWriteAttributeEpochUsMinValue_114();
+            ChipLogProgress(chipTool, " ***** Test Step 114 : Write attribute OCTET_STRING\n");
+            err = TestWriteAttributeOctetString_114();
             break;
         case 115:
-            ChipLogProgress(chipTool, " ***** Test Step 115 : Read attribute EPOCH_US Min Value\n");
-            err = TestReadAttributeEpochUsMinValue_115();
+            ChipLogProgress(chipTool, " ***** Test Step 115 : Read attribute LONG_OCTET_STRING Default Value\n");
+            err = TestReadAttributeLongOctetStringDefaultValue_115();
             break;
         case 116:
-            ChipLogProgress(chipTool, " ***** Test Step 116 : Read attribute EPOCH_S Default Value\n");
-            err = TestReadAttributeEpochSDefaultValue_116();
+            ChipLogProgress(chipTool, " ***** Test Step 116 : Write attribute LONG_OCTET_STRING\n");
+            err = TestWriteAttributeLongOctetString_116();
             break;
         case 117:
-            ChipLogProgress(chipTool, " ***** Test Step 117 : Write attribute EPOCH_S Max Value\n");
-            err = TestWriteAttributeEpochSMaxValue_117();
+            ChipLogProgress(chipTool, " ***** Test Step 117 : Read attribute LONG_OCTET_STRING\n");
+            err = TestReadAttributeLongOctetString_117();
             break;
         case 118:
-            ChipLogProgress(chipTool, " ***** Test Step 118 : Read attribute EPOCH_S Max Value\n");
-            err = TestReadAttributeEpochSMaxValue_118();
+            ChipLogProgress(chipTool, " ***** Test Step 118 : Write attribute LONG_OCTET_STRING\n");
+            err = TestWriteAttributeLongOctetString_118();
             break;
         case 119:
-            ChipLogProgress(chipTool, " ***** Test Step 119 : Write attribute EPOCH_S Min Value\n");
-            err = TestWriteAttributeEpochSMinValue_119();
+            ChipLogProgress(chipTool, " ***** Test Step 119 : Read attribute CHAR_STRING Default Value\n");
+            err = TestReadAttributeCharStringDefaultValue_119();
             break;
         case 120:
-            ChipLogProgress(chipTool, " ***** Test Step 120 : Read attribute EPOCH_S Min Value\n");
-            err = TestReadAttributeEpochSMinValue_120();
+            ChipLogProgress(chipTool, " ***** Test Step 120 : Write attribute CHAR_STRING\n");
+            err = TestWriteAttributeCharString_120();
             break;
         case 121:
-            ChipLogProgress(chipTool, " ***** Test Step 121 : Read attribute UNSUPPORTED\n");
-            err = TestReadAttributeUnsupported_121();
+            ChipLogProgress(chipTool, " ***** Test Step 121 : Read attribute CHAR_STRING\n");
+            err = TestReadAttributeCharString_121();
             break;
         case 122:
-            ChipLogProgress(chipTool, " ***** Test Step 122 : Writeattribute UNSUPPORTED\n");
-            err = TestWriteattributeUnsupported_122();
+            ChipLogProgress(chipTool, " ***** Test Step 122 : Write attribute CHAR_STRING - Value too long\n");
+            err = TestWriteAttributeCharStringValueTooLong_122();
             break;
         case 123:
-            ChipLogProgress(chipTool, " ***** Test Step 123 : Send Test Command to unsupported endpoint\n");
-            err = TestSendTestCommandToUnsupportedEndpoint_123();
+            ChipLogProgress(chipTool, " ***** Test Step 123 : Read attribute CHAR_STRING\n");
+            err = TestReadAttributeCharString_123();
             break;
         case 124:
-            ChipLogProgress(chipTool, " ***** Test Step 124 : Send Test Command to unsupported cluster\n");
-            err = TestSendTestCommandToUnsupportedCluster_124();
+            ChipLogProgress(chipTool, " ***** Test Step 124 : Write attribute CHAR_STRING - Empty\n");
+            err = TestWriteAttributeCharStringEmpty_124();
             break;
         case 125:
-            ChipLogProgress(chipTool, " ***** Test Step 125 : Read attribute vendor_id Default Value\n");
-            err = TestReadAttributeVendorIdDefaultValue_125();
+            ChipLogProgress(chipTool, " ***** Test Step 125 : Read attribute LONG_CHAR_STRING Default Value\n");
+            err = TestReadAttributeLongCharStringDefaultValue_125();
             break;
         case 126:
-            ChipLogProgress(chipTool, " ***** Test Step 126 : Write attribute vendor_id\n");
-            err = TestWriteAttributeVendorId_126();
+            ChipLogProgress(chipTool, " ***** Test Step 126 : Write attribute LONG_CHAR_STRING\n");
+            err = TestWriteAttributeLongCharString_126();
             break;
         case 127:
-            ChipLogProgress(chipTool, " ***** Test Step 127 : Read attribute vendor_id\n");
-            err = TestReadAttributeVendorId_127();
+            ChipLogProgress(chipTool, " ***** Test Step 127 : Read attribute LONG_CHAR_STRING\n");
+            err = TestReadAttributeLongCharString_127();
             break;
         case 128:
-            ChipLogProgress(chipTool, " ***** Test Step 128 : Restore attribute vendor_id\n");
-            err = TestRestoreAttributeVendorId_128();
+            ChipLogProgress(chipTool, " ***** Test Step 128 : Write attribute LONG_CHAR_STRING\n");
+            err = TestWriteAttributeLongCharString_128();
             break;
         case 129:
-            ChipLogProgress(chipTool, " ***** Test Step 129 : Send a command with a vendor_id and enum\n");
-            err = TestSendACommandWithAVendorIdAndEnum_129();
+            ChipLogProgress(chipTool, " ***** Test Step 129 : Read attribute EPOCH_US Default Value\n");
+            err = TestReadAttributeEpochUsDefaultValue_129();
             break;
         case 130:
-            ChipLogProgress(chipTool, " ***** Test Step 130 : Send Test Command With Struct Argument and arg1.b is true\n");
-            err = TestSendTestCommandWithStructArgumentAndArg1bIsTrue_130();
+            ChipLogProgress(chipTool, " ***** Test Step 130 : Write attribute EPOCH_US Max Value\n");
+            err = TestWriteAttributeEpochUsMaxValue_130();
             break;
         case 131:
-            ChipLogProgress(chipTool, " ***** Test Step 131 : Send Test Command With Struct Argument and arg1.b is false\n");
-            err = TestSendTestCommandWithStructArgumentAndArg1bIsFalse_131();
+            ChipLogProgress(chipTool, " ***** Test Step 131 : Read attribute EPOCH_US Max Value\n");
+            err = TestReadAttributeEpochUsMaxValue_131();
             break;
         case 132:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 132 : Send Test Command With Nested Struct Argument and arg1.c.b is true\n");
-            err = TestSendTestCommandWithNestedStructArgumentAndArg1cbIsTrue_132();
+            ChipLogProgress(chipTool, " ***** Test Step 132 : Write attribute EPOCH_US Min Value\n");
+            err = TestWriteAttributeEpochUsMinValue_132();
             break;
         case 133:
-            ChipLogProgress(chipTool, " ***** Test Step 133 : Send Test Command With Nested Struct Argument arg1.c.b is false\n");
-            err = TestSendTestCommandWithNestedStructArgumentArg1cbIsFalse_133();
+            ChipLogProgress(chipTool, " ***** Test Step 133 : Read attribute EPOCH_US Min Value\n");
+            err = TestReadAttributeEpochUsMinValue_133();
             break;
         case 134:
-            ChipLogProgress(
-                chipTool,
-                " ***** Test Step 134 : Send Test Command With Nested Struct List Argument and all fields b of arg1.d are true\n");
-            err = TestSendTestCommandWithNestedStructListArgumentAndAllFieldsBOfArg1dAreTrue_134();
+            ChipLogProgress(chipTool, " ***** Test Step 134 : Read attribute EPOCH_S Default Value\n");
+            err = TestReadAttributeEpochSDefaultValue_134();
             break;
         case 135:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 135 : Send Test Command With Nested Struct List Argument and some fields b of arg1.d "
-                            "are false\n");
-            err = TestSendTestCommandWithNestedStructListArgumentAndSomeFieldsBOfArg1dAreFalse_135();
+            ChipLogProgress(chipTool, " ***** Test Step 135 : Write attribute EPOCH_S Max Value\n");
+            err = TestWriteAttributeEpochSMaxValue_135();
             break;
         case 136:
-            ChipLogProgress(chipTool, " ***** Test Step 136 : Send Test Command With Struct Argument and see what we get back\n");
-            err = TestSendTestCommandWithStructArgumentAndSeeWhatWeGetBack_136();
+            ChipLogProgress(chipTool, " ***** Test Step 136 : Read attribute EPOCH_S Max Value\n");
+            err = TestReadAttributeEpochSMaxValue_136();
             break;
         case 137:
-            ChipLogProgress(chipTool, " ***** Test Step 137 : Send Test Command With List of INT8U and none of them is set to 0\n");
-            err = TestSendTestCommandWithListOfInt8uAndNoneOfThemIsSetTo0_137();
+            ChipLogProgress(chipTool, " ***** Test Step 137 : Write attribute EPOCH_S Min Value\n");
+            err = TestWriteAttributeEpochSMinValue_137();
             break;
         case 138:
-            ChipLogProgress(chipTool, " ***** Test Step 138 : Send Test Command With List of INT8U and one of them is set to 0\n");
-            err = TestSendTestCommandWithListOfInt8uAndOneOfThemIsSetTo0_138();
+            ChipLogProgress(chipTool, " ***** Test Step 138 : Read attribute EPOCH_S Min Value\n");
+            err = TestReadAttributeEpochSMinValue_138();
             break;
         case 139:
-            ChipLogProgress(chipTool, " ***** Test Step 139 : Send Test Command With List of INT8U and get it reversed\n");
-            err = TestSendTestCommandWithListOfInt8uAndGetItReversed_139();
+            ChipLogProgress(chipTool, " ***** Test Step 139 : Read attribute UNSUPPORTED\n");
+            err = TestReadAttributeUnsupported_139();
             break;
         case 140:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 140 : Send Test Command With empty List of INT8U and get an empty list back\n");
-            err = TestSendTestCommandWithEmptyListOfInt8uAndGetAnEmptyListBack_140();
+            ChipLogProgress(chipTool, " ***** Test Step 140 : Writeattribute UNSUPPORTED\n");
+            err = TestWriteattributeUnsupported_140();
             break;
         case 141:
-            ChipLogProgress(
-                chipTool,
-                " ***** Test Step 141 : Send Test Command With List of Struct Argument and arg1.b of first item is true\n");
-            err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_141();
+            ChipLogProgress(chipTool, " ***** Test Step 141 : Send Test Command to unsupported endpoint\n");
+            err = TestSendTestCommandToUnsupportedEndpoint_141();
             break;
         case 142:
-            ChipLogProgress(
-                chipTool,
-                " ***** Test Step 142 : Send Test Command With List of Struct Argument and arg1.b of first item is false\n");
-            err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_142();
+            ChipLogProgress(chipTool, " ***** Test Step 142 : Send Test Command to unsupported cluster\n");
+            err = TestSendTestCommandToUnsupportedCluster_142();
             break;
         case 143:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 143 : Send Test Command With List of Nested Struct List Argument and all fields b of "
-                            "elements of arg1.d are true\n");
-            err = TestSendTestCommandWithListOfNestedStructListArgumentAndAllFieldsBOfElementsOfArg1dAreTrue_143();
+            ChipLogProgress(chipTool, " ***** Test Step 143 : Read attribute vendor_id Default Value\n");
+            err = TestReadAttributeVendorIdDefaultValue_143();
             break;
         case 144:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 144 : Send Test Command With Nested Struct List Argument and some fields b of "
-                            "elements of arg1.d are false\n");
-            err = TestSendTestCommandWithNestedStructListArgumentAndSomeFieldsBOfElementsOfArg1dAreFalse_144();
+            ChipLogProgress(chipTool, " ***** Test Step 144 : Write attribute vendor_id\n");
+            err = TestWriteAttributeVendorId_144();
             break;
         case 145:
-            ChipLogProgress(chipTool,
-                            " ***** Test Step 145 : Write attribute LIST With List of INT8U and none of them is set to 0\n");
-            err = TestWriteAttributeListWithListOfInt8uAndNoneOfThemIsSetTo0_145();
+            ChipLogProgress(chipTool, " ***** Test Step 145 : Read attribute vendor_id\n");
+            err = TestReadAttributeVendorId_145();
             break;
         case 146:
-            ChipLogProgress(chipTool, " ***** Test Step 146 : Read attribute LIST With List of INT8U\n");
-            err = TestReadAttributeListWithListOfInt8u_146();
+            ChipLogProgress(chipTool, " ***** Test Step 146 : Restore attribute vendor_id\n");
+            err = TestRestoreAttributeVendorId_146();
             break;
         case 147:
-            ChipLogProgress(chipTool, " ***** Test Step 147 : Write attribute LIST With List of OCTET_STRING\n");
-            err = TestWriteAttributeListWithListOfOctetString_147();
+            ChipLogProgress(chipTool, " ***** Test Step 147 : Send a command with a vendor_id and enum\n");
+            err = TestSendACommandWithAVendorIdAndEnum_147();
             break;
         case 148:
-            ChipLogProgress(chipTool, " ***** Test Step 148 : Read attribute LIST With List of OCTET_STRING\n");
-            err = TestReadAttributeListWithListOfOctetString_148();
+            ChipLogProgress(chipTool, " ***** Test Step 148 : Send Test Command With Struct Argument and arg1.b is true\n");
+            err = TestSendTestCommandWithStructArgumentAndArg1bIsTrue_148();
             break;
         case 149:
-            ChipLogProgress(chipTool, " ***** Test Step 149 : Write attribute LIST With List of LIST_STRUCT_OCTET_STRING\n");
-            err = TestWriteAttributeListWithListOfListStructOctetString_149();
+            ChipLogProgress(chipTool, " ***** Test Step 149 : Send Test Command With Struct Argument and arg1.b is false\n");
+            err = TestSendTestCommandWithStructArgumentAndArg1bIsFalse_149();
             break;
         case 150:
-            ChipLogProgress(chipTool, " ***** Test Step 150 : Read attribute LIST With List of LIST_STRUCT_OCTET_STRING\n");
-            err = TestReadAttributeListWithListOfListStructOctetString_150();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 150 : Send Test Command With Nested Struct Argument and arg1.c.b is true\n");
+            err = TestSendTestCommandWithNestedStructArgumentAndArg1cbIsTrue_150();
             break;
         case 151:
-            ChipLogProgress(chipTool, " ***** Test Step 151 : Send Test Command with optional arg set.\n");
-            err = TestSendTestCommandWithOptionalArgSet_151();
+            ChipLogProgress(chipTool, " ***** Test Step 151 : Send Test Command With Nested Struct Argument arg1.c.b is false\n");
+            err = TestSendTestCommandWithNestedStructArgumentArg1cbIsFalse_151();
             break;
         case 152:
-            ChipLogProgress(chipTool, " ***** Test Step 152 : Send Test Command without its optional arg.\n");
-            err = TestSendTestCommandWithoutItsOptionalArg_152();
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 152 : Send Test Command With Nested Struct List Argument and all fields b of arg1.d are true\n");
+            err = TestSendTestCommandWithNestedStructListArgumentAndAllFieldsBOfArg1dAreTrue_152();
             break;
         case 153:
-            ChipLogProgress(chipTool, " ***** Test Step 153 : Write attribute NULLABLE_BOOLEAN null\n");
-            err = TestWriteAttributeNullableBooleanNull_153();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 153 : Send Test Command With Nested Struct List Argument and some fields b of arg1.d "
+                            "are false\n");
+            err = TestSendTestCommandWithNestedStructListArgumentAndSomeFieldsBOfArg1dAreFalse_153();
             break;
         case 154:
-            ChipLogProgress(chipTool, " ***** Test Step 154 : Read attribute NULLABLE_BOOLEAN null\n");
-            err = TestReadAttributeNullableBooleanNull_154();
+            ChipLogProgress(chipTool, " ***** Test Step 154 : Send Test Command With Struct Argument and see what we get back\n");
+            err = TestSendTestCommandWithStructArgumentAndSeeWhatWeGetBack_154();
             break;
         case 155:
-            ChipLogProgress(chipTool, " ***** Test Step 155 : Write attribute NULLABLE_BOOLEAN True\n");
-            err = TestWriteAttributeNullableBooleanTrue_155();
+            ChipLogProgress(chipTool, " ***** Test Step 155 : Send Test Command With List of INT8U and none of them is set to 0\n");
+            err = TestSendTestCommandWithListOfInt8uAndNoneOfThemIsSetTo0_155();
             break;
         case 156:
-            ChipLogProgress(chipTool, " ***** Test Step 156 : Read attribute NULLABLE_BOOLEAN True\n");
-            err = TestReadAttributeNullableBooleanTrue_156();
+            ChipLogProgress(chipTool, " ***** Test Step 156 : Send Test Command With List of INT8U and one of them is set to 0\n");
+            err = TestSendTestCommandWithListOfInt8uAndOneOfThemIsSetTo0_156();
             break;
         case 157:
-            ChipLogProgress(chipTool, " ***** Test Step 157 : Write attribute NULLABLE_BITMAP8 Max Value\n");
-            err = TestWriteAttributeNullableBitmap8MaxValue_157();
+            ChipLogProgress(chipTool, " ***** Test Step 157 : Send Test Command With List of INT8U and get it reversed\n");
+            err = TestSendTestCommandWithListOfInt8uAndGetItReversed_157();
             break;
         case 158:
-            ChipLogProgress(chipTool, " ***** Test Step 158 : Read attribute NULLABLE_BITMAP8 Max Value\n");
-            err = TestReadAttributeNullableBitmap8MaxValue_158();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 158 : Send Test Command With empty List of INT8U and get an empty list back\n");
+            err = TestSendTestCommandWithEmptyListOfInt8uAndGetAnEmptyListBack_158();
             break;
         case 159:
-            ChipLogProgress(chipTool, " ***** Test Step 159 : Write attribute NULLABLE_BITMAP8 Invalid Value\n");
-            err = TestWriteAttributeNullableBitmap8InvalidValue_159();
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 159 : Send Test Command With List of Struct Argument and arg1.b of first item is true\n");
+            err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_159();
             break;
         case 160:
-            ChipLogProgress(chipTool, " ***** Test Step 160 : Read attribute NULLABLE_BITMAP8 unchanged Value\n");
-            err = TestReadAttributeNullableBitmap8UnchangedValue_160();
+            ChipLogProgress(
+                chipTool,
+                " ***** Test Step 160 : Send Test Command With List of Struct Argument and arg1.b of first item is false\n");
+            err = TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_160();
             break;
         case 161:
-            ChipLogProgress(chipTool, " ***** Test Step 161 : Write attribute NULLABLE_BITMAP8 null Value\n");
-            err = TestWriteAttributeNullableBitmap8NullValue_161();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 161 : Send Test Command With List of Nested Struct List Argument and all fields b of "
+                            "elements of arg1.d are true\n");
+            err = TestSendTestCommandWithListOfNestedStructListArgumentAndAllFieldsBOfElementsOfArg1dAreTrue_161();
             break;
         case 162:
-            ChipLogProgress(chipTool, " ***** Test Step 162 : Read attribute NULLABLE_BITMAP8 null Value\n");
-            err = TestReadAttributeNullableBitmap8NullValue_162();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 162 : Send Test Command With Nested Struct List Argument and some fields b of "
+                            "elements of arg1.d are false\n");
+            err = TestSendTestCommandWithNestedStructListArgumentAndSomeFieldsBOfElementsOfArg1dAreFalse_162();
             break;
         case 163:
-            ChipLogProgress(chipTool, " ***** Test Step 163 : Write attribute NULLABLE_BITMAP16 Max Value\n");
-            err = TestWriteAttributeNullableBitmap16MaxValue_163();
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 163 : Write attribute LIST With List of INT8U and none of them is set to 0\n");
+            err = TestWriteAttributeListWithListOfInt8uAndNoneOfThemIsSetTo0_163();
             break;
         case 164:
-            ChipLogProgress(chipTool, " ***** Test Step 164 : Read attribute NULLABLE_BITMAP16 Max Value\n");
-            err = TestReadAttributeNullableBitmap16MaxValue_164();
+            ChipLogProgress(chipTool, " ***** Test Step 164 : Read attribute LIST With List of INT8U\n");
+            err = TestReadAttributeListWithListOfInt8u_164();
             break;
         case 165:
-            ChipLogProgress(chipTool, " ***** Test Step 165 : Write attribute NULLABLE_BITMAP16 Invalid Value\n");
-            err = TestWriteAttributeNullableBitmap16InvalidValue_165();
+            ChipLogProgress(chipTool, " ***** Test Step 165 : Write attribute LIST With List of OCTET_STRING\n");
+            err = TestWriteAttributeListWithListOfOctetString_165();
             break;
         case 166:
-            ChipLogProgress(chipTool, " ***** Test Step 166 : Read attribute NULLABLE_BITMAP16 unchanged Value\n");
-            err = TestReadAttributeNullableBitmap16UnchangedValue_166();
+            ChipLogProgress(chipTool, " ***** Test Step 166 : Read attribute LIST With List of OCTET_STRING\n");
+            err = TestReadAttributeListWithListOfOctetString_166();
             break;
         case 167:
-            ChipLogProgress(chipTool, " ***** Test Step 167 : Write attribute NULLABLE_BITMAP16 null Value\n");
-            err = TestWriteAttributeNullableBitmap16NullValue_167();
+            ChipLogProgress(chipTool, " ***** Test Step 167 : Write attribute LIST With List of LIST_STRUCT_OCTET_STRING\n");
+            err = TestWriteAttributeListWithListOfListStructOctetString_167();
             break;
         case 168:
-            ChipLogProgress(chipTool, " ***** Test Step 168 : Read attribute NULLABLE_BITMAP16 null Value\n");
-            err = TestReadAttributeNullableBitmap16NullValue_168();
+            ChipLogProgress(chipTool, " ***** Test Step 168 : Read attribute LIST With List of LIST_STRUCT_OCTET_STRING\n");
+            err = TestReadAttributeListWithListOfListStructOctetString_168();
             break;
         case 169:
-            ChipLogProgress(chipTool, " ***** Test Step 169 : Write attribute NULLABLE_BITMAP32 Max Value\n");
-            err = TestWriteAttributeNullableBitmap32MaxValue_169();
+            ChipLogProgress(chipTool, " ***** Test Step 169 : Send Test Command with optional arg set.\n");
+            err = TestSendTestCommandWithOptionalArgSet_169();
             break;
         case 170:
-            ChipLogProgress(chipTool, " ***** Test Step 170 : Read attribute NULLABLE_BITMAP32 Max Value\n");
-            err = TestReadAttributeNullableBitmap32MaxValue_170();
+            ChipLogProgress(chipTool, " ***** Test Step 170 : Send Test Command without its optional arg.\n");
+            err = TestSendTestCommandWithoutItsOptionalArg_170();
             break;
         case 171:
-            ChipLogProgress(chipTool, " ***** Test Step 171 : Write attribute NULLABLE_BITMAP32 Invalid Value\n");
-            err = TestWriteAttributeNullableBitmap32InvalidValue_171();
+            ChipLogProgress(chipTool, " ***** Test Step 171 : Write attribute NULLABLE_BOOLEAN null\n");
+            err = TestWriteAttributeNullableBooleanNull_171();
             break;
         case 172:
-            ChipLogProgress(chipTool, " ***** Test Step 172 : Read attribute NULLABLE_BITMAP32 unchanged Value\n");
-            err = TestReadAttributeNullableBitmap32UnchangedValue_172();
+            ChipLogProgress(chipTool, " ***** Test Step 172 : Read attribute NULLABLE_BOOLEAN null\n");
+            err = TestReadAttributeNullableBooleanNull_172();
             break;
         case 173:
-            ChipLogProgress(chipTool, " ***** Test Step 173 : Write attribute NULLABLE_BITMAP32 null Value\n");
-            err = TestWriteAttributeNullableBitmap32NullValue_173();
+            ChipLogProgress(chipTool, " ***** Test Step 173 : Write attribute NULLABLE_BOOLEAN True\n");
+            err = TestWriteAttributeNullableBooleanTrue_173();
             break;
         case 174:
-            ChipLogProgress(chipTool, " ***** Test Step 174 : Read attribute NULLABLE_BITMAP32 null Value\n");
-            err = TestReadAttributeNullableBitmap32NullValue_174();
+            ChipLogProgress(chipTool, " ***** Test Step 174 : Read attribute NULLABLE_BOOLEAN True\n");
+            err = TestReadAttributeNullableBooleanTrue_174();
             break;
         case 175:
-            ChipLogProgress(chipTool, " ***** Test Step 175 : Write attribute NULLABLE_BITMAP64 Max Value\n");
-            err = TestWriteAttributeNullableBitmap64MaxValue_175();
+            ChipLogProgress(chipTool, " ***** Test Step 175 : Write attribute NULLABLE_BITMAP8 Max Value\n");
+            err = TestWriteAttributeNullableBitmap8MaxValue_175();
             break;
         case 176:
-            ChipLogProgress(chipTool, " ***** Test Step 176 : Read attribute NULLABLE_BITMAP64 Max Value\n");
-            err = TestReadAttributeNullableBitmap64MaxValue_176();
+            ChipLogProgress(chipTool, " ***** Test Step 176 : Read attribute NULLABLE_BITMAP8 Max Value\n");
+            err = TestReadAttributeNullableBitmap8MaxValue_176();
             break;
         case 177:
-            ChipLogProgress(chipTool, " ***** Test Step 177 : Write attribute NULLABLE_BITMAP64 Invalid Value\n");
-            err = TestWriteAttributeNullableBitmap64InvalidValue_177();
+            ChipLogProgress(chipTool, " ***** Test Step 177 : Write attribute NULLABLE_BITMAP8 Invalid Value\n");
+            err = TestWriteAttributeNullableBitmap8InvalidValue_177();
             break;
         case 178:
-            ChipLogProgress(chipTool, " ***** Test Step 178 : Read attribute NULLABLE_BITMAP64 unchanged Value\n");
-            err = TestReadAttributeNullableBitmap64UnchangedValue_178();
+            ChipLogProgress(chipTool, " ***** Test Step 178 : Read attribute NULLABLE_BITMAP8 unchanged Value\n");
+            err = TestReadAttributeNullableBitmap8UnchangedValue_178();
             break;
         case 179:
-            ChipLogProgress(chipTool, " ***** Test Step 179 : Write attribute NULLABLE_BITMAP64 null Value\n");
-            err = TestWriteAttributeNullableBitmap64NullValue_179();
+            ChipLogProgress(chipTool, " ***** Test Step 179 : Write attribute NULLABLE_BITMAP8 null Value\n");
+            err = TestWriteAttributeNullableBitmap8NullValue_179();
             break;
         case 180:
-            ChipLogProgress(chipTool, " ***** Test Step 180 : Read attribute NULLABLE_BITMAP64 null Value\n");
-            err = TestReadAttributeNullableBitmap64NullValue_180();
+            ChipLogProgress(chipTool, " ***** Test Step 180 : Read attribute NULLABLE_BITMAP8 null Value\n");
+            err = TestReadAttributeNullableBitmap8NullValue_180();
             break;
         case 181:
-            ChipLogProgress(chipTool, " ***** Test Step 181 : Write attribute NULLABLE_INT8U Max Value\n");
-            err = TestWriteAttributeNullableInt8uMaxValue_181();
+            ChipLogProgress(chipTool, " ***** Test Step 181 : Write attribute NULLABLE_BITMAP16 Max Value\n");
+            err = TestWriteAttributeNullableBitmap16MaxValue_181();
             break;
         case 182:
-            ChipLogProgress(chipTool, " ***** Test Step 182 : Read attribute NULLABLE_INT8U Max Value\n");
-            err = TestReadAttributeNullableInt8uMaxValue_182();
+            ChipLogProgress(chipTool, " ***** Test Step 182 : Read attribute NULLABLE_BITMAP16 Max Value\n");
+            err = TestReadAttributeNullableBitmap16MaxValue_182();
             break;
         case 183:
-            ChipLogProgress(chipTool, " ***** Test Step 183 : Write attribute NULLABLE_INT8U Invalid Value\n");
-            err = TestWriteAttributeNullableInt8uInvalidValue_183();
+            ChipLogProgress(chipTool, " ***** Test Step 183 : Write attribute NULLABLE_BITMAP16 Invalid Value\n");
+            err = TestWriteAttributeNullableBitmap16InvalidValue_183();
             break;
         case 184:
-            ChipLogProgress(chipTool, " ***** Test Step 184 : Read attribute NULLABLE_INT8U unchanged Value\n");
-            err = TestReadAttributeNullableInt8uUnchangedValue_184();
+            ChipLogProgress(chipTool, " ***** Test Step 184 : Read attribute NULLABLE_BITMAP16 unchanged Value\n");
+            err = TestReadAttributeNullableBitmap16UnchangedValue_184();
             break;
         case 185:
-            ChipLogProgress(chipTool, " ***** Test Step 185 : Write attribute NULLABLE_INT8U null Value\n");
-            err = TestWriteAttributeNullableInt8uNullValue_185();
+            ChipLogProgress(chipTool, " ***** Test Step 185 : Write attribute NULLABLE_BITMAP16 null Value\n");
+            err = TestWriteAttributeNullableBitmap16NullValue_185();
             break;
         case 186:
-            ChipLogProgress(chipTool, " ***** Test Step 186 : Read attribute NULLABLE_INT8U null Value\n");
-            err = TestReadAttributeNullableInt8uNullValue_186();
+            ChipLogProgress(chipTool, " ***** Test Step 186 : Read attribute NULLABLE_BITMAP16 null Value\n");
+            err = TestReadAttributeNullableBitmap16NullValue_186();
             break;
         case 187:
-            ChipLogProgress(chipTool, " ***** Test Step 187 : Write attribute NULLABLE_INT16U Max Value\n");
-            err = TestWriteAttributeNullableInt16uMaxValue_187();
+            ChipLogProgress(chipTool, " ***** Test Step 187 : Write attribute NULLABLE_BITMAP32 Max Value\n");
+            err = TestWriteAttributeNullableBitmap32MaxValue_187();
             break;
         case 188:
-            ChipLogProgress(chipTool, " ***** Test Step 188 : Read attribute NULLABLE_INT16U Max Value\n");
-            err = TestReadAttributeNullableInt16uMaxValue_188();
+            ChipLogProgress(chipTool, " ***** Test Step 188 : Read attribute NULLABLE_BITMAP32 Max Value\n");
+            err = TestReadAttributeNullableBitmap32MaxValue_188();
             break;
         case 189:
-            ChipLogProgress(chipTool, " ***** Test Step 189 : Write attribute NULLABLE_INT16U Invalid Value\n");
-            err = TestWriteAttributeNullableInt16uInvalidValue_189();
+            ChipLogProgress(chipTool, " ***** Test Step 189 : Write attribute NULLABLE_BITMAP32 Invalid Value\n");
+            err = TestWriteAttributeNullableBitmap32InvalidValue_189();
             break;
         case 190:
-            ChipLogProgress(chipTool, " ***** Test Step 190 : Read attribute NULLABLE_INT16U unchanged Value\n");
-            err = TestReadAttributeNullableInt16uUnchangedValue_190();
+            ChipLogProgress(chipTool, " ***** Test Step 190 : Read attribute NULLABLE_BITMAP32 unchanged Value\n");
+            err = TestReadAttributeNullableBitmap32UnchangedValue_190();
             break;
         case 191:
-            ChipLogProgress(chipTool, " ***** Test Step 191 : Write attribute NULLABLE_INT16U null Value\n");
-            err = TestWriteAttributeNullableInt16uNullValue_191();
+            ChipLogProgress(chipTool, " ***** Test Step 191 : Write attribute NULLABLE_BITMAP32 null Value\n");
+            err = TestWriteAttributeNullableBitmap32NullValue_191();
             break;
         case 192:
-            ChipLogProgress(chipTool, " ***** Test Step 192 : Read attribute NULLABLE_INT16U null Value\n");
-            err = TestReadAttributeNullableInt16uNullValue_192();
+            ChipLogProgress(chipTool, " ***** Test Step 192 : Read attribute NULLABLE_BITMAP32 null Value\n");
+            err = TestReadAttributeNullableBitmap32NullValue_192();
             break;
         case 193:
-            ChipLogProgress(chipTool, " ***** Test Step 193 : Write attribute NULLABLE_INT32U Max Value\n");
-            err = TestWriteAttributeNullableInt32uMaxValue_193();
+            ChipLogProgress(chipTool, " ***** Test Step 193 : Write attribute NULLABLE_BITMAP64 Max Value\n");
+            err = TestWriteAttributeNullableBitmap64MaxValue_193();
             break;
         case 194:
-            ChipLogProgress(chipTool, " ***** Test Step 194 : Read attribute NULLABLE_INT32U Max Value\n");
-            err = TestReadAttributeNullableInt32uMaxValue_194();
+            ChipLogProgress(chipTool, " ***** Test Step 194 : Read attribute NULLABLE_BITMAP64 Max Value\n");
+            err = TestReadAttributeNullableBitmap64MaxValue_194();
             break;
         case 195:
-            ChipLogProgress(chipTool, " ***** Test Step 195 : Write attribute NULLABLE_INT32U Invalid Value\n");
-            err = TestWriteAttributeNullableInt32uInvalidValue_195();
+            ChipLogProgress(chipTool, " ***** Test Step 195 : Write attribute NULLABLE_BITMAP64 Invalid Value\n");
+            err = TestWriteAttributeNullableBitmap64InvalidValue_195();
             break;
         case 196:
-            ChipLogProgress(chipTool, " ***** Test Step 196 : Read attribute NULLABLE_INT32U unchanged Value\n");
-            err = TestReadAttributeNullableInt32uUnchangedValue_196();
+            ChipLogProgress(chipTool, " ***** Test Step 196 : Read attribute NULLABLE_BITMAP64 unchanged Value\n");
+            err = TestReadAttributeNullableBitmap64UnchangedValue_196();
             break;
         case 197:
-            ChipLogProgress(chipTool, " ***** Test Step 197 : Write attribute NULLABLE_INT32U null Value\n");
-            err = TestWriteAttributeNullableInt32uNullValue_197();
+            ChipLogProgress(chipTool, " ***** Test Step 197 : Write attribute NULLABLE_BITMAP64 null Value\n");
+            err = TestWriteAttributeNullableBitmap64NullValue_197();
             break;
         case 198:
-            ChipLogProgress(chipTool, " ***** Test Step 198 : Read attribute NULLABLE_INT32U null Value\n");
-            err = TestReadAttributeNullableInt32uNullValue_198();
+            ChipLogProgress(chipTool, " ***** Test Step 198 : Read attribute NULLABLE_BITMAP64 null Value\n");
+            err = TestReadAttributeNullableBitmap64NullValue_198();
             break;
         case 199:
-            ChipLogProgress(chipTool, " ***** Test Step 199 : Write attribute NULLABLE_INT64U Max Value\n");
-            err = TestWriteAttributeNullableInt64uMaxValue_199();
+            ChipLogProgress(chipTool, " ***** Test Step 199 : Write attribute NULLABLE_INT8U Max Value\n");
+            err = TestWriteAttributeNullableInt8uMaxValue_199();
             break;
         case 200:
-            ChipLogProgress(chipTool, " ***** Test Step 200 : Read attribute NULLABLE_INT64U Max Value\n");
-            err = TestReadAttributeNullableInt64uMaxValue_200();
+            ChipLogProgress(chipTool, " ***** Test Step 200 : Read attribute NULLABLE_INT8U Max Value\n");
+            err = TestReadAttributeNullableInt8uMaxValue_200();
             break;
         case 201:
-            ChipLogProgress(chipTool, " ***** Test Step 201 : Write attribute NULLABLE_INT64U Invalid Value\n");
-            err = TestWriteAttributeNullableInt64uInvalidValue_201();
+            ChipLogProgress(chipTool, " ***** Test Step 201 : Write attribute NULLABLE_INT8U Invalid Value\n");
+            err = TestWriteAttributeNullableInt8uInvalidValue_201();
             break;
         case 202:
-            ChipLogProgress(chipTool, " ***** Test Step 202 : Read attribute NULLABLE_INT64U unchanged Value\n");
-            err = TestReadAttributeNullableInt64uUnchangedValue_202();
+            ChipLogProgress(chipTool, " ***** Test Step 202 : Read attribute NULLABLE_INT8U unchanged Value\n");
+            err = TestReadAttributeNullableInt8uUnchangedValue_202();
             break;
         case 203:
-            ChipLogProgress(chipTool, " ***** Test Step 203 : Write attribute NULLABLE_INT64U null Value\n");
-            err = TestWriteAttributeNullableInt64uNullValue_203();
+            ChipLogProgress(chipTool, " ***** Test Step 203 : Write attribute NULLABLE_INT8U null Value\n");
+            err = TestWriteAttributeNullableInt8uNullValue_203();
             break;
         case 204:
-            ChipLogProgress(chipTool, " ***** Test Step 204 : Read attribute NULLABLE_INT64U null Value\n");
-            err = TestReadAttributeNullableInt64uNullValue_204();
+            ChipLogProgress(chipTool, " ***** Test Step 204 : Read attribute NULLABLE_INT8U null Value\n");
+            err = TestReadAttributeNullableInt8uNullValue_204();
             break;
         case 205:
-            ChipLogProgress(chipTool, " ***** Test Step 205 : Write attribute NULLABLE_INT8S Min Value\n");
-            err = TestWriteAttributeNullableInt8sMinValue_205();
+            ChipLogProgress(chipTool, " ***** Test Step 205 : Write attribute NULLABLE_INT16U Max Value\n");
+            err = TestWriteAttributeNullableInt16uMaxValue_205();
             break;
         case 206:
-            ChipLogProgress(chipTool, " ***** Test Step 206 : Read attribute NULLABLE_INT8S Min Value\n");
-            err = TestReadAttributeNullableInt8sMinValue_206();
+            ChipLogProgress(chipTool, " ***** Test Step 206 : Read attribute NULLABLE_INT16U Max Value\n");
+            err = TestReadAttributeNullableInt16uMaxValue_206();
             break;
         case 207:
-            ChipLogProgress(chipTool, " ***** Test Step 207 : Write attribute NULLABLE_INT8S Invalid Value\n");
-            err = TestWriteAttributeNullableInt8sInvalidValue_207();
+            ChipLogProgress(chipTool, " ***** Test Step 207 : Write attribute NULLABLE_INT16U Invalid Value\n");
+            err = TestWriteAttributeNullableInt16uInvalidValue_207();
             break;
         case 208:
-            ChipLogProgress(chipTool, " ***** Test Step 208 : Read attribute NULLABLE_INT8S unchanged Value\n");
-            err = TestReadAttributeNullableInt8sUnchangedValue_208();
+            ChipLogProgress(chipTool, " ***** Test Step 208 : Read attribute NULLABLE_INT16U unchanged Value\n");
+            err = TestReadAttributeNullableInt16uUnchangedValue_208();
             break;
         case 209:
-            ChipLogProgress(chipTool, " ***** Test Step 209 : Write attribute NULLABLE_INT8S null Value\n");
-            err = TestWriteAttributeNullableInt8sNullValue_209();
+            ChipLogProgress(chipTool, " ***** Test Step 209 : Write attribute NULLABLE_INT16U null Value\n");
+            err = TestWriteAttributeNullableInt16uNullValue_209();
             break;
         case 210:
-            ChipLogProgress(chipTool, " ***** Test Step 210 : Read attribute NULLABLE_INT8S null Value\n");
-            err = TestReadAttributeNullableInt8sNullValue_210();
+            ChipLogProgress(chipTool, " ***** Test Step 210 : Read attribute NULLABLE_INT16U null Value\n");
+            err = TestReadAttributeNullableInt16uNullValue_210();
             break;
         case 211:
-            ChipLogProgress(chipTool, " ***** Test Step 211 : Write attribute NULLABLE_INT16S Min Value\n");
-            err = TestWriteAttributeNullableInt16sMinValue_211();
+            ChipLogProgress(chipTool, " ***** Test Step 211 : Write attribute NULLABLE_INT32U Max Value\n");
+            err = TestWriteAttributeNullableInt32uMaxValue_211();
             break;
         case 212:
-            ChipLogProgress(chipTool, " ***** Test Step 212 : Read attribute NULLABLE_INT16S Min Value\n");
-            err = TestReadAttributeNullableInt16sMinValue_212();
+            ChipLogProgress(chipTool, " ***** Test Step 212 : Read attribute NULLABLE_INT32U Max Value\n");
+            err = TestReadAttributeNullableInt32uMaxValue_212();
             break;
         case 213:
-            ChipLogProgress(chipTool, " ***** Test Step 213 : Write attribute NULLABLE_INT16S Invalid Value\n");
-            err = TestWriteAttributeNullableInt16sInvalidValue_213();
+            ChipLogProgress(chipTool, " ***** Test Step 213 : Write attribute NULLABLE_INT32U Invalid Value\n");
+            err = TestWriteAttributeNullableInt32uInvalidValue_213();
             break;
         case 214:
-            ChipLogProgress(chipTool, " ***** Test Step 214 : Read attribute NULLABLE_INT16S unchanged Value\n");
-            err = TestReadAttributeNullableInt16sUnchangedValue_214();
+            ChipLogProgress(chipTool, " ***** Test Step 214 : Read attribute NULLABLE_INT32U unchanged Value\n");
+            err = TestReadAttributeNullableInt32uUnchangedValue_214();
             break;
         case 215:
-            ChipLogProgress(chipTool, " ***** Test Step 215 : Write attribute NULLABLE_INT16S null Value\n");
-            err = TestWriteAttributeNullableInt16sNullValue_215();
+            ChipLogProgress(chipTool, " ***** Test Step 215 : Write attribute NULLABLE_INT32U null Value\n");
+            err = TestWriteAttributeNullableInt32uNullValue_215();
             break;
         case 216:
-            ChipLogProgress(chipTool, " ***** Test Step 216 : Read attribute NULLABLE_INT16S null Value\n");
-            err = TestReadAttributeNullableInt16sNullValue_216();
+            ChipLogProgress(chipTool, " ***** Test Step 216 : Read attribute NULLABLE_INT32U null Value\n");
+            err = TestReadAttributeNullableInt32uNullValue_216();
             break;
         case 217:
-            ChipLogProgress(chipTool, " ***** Test Step 217 : Write attribute NULLABLE_INT32S Min Value\n");
-            err = TestWriteAttributeNullableInt32sMinValue_217();
+            ChipLogProgress(chipTool, " ***** Test Step 217 : Write attribute NULLABLE_INT64U Max Value\n");
+            err = TestWriteAttributeNullableInt64uMaxValue_217();
             break;
         case 218:
-            ChipLogProgress(chipTool, " ***** Test Step 218 : Read attribute NULLABLE_INT32S Min Value\n");
-            err = TestReadAttributeNullableInt32sMinValue_218();
+            ChipLogProgress(chipTool, " ***** Test Step 218 : Read attribute NULLABLE_INT64U Max Value\n");
+            err = TestReadAttributeNullableInt64uMaxValue_218();
             break;
         case 219:
-            ChipLogProgress(chipTool, " ***** Test Step 219 : Write attribute NULLABLE_INT32S Invalid Value\n");
-            err = TestWriteAttributeNullableInt32sInvalidValue_219();
+            ChipLogProgress(chipTool, " ***** Test Step 219 : Write attribute NULLABLE_INT64U Invalid Value\n");
+            err = TestWriteAttributeNullableInt64uInvalidValue_219();
             break;
         case 220:
-            ChipLogProgress(chipTool, " ***** Test Step 220 : Read attribute NULLABLE_INT32S unchanged Value\n");
-            err = TestReadAttributeNullableInt32sUnchangedValue_220();
+            ChipLogProgress(chipTool, " ***** Test Step 220 : Read attribute NULLABLE_INT64U unchanged Value\n");
+            err = TestReadAttributeNullableInt64uUnchangedValue_220();
             break;
         case 221:
-            ChipLogProgress(chipTool, " ***** Test Step 221 : Write attribute NULLABLE_INT32S null Value\n");
-            err = TestWriteAttributeNullableInt32sNullValue_221();
+            ChipLogProgress(chipTool, " ***** Test Step 221 : Write attribute NULLABLE_INT64U null Value\n");
+            err = TestWriteAttributeNullableInt64uNullValue_221();
             break;
         case 222:
-            ChipLogProgress(chipTool, " ***** Test Step 222 : Read attribute NULLABLE_INT32S null Value\n");
-            err = TestReadAttributeNullableInt32sNullValue_222();
+            ChipLogProgress(chipTool, " ***** Test Step 222 : Read attribute NULLABLE_INT64U null Value\n");
+            err = TestReadAttributeNullableInt64uNullValue_222();
             break;
         case 223:
-            ChipLogProgress(chipTool, " ***** Test Step 223 : Write attribute NULLABLE_INT64S Min Value\n");
-            err = TestWriteAttributeNullableInt64sMinValue_223();
+            ChipLogProgress(chipTool, " ***** Test Step 223 : Write attribute NULLABLE_INT8S Min Value\n");
+            err = TestWriteAttributeNullableInt8sMinValue_223();
             break;
         case 224:
-            ChipLogProgress(chipTool, " ***** Test Step 224 : Read attribute NULLABLE_INT64S Min Value\n");
-            err = TestReadAttributeNullableInt64sMinValue_224();
+            ChipLogProgress(chipTool, " ***** Test Step 224 : Read attribute NULLABLE_INT8S Min Value\n");
+            err = TestReadAttributeNullableInt8sMinValue_224();
             break;
         case 225:
-            ChipLogProgress(chipTool, " ***** Test Step 225 : Write attribute NULLABLE_INT64S Invalid Value\n");
-            err = TestWriteAttributeNullableInt64sInvalidValue_225();
+            ChipLogProgress(chipTool, " ***** Test Step 225 : Write attribute NULLABLE_INT8S Invalid Value\n");
+            err = TestWriteAttributeNullableInt8sInvalidValue_225();
             break;
         case 226:
-            ChipLogProgress(chipTool, " ***** Test Step 226 : Read attribute NULLABLE_INT64S unchanged Value\n");
-            err = TestReadAttributeNullableInt64sUnchangedValue_226();
+            ChipLogProgress(chipTool, " ***** Test Step 226 : Read attribute NULLABLE_INT8S unchanged Value\n");
+            err = TestReadAttributeNullableInt8sUnchangedValue_226();
             break;
         case 227:
-            ChipLogProgress(chipTool, " ***** Test Step 227 : Write attribute NULLABLE_INT64S null Value\n");
-            err = TestWriteAttributeNullableInt64sNullValue_227();
+            ChipLogProgress(chipTool, " ***** Test Step 227 : Write attribute NULLABLE_INT8S null Value\n");
+            err = TestWriteAttributeNullableInt8sNullValue_227();
             break;
         case 228:
-            ChipLogProgress(chipTool, " ***** Test Step 228 : Read attribute NULLABLE_INT64S null Value\n");
-            err = TestReadAttributeNullableInt64sNullValue_228();
+            ChipLogProgress(chipTool, " ***** Test Step 228 : Read attribute NULLABLE_INT8S null Value\n");
+            err = TestReadAttributeNullableInt8sNullValue_228();
             break;
         case 229:
-            ChipLogProgress(chipTool, " ***** Test Step 229 : Write attribute NULLABLE_ENUM8 Max Value\n");
-            err = TestWriteAttributeNullableEnum8MaxValue_229();
+            ChipLogProgress(chipTool, " ***** Test Step 229 : Write attribute NULLABLE_INT16S Min Value\n");
+            err = TestWriteAttributeNullableInt16sMinValue_229();
             break;
         case 230:
-            ChipLogProgress(chipTool, " ***** Test Step 230 : Read attribute NULLABLE_ENUM8 Max Value\n");
-            err = TestReadAttributeNullableEnum8MaxValue_230();
+            ChipLogProgress(chipTool, " ***** Test Step 230 : Read attribute NULLABLE_INT16S Min Value\n");
+            err = TestReadAttributeNullableInt16sMinValue_230();
             break;
         case 231:
-            ChipLogProgress(chipTool, " ***** Test Step 231 : Write attribute NULLABLE_ENUM8 Invalid Value\n");
-            err = TestWriteAttributeNullableEnum8InvalidValue_231();
+            ChipLogProgress(chipTool, " ***** Test Step 231 : Write attribute NULLABLE_INT16S Invalid Value\n");
+            err = TestWriteAttributeNullableInt16sInvalidValue_231();
             break;
         case 232:
-            ChipLogProgress(chipTool, " ***** Test Step 232 : Read attribute NULLABLE_ENUM8 unchanged Value\n");
-            err = TestReadAttributeNullableEnum8UnchangedValue_232();
+            ChipLogProgress(chipTool, " ***** Test Step 232 : Read attribute NULLABLE_INT16S unchanged Value\n");
+            err = TestReadAttributeNullableInt16sUnchangedValue_232();
             break;
         case 233:
-            ChipLogProgress(chipTool, " ***** Test Step 233 : Write attribute NULLABLE_ENUM8 null Value\n");
-            err = TestWriteAttributeNullableEnum8NullValue_233();
+            ChipLogProgress(chipTool, " ***** Test Step 233 : Write attribute NULLABLE_INT16S null Value\n");
+            err = TestWriteAttributeNullableInt16sNullValue_233();
             break;
         case 234:
-            ChipLogProgress(chipTool, " ***** Test Step 234 : Read attribute NULLABLE_ENUM8 null Value\n");
-            err = TestReadAttributeNullableEnum8NullValue_234();
+            ChipLogProgress(chipTool, " ***** Test Step 234 : Read attribute NULLABLE_INT16S null Value\n");
+            err = TestReadAttributeNullableInt16sNullValue_234();
             break;
         case 235:
-            ChipLogProgress(chipTool, " ***** Test Step 235 : Write attribute NULLABLE_ENUM16 Max Value\n");
-            err = TestWriteAttributeNullableEnum16MaxValue_235();
+            ChipLogProgress(chipTool, " ***** Test Step 235 : Write attribute NULLABLE_INT32S Min Value\n");
+            err = TestWriteAttributeNullableInt32sMinValue_235();
             break;
         case 236:
-            ChipLogProgress(chipTool, " ***** Test Step 236 : Read attribute NULLABLE_ENUM16 Max Value\n");
-            err = TestReadAttributeNullableEnum16MaxValue_236();
+            ChipLogProgress(chipTool, " ***** Test Step 236 : Read attribute NULLABLE_INT32S Min Value\n");
+            err = TestReadAttributeNullableInt32sMinValue_236();
             break;
         case 237:
-            ChipLogProgress(chipTool, " ***** Test Step 237 : Write attribute NULLABLE_ENUM16 Invalid Value\n");
-            err = TestWriteAttributeNullableEnum16InvalidValue_237();
+            ChipLogProgress(chipTool, " ***** Test Step 237 : Write attribute NULLABLE_INT32S Invalid Value\n");
+            err = TestWriteAttributeNullableInt32sInvalidValue_237();
             break;
         case 238:
-            ChipLogProgress(chipTool, " ***** Test Step 238 : Read attribute NULLABLE_ENUM16 unchanged Value\n");
-            err = TestReadAttributeNullableEnum16UnchangedValue_238();
+            ChipLogProgress(chipTool, " ***** Test Step 238 : Read attribute NULLABLE_INT32S unchanged Value\n");
+            err = TestReadAttributeNullableInt32sUnchangedValue_238();
             break;
         case 239:
-            ChipLogProgress(chipTool, " ***** Test Step 239 : Write attribute NULLABLE_ENUM16 null Value\n");
-            err = TestWriteAttributeNullableEnum16NullValue_239();
+            ChipLogProgress(chipTool, " ***** Test Step 239 : Write attribute NULLABLE_INT32S null Value\n");
+            err = TestWriteAttributeNullableInt32sNullValue_239();
             break;
         case 240:
-            ChipLogProgress(chipTool, " ***** Test Step 240 : Read attribute NULLABLE_ENUM16 null Value\n");
-            err = TestReadAttributeNullableEnum16NullValue_240();
+            ChipLogProgress(chipTool, " ***** Test Step 240 : Read attribute NULLABLE_INT32S null Value\n");
+            err = TestReadAttributeNullableInt32sNullValue_240();
             break;
         case 241:
-            ChipLogProgress(chipTool, " ***** Test Step 241 : Read attribute NULLABLE_OCTET_STRING Default Value\n");
-            err = TestReadAttributeNullableOctetStringDefaultValue_241();
+            ChipLogProgress(chipTool, " ***** Test Step 241 : Write attribute NULLABLE_INT64S Min Value\n");
+            err = TestWriteAttributeNullableInt64sMinValue_241();
             break;
         case 242:
-            ChipLogProgress(chipTool, " ***** Test Step 242 : Write attribute NULLABLE_OCTET_STRING\n");
-            err = TestWriteAttributeNullableOctetString_242();
+            ChipLogProgress(chipTool, " ***** Test Step 242 : Read attribute NULLABLE_INT64S Min Value\n");
+            err = TestReadAttributeNullableInt64sMinValue_242();
             break;
         case 243:
-            ChipLogProgress(chipTool, " ***** Test Step 243 : Read attribute NULLABLE_OCTET_STRING\n");
-            err = TestReadAttributeNullableOctetString_243();
+            ChipLogProgress(chipTool, " ***** Test Step 243 : Write attribute NULLABLE_INT64S Invalid Value\n");
+            err = TestWriteAttributeNullableInt64sInvalidValue_243();
             break;
         case 244:
-            ChipLogProgress(chipTool, " ***** Test Step 244 : Write attribute NULLABLE_OCTET_STRING\n");
-            err = TestWriteAttributeNullableOctetString_244();
+            ChipLogProgress(chipTool, " ***** Test Step 244 : Read attribute NULLABLE_INT64S unchanged Value\n");
+            err = TestReadAttributeNullableInt64sUnchangedValue_244();
             break;
         case 245:
-            ChipLogProgress(chipTool, " ***** Test Step 245 : Read attribute NULLABLE_OCTET_STRING\n");
-            err = TestReadAttributeNullableOctetString_245();
+            ChipLogProgress(chipTool, " ***** Test Step 245 : Write attribute NULLABLE_INT64S null Value\n");
+            err = TestWriteAttributeNullableInt64sNullValue_245();
             break;
         case 246:
-            ChipLogProgress(chipTool, " ***** Test Step 246 : Write attribute NULLABLE_OCTET_STRING\n");
-            err = TestWriteAttributeNullableOctetString_246();
+            ChipLogProgress(chipTool, " ***** Test Step 246 : Read attribute NULLABLE_INT64S null Value\n");
+            err = TestReadAttributeNullableInt64sNullValue_246();
             break;
         case 247:
-            ChipLogProgress(chipTool, " ***** Test Step 247 : Read attribute NULLABLE_OCTET_STRING\n");
-            err = TestReadAttributeNullableOctetString_247();
+            ChipLogProgress(chipTool, " ***** Test Step 247 : Write attribute NULLABLE_SINGLE medium Value\n");
+            err = TestWriteAttributeNullableSingleMediumValue_247();
             break;
         case 248:
-            ChipLogProgress(chipTool, " ***** Test Step 248 : Read attribute NULLABLE_CHAR_STRING Default Value\n");
-            err = TestReadAttributeNullableCharStringDefaultValue_248();
+            ChipLogProgress(chipTool, " ***** Test Step 248 : Read attribute NULLABLE_SINGLE medium Value\n");
+            err = TestReadAttributeNullableSingleMediumValue_248();
             break;
         case 249:
-            ChipLogProgress(chipTool, " ***** Test Step 249 : Write attribute NULLABLE_CHAR_STRING\n");
-            err = TestWriteAttributeNullableCharString_249();
+            ChipLogProgress(chipTool, " ***** Test Step 249 : Write attribute NULLABLE_SINGLE largest Value\n");
+            err = TestWriteAttributeNullableSingleLargestValue_249();
             break;
         case 250:
-            ChipLogProgress(chipTool, " ***** Test Step 250 : Read attribute NULLABLE_CHAR_STRING\n");
-            err = TestReadAttributeNullableCharString_250();
+            ChipLogProgress(chipTool, " ***** Test Step 250 : Read attribute NULLABLE_SINGLE largest Value\n");
+            err = TestReadAttributeNullableSingleLargestValue_250();
             break;
         case 251:
-            ChipLogProgress(chipTool, " ***** Test Step 251 : Write attribute NULLABLE_CHAR_STRING - Value too long\n");
-            err = TestWriteAttributeNullableCharStringValueTooLong_251();
+            ChipLogProgress(chipTool, " ***** Test Step 251 : Write attribute NULLABLE_SINGLE smallest Value\n");
+            err = TestWriteAttributeNullableSingleSmallestValue_251();
             break;
         case 252:
-            ChipLogProgress(chipTool, " ***** Test Step 252 : Read attribute NULLABLE_CHAR_STRING\n");
-            err = TestReadAttributeNullableCharString_252();
+            ChipLogProgress(chipTool, " ***** Test Step 252 : Read attribute NULLABLE_SINGLE smallest Value\n");
+            err = TestReadAttributeNullableSingleSmallestValue_252();
             break;
         case 253:
-            ChipLogProgress(chipTool, " ***** Test Step 253 : Write attribute NULLABLE_CHAR_STRING - Empty\n");
-            err = TestWriteAttributeNullableCharStringEmpty_253();
+            ChipLogProgress(chipTool, " ***** Test Step 253 : Write attribute NULLABLE_SINGLE null Value\n");
+            err = TestWriteAttributeNullableSingleNullValue_253();
             break;
         case 254:
-            ChipLogProgress(chipTool, " ***** Test Step 254 : Read attribute NULLABLE_CHAR_STRING\n");
-            err = TestReadAttributeNullableCharString_254();
+            ChipLogProgress(chipTool, " ***** Test Step 254 : Read attribute NULLABLE_SINGLE null Value\n");
+            err = TestReadAttributeNullableSingleNullValue_254();
             break;
         case 255:
-            ChipLogProgress(chipTool, " ***** Test Step 255 : Read attribute from nonexistent endpoint.\n");
-            err = TestReadAttributeFromNonexistentEndpoint_255();
+            ChipLogProgress(chipTool, " ***** Test Step 255 : Write attribute NULLABLE_SINGLE 0 Value\n");
+            err = TestWriteAttributeNullableSingle0Value_255();
             break;
         case 256:
-            ChipLogProgress(chipTool, " ***** Test Step 256 : Read attribute from nonexistent cluster.\n");
-            err = TestReadAttributeFromNonexistentCluster_256();
+            ChipLogProgress(chipTool, " ***** Test Step 256 : Read attribute NULLABLE_SINGLE 0 Value\n");
+            err = TestReadAttributeNullableSingle0Value_256();
+            break;
+        case 257:
+            ChipLogProgress(chipTool, " ***** Test Step 257 : Write attribute NULLABLE_DOUBLE medium Value\n");
+            err = TestWriteAttributeNullableDoubleMediumValue_257();
+            break;
+        case 258:
+            ChipLogProgress(chipTool, " ***** Test Step 258 : Read attribute NULLABLE_DOUBLE medium Value\n");
+            err = TestReadAttributeNullableDoubleMediumValue_258();
+            break;
+        case 259:
+            ChipLogProgress(chipTool, " ***** Test Step 259 : Write attribute NULLABLE_DOUBLE largest Value\n");
+            err = TestWriteAttributeNullableDoubleLargestValue_259();
+            break;
+        case 260:
+            ChipLogProgress(chipTool, " ***** Test Step 260 : Read attribute NULLABLE_DOUBLE largest Value\n");
+            err = TestReadAttributeNullableDoubleLargestValue_260();
+            break;
+        case 261:
+            ChipLogProgress(chipTool, " ***** Test Step 261 : Write attribute NULLABLE_DOUBLE smallest Value\n");
+            err = TestWriteAttributeNullableDoubleSmallestValue_261();
+            break;
+        case 262:
+            ChipLogProgress(chipTool, " ***** Test Step 262 : Read attribute NULLABLE_DOUBLE smallest Value\n");
+            err = TestReadAttributeNullableDoubleSmallestValue_262();
+            break;
+        case 263:
+            ChipLogProgress(chipTool, " ***** Test Step 263 : Write attribute NULLABLE_DOUBLE null Value\n");
+            err = TestWriteAttributeNullableDoubleNullValue_263();
+            break;
+        case 264:
+            ChipLogProgress(chipTool, " ***** Test Step 264 : Read attribute NULLABLE_DOUBLE null Value\n");
+            err = TestReadAttributeNullableDoubleNullValue_264();
+            break;
+        case 265:
+            ChipLogProgress(chipTool, " ***** Test Step 265 : Write attribute NULLABLE_DOUBLE 0 Value\n");
+            err = TestWriteAttributeNullableDouble0Value_265();
+            break;
+        case 266:
+            ChipLogProgress(chipTool, " ***** Test Step 266 : Read attribute NULLABLE_DOUBLE 0 Value\n");
+            err = TestReadAttributeNullableDouble0Value_266();
+            break;
+        case 267:
+            ChipLogProgress(chipTool, " ***** Test Step 267 : Write attribute NULLABLE_ENUM8 Max Value\n");
+            err = TestWriteAttributeNullableEnum8MaxValue_267();
+            break;
+        case 268:
+            ChipLogProgress(chipTool, " ***** Test Step 268 : Read attribute NULLABLE_ENUM8 Max Value\n");
+            err = TestReadAttributeNullableEnum8MaxValue_268();
+            break;
+        case 269:
+            ChipLogProgress(chipTool, " ***** Test Step 269 : Write attribute NULLABLE_ENUM8 Invalid Value\n");
+            err = TestWriteAttributeNullableEnum8InvalidValue_269();
+            break;
+        case 270:
+            ChipLogProgress(chipTool, " ***** Test Step 270 : Read attribute NULLABLE_ENUM8 unchanged Value\n");
+            err = TestReadAttributeNullableEnum8UnchangedValue_270();
+            break;
+        case 271:
+            ChipLogProgress(chipTool, " ***** Test Step 271 : Write attribute NULLABLE_ENUM8 null Value\n");
+            err = TestWriteAttributeNullableEnum8NullValue_271();
+            break;
+        case 272:
+            ChipLogProgress(chipTool, " ***** Test Step 272 : Read attribute NULLABLE_ENUM8 null Value\n");
+            err = TestReadAttributeNullableEnum8NullValue_272();
+            break;
+        case 273:
+            ChipLogProgress(chipTool, " ***** Test Step 273 : Write attribute NULLABLE_ENUM16 Max Value\n");
+            err = TestWriteAttributeNullableEnum16MaxValue_273();
+            break;
+        case 274:
+            ChipLogProgress(chipTool, " ***** Test Step 274 : Read attribute NULLABLE_ENUM16 Max Value\n");
+            err = TestReadAttributeNullableEnum16MaxValue_274();
+            break;
+        case 275:
+            ChipLogProgress(chipTool, " ***** Test Step 275 : Write attribute NULLABLE_ENUM16 Invalid Value\n");
+            err = TestWriteAttributeNullableEnum16InvalidValue_275();
+            break;
+        case 276:
+            ChipLogProgress(chipTool, " ***** Test Step 276 : Read attribute NULLABLE_ENUM16 unchanged Value\n");
+            err = TestReadAttributeNullableEnum16UnchangedValue_276();
+            break;
+        case 277:
+            ChipLogProgress(chipTool, " ***** Test Step 277 : Write attribute NULLABLE_ENUM16 null Value\n");
+            err = TestWriteAttributeNullableEnum16NullValue_277();
+            break;
+        case 278:
+            ChipLogProgress(chipTool, " ***** Test Step 278 : Read attribute NULLABLE_ENUM16 null Value\n");
+            err = TestReadAttributeNullableEnum16NullValue_278();
+            break;
+        case 279:
+            ChipLogProgress(chipTool, " ***** Test Step 279 : Read attribute NULLABLE_OCTET_STRING Default Value\n");
+            err = TestReadAttributeNullableOctetStringDefaultValue_279();
+            break;
+        case 280:
+            ChipLogProgress(chipTool, " ***** Test Step 280 : Write attribute NULLABLE_OCTET_STRING\n");
+            err = TestWriteAttributeNullableOctetString_280();
+            break;
+        case 281:
+            ChipLogProgress(chipTool, " ***** Test Step 281 : Read attribute NULLABLE_OCTET_STRING\n");
+            err = TestReadAttributeNullableOctetString_281();
+            break;
+        case 282:
+            ChipLogProgress(chipTool, " ***** Test Step 282 : Write attribute NULLABLE_OCTET_STRING\n");
+            err = TestWriteAttributeNullableOctetString_282();
+            break;
+        case 283:
+            ChipLogProgress(chipTool, " ***** Test Step 283 : Read attribute NULLABLE_OCTET_STRING\n");
+            err = TestReadAttributeNullableOctetString_283();
+            break;
+        case 284:
+            ChipLogProgress(chipTool, " ***** Test Step 284 : Write attribute NULLABLE_OCTET_STRING\n");
+            err = TestWriteAttributeNullableOctetString_284();
+            break;
+        case 285:
+            ChipLogProgress(chipTool, " ***** Test Step 285 : Read attribute NULLABLE_OCTET_STRING\n");
+            err = TestReadAttributeNullableOctetString_285();
+            break;
+        case 286:
+            ChipLogProgress(chipTool, " ***** Test Step 286 : Read attribute NULLABLE_CHAR_STRING Default Value\n");
+            err = TestReadAttributeNullableCharStringDefaultValue_286();
+            break;
+        case 287:
+            ChipLogProgress(chipTool, " ***** Test Step 287 : Write attribute NULLABLE_CHAR_STRING\n");
+            err = TestWriteAttributeNullableCharString_287();
+            break;
+        case 288:
+            ChipLogProgress(chipTool, " ***** Test Step 288 : Read attribute NULLABLE_CHAR_STRING\n");
+            err = TestReadAttributeNullableCharString_288();
+            break;
+        case 289:
+            ChipLogProgress(chipTool, " ***** Test Step 289 : Write attribute NULLABLE_CHAR_STRING - Value too long\n");
+            err = TestWriteAttributeNullableCharStringValueTooLong_289();
+            break;
+        case 290:
+            ChipLogProgress(chipTool, " ***** Test Step 290 : Read attribute NULLABLE_CHAR_STRING\n");
+            err = TestReadAttributeNullableCharString_290();
+            break;
+        case 291:
+            ChipLogProgress(chipTool, " ***** Test Step 291 : Write attribute NULLABLE_CHAR_STRING - Empty\n");
+            err = TestWriteAttributeNullableCharStringEmpty_291();
+            break;
+        case 292:
+            ChipLogProgress(chipTool, " ***** Test Step 292 : Read attribute NULLABLE_CHAR_STRING\n");
+            err = TestReadAttributeNullableCharString_292();
+            break;
+        case 293:
+            ChipLogProgress(chipTool, " ***** Test Step 293 : Read attribute from nonexistent endpoint.\n");
+            err = TestReadAttributeFromNonexistentEndpoint_293();
+            break;
+        case 294:
+            ChipLogProgress(chipTool, " ***** Test Step 294 : Read attribute from nonexistent cluster.\n");
+            err = TestReadAttributeFromNonexistentCluster_294();
             break;
         }
 
@@ -33283,7 +33436,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 257;
+    const uint16_t mTestCount = 295;
 
     static void OnFailureCallback_6(void * context, EmberAfStatus status)
     {
@@ -33930,9 +34083,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_79(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_79(void * context, uint8_t enum8)
+    static void OnSuccessCallback_79(void * context, float floatSingle)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_79(enum8);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_79(floatSingle);
     }
 
     static void OnFailureCallback_80(void * context, EmberAfStatus status)
@@ -33947,9 +34100,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_81(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_81(void * context, uint8_t enum8)
+    static void OnSuccessCallback_81(void * context, float floatSingle)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_81(enum8);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_81(floatSingle);
     }
 
     static void OnFailureCallback_82(void * context, EmberAfStatus status)
@@ -33964,9 +34117,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_83(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_83(void * context, uint8_t enum8)
+    static void OnSuccessCallback_83(void * context, float floatSingle)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_83(enum8);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_83(floatSingle);
     }
 
     static void OnFailureCallback_84(void * context, EmberAfStatus status)
@@ -33974,43 +34127,43 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_84(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_84(void * context, uint16_t enum16)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_84(enum16);
-    }
+    static void OnSuccessCallback_84(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_84(); }
 
     static void OnFailureCallback_85(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_85(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_85(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_85(); }
+    static void OnSuccessCallback_85(void * context, float floatSingle)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_85(floatSingle);
+    }
 
     static void OnFailureCallback_86(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_86(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_86(void * context, uint16_t enum16)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_86(enum16);
-    }
+    static void OnSuccessCallback_86(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_86(); }
 
     static void OnFailureCallback_87(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_87(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_87(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_87(); }
+    static void OnSuccessCallback_87(void * context, float floatSingle)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_87(floatSingle);
+    }
 
     static void OnFailureCallback_88(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_88(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_88(void * context, uint16_t enum16)
+    static void OnSuccessCallback_88(void * context, double floatDouble)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_88(enum16);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_88(floatDouble);
     }
 
     static void OnFailureCallback_89(void * context, EmberAfStatus status)
@@ -34018,77 +34171,77 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_89(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_89(void * context, chip::ByteSpan octetString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_89(octetString);
-    }
+    static void OnSuccessCallback_89(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_89(); }
 
     static void OnFailureCallback_90(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_90(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_90(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_90(); }
+    static void OnSuccessCallback_90(void * context, double floatDouble)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_90(floatDouble);
+    }
 
     static void OnFailureCallback_91(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_91(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_91(void * context, chip::ByteSpan octetString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_91(octetString);
-    }
+    static void OnSuccessCallback_91(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_91(); }
 
     static void OnFailureCallback_92(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_92(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_92(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_92(); }
+    static void OnSuccessCallback_92(void * context, double floatDouble)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_92(floatDouble);
+    }
 
     static void OnFailureCallback_93(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_93(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_93(void * context, chip::ByteSpan octetString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_93(octetString);
-    }
+    static void OnSuccessCallback_93(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_93(); }
 
     static void OnFailureCallback_94(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_94(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_94(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_94(); }
+    static void OnSuccessCallback_94(void * context, double floatDouble)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_94(floatDouble);
+    }
 
     static void OnFailureCallback_95(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_95(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_95(void * context, chip::ByteSpan octetString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_95(octetString);
-    }
+    static void OnSuccessCallback_95(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_95(); }
 
     static void OnFailureCallback_96(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_96(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_96(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_96(); }
+    static void OnSuccessCallback_96(void * context, double floatDouble)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_96(floatDouble);
+    }
 
     static void OnFailureCallback_97(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_97(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_97(void * context, chip::ByteSpan longOctetString)
+    static void OnSuccessCallback_97(void * context, uint8_t enum8)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_97(longOctetString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_97(enum8);
     }
 
     static void OnFailureCallback_98(void * context, EmberAfStatus status)
@@ -34103,9 +34256,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_99(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_99(void * context, chip::ByteSpan longOctetString)
+    static void OnSuccessCallback_99(void * context, uint8_t enum8)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_99(longOctetString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_99(enum8);
     }
 
     static void OnFailureCallback_100(void * context, EmberAfStatus status)
@@ -34120,9 +34273,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_101(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_101(void * context, chip::CharSpan charString)
+    static void OnSuccessCallback_101(void * context, uint8_t enum8)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_101(charString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_101(enum8);
     }
 
     static void OnFailureCallback_102(void * context, EmberAfStatus status)
@@ -34130,50 +34283,53 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_102(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_102(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_102(); }
+    static void OnSuccessCallback_102(void * context, uint16_t enum16)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_102(enum16);
+    }
 
     static void OnFailureCallback_103(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_103(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_103(void * context, chip::CharSpan charString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_103(charString);
-    }
+    static void OnSuccessCallback_103(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_103(); }
 
     static void OnFailureCallback_104(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_104(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_104(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_104(); }
+    static void OnSuccessCallback_104(void * context, uint16_t enum16)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_104(enum16);
+    }
 
     static void OnFailureCallback_105(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_105(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_105(void * context, chip::CharSpan charString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_105(charString);
-    }
+    static void OnSuccessCallback_105(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_105(); }
 
     static void OnFailureCallback_106(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_106(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_106(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_106(); }
+    static void OnSuccessCallback_106(void * context, uint16_t enum16)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_106(enum16);
+    }
 
     static void OnFailureCallback_107(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_107(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_107(void * context, chip::CharSpan longCharString)
+    static void OnSuccessCallback_107(void * context, chip::ByteSpan octetString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_107(longCharString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_107(octetString);
     }
 
     static void OnFailureCallback_108(void * context, EmberAfStatus status)
@@ -34188,9 +34344,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_109(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_109(void * context, chip::CharSpan longCharString)
+    static void OnSuccessCallback_109(void * context, chip::ByteSpan octetString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_109(longCharString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_109(octetString);
     }
 
     static void OnFailureCallback_110(void * context, EmberAfStatus status)
@@ -34205,9 +34361,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_111(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_111(void * context, uint64_t epochUs)
+    static void OnSuccessCallback_111(void * context, chip::ByteSpan octetString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_111(epochUs);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_111(octetString);
     }
 
     static void OnFailureCallback_112(void * context, EmberAfStatus status)
@@ -34222,9 +34378,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_113(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_113(void * context, uint64_t epochUs)
+    static void OnSuccessCallback_113(void * context, chip::ByteSpan octetString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_113(epochUs);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_113(octetString);
     }
 
     static void OnFailureCallback_114(void * context, EmberAfStatus status)
@@ -34239,9 +34395,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_115(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_115(void * context, uint64_t epochUs)
+    static void OnSuccessCallback_115(void * context, chip::ByteSpan longOctetString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_115(epochUs);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_115(longOctetString);
     }
 
     static void OnFailureCallback_116(void * context, EmberAfStatus status)
@@ -34249,53 +34405,50 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_116(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_116(void * context, uint32_t epochS)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_116(epochS);
-    }
+    static void OnSuccessCallback_116(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_116(); }
 
     static void OnFailureCallback_117(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_117(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_117(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_117(); }
+    static void OnSuccessCallback_117(void * context, chip::ByteSpan longOctetString)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_117(longOctetString);
+    }
 
     static void OnFailureCallback_118(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_118(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_118(void * context, uint32_t epochS)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_118(epochS);
-    }
+    static void OnSuccessCallback_118(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_118(); }
 
     static void OnFailureCallback_119(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_119(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_119(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_119(); }
+    static void OnSuccessCallback_119(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_119(charString);
+    }
 
     static void OnFailureCallback_120(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_120(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_120(void * context, uint32_t epochS)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_120(epochS);
-    }
+    static void OnSuccessCallback_120(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_120(); }
 
     static void OnFailureCallback_121(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_121(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_121(void * context, bool unsupported)
+    static void OnSuccessCallback_121(void * context, chip::CharSpan charString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_121(unsupported);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_121(charString);
     }
 
     static void OnFailureCallback_122(void * context, EmberAfStatus status)
@@ -34305,14 +34458,31 @@ private:
 
     static void OnSuccessCallback_122(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_122(); }
 
+    static void OnFailureCallback_123(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_123(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_123(void * context, chip::CharSpan charString)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_123(charString);
+    }
+
+    static void OnFailureCallback_124(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_124(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_124(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_124(); }
+
     static void OnFailureCallback_125(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_125(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_125(void * context, chip::VendorId vendorId)
+    static void OnSuccessCallback_125(void * context, chip::CharSpan longCharString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_125(vendorId);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_125(longCharString);
     }
 
     static void OnFailureCallback_126(void * context, EmberAfStatus status)
@@ -34327,9 +34497,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_127(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_127(void * context, chip::VendorId vendorId)
+    static void OnSuccessCallback_127(void * context, chip::CharSpan longCharString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_127(vendorId);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_127(longCharString);
     }
 
     static void OnFailureCallback_128(void * context, EmberAfStatus status)
@@ -34339,144 +34509,144 @@ private:
 
     static void OnSuccessCallback_128(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_128(); }
 
+    static void OnFailureCallback_129(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_129(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_129(void * context, uint64_t epochUs)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_129(epochUs);
+    }
+
+    static void OnFailureCallback_130(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_130(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_130(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_130(); }
+
+    static void OnFailureCallback_131(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_131(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_131(void * context, uint64_t epochUs)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_131(epochUs);
+    }
+
+    static void OnFailureCallback_132(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_132(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_132(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_132(); }
+
+    static void OnFailureCallback_133(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_133(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_133(void * context, uint64_t epochUs)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_133(epochUs);
+    }
+
+    static void OnFailureCallback_134(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_134(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_134(void * context, uint32_t epochS)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_134(epochS);
+    }
+
+    static void OnFailureCallback_135(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_135(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_135(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_135(); }
+
+    static void OnFailureCallback_136(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_136(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_136(void * context, uint32_t epochS)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_136(epochS);
+    }
+
+    static void OnFailureCallback_137(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_137(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_137(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_137(); }
+
+    static void OnFailureCallback_138(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_138(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_138(void * context, uint32_t epochS)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_138(epochS);
+    }
+
+    static void OnFailureCallback_139(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_139(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_139(void * context, bool unsupported)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_139(unsupported);
+    }
+
+    static void OnFailureCallback_140(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_140(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_140(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_140(); }
+
+    static void OnFailureCallback_143(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_143(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_143(void * context, chip::VendorId vendorId)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_143(vendorId);
+    }
+
+    static void OnFailureCallback_144(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_144(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_144(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_144(); }
+
     static void OnFailureCallback_145(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_145(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_145(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_145(); }
+    static void OnSuccessCallback_145(void * context, chip::VendorId vendorId)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_145(vendorId);
+    }
 
     static void OnFailureCallback_146(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_146(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_146(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_146(listInt8u);
-    }
-
-    static void OnFailureCallback_147(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_147(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_147(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_147(); }
-
-    static void OnFailureCallback_148(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_148(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_148(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & listOctetString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_148(listOctetString);
-    }
-
-    static void OnFailureCallback_149(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_149(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_149(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_149(); }
-
-    static void OnFailureCallback_150(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_150(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_150(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
-            listStructOctetString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_150(listStructOctetString);
-    }
-
-    static void OnFailureCallback_153(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_153(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_153(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_153(); }
-
-    static void OnFailureCallback_154(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_154(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_154(void * context, const chip::app::DataModel::Nullable<bool> & nullableBoolean)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_154(nullableBoolean);
-    }
-
-    static void OnFailureCallback_155(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_155(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_155(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_155(); }
-
-    static void OnFailureCallback_156(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_156(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_156(void * context, const chip::app::DataModel::Nullable<bool> & nullableBoolean)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_156(nullableBoolean);
-    }
-
-    static void OnFailureCallback_157(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_157(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_157(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_157(); }
-
-    static void OnFailureCallback_158(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_158(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_158(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_158(nullableBitmap8);
-    }
-
-    static void OnFailureCallback_159(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_159(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_159(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_159(); }
-
-    static void OnFailureCallback_160(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_160(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_160(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_160(nullableBitmap8);
-    }
-
-    static void OnFailureCallback_161(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_161(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_161(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_161(); }
-
-    static void OnFailureCallback_162(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_162(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_162(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_162(nullableBitmap8);
-    }
+    static void OnSuccessCallback_146(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_146(); }
 
     static void OnFailureCallback_163(void * context, EmberAfStatus status)
     {
@@ -34490,9 +34660,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_164(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_164(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
+    static void OnSuccessCallback_164(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_164(nullableBitmap16);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_164(listInt8u);
     }
 
     static void OnFailureCallback_165(void * context, EmberAfStatus status)
@@ -34507,9 +34677,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_166(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_166(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
+    static void OnSuccessCallback_166(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & listOctetString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_166(nullableBitmap16);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_166(listOctetString);
     }
 
     static void OnFailureCallback_167(void * context, EmberAfStatus status)
@@ -34524,26 +34694,12 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_168(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_168(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
+    static void OnSuccessCallback_168(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+            listStructOctetString)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_168(nullableBitmap16);
-    }
-
-    static void OnFailureCallback_169(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_169(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_169(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_169(); }
-
-    static void OnFailureCallback_170(void * context, EmberAfStatus status)
-    {
-        (static_cast<TestCluster *>(context))->OnFailureResponse_170(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_170(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_170(nullableBitmap32);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_168(listStructOctetString);
     }
 
     static void OnFailureCallback_171(void * context, EmberAfStatus status)
@@ -34558,9 +34714,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_172(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_172(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
+    static void OnSuccessCallback_172(void * context, const chip::app::DataModel::Nullable<bool> & nullableBoolean)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_172(nullableBitmap32);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_172(nullableBoolean);
     }
 
     static void OnFailureCallback_173(void * context, EmberAfStatus status)
@@ -34575,9 +34731,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_174(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_174(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
+    static void OnSuccessCallback_174(void * context, const chip::app::DataModel::Nullable<bool> & nullableBoolean)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_174(nullableBitmap32);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_174(nullableBoolean);
     }
 
     static void OnFailureCallback_175(void * context, EmberAfStatus status)
@@ -34592,9 +34748,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_176(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_176(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
+    static void OnSuccessCallback_176(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_176(nullableBitmap64);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_176(nullableBitmap8);
     }
 
     static void OnFailureCallback_177(void * context, EmberAfStatus status)
@@ -34609,9 +34765,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_178(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_178(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
+    static void OnSuccessCallback_178(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_178(nullableBitmap64);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_178(nullableBitmap8);
     }
 
     static void OnFailureCallback_179(void * context, EmberAfStatus status)
@@ -34626,9 +34782,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_180(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_180(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
+    static void OnSuccessCallback_180(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_180(nullableBitmap64);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_180(nullableBitmap8);
     }
 
     static void OnFailureCallback_181(void * context, EmberAfStatus status)
@@ -34643,9 +34799,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_182(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_182(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
+    static void OnSuccessCallback_182(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_182(nullableInt8u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_182(nullableBitmap16);
     }
 
     static void OnFailureCallback_183(void * context, EmberAfStatus status)
@@ -34660,9 +34816,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_184(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_184(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
+    static void OnSuccessCallback_184(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_184(nullableInt8u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_184(nullableBitmap16);
     }
 
     static void OnFailureCallback_185(void * context, EmberAfStatus status)
@@ -34677,9 +34833,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_186(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_186(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
+    static void OnSuccessCallback_186(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_186(nullableInt8u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_186(nullableBitmap16);
     }
 
     static void OnFailureCallback_187(void * context, EmberAfStatus status)
@@ -34694,9 +34850,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_188(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_188(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
+    static void OnSuccessCallback_188(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_188(nullableInt16u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_188(nullableBitmap32);
     }
 
     static void OnFailureCallback_189(void * context, EmberAfStatus status)
@@ -34711,9 +34867,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_190(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_190(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
+    static void OnSuccessCallback_190(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_190(nullableInt16u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_190(nullableBitmap32);
     }
 
     static void OnFailureCallback_191(void * context, EmberAfStatus status)
@@ -34728,9 +34884,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_192(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_192(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
+    static void OnSuccessCallback_192(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_192(nullableInt16u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_192(nullableBitmap32);
     }
 
     static void OnFailureCallback_193(void * context, EmberAfStatus status)
@@ -34745,9 +34901,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_194(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_194(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
+    static void OnSuccessCallback_194(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_194(nullableInt32u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_194(nullableBitmap64);
     }
 
     static void OnFailureCallback_195(void * context, EmberAfStatus status)
@@ -34762,9 +34918,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_196(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_196(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
+    static void OnSuccessCallback_196(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_196(nullableInt32u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_196(nullableBitmap64);
     }
 
     static void OnFailureCallback_197(void * context, EmberAfStatus status)
@@ -34779,9 +34935,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_198(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_198(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
+    static void OnSuccessCallback_198(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_198(nullableInt32u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_198(nullableBitmap64);
     }
 
     static void OnFailureCallback_199(void * context, EmberAfStatus status)
@@ -34796,9 +34952,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_200(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_200(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
+    static void OnSuccessCallback_200(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_200(nullableInt64u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_200(nullableInt8u);
     }
 
     static void OnFailureCallback_201(void * context, EmberAfStatus status)
@@ -34813,9 +34969,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_202(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_202(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
+    static void OnSuccessCallback_202(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_202(nullableInt64u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_202(nullableInt8u);
     }
 
     static void OnFailureCallback_203(void * context, EmberAfStatus status)
@@ -34830,9 +34986,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_204(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_204(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
+    static void OnSuccessCallback_204(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_204(nullableInt64u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_204(nullableInt8u);
     }
 
     static void OnFailureCallback_205(void * context, EmberAfStatus status)
@@ -34847,9 +35003,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_206(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_206(void * context, const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
+    static void OnSuccessCallback_206(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_206(nullableInt8s);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_206(nullableInt16u);
     }
 
     static void OnFailureCallback_207(void * context, EmberAfStatus status)
@@ -34864,9 +35020,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_208(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_208(void * context, const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
+    static void OnSuccessCallback_208(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_208(nullableInt8s);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_208(nullableInt16u);
     }
 
     static void OnFailureCallback_209(void * context, EmberAfStatus status)
@@ -34881,9 +35037,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_210(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_210(void * context, const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
+    static void OnSuccessCallback_210(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_210(nullableInt8s);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_210(nullableInt16u);
     }
 
     static void OnFailureCallback_211(void * context, EmberAfStatus status)
@@ -34898,9 +35054,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_212(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_212(void * context, const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
+    static void OnSuccessCallback_212(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_212(nullableInt16s);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_212(nullableInt32u);
     }
 
     static void OnFailureCallback_213(void * context, EmberAfStatus status)
@@ -34915,9 +35071,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_214(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_214(void * context, const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
+    static void OnSuccessCallback_214(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_214(nullableInt16s);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_214(nullableInt32u);
     }
 
     static void OnFailureCallback_215(void * context, EmberAfStatus status)
@@ -34932,9 +35088,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_216(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_216(void * context, const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
+    static void OnSuccessCallback_216(void * context, const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_216(nullableInt16s);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_216(nullableInt32u);
     }
 
     static void OnFailureCallback_217(void * context, EmberAfStatus status)
@@ -34949,9 +35105,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_218(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_218(void * context, const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
+    static void OnSuccessCallback_218(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_218(nullableInt32s);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_218(nullableInt64u);
     }
 
     static void OnFailureCallback_219(void * context, EmberAfStatus status)
@@ -34966,9 +35122,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_220(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_220(void * context, const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
+    static void OnSuccessCallback_220(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_220(nullableInt32s);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_220(nullableInt64u);
     }
 
     static void OnFailureCallback_221(void * context, EmberAfStatus status)
@@ -34983,9 +35139,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_222(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_222(void * context, const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
+    static void OnSuccessCallback_222(void * context, const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_222(nullableInt32s);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_222(nullableInt64u);
     }
 
     static void OnFailureCallback_223(void * context, EmberAfStatus status)
@@ -35000,9 +35156,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_224(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_224(void * context, const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
+    static void OnSuccessCallback_224(void * context, const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_224(nullableInt64s);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_224(nullableInt8s);
     }
 
     static void OnFailureCallback_225(void * context, EmberAfStatus status)
@@ -35017,9 +35173,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_226(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_226(void * context, const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
+    static void OnSuccessCallback_226(void * context, const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_226(nullableInt64s);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_226(nullableInt8s);
     }
 
     static void OnFailureCallback_227(void * context, EmberAfStatus status)
@@ -35034,9 +35190,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_228(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_228(void * context, const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
+    static void OnSuccessCallback_228(void * context, const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_228(nullableInt64s);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_228(nullableInt8s);
     }
 
     static void OnFailureCallback_229(void * context, EmberAfStatus status)
@@ -35051,9 +35207,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_230(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_230(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableEnum8)
+    static void OnSuccessCallback_230(void * context, const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_230(nullableEnum8);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_230(nullableInt16s);
     }
 
     static void OnFailureCallback_231(void * context, EmberAfStatus status)
@@ -35068,9 +35224,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_232(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_232(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableEnum8)
+    static void OnSuccessCallback_232(void * context, const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_232(nullableEnum8);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_232(nullableInt16s);
     }
 
     static void OnFailureCallback_233(void * context, EmberAfStatus status)
@@ -35085,9 +35241,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_234(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_234(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableEnum8)
+    static void OnSuccessCallback_234(void * context, const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_234(nullableEnum8);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_234(nullableInt16s);
     }
 
     static void OnFailureCallback_235(void * context, EmberAfStatus status)
@@ -35102,9 +35258,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_236(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_236(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
+    static void OnSuccessCallback_236(void * context, const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_236(nullableEnum16);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_236(nullableInt32s);
     }
 
     static void OnFailureCallback_237(void * context, EmberAfStatus status)
@@ -35119,9 +35275,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_238(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_238(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
+    static void OnSuccessCallback_238(void * context, const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_238(nullableEnum16);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_238(nullableInt32s);
     }
 
     static void OnFailureCallback_239(void * context, EmberAfStatus status)
@@ -35136,9 +35292,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_240(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_240(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
+    static void OnSuccessCallback_240(void * context, const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_240(nullableEnum16);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_240(nullableInt32s);
     }
 
     static void OnFailureCallback_241(void * context, EmberAfStatus status)
@@ -35146,70 +35302,67 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_241(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_241(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_241(nullableOctetString);
-    }
+    static void OnSuccessCallback_241(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_241(); }
 
     static void OnFailureCallback_242(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_242(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_242(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_242(); }
+    static void OnSuccessCallback_242(void * context, const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_242(nullableInt64s);
+    }
 
     static void OnFailureCallback_243(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_243(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_243(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_243(nullableOctetString);
-    }
+    static void OnSuccessCallback_243(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_243(); }
 
     static void OnFailureCallback_244(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_244(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_244(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_244(); }
+    static void OnSuccessCallback_244(void * context, const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_244(nullableInt64s);
+    }
 
     static void OnFailureCallback_245(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_245(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_245(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_245(nullableOctetString);
-    }
+    static void OnSuccessCallback_245(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_245(); }
 
     static void OnFailureCallback_246(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_246(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_246(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_246(); }
+    static void OnSuccessCallback_246(void * context, const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_246(nullableInt64s);
+    }
 
     static void OnFailureCallback_247(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_247(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_247(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_247(nullableOctetString);
-    }
+    static void OnSuccessCallback_247(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_247(); }
 
     static void OnFailureCallback_248(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_248(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_248(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
+    static void OnSuccessCallback_248(void * context, const chip::app::DataModel::Nullable<float> & nullableFloatSingle)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_248(nullableCharString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_248(nullableFloatSingle);
     }
 
     static void OnFailureCallback_249(void * context, EmberAfStatus status)
@@ -35224,9 +35377,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_250(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_250(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
+    static void OnSuccessCallback_250(void * context, const chip::app::DataModel::Nullable<float> & nullableFloatSingle)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_250(nullableCharString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_250(nullableFloatSingle);
     }
 
     static void OnFailureCallback_251(void * context, EmberAfStatus status)
@@ -35241,9 +35394,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_252(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_252(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
+    static void OnSuccessCallback_252(void * context, const chip::app::DataModel::Nullable<float> & nullableFloatSingle)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_252(nullableCharString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_252(nullableFloatSingle);
     }
 
     static void OnFailureCallback_253(void * context, EmberAfStatus status)
@@ -35258,9 +35411,9 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_254(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_254(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
+    static void OnSuccessCallback_254(void * context, const chip::app::DataModel::Nullable<float> & nullableFloatSingle)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_254(nullableCharString);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_254(nullableFloatSingle);
     }
 
     static void OnFailureCallback_255(void * context, EmberAfStatus status)
@@ -35268,19 +35421,345 @@ private:
         (static_cast<TestCluster *>(context))->OnFailureResponse_255(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_255(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
-    {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_255(listInt8u);
-    }
+    static void OnSuccessCallback_255(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_255(); }
 
     static void OnFailureCallback_256(void * context, EmberAfStatus status)
     {
         (static_cast<TestCluster *>(context))->OnFailureResponse_256(chip::to_underlying(status));
     }
 
-    static void OnSuccessCallback_256(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    static void OnSuccessCallback_256(void * context, const chip::app::DataModel::Nullable<float> & nullableFloatSingle)
     {
-        (static_cast<TestCluster *>(context))->OnSuccessResponse_256(listInt8u);
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_256(nullableFloatSingle);
+    }
+
+    static void OnFailureCallback_257(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_257(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_257(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_257(); }
+
+    static void OnFailureCallback_258(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_258(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_258(void * context, const chip::app::DataModel::Nullable<double> & nullableFloatDouble)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_258(nullableFloatDouble);
+    }
+
+    static void OnFailureCallback_259(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_259(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_259(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_259(); }
+
+    static void OnFailureCallback_260(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_260(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_260(void * context, const chip::app::DataModel::Nullable<double> & nullableFloatDouble)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_260(nullableFloatDouble);
+    }
+
+    static void OnFailureCallback_261(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_261(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_261(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_261(); }
+
+    static void OnFailureCallback_262(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_262(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_262(void * context, const chip::app::DataModel::Nullable<double> & nullableFloatDouble)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_262(nullableFloatDouble);
+    }
+
+    static void OnFailureCallback_263(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_263(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_263(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_263(); }
+
+    static void OnFailureCallback_264(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_264(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_264(void * context, const chip::app::DataModel::Nullable<double> & nullableFloatDouble)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_264(nullableFloatDouble);
+    }
+
+    static void OnFailureCallback_265(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_265(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_265(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_265(); }
+
+    static void OnFailureCallback_266(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_266(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_266(void * context, const chip::app::DataModel::Nullable<double> & nullableFloatDouble)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_266(nullableFloatDouble);
+    }
+
+    static void OnFailureCallback_267(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_267(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_267(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_267(); }
+
+    static void OnFailureCallback_268(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_268(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_268(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableEnum8)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_268(nullableEnum8);
+    }
+
+    static void OnFailureCallback_269(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_269(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_269(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_269(); }
+
+    static void OnFailureCallback_270(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_270(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_270(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableEnum8)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_270(nullableEnum8);
+    }
+
+    static void OnFailureCallback_271(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_271(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_271(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_271(); }
+
+    static void OnFailureCallback_272(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_272(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_272(void * context, const chip::app::DataModel::Nullable<uint8_t> & nullableEnum8)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_272(nullableEnum8);
+    }
+
+    static void OnFailureCallback_273(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_273(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_273(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_273(); }
+
+    static void OnFailureCallback_274(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_274(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_274(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_274(nullableEnum16);
+    }
+
+    static void OnFailureCallback_275(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_275(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_275(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_275(); }
+
+    static void OnFailureCallback_276(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_276(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_276(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_276(nullableEnum16);
+    }
+
+    static void OnFailureCallback_277(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_277(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_277(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_277(); }
+
+    static void OnFailureCallback_278(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_278(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_278(void * context, const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_278(nullableEnum16);
+    }
+
+    static void OnFailureCallback_279(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_279(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_279(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_279(nullableOctetString);
+    }
+
+    static void OnFailureCallback_280(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_280(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_280(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_280(); }
+
+    static void OnFailureCallback_281(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_281(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_281(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_281(nullableOctetString);
+    }
+
+    static void OnFailureCallback_282(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_282(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_282(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_282(); }
+
+    static void OnFailureCallback_283(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_283(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_283(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_283(nullableOctetString);
+    }
+
+    static void OnFailureCallback_284(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_284(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_284(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_284(); }
+
+    static void OnFailureCallback_285(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_285(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_285(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_285(nullableOctetString);
+    }
+
+    static void OnFailureCallback_286(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_286(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_286(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_286(nullableCharString);
+    }
+
+    static void OnFailureCallback_287(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_287(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_287(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_287(); }
+
+    static void OnFailureCallback_288(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_288(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_288(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_288(nullableCharString);
+    }
+
+    static void OnFailureCallback_289(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_289(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_289(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_289(); }
+
+    static void OnFailureCallback_290(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_290(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_290(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_290(nullableCharString);
+    }
+
+    static void OnFailureCallback_291(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_291(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_291(void * context) { (static_cast<TestCluster *>(context))->OnSuccessResponse_291(); }
+
+    static void OnFailureCallback_292(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_292(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_292(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_292(nullableCharString);
+    }
+
+    static void OnFailureCallback_293(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_293(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_293(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_293(listInt8u);
+    }
+
+    static void OnFailureCallback_294(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestCluster *>(context))->OnFailureResponse_294(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_294(void * context, const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    {
+        (static_cast<TestCluster *>(context))->OnSuccessResponse_294(listInt8u);
     }
 
     //
@@ -36757,26 +37236,352 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeEnum8DefaultValue_79()
+    CHIP_ERROR TestReadAttributeSingleDefaultValue_79()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(this, OnSuccessCallback_79,
-                                                                                                    OnFailureCallback_79);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+            this, OnSuccessCallback_79, OnFailureCallback_79);
     }
 
     void OnFailureResponse_79(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_79(uint8_t enum8)
+    void OnSuccessResponse_79(float floatSingle)
+    {
+        VerifyOrReturn(CheckValue("floatSingle", floatSingle, 0.0f));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeSingleMediumValue_80()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        float floatSingleArgument;
+        floatSingleArgument = 0.1f;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+            floatSingleArgument, this, OnSuccessCallback_80, OnFailureCallback_80);
+    }
+
+    void OnFailureResponse_80(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_80() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeSingleMediumValue_81()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+            this, OnSuccessCallback_81, OnFailureCallback_81);
+    }
+
+    void OnFailureResponse_81(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_81(float floatSingle)
+    {
+        VerifyOrReturn(CheckValue("floatSingle", floatSingle, 0.1f));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeSingleLargeValue_82()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        float floatSingleArgument;
+        floatSingleArgument = 17000000000.0f;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+            floatSingleArgument, this, OnSuccessCallback_82, OnFailureCallback_82);
+    }
+
+    void OnFailureResponse_82(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_82() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeSingleLargeValue_83()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+            this, OnSuccessCallback_83, OnFailureCallback_83);
+    }
+
+    void OnFailureResponse_83(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_83(float floatSingle)
+    {
+        VerifyOrReturn(CheckValue("floatSingle", floatSingle, 17000000000.0f));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeSingleSmallValue_84()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        float floatSingleArgument;
+        floatSingleArgument = 1.7e-10f;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+            floatSingleArgument, this, OnSuccessCallback_84, OnFailureCallback_84);
+    }
+
+    void OnFailureResponse_84(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_84() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeSingleSmallValue_85()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+            this, OnSuccessCallback_85, OnFailureCallback_85);
+    }
+
+    void OnFailureResponse_85(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_85(float floatSingle)
+    {
+        VerifyOrReturn(CheckValue("floatSingle", floatSingle, 1.7e-10f));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeSingleDefaultValue_86()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        float floatSingleArgument;
+        floatSingleArgument = 0.0f;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+            floatSingleArgument, this, OnSuccessCallback_86, OnFailureCallback_86);
+    }
+
+    void OnFailureResponse_86(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_86() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeSingleDefaultValue_87()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+            this, OnSuccessCallback_87, OnFailureCallback_87);
+    }
+
+    void OnFailureResponse_87(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_87(float floatSingle)
+    {
+        VerifyOrReturn(CheckValue("floatSingle", floatSingle, 0.0f));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeDoubleDefaultValue_88()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+            this, OnSuccessCallback_88, OnFailureCallback_88);
+    }
+
+    void OnFailureResponse_88(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_88(double floatDouble)
+    {
+        VerifyOrReturn(CheckValue("floatDouble", floatDouble, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeDoubleMediumValue_89()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        double floatDoubleArgument;
+        floatDoubleArgument = 0.1234567890123;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+            floatDoubleArgument, this, OnSuccessCallback_89, OnFailureCallback_89);
+    }
+
+    void OnFailureResponse_89(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_89() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeDoubleMediumValue_90()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+            this, OnSuccessCallback_90, OnFailureCallback_90);
+    }
+
+    void OnFailureResponse_90(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_90(double floatDouble)
+    {
+        VerifyOrReturn(CheckValue("floatDouble", floatDouble, 0.1234567890123));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeDoubleLargeValue_91()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        double floatDoubleArgument;
+        floatDoubleArgument = 1.7e+200;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+            floatDoubleArgument, this, OnSuccessCallback_91, OnFailureCallback_91);
+    }
+
+    void OnFailureResponse_91(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_91() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeDoubleLargeValue_92()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+            this, OnSuccessCallback_92, OnFailureCallback_92);
+    }
+
+    void OnFailureResponse_92(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_92(double floatDouble)
+    {
+        VerifyOrReturn(CheckValue("floatDouble", floatDouble, 1.7e+200));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeDoubleSmallValue_93()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        double floatDoubleArgument;
+        floatDoubleArgument = 1.7e-200;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+            floatDoubleArgument, this, OnSuccessCallback_93, OnFailureCallback_93);
+    }
+
+    void OnFailureResponse_93(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_93() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeDoubleSmallValue_94()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+            this, OnSuccessCallback_94, OnFailureCallback_94);
+    }
+
+    void OnFailureResponse_94(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_94(double floatDouble)
+    {
+        VerifyOrReturn(CheckValue("floatDouble", floatDouble, 1.7e-200));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeDoubleDefaultValue_95()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        double floatDoubleArgument;
+        floatDoubleArgument = 0;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+            floatDoubleArgument, this, OnSuccessCallback_95, OnFailureCallback_95);
+    }
+
+    void OnFailureResponse_95(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_95() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeDoubleDefaultValue_96()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+            this, OnSuccessCallback_96, OnFailureCallback_96);
+    }
+
+    void OnFailureResponse_96(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_96(double floatDouble)
+    {
+        VerifyOrReturn(CheckValue("floatDouble", floatDouble, 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestReadAttributeEnum8DefaultValue_97()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(this, OnSuccessCallback_97,
+                                                                                                    OnFailureCallback_97);
+    }
+
+    void OnFailureResponse_97(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_97(uint8_t enum8)
     {
         VerifyOrReturn(CheckValue("enum8", enum8, 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeEnum8MaxValue_80()
+    CHIP_ERROR TestWriteAttributeEnum8MaxValue_98()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -36786,33 +37591,33 @@ private:
         enum8Argument = static_cast<uint8_t>(255);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
-            enum8Argument, this, OnSuccessCallback_80, OnFailureCallback_80);
+            enum8Argument, this, OnSuccessCallback_98, OnFailureCallback_98);
     }
 
-    void OnFailureResponse_80(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_98(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_80() { NextTest(); }
+    void OnSuccessResponse_98() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeEnum8MaxValue_81()
+    CHIP_ERROR TestReadAttributeEnum8MaxValue_99()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(this, OnSuccessCallback_81,
-                                                                                                    OnFailureCallback_81);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(this, OnSuccessCallback_99,
+                                                                                                    OnFailureCallback_99);
     }
 
-    void OnFailureResponse_81(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_99(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_81(uint8_t enum8)
+    void OnSuccessResponse_99(uint8_t enum8)
     {
         VerifyOrReturn(CheckValue("enum8", enum8, 255));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeEnum8MinValue_82()
+    CHIP_ERROR TestWriteAttributeEnum8MinValue_100()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -36822,52 +37627,52 @@ private:
         enum8Argument = static_cast<uint8_t>(0);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
-            enum8Argument, this, OnSuccessCallback_82, OnFailureCallback_82);
+            enum8Argument, this, OnSuccessCallback_100, OnFailureCallback_100);
     }
 
-    void OnFailureResponse_82(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_100(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_82() { NextTest(); }
+    void OnSuccessResponse_100() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeEnum8MinValue_83()
+    CHIP_ERROR TestReadAttributeEnum8MinValue_101()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(this, OnSuccessCallback_83,
-                                                                                                    OnFailureCallback_83);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(this, OnSuccessCallback_101,
+                                                                                                    OnFailureCallback_101);
     }
 
-    void OnFailureResponse_83(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_101(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_83(uint8_t enum8)
+    void OnSuccessResponse_101(uint8_t enum8)
     {
         VerifyOrReturn(CheckValue("enum8", enum8, 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeEnum16DefaultValue_84()
+    CHIP_ERROR TestReadAttributeEnum16DefaultValue_102()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(this, OnSuccessCallback_84,
-                                                                                                     OnFailureCallback_84);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(this, OnSuccessCallback_102,
+                                                                                                     OnFailureCallback_102);
     }
 
-    void OnFailureResponse_84(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_102(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_84(uint16_t enum16)
+    void OnSuccessResponse_102(uint16_t enum16)
     {
         VerifyOrReturn(CheckValue("enum16", enum16, 0U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeEnum16MaxValue_85()
+    CHIP_ERROR TestWriteAttributeEnum16MaxValue_103()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -36877,33 +37682,33 @@ private:
         enum16Argument = static_cast<uint16_t>(65535);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
-            enum16Argument, this, OnSuccessCallback_85, OnFailureCallback_85);
+            enum16Argument, this, OnSuccessCallback_103, OnFailureCallback_103);
     }
 
-    void OnFailureResponse_85(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_103(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_85() { NextTest(); }
+    void OnSuccessResponse_103() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeEnum16MaxValue_86()
+    CHIP_ERROR TestReadAttributeEnum16MaxValue_104()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(this, OnSuccessCallback_86,
-                                                                                                     OnFailureCallback_86);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(this, OnSuccessCallback_104,
+                                                                                                     OnFailureCallback_104);
     }
 
-    void OnFailureResponse_86(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_104(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_86(uint16_t enum16)
+    void OnSuccessResponse_104(uint16_t enum16)
     {
         VerifyOrReturn(CheckValue("enum16", enum16, 65535U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeEnum16MinValue_87()
+    CHIP_ERROR TestWriteAttributeEnum16MinValue_105()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -36913,52 +37718,52 @@ private:
         enum16Argument = static_cast<uint16_t>(0);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
-            enum16Argument, this, OnSuccessCallback_87, OnFailureCallback_87);
+            enum16Argument, this, OnSuccessCallback_105, OnFailureCallback_105);
     }
 
-    void OnFailureResponse_87(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_105(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_87() { NextTest(); }
+    void OnSuccessResponse_105() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeEnum16MinValue_88()
+    CHIP_ERROR TestReadAttributeEnum16MinValue_106()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(this, OnSuccessCallback_88,
-                                                                                                     OnFailureCallback_88);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(this, OnSuccessCallback_106,
+                                                                                                     OnFailureCallback_106);
     }
 
-    void OnFailureResponse_88(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_106(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_88(uint16_t enum16)
+    void OnSuccessResponse_106(uint16_t enum16)
     {
         VerifyOrReturn(CheckValue("enum16", enum16, 0U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeOctetStringDefaultValue_89()
+    CHIP_ERROR TestReadAttributeOctetStringDefaultValue_107()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_89, OnFailureCallback_89);
+            this, OnSuccessCallback_107, OnFailureCallback_107);
     }
 
-    void OnFailureResponse_89(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_107(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_89(chip::ByteSpan octetString)
+    void OnSuccessResponse_107(chip::ByteSpan octetString)
     {
         VerifyOrReturn(CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeOctetStringWithEmbeddedNull_90()
+    CHIP_ERROR TestWriteAttributeOctetStringWithEmbeddedNull_108()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -36968,26 +37773,26 @@ private:
         octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("Tes\x00ti\x00nggarbage: not in length on purpose"), 9);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            octetStringArgument, this, OnSuccessCallback_90, OnFailureCallback_90);
+            octetStringArgument, this, OnSuccessCallback_108, OnFailureCallback_108);
     }
 
-    void OnFailureResponse_90(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_108(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_90() { NextTest(); }
+    void OnSuccessResponse_108() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeOctetStringWithEmbeddedNull_91()
+    CHIP_ERROR TestReadAttributeOctetStringWithEmbeddedNull_109()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_91, OnFailureCallback_91);
+            this, OnSuccessCallback_109, OnFailureCallback_109);
     }
 
-    void OnFailureResponse_91(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_109(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_91(chip::ByteSpan octetString)
+    void OnSuccessResponse_109(chip::ByteSpan octetString)
     {
         VerifyOrReturn(
             CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("Tes\x00ti\x00ng"), 9)));
@@ -36995,7 +37800,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeOctetString_92()
+    CHIP_ERROR TestWriteAttributeOctetString_110()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37005,26 +37810,26 @@ private:
         octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("TestValuegarbage: not in length on purpose"), 9);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            octetStringArgument, this, OnSuccessCallback_92, OnFailureCallback_92);
+            octetStringArgument, this, OnSuccessCallback_110, OnFailureCallback_110);
     }
 
-    void OnFailureResponse_92(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_110(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_92() { NextTest(); }
+    void OnSuccessResponse_110() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeOctetString_93()
+    CHIP_ERROR TestReadAttributeOctetString_111()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_93, OnFailureCallback_93);
+            this, OnSuccessCallback_111, OnFailureCallback_111);
     }
 
-    void OnFailureResponse_93(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_111(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_93(chip::ByteSpan octetString)
+    void OnSuccessResponse_111(chip::ByteSpan octetString)
     {
         VerifyOrReturn(
             CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), 9)));
@@ -37032,7 +37837,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeOctetString_94()
+    CHIP_ERROR TestWriteAttributeOctetString_112()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37043,30 +37848,30 @@ private:
             chip::ByteSpan(chip::Uint8::from_const_char("TestValueLongerThan10garbage: not in length on purpose"), 21);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            octetStringArgument, this, OnSuccessCallback_94, OnFailureCallback_94);
+            octetStringArgument, this, OnSuccessCallback_112, OnFailureCallback_112);
     }
 
-    void OnFailureResponse_94(uint8_t status)
+    void OnFailureResponse_112(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
-    void OnSuccessResponse_94() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_112() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeOctetString_95()
+    CHIP_ERROR TestReadAttributeOctetString_113()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            this, OnSuccessCallback_95, OnFailureCallback_95);
+            this, OnSuccessCallback_113, OnFailureCallback_113);
     }
 
-    void OnFailureResponse_95(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_113(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_95(chip::ByteSpan octetString)
+    void OnSuccessResponse_113(chip::ByteSpan octetString)
     {
         VerifyOrReturn(
             CheckValueAsString("octetString", octetString, chip::ByteSpan(chip::Uint8::from_const_char("TestValue"), 9)));
@@ -37074,7 +37879,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeOctetString_96()
+    CHIP_ERROR TestWriteAttributeOctetString_114()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37084,33 +37889,33 @@ private:
         octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            octetStringArgument, this, OnSuccessCallback_96, OnFailureCallback_96);
+            octetStringArgument, this, OnSuccessCallback_114, OnFailureCallback_114);
     }
 
-    void OnFailureResponse_96(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_114(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_96() { NextTest(); }
+    void OnSuccessResponse_114() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeLongOctetStringDefaultValue_97()
+    CHIP_ERROR TestReadAttributeLongOctetStringDefaultValue_115()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
-            this, OnSuccessCallback_97, OnFailureCallback_97);
+            this, OnSuccessCallback_115, OnFailureCallback_115);
     }
 
-    void OnFailureResponse_97(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_115(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_97(chip::ByteSpan longOctetString)
+    void OnSuccessResponse_115(chip::ByteSpan longOctetString)
     {
         VerifyOrReturn(CheckValueAsString("longOctetString", longOctetString, chip::ByteSpan(chip::Uint8::from_const_char(""), 0)));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeLongOctetString_98()
+    CHIP_ERROR TestWriteAttributeLongOctetString_116()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37125,26 +37930,26 @@ private:
             300);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
-            longOctetStringArgument, this, OnSuccessCallback_98, OnFailureCallback_98);
+            longOctetStringArgument, this, OnSuccessCallback_116, OnFailureCallback_116);
     }
 
-    void OnFailureResponse_98(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_116(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_98() { NextTest(); }
+    void OnSuccessResponse_116() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeLongOctetString_99()
+    CHIP_ERROR TestReadAttributeLongOctetString_117()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
-            this, OnSuccessCallback_99, OnFailureCallback_99);
+            this, OnSuccessCallback_117, OnFailureCallback_117);
     }
 
-    void OnFailureResponse_99(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_117(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_99(chip::ByteSpan longOctetString)
+    void OnSuccessResponse_117(chip::ByteSpan longOctetString)
     {
         VerifyOrReturn(CheckValueAsString(
             "longOctetString", longOctetString,
@@ -37158,7 +37963,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeLongOctetString_100()
+    CHIP_ERROR TestWriteAttributeLongOctetString_118()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37168,33 +37973,33 @@ private:
         longOctetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
-            longOctetStringArgument, this, OnSuccessCallback_100, OnFailureCallback_100);
+            longOctetStringArgument, this, OnSuccessCallback_118, OnFailureCallback_118);
     }
 
-    void OnFailureResponse_100(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_118(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_100() { NextTest(); }
+    void OnSuccessResponse_118() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeCharStringDefaultValue_101()
+    CHIP_ERROR TestReadAttributeCharStringDefaultValue_119()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_101, OnFailureCallback_101);
+            this, OnSuccessCallback_119, OnFailureCallback_119);
     }
 
-    void OnFailureResponse_101(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_119(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_101(chip::CharSpan charString)
+    void OnSuccessResponse_119(chip::CharSpan charString)
     {
         VerifyOrReturn(CheckValueAsString("charString", charString, chip::CharSpan("", 0)));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeCharString_102()
+    CHIP_ERROR TestWriteAttributeCharString_120()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37204,33 +38009,33 @@ private:
         charStringArgument = chip::Span<const char>("☉T☉garbage: not in length on purpose", 7);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            charStringArgument, this, OnSuccessCallback_102, OnFailureCallback_102);
+            charStringArgument, this, OnSuccessCallback_120, OnFailureCallback_120);
     }
 
-    void OnFailureResponse_102(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_120(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_102() { NextTest(); }
+    void OnSuccessResponse_120() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeCharString_103()
+    CHIP_ERROR TestReadAttributeCharString_121()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_103, OnFailureCallback_103);
+            this, OnSuccessCallback_121, OnFailureCallback_121);
     }
 
-    void OnFailureResponse_103(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_121(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_103(chip::CharSpan charString)
+    void OnSuccessResponse_121(chip::CharSpan charString)
     {
         VerifyOrReturn(CheckValueAsString("charString", charString, chip::CharSpan("☉T☉", 7)));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeCharStringValueTooLong_104()
+    CHIP_ERROR TestWriteAttributeCharStringValueTooLong_122()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37240,37 +38045,37 @@ private:
         charStringArgument = chip::Span<const char>("☉TestValueLongerThan10☉garbage: not in length on purpose", 27);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            charStringArgument, this, OnSuccessCallback_104, OnFailureCallback_104);
+            charStringArgument, this, OnSuccessCallback_122, OnFailureCallback_122);
     }
 
-    void OnFailureResponse_104(uint8_t status)
+    void OnFailureResponse_122(uint8_t status)
     {
         VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
         NextTest();
     }
 
-    void OnSuccessResponse_104() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_122() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeCharString_105()
+    CHIP_ERROR TestReadAttributeCharString_123()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            this, OnSuccessCallback_105, OnFailureCallback_105);
+            this, OnSuccessCallback_123, OnFailureCallback_123);
     }
 
-    void OnFailureResponse_105(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_123(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_105(chip::CharSpan charString)
+    void OnSuccessResponse_123(chip::CharSpan charString)
     {
         VerifyOrReturn(CheckValueAsString("charString", charString, chip::CharSpan("☉T☉", 7)));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeCharStringEmpty_106()
+    CHIP_ERROR TestWriteAttributeCharStringEmpty_124()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37280,33 +38085,33 @@ private:
         charStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            charStringArgument, this, OnSuccessCallback_106, OnFailureCallback_106);
+            charStringArgument, this, OnSuccessCallback_124, OnFailureCallback_124);
     }
 
-    void OnFailureResponse_106(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_124(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_106() { NextTest(); }
+    void OnSuccessResponse_124() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeLongCharStringDefaultValue_107()
+    CHIP_ERROR TestReadAttributeLongCharStringDefaultValue_125()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
-            this, OnSuccessCallback_107, OnFailureCallback_107);
+            this, OnSuccessCallback_125, OnFailureCallback_125);
     }
 
-    void OnFailureResponse_107(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_125(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_107(chip::CharSpan longCharString)
+    void OnSuccessResponse_125(chip::CharSpan longCharString)
     {
         VerifyOrReturn(CheckValueAsString("longCharString", longCharString, chip::CharSpan("", 0)));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeLongCharString_108()
+    CHIP_ERROR TestWriteAttributeLongCharString_126()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37320,26 +38125,26 @@ private:
             900);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
-            longCharStringArgument, this, OnSuccessCallback_108, OnFailureCallback_108);
+            longCharStringArgument, this, OnSuccessCallback_126, OnFailureCallback_126);
     }
 
-    void OnFailureResponse_108(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_126(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_108() { NextTest(); }
+    void OnSuccessResponse_126() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeLongCharString_109()
+    CHIP_ERROR TestReadAttributeLongCharString_127()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
-            this, OnSuccessCallback_109, OnFailureCallback_109);
+            this, OnSuccessCallback_127, OnFailureCallback_127);
     }
 
-    void OnFailureResponse_109(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_127(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_109(chip::CharSpan longCharString)
+    void OnSuccessResponse_127(chip::CharSpan longCharString)
     {
         VerifyOrReturn(CheckValueAsString(
             "longCharString", longCharString,
@@ -37351,7 +38156,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeLongCharString_110()
+    CHIP_ERROR TestWriteAttributeLongCharString_128()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37361,33 +38166,33 @@ private:
         longCharStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
-            longCharStringArgument, this, OnSuccessCallback_110, OnFailureCallback_110);
+            longCharStringArgument, this, OnSuccessCallback_128, OnFailureCallback_128);
     }
 
-    void OnFailureResponse_110(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_128(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_110() { NextTest(); }
+    void OnSuccessResponse_128() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeEpochUsDefaultValue_111()
+    CHIP_ERROR TestReadAttributeEpochUsDefaultValue_129()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_111,
-                                                                                                      OnFailureCallback_111);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_129,
+                                                                                                      OnFailureCallback_129);
     }
 
-    void OnFailureResponse_111(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_129(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_111(uint64_t epochUs)
+    void OnSuccessResponse_129(uint64_t epochUs)
     {
         VerifyOrReturn(CheckValue("epochUs", epochUs, 0ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeEpochUsMaxValue_112()
+    CHIP_ERROR TestWriteAttributeEpochUsMaxValue_130()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37397,33 +38202,33 @@ private:
         epochUsArgument = 18446744073709551615ULL;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            epochUsArgument, this, OnSuccessCallback_112, OnFailureCallback_112);
+            epochUsArgument, this, OnSuccessCallback_130, OnFailureCallback_130);
     }
 
-    void OnFailureResponse_112(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_130(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_112() { NextTest(); }
+    void OnSuccessResponse_130() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeEpochUsMaxValue_113()
+    CHIP_ERROR TestReadAttributeEpochUsMaxValue_131()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_113,
-                                                                                                      OnFailureCallback_113);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_131,
+                                                                                                      OnFailureCallback_131);
     }
 
-    void OnFailureResponse_113(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_131(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_113(uint64_t epochUs)
+    void OnSuccessResponse_131(uint64_t epochUs)
     {
         VerifyOrReturn(CheckValue("epochUs", epochUs, 18446744073709551615ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeEpochUsMinValue_114()
+    CHIP_ERROR TestWriteAttributeEpochUsMinValue_132()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37433,52 +38238,52 @@ private:
         epochUsArgument = 0ULL;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            epochUsArgument, this, OnSuccessCallback_114, OnFailureCallback_114);
+            epochUsArgument, this, OnSuccessCallback_132, OnFailureCallback_132);
     }
 
-    void OnFailureResponse_114(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_132(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_114() { NextTest(); }
+    void OnSuccessResponse_132() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeEpochUsMinValue_115()
+    CHIP_ERROR TestReadAttributeEpochUsMinValue_133()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_115,
-                                                                                                      OnFailureCallback_115);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnSuccessCallback_133,
+                                                                                                      OnFailureCallback_133);
     }
 
-    void OnFailureResponse_115(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_133(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_115(uint64_t epochUs)
+    void OnSuccessResponse_133(uint64_t epochUs)
     {
         VerifyOrReturn(CheckValue("epochUs", epochUs, 0ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeEpochSDefaultValue_116()
+    CHIP_ERROR TestReadAttributeEpochSDefaultValue_134()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_116,
-                                                                                                     OnFailureCallback_116);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_134,
+                                                                                                     OnFailureCallback_134);
     }
 
-    void OnFailureResponse_116(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_134(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_116(uint32_t epochS)
+    void OnSuccessResponse_134(uint32_t epochS)
     {
         VerifyOrReturn(CheckValue("epochS", epochS, 0UL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeEpochSMaxValue_117()
+    CHIP_ERROR TestWriteAttributeEpochSMaxValue_135()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37488,33 +38293,33 @@ private:
         epochSArgument = 4294967295UL;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            epochSArgument, this, OnSuccessCallback_117, OnFailureCallback_117);
+            epochSArgument, this, OnSuccessCallback_135, OnFailureCallback_135);
     }
 
-    void OnFailureResponse_117(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_135(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_117() { NextTest(); }
+    void OnSuccessResponse_135() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeEpochSMaxValue_118()
+    CHIP_ERROR TestReadAttributeEpochSMaxValue_136()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_118,
-                                                                                                     OnFailureCallback_118);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_136,
+                                                                                                     OnFailureCallback_136);
     }
 
-    void OnFailureResponse_118(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_136(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_118(uint32_t epochS)
+    void OnSuccessResponse_136(uint32_t epochS)
     {
         VerifyOrReturn(CheckValue("epochS", epochS, 4294967295UL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeEpochSMinValue_119()
+    CHIP_ERROR TestWriteAttributeEpochSMinValue_137()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37524,55 +38329,55 @@ private:
         epochSArgument = 0UL;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            epochSArgument, this, OnSuccessCallback_119, OnFailureCallback_119);
+            epochSArgument, this, OnSuccessCallback_137, OnFailureCallback_137);
     }
 
-    void OnFailureResponse_119(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_137(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_119() { NextTest(); }
+    void OnSuccessResponse_137() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeEpochSMinValue_120()
+    CHIP_ERROR TestReadAttributeEpochSMinValue_138()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_120,
-                                                                                                     OnFailureCallback_120);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnSuccessCallback_138,
+                                                                                                     OnFailureCallback_138);
     }
 
-    void OnFailureResponse_120(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_138(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_120(uint32_t epochS)
+    void OnSuccessResponse_138(uint32_t epochS)
     {
         VerifyOrReturn(CheckValue("epochS", epochS, 0UL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeUnsupported_121()
+    CHIP_ERROR TestReadAttributeUnsupported_139()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(
-            this, OnSuccessCallback_121, OnFailureCallback_121);
+            this, OnSuccessCallback_139, OnFailureCallback_139);
     }
 
-    void OnFailureResponse_121(uint8_t status)
+    void OnFailureResponse_139(uint8_t status)
     {
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_121(bool unsupported)
+    void OnSuccessResponse_139(bool unsupported)
     {
         VerifyOrReturn(CheckValue("unsupported", unsupported, 0));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteattributeUnsupported_122()
+    CHIP_ERROR TestWriteattributeUnsupported_140()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37582,17 +38387,17 @@ private:
         unsupportedArgument = 0;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(
-            unsupportedArgument, this, OnSuccessCallback_122, OnFailureCallback_122);
+            unsupportedArgument, this, OnSuccessCallback_140, OnFailureCallback_140);
     }
 
-    void OnFailureResponse_122(uint8_t status)
+    void OnFailureResponse_140(uint8_t status)
     {
         (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE) ? NextTest() : ThrowFailureResponse();
     }
 
-    void OnSuccessResponse_122() { NextTest(); }
+    void OnSuccessResponse_140() { NextTest(); }
 
-    CHIP_ERROR TestSendTestCommandToUnsupportedEndpoint_123()
+    CHIP_ERROR TestSendTestCommandToUnsupportedEndpoint_141()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 200;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::Test::Type;
@@ -37600,26 +38405,26 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_123();
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_141();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_123(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_141(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_123(uint8_t status)
+    void OnFailureResponse_141(uint8_t status)
     {
         VerifyOrReturn(CheckConstraintNotValue("status", status, 0));
         NextTest();
     }
 
-    void OnSuccessResponse_123() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_141() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestSendTestCommandToUnsupportedCluster_124()
+    CHIP_ERROR TestSendTestCommandToUnsupportedCluster_142()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::Test::Type;
@@ -37627,45 +38432,45 @@ private:
         RequestType request;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_124();
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_142();
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_124(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_142(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_124(uint8_t status)
+    void OnFailureResponse_142(uint8_t status)
     {
         VerifyOrReturn(CheckConstraintNotValue("status", status, 0));
         NextTest();
     }
 
-    void OnSuccessResponse_124() { ThrowSuccessResponse(); }
+    void OnSuccessResponse_142() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeVendorIdDefaultValue_125()
+    CHIP_ERROR TestReadAttributeVendorIdDefaultValue_143()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnSuccessCallback_125,
-                                                                                                       OnFailureCallback_125);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnSuccessCallback_143,
+                                                                                                       OnFailureCallback_143);
     }
 
-    void OnFailureResponse_125(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_143(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_125(chip::VendorId vendorId)
+    void OnSuccessResponse_143(chip::VendorId vendorId)
     {
         VerifyOrReturn(CheckValue("vendorId", vendorId, 0U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeVendorId_126()
+    CHIP_ERROR TestWriteAttributeVendorId_144()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37675,33 +38480,33 @@ private:
         vendorIdArgument = static_cast<chip::VendorId>(17);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-            vendorIdArgument, this, OnSuccessCallback_126, OnFailureCallback_126);
+            vendorIdArgument, this, OnSuccessCallback_144, OnFailureCallback_144);
     }
 
-    void OnFailureResponse_126(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_144(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_126() { NextTest(); }
+    void OnSuccessResponse_144() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeVendorId_127()
+    CHIP_ERROR TestReadAttributeVendorId_145()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnSuccessCallback_127,
-                                                                                                       OnFailureCallback_127);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnSuccessCallback_145,
+                                                                                                       OnFailureCallback_145);
     }
 
-    void OnFailureResponse_127(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_145(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_127(chip::VendorId vendorId)
+    void OnSuccessResponse_145(chip::VendorId vendorId)
     {
         VerifyOrReturn(CheckValue("vendorId", vendorId, 17U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestRestoreAttributeVendorId_128()
+    CHIP_ERROR TestRestoreAttributeVendorId_146()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -37711,14 +38516,14 @@ private:
         vendorIdArgument = static_cast<chip::VendorId>(0);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-            vendorIdArgument, this, OnSuccessCallback_128, OnFailureCallback_128);
+            vendorIdArgument, this, OnSuccessCallback_146, OnFailureCallback_146);
     }
 
-    void OnFailureResponse_128(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_146(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_128() { NextTest(); }
+    void OnSuccessResponse_146() { NextTest(); }
 
-    CHIP_ERROR TestSendACommandWithAVendorIdAndEnum_129()
+    CHIP_ERROR TestSendACommandWithAVendorIdAndEnum_147()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestEnumsRequest::Type;
@@ -37728,20 +38533,20 @@ private:
         request.arg2 = static_cast<chip::app::Clusters::TestCluster::SimpleEnum>(101);
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_129(data.arg1, data.arg2);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_147(data.arg1, data.arg2);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_129(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_147(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_129(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_147(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_129(chip::VendorId arg1, chip::app::Clusters::TestCluster::SimpleEnum arg2)
+    void OnSuccessResponse_147(chip::VendorId arg1, chip::app::Clusters::TestCluster::SimpleEnum arg2)
     {
         VerifyOrReturn(CheckValue("arg1", arg1, 20003U));
 
@@ -37750,7 +38555,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithStructArgumentAndArg1bIsTrue_130()
+    CHIP_ERROR TestSendTestCommandWithStructArgumentAndArg1bIsTrue_148()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
@@ -37763,31 +38568,31 @@ private:
         request.arg1.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
         request.arg1.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
         request.arg1.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        request.arg1.g = 0;
+        request.arg1.g = 0.0f;
         request.arg1.h = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_130(data.value);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_148(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_130(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_148(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_130(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_148(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_130(bool value)
+    void OnSuccessResponse_148(bool value)
     {
         VerifyOrReturn(CheckValue("value", value, true));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithStructArgumentAndArg1bIsFalse_131()
+    CHIP_ERROR TestSendTestCommandWithStructArgumentAndArg1bIsFalse_149()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestStructArgumentRequest::Type;
@@ -37800,31 +38605,31 @@ private:
         request.arg1.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
         request.arg1.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
         request.arg1.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        request.arg1.g = 0;
+        request.arg1.g = 0.0f;
         request.arg1.h = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_131(data.value);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_149(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_131(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_149(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_131(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_149(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_131(bool value)
+    void OnSuccessResponse_149(bool value)
     {
         VerifyOrReturn(CheckValue("value", value, false));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithNestedStructArgumentAndArg1cbIsTrue_132()
+    CHIP_ERROR TestSendTestCommandWithNestedStructArgumentAndArg1cbIsTrue_150()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type;
@@ -37840,31 +38645,31 @@ private:
         request.arg1.c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
         request.arg1.c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
         request.arg1.c.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        request.arg1.c.g = 0;
+        request.arg1.c.g = 0.0f;
         request.arg1.c.h = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_132(data.value);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_150(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_132(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_150(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_132(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_150(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_132(bool value)
+    void OnSuccessResponse_150(bool value)
     {
         VerifyOrReturn(CheckValue("value", value, true));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithNestedStructArgumentArg1cbIsFalse_133()
+    CHIP_ERROR TestSendTestCommandWithNestedStructArgumentArg1cbIsFalse_151()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNestedStructArgumentRequest::Type;
@@ -37880,31 +38685,31 @@ private:
         request.arg1.c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
         request.arg1.c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
         request.arg1.c.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        request.arg1.c.g = 0;
+        request.arg1.c.g = 0.0f;
         request.arg1.c.h = 0;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_133(data.value);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_151(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_133(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_151(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_133(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_151(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_133(bool value)
+    void OnSuccessResponse_151(bool value)
     {
         VerifyOrReturn(CheckValue("value", value, false));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithNestedStructListArgumentAndAllFieldsBOfArg1dAreTrue_134()
+    CHIP_ERROR TestSendTestCommandWithNestedStructListArgumentAndAllFieldsBOfArg1dAreTrue_152()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type;
@@ -37920,7 +38725,7 @@ private:
         request.arg1.c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
         request.arg1.c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
         request.arg1.c.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        request.arg1.c.g = 0;
+        request.arg1.c.g = 0.0f;
         request.arg1.c.h = 0;
 
         chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type dList[2];
@@ -37931,7 +38736,7 @@ private:
         dList[0].d = chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
         dList[0].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
         dList[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        dList[0].g = 0;
+        dList[0].g = 0.0f;
         dList[0].h = 0;
 
         dList[1].a = 2;
@@ -37940,7 +38745,7 @@ private:
         dList[1].d = chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
         dList[1].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
         dList[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        dList[1].g = 0;
+        dList[1].g = 0.0f;
         dList[1].h = 0;
 
         request.arg1.d = dList;
@@ -37963,27 +38768,27 @@ private:
         request.arg1.g = gList;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_134(data.value);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_152(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_134(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_152(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_134(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_152(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_134(bool value)
+    void OnSuccessResponse_152(bool value)
     {
         VerifyOrReturn(CheckValue("value", value, true));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithNestedStructListArgumentAndSomeFieldsBOfArg1dAreFalse_135()
+    CHIP_ERROR TestSendTestCommandWithNestedStructListArgumentAndSomeFieldsBOfArg1dAreFalse_153()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNestedStructListArgumentRequest::Type;
@@ -37999,7 +38804,7 @@ private:
         request.arg1.c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
         request.arg1.c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
         request.arg1.c.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        request.arg1.c.g = 0;
+        request.arg1.c.g = 0.0f;
         request.arg1.c.h = 0;
 
         chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type dList[2];
@@ -38010,7 +38815,7 @@ private:
         dList[0].d = chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
         dList[0].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
         dList[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        dList[0].g = 0;
+        dList[0].g = 0.0f;
         dList[0].h = 0;
 
         dList[1].a = 2;
@@ -38019,7 +38824,7 @@ private:
         dList[1].d = chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
         dList[1].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
         dList[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        dList[1].g = 0;
+        dList[1].g = 0.0f;
         dList[1].h = 0;
 
         request.arg1.d = dList;
@@ -38042,27 +38847,27 @@ private:
         request.arg1.g = gList;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_135(data.value);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_153(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_135(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_153(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_135(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_153(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_135(bool value)
+    void OnSuccessResponse_153(bool value)
     {
         VerifyOrReturn(CheckValue("value", value, false));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithStructArgumentAndSeeWhatWeGetBack_136()
+    CHIP_ERROR TestSendTestCommandWithStructArgumentAndSeeWhatWeGetBack_154()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::SimpleStructEchoRequest::Type;
@@ -38079,20 +38884,20 @@ private:
         request.arg1.h = 0.1;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_136(data.arg1);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_154(data.arg1);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_136(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_154(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_136(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_154(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_136(const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & arg1)
+    void OnSuccessResponse_154(const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & arg1)
     {
         VerifyOrReturn(CheckValue("arg1.a", arg1.a, 17));
         VerifyOrReturn(CheckValue("arg1.b", arg1.b, false));
@@ -38106,7 +38911,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithListOfInt8uAndNoneOfThemIsSetTo0_137()
+    CHIP_ERROR TestSendTestCommandWithListOfInt8uAndNoneOfThemIsSetTo0_155()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
@@ -38126,27 +38931,27 @@ private:
         request.arg1 = arg1List;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_137(data.value);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_155(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_137(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_155(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_137(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_155(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_137(bool value)
+    void OnSuccessResponse_155(bool value)
     {
         VerifyOrReturn(CheckValue("value", value, true));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithListOfInt8uAndOneOfThemIsSetTo0_138()
+    CHIP_ERROR TestSendTestCommandWithListOfInt8uAndOneOfThemIsSetTo0_156()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListInt8UArgumentRequest::Type;
@@ -38167,27 +38972,27 @@ private:
         request.arg1 = arg1List;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_138(data.value);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_156(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_138(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_156(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_138(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_156(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_138(bool value)
+    void OnSuccessResponse_156(bool value)
     {
         VerifyOrReturn(CheckValue("value", value, false));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithListOfInt8uAndGetItReversed_139()
+    CHIP_ERROR TestSendTestCommandWithListOfInt8uAndGetItReversed_157()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
@@ -38207,20 +39012,20 @@ private:
         request.arg1 = arg1List;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_139(data.arg1);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_157(data.arg1);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_139(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_157(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_139(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_157(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_139(const chip::app::DataModel::DecodableList<uint8_t> & arg1)
+    void OnSuccessResponse_157(const chip::app::DataModel::DecodableList<uint8_t> & arg1)
     {
         auto iter = arg1.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(arg1)>("arg1", iter, 0));
@@ -38246,7 +39051,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithEmptyListOfInt8uAndGetAnEmptyListBack_140()
+    CHIP_ERROR TestSendTestCommandWithEmptyListOfInt8uAndGetAnEmptyListBack_158()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseRequest::Type;
@@ -38256,20 +39061,20 @@ private:
         request.arg1 = chip::app::DataModel::List<uint8_t>();
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_140(data.arg1);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_158(data.arg1);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_140(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_158(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_140(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_158(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_140(const chip::app::DataModel::DecodableList<uint8_t> & arg1)
+    void OnSuccessResponse_158(const chip::app::DataModel::DecodableList<uint8_t> & arg1)
     {
         auto iter = arg1.begin();
         VerifyOrReturn(CheckNoMoreListItems<decltype(arg1)>("arg1", iter, 0));
@@ -38277,7 +39082,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_141()
+    CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsTrue_159()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
@@ -38292,7 +39097,7 @@ private:
         arg1List[0].d = chip::ByteSpan(chip::Uint8::from_const_char("first_octet_stringgarbage: not in length on purpose"), 18);
         arg1List[0].e = chip::Span<const char>("first_char_stringgarbage: not in length on purpose", 17);
         arg1List[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        arg1List[0].g = 0;
+        arg1List[0].g = 0.0f;
         arg1List[0].h = 0;
 
         arg1List[1].a = 1;
@@ -38301,33 +39106,33 @@ private:
         arg1List[1].d = chip::ByteSpan(chip::Uint8::from_const_char("second_octet_stringgarbage: not in length on purpose"), 19);
         arg1List[1].e = chip::Span<const char>("second_char_stringgarbage: not in length on purpose", 18);
         arg1List[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        arg1List[1].g = 0;
+        arg1List[1].g = 0.0f;
         arg1List[1].h = 0;
 
         request.arg1 = arg1List;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_141(data.value);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_159(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_141(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_159(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_141(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_159(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_141(bool value)
+    void OnSuccessResponse_159(bool value)
     {
         VerifyOrReturn(CheckValue("value", value, true));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_142()
+    CHIP_ERROR TestSendTestCommandWithListOfStructArgumentAndArg1bOfFirstItemIsFalse_160()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListStructArgumentRequest::Type;
@@ -38342,7 +39147,7 @@ private:
         arg1List[0].d = chip::ByteSpan(chip::Uint8::from_const_char("second_octet_stringgarbage: not in length on purpose"), 19);
         arg1List[0].e = chip::Span<const char>("second_char_stringgarbage: not in length on purpose", 18);
         arg1List[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        arg1List[0].g = 0;
+        arg1List[0].g = 0.0f;
         arg1List[0].h = 0;
 
         arg1List[1].a = 0;
@@ -38351,33 +39156,33 @@ private:
         arg1List[1].d = chip::ByteSpan(chip::Uint8::from_const_char("first_octet_stringgarbage: not in length on purpose"), 18);
         arg1List[1].e = chip::Span<const char>("first_char_stringgarbage: not in length on purpose", 17);
         arg1List[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        arg1List[1].g = 0;
+        arg1List[1].g = 0.0f;
         arg1List[1].h = 0;
 
         request.arg1 = arg1List;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_142(data.value);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_160(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_142(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_160(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_142(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_160(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_142(bool value)
+    void OnSuccessResponse_160(bool value)
     {
         VerifyOrReturn(CheckValue("value", value, false));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithListOfNestedStructListArgumentAndAllFieldsBOfElementsOfArg1dAreTrue_143()
+    CHIP_ERROR TestSendTestCommandWithListOfNestedStructListArgumentAndAllFieldsBOfElementsOfArg1dAreTrue_161()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::Type;
@@ -38395,7 +39200,7 @@ private:
         arg1List[0].c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
         arg1List[0].c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
         arg1List[0].c.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        arg1List[0].c.g = 0;
+        arg1List[0].c.g = 0.0f;
         arg1List[0].c.h = 0;
 
         chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type dList[2];
@@ -38406,7 +39211,7 @@ private:
         dList[0].d = chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
         dList[0].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
         dList[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        dList[0].g = 0;
+        dList[0].g = 0.0f;
         dList[0].h = 0;
 
         dList[1].a = 2;
@@ -38415,7 +39220,7 @@ private:
         dList[1].d = chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
         dList[1].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
         dList[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        dList[1].g = 0;
+        dList[1].g = 0.0f;
         dList[1].h = 0;
 
         arg1List[0].d = dList;
@@ -38440,27 +39245,27 @@ private:
         request.arg1 = arg1List;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_143(data.value);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_161(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_143(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_161(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_143(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_161(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_143(bool value)
+    void OnSuccessResponse_161(bool value)
     {
         VerifyOrReturn(CheckValue("value", value, true));
 
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithNestedStructListArgumentAndSomeFieldsBOfElementsOfArg1dAreFalse_144()
+    CHIP_ERROR TestSendTestCommandWithNestedStructListArgumentAndSomeFieldsBOfElementsOfArg1dAreFalse_162()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestListNestedStructListArgumentRequest::Type;
@@ -38478,7 +39283,7 @@ private:
         arg1List[0].c.d = chip::ByteSpan(chip::Uint8::from_const_char("octet_stringgarbage: not in length on purpose"), 12);
         arg1List[0].c.e = chip::Span<const char>("char_stringgarbage: not in length on purpose", 11);
         arg1List[0].c.f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        arg1List[0].c.g = 0;
+        arg1List[0].c.g = 0.0f;
         arg1List[0].c.h = 0;
 
         chip::app::Clusters::TestCluster::Structs::SimpleStruct::Type dList[2];
@@ -38489,7 +39294,7 @@ private:
         dList[0].d = chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
         dList[0].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
         dList[0].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        dList[0].g = 0;
+        dList[0].g = 0.0f;
         dList[0].h = 0;
 
         dList[1].a = 2;
@@ -38498,7 +39303,7 @@ private:
         dList[1].d = chip::ByteSpan(chip::Uint8::from_const_char("nested_octet_stringgarbage: not in length on purpose"), 19);
         dList[1].e = chip::Span<const char>("nested_char_stringgarbage: not in length on purpose", 18);
         dList[1].f = static_cast<chip::BitFlags<chip::app::Clusters::TestCluster::SimpleBitmap>>(1);
-        dList[1].g = 0;
+        dList[1].g = 0.0f;
         dList[1].h = 0;
 
         arg1List[0].d = dList;
@@ -38523,27 +39328,27 @@ private:
         request.arg1 = arg1List;
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TestCluster *>(context))->OnSuccessResponse_144(data.value);
+            (static_cast<TestCluster *>(context))->OnSuccessResponse_162(data.value);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_144(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_162(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_144(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_162(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_144(bool value)
+    void OnSuccessResponse_162(bool value)
     {
         VerifyOrReturn(CheckValue("value", value, false));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeListWithListOfInt8uAndNoneOfThemIsSetTo0_145()
+    CHIP_ERROR TestWriteAttributeListWithListOfInt8uAndNoneOfThemIsSetTo0_163()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -38559,26 +39364,26 @@ private:
         listInt8uArgument = listInt8uList;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(
-            listInt8uArgument, this, OnSuccessCallback_145, OnFailureCallback_145);
+            listInt8uArgument, this, OnSuccessCallback_163, OnFailureCallback_163);
     }
 
-    void OnFailureResponse_145(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_163(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_145() { NextTest(); }
+    void OnSuccessResponse_163() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeListWithListOfInt8u_146()
+    CHIP_ERROR TestReadAttributeListWithListOfInt8u_164()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_146,
-                                                                                                        OnFailureCallback_146);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_164,
+                                                                                                        OnFailureCallback_164);
     }
 
-    void OnFailureResponse_146(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_164(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_146(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
+    void OnSuccessResponse_164(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u)
     {
         auto iter = listInt8u.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(listInt8u)>("listInt8u", iter, 0));
@@ -38594,7 +39399,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeListWithListOfOctetString_147()
+    CHIP_ERROR TestWriteAttributeListWithListOfOctetString_165()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -38610,26 +39415,26 @@ private:
         listOctetStringArgument = listOctetStringList;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo>(
-            listOctetStringArgument, this, OnSuccessCallback_147, OnFailureCallback_147);
+            listOctetStringArgument, this, OnSuccessCallback_165, OnFailureCallback_165);
     }
 
-    void OnFailureResponse_147(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_165(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_147() { NextTest(); }
+    void OnSuccessResponse_165() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeListWithListOfOctetString_148()
+    CHIP_ERROR TestReadAttributeListWithListOfOctetString_166()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo>(
-            this, OnSuccessCallback_148, OnFailureCallback_148);
+            this, OnSuccessCallback_166, OnFailureCallback_166);
     }
 
-    void OnFailureResponse_148(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_166(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_148(const chip::app::DataModel::DecodableList<chip::ByteSpan> & listOctetString)
+    void OnSuccessResponse_166(const chip::app::DataModel::DecodableList<chip::ByteSpan> & listOctetString)
     {
         auto iter = listOctetString.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(listOctetString)>("listOctetString", iter, 0));
@@ -38649,7 +39454,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeListWithListOfListStructOctetString_149()
+    CHIP_ERROR TestWriteAttributeListWithListOfListStructOctetString_167()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -38679,26 +39484,26 @@ private:
         listStructOctetStringArgument = listStructOctetStringList;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-            listStructOctetStringArgument, this, OnSuccessCallback_149, OnFailureCallback_149);
+            listStructOctetStringArgument, this, OnSuccessCallback_167, OnFailureCallback_167);
     }
 
-    void OnFailureResponse_149(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_167(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_149() { NextTest(); }
+    void OnSuccessResponse_167() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeListWithListOfListStructOctetString_150()
+    CHIP_ERROR TestReadAttributeListWithListOfListStructOctetString_168()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-            this, OnSuccessCallback_150, OnFailureCallback_150);
+            this, OnSuccessCallback_168, OnFailureCallback_168);
     }
 
-    void OnFailureResponse_150(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_168(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_150(
+    void OnSuccessResponse_168(
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
             listStructOctetString)
     {
@@ -38724,7 +39529,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithOptionalArgSet_151()
+    CHIP_ERROR TestSendTestCommandWithOptionalArgSet_169()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
@@ -38734,20 +39539,20 @@ private:
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))
-                ->OnSuccessResponse_151(data.wasPresent, data.wasNull, data.value, data.originalValue);
+                ->OnSuccessResponse_169(data.wasPresent, data.wasNull, data.value, data.originalValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_151(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_169(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_151(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_169(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_151(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
+    void OnSuccessResponse_169(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
                                const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
     {
         VerifyOrReturn(CheckValue("wasPresent", wasPresent, true));
@@ -38765,7 +39570,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestSendTestCommandWithoutItsOptionalArg_152()
+    CHIP_ERROR TestSendTestCommandWithoutItsOptionalArg_170()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         using RequestType               = chip::app::Clusters::TestCluster::Commands::TestNullableOptionalRequest::Type;
@@ -38774,20 +39579,20 @@ private:
 
         auto success = [](void * context, const typename RequestType::ResponseType & data) {
             (static_cast<TestCluster *>(context))
-                ->OnSuccessResponse_152(data.wasPresent, data.wasNull, data.value, data.originalValue);
+                ->OnSuccessResponse_170(data.wasPresent, data.wasNull, data.value, data.originalValue);
         };
 
         auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TestCluster *>(context))->OnFailureResponse_152(status);
+            (static_cast<TestCluster *>(context))->OnFailureResponse_170(status);
         };
 
         ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
         return CHIP_NO_ERROR;
     }
 
-    void OnFailureResponse_152(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_170(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_152(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
+    void OnSuccessResponse_170(bool wasPresent, const chip::Optional<bool> & wasNull, const chip::Optional<uint8_t> & value,
                                const chip::Optional<chip::app::DataModel::Nullable<uint8_t>> & originalValue)
     {
         VerifyOrReturn(CheckValue("wasPresent", wasPresent, false));
@@ -38795,7 +39600,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableBooleanNull_153()
+    CHIP_ERROR TestWriteAttributeNullableBooleanNull_171()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -38805,33 +39610,33 @@ private:
         nullableBooleanArgument.SetNull();
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
-            nullableBooleanArgument, this, OnSuccessCallback_153, OnFailureCallback_153);
+            nullableBooleanArgument, this, OnSuccessCallback_171, OnFailureCallback_171);
     }
 
-    void OnFailureResponse_153(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_171(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_153() { NextTest(); }
+    void OnSuccessResponse_171() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableBooleanNull_154()
+    CHIP_ERROR TestReadAttributeNullableBooleanNull_172()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
-            this, OnSuccessCallback_154, OnFailureCallback_154);
+            this, OnSuccessCallback_172, OnFailureCallback_172);
     }
 
-    void OnFailureResponse_154(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_172(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_154(const chip::app::DataModel::Nullable<bool> & nullableBoolean)
+    void OnSuccessResponse_172(const chip::app::DataModel::Nullable<bool> & nullableBoolean)
     {
         VerifyOrReturn(CheckValueNull("nullableBoolean", nullableBoolean));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableBooleanTrue_155()
+    CHIP_ERROR TestWriteAttributeNullableBooleanTrue_173()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -38841,26 +39646,26 @@ private:
         nullableBooleanArgument.SetNonNull() = true;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
-            nullableBooleanArgument, this, OnSuccessCallback_155, OnFailureCallback_155);
+            nullableBooleanArgument, this, OnSuccessCallback_173, OnFailureCallback_173);
     }
 
-    void OnFailureResponse_155(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_173(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_155() { NextTest(); }
+    void OnSuccessResponse_173() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableBooleanTrue_156()
+    CHIP_ERROR TestReadAttributeNullableBooleanTrue_174()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
-            this, OnSuccessCallback_156, OnFailureCallback_156);
+            this, OnSuccessCallback_174, OnFailureCallback_174);
     }
 
-    void OnFailureResponse_156(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_174(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_156(const chip::app::DataModel::Nullable<bool> & nullableBoolean)
+    void OnSuccessResponse_174(const chip::app::DataModel::Nullable<bool> & nullableBoolean)
     {
         VerifyOrReturn(CheckValueNonNull("nullableBoolean", nullableBoolean));
         VerifyOrReturn(CheckValue("nullableBoolean.Value()", nullableBoolean.Value(), true));
@@ -38868,7 +39673,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableBitmap8MaxValue_157()
+    CHIP_ERROR TestWriteAttributeNullableBitmap8MaxValue_175()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -38878,26 +39683,26 @@ private:
         nullableBitmap8Argument.SetNonNull() = 254;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
-            nullableBitmap8Argument, this, OnSuccessCallback_157, OnFailureCallback_157);
+            nullableBitmap8Argument, this, OnSuccessCallback_175, OnFailureCallback_175);
     }
 
-    void OnFailureResponse_157(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_175(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_157() { NextTest(); }
+    void OnSuccessResponse_175() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableBitmap8MaxValue_158()
+    CHIP_ERROR TestReadAttributeNullableBitmap8MaxValue_176()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
-            this, OnSuccessCallback_158, OnFailureCallback_158);
+            this, OnSuccessCallback_176, OnFailureCallback_176);
     }
 
-    void OnFailureResponse_158(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_176(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_158(const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
+    void OnSuccessResponse_176(const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
     {
         VerifyOrReturn(CheckValueNonNull("nullableBitmap8", nullableBitmap8));
         VerifyOrReturn(CheckValue("nullableBitmap8.Value()", nullableBitmap8.Value(), 254));
@@ -38905,7 +39710,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableBitmap8InvalidValue_159()
+    CHIP_ERROR TestWriteAttributeNullableBitmap8InvalidValue_177()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -38915,349 +39720,7 @@ private:
         nullableBitmap8Argument.SetNonNull() = 255;
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
-            nullableBitmap8Argument, this, OnSuccessCallback_159, OnFailureCallback_159);
-    }
-
-    void OnFailureResponse_159(uint8_t status)
-    {
-        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-        NextTest();
-    }
-
-    void OnSuccessResponse_159() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadAttributeNullableBitmap8UnchangedValue_160()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
-            this, OnSuccessCallback_160, OnFailureCallback_160);
-    }
-
-    void OnFailureResponse_160(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_160(const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
-    {
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap8", nullableBitmap8));
-        VerifyOrReturn(CheckValue("nullableBitmap8.Value()", nullableBitmap8.Value(), 254));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteAttributeNullableBitmap8NullValue_161()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        chip::app::DataModel::Nullable<uint8_t> nullableBitmap8Argument;
-        nullableBitmap8Argument.SetNull();
-
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
-            nullableBitmap8Argument, this, OnSuccessCallback_161, OnFailureCallback_161);
-    }
-
-    void OnFailureResponse_161(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_161() { NextTest(); }
-
-    CHIP_ERROR TestReadAttributeNullableBitmap8NullValue_162()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
-            this, OnSuccessCallback_162, OnFailureCallback_162);
-    }
-
-    void OnFailureResponse_162(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_162(const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
-    {
-        VerifyOrReturn(CheckValueNull("nullableBitmap8", nullableBitmap8));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteAttributeNullableBitmap16MaxValue_163()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
-        nullableBitmap16Argument.SetNonNull() = 65534U;
-
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
-            nullableBitmap16Argument, this, OnSuccessCallback_163, OnFailureCallback_163);
-    }
-
-    void OnFailureResponse_163(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_163() { NextTest(); }
-
-    CHIP_ERROR TestReadAttributeNullableBitmap16MaxValue_164()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
-            this, OnSuccessCallback_164, OnFailureCallback_164);
-    }
-
-    void OnFailureResponse_164(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_164(const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
-    {
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap16", nullableBitmap16));
-        VerifyOrReturn(CheckValue("nullableBitmap16.Value()", nullableBitmap16.Value(), 65534U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteAttributeNullableBitmap16InvalidValue_165()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
-        nullableBitmap16Argument.SetNonNull() = 65535U;
-
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
-            nullableBitmap16Argument, this, OnSuccessCallback_165, OnFailureCallback_165);
-    }
-
-    void OnFailureResponse_165(uint8_t status)
-    {
-        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-        NextTest();
-    }
-
-    void OnSuccessResponse_165() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadAttributeNullableBitmap16UnchangedValue_166()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
-            this, OnSuccessCallback_166, OnFailureCallback_166);
-    }
-
-    void OnFailureResponse_166(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_166(const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
-    {
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap16", nullableBitmap16));
-        VerifyOrReturn(CheckValue("nullableBitmap16.Value()", nullableBitmap16.Value(), 65534U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteAttributeNullableBitmap16NullValue_167()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
-        nullableBitmap16Argument.SetNull();
-
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
-            nullableBitmap16Argument, this, OnSuccessCallback_167, OnFailureCallback_167);
-    }
-
-    void OnFailureResponse_167(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_167() { NextTest(); }
-
-    CHIP_ERROR TestReadAttributeNullableBitmap16NullValue_168()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
-            this, OnSuccessCallback_168, OnFailureCallback_168);
-    }
-
-    void OnFailureResponse_168(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_168(const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
-    {
-        VerifyOrReturn(CheckValueNull("nullableBitmap16", nullableBitmap16));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteAttributeNullableBitmap32MaxValue_169()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
-        nullableBitmap32Argument.SetNonNull() = 4294967294UL;
-
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
-            nullableBitmap32Argument, this, OnSuccessCallback_169, OnFailureCallback_169);
-    }
-
-    void OnFailureResponse_169(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_169() { NextTest(); }
-
-    CHIP_ERROR TestReadAttributeNullableBitmap32MaxValue_170()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
-            this, OnSuccessCallback_170, OnFailureCallback_170);
-    }
-
-    void OnFailureResponse_170(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_170(const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
-    {
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap32", nullableBitmap32));
-        VerifyOrReturn(CheckValue("nullableBitmap32.Value()", nullableBitmap32.Value(), 4294967294UL));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteAttributeNullableBitmap32InvalidValue_171()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
-        nullableBitmap32Argument.SetNonNull() = 4294967295UL;
-
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
-            nullableBitmap32Argument, this, OnSuccessCallback_171, OnFailureCallback_171);
-    }
-
-    void OnFailureResponse_171(uint8_t status)
-    {
-        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
-        NextTest();
-    }
-
-    void OnSuccessResponse_171() { ThrowSuccessResponse(); }
-
-    CHIP_ERROR TestReadAttributeNullableBitmap32UnchangedValue_172()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
-            this, OnSuccessCallback_172, OnFailureCallback_172);
-    }
-
-    void OnFailureResponse_172(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_172(const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
-    {
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap32", nullableBitmap32));
-        VerifyOrReturn(CheckValue("nullableBitmap32.Value()", nullableBitmap32.Value(), 4294967294UL));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteAttributeNullableBitmap32NullValue_173()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
-        nullableBitmap32Argument.SetNull();
-
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
-            nullableBitmap32Argument, this, OnSuccessCallback_173, OnFailureCallback_173);
-    }
-
-    void OnFailureResponse_173(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_173() { NextTest(); }
-
-    CHIP_ERROR TestReadAttributeNullableBitmap32NullValue_174()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
-            this, OnSuccessCallback_174, OnFailureCallback_174);
-    }
-
-    void OnFailureResponse_174(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_174(const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
-    {
-        VerifyOrReturn(CheckValueNull("nullableBitmap32", nullableBitmap32));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteAttributeNullableBitmap64MaxValue_175()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
-        nullableBitmap64Argument.SetNonNull() = 18446744073709551614ULL;
-
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
-            nullableBitmap64Argument, this, OnSuccessCallback_175, OnFailureCallback_175);
-    }
-
-    void OnFailureResponse_175(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_175() { NextTest(); }
-
-    CHIP_ERROR TestReadAttributeNullableBitmap64MaxValue_176()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
-            this, OnSuccessCallback_176, OnFailureCallback_176);
-    }
-
-    void OnFailureResponse_176(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_176(const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
-    {
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap64", nullableBitmap64));
-        VerifyOrReturn(CheckValue("nullableBitmap64.Value()", nullableBitmap64.Value(), 18446744073709551614ULL));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestWriteAttributeNullableBitmap64InvalidValue_177()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::TestClusterClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
-        nullableBitmap64Argument.SetNonNull() = 18446744073709551615ULL;
-
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
-            nullableBitmap64Argument, this, OnSuccessCallback_177, OnFailureCallback_177);
+            nullableBitmap8Argument, this, OnSuccessCallback_177, OnFailureCallback_177);
     }
 
     void OnFailureResponse_177(uint8_t status)
@@ -39268,110 +39731,110 @@ private:
 
     void OnSuccessResponse_177() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeNullableBitmap64UnchangedValue_178()
+    CHIP_ERROR TestReadAttributeNullableBitmap8UnchangedValue_178()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
             this, OnSuccessCallback_178, OnFailureCallback_178);
     }
 
     void OnFailureResponse_178(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_178(const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
+    void OnSuccessResponse_178(const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableBitmap64", nullableBitmap64));
-        VerifyOrReturn(CheckValue("nullableBitmap64.Value()", nullableBitmap64.Value(), 18446744073709551614ULL));
+        VerifyOrReturn(CheckValueNonNull("nullableBitmap8", nullableBitmap8));
+        VerifyOrReturn(CheckValue("nullableBitmap8.Value()", nullableBitmap8.Value(), 254));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableBitmap64NullValue_179()
+    CHIP_ERROR TestWriteAttributeNullableBitmap8NullValue_179()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
-        nullableBitmap64Argument.SetNull();
+        chip::app::DataModel::Nullable<uint8_t> nullableBitmap8Argument;
+        nullableBitmap8Argument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
-            nullableBitmap64Argument, this, OnSuccessCallback_179, OnFailureCallback_179);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
+            nullableBitmap8Argument, this, OnSuccessCallback_179, OnFailureCallback_179);
     }
 
     void OnFailureResponse_179(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_179() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableBitmap64NullValue_180()
+    CHIP_ERROR TestReadAttributeNullableBitmap8NullValue_180()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
             this, OnSuccessCallback_180, OnFailureCallback_180);
     }
 
     void OnFailureResponse_180(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_180(const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
+    void OnSuccessResponse_180(const chip::app::DataModel::Nullable<uint8_t> & nullableBitmap8)
     {
-        VerifyOrReturn(CheckValueNull("nullableBitmap64", nullableBitmap64));
+        VerifyOrReturn(CheckValueNull("nullableBitmap8", nullableBitmap8));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt8uMaxValue_181()
+    CHIP_ERROR TestWriteAttributeNullableBitmap16MaxValue_181()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint8_t> nullableInt8uArgument;
-        nullableInt8uArgument.SetNonNull() = 254;
+        chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
+        nullableBitmap16Argument.SetNonNull() = 65534U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            nullableInt8uArgument, this, OnSuccessCallback_181, OnFailureCallback_181);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
+            nullableBitmap16Argument, this, OnSuccessCallback_181, OnFailureCallback_181);
     }
 
     void OnFailureResponse_181(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_181() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt8uMaxValue_182()
+    CHIP_ERROR TestReadAttributeNullableBitmap16MaxValue_182()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
             this, OnSuccessCallback_182, OnFailureCallback_182);
     }
 
     void OnFailureResponse_182(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_182(const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
+    void OnSuccessResponse_182(const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt8u", nullableInt8u));
-        VerifyOrReturn(CheckValue("nullableInt8u.Value()", nullableInt8u.Value(), 254));
+        VerifyOrReturn(CheckValueNonNull("nullableBitmap16", nullableBitmap16));
+        VerifyOrReturn(CheckValue("nullableBitmap16.Value()", nullableBitmap16.Value(), 65534U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt8uInvalidValue_183()
+    CHIP_ERROR TestWriteAttributeNullableBitmap16InvalidValue_183()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint8_t> nullableInt8uArgument;
-        nullableInt8uArgument.SetNonNull() = 255;
+        chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
+        nullableBitmap16Argument.SetNonNull() = 65535U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            nullableInt8uArgument, this, OnSuccessCallback_183, OnFailureCallback_183);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
+            nullableBitmap16Argument, this, OnSuccessCallback_183, OnFailureCallback_183);
     }
 
     void OnFailureResponse_183(uint8_t status)
@@ -39382,110 +39845,110 @@ private:
 
     void OnSuccessResponse_183() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt8uUnchangedValue_184()
+    CHIP_ERROR TestReadAttributeNullableBitmap16UnchangedValue_184()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
             this, OnSuccessCallback_184, OnFailureCallback_184);
     }
 
     void OnFailureResponse_184(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_184(const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
+    void OnSuccessResponse_184(const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt8u", nullableInt8u));
-        VerifyOrReturn(CheckValue("nullableInt8u.Value()", nullableInt8u.Value(), 254));
+        VerifyOrReturn(CheckValueNonNull("nullableBitmap16", nullableBitmap16));
+        VerifyOrReturn(CheckValue("nullableBitmap16.Value()", nullableBitmap16.Value(), 65534U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt8uNullValue_185()
+    CHIP_ERROR TestWriteAttributeNullableBitmap16NullValue_185()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint8_t> nullableInt8uArgument;
-        nullableInt8uArgument.SetNull();
+        chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
+        nullableBitmap16Argument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            nullableInt8uArgument, this, OnSuccessCallback_185, OnFailureCallback_185);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
+            nullableBitmap16Argument, this, OnSuccessCallback_185, OnFailureCallback_185);
     }
 
     void OnFailureResponse_185(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_185() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt8uNullValue_186()
+    CHIP_ERROR TestReadAttributeNullableBitmap16NullValue_186()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
             this, OnSuccessCallback_186, OnFailureCallback_186);
     }
 
     void OnFailureResponse_186(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_186(const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
+    void OnSuccessResponse_186(const chip::app::DataModel::Nullable<uint16_t> & nullableBitmap16)
     {
-        VerifyOrReturn(CheckValueNull("nullableInt8u", nullableInt8u));
+        VerifyOrReturn(CheckValueNull("nullableBitmap16", nullableBitmap16));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt16uMaxValue_187()
+    CHIP_ERROR TestWriteAttributeNullableBitmap32MaxValue_187()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint16_t> nullableInt16uArgument;
-        nullableInt16uArgument.SetNonNull() = 65534U;
+        chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
+        nullableBitmap32Argument.SetNonNull() = 4294967294UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            nullableInt16uArgument, this, OnSuccessCallback_187, OnFailureCallback_187);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
+            nullableBitmap32Argument, this, OnSuccessCallback_187, OnFailureCallback_187);
     }
 
     void OnFailureResponse_187(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_187() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt16uMaxValue_188()
+    CHIP_ERROR TestReadAttributeNullableBitmap32MaxValue_188()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
             this, OnSuccessCallback_188, OnFailureCallback_188);
     }
 
     void OnFailureResponse_188(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_188(const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
+    void OnSuccessResponse_188(const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt16u", nullableInt16u));
-        VerifyOrReturn(CheckValue("nullableInt16u.Value()", nullableInt16u.Value(), 65534U));
+        VerifyOrReturn(CheckValueNonNull("nullableBitmap32", nullableBitmap32));
+        VerifyOrReturn(CheckValue("nullableBitmap32.Value()", nullableBitmap32.Value(), 4294967294UL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt16uInvalidValue_189()
+    CHIP_ERROR TestWriteAttributeNullableBitmap32InvalidValue_189()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint16_t> nullableInt16uArgument;
-        nullableInt16uArgument.SetNonNull() = 65535U;
+        chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
+        nullableBitmap32Argument.SetNonNull() = 4294967295UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            nullableInt16uArgument, this, OnSuccessCallback_189, OnFailureCallback_189);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
+            nullableBitmap32Argument, this, OnSuccessCallback_189, OnFailureCallback_189);
     }
 
     void OnFailureResponse_189(uint8_t status)
@@ -39496,110 +39959,110 @@ private:
 
     void OnSuccessResponse_189() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt16uUnchangedValue_190()
+    CHIP_ERROR TestReadAttributeNullableBitmap32UnchangedValue_190()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
             this, OnSuccessCallback_190, OnFailureCallback_190);
     }
 
     void OnFailureResponse_190(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_190(const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
+    void OnSuccessResponse_190(const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt16u", nullableInt16u));
-        VerifyOrReturn(CheckValue("nullableInt16u.Value()", nullableInt16u.Value(), 65534U));
+        VerifyOrReturn(CheckValueNonNull("nullableBitmap32", nullableBitmap32));
+        VerifyOrReturn(CheckValue("nullableBitmap32.Value()", nullableBitmap32.Value(), 4294967294UL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt16uNullValue_191()
+    CHIP_ERROR TestWriteAttributeNullableBitmap32NullValue_191()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint16_t> nullableInt16uArgument;
-        nullableInt16uArgument.SetNull();
+        chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
+        nullableBitmap32Argument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            nullableInt16uArgument, this, OnSuccessCallback_191, OnFailureCallback_191);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
+            nullableBitmap32Argument, this, OnSuccessCallback_191, OnFailureCallback_191);
     }
 
     void OnFailureResponse_191(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_191() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt16uNullValue_192()
+    CHIP_ERROR TestReadAttributeNullableBitmap32NullValue_192()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
             this, OnSuccessCallback_192, OnFailureCallback_192);
     }
 
     void OnFailureResponse_192(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_192(const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
+    void OnSuccessResponse_192(const chip::app::DataModel::Nullable<uint32_t> & nullableBitmap32)
     {
-        VerifyOrReturn(CheckValueNull("nullableInt16u", nullableInt16u));
+        VerifyOrReturn(CheckValueNull("nullableBitmap32", nullableBitmap32));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt32uMaxValue_193()
+    CHIP_ERROR TestWriteAttributeNullableBitmap64MaxValue_193()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint32_t> nullableInt32uArgument;
-        nullableInt32uArgument.SetNonNull() = 4294967294UL;
+        chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
+        nullableBitmap64Argument.SetNonNull() = 18446744073709551614ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            nullableInt32uArgument, this, OnSuccessCallback_193, OnFailureCallback_193);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
+            nullableBitmap64Argument, this, OnSuccessCallback_193, OnFailureCallback_193);
     }
 
     void OnFailureResponse_193(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_193() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt32uMaxValue_194()
+    CHIP_ERROR TestReadAttributeNullableBitmap64MaxValue_194()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
             this, OnSuccessCallback_194, OnFailureCallback_194);
     }
 
     void OnFailureResponse_194(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_194(const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
+    void OnSuccessResponse_194(const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt32u", nullableInt32u));
-        VerifyOrReturn(CheckValue("nullableInt32u.Value()", nullableInt32u.Value(), 4294967294UL));
+        VerifyOrReturn(CheckValueNonNull("nullableBitmap64", nullableBitmap64));
+        VerifyOrReturn(CheckValue("nullableBitmap64.Value()", nullableBitmap64.Value(), 18446744073709551614ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt32uInvalidValue_195()
+    CHIP_ERROR TestWriteAttributeNullableBitmap64InvalidValue_195()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint32_t> nullableInt32uArgument;
-        nullableInt32uArgument.SetNonNull() = 4294967295UL;
+        chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
+        nullableBitmap64Argument.SetNonNull() = 18446744073709551615ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            nullableInt32uArgument, this, OnSuccessCallback_195, OnFailureCallback_195);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
+            nullableBitmap64Argument, this, OnSuccessCallback_195, OnFailureCallback_195);
     }
 
     void OnFailureResponse_195(uint8_t status)
@@ -39610,110 +40073,110 @@ private:
 
     void OnSuccessResponse_195() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt32uUnchangedValue_196()
+    CHIP_ERROR TestReadAttributeNullableBitmap64UnchangedValue_196()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
             this, OnSuccessCallback_196, OnFailureCallback_196);
     }
 
     void OnFailureResponse_196(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_196(const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
+    void OnSuccessResponse_196(const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt32u", nullableInt32u));
-        VerifyOrReturn(CheckValue("nullableInt32u.Value()", nullableInt32u.Value(), 4294967294UL));
+        VerifyOrReturn(CheckValueNonNull("nullableBitmap64", nullableBitmap64));
+        VerifyOrReturn(CheckValue("nullableBitmap64.Value()", nullableBitmap64.Value(), 18446744073709551614ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt32uNullValue_197()
+    CHIP_ERROR TestWriteAttributeNullableBitmap64NullValue_197()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint32_t> nullableInt32uArgument;
-        nullableInt32uArgument.SetNull();
+        chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
+        nullableBitmap64Argument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            nullableInt32uArgument, this, OnSuccessCallback_197, OnFailureCallback_197);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
+            nullableBitmap64Argument, this, OnSuccessCallback_197, OnFailureCallback_197);
     }
 
     void OnFailureResponse_197(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_197() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt32uNullValue_198()
+    CHIP_ERROR TestReadAttributeNullableBitmap64NullValue_198()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
             this, OnSuccessCallback_198, OnFailureCallback_198);
     }
 
     void OnFailureResponse_198(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_198(const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
+    void OnSuccessResponse_198(const chip::app::DataModel::Nullable<uint64_t> & nullableBitmap64)
     {
-        VerifyOrReturn(CheckValueNull("nullableInt32u", nullableInt32u));
+        VerifyOrReturn(CheckValueNull("nullableBitmap64", nullableBitmap64));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt64uMaxValue_199()
+    CHIP_ERROR TestWriteAttributeNullableInt8uMaxValue_199()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint64_t> nullableInt64uArgument;
-        nullableInt64uArgument.SetNonNull() = 18446744073709551614ULL;
+        chip::app::DataModel::Nullable<uint8_t> nullableInt8uArgument;
+        nullableInt8uArgument.SetNonNull() = 254;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            nullableInt64uArgument, this, OnSuccessCallback_199, OnFailureCallback_199);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
+            nullableInt8uArgument, this, OnSuccessCallback_199, OnFailureCallback_199);
     }
 
     void OnFailureResponse_199(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_199() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt64uMaxValue_200()
+    CHIP_ERROR TestReadAttributeNullableInt8uMaxValue_200()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
             this, OnSuccessCallback_200, OnFailureCallback_200);
     }
 
     void OnFailureResponse_200(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_200(const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
+    void OnSuccessResponse_200(const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt64u", nullableInt64u));
-        VerifyOrReturn(CheckValue("nullableInt64u.Value()", nullableInt64u.Value(), 18446744073709551614ULL));
+        VerifyOrReturn(CheckValueNonNull("nullableInt8u", nullableInt8u));
+        VerifyOrReturn(CheckValue("nullableInt8u.Value()", nullableInt8u.Value(), 254));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt64uInvalidValue_201()
+    CHIP_ERROR TestWriteAttributeNullableInt8uInvalidValue_201()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint64_t> nullableInt64uArgument;
-        nullableInt64uArgument.SetNonNull() = 18446744073709551615ULL;
+        chip::app::DataModel::Nullable<uint8_t> nullableInt8uArgument;
+        nullableInt8uArgument.SetNonNull() = 255;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            nullableInt64uArgument, this, OnSuccessCallback_201, OnFailureCallback_201);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
+            nullableInt8uArgument, this, OnSuccessCallback_201, OnFailureCallback_201);
     }
 
     void OnFailureResponse_201(uint8_t status)
@@ -39724,110 +40187,110 @@ private:
 
     void OnSuccessResponse_201() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt64uUnchangedValue_202()
+    CHIP_ERROR TestReadAttributeNullableInt8uUnchangedValue_202()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
             this, OnSuccessCallback_202, OnFailureCallback_202);
     }
 
     void OnFailureResponse_202(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_202(const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
+    void OnSuccessResponse_202(const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt64u", nullableInt64u));
-        VerifyOrReturn(CheckValue("nullableInt64u.Value()", nullableInt64u.Value(), 18446744073709551614ULL));
+        VerifyOrReturn(CheckValueNonNull("nullableInt8u", nullableInt8u));
+        VerifyOrReturn(CheckValue("nullableInt8u.Value()", nullableInt8u.Value(), 254));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt64uNullValue_203()
+    CHIP_ERROR TestWriteAttributeNullableInt8uNullValue_203()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint64_t> nullableInt64uArgument;
-        nullableInt64uArgument.SetNull();
+        chip::app::DataModel::Nullable<uint8_t> nullableInt8uArgument;
+        nullableInt8uArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            nullableInt64uArgument, this, OnSuccessCallback_203, OnFailureCallback_203);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
+            nullableInt8uArgument, this, OnSuccessCallback_203, OnFailureCallback_203);
     }
 
     void OnFailureResponse_203(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_203() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt64uNullValue_204()
+    CHIP_ERROR TestReadAttributeNullableInt8uNullValue_204()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
             this, OnSuccessCallback_204, OnFailureCallback_204);
     }
 
     void OnFailureResponse_204(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_204(const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
+    void OnSuccessResponse_204(const chip::app::DataModel::Nullable<uint8_t> & nullableInt8u)
     {
-        VerifyOrReturn(CheckValueNull("nullableInt64u", nullableInt64u));
+        VerifyOrReturn(CheckValueNull("nullableInt8u", nullableInt8u));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt8sMinValue_205()
+    CHIP_ERROR TestWriteAttributeNullableInt16uMaxValue_205()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<int8_t> nullableInt8sArgument;
-        nullableInt8sArgument.SetNonNull() = -127;
+        chip::app::DataModel::Nullable<uint16_t> nullableInt16uArgument;
+        nullableInt16uArgument.SetNonNull() = 65534U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
-            nullableInt8sArgument, this, OnSuccessCallback_205, OnFailureCallback_205);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
+            nullableInt16uArgument, this, OnSuccessCallback_205, OnFailureCallback_205);
     }
 
     void OnFailureResponse_205(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_205() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt8sMinValue_206()
+    CHIP_ERROR TestReadAttributeNullableInt16uMaxValue_206()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
             this, OnSuccessCallback_206, OnFailureCallback_206);
     }
 
     void OnFailureResponse_206(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_206(const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
+    void OnSuccessResponse_206(const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt8s", nullableInt8s));
-        VerifyOrReturn(CheckValue("nullableInt8s.Value()", nullableInt8s.Value(), -127));
+        VerifyOrReturn(CheckValueNonNull("nullableInt16u", nullableInt16u));
+        VerifyOrReturn(CheckValue("nullableInt16u.Value()", nullableInt16u.Value(), 65534U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt8sInvalidValue_207()
+    CHIP_ERROR TestWriteAttributeNullableInt16uInvalidValue_207()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<int8_t> nullableInt8sArgument;
-        nullableInt8sArgument.SetNonNull() = -128;
+        chip::app::DataModel::Nullable<uint16_t> nullableInt16uArgument;
+        nullableInt16uArgument.SetNonNull() = 65535U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
-            nullableInt8sArgument, this, OnSuccessCallback_207, OnFailureCallback_207);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
+            nullableInt16uArgument, this, OnSuccessCallback_207, OnFailureCallback_207);
     }
 
     void OnFailureResponse_207(uint8_t status)
@@ -39838,110 +40301,110 @@ private:
 
     void OnSuccessResponse_207() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt8sUnchangedValue_208()
+    CHIP_ERROR TestReadAttributeNullableInt16uUnchangedValue_208()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
             this, OnSuccessCallback_208, OnFailureCallback_208);
     }
 
     void OnFailureResponse_208(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_208(const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
+    void OnSuccessResponse_208(const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt8s", nullableInt8s));
-        VerifyOrReturn(CheckValue("nullableInt8s.Value()", nullableInt8s.Value(), -127));
+        VerifyOrReturn(CheckValueNonNull("nullableInt16u", nullableInt16u));
+        VerifyOrReturn(CheckValue("nullableInt16u.Value()", nullableInt16u.Value(), 65534U));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt8sNullValue_209()
+    CHIP_ERROR TestWriteAttributeNullableInt16uNullValue_209()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<int8_t> nullableInt8sArgument;
-        nullableInt8sArgument.SetNull();
+        chip::app::DataModel::Nullable<uint16_t> nullableInt16uArgument;
+        nullableInt16uArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
-            nullableInt8sArgument, this, OnSuccessCallback_209, OnFailureCallback_209);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
+            nullableInt16uArgument, this, OnSuccessCallback_209, OnFailureCallback_209);
     }
 
     void OnFailureResponse_209(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_209() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt8sNullValue_210()
+    CHIP_ERROR TestReadAttributeNullableInt16uNullValue_210()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
             this, OnSuccessCallback_210, OnFailureCallback_210);
     }
 
     void OnFailureResponse_210(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_210(const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
+    void OnSuccessResponse_210(const chip::app::DataModel::Nullable<uint16_t> & nullableInt16u)
     {
-        VerifyOrReturn(CheckValueNull("nullableInt8s", nullableInt8s));
+        VerifyOrReturn(CheckValueNull("nullableInt16u", nullableInt16u));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt16sMinValue_211()
+    CHIP_ERROR TestWriteAttributeNullableInt32uMaxValue_211()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<int16_t> nullableInt16sArgument;
-        nullableInt16sArgument.SetNonNull() = -32767;
+        chip::app::DataModel::Nullable<uint32_t> nullableInt32uArgument;
+        nullableInt32uArgument.SetNonNull() = 4294967294UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
-            nullableInt16sArgument, this, OnSuccessCallback_211, OnFailureCallback_211);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
+            nullableInt32uArgument, this, OnSuccessCallback_211, OnFailureCallback_211);
     }
 
     void OnFailureResponse_211(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_211() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt16sMinValue_212()
+    CHIP_ERROR TestReadAttributeNullableInt32uMaxValue_212()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
             this, OnSuccessCallback_212, OnFailureCallback_212);
     }
 
     void OnFailureResponse_212(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_212(const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
+    void OnSuccessResponse_212(const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt16s", nullableInt16s));
-        VerifyOrReturn(CheckValue("nullableInt16s.Value()", nullableInt16s.Value(), -32767));
+        VerifyOrReturn(CheckValueNonNull("nullableInt32u", nullableInt32u));
+        VerifyOrReturn(CheckValue("nullableInt32u.Value()", nullableInt32u.Value(), 4294967294UL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt16sInvalidValue_213()
+    CHIP_ERROR TestWriteAttributeNullableInt32uInvalidValue_213()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<int16_t> nullableInt16sArgument;
-        nullableInt16sArgument.SetNonNull() = -32768;
+        chip::app::DataModel::Nullable<uint32_t> nullableInt32uArgument;
+        nullableInt32uArgument.SetNonNull() = 4294967295UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
-            nullableInt16sArgument, this, OnSuccessCallback_213, OnFailureCallback_213);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
+            nullableInt32uArgument, this, OnSuccessCallback_213, OnFailureCallback_213);
     }
 
     void OnFailureResponse_213(uint8_t status)
@@ -39952,110 +40415,110 @@ private:
 
     void OnSuccessResponse_213() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt16sUnchangedValue_214()
+    CHIP_ERROR TestReadAttributeNullableInt32uUnchangedValue_214()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
             this, OnSuccessCallback_214, OnFailureCallback_214);
     }
 
     void OnFailureResponse_214(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_214(const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
+    void OnSuccessResponse_214(const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt16s", nullableInt16s));
-        VerifyOrReturn(CheckValue("nullableInt16s.Value()", nullableInt16s.Value(), -32767));
+        VerifyOrReturn(CheckValueNonNull("nullableInt32u", nullableInt32u));
+        VerifyOrReturn(CheckValue("nullableInt32u.Value()", nullableInt32u.Value(), 4294967294UL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt16sNullValue_215()
+    CHIP_ERROR TestWriteAttributeNullableInt32uNullValue_215()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<int16_t> nullableInt16sArgument;
-        nullableInt16sArgument.SetNull();
+        chip::app::DataModel::Nullable<uint32_t> nullableInt32uArgument;
+        nullableInt32uArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
-            nullableInt16sArgument, this, OnSuccessCallback_215, OnFailureCallback_215);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
+            nullableInt32uArgument, this, OnSuccessCallback_215, OnFailureCallback_215);
     }
 
     void OnFailureResponse_215(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_215() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt16sNullValue_216()
+    CHIP_ERROR TestReadAttributeNullableInt32uNullValue_216()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
             this, OnSuccessCallback_216, OnFailureCallback_216);
     }
 
     void OnFailureResponse_216(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_216(const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
+    void OnSuccessResponse_216(const chip::app::DataModel::Nullable<uint32_t> & nullableInt32u)
     {
-        VerifyOrReturn(CheckValueNull("nullableInt16s", nullableInt16s));
+        VerifyOrReturn(CheckValueNull("nullableInt32u", nullableInt32u));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt32sMinValue_217()
+    CHIP_ERROR TestWriteAttributeNullableInt64uMaxValue_217()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<int32_t> nullableInt32sArgument;
-        nullableInt32sArgument.SetNonNull() = -2147483647L;
+        chip::app::DataModel::Nullable<uint64_t> nullableInt64uArgument;
+        nullableInt64uArgument.SetNonNull() = 18446744073709551614ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
-            nullableInt32sArgument, this, OnSuccessCallback_217, OnFailureCallback_217);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
+            nullableInt64uArgument, this, OnSuccessCallback_217, OnFailureCallback_217);
     }
 
     void OnFailureResponse_217(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_217() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt32sMinValue_218()
+    CHIP_ERROR TestReadAttributeNullableInt64uMaxValue_218()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
             this, OnSuccessCallback_218, OnFailureCallback_218);
     }
 
     void OnFailureResponse_218(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_218(const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
+    void OnSuccessResponse_218(const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt32s", nullableInt32s));
-        VerifyOrReturn(CheckValue("nullableInt32s.Value()", nullableInt32s.Value(), -2147483647L));
+        VerifyOrReturn(CheckValueNonNull("nullableInt64u", nullableInt64u));
+        VerifyOrReturn(CheckValue("nullableInt64u.Value()", nullableInt64u.Value(), 18446744073709551614ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt32sInvalidValue_219()
+    CHIP_ERROR TestWriteAttributeNullableInt64uInvalidValue_219()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<int32_t> nullableInt32sArgument;
-        nullableInt32sArgument.SetNonNull() = -2147483648L;
+        chip::app::DataModel::Nullable<uint64_t> nullableInt64uArgument;
+        nullableInt64uArgument.SetNonNull() = 18446744073709551615ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
-            nullableInt32sArgument, this, OnSuccessCallback_219, OnFailureCallback_219);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
+            nullableInt64uArgument, this, OnSuccessCallback_219, OnFailureCallback_219);
     }
 
     void OnFailureResponse_219(uint8_t status)
@@ -40066,110 +40529,110 @@ private:
 
     void OnSuccessResponse_219() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt32sUnchangedValue_220()
+    CHIP_ERROR TestReadAttributeNullableInt64uUnchangedValue_220()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
             this, OnSuccessCallback_220, OnFailureCallback_220);
     }
 
     void OnFailureResponse_220(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_220(const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
+    void OnSuccessResponse_220(const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt32s", nullableInt32s));
-        VerifyOrReturn(CheckValue("nullableInt32s.Value()", nullableInt32s.Value(), -2147483647L));
+        VerifyOrReturn(CheckValueNonNull("nullableInt64u", nullableInt64u));
+        VerifyOrReturn(CheckValue("nullableInt64u.Value()", nullableInt64u.Value(), 18446744073709551614ULL));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt32sNullValue_221()
+    CHIP_ERROR TestWriteAttributeNullableInt64uNullValue_221()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<int32_t> nullableInt32sArgument;
-        nullableInt32sArgument.SetNull();
+        chip::app::DataModel::Nullable<uint64_t> nullableInt64uArgument;
+        nullableInt64uArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
-            nullableInt32sArgument, this, OnSuccessCallback_221, OnFailureCallback_221);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
+            nullableInt64uArgument, this, OnSuccessCallback_221, OnFailureCallback_221);
     }
 
     void OnFailureResponse_221(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_221() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt32sNullValue_222()
+    CHIP_ERROR TestReadAttributeNullableInt64uNullValue_222()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
             this, OnSuccessCallback_222, OnFailureCallback_222);
     }
 
     void OnFailureResponse_222(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_222(const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
+    void OnSuccessResponse_222(const chip::app::DataModel::Nullable<uint64_t> & nullableInt64u)
     {
-        VerifyOrReturn(CheckValueNull("nullableInt32s", nullableInt32s));
+        VerifyOrReturn(CheckValueNull("nullableInt64u", nullableInt64u));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt64sMinValue_223()
+    CHIP_ERROR TestWriteAttributeNullableInt8sMinValue_223()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<int64_t> nullableInt64sArgument;
-        nullableInt64sArgument.SetNonNull() = -9223372036854775807LL;
+        chip::app::DataModel::Nullable<int8_t> nullableInt8sArgument;
+        nullableInt8sArgument.SetNonNull() = -127;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
-            nullableInt64sArgument, this, OnSuccessCallback_223, OnFailureCallback_223);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
+            nullableInt8sArgument, this, OnSuccessCallback_223, OnFailureCallback_223);
     }
 
     void OnFailureResponse_223(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_223() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt64sMinValue_224()
+    CHIP_ERROR TestReadAttributeNullableInt8sMinValue_224()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
             this, OnSuccessCallback_224, OnFailureCallback_224);
     }
 
     void OnFailureResponse_224(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_224(const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
+    void OnSuccessResponse_224(const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt64s", nullableInt64s));
-        VerifyOrReturn(CheckValue("nullableInt64s.Value()", nullableInt64s.Value(), -9223372036854775807LL));
+        VerifyOrReturn(CheckValueNonNull("nullableInt8s", nullableInt8s));
+        VerifyOrReturn(CheckValue("nullableInt8s.Value()", nullableInt8s.Value(), -127));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt64sInvalidValue_225()
+    CHIP_ERROR TestWriteAttributeNullableInt8sInvalidValue_225()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<int64_t> nullableInt64sArgument;
-        nullableInt64sArgument.SetNonNull() = -9223372036854775807LL - 1;
+        chip::app::DataModel::Nullable<int8_t> nullableInt8sArgument;
+        nullableInt8sArgument.SetNonNull() = -128;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
-            nullableInt64sArgument, this, OnSuccessCallback_225, OnFailureCallback_225);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
+            nullableInt8sArgument, this, OnSuccessCallback_225, OnFailureCallback_225);
     }
 
     void OnFailureResponse_225(uint8_t status)
@@ -40180,110 +40643,110 @@ private:
 
     void OnSuccessResponse_225() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt64sUnchangedValue_226()
+    CHIP_ERROR TestReadAttributeNullableInt8sUnchangedValue_226()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
             this, OnSuccessCallback_226, OnFailureCallback_226);
     }
 
     void OnFailureResponse_226(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_226(const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
+    void OnSuccessResponse_226(const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableInt64s", nullableInt64s));
-        VerifyOrReturn(CheckValue("nullableInt64s.Value()", nullableInt64s.Value(), -9223372036854775807LL));
+        VerifyOrReturn(CheckValueNonNull("nullableInt8s", nullableInt8s));
+        VerifyOrReturn(CheckValue("nullableInt8s.Value()", nullableInt8s.Value(), -127));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableInt64sNullValue_227()
+    CHIP_ERROR TestWriteAttributeNullableInt8sNullValue_227()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<int64_t> nullableInt64sArgument;
-        nullableInt64sArgument.SetNull();
+        chip::app::DataModel::Nullable<int8_t> nullableInt8sArgument;
+        nullableInt8sArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
-            nullableInt64sArgument, this, OnSuccessCallback_227, OnFailureCallback_227);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
+            nullableInt8sArgument, this, OnSuccessCallback_227, OnFailureCallback_227);
     }
 
     void OnFailureResponse_227(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_227() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableInt64sNullValue_228()
+    CHIP_ERROR TestReadAttributeNullableInt8sNullValue_228()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
             this, OnSuccessCallback_228, OnFailureCallback_228);
     }
 
     void OnFailureResponse_228(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_228(const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
+    void OnSuccessResponse_228(const chip::app::DataModel::Nullable<int8_t> & nullableInt8s)
     {
-        VerifyOrReturn(CheckValueNull("nullableInt64s", nullableInt64s));
+        VerifyOrReturn(CheckValueNull("nullableInt8s", nullableInt8s));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableEnum8MaxValue_229()
+    CHIP_ERROR TestWriteAttributeNullableInt16sMinValue_229()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
-        nullableEnum8Argument.SetNonNull() = static_cast<uint8_t>(254);
+        chip::app::DataModel::Nullable<int16_t> nullableInt16sArgument;
+        nullableInt16sArgument.SetNonNull() = -32767;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
-            nullableEnum8Argument, this, OnSuccessCallback_229, OnFailureCallback_229);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
+            nullableInt16sArgument, this, OnSuccessCallback_229, OnFailureCallback_229);
     }
 
     void OnFailureResponse_229(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_229() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableEnum8MaxValue_230()
+    CHIP_ERROR TestReadAttributeNullableInt16sMinValue_230()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
             this, OnSuccessCallback_230, OnFailureCallback_230);
     }
 
     void OnFailureResponse_230(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_230(const chip::app::DataModel::Nullable<uint8_t> & nullableEnum8)
+    void OnSuccessResponse_230(const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableEnum8", nullableEnum8));
-        VerifyOrReturn(CheckValue("nullableEnum8.Value()", nullableEnum8.Value(), 254));
+        VerifyOrReturn(CheckValueNonNull("nullableInt16s", nullableInt16s));
+        VerifyOrReturn(CheckValue("nullableInt16s.Value()", nullableInt16s.Value(), -32767));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableEnum8InvalidValue_231()
+    CHIP_ERROR TestWriteAttributeNullableInt16sInvalidValue_231()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
-        nullableEnum8Argument.SetNonNull() = static_cast<uint8_t>(255);
+        chip::app::DataModel::Nullable<int16_t> nullableInt16sArgument;
+        nullableInt16sArgument.SetNonNull() = -32768;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
-            nullableEnum8Argument, this, OnSuccessCallback_231, OnFailureCallback_231);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
+            nullableInt16sArgument, this, OnSuccessCallback_231, OnFailureCallback_231);
     }
 
     void OnFailureResponse_231(uint8_t status)
@@ -40294,110 +40757,110 @@ private:
 
     void OnSuccessResponse_231() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeNullableEnum8UnchangedValue_232()
+    CHIP_ERROR TestReadAttributeNullableInt16sUnchangedValue_232()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
             this, OnSuccessCallback_232, OnFailureCallback_232);
     }
 
     void OnFailureResponse_232(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_232(const chip::app::DataModel::Nullable<uint8_t> & nullableEnum8)
+    void OnSuccessResponse_232(const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableEnum8", nullableEnum8));
-        VerifyOrReturn(CheckValue("nullableEnum8.Value()", nullableEnum8.Value(), 254));
+        VerifyOrReturn(CheckValueNonNull("nullableInt16s", nullableInt16s));
+        VerifyOrReturn(CheckValue("nullableInt16s.Value()", nullableInt16s.Value(), -32767));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableEnum8NullValue_233()
+    CHIP_ERROR TestWriteAttributeNullableInt16sNullValue_233()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
-        nullableEnum8Argument.SetNull();
+        chip::app::DataModel::Nullable<int16_t> nullableInt16sArgument;
+        nullableInt16sArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
-            nullableEnum8Argument, this, OnSuccessCallback_233, OnFailureCallback_233);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
+            nullableInt16sArgument, this, OnSuccessCallback_233, OnFailureCallback_233);
     }
 
     void OnFailureResponse_233(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_233() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableEnum8NullValue_234()
+    CHIP_ERROR TestReadAttributeNullableInt16sNullValue_234()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
             this, OnSuccessCallback_234, OnFailureCallback_234);
     }
 
     void OnFailureResponse_234(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_234(const chip::app::DataModel::Nullable<uint8_t> & nullableEnum8)
+    void OnSuccessResponse_234(const chip::app::DataModel::Nullable<int16_t> & nullableInt16s)
     {
-        VerifyOrReturn(CheckValueNull("nullableEnum8", nullableEnum8));
+        VerifyOrReturn(CheckValueNull("nullableInt16s", nullableInt16s));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableEnum16MaxValue_235()
+    CHIP_ERROR TestWriteAttributeNullableInt32sMinValue_235()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint16_t> nullableEnum16Argument;
-        nullableEnum16Argument.SetNonNull() = static_cast<uint16_t>(65534);
+        chip::app::DataModel::Nullable<int32_t> nullableInt32sArgument;
+        nullableInt32sArgument.SetNonNull() = -2147483647L;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
-            nullableEnum16Argument, this, OnSuccessCallback_235, OnFailureCallback_235);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
+            nullableInt32sArgument, this, OnSuccessCallback_235, OnFailureCallback_235);
     }
 
     void OnFailureResponse_235(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_235() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableEnum16MaxValue_236()
+    CHIP_ERROR TestReadAttributeNullableInt32sMinValue_236()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
             this, OnSuccessCallback_236, OnFailureCallback_236);
     }
 
     void OnFailureResponse_236(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_236(const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
+    void OnSuccessResponse_236(const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
     {
-        VerifyOrReturn(CheckValueNonNull("nullableEnum16", nullableEnum16));
-        VerifyOrReturn(CheckValue("nullableEnum16.Value()", nullableEnum16.Value(), 65534U));
+        VerifyOrReturn(CheckValueNonNull("nullableInt32s", nullableInt32s));
+        VerifyOrReturn(CheckValue("nullableInt32s.Value()", nullableInt32s.Value(), -2147483647L));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableEnum16InvalidValue_237()
+    CHIP_ERROR TestWriteAttributeNullableInt32sInvalidValue_237()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        chip::app::DataModel::Nullable<uint16_t> nullableEnum16Argument;
-        nullableEnum16Argument.SetNonNull() = static_cast<uint16_t>(65535);
+        chip::app::DataModel::Nullable<int32_t> nullableInt32sArgument;
+        nullableInt32sArgument.SetNonNull() = -2147483648L;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
-            nullableEnum16Argument, this, OnSuccessCallback_237, OnFailureCallback_237);
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
+            nullableInt32sArgument, this, OnSuccessCallback_237, OnFailureCallback_237);
     }
 
     void OnFailureResponse_237(uint8_t status)
@@ -40408,19 +40871,688 @@ private:
 
     void OnSuccessResponse_237() { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeNullableEnum16UnchangedValue_238()
+    CHIP_ERROR TestReadAttributeNullableInt32sUnchangedValue_238()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
+            this, OnSuccessCallback_238, OnFailureCallback_238);
+    }
+
+    void OnFailureResponse_238(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_238(const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableInt32s", nullableInt32s));
+        VerifyOrReturn(CheckValue("nullableInt32s.Value()", nullableInt32s.Value(), -2147483647L));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableInt32sNullValue_239()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<int32_t> nullableInt32sArgument;
+        nullableInt32sArgument.SetNull();
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
+            nullableInt32sArgument, this, OnSuccessCallback_239, OnFailureCallback_239);
+    }
+
+    void OnFailureResponse_239(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_239() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableInt32sNullValue_240()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
+            this, OnSuccessCallback_240, OnFailureCallback_240);
+    }
+
+    void OnFailureResponse_240(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_240(const chip::app::DataModel::Nullable<int32_t> & nullableInt32s)
+    {
+        VerifyOrReturn(CheckValueNull("nullableInt32s", nullableInt32s));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableInt64sMinValue_241()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<int64_t> nullableInt64sArgument;
+        nullableInt64sArgument.SetNonNull() = -9223372036854775807LL;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+            nullableInt64sArgument, this, OnSuccessCallback_241, OnFailureCallback_241);
+    }
+
+    void OnFailureResponse_241(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_241() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableInt64sMinValue_242()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+            this, OnSuccessCallback_242, OnFailureCallback_242);
+    }
+
+    void OnFailureResponse_242(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_242(const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableInt64s", nullableInt64s));
+        VerifyOrReturn(CheckValue("nullableInt64s.Value()", nullableInt64s.Value(), -9223372036854775807LL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableInt64sInvalidValue_243()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<int64_t> nullableInt64sArgument;
+        nullableInt64sArgument.SetNonNull() = -9223372036854775807LL - 1;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+            nullableInt64sArgument, this, OnSuccessCallback_243, OnFailureCallback_243);
+    }
+
+    void OnFailureResponse_243(uint8_t status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+        NextTest();
+    }
+
+    void OnSuccessResponse_243() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadAttributeNullableInt64sUnchangedValue_244()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+            this, OnSuccessCallback_244, OnFailureCallback_244);
+    }
+
+    void OnFailureResponse_244(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_244(const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableInt64s", nullableInt64s));
+        VerifyOrReturn(CheckValue("nullableInt64s.Value()", nullableInt64s.Value(), -9223372036854775807LL));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableInt64sNullValue_245()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<int64_t> nullableInt64sArgument;
+        nullableInt64sArgument.SetNull();
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+            nullableInt64sArgument, this, OnSuccessCallback_245, OnFailureCallback_245);
+    }
+
+    void OnFailureResponse_245(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_245() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableInt64sNullValue_246()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+            this, OnSuccessCallback_246, OnFailureCallback_246);
+    }
+
+    void OnFailureResponse_246(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_246(const chip::app::DataModel::Nullable<int64_t> & nullableInt64s)
+    {
+        VerifyOrReturn(CheckValueNull("nullableInt64s", nullableInt64s));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableSingleMediumValue_247()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<float> nullableFloatSingleArgument;
+        nullableFloatSingleArgument.SetNonNull() = 0.1f;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            nullableFloatSingleArgument, this, OnSuccessCallback_247, OnFailureCallback_247);
+    }
+
+    void OnFailureResponse_247(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_247() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableSingleMediumValue_248()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            this, OnSuccessCallback_248, OnFailureCallback_248);
+    }
+
+    void OnFailureResponse_248(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_248(const chip::app::DataModel::Nullable<float> & nullableFloatSingle)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableFloatSingle", nullableFloatSingle));
+        VerifyOrReturn(CheckValue("nullableFloatSingle.Value()", nullableFloatSingle.Value(), 0.1f));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableSingleLargestValue_249()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<float> nullableFloatSingleArgument;
+        nullableFloatSingleArgument.SetNonNull() = INFINITY;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            nullableFloatSingleArgument, this, OnSuccessCallback_249, OnFailureCallback_249);
+    }
+
+    void OnFailureResponse_249(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_249() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableSingleLargestValue_250()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            this, OnSuccessCallback_250, OnFailureCallback_250);
+    }
+
+    void OnFailureResponse_250(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_250(const chip::app::DataModel::Nullable<float> & nullableFloatSingle)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableFloatSingle", nullableFloatSingle));
+        VerifyOrReturn(CheckValue("nullableFloatSingle.Value()", nullableFloatSingle.Value(), INFINITY));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableSingleSmallestValue_251()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<float> nullableFloatSingleArgument;
+        nullableFloatSingleArgument.SetNonNull() = -INFINITY;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            nullableFloatSingleArgument, this, OnSuccessCallback_251, OnFailureCallback_251);
+    }
+
+    void OnFailureResponse_251(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_251() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableSingleSmallestValue_252()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            this, OnSuccessCallback_252, OnFailureCallback_252);
+    }
+
+    void OnFailureResponse_252(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_252(const chip::app::DataModel::Nullable<float> & nullableFloatSingle)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableFloatSingle", nullableFloatSingle));
+        VerifyOrReturn(CheckValue("nullableFloatSingle.Value()", nullableFloatSingle.Value(), -INFINITY));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableSingleNullValue_253()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<float> nullableFloatSingleArgument;
+        nullableFloatSingleArgument.SetNull();
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            nullableFloatSingleArgument, this, OnSuccessCallback_253, OnFailureCallback_253);
+    }
+
+    void OnFailureResponse_253(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_253() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableSingleNullValue_254()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            this, OnSuccessCallback_254, OnFailureCallback_254);
+    }
+
+    void OnFailureResponse_254(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_254(const chip::app::DataModel::Nullable<float> & nullableFloatSingle)
+    {
+        VerifyOrReturn(CheckValueNull("nullableFloatSingle", nullableFloatSingle));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableSingle0Value_255()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<float> nullableFloatSingleArgument;
+        nullableFloatSingleArgument.SetNonNull() = 0.0f;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            nullableFloatSingleArgument, this, OnSuccessCallback_255, OnFailureCallback_255);
+    }
+
+    void OnFailureResponse_255(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_255() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableSingle0Value_256()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            this, OnSuccessCallback_256, OnFailureCallback_256);
+    }
+
+    void OnFailureResponse_256(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_256(const chip::app::DataModel::Nullable<float> & nullableFloatSingle)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableFloatSingle", nullableFloatSingle));
+        VerifyOrReturn(CheckValue("nullableFloatSingle.Value()", nullableFloatSingle.Value(), 0.0f));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableDoubleMediumValue_257()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<double> nullableFloatDoubleArgument;
+        nullableFloatDoubleArgument.SetNonNull() = 0.1234567890123;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            nullableFloatDoubleArgument, this, OnSuccessCallback_257, OnFailureCallback_257);
+    }
+
+    void OnFailureResponse_257(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_257() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableDoubleMediumValue_258()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            this, OnSuccessCallback_258, OnFailureCallback_258);
+    }
+
+    void OnFailureResponse_258(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_258(const chip::app::DataModel::Nullable<double> & nullableFloatDouble)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableFloatDouble", nullableFloatDouble));
+        VerifyOrReturn(CheckValue("nullableFloatDouble.Value()", nullableFloatDouble.Value(), 0.1234567890123));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableDoubleLargestValue_259()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<double> nullableFloatDoubleArgument;
+        nullableFloatDoubleArgument.SetNonNull() = INFINITY;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            nullableFloatDoubleArgument, this, OnSuccessCallback_259, OnFailureCallback_259);
+    }
+
+    void OnFailureResponse_259(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_259() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableDoubleLargestValue_260()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            this, OnSuccessCallback_260, OnFailureCallback_260);
+    }
+
+    void OnFailureResponse_260(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_260(const chip::app::DataModel::Nullable<double> & nullableFloatDouble)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableFloatDouble", nullableFloatDouble));
+        VerifyOrReturn(CheckValue("nullableFloatDouble.Value()", nullableFloatDouble.Value(), INFINITY));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableDoubleSmallestValue_261()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<double> nullableFloatDoubleArgument;
+        nullableFloatDoubleArgument.SetNonNull() = -INFINITY;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            nullableFloatDoubleArgument, this, OnSuccessCallback_261, OnFailureCallback_261);
+    }
+
+    void OnFailureResponse_261(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_261() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableDoubleSmallestValue_262()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            this, OnSuccessCallback_262, OnFailureCallback_262);
+    }
+
+    void OnFailureResponse_262(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_262(const chip::app::DataModel::Nullable<double> & nullableFloatDouble)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableFloatDouble", nullableFloatDouble));
+        VerifyOrReturn(CheckValue("nullableFloatDouble.Value()", nullableFloatDouble.Value(), -INFINITY));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableDoubleNullValue_263()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<double> nullableFloatDoubleArgument;
+        nullableFloatDoubleArgument.SetNull();
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            nullableFloatDoubleArgument, this, OnSuccessCallback_263, OnFailureCallback_263);
+    }
+
+    void OnFailureResponse_263(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_263() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableDoubleNullValue_264()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            this, OnSuccessCallback_264, OnFailureCallback_264);
+    }
+
+    void OnFailureResponse_264(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_264(const chip::app::DataModel::Nullable<double> & nullableFloatDouble)
+    {
+        VerifyOrReturn(CheckValueNull("nullableFloatDouble", nullableFloatDouble));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableDouble0Value_265()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<double> nullableFloatDoubleArgument;
+        nullableFloatDoubleArgument.SetNonNull() = 0;
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            nullableFloatDoubleArgument, this, OnSuccessCallback_265, OnFailureCallback_265);
+    }
+
+    void OnFailureResponse_265(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_265() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableDouble0Value_266()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            this, OnSuccessCallback_266, OnFailureCallback_266);
+    }
+
+    void OnFailureResponse_266(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_266(const chip::app::DataModel::Nullable<double> & nullableFloatDouble)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableFloatDouble", nullableFloatDouble));
+        VerifyOrReturn(CheckValue("nullableFloatDouble.Value()", nullableFloatDouble.Value(), 0));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableEnum8MaxValue_267()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
+        nullableEnum8Argument.SetNonNull() = static_cast<uint8_t>(254);
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+            nullableEnum8Argument, this, OnSuccessCallback_267, OnFailureCallback_267);
+    }
+
+    void OnFailureResponse_267(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_267() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableEnum8MaxValue_268()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+            this, OnSuccessCallback_268, OnFailureCallback_268);
+    }
+
+    void OnFailureResponse_268(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_268(const chip::app::DataModel::Nullable<uint8_t> & nullableEnum8)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableEnum8", nullableEnum8));
+        VerifyOrReturn(CheckValue("nullableEnum8.Value()", nullableEnum8.Value(), 254));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableEnum8InvalidValue_269()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
+        nullableEnum8Argument.SetNonNull() = static_cast<uint8_t>(255);
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+            nullableEnum8Argument, this, OnSuccessCallback_269, OnFailureCallback_269);
+    }
+
+    void OnFailureResponse_269(uint8_t status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+        NextTest();
+    }
+
+    void OnSuccessResponse_269() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadAttributeNullableEnum8UnchangedValue_270()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+            this, OnSuccessCallback_270, OnFailureCallback_270);
+    }
+
+    void OnFailureResponse_270(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_270(const chip::app::DataModel::Nullable<uint8_t> & nullableEnum8)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableEnum8", nullableEnum8));
+        VerifyOrReturn(CheckValue("nullableEnum8.Value()", nullableEnum8.Value(), 254));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableEnum8NullValue_271()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
+        nullableEnum8Argument.SetNull();
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+            nullableEnum8Argument, this, OnSuccessCallback_271, OnFailureCallback_271);
+    }
+
+    void OnFailureResponse_271(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_271() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableEnum8NullValue_272()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+            this, OnSuccessCallback_272, OnFailureCallback_272);
+    }
+
+    void OnFailureResponse_272(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_272(const chip::app::DataModel::Nullable<uint8_t> & nullableEnum8)
+    {
+        VerifyOrReturn(CheckValueNull("nullableEnum8", nullableEnum8));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableEnum16MaxValue_273()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<uint16_t> nullableEnum16Argument;
+        nullableEnum16Argument.SetNonNull() = static_cast<uint16_t>(65534);
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
+            nullableEnum16Argument, this, OnSuccessCallback_273, OnFailureCallback_273);
+    }
+
+    void OnFailureResponse_273(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_273() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeNullableEnum16MaxValue_274()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
-            this, OnSuccessCallback_238, OnFailureCallback_238);
+            this, OnSuccessCallback_274, OnFailureCallback_274);
     }
 
-    void OnFailureResponse_238(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_274(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_238(const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
+    void OnSuccessResponse_274(const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
     {
         VerifyOrReturn(CheckValueNonNull("nullableEnum16", nullableEnum16));
         VerifyOrReturn(CheckValue("nullableEnum16.Value()", nullableEnum16.Value(), 65534U));
@@ -40428,7 +41560,48 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableEnum16NullValue_239()
+    CHIP_ERROR TestWriteAttributeNullableEnum16InvalidValue_275()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        chip::app::DataModel::Nullable<uint16_t> nullableEnum16Argument;
+        nullableEnum16Argument.SetNonNull() = static_cast<uint16_t>(65535);
+
+        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
+            nullableEnum16Argument, this, OnSuccessCallback_275, OnFailureCallback_275);
+    }
+
+    void OnFailureResponse_275(uint8_t status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_CONSTRAINT_ERROR));
+        NextTest();
+    }
+
+    void OnSuccessResponse_275() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadAttributeNullableEnum16UnchangedValue_276()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
+            this, OnSuccessCallback_276, OnFailureCallback_276);
+    }
+
+    void OnFailureResponse_276(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_276(const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
+    {
+        VerifyOrReturn(CheckValueNonNull("nullableEnum16", nullableEnum16));
+        VerifyOrReturn(CheckValue("nullableEnum16.Value()", nullableEnum16.Value(), 65534U));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeNullableEnum16NullValue_277()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -40438,45 +41611,45 @@ private:
         nullableEnum16Argument.SetNull();
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
-            nullableEnum16Argument, this, OnSuccessCallback_239, OnFailureCallback_239);
+            nullableEnum16Argument, this, OnSuccessCallback_277, OnFailureCallback_277);
     }
 
-    void OnFailureResponse_239(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_277(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_239() { NextTest(); }
+    void OnSuccessResponse_277() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableEnum16NullValue_240()
+    CHIP_ERROR TestReadAttributeNullableEnum16NullValue_278()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
-            this, OnSuccessCallback_240, OnFailureCallback_240);
+            this, OnSuccessCallback_278, OnFailureCallback_278);
     }
 
-    void OnFailureResponse_240(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_278(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_240(const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
+    void OnSuccessResponse_278(const chip::app::DataModel::Nullable<uint16_t> & nullableEnum16)
     {
         VerifyOrReturn(CheckValueNull("nullableEnum16", nullableEnum16));
 
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeNullableOctetStringDefaultValue_241()
+    CHIP_ERROR TestReadAttributeNullableOctetStringDefaultValue_279()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            this, OnSuccessCallback_241, OnFailureCallback_241);
+            this, OnSuccessCallback_279, OnFailureCallback_279);
     }
 
-    void OnFailureResponse_241(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_279(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_241(const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
+    void OnSuccessResponse_279(const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
     {
         VerifyOrReturn(CheckValueNonNull("nullableOctetString", nullableOctetString));
         VerifyOrReturn(CheckValueAsString("nullableOctetString.Value()", nullableOctetString.Value(),
@@ -40485,7 +41658,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableOctetString_242()
+    CHIP_ERROR TestWriteAttributeNullableOctetString_280()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -40496,26 +41669,26 @@ private:
             chip::ByteSpan(chip::Uint8::from_const_char("TestValuegarbage: not in length on purpose"), 9);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            nullableOctetStringArgument, this, OnSuccessCallback_242, OnFailureCallback_242);
+            nullableOctetStringArgument, this, OnSuccessCallback_280, OnFailureCallback_280);
     }
 
-    void OnFailureResponse_242(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_280(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_242() { NextTest(); }
+    void OnSuccessResponse_280() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableOctetString_243()
+    CHIP_ERROR TestReadAttributeNullableOctetString_281()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            this, OnSuccessCallback_243, OnFailureCallback_243);
+            this, OnSuccessCallback_281, OnFailureCallback_281);
     }
 
-    void OnFailureResponse_243(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_281(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_243(const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
+    void OnSuccessResponse_281(const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
     {
         VerifyOrReturn(CheckValueNonNull("nullableOctetString", nullableOctetString));
         VerifyOrReturn(CheckValueAsString("nullableOctetString.Value()", nullableOctetString.Value(),
@@ -40524,7 +41697,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableOctetString_244()
+    CHIP_ERROR TestWriteAttributeNullableOctetString_282()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -40534,33 +41707,33 @@ private:
         nullableOctetStringArgument.SetNull();
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            nullableOctetStringArgument, this, OnSuccessCallback_244, OnFailureCallback_244);
+            nullableOctetStringArgument, this, OnSuccessCallback_282, OnFailureCallback_282);
     }
 
-    void OnFailureResponse_244(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_282(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_244() { NextTest(); }
+    void OnSuccessResponse_282() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableOctetString_245()
+    CHIP_ERROR TestReadAttributeNullableOctetString_283()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            this, OnSuccessCallback_245, OnFailureCallback_245);
+            this, OnSuccessCallback_283, OnFailureCallback_283);
     }
 
-    void OnFailureResponse_245(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_283(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_245(const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
+    void OnSuccessResponse_283(const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
     {
         VerifyOrReturn(CheckValueNull("nullableOctetString", nullableOctetString));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableOctetString_246()
+    CHIP_ERROR TestWriteAttributeNullableOctetString_284()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -40571,26 +41744,26 @@ private:
             chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            nullableOctetStringArgument, this, OnSuccessCallback_246, OnFailureCallback_246);
+            nullableOctetStringArgument, this, OnSuccessCallback_284, OnFailureCallback_284);
     }
 
-    void OnFailureResponse_246(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_284(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_246() { NextTest(); }
+    void OnSuccessResponse_284() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableOctetString_247()
+    CHIP_ERROR TestReadAttributeNullableOctetString_285()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            this, OnSuccessCallback_247, OnFailureCallback_247);
+            this, OnSuccessCallback_285, OnFailureCallback_285);
     }
 
-    void OnFailureResponse_247(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_285(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_247(const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
+    void OnSuccessResponse_285(const chip::app::DataModel::Nullable<chip::ByteSpan> & nullableOctetString)
     {
         VerifyOrReturn(CheckValueNonNull("nullableOctetString", nullableOctetString));
         VerifyOrReturn(CheckValueAsString("nullableOctetString.Value()", nullableOctetString.Value(),
@@ -40599,19 +41772,19 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeNullableCharStringDefaultValue_248()
+    CHIP_ERROR TestReadAttributeNullableCharStringDefaultValue_286()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            this, OnSuccessCallback_248, OnFailureCallback_248);
+            this, OnSuccessCallback_286, OnFailureCallback_286);
     }
 
-    void OnFailureResponse_248(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_286(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_248(const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
+    void OnSuccessResponse_286(const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
     {
         VerifyOrReturn(CheckValueNonNull("nullableCharString", nullableCharString));
         VerifyOrReturn(CheckValueAsString("nullableCharString.Value()", nullableCharString.Value(), chip::CharSpan("", 0)));
@@ -40619,7 +41792,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableCharString_249()
+    CHIP_ERROR TestWriteAttributeNullableCharString_287()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -40629,26 +41802,26 @@ private:
         nullableCharStringArgument.SetNonNull() = chip::Span<const char>("☉T☉garbage: not in length on purpose", 7);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            nullableCharStringArgument, this, OnSuccessCallback_249, OnFailureCallback_249);
+            nullableCharStringArgument, this, OnSuccessCallback_287, OnFailureCallback_287);
     }
 
-    void OnFailureResponse_249(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_287(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_249() { NextTest(); }
+    void OnSuccessResponse_287() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableCharString_250()
+    CHIP_ERROR TestReadAttributeNullableCharString_288()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            this, OnSuccessCallback_250, OnFailureCallback_250);
+            this, OnSuccessCallback_288, OnFailureCallback_288);
     }
 
-    void OnFailureResponse_250(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_288(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_250(const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
+    void OnSuccessResponse_288(const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
     {
         VerifyOrReturn(CheckValueNonNull("nullableCharString", nullableCharString));
         VerifyOrReturn(CheckValueAsString("nullableCharString.Value()", nullableCharString.Value(), chip::CharSpan("☉T☉", 7)));
@@ -40656,7 +41829,7 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableCharStringValueTooLong_251()
+    CHIP_ERROR TestWriteAttributeNullableCharStringValueTooLong_289()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -40666,33 +41839,33 @@ private:
         nullableCharStringArgument.SetNull();
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            nullableCharStringArgument, this, OnSuccessCallback_251, OnFailureCallback_251);
+            nullableCharStringArgument, this, OnSuccessCallback_289, OnFailureCallback_289);
     }
 
-    void OnFailureResponse_251(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_289(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_251() { NextTest(); }
+    void OnSuccessResponse_289() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableCharString_252()
+    CHIP_ERROR TestReadAttributeNullableCharString_290()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            this, OnSuccessCallback_252, OnFailureCallback_252);
+            this, OnSuccessCallback_290, OnFailureCallback_290);
     }
 
-    void OnFailureResponse_252(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_290(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_252(const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
+    void OnSuccessResponse_290(const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
     {
         VerifyOrReturn(CheckValueNull("nullableCharString", nullableCharString));
 
         NextTest();
     }
 
-    CHIP_ERROR TestWriteAttributeNullableCharStringEmpty_253()
+    CHIP_ERROR TestWriteAttributeNullableCharStringEmpty_291()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
@@ -40702,26 +41875,26 @@ private:
         nullableCharStringArgument.SetNonNull() = chip::Span<const char>("garbage: not in length on purpose", 0);
 
         return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            nullableCharStringArgument, this, OnSuccessCallback_253, OnFailureCallback_253);
+            nullableCharStringArgument, this, OnSuccessCallback_291, OnFailureCallback_291);
     }
 
-    void OnFailureResponse_253(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_291(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_253() { NextTest(); }
+    void OnSuccessResponse_291() { NextTest(); }
 
-    CHIP_ERROR TestReadAttributeNullableCharString_254()
+    CHIP_ERROR TestReadAttributeNullableCharString_292()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
         return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            this, OnSuccessCallback_254, OnFailureCallback_254);
+            this, OnSuccessCallback_292, OnFailureCallback_292);
     }
 
-    void OnFailureResponse_254(uint8_t status) { ThrowFailureResponse(); }
+    void OnFailureResponse_292(uint8_t status) { ThrowFailureResponse(); }
 
-    void OnSuccessResponse_254(const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
+    void OnSuccessResponse_292(const chip::app::DataModel::Nullable<chip::CharSpan> & nullableCharString)
     {
         VerifyOrReturn(CheckValueNonNull("nullableCharString", nullableCharString));
         VerifyOrReturn(CheckValueAsString("nullableCharString.Value()", nullableCharString.Value(), chip::CharSpan("", 0)));
@@ -40729,41 +41902,41 @@ private:
         NextTest();
     }
 
-    CHIP_ERROR TestReadAttributeFromNonexistentEndpoint_255()
+    CHIP_ERROR TestReadAttributeFromNonexistentEndpoint_293()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 200;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_255,
-                                                                                                        OnFailureCallback_255);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_293,
+                                                                                                        OnFailureCallback_293);
     }
 
-    void OnFailureResponse_255(uint8_t status)
+    void OnFailureResponse_293(uint8_t status)
     {
         VerifyOrReturn(CheckConstraintNotValue("status", status, 0));
         NextTest();
     }
 
-    void OnSuccessResponse_255(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_293(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u) { ThrowSuccessResponse(); }
 
-    CHIP_ERROR TestReadAttributeFromNonexistentCluster_256()
+    CHIP_ERROR TestReadAttributeFromNonexistentCluster_294()
     {
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 0;
         chip::Controller::TestClusterClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_256,
-                                                                                                        OnFailureCallback_256);
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnSuccessCallback_294,
+                                                                                                        OnFailureCallback_294);
     }
 
-    void OnFailureResponse_256(uint8_t status)
+    void OnFailureResponse_294(uint8_t status)
     {
         VerifyOrReturn(CheckConstraintNotValue("status", status, 0));
         NextTest();
     }
 
-    void OnSuccessResponse_256(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u) { ThrowSuccessResponse(); }
+    void OnSuccessResponse_294(const chip::app::DataModel::DecodableList<uint8_t> & listInt8u) { ThrowSuccessResponse(); }
 };
 
 class TestClusterComplexTypes : public TestCommand

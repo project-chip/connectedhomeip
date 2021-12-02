@@ -209,9 +209,17 @@ public:
     void OnTimedInvoke(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
                        const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
 
+    /**
+     * Called when a timed write is received.  This function takes over all
+     * handling of the exchange, status reporting, and so forth.
+     */
+    void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
+    using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;
 
@@ -239,11 +247,12 @@ private:
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
-     * the Write Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
-     * expected to set it to success if it does not want an automatic status response message to be sent.
+     * the Write Request are handled entirely within this function. If the
+     * status returned is not Status::Success, the caller will send a status
+     * response message with that status.
      */
-    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                              System::PacketBufferHandle && aPayload, Protocols::InteractionModel::Status & aStatus);
+    Status OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                          System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
 
     /**
      * Called when Interaction Model receives a Timed Request message.  Errors processing

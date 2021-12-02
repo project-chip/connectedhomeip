@@ -42,6 +42,16 @@ public class ChipClusters {
     void onError(Exception error);
   }
 
+  public interface FloatAttributeCallback {
+    void onSuccess(float value);
+    void onError(Exception error);
+  }
+
+  public interface DoubleAttributeCallback {
+    void onSuccess(double value);
+    void onError(Exception error);
+  }
+
   public static abstract class BaseChipCluster {
     protected long chipClusterPtr;
 

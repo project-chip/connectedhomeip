@@ -11,6 +11,8 @@
 
 #import <app/util/af-enums.h>
 
+#import <math.h> // For INFINITY
+
 // system dependencies
 #import <XCTest/XCTest.h>
 

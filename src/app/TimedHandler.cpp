@@ -17,6 +17,7 @@
  */
 
 #include "TimedHandler.h"
+#include <app/InteractionModelDelegate.h>
 #include <app/InteractionModelEngine.h>
 #include <app/MessageDef/TimedRequestMessage.h>
 #include <app/StatusResponse.h>
@@ -53,7 +54,7 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
         {
             ChipLogError(DataManagement, "Failed to parse Timed Request action: handler %p exchange " ChipLogFormatExchange, this,
                          ChipLogValueExchange(aExchangeContext));
-            StatusResponse::SendStatusResponse(Status::InvalidAction, aExchangeContext, /* aExpectResponse = */ false);
+            StatusResponse::Send(Status::InvalidAction, aExchangeContext, /* aExpectResponse = */ false);
         }
         return err;
     }
@@ -65,20 +66,26 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
             // Time is up.  Spec says to send UNSUPPORTED_ACCESS.
             ChipLogError(DataManagement, "Timeout expired: handler %p exchange " ChipLogFormatExchange, this,
                          ChipLogValueExchange(aExchangeContext));
-            return StatusResponse::SendStatusResponse(Status::UnsupportedAccess, aExchangeContext, /* aExpectResponse = */ false);
+            return StatusResponse::Send(Status::UnsupportedAccess, aExchangeContext, /* aExpectResponse = */ false);
         }
 
         if (aPayloadHeader.HasMessageType(MsgType::InvokeCommandRequest))
         {
             auto * imEngine = InteractionModelEngine::GetInstance();
-            aExchangeContext->SetDelegate(imEngine);
             ChipLogDetail(DataManagement, "Handing timed invoke to IM engine: handler %p exchange " ChipLogFormatExchange, this,
                           ChipLogValueExchange(aExchangeContext));
             imEngine->OnTimedInvoke(this, aExchangeContext, aPayloadHeader, std::move(aPayload));
             return CHIP_NO_ERROR;
         }
 
-        // TODO: Add handling of MsgType::WriteRequest here.
+        if (aPayloadHeader.HasMessageType(MsgType::WriteRequest))
+        {
+            auto * imEngine = InteractionModelEngine::GetInstance();
+            ChipLogDetail(DataManagement, "Handing timed write to IM engine: handler %p exchange " ChipLogFormatExchange, this,
+                          ChipLogValueExchange(aExchangeContext));
+            imEngine->OnTimedWrite(this, aExchangeContext, aPayloadHeader, std::move(aPayload));
+            return CHIP_NO_ERROR;
+        }
     }
 
     // Not an expected message.  Send an error response.  The exchange will
@@ -86,7 +93,7 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
     ChipLogError(DataManagement, "Unexpected unknown message in tiemd interaction: handler %p exchange " ChipLogFormatExchange,
                  this, ChipLogValueExchange(aExchangeContext));
 
-    return StatusResponse::SendStatusResponse(Status::InvalidAction, aExchangeContext, /* aExpectResponse = */ false);
+    return StatusResponse::Send(Status::InvalidAction, aExchangeContext, /* aExpectResponse = */ false);
 }
 
 void TimedHandler::OnExchangeClosing(Messaging::ExchangeContext *)
@@ -116,11 +123,14 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
 
     ChipLogDetail(DataManagement, "Got Timed Request with timeout %" PRIu16 ": handler %p exchange " ChipLogFormatExchange,
                   timeoutMs, this, ChipLogValueExchange(aExchangeContext));
-    // Tell the exchange to close after the timeout passes, so we don't get
-    // stuck waiting forever if the client never sends another message.
+    // Use at least our default IM timeout, because if we close our exchange as
+    // soon as we know the delay has passed we won't be able to send the
+    // UNSUPPORTED_ACCESS status code the spec tells us to send (and in fact
+    // will send nothing and the other side will have to time out to realize
+    // it's missed its window).
     auto delay = System::Clock::Milliseconds32(timeoutMs);
-    aExchangeContext->SetResponseTimeout(delay);
-    ReturnErrorOnFailure(StatusResponse::SendStatusResponse(Status::Success, aExchangeContext, /* aExpectResponse = */ true));
+    aExchangeContext->SetResponseTimeout(std::max(delay, kImMessageTimeout));
+    ReturnErrorOnFailure(StatusResponse::Send(Status::Success, aExchangeContext, /* aExpectResponse = */ true));
 
     // Now just wait for the client.
     mState     = State::kExpectingFollowingAction;

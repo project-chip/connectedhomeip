@@ -31,6 +31,10 @@
 {{#>CHIPCallbackBridge type="Int64u"       isNullable=true  ns="chip"}}NullableInt64uAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge type="Int64s"       isNullable=false ns="chip"}}Int64sAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge type="Int64s"       isNullable=true  ns="chip"}}NullableInt64sAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge type="Single"       isNullable=false ns="chip"}}FloatAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge type="Single"       isNullable=true  ns="chip"}}NullableFloatAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge type="Double"       isNullable=false ns="chip"}}DoubleAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge type="Double"       isNullable=true  ns="chip"}}NullableDoubleAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge type="vendor_id"    isNullable=false ns="chip"}}VendorIdAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge type="vendor_id"    isNullable=true  ns="chip"}}NullableVendorIdAttributeCallback{{/CHIPCallbackBridge}}
 

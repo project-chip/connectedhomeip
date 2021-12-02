@@ -416,14 +416,14 @@ void TxtFieldMrpRetryIntervalIdle(nlTestSuite * inSuite, void * inContext)
     sprintf(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 1);
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 1_ms32);
 
     // Maximum
     sprintf(key, "CRI");
     sprintf(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 3600000);
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalIdle().Value() == 3600000_ms32);
 
     // Test no other fields were populated
     ResetRetryIntervalIdle(nodeData);
@@ -479,14 +479,14 @@ void TxtFieldMrpRetryIntervalActive(nlTestSuite * inSuite, void * inContext)
     sprintf(val, "1");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 1);
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 1_ms32);
 
     // Maximum
     sprintf(key, "CRA");
     sprintf(val, "3600000");
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
     NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().HasValue());
-    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 3600000);
+    NL_TEST_ASSERT(inSuite, nodeData.GetMrpRetryIntervalActive().Value() == 3600000_ms32);
 
     // Test no other fields were populated
     ResetRetryIntervalActive(nodeData);

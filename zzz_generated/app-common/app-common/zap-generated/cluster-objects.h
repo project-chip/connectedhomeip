@@ -13339,6 +13339,70 @@ struct TypeInfo
 } // namespace ClusterRevision
 } // namespace Attributes
 } // namespace FixedLabel
+namespace UserLabel {
+
+namespace Structs {
+namespace LabelStruct {
+enum class Fields
+{
+    kLabel = 1,
+    kValue = 2,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan label;
+    chip::CharSpan value;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace LabelStruct
+} // namespace Structs
+
+namespace Attributes {
+namespace LabelList {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const Structs::LabelStruct::Type>;
+    using DecodableType    = DataModel::DecodableList<Structs::LabelStruct::DecodableType>;
+    using DecodableArgType = const DataModel::DecodableList<Structs::LabelStruct::DecodableType> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LabelList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LabelList
+namespace FeatureMap {
+struct TypeInfo
+{
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::FeatureMap::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace FeatureMap
+namespace ClusterRevision {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::UserLabel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ClusterRevision::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ClusterRevision
+} // namespace Attributes
+} // namespace UserLabel
 namespace BooleanState {
 
 namespace Attributes {
@@ -28860,9 +28924,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace AccountLogin
 namespace TestCluster {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for SimpleEnum
 enum class SimpleEnum : uint8_t
 {
@@ -28871,9 +28932,6 @@ enum class SimpleEnum : uint8_t
     kValueB      = 0x02,
     kValueC      = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using SimpleEnum                      = EmberAfSimpleEnum;
-#endif
 
 // Bitmap for SimpleBitmap
 enum class SimpleBitmap : uint8_t

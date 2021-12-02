@@ -349,9 +349,10 @@ CHIP_ERROR InteractionModelEngine::OnReadInitialRequest(Messaging::ExchangeConte
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext,
-                                                  const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
-                                                  Protocols::InteractionModel::Status & aStatus)
+Protocols::InteractionModel::Status InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                                           const PayloadHeader & aPayloadHeader,
+                                                                           System::PacketBufferHandle && aPayload,
+                                                                           bool aIsTimedWrite)
 {
     ChipLogDetail(InteractionModel, "Received Write request");
 
@@ -359,15 +360,12 @@ CHIP_ERROR InteractionModelEngine::OnWriteRequest(Messaging::ExchangeContext * a
     {
         if (writeHandler.IsFree())
         {
-            ReturnErrorOnFailure(writeHandler.Init(mpDelegate));
-            ReturnErrorOnFailure(writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload)));
-            aStatus = Protocols::InteractionModel::Status::Success;
-            return CHIP_NO_ERROR;
+            VerifyOrReturnError(writeHandler.Init(mpDelegate) == CHIP_NO_ERROR, Status::Busy);
+            return writeHandler.OnWriteRequest(apExchangeContext, std::move(aPayload), aIsTimedWrite);
         }
     }
     ChipLogProgress(InteractionModel, "no resource for write interaction");
-    aStatus = Protocols::InteractionModel::Status::Busy;
-    return CHIP_NO_ERROR;
+    return Status::Busy;
 }
 
 CHIP_ERROR InteractionModelEngine::OnTimedRequest(Messaging::ExchangeContext * apExchangeContext,
@@ -438,7 +436,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::WriteRequest))
     {
-        SuccessOrExit(OnWriteRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), status));
+        status = OnWriteRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedWrite = */ false);
     }
     else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::SubscribeRequest))
     {
@@ -462,7 +460,7 @@ CHIP_ERROR InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext 
 exit:
     if (status != Protocols::InteractionModel::Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
-        err = StatusResponse::SendStatusResponse(status, apExchangeContext, false /*aExpectResponse*/);
+        err = StatusResponse::Send(status, apExchangeContext, false /*aExpectResponse*/);
     }
     return err;
 }
@@ -718,7 +716,27 @@ void InteractionModelEngine::OnTimedInvoke(TimedHandler * apTimedHandler, Messag
     OnInvokeCommandRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedInvoke = */ true, status);
     if (status != Status::Success)
     {
-        StatusResponse::SendStatusResponse(status, apExchangeContext, /* aExpectResponse = */ false);
+        StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
+    }
+}
+
+void InteractionModelEngine::OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                                          const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload)
+{
+    using namespace Protocols::InteractionModel;
+
+    // Reset the ourselves as the exchange delegate for now, to match what we'd
+    // do with an initial unsolicited write.
+    apExchangeContext->SetDelegate(this);
+    mTimedHandlers.Deallocate(apTimedHandler);
+
+    VerifyOrDie(aPayloadHeader.HasMessageType(MsgType::WriteRequest));
+    VerifyOrDie(!apExchangeContext->IsGroupExchangeContext());
+
+    Status status = OnWriteRequest(apExchangeContext, aPayloadHeader, std::move(aPayload), /* aIsTimedWrite = */ true);
+    if (status != Status::Success)
+    {
+        StatusResponse::Send(status, apExchangeContext, /* aExpectResponse = */ false);
     }
 }
 

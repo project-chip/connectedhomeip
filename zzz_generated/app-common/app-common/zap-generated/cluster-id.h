@@ -136,6 +136,9 @@ static constexpr chip::ClusterId ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID = 0x003E
 // Definitions for cluster: Fixed Label
 static constexpr chip::ClusterId ZCL_FIXED_LABEL_CLUSTER_ID = 0x0040;
 
+// Definitions for cluster: User Label
+static constexpr chip::ClusterId ZCL_USER_LABEL_CLUSTER_ID = 0x0041;
+
 // Definitions for cluster: Boolean State
 static constexpr chip::ClusterId ZCL_BOOLEAN_STATE_CLUSTER_ID = 0x0045;
 
