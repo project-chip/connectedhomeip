@@ -347,48 +347,48 @@ CHIP_ERROR ServerBase::BroadcastImpl(chip::System::PacketBufferHandle && data, u
     CHIP_ERROR lastError  = CHIP_ERROR_NO_ENDPOINT;
 
     if (chip::Loop::Break == mEndpoints.ForEachActiveObject([&](auto * info) {
-        chip::Inet::UDPEndPoint * udp = delegate->Accept(info);
+            chip::Inet::UDPEndPoint * udp = delegate->Accept(info);
 
-        if (udp == nullptr)
-        {
-            return chip::Loop::Continue;
-        }
+            if (udp == nullptr)
+            {
+                return chip::Loop::Continue;
+            }
 
-        CHIP_ERROR err;
+            CHIP_ERROR err;
 
-        /// The same packet needs to be sent over potentially multiple interfaces.
-        /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
-        /// for sending via `CloneData`
-        ///
-        /// TODO: this wastes one copy of the data and that could be optimized away
-        if (info->mAddressType == chip::Inet::IPAddressType::kIPv6)
-        {
-            err = udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), udp->GetBoundInterface());
-        }
+            /// The same packet needs to be sent over potentially multiple interfaces.
+            /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
+            /// for sending via `CloneData`
+            ///
+            /// TODO: this wastes one copy of the data and that could be optimized away
+            if (info->mAddressType == chip::Inet::IPAddressType::kIPv6)
+            {
+                err = udp->SendTo(mIpv6BroadcastAddress, port, data.CloneData(), udp->GetBoundInterface());
+            }
 #if INET_CONFIG_ENABLE_IPV4
-        else if (info->mAddressType == chip::Inet::IPAddressType::kIPv4)
-        {
-            err = udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), udp->GetBoundInterface());
-        }
+            else if (info->mAddressType == chip::Inet::IPAddressType::kIPv4)
+            {
+                err = udp->SendTo(mIpv4BroadcastAddress, port, data.CloneData(), udp->GetBoundInterface());
+            }
 #endif
-        else
-        {
-            // This is a general error of internal consistency: every address has a known type. Fail completely otherwise.
-            lastError = CHIP_ERROR_INCORRECT_STATE;
-            return chip::Loop::Break;
-        }
+            else
+            {
+                // This is a general error of internal consistency: every address has a known type. Fail completely otherwise.
+                lastError = CHIP_ERROR_INCORRECT_STATE;
+                return chip::Loop::Break;
+            }
 
-        if (err == CHIP_NO_ERROR)
-        {
-            hadSuccesfulSend = true;
-        }
-        else
-        {
-            ChipLogError(Discovery, "Attempt to mDNS broadcast failed:  %s", chip::ErrorStr(err));
-            lastError = err;
-        }
-        return chip::Loop::Continue;
-    }))
+            if (err == CHIP_NO_ERROR)
+            {
+                hadSuccesfulSend = true;
+            }
+            else
+            {
+                ChipLogError(Discovery, "Attempt to mDNS broadcast failed:  %s", chip::ErrorStr(err));
+                lastError = err;
+            }
+            return chip::Loop::Continue;
+        }))
     {
         return lastError;
     }
