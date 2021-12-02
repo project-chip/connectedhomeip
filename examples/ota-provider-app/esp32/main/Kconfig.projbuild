@@ -51,6 +51,6 @@ menu "Demo"
         string "OTA image file name"
         default "hello_world.bin"
         help
-            Name of OTA image file which will be added to '/spiffs/' and sent to the OTA Requestor.
+            Name of OTA image file which will be added to '/spiffs_image/' and sent to the OTA Requestor.
 
 endmenu

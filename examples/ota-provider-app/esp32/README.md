@@ -5,7 +5,7 @@ A prototype application that demonstrates OTA provider capabilities.
 ## Supported Devices
 
 -   This example supports ESP32 and ESP32C3. For details please check
-    [here](https://github.com/shubhamdp/connectedhomeip/tree/shubhamdp-patch-1/examples/all-clusters-app/esp32#supported-devices).
+    [here](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32#supported-devices).
 
 ## Copy the OTA image
 
@@ -22,7 +22,7 @@ idf.py menuconfig
 ## Building the Example Application
 
 -   If you are building for the first time please check
-    [Building the Example Application](https://github.com/shubhamdp/connectedhomeip/tree/shubhamdp-patch-1/examples/all-clusters-app/esp32#building-the-example-application)
+    [Building the Example Application](https://github.com/project-chip/connectedhomeip/tree/master/examples/all-clusters-app/esp32#building-the-example-application)
     guide.
 -   Otherwise, `idf.py build` works!
 
