@@ -486,6 +486,81 @@ class ChipDeviceController(object):
             raise self._ChipStack.ErrorToException(res)
         return await future
 
+    async def ReadEvent(self, nodeid: int, events: typing.List[typing.Union[
+        None,  # Empty tuple, all wildcard
+        typing.Tuple[int],  # Endpoint
+        # Wildcard endpoint, Cluster id present
+        typing.Tuple[typing.Type[ClusterObjects.Cluster]],
+        # Wildcard endpoint, Cluster + Event present
+        typing.Tuple[typing.Type[ClusterObjects.ClusterEventDescriptor]],
+        # Wildcard event id
+        typing.Tuple[int, typing.Type[ClusterObjects.Cluster]],
+        # Concrete path
+        typing.Tuple[int, typing.Type[ClusterObjects.ClusterEventDescriptor]]
+    ]], reportInterval: typing.Tuple[int, int] = None):
+        '''
+        Read a list of events from a target node
+
+        nodeId: Target's Node ID
+        events: A list of tuples of varying types depending on the type of read being requested:
+            (endpoint, Clusters.ClusterA.EventA):       Endpoint = specific,    Cluster = specific,   Event = specific
+            (endpoint, Clusters.ClusterA):              Endpoint = specific,    Cluster = specific,   Event = *
+            (Clusters.ClusterA.EventA):                 Endpoint = *,           Cluster = specific,   Event = specific
+            endpoint:                                   Endpoint = specific,    Cluster = *,          Event = *
+            Clusters.ClusterA:                          Endpoint = *,           Cluster = specific,   Event = *
+            '*' or ():                                  Endpoint = *,           Cluster = *,          Event = *
+
+        The cluster and events specified above are to be selected from the generated cluster objects.
+
+        e.g.
+            ReadEvent(1, [ 1 ] ) -- case 4 above.
+            ReadEvent(1, [ Clusters.Basic ] ) -- case 5 above.
+            ReadEvent(1, [ (1, Clusters.Basic.Events.Location ] ) -- case 1 above.
+
+        reportInterval: A tuple of two int-s for (MinIntervalFloor, MaxIntervalCeiling). Used by establishing subscriptions.
+            When not provided, a read request will be sent.
+        '''
+
+        eventLoop = asyncio.get_running_loop()
+        future = eventLoop.create_future()
+
+        device = self.GetConnectedDeviceSync(nodeid)
+        eves = []
+        for v in events:
+            endpoint = None
+            cluster = None
+            event = None
+            if v in [('*'), ()]:
+                # Wildcard
+                pass
+            elif type(v) is not tuple:
+                print(type(v))
+                if type(v) is int:
+                    endpoint = v
+                elif issubclass(v, ClusterObjects.Cluster):
+                    cluster = v
+                elif issubclass(v, ClusterObjects.ClusterEventDescriptor):
+                    event = v
+                else:
+                    raise ValueError("Unsupported Event Path")
+            else:
+                # endpoint + (cluster) event / endpoint + cluster
+                endpoint = v[0]
+                if issubclass(v[1], ClusterObjects.Cluster):
+                    cluster = v[1]
+                elif issubclass(v[1], ClusterAttribute.ClusterEventDescriptor):
+                    event = v[1]
+                else:
+                    raise ValueError("Unsupported Attribute Path")
+            eves.append(ClusterAttribute.EventPath(
+                EndpointId=endpoint, Cluster=cluster, Event=event))
+        res = self._ChipStack.Call(
+            lambda: ClusterAttribute.ReadEvents(future, eventLoop, device, self, eves, ClusterAttribute.SubscriptionParameters(reportInterval[0], reportInterval[1]) if reportInterval else None))
+        if res != 0:
+            raise self._ChipStack.ErrorToException(res)
+        outcome = await future
+        return await future
+
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args, blocking=False):
         req = None
         try:
@@ -507,7 +582,8 @@ class ChipDeviceController(object):
         except:
             raise UnknownAttribute(cluster, attribute)
 
-        result = asyncio.run(self.ReadAttribute(nodeid, [(endpoint, req)]))
+        result = asyncio.run(self.ReadAttribute(
+            nodeid, [(endpoint, req)]))['Attributes']
         path = ClusterAttribute.AttributePath(
             EndpointId=endpoint, Attribute=req)
         return im.AttributeReadResult(path=im.AttributePath(nodeId=nodeid, endpointId=path.EndpointId, clusterId=path.ClusterId, attributeId=path.AttributeId), status=0, value=result[path].Data.value)

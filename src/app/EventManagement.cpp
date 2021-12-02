@@ -606,7 +606,11 @@ exit:
                       opts.mTimestamp.mType == Timestamp::Type::kSystem ? "Sys" : "Epoch", ChipLogValueX64(opts.mTimestamp.mValue));
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
-        ScheduleFlushIfNeeded(opts.mUrgent);
+        if (opts.mUrgent == EventOptions::Type::kUrgent)
+        {
+            ConcreteEventPath path(opts.mpEventSchema->mEndpointId, opts.mpEventSchema->mClusterId, opts.mpEventSchema->mEventId);
+            err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDelivery(path);
+        }
     }
 
     return err;
@@ -849,12 +853,6 @@ CHIP_ERROR EventManagement::EvictEvent(CHIPCircularTLVBuffer & apBuffer, void * 
     // event is not getting dropped. Note how much space it requires, and return.
     ctx->mSpaceNeededForMovedEvent = aReader.GetLengthRead();
     return CHIP_END_OF_TLV;
-}
-
-CHIP_ERROR EventManagement::ScheduleFlushIfNeeded(EventOptions::Type aUrgent)
-{
-    // TODO: Implement ScheduleFlushIfNeeded
-    return CHIP_NO_ERROR;
 }
 
 void EventManagement::SetScheduledEventEndpoint(EventNumber * apEventEndpoints)

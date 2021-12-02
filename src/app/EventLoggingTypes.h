@@ -157,8 +157,8 @@ public:
 
     EventSchema * mpEventSchema = nullptr; /**< A pointer to the schema of the cluster instance.*/
 
-    Type mUrgent = Type::kNotUrgent; /**< A flag denoting that the event is time sensitive.  When set, it causes the event log to be
-                                        flushed. */
+    Type mUrgent = Type::kNotUrgent; /**< A flag denoting if the event is time sensitive.  When kUrgent is set, it causes
+                                            the event log to be flushed. */
 };
 
 /**

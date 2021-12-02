@@ -400,39 +400,6 @@ public:
 
     /**
      * @brief
-     *  Schedule a log offload task.
-     *
-     * The function decides whether to schedule a task offload process,
-     * and if so, it schedules the `LoggingFlushHandler` to be run
-     * asynchronously on the Chip thread.
-     *
-     * The decision to schedule a flush is dependent on three factors:
-     *
-     * -- an explicit request to flush the buffer
-     *
-     * -- the state of the event buffer and the amount of data not yet
-     *    synchronized with the event consumers
-     *
-     * -- whether there is an already pending request flush request event.
-     *
-     * The explicit request to schedule a flush is passed via an input
-     * parameter.
-     *
-     * The automatic flush is typically scheduled when the event buffers
-     * contain enough data to merit starting a new offload.  Additional
-     * triggers -- such as minimum and maximum time between offloads --
-     * may also be taken into account depending on the offload strategy.
-     *
-     *
-     * @param aUrgent  indiate whether the flush should be scheduled if it is urgent
-     *
-     * @retval #CHIP_ERROR_INCORRECT_STATE EventManagement module was not initialized fully.
-     * @retval #CHIP_NO_ERROR              On success.
-     */
-    CHIP_ERROR ScheduleFlushIfNeeded(EventOptions::Type aUrgent);
-
-    /**
-     * @brief
      *   Fetch the most recently vended Number for a particular priority level
      *
      * @param aPriority Priority level

@@ -22,6 +22,7 @@
 #include <inet/InetLayer.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPError.h>
+#include <lib/support/PoolWrapper.h>
 
 #include <lib/dnssd/minimal_mdns/core/BytesRange.h>
 
@@ -75,13 +76,49 @@ public:
 class ServerBase
 {
 public:
-    struct EndpointInfo
+    class EndpointInfo
     {
-        chip::Inet::InterfaceId interfaceId = chip::Inet::InterfaceId::Null();
-        chip::Inet::IPAddressType addressType;
-        chip::Inet::UDPEndPoint * listen_udp = nullptr;
+    public:
+        struct EndPointDeletor
+        {
+            void operator()(chip::Inet::UDPEndPoint * e) { e->Free(); }
+        };
+
 #if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
-        chip::Inet::UDPEndPoint * unicast_query_udp = nullptr;
+        EndpointInfo(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
+                     std::unique_ptr<chip::Inet::UDPEndPoint, EndPointDeletor> && listenUdp,
+                     std::unique_ptr<chip::Inet::UDPEndPoint, EndPointDeletor> && unicastQueryUdp) :
+            mInterfaceId(interfaceId),
+            mAddressType(addressType), mListenUdp(listenUdp.release()), mUnicastQueryUdp(unicastQueryUdp.release())
+        {}
+#else
+        EndpointInfo(chip::Inet::InterfaceId interfaceId, chip::Inet::IPAddressType addressType,
+                     std::unique_ptr<chip::Inet::UDPEndPoint, EndPointDeletor> && listenUdp) :
+            mInterfaceId(interfaceId),
+            mAddressType(addressType), mListenUdp(listenUdp.release())
+        {}
+#endif
+
+        ~EndpointInfo()
+        {
+            if (mListenUdp != nullptr)
+            {
+                mListenUdp->Free();
+            }
+
+#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
+            if (mUnicastQueryUdp != nullptr)
+            {
+                mUnicastQueryUdp->Free();
+            }
+#endif
+        }
+
+        const chip::Inet::InterfaceId mInterfaceId;
+        const chip::Inet::IPAddressType mAddressType;
+        chip::Inet::UDPEndPoint * const mListenUdp;
+#if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
+        chip::Inet::UDPEndPoint * const mUnicastQueryUdp;
 #endif
     };
 
@@ -101,16 +138,17 @@ public:
         virtual chip::Inet::UDPEndPoint * Accept(ServerBase::EndpointInfo * info) = 0;
     };
 
-    ServerBase(EndpointInfo * endpointStorage, size_t kStorageSize) : mEndpoints(endpointStorage), mEndpointCount(kStorageSize)
-    {
-        for (size_t i = 0; i < mEndpointCount; i++)
-        {
-            mEndpoints[i].listen_udp = nullptr;
 #if CHIP_MINMDNS_USE_EPHEMERAL_UNICAST_PORT
-            mEndpoints[i].unicast_query_udp = nullptr;
+    using EndpointInfoPoolType = chip::PoolInterface<EndpointInfo, chip::Inet::InterfaceId, chip::Inet::IPAddressType,
+                                                     std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> &&,
+                                                     std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> &&>;
+#else
+    using EndpointInfoPoolType = chip::PoolInterface<EndpointInfo, chip::Inet::InterfaceId, chip::Inet::IPAddressType,
+                                                     std::unique_ptr<chip::Inet::UDPEndPoint, EndpointInfo::EndPointDeletor> &&>;
 #endif
-        }
 
+    ServerBase(EndpointInfoPoolType & pool) : mEndpoints(pool)
+    {
         BroadcastIpAddresses::GetIpv6Into(mIpv6BroadcastAddress);
 
 #if INET_CONFIG_ENABLE_IPV4
@@ -121,6 +159,8 @@ public:
 
     /// Closes all currently open endpoints
     void Shutdown();
+
+    void ShutdownEndpoint(EndpointInfo & aEndpoint);
 
     /// Listen on the given interfaces/address types.
     ///
@@ -155,13 +195,12 @@ public:
         return *this;
     }
 
-    /// How many endpoints are availabe to be used by the server.
-    size_t GetEndpointCount() const { return mEndpointCount; }
-
-    /// Get the endpoints that are used by this server
-    ///
-    /// Entries with non-null UDP are considered usable.
-    const EndpointInfo * GetEndpoints() const { return mEndpoints; }
+    /// Iterator through all Endpoints
+    template <typename Function>
+    chip::Loop ForEachEndPoints(Function && function)
+    {
+        return mEndpoints.ForEachActiveObject(std::forward<Function>(function));
+    }
 
     /// A server is considered listening if any UDP endpoint is active.
     ///
@@ -176,8 +215,7 @@ private:
     static void OnUdpPacketReceived(chip::Inet::UDPEndPoint * endPoint, chip::System::PacketBufferHandle && buffer,
                                     const chip::Inet::IPPacketInfo * info);
 
-    EndpointInfo * mEndpoints;   // possible endpoints, to listen on multiple interfaces
-    const size_t mEndpointCount; // how many endpoints are allocated
+    EndpointInfoPoolType & mEndpoints; // possible endpoints, to listen on multiple interfaces
     ServerDelegate * mDelegate = nullptr;
 
     // Broadcast IP addresses are cached to not require a string parse every time
@@ -188,15 +226,14 @@ private:
 #endif
 };
 
+// The PoolImpl impl is used as a base class because its destructor must be called after ServerBase's destructor.
 template <size_t kCount>
-class Server : public ServerBase
+class Server : private chip::PoolImpl<ServerBase::EndpointInfo, kCount, ServerBase::EndpointInfoPoolType::Interface>,
+               public ServerBase
 {
 public:
-    Server() : ServerBase(mAllocatedStorage, kCount) {}
+    Server() : ServerBase(*static_cast<ServerBase::EndpointInfoPoolType *>(this)) {}
     ~Server() {}
-
-private:
-    EndpointInfo mAllocatedStorage[kCount];
 };
 
 } // namespace Minimal

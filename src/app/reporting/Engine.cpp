@@ -227,14 +227,14 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
 
     VerifyOrExit(clusterInfoList != nullptr, );
     VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    // If the eventManager is not valid or has not been initialized,
+    // skip the rest of processing
+    VerifyOrExit(eventManager.IsValid(), ChipLogError(DataManagement, "EventManagement has not yet initialized"));
 
     EventReports = aReportDataBuilder.CreateEventReports();
     SuccessOrExit(err = EventReports.GetError());
 
     memcpy(initialEvents, eventNumberList, sizeof(initialEvents));
-    // If the eventManager is not valid or has not been initialized,
-    // skip the rest of processing
-    VerifyOrExit(eventManager.IsValid(), err = CHIP_ERROR_INCORRECT_STATE);
 
     for (size_t index = 0; index < kNumPriorityLevel; index++)
     {
@@ -569,6 +569,23 @@ void Engine::OnReportConfirm()
 
     mNumReportsInFlight--;
     ChipLogDetail(DataManagement, "<RE> OnReportConfirm: NumReports = %" PRIu32, mNumReportsInFlight);
+}
+
+CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
+{
+    for (auto & handler : InteractionModelEngine::GetInstance()->mReadHandlers)
+    {
+        for (auto clusterInfo = handler.GetEventClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
+        {
+            if (clusterInfo->IsEventPathSupersetOf(aPath))
+            {
+                ChipLogProgress(DataManagement, "<RE> Unblock Urgent Event Delivery for readHandler[%d]",
+                                InteractionModelEngine::GetInstance()->GetReadHandlerArrayIndex(&handler));
+                handler.UnblockUrgentEventDelivery();
+            }
+        }
+    }
+    return ScheduleRun();
 }
 
 }; // namespace reporting
