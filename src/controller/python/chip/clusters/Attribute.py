@@ -359,19 +359,22 @@ class AsyncReadTransaction:
             self._event_loop.call_soon_threadsafe(
                 self._handleAttributeData, path, status, data)
 
-    def _handleEventData(self, header: EventHeader, data: bytes):
+    def _handleEventData(self, header: EventHeader, path: EventPath, data: bytes):
         try:
+            eventType = _EventIndex.get(str(path), None)
             eventValue = None
             tlvData = chip.tlv.TLVReader(data).get().get("Any", {})
-            if header.Event is None:
+            if eventType is None:
                 eventValue = ValueDecodeFailure(
                     tlvData, LookupError("event schema not found"))
             else:
                 try:
-                    eventValue = EventHeader.Event(header.Event.FromTLV(data))
+                    eventValue = eventType(eventType.FromTLV(data))
                 except Exception as ex:
                     logging.error(
-                        f"Failed Cluster Object: {str(EventHeader.Event)}")
+                        f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Event = {path.EventId}")
+                    logging.error(
+                        f"Failed Cluster Object: {str(eventType)}")
                     logging.error(ex)
                     eventValue = ValueDecodeFailure(
                         tlvData, ex)
@@ -386,12 +389,12 @@ class AsyncReadTransaction:
         except Exception as ex:
             logging.exception(ex)
 
-    def handleEventData(self, header: EventHeader, data: bytes):
+    def handleEventData(self, header: EventHeader, path: EventPath, data: bytes):
         if self._subscription_handler is not None:
-            self._handleEventData(header, data)
+            self._handleEventData(header, path, data)
         else:
             self._event_loop.call_soon_threadsafe(
-                self._handleEventData, header, data)
+                self._handleEventData, header,path, data)
 
     def _handleError(self, chipError: int):
         self._future.set_exception(
@@ -476,9 +479,8 @@ def _OnReadAttributeDataCallback(closure, endpoint: int, cluster: int, attribute
 def _OnReadEventDataCallback(closure, endpoint: int, cluster: int, event: int, number: int, priority: int, timestamp: int, timestampType: int, data, len):
     dataBytes = ctypes.string_at(data, len)
     path = EventPath(ClusterId=cluster, EventId=event)
-    eventType = _EventIndex.get(str(path), None)
     closure.handleEventData(EventHeader(
-        EndpointId=endpoint, Event=eventType, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), dataBytes[:])
+        EndpointId=endpoint, EventNumber=number, Priority=EventPriority(priority), Timestamp=timestamp, TimestampType=EventTimestampType(timestampType)), path, dataBytes[:])
 
 
 @_OnSubscriptionEstablishedCallbackFunct
