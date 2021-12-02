@@ -20,6 +20,7 @@
 #include <lib/core/CHIPError.h>
 #include <lib/dnssd/Resolver.h>
 #include <lib/support/Span.h>
+#include <system/SystemClock.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -27,11 +28,13 @@
 namespace chip {
 namespace Dnssd {
 
+using namespace System::Clock::Literals;
+
 // Operational node TXT entries
-static constexpr size_t kTxtRetryIntervalIdleMaxLength   = 7; // [CRI] 0-3600000
-static constexpr size_t kTxtRetryIntervalActiveMaxLength = 7; // [CRA] 0-3600000
-static constexpr size_t kMaxRetryInterval                = 3600000;
-static constexpr size_t kKeyTcpSupportMaxLength          = 1;
+static constexpr size_t kTxtRetryIntervalIdleMaxLength           = 7; // [CRI] 0-3600000
+static constexpr size_t kTxtRetryIntervalActiveMaxLength         = 7; // [CRA] 0-3600000
+static constexpr System::Clock::Milliseconds32 kMaxRetryInterval = 3600000_ms32;
+static constexpr size_t kKeyTcpSupportMaxLength                  = 1;
 
 // Commissionable/commissioner node TXT entries
 static constexpr size_t kKeyDiscriminatorMaxLength           = 5;

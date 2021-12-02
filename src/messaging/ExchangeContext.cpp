@@ -529,8 +529,7 @@ System::Clock::Milliseconds32 ExchangeContext::GetAckTimeout()
     System::Clock::Timeout timeout;
     if (IsUDPTransport())
     {
-        timeout = System::Clock::Milliseconds32((CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1) *
-                                                (GetIdleRetransmitTimeoutTick() << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT));
+        timeout = GetMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
     }
     else if (IsTCPTransport())
     {
