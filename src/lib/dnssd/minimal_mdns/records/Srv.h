@@ -42,13 +42,7 @@ public:
 protected:
     bool WriteData(RecordWriter & out) const override
     {
-        out.Writer().Put16(mPriority);
-        out.Writer().Put16(mWeight);
-        out.Writer().Put16(mPort);
-
-        out.WriteQName(mServerName);
-
-        return out.Writer().Fit();
+        return out.Put16(mPriority).Put16(mWeight).Put16(mPort).WriteQName(mServerName).Fit();
     }
 
 private:

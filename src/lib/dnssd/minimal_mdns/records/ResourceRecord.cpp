@@ -42,7 +42,7 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, RecordWriter &
         ;
 
     chip::Encoding::BigEndian::BufferWriter sizeOutput(out.Writer()); // copy to re-output size
-    out.Writer().Put16(0);                                            // dummy, will be replaced later
+    out.Put16(0);                                                     // dummy, will be replaced later
 
     if (!WriteData(out))
     {
@@ -51,7 +51,7 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, RecordWriter &
     sizeOutput.Put16(static_cast<uint16_t>(out.Writer().Needed() - sizeOutput.Needed() - 2));
 
     // This MUST be final and separated out: record count is only updated on success.
-    if (out.Writer().Fit())
+    if (out.Fit())
     {
         switch (asType)
         {
@@ -67,7 +67,7 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, RecordWriter &
         }
     }
 
-    return out.Writer().Fit();
+    return out.Fit();
 }
 
 } // namespace Minimal

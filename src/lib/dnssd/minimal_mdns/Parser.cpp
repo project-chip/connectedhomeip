@@ -73,11 +73,11 @@ bool QueryData::Append(HeaderRef & hdr, RecordWriter & out) const
         return false;
     }
 
-    out.WriteQName(GetName());
-    out.Writer().Put16(static_cast<uint16_t>(mType));
-    out.Writer().Put16(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kQClassUnicastAnswerFlag : 0));
+    out.WriteQName(GetName())
+        .Put16(static_cast<uint16_t>(mType))
+        .Put16(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kQClassUnicastAnswerFlag : 0));
 
-    if (!out.Writer().Fit())
+    if (!out.Fit())
     {
         return false;
     }

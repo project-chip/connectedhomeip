@@ -47,11 +47,43 @@ public:
 
     /// Writes  the given qname into the underlying buffer, applying
     /// compression if possible
-    void WriteQName(const FullQName & qname);
+    RecordWriter & WriteQName(const FullQName & qname);
 
     /// Writes  the given qname into the underlying buffer, applying
     /// compression if possible
-    void WriteQName(const SerializedQNameIterator & qname);
+    RecordWriter & WriteQName(const SerializedQNameIterator & qname);
+
+    inline RecordWriter & Put8(uint8_t value)
+    {
+        mOutput->Put8(value);
+        return *this;
+    }
+
+    inline RecordWriter & Put16(uint16_t value)
+    {
+        mOutput->Put16(value);
+        return *this;
+    }
+
+    inline RecordWriter & Put32(uint32_t value)
+    {
+        mOutput->Put32(value);
+        return *this;
+    }
+
+    inline RecordWriter & PutString(const char * value)
+    {
+        mOutput->Put(value);
+        return *this;
+    }
+
+    inline RecordWriter & Put(const BytesRange & range)
+    {
+        mOutput->Put(range.Start(), range.Size());
+        return *this;
+    }
+
+    inline bool Fit() const { return mOutput->Fit(); }
 
 private:
     // How  many paths to remember as 'previously written'

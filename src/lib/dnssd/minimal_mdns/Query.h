@@ -65,13 +65,11 @@ public:
             return false;
         }
 
-        out.WriteQName(mQName);
+        out.WriteQName(mQName)
+            .Put16(static_cast<uint16_t>(mType))
+            .Put16(static_cast<uint16_t>(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kQClassUnicastAnswerFlag : 0)));
 
-        out.Writer().Put16(static_cast<uint16_t>(mType));
-        out.Writer().Put16(
-            static_cast<uint16_t>(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kQClassUnicastAnswerFlag : 0)));
-
-        if (!out.Writer().Fit())
+        if (!out.Fit())
         {
             return false;
         }

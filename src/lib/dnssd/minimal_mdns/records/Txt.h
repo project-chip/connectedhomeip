@@ -62,10 +62,9 @@ protected:
                 return false;
             }
 
-            out.Writer().Put8(static_cast<uint8_t>(len));
-            out.Writer().Put(mEntries[i]);
+            out.Put8(static_cast<uint8_t>(len)).PutString(mEntries[i]);
         }
-        return out.Writer().Fit();
+        return out.Fit();
     }
 
 private:

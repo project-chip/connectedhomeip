@@ -36,7 +36,7 @@ SerializedQNameIterator RecordWriter::PreviousName(size_t index) const
                                    mOutput->Buffer() + offset);
 }
 
-void RecordWriter::WriteQName(const FullQName & qname)
+RecordWriter & RecordWriter::WriteQName(const FullQName & qname)
 {
     size_t qNameWriteStart = mOutput->WritePos();
     bool isFullyCompressed = true;
@@ -61,7 +61,7 @@ void RecordWriter::WriteQName(const FullQName & qname)
             {
                 RememberWrittenQnameOffset(qNameWriteStart);
             }
-            return;
+            return *this;
         }
 
         mOutput->Put8(static_cast<uint8_t>(strlen(qname.names[i])));
@@ -74,9 +74,10 @@ void RecordWriter::WriteQName(const FullQName & qname)
     {
         RememberWrittenQnameOffset(qNameWriteStart);
     }
+    return *this;
 }
 
-void RecordWriter::WriteQName(const SerializedQNameIterator & qname)
+RecordWriter & RecordWriter::WriteQName(const SerializedQNameIterator & qname)
 {
     size_t qNameWriteStart = mOutput->WritePos();
     bool isFullyCompressed = true;
@@ -96,7 +97,7 @@ void RecordWriter::WriteQName(const SerializedQNameIterator & qname)
             {
                 RememberWrittenQnameOffset(qNameWriteStart);
             }
-            return;
+            return *this;
         }
 
         if (!copy.Next())
@@ -119,6 +120,7 @@ void RecordWriter::WriteQName(const SerializedQNameIterator & qname)
     {
         RememberWrittenQnameOffset(qNameWriteStart);
     }
+    return *this;
 }
 
 void RecordWriter::RememberWrittenQnameOffset(size_t offset)

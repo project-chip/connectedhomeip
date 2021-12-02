@@ -44,6 +44,11 @@ public:
 
     size_t Size() const { return static_cast<size_t>(mEnd - mStart); }
 
+    inline static BytesRange BufferWithSize(const void * buff, size_t len)
+    {
+        return BytesRange(static_cast<const uint8_t *>(buff), static_cast<const uint8_t *>(buff) + len);
+    }
+
 private:
     const uint8_t * mStart = nullptr;
     const uint8_t * mEnd   = nullptr;
