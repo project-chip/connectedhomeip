@@ -40,7 +40,7 @@ CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
     mMessageWriter.Init(std::move(packet));
     ReturnLogErrorOnFailure(mWriteResponseBuilder.Init(&mMessageWriter));
 
-    AttributeStatuses::Builder attributeStatusesBuilder = mWriteResponseBuilder.CreateWriteResponses();
+    AttributeStatusIBs::Builder attributeStatusesBuilder = mWriteResponseBuilder.CreateWriteResponses();
     ReturnLogErrorOnFailure(attributeStatusesBuilder.GetError());
 
     MoveToState(State::Initialized);
@@ -80,7 +80,7 @@ Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeConte
 CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributeStatuses::Builder attributeStatuses;
+    AttributeStatusIBs::Builder attributeStatuses;
     VerifyOrExit(mState == State::AddStatus, err = CHIP_ERROR_INCORRECT_STATE);
     attributeStatuses = mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses();
     err               = attributeStatuses.GetError();

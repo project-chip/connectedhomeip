@@ -15,17 +15,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines EventReports parser and builder in CHIP interaction model
- *
- */
 
 #pragma once
 
 #include "ArrayBuilder.h"
 #include "ArrayParser.h"
-#include "EventReportIB.h"
+#include "EventPathIB.h"
+#include "EventPathIBs.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -36,7 +32,7 @@
 
 namespace chip {
 namespace app {
-namespace EventReports {
+namespace EventPathIBs {
 class Parser : public ArrayParser
 {
 public:
@@ -62,22 +58,22 @@ class Builder : public ArrayBuilder
 {
 public:
     /**
-     *  @brief Initialize a EventReportIB::Builder for writing into the TLV stream
+     *  @brief Initialize a EventPathIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to EventReportIB::Builder
+     *  @return A reference to EventPathIB::Builder
      */
-    EventReportIB::Builder & CreateEventReport();
+    EventPathIB::Builder & CreatePath();
 
     /**
-     *  @brief Mark the end of this EventReports
+     *  @brief Mark the end of this EventPathIBs
      *
      *  @return A reference to *this
      */
-    EventReports::Builder & EndOfEventReports();
+    EventPathIBs::Builder & EndOfEventPaths();
 
 private:
-    EventReportIB::Builder mEventReport;
+    EventPathIB::Builder mEventPath;
 };
-} // namespace EventReports
+} // namespace EventPathIBs
 } // namespace app
 } // namespace chip

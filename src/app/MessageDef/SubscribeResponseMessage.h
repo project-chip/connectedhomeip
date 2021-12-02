@@ -16,7 +16,7 @@
  */
 
 #pragma once
-#include "EventPaths.h"
+#include "EventPathIBs.h"
 #include "StructBuilder.h"
 #include "StructParser.h"
 #include <app/AppBuildConfig.h>

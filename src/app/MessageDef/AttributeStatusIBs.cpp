@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "AttributeStatuses.h"
+#include "AttributeStatusIBs.h"
 #include "AttributeStatusIB.h"
 
 #include "MessageDefHelper.h"
@@ -29,7 +29,7 @@
 
 namespace chip {
 namespace app {
-AttributeStatusIB::Builder & AttributeStatuses::Builder::CreateAttributeStatus()
+AttributeStatusIB::Builder & AttributeStatusIBs::Builder::CreateAttributeStatus()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -38,23 +38,23 @@ AttributeStatusIB::Builder & AttributeStatuses::Builder::CreateAttributeStatus()
     return mAttributeStatus;
 }
 
-AttributeStatuses::Builder & AttributeStatuses::Builder::EndOfAttributeStatuses()
+AttributeStatusIBs::Builder & AttributeStatusIBs::Builder::EndOfAttributeStatuses()
 {
     EndOfContainer();
     return *this;
 }
 
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR AttributeStatuses::Parser::CheckSchemaValidity() const
+CHIP_ERROR AttributeStatusIBs::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
     size_t NumAttributeStatus = 0;
     TLV::TLVReader reader;
 
-    PRETTY_PRINT("AttributeStatuses =");
+    PRETTY_PRINT("AttributeStatusIBs =");
     PRETTY_PRINT("[");
 
-    // make a copy of the EventReports reader
+    // make a copy of the AttributeStatusIBs reader
     reader.Init(mReader);
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
