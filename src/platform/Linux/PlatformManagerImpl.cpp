@@ -275,22 +275,64 @@ void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
 {
     GeneralDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
 
-    if (delegate != nullptr)
+    if (delegate == nullptr)
     {
-        switch (EventId)
-        {
-        case GeneralDiagnostics::Events::HardwareFaultChange::kEventId:
-            delegate->OnHardwareFaultsDetected();
-            break;
-        case GeneralDiagnostics::Events::RadioFaultChange::kEventId:
-            delegate->OnRadioFaultsDetected();
-            break;
-        case GeneralDiagnostics::Events::NetworkFaultChange::kEventId:
-            delegate->OnNetworkFaultsDetected();
-            break;
-        default:
-            break;
-        }
+        ChipLogError(DeviceLayer, "No delegate registered to handle General Diagnostics event");
+        return;
+    }
+
+    if (EventId == GeneralDiagnostics::Events::HardwareFaultChange::kEventId)
+    {
+        GeneralFaults<kMaxHardwareFaults> previous;
+        GeneralFaults<kMaxHardwareFaults> current;
+
+#if CHIP_CONFIG_TEST
+        // On Linux Simulation, set following hardware faults statically.
+        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
+        ReturnOnFailure(previous.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_RADIO));
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_SENSOR));
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_POWER_SOURCE));
+        ReturnOnFailure(current.add(EMBER_ZCL_HARDWARE_FAULT_TYPE_USER_INTERFACE_FAULT));
+#endif
+        delegate->OnHardwareFaultsDetected(previous, current);
+    }
+    else if (EventId == GeneralDiagnostics::Events::RadioFaultChange::kEventId)
+    {
+        GeneralFaults<kMaxRadioFaults> previous;
+        GeneralFaults<kMaxRadioFaults> current;
+
+#if CHIP_CONFIG_TEST
+        // On Linux Simulation, set following radio faults statically.
+        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
+        ReturnOnFailure(previous.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_WI_FI_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_CELLULAR_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_THREAD_FAULT));
+        ReturnOnFailure(current.add(EMBER_ZCL_RADIO_FAULT_TYPE_NFC_FAULT));
+#endif
+        delegate->OnRadioFaultsDetected(previous, current);
+    }
+    else if (EventId == GeneralDiagnostics::Events::NetworkFaultChange::kEventId)
+    {
+        GeneralFaults<kMaxNetworkFaults> previous;
+        GeneralFaults<kMaxNetworkFaults> current;
+
+#if CHIP_CONFIG_TEST
+        // On Linux Simulation, set following radio faults statically.
+        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
+        ReturnOnFailure(previous.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+
+        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_HARDWARE_FAILURE));
+        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_NETWORK_JAMMED));
+        ReturnOnFailure(current.add(EMBER_ZCL_NETWORK_FAULT_TYPE_CONNECTION_FAILED));
+#endif
+        delegate->OnNetworkFaultsDetected(previous, current);
+    }
+    else
+    {
     }
 }
 

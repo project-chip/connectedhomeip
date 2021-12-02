@@ -67,19 +67,20 @@ public:
      * @brief
      *   Called when the Node detects a hardware fault has been raised.
      */
-    virtual void OnHardwareFaultsDetected() {}
+    virtual void OnHardwareFaultsDetected(GeneralFaults<kMaxHardwareFaults> & previous, GeneralFaults<kMaxHardwareFaults> & current)
+    {}
 
     /**
      * @brief
      *   Called when the Node detects a radio fault has been raised.
      */
-    virtual void OnRadioFaultsDetected() {}
+    virtual void OnRadioFaultsDetected(GeneralFaults<kMaxRadioFaults> & previous, GeneralFaults<kMaxRadioFaults> & current) {}
 
     /**
      * @brief
      *   Called when the Node detects a network fault has been raised.
      */
-    virtual void OnNetworkFaultsDetected() {}
+    virtual void OnNetworkFaultsDetected(GeneralFaults<kMaxNetworkFaults> & previous, GeneralFaults<kMaxNetworkFaults> & current) {}
 };
 
 /**
