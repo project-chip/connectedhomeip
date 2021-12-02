@@ -146,20 +146,31 @@ def Esp32Targets():
 
 
 def Efr32Targets():
-    efr_target = Target('efr32-brd4161a', Efr32Builder,
-                        board=Efr32Board.BRD4161A)
-
-    yield efr_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
-    yield efr_target.Extend('unit-test', app=Efr32App.UNIT_TEST)
-
-    rpc_aware_targets = [
-        efr_target.Extend('light', app=Efr32App.LIGHT),
-        efr_target.Extend('lock', app=Efr32App.LOCK)
+    efr_target = Target('efr32', Efr32Builder)
+    
+    board_targets = [
+        efr_target.Extend('brd4161a',board=Efr32Board.BRD4161A),
+        efr_target.Extend('brd4163a',board=Efr32Board.BRD4163A),
+        efr_target.Extend('brd4164a',board=Efr32Board.BRD4164A),
+        efr_target.Extend('brd4166a',board=Efr32Board.BRD4166A),
+        efr_target.Extend('brd4170a',board=Efr32Board.BRD4170A),
+        efr_target.Extend('brd4186a',board=Efr32Board.BRD4186A),
+        efr_target.Extend('brd4187a',board=Efr32Board.BRD4187A),
+        efr_target.Extend('brd4304a',board=Efr32Board.BRD4304A)
     ]
 
-    for target in rpc_aware_targets:
-        yield target
-        yield target.Extend('rpc', enable_rpcs=True)
+    for board_target in board_targets:
+        yield board_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
+        yield board_target.Extend('unit-test', app=Efr32App.UNIT_TEST)
+
+        rpc_aware_targets = [
+            board_target.Extend('light', app=Efr32App.LIGHT),
+            board_target.Extend('lock', app=Efr32App.LOCK)
+        ]
+
+        for target in rpc_aware_targets:
+            yield target
+            yield target.Extend('rpc', enable_rpcs=True)
 
 
 def NrfTargets():
