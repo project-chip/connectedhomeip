@@ -62,7 +62,7 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
             VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventRequests))), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << to_underlying(Tag::kEventRequests));
             {
-                EventPaths::Parser eventRequests;
+                EventPathIBs::Parser eventRequests;
                 ReturnErrorOnFailure(eventRequests.Init(reader));
 
                 PRETTY_PRINT_INCDEPTH();
@@ -75,7 +75,7 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
             VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventFilters))), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << to_underlying(Tag::kEventFilters));
             {
-                EventFilters::Parser eventFilters;
+                EventFilterIBs::Parser eventFilters;
                 ReturnErrorOnFailure(eventFilters.Init(reader));
 
                 PRETTY_PRINT_INCDEPTH();
@@ -130,14 +130,14 @@ CHIP_ERROR ReadRequestMessage::Parser::GetAttributeRequests(AttributePathIBs::Pa
     return apAttributeRequests->Init(reader);
 }
 
-CHIP_ERROR ReadRequestMessage::Parser::GetEventRequests(EventPaths::Parser * const apEventRequests) const
+CHIP_ERROR ReadRequestMessage::Parser::GetEventRequests(EventPathIBs::Parser * const apEventRequests) const
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventRequests)), reader));
     return apEventRequests->Init(reader);
 }
 
-CHIP_ERROR ReadRequestMessage::Parser::GetEventFilters(EventFilters::Parser * const apEventFilters) const
+CHIP_ERROR ReadRequestMessage::Parser::GetEventFilters(EventFilterIBs::Parser * const apEventFilters) const
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventFilters)), reader));
@@ -159,7 +159,7 @@ AttributePathIBs::Builder & ReadRequestMessage::Builder::CreateAttributeRequests
     return mAttributeRequests;
 }
 
-EventPaths::Builder & ReadRequestMessage::Builder::CreateEventRequests()
+EventPathIBs::Builder & ReadRequestMessage::Builder::CreateEventRequests()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -169,7 +169,7 @@ EventPaths::Builder & ReadRequestMessage::Builder::CreateEventRequests()
     return mEventRequests;
 }
 
-EventFilters::Builder & ReadRequestMessage::Builder::CreateEventFilters()
+EventFilterIBs::Builder & ReadRequestMessage::Builder::CreateEventFilters()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)

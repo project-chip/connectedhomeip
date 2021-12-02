@@ -142,7 +142,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
         if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
         {
-            EventPaths::Builder & eventPathListBuilder = request.CreateEventRequests();
+            EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
             SuccessOrExit(err = eventPathListBuilder.GetError());
             err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
                                      aReadPrepareParams.mEventPathParamsListSize);
@@ -150,7 +150,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
             if (aReadPrepareParams.mEventNumber != 0)
             {
                 // EventFilter is optional
-                EventFilters::Builder eventFilters = request.CreateEventFilters();
+                EventFilterIBs::Builder eventFilters = request.CreateEventFilters();
                 SuccessOrExit(err = request.GetError());
                 EventFilterIB::Builder eventFilter = eventFilters.CreateEventFilter();
                 eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB();
@@ -199,7 +199,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadClient::GenerateEventPaths(EventPaths::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
+CHIP_ERROR ReadClient::GenerateEventPaths(EventPathIBs::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
                                           size_t aEventPathParamsListSize)
 {
     for (size_t index = 0; index < aEventPathParamsListSize; ++index)
@@ -219,7 +219,7 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAt
     for (size_t index = 0; index < aAttributePathParamsListSize; index++)
     {
         VerifyOrReturnError(apAttributePathParamsList[index].IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-        ReturnErrorOnFailure(aAttributePathIBsBuilder.CreateAttributePath().Encode(apAttributePathParamsList[index]));
+        ReturnErrorOnFailure(aAttributePathIBsBuilder.CreatePath().Encode(apAttributePathParamsList[index]));
     }
     aAttributePathIBsBuilder.EndOfAttributePathIBs();
     return aAttributePathIBsBuilder.GetError();
@@ -298,7 +298,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     bool isAttributeReportIBsPresent = false;
     bool suppressResponse            = true;
     uint64_t subscriptionId          = 0;
-    EventReports::Parser EventReports;
+    EventReportIBs::Parser eventReportIBs;
     AttributeReportIBs::Parser attributeReportIBs;
     System::PacketBufferTLVReader reader;
 
@@ -354,7 +354,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
     SuccessOrExit(err);
 
-    err                   = report.GetEventReports(&EventReports);
+    err                   = report.GetEventReports(&eventReportIBs);
     isEventReportsPresent = (err == CHIP_NO_ERROR);
     if (err == CHIP_END_OF_TLV)
     {
@@ -365,7 +365,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     if (isEventReportsPresent && nullptr != mpCallback)
     {
         chip::TLV::TLVReader EventReportsReader;
-        EventReports.GetReader(&EventReportsReader);
+        eventReportIBs.GetReader(&EventReportsReader);
         err = ProcessEventReportIBs(EventReportsReader);
         SuccessOrExit(err);
     }
@@ -640,7 +640,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
     {
-        EventPaths::Builder & eventPathListBuilder = request.CreateEventRequests();
+        EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
         SuccessOrExit(err = eventPathListBuilder.GetError());
         err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
                                  aReadPrepareParams.mEventPathParamsListSize);
@@ -649,7 +649,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         if (aReadPrepareParams.mEventNumber != 0)
         {
             // EventNumber is optional
-            EventFilters::Builder eventFilters = request.CreateEventFilters();
+            EventFilterIBs::Builder eventFilters = request.CreateEventFilters();
             SuccessOrExit(err = request.GetError());
             EventFilterIB::Builder eventFilter = eventFilters.CreateEventFilter();
             eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB();
