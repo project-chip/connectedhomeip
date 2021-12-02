@@ -124,6 +124,8 @@ void TestTimedHandler::TestFollowingMessageFastEnough(nlTestSuite * aSuite, void
 
     CHIP_ERROR err = exchange->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse);
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
     NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus == Status::Success);
@@ -136,8 +138,10 @@ void TestTimedHandler::TestFollowingMessageFastEnough(nlTestSuite * aSuite, void
     delegate.mKeepExchangeOpen   = false;
     delegate.mNewMessageReceived = false;
 
-    err = exchange->SendMessage(aMsgType, std::move(payload));
+    err = exchange->SendMessage(aMsgType, std::move(payload), SendMessageFlags::kExpectResponse);
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
     NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus != Status::UnsupportedAccess);
@@ -170,6 +174,8 @@ void TestTimedHandler::TestFollowingMessageTooSlow(nlTestSuite * aSuite, void * 
 
     CHIP_ERROR err = exchange->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse);
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
     NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus == Status::Success);
@@ -185,8 +191,10 @@ void TestTimedHandler::TestFollowingMessageTooSlow(nlTestSuite * aSuite, void * 
     delegate.mKeepExchangeOpen   = false;
     delegate.mNewMessageReceived = false;
 
-    err = exchange->SendMessage(aMsgType, std::move(payload));
+    err = exchange->SendMessage(aMsgType, std::move(payload), SendMessageFlags::kExpectResponse);
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
     NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus == Status::UnsupportedAccess);
@@ -217,6 +225,8 @@ void TestTimedHandler::TestInvokeNeverComes(nlTestSuite * aSuite, void * aContex
 
     CHIP_ERROR err = exchange->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse);
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(aSuite, delegate.mNewMessageReceived);
     NL_TEST_ASSERT(aSuite, delegate.mLastMessageWasStatus);
     NL_TEST_ASSERT(aSuite, delegate.mStatus.mStatus == Status::Success);
@@ -249,7 +259,7 @@ nlTestSuite sSuite =
 {
     "TestTimedHandler",
     &sTests[0],
-    TestContext::Initialize,
+    TestContext::InitializeAsync,
     TestContext::Finalize
 };
 // clang-format on
