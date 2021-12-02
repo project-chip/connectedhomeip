@@ -60,7 +60,9 @@ tests:
       command: "readAttribute"
       attribute: "Client List"
       response:
-          value: []
+          value: [
+                  0x0029, # OTA Software Update Provider
+              ]
 
     - label: "Read attribute Parts list"
       command: "readAttribute"
