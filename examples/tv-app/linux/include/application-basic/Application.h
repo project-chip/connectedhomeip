@@ -24,11 +24,11 @@ struct Application
 {
     using ApplicationBasicStatus = chip::app::Clusters::ApplicationBasic::ApplicationBasicStatus;
 
-    char vendorName[32]                  = "";
-    char name[32]                        = "";
-    char id[32]                          = "";
-    uint16_t vendorId                    = 0;
-    uint16_t productId                   = 0;
-    uint16_t catalogVendorId             = 0;
+    char vendorName[32]           = "";
+    char name[32]                 = "";
+    char id[32]                   = "";
+    uint16_t vendorId             = 0;
+    uint16_t productId            = 0;
+    uint16_t catalogVendorId      = 0;
     ApplicationBasicStatus status = ApplicationBasicStatus::kStopped;
 };
