@@ -81,7 +81,7 @@ void InteractionModelEngine::Shutdown()
     // Increase magic number to invalidate all Handle-s.
     mMagic++;
 
-    mCommandHandlerObjs.ForEachActiveObject([this](CommandHandler * obj) -> bool {
+    mCommandHandlerObjs.ForEachActiveObject([this](CommandHandler * obj) -> Loop {
         // Modifying the pool during iteration is generally frowned upon.
         // This is almost safe since mCommandHandlerObjs is a BitMapObjectPool which won't malfunction when modifying the inner
         // record while during traversal. But this behavior is not guranteed, so we should fix this by implementing DeallocateAll.
@@ -92,16 +92,16 @@ void InteractionModelEngine::Shutdown()
         // TODO(@kghost, #10332) Implement DeallocateAll and replace this.
 
         mCommandHandlerObjs.Deallocate(obj);
-        return true;
+        return Loop::Continue;
     });
 
-    mTimedHandlers.ForEachActiveObject([this](TimedHandler * obj) -> bool {
+    mTimedHandlers.ForEachActiveObject([this](TimedHandler * obj) -> Loop {
         // This calls back into us and deallocates |obj|.  As above, this is not
         // really guaranteed, and we should do something better here (like
         // ignoring the calls to OnTimedInteractionFailed and then doing a
         // DeallocateAll.
         mpExchangeMgr->CloseAllContextsForDelegate(obj);
-        return true;
+        return Loop::Continue;
     });
 
     for (auto & readClient : mReadClients)

@@ -177,7 +177,7 @@ private:
     {
         mContextPool.ForEachActiveObject([&](auto * ec) {
             function(ec->GetReliableMessageContext());
-            return true;
+            return Loop::Continue;
         });
     }
 

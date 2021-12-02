@@ -708,9 +708,9 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(SessionHand
         if (deviceProxy->MatchesSession(session))
         {
             foundDevice = deviceProxy;
-            return false;
+            return Loop::Break;
         }
-        return true;
+        return Loop::Continue;
     });
 
     return foundDevice;
@@ -723,9 +723,9 @@ CommissioneeDeviceProxy * DeviceCommissioner::FindCommissioneeDevice(NodeId id)
         if (deviceProxy->GetDeviceId() == id)
         {
             foundDevice = deviceProxy;
-            return false;
+            return Loop::Break;
         }
-        return true;
+        return Loop::Continue;
     });
 
     return foundDevice;
