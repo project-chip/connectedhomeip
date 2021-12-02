@@ -45,9 +45,6 @@ CHIP_ERROR CASEServer::ListenForSessionEstablishment(Messaging::ExchangeManager 
     mIDAllocator     = idAllocator;
 
     Cleanup();
-
-    ReturnErrorOnFailure(GetSession().MessageDispatch().Init(sessionManager));
-
     return CHIP_NO_ERROR;
 }
 

@@ -74,7 +74,7 @@ public:
      */
     bool IsInitiator() const;
 
-    bool IsEncryptionRequired() const { return mDispatch->IsEncryptionRequired(); }
+    bool IsEncryptionRequired() const { return mDispatch.IsEncryptionRequired(); }
 
     bool IsGroupExchangeContext() const { return (mSession.HasValue() && mSession.Value().IsGroupSession()); }
 
@@ -149,7 +149,7 @@ public:
 
     ReliableMessageContext * GetReliableMessageContext() { return static_cast<ReliableMessageContext *>(this); };
 
-    ExchangeMessageDispatch * GetMessageDispatch() { return mDispatch; }
+    ExchangeMessageDispatch & GetMessageDispatch() { return mDispatch; }
 
     SessionHandle GetSessionHandle() const { return mSession.Value(); }
     bool HasSessionHandle() const { return mSession.HasValue(); }
@@ -183,7 +183,7 @@ private:
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
 
-    ExchangeMessageDispatch * mDispatch = nullptr;
+    ExchangeMessageDispatch & mDispatch;
 
     Optional<SessionHandle> mSession; // The connection state
     uint16_t mExchangeId;             // Assigned exchange ID.

@@ -97,10 +97,7 @@ public:
      */
     virtual void OnExchangeClosing(ExchangeContext * ec) {}
 
-    virtual ExchangeMessageDispatch * GetMessageDispatch(ReliableMessageMgr * reliableMessageMgr, SessionManager * sessionManager)
-    {
-        return nullptr;
-    }
+    virtual ExchangeMessageDispatch & GetMessageDispatch() { return ApplicationExchangeDispatch::Instance(); }
 };
 
 } // namespace Messaging

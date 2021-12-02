@@ -213,8 +213,7 @@ bool ReliableMessageMgr::CheckAndRemRetransTable(ReliableMessageContext * rc, ui
 
 CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
 {
-    const ExchangeMessageDispatch * dispatcher = entry->ec->GetMessageDispatch();
-    if (dispatcher == nullptr || !entry->ec->HasSessionHandle())
+    if (!entry->ec->HasSessionHandle())
     {
         // Using same error message for all errors to reduce code size.
         ChipLogError(ExchangeManager,
@@ -226,7 +225,8 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    CHIP_ERROR err = dispatcher->SendPreparedMessage(entry->ec->GetSessionHandle(), entry->retainedBuf);
+    auto * sessionManager = entry->ec->GetExchangeMgr()->GetSessionManager();
+    CHIP_ERROR err        = sessionManager->SendPreparedMessage(entry->ec->GetSessionHandle(), entry->retainedBuf);
 
     if (err == CHIP_NO_ERROR)
     {
