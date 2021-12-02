@@ -167,13 +167,13 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
     return CHIP_NO_ERROR;
 }
 
-class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegate, public DeviceLayer::DiagnosticsDelegate
+class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelegate, public DeviceLayer::GeneralDiagnosticsDelegate
 {
 
     // Gets called when any network interface on the Node is updated.
     void OnNetworkInfoChanged() override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnNetworkInfoChanged");
+        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnNetworkInfoChanged");
 
         for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
         {
@@ -194,7 +194,7 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
     // Gets called when the device has been rebooted.
     void OnDeviceRebooted() override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnDeviceRebooted");
+        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnDeviceRebooted");
 
         for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
         {
@@ -217,7 +217,7 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
     // Get called when the Node detects a hardware fault has been raised.
     void OnHardwareFaultsDetected() override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnHardwareFaultsDetected");
+        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
         for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
         {
@@ -238,7 +238,7 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
     // Get called when the Node detects a radio fault has been raised.
     void OnRadioFaultsDetected() override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnHardwareFaultsDetected");
+        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
         for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
         {
@@ -259,7 +259,7 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
     // Get called when the Node detects a network fault has been raised.
     void OnNetworkFaultsDetected() override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnHardwareFaultsDetected");
+        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
         for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
         {
@@ -278,7 +278,7 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
     }
 };
 
-GeneralDiagnosticDelegate gDiagnosticDelegate;
+GeneralDiagnosticsDelegate gDiagnosticDelegate;
 
 } // anonymous namespace
 
@@ -286,6 +286,6 @@ void MatterGeneralDiagnosticsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 
-    GetDiagnosticDataProvider().SetDelegate(&gDiagnosticDelegate);
     ConnectivityMgr().SetDelegate(&gDiagnosticDelegate);
+    GetDiagnosticDataProvider().SetGeneralDiagnosticsDelegate(&gDiagnosticDelegate);
 }
