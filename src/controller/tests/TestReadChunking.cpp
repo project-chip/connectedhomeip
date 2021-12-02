@@ -23,6 +23,7 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/AppBuildConfig.h>
 #include <app/AttributeAccessInterface.h>
+#include <app/BufferedReadCallback.h>
 #include <app/CommandHandlerInterface.h>
 #include <app/InteractionModelEngine.h>
 #include <app/data-model/Decode.h>
@@ -51,12 +52,16 @@ nlTestSuite * gSuite     = nullptr;
 // number higher than that for our dynamic test endpoint.
 //
 constexpr EndpointId kTestEndpointId = 2;
+// Another endpoint, with a list attribute only.
+constexpr EndpointId kTestEndpointId3    = 3;
+constexpr AttributeId kTestListAttribute = 6;
 
 class TestCommandInteraction
 {
 public:
     TestCommandInteraction() {}
     static void TestChunking(nlTestSuite * apSuite, void * apContext);
+    static void TestListChunking(nlTestSuite * apSuite, void * apContext);
 
 private:
 };
@@ -71,11 +76,21 @@ DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpointClusters)
 DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrs), DECLARE_DYNAMIC_CLUSTER_LIST_END;
 
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
+
+DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint3)
+DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+
+DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint3Clusters)
+DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint3), DECLARE_DYNAMIC_CLUSTER_LIST_END;
+
+DECLARE_DYNAMIC_ENDPOINT(testEndpoint3, testEndpoint3Clusters);
+
 //clang-format on
 
 class TestReadCallback : public app::ReadClient::Callback
 {
 public:
+    TestReadCallback() : mBufferedCallback(*this) {}
     void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteDataAttributePath & aPath,
                          TLV::TLVReader * apData, const app::StatusIB & aStatus) override;
 
@@ -85,14 +100,32 @@ public:
 
     uint32_t mAttributeCount = 0;
     bool mOnReportEnd        = false;
+    app::BufferedReadCallback mBufferedCallback;
 };
 
 void TestReadCallback::OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteDataAttributePath & aPath,
                                        TLV::TLVReader * apData, const app::StatusIB & aStatus)
 {
-    uint8_t v;
-    NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(gSuite, v == (uint8_t) gIterationCount);
+    if (aPath.mAttributeId != kTestListAttribute)
+    {
+        uint8_t v;
+        NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, v == (uint8_t) gIterationCount);
+    }
+    else
+    {
+        app::DataModel::DecodableList<uint8_t> v;
+        NL_TEST_ASSERT(gSuite, app::DataModel::Decode(*apData, v) == CHIP_NO_ERROR);
+        auto it          = v.begin();
+        size_t arraySize = 0;
+        while (it.Next())
+        {
+            NL_TEST_ASSERT(gSuite, it.GetValue() == static_cast<uint8_t>(gIterationCount));
+        }
+        NL_TEST_ASSERT(gSuite, it.GetStatus() == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, v.ComputeSize(&arraySize) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(gSuite, arraySize = 5);
+    }
     mAttributeCount++;
 }
 
@@ -110,7 +143,19 @@ public:
 
 CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.Encode((uint8_t) gIterationCount);
+    switch (aPath.mAttributeId)
+    {
+    case kTestListAttribute:
+        return aEncoder.EncodeList([](const auto & encoder) {
+            for (int i = 0; i < 5; i++)
+            {
+                ReturnErrorOnFailure(encoder.Encode((uint8_t) gIterationCount));
+            }
+            return CHIP_NO_ERROR;
+        });
+    default:
+        return aEncoder.Encode((uint8_t) gIterationCount);
+    }
 }
 
 CHIP_ERROR TestAttrAccess::Write(const app::ConcreteDataAttributePath & aPath, app::AttributeValueDecoder & aDecoder)
@@ -171,10 +216,11 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
 
         gIterationCount = (uint32_t) i;
 
-        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved((uint32_t)(850 + i));
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(static_cast<uint32_t>(850 + i));
 
         NL_TEST_ASSERT(apSuite,
-                       engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, &readCallback) == CHIP_NO_ERROR);
+                       engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read,
+                                             &readCallback.mBufferedCallback) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(apSuite, readClient->SendReadRequest(readParams) == CHIP_NO_ERROR);
 
         //
@@ -207,10 +253,86 @@ void TestCommandInteraction::TestChunking(nlTestSuite * apSuite, void * apContex
     }
 }
 
+// Similar to the test above, but for the list chunking feature.
+void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx                    = *static_cast<TestContext *>(apContext);
+    auto sessionHandle                   = ctx.GetSessionBobToAlice();
+    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+    app::ReadClient * readClient;
+    TestAttrAccess testServer;
+
+    // Initialize the ember side server logic
+    InitDataModelHandler(&ctx.GetExchangeManager());
+
+    // Register our fake dynamic endpoint.
+    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0);
+
+    // Register our fake attribute access interface.
+    registerAttributeAccessOverride(&testServer);
+
+    app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::TestCluster::Id, kTestListAttribute);
+    app::ReadPrepareParams readParams(sessionHandle);
+
+    readParams.mpAttributePathParamsList    = &attributePath;
+    readParams.mAttributePathParamsListSize = 1;
+
+    //
+    // We've empirically determined that by reserving 950 bytes in the packet buffer, we can fit 2
+    // AttributeDataIBs into the packet. ~30-40 bytes covers a single AttributeDataIB, but let's 2-3x that
+    // to ensure we'll sweep from fitting 2 IBs to 3-4 IBs.
+    //
+    for (int i = 100; i > 0; i--)
+    {
+        TestReadCallback readCallback;
+
+        ChipLogDetail(DataManagement, "Running iteration %d\n", i);
+
+        gIterationCount = (uint32_t) i;
+
+        app::InteractionModelEngine::GetInstance()->GetReportingEngine().SetWriterReserved(static_cast<uint32_t>(850 + i));
+
+        NL_TEST_ASSERT(apSuite,
+                       engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read,
+                                             &readCallback.mBufferedCallback) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(apSuite, readClient->SendReadRequest(readParams) == CHIP_NO_ERROR);
+
+        //
+        // Service the IO + Engine till we get a ReportEnd callback on the client.
+        // Since bugs can happen, we don't want this test to never stop, so create a ceiling for how many
+        // times this can run without seeing expected results.
+        //
+        for (int j = 0; j < 10 && !readCallback.mOnReportEnd; j++)
+        {
+            ctx.DrainAndServiceIO();
+            chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+            ctx.DrainAndServiceIO();
+        }
+
+        //
+        // Always returns the same number of attributes read (merged by buffered read callback). The content is checked in
+        // TestReadCallback::OnAttributeData
+        //
+        NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 1);
+        readCallback.mAttributeCount = 0;
+
+        NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+
+        //
+        // Stop the test if we detected an error. Otherwise, it'll be difficult to read the logs.
+        //
+        if (apSuite->flagError)
+        {
+            break;
+        }
+    }
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestChunking", TestCommandInteraction::TestChunking),
+    NL_TEST_DEF("TestListChunking", TestCommandInteraction::TestListChunking),
     NL_TEST_SENTINEL()
 };
 
