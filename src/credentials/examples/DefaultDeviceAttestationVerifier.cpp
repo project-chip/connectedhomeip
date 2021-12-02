@@ -248,7 +248,9 @@ AttestationVerificationResult DefaultDACVerifier::VerifyAttestationInformation(c
     VerifyOrReturnError(mAttestationTrustStore->GetProductAttestationAuthorityCert(akid, paaDerBuffer) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kPaaNotFound);
 
+#if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
     VerifyOrReturnError(IsCertificateValidAtCurrentTime(dacDerBuffer) == CHIP_NO_ERROR, AttestationVerificationResult::kDacExpired);
+#endif
 
     VerifyOrReturnError(IsCertificateValidAtIssuance(dacDerBuffer, paiDerBuffer) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kPaiExpired);

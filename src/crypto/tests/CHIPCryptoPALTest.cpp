@@ -1947,9 +1947,11 @@ static void TestX509_IssuingTimestampValidation(nlTestSuite * inSuite, void * in
     err = IsCertificateValidAtIssuance(kDacCert, leafCert);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+#if !defined(CURRENT_TIME_NOT_IMPLEMENTED)
     // test certificate validity (this one contains validity until year 9999 so it will not fail soon)
     err = IsCertificateValidAtCurrentTime(kDacCert);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+#endif
 }
 
 static void TestSKID_x509Extraction(nlTestSuite * inSuite, void * inContext)
