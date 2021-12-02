@@ -571,6 +571,23 @@ void Engine::OnReportConfirm()
     ChipLogDetail(DataManagement, "<RE> OnReportConfirm: NumReports = %" PRIu32, mNumReportsInFlight);
 }
 
+CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
+{
+    for (auto & handler : InteractionModelEngine::GetInstance()->mReadHandlers)
+    {
+        for (auto clusterInfo = handler.GetEventClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
+        {
+            if (clusterInfo->IsEventPathSupersetOf(aPath))
+            {
+                ChipLogProgress(DataManagement, "<RE> Unblock Urgent Event Delivery for readHandler[%d]",
+                                InteractionModelEngine::GetInstance()->GetReadHandlerArrayIndex(&handler));
+                handler.UnblockUrgentEventDelivery();
+            }
+        }
+    }
+    return ScheduleRun();
+}
+
 }; // namespace reporting
 } // namespace app
 } // namespace chip

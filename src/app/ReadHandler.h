@@ -146,6 +146,12 @@ public:
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
     FabricIndex GetAccessingFabricIndex() const { return mFabricIndex; }
 
+    void UnblockUrgentEventDelivery()
+    {
+        mHoldReport = false;
+        mDirty      = true;
+    }
+
 private:
     friend class TestReadInteraction;
     enum class HandlerState

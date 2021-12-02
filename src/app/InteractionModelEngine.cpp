@@ -502,6 +502,11 @@ uint16_t InteractionModelEngine::GetWriteClientArrayIndex(const WriteClient * co
     return static_cast<uint16_t>(apWriteClient - mWriteClients);
 }
 
+uint16_t InteractionModelEngine::GetReadHandlerArrayIndex(const ReadHandler * const apReadHandler) const
+{
+    return static_cast<uint16_t>(apReadHandler - mReadHandlers);
+}
+
 void InteractionModelEngine::ReleaseClusterInfoList(ClusterInfo *& aClusterInfo)
 {
     ClusterInfo * lastClusterInfo = aClusterInfo;
