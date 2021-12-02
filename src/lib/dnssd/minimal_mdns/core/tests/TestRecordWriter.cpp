@@ -114,7 +114,7 @@ void ComplexDedup(nlTestSuite * inSuite, void * inContext)
         0xC0, 5,                    // POINTER: "name" is at offset 5
         6, 'p', 'r', 'e', 'f', 'i', 'x',
         2, 'o', 'f',
-        0xC0, 11,                   // POINTER: "otner.name" is at offset 11
+        0xC0, 11,                   // POINTER: "other.name" is at offset 11
         'x', 'y', 'z',
         4, 's', 'o', 'm', 'e',            // QNAME part: some
         4, 'n', 'a', 'm', 'e',            // QNAME part: name

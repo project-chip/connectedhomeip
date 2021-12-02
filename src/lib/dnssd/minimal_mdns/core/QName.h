@@ -100,7 +100,7 @@ public:
     bool operator==(const SerializedQNameIterator & other) const;
     bool operator!=(const SerializedQNameIterator & other) const { return !(*this == other); }
 
-    size_t OffsetInCurrentValidData() const { return mCurrentPosition - mValidData.Start(); }
+    size_t OffsetInCurrentValidData() const { return static_cast<size_t>(mCurrentPosition - mValidData.Start()); }
 
 private:
     static constexpr size_t kMaxValueSize = 63;
