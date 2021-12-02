@@ -816,9 +816,6 @@ CHIP_ERROR DeviceCommissioner::EstablishPASEConnection(NodeId remoteDeviceId, Re
 
     device->Init(GetControllerDeviceInitParams(), remoteDeviceId, peerAddress, fabric->GetFabricIndex());
 
-    err = device->GetPairing().MessageDispatch().Init(mSystemState->SessionMgr());
-    SuccessOrExit(err);
-
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
         device->SetAddress(params.GetPeerAddress().GetIPAddress());

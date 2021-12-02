@@ -41,9 +41,10 @@
 namespace chip {
 namespace Messaging {
 
-CHIP_ERROR ExchangeMessageDispatch::SendMessage(const SessionHandle & session, uint16_t exchangeId, bool isInitiator,
-                                                ReliableMessageContext * reliableMessageContext, bool isReliableTransmission,
-                                                Protocols::Id protocol, uint8_t type, System::PacketBufferHandle && message)
+CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager, const SessionHandle & session, uint16_t exchangeId,
+                                                bool isInitiator, ReliableMessageContext * reliableMessageContext,
+                                                bool isReliableTransmission, Protocols::Id protocol, uint8_t type,
+                                                System::PacketBufferHandle && message)
 {
     ReturnErrorCodeIf(!MessagePermitted(protocol.GetProtocolId(), type), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -82,8 +83,8 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(const SessionHandle & session, u
         };
         std::unique_ptr<ReliableMessageMgr::RetransTableEntry, decltype(deleter)> entryOwner(entry, deleter);
 
-        ReturnErrorOnFailure(PrepareMessage(session, payloadHeader, std::move(message), entryOwner->retainedBuf));
-        CHIP_ERROR err = SendPreparedMessage(session, entryOwner->retainedBuf);
+        ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(message), entryOwner->retainedBuf));
+        CHIP_ERROR err = sessionManager->SendPreparedMessage(session, entryOwner->retainedBuf);
         if (err == CHIP_ERROR_POSIX(ENOBUFS))
         {
             // sendmsg on BSD-based systems never blocks, no matter how the
@@ -105,8 +106,8 @@ CHIP_ERROR ExchangeMessageDispatch::SendMessage(const SessionHandle & session, u
         // If the channel itself is providing reliability, let's not request MRP acks
         payloadHeader.SetNeedsAck(false);
         EncryptedPacketBufferHandle preparedMessage;
-        ReturnErrorOnFailure(PrepareMessage(session, payloadHeader, std::move(message), preparedMessage));
-        ReturnErrorOnFailure(SendPreparedMessage(session, preparedMessage));
+        ReturnErrorOnFailure(sessionManager->PrepareMessage(session, payloadHeader, std::move(message), preparedMessage));
+        ReturnErrorOnFailure(sessionManager->SendPreparedMessage(session, preparedMessage));
     }
 
     return CHIP_NO_ERROR;

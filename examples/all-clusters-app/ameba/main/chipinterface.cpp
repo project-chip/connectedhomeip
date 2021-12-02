@@ -36,10 +36,6 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
 
-extern "C" {
-void * __dso_handle = 0;
-}
-
 using namespace ::chip;
 using namespace ::chip::Credentials;
 using namespace ::chip::DeviceManager;
