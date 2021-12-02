@@ -158,10 +158,7 @@ public:
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
 
-    virtual ExchangeMessageDispatch & GetMessageDispatch() override
-    {
-        return mMessageDispatch;
-    }
+    virtual ExchangeMessageDispatch & GetMessageDispatch() override { return mMessageDispatch; }
 
     bool IsOnMessageReceivedCalled = false;
     MockSessionEstablishmentExchangeDispatch mMessageDispatch;

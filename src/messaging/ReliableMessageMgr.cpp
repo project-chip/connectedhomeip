@@ -226,7 +226,7 @@ CHIP_ERROR ReliableMessageMgr::SendFromRetransTable(RetransTableEntry * entry)
     }
 
     auto * sessionManager = entry->ec->GetExchangeMgr()->GetSessionManager();
-    CHIP_ERROR err = sessionManager->SendPreparedMessage(entry->ec->GetSessionHandle(), entry->retainedBuf);
+    CHIP_ERROR err        = sessionManager->SendPreparedMessage(entry->ec->GetSessionHandle(), entry->retainedBuf);
 
     if (err == CHIP_NO_ERROR)
     {

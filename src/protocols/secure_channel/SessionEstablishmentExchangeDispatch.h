@@ -31,7 +31,8 @@ namespace chip {
 class SessionEstablishmentExchangeDispatch : public Messaging::ExchangeMessageDispatch
 {
 public:
-    static ExchangeMessageDispatch & Instance() {
+    static ExchangeMessageDispatch & Instance()
+    {
         static SessionEstablishmentExchangeDispatch instance;
         return instance;
     }

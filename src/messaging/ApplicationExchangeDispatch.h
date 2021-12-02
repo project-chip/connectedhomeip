@@ -33,7 +33,8 @@ namespace Messaging {
 class ApplicationExchangeDispatch : public ExchangeMessageDispatch
 {
 public:
-    static ExchangeMessageDispatch & Instance() {
+    static ExchangeMessageDispatch & Instance()
+    {
         static ApplicationExchangeDispatch instance;
         return instance;
     }

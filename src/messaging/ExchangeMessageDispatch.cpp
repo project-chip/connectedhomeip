@@ -40,9 +40,10 @@
 namespace chip {
 namespace Messaging {
 
-CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager, SessionHandle session, uint16_t exchangeId, bool isInitiator,
-                                                ReliableMessageContext * reliableMessageContext, bool isReliableTransmission,
-                                                Protocols::Id protocol, uint8_t type, System::PacketBufferHandle && message)
+CHIP_ERROR ExchangeMessageDispatch::SendMessage(SessionManager * sessionManager, SessionHandle session, uint16_t exchangeId,
+                                                bool isInitiator, ReliableMessageContext * reliableMessageContext,
+                                                bool isReliableTransmission, Protocols::Id protocol, uint8_t type,
+                                                System::PacketBufferHandle && message)
 {
     ReturnErrorCodeIf(!MessagePermitted(protocol.GetProtocolId(), type), CHIP_ERROR_INVALID_ARGUMENT);
 

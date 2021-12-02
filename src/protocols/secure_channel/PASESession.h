@@ -229,10 +229,7 @@ public:
      */
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 
-    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override
-    {
-        return SessionEstablishmentExchangeDispatch::Instance();
-    }
+    Messaging::ExchangeMessageDispatch & GetMessageDispatch() override { return SessionEstablishmentExchangeDispatch::Instance(); }
 
 private:
     enum Spake2pErrorType : uint8_t

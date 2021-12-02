@@ -162,8 +162,9 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
         }
 
         // Create a new scope for `err`, to avoid shadowing warning previous `err`.
-        CHIP_ERROR err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), mSession.Value(), mExchangeId, IsInitiator(), GetReliableMessageContext(),
-                                                reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
+        CHIP_ERROR err = mDispatch.SendMessage(GetExchangeMgr()->GetSessionManager(), mSession.Value(), mExchangeId, IsInitiator(),
+                                               GetReliableMessageContext(), reliableTransmissionRequested, protocolId, msgType,
+                                               std::move(msgBuf));
         if (err != CHIP_NO_ERROR && IsResponseExpected())
         {
             CancelResponseTimer();
@@ -250,7 +251,8 @@ void ExchangeContextDeletor::Release(ExchangeContext * ec)
 }
 
 ExchangeContext::ExchangeContext(ExchangeManager * em, uint16_t ExchangeId, SessionHandle session, bool Initiator,
-                                 ExchangeDelegate * delegate) : mDispatch((delegate != nullptr) ? delegate->GetMessageDispatch() : ApplicationExchangeDispatch::Instance())
+                                 ExchangeDelegate * delegate) :
+    mDispatch((delegate != nullptr) ? delegate->GetMessageDispatch() : ApplicationExchangeDispatch::Instance())
 {
     VerifyOrDie(mExchangeMgr == nullptr);
 
@@ -428,7 +430,8 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
     // TODO : Remove this bypass for group as to perform the MessagePermitted function Issue # 12101
     if (!IsGroupExchangeContext())
     {
-        ReturnErrorOnFailure(mDispatch.OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
+        ReturnErrorOnFailure(
+            mDispatch.OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
     }
 
     if (IsAckPending() && !mDelegate)
