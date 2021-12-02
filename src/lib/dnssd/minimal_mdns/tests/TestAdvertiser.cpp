@@ -30,6 +30,7 @@
 #include <lib/dnssd/minimal_mdns/tests/CheckOnlyServer.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlunit-test.h>
 
@@ -213,7 +214,7 @@ void OperationalAdverts(nlTestSuite * inSuite, void * inContext)
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.RemoveServices() == CHIP_NO_ERROR);
 
-    auto & server = reinterpret_cast<CheckOnlyServer &>(GlobalMinimalMdnsServer::Server());
+    auto & server = static_cast<CheckOnlyServer &>(GlobalMinimalMdnsServer::Server());
     server.SetTestSuite(inSuite);
     server.Reset();
 
@@ -341,7 +342,7 @@ void CommissionableAdverts(nlTestSuite * inSuite, void * inContext)
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.RemoveServices() == CHIP_NO_ERROR);
 
-    auto & server = reinterpret_cast<CheckOnlyServer &>(GlobalMinimalMdnsServer::Server());
+    auto & server = static_cast<CheckOnlyServer &>(GlobalMinimalMdnsServer::Server());
     server.SetTestSuite(inSuite);
     server.Reset();
 
@@ -457,7 +458,7 @@ void CommissionableAndOperationalAdverts(nlTestSuite * inSuite, void * inContext
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
     NL_TEST_ASSERT(inSuite, mdnsAdvertiser.RemoveServices() == CHIP_NO_ERROR);
 
-    auto & server = reinterpret_cast<CheckOnlyServer &>(GlobalMinimalMdnsServer::Server());
+    auto & server = static_cast<CheckOnlyServer &>(GlobalMinimalMdnsServer::Server());
     server.SetTestSuite(inSuite);
     server.Reset();
 
@@ -548,12 +549,15 @@ const nlTest sTests[] = {
 int TestAdvertiser(void)
 {
     chip::Platform::MemoryInit();
+    chip::Test::IOContext context;
+    context.Init();
     nlTestSuite theSuite = { "AdvertiserImplMinimal", sTests, nullptr, nullptr };
     CheckOnlyServer server(&theSuite);
     test::ServerSwapper swapper(&server);
     auto & mdnsAdvertiser = chip::Dnssd::ServiceAdvertiser::Instance();
-    mdnsAdvertiser.Init(nullptr);
+    mdnsAdvertiser.Init(&context.GetInetLayer());
     nlTestRunner(&theSuite, &server);
+    server.Shutdown();
     return nlTestRunnerStats(&theSuite);
 }
 
