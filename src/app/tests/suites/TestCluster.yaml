@@ -2360,3 +2360,16 @@ tests:
       response:
           # SDK returning wrong error code here so far.
           errorWrongValue: UNSUPPORTED_CLUSTER
+
+  # Tests for command with optional arguments
+    - label: "Send a command that takes an optional parameter but do not set it."
+      command: "TestSimpleOptionalArgumentRequest"
+      response:
+          error: INVALID_VALUE
+
+    - label: "Send a command that takes an optional parameter but do not set it."
+      command: "TestSimpleOptionalArgumentRequest"
+      arguments:
+          values:
+            - name: "arg1"
+              value: 1
