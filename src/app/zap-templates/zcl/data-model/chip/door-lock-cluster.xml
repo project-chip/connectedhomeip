@@ -58,16 +58,16 @@ limitations under the License.
         <!-- The principle behind  mandatory/optional is the following:
          1. If attribute/command is marked as mandatory it should be mandatory here.
          2. If attribute/command is marked as optional it should be optional here.
-         3. Everything that depends on a certain feature is optional because we have no way 
-            of setting up the dependencies here. Dependencies would be probably resolved in the 
+         3. Everything that depends on a certain feature is optional because we have no way
+            of setting up the dependencies here. Dependencies would be probably resolved in the
             cluster itself. Those attributes/commands are marked with a special comment. -->
 
         <!-- Attributes -->
-        <attribute side="server" code="0" define="LOCK_STATE" type="ENUM8" min="0" max="2" isNullable="true" reportable="true" writable="false">LockState</attribute>
-        <attribute side="server" code="1" define="LOCK_TYPE" type="ENUM8" min="0" max="10" writable="false">LockType</attribute>
+        <attribute side="server" code="0" define="LOCK_STATE" type="DlLockState" min="0" max="2" isNullable="true" reportable="true" writable="false">LockState</attribute>
+        <attribute side="server" code="1" define="LOCK_TYPE" type="DlLockType" min="0" max="10" writable="false">LockType</attribute>
         <attribute side="server" code="2" define="ACTUATOR_ENABLED" type="boolean" writable="false">ActuatorEnabled</attribute>
         <!-- Conformance feature DPS - for now optional -->
-        <attribute side="server" code="3" define="DOOR_STATE" type="ENUM8" min="0" max="5" isNullable="true" reportable="true" optional="true">DoorState</attribute>
+        <attribute side="server" code="3" define="DOOR_STATE" type="DlDoorState" min="0" max="5" isNullable="true" reportable="true" optional="true">DoorState</attribute>
         <!-- Conformance feature [DPS] - for now optional -->
         <attribute side="server" code="4" define="DOOR_OPEN_EVENTS" type="INT32U" writable="true" optional="true">
             <description>DoorOpenEvents</description>
@@ -136,7 +136,7 @@ limitations under the License.
             <access op="read" role="view" />
             <access op="write" role="manage" />
         </attribute>
-        <attribute side="server" code="37" define="OPERATING_MODE" type="ENUM8" min="0" max="4" reportable="true" writable="true">
+        <attribute side="server" code="37" define="OPERATING_MODE" type="DlOperatingMode" min="0" max="4" reportable="true" writable="true">
             <description>OperatingMode</description>
             <access op="read" role="view" />
             <access op="write" role="manage" />
@@ -334,7 +334,7 @@ limitations under the License.
         </command>
         <!-- Conformance feature !USR - for now optional -->
         <command source="server" code="10" name="GetUserStatusResponse" disableDefaultResponse="true" optional="true">
-            <description>Returns the user status for the specified user ID. </description>
+            <description>Returns the user status for the specified user ID.</description>
             <access op="invoke" role="administer" />
             <arg name="userId" type="INT16U" />
             <arg name="userStatus" type="DlUserStatus" />
