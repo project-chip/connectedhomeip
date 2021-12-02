@@ -92,6 +92,7 @@ Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLengt
 Structs::SimpleStruct::Type gStructAttributeValue = { 0,          false,      SimpleEnum::kValueA,
                                                       ByteSpan(), CharSpan(), BitFlags<SimpleBitmap>(),
                                                       0,          0 };
+NullableStruct::TypeInfo::Type gNullableStructAttributeValue;
 
 CHIP_ERROR TestAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
@@ -155,17 +156,12 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
 
 CHIP_ERROR TestAttrAccess::ReadNullableStruct(AttributeValueEncoder & aEncoder)
 {
-    NullableStruct::TypeInfo::Type value;
-
-    // Just encode a default initialized instance of the struct for now.
-    return aEncoder.Encode(value);
+    return aEncoder.Encode(gNullableStructAttributeValue);
 }
 
 CHIP_ERROR TestAttrAccess::WriteNullableStruct(AttributeValueDecoder & aDecoder)
 {
-    NullableStruct::TypeInfo::DecodableType value;
-
-    return aDecoder.Decode(value);
+    return aDecoder.Decode(gNullableStructAttributeValue);
 }
 
 CHIP_ERROR TestAttrAccess::ReadListInt8uAttribute(AttributeValueEncoder & aEncoder)
