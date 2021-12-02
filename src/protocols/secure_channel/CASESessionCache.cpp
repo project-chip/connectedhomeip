@@ -25,7 +25,7 @@ CASESessionCache::~CASESessionCache()
 {
     mCachePool.ForEachActiveObject([&](auto * ec) {
         mCachePool.ReleaseObject(ec);
-        return true;
+        return Loop::Continue;
     });
 }
 
@@ -39,7 +39,7 @@ CASESessionCachable * CASESessionCache::GetLRUSession()
             minTimeStamp = ec->mSessionSetupTimeStamp;
             lruSession   = ec;
         }
-        return true;
+        return Loop::Continue;
     });
     return lruSession;
 }
@@ -68,7 +68,7 @@ CHIP_ERROR CASESessionCache::Remove(ResumptionID resumptionID)
         {
             mCachePool.ReleaseObject(ec);
         }
-        return true;
+        return Loop::Continue;
     });
 
     return err;
@@ -83,9 +83,9 @@ CHIP_ERROR CASESessionCache::Get(ResumptionID resumptionID, CASESessionCachable 
         {
             found              = true;
             outSessionCachable = *ec;
-            return false;
+            return Loop::Break;
         }
-        return true;
+        return Loop::Continue;
     });
 
     if (!found)
