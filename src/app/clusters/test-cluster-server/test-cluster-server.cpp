@@ -81,6 +81,7 @@ private:
     CHIP_ERROR ReadStructAttribute(AttributeValueEncoder & aEncoder);
     CHIP_ERROR WriteStructAttribute(AttributeValueDecoder & aDecoder);
     CHIP_ERROR ReadNullableStruct(AttributeValueEncoder & aEncoder);
+    CHIP_ERROR WriteNullableStruct(AttributeValueDecoder & aDecoder);
 };
 
 TestAttrAccess gAttrAccess;
@@ -141,6 +142,9 @@ CHIP_ERROR TestAttrAccess::Write(const ConcreteDataAttributePath & aPath, Attrib
     case Struct::Id: {
         return WriteStructAttribute(aDecoder);
     }
+    case NullableStruct::Id: {
+        return WriteNullableStruct(aDecoder);
+    }
     default: {
         break;
     }
@@ -155,6 +159,13 @@ CHIP_ERROR TestAttrAccess::ReadNullableStruct(AttributeValueEncoder & aEncoder)
 
     // Just encode a default initialized instance of the struct for now.
     return aEncoder.Encode(value);
+}
+
+CHIP_ERROR TestAttrAccess::WriteNullableStruct(AttributeValueDecoder & aDecoder)
+{
+    NullableStruct::TypeInfo::DecodableType value;
+
+    return aDecoder.Decode(value);
 }
 
 CHIP_ERROR TestAttrAccess::ReadListInt8uAttribute(AttributeValueEncoder & aEncoder)
