@@ -394,7 +394,7 @@ class AsyncReadTransaction:
             self._handleEventData(header, path, data)
         else:
             self._event_loop.call_soon_threadsafe(
-                self._handleEventData, header,path, data)
+                self._handleEventData, header, path, data)
 
     def _handleError(self, chipError: int):
         self._future.set_exception(
