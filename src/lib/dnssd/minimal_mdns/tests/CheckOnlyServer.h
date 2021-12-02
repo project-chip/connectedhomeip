@@ -102,11 +102,11 @@ public:
         switch (data.GetType())
         {
         case QType::PTR:
-            ParsePtrRecord(data.GetData(), data.GetData(), &target);
+            ParsePtrRecord(data.GetData(), mPacketData, &target);
             break;
         case QType::SRV: {
             SrvRecord srv;
-            bool srvParseOk = srv.Parse(data.GetData(), data.GetData());
+            bool srvParseOk = srv.Parse(data.GetData(), mPacketData);
             NL_TEST_ASSERT(mInSuite, srvParseOk);
             if (!srvParseOk)
             {
@@ -223,7 +223,8 @@ public:
     DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
                chip::Inet::InterfaceId interface) override
     {
-        ParsePacket(BytesRange(data->Start(), data->Start() + data->TotalLength()), this);
+        mPacketData = BytesRange(data->Start(), data->Start() + data->TotalLength());
+        ParsePacket(mPacketData, this);
         if (mHeaderFound)
         {
             TestGotAllExpectedPackets();
@@ -311,6 +312,7 @@ private:
     bool mSendCalled              = false;
     int mTotalRecords             = 0;
     FullQName kIgnoreQname        = FullQName(kIgnoreQNameParts);
+    BytesRange mPacketData;
 
     int GetNumExpectedRecords() const
     {
