@@ -355,8 +355,8 @@ bool emberAfTestClusterClusterTestListStructArgumentRequestCallback(
     return SendBooleanResponse(commandObj, commandPath, shouldReturnTrue);
 }
 bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::TestCluster::Commands::TestEmitTestEventRequest::DecodableType & commandData)
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestEmitTestEventRequest::DecodableType & commandData)
 {
     Commands::TestEmitTestEventResponse::Type responseData;
     DataModel::List<const Structs::SimpleStruct::Type> arg5;
@@ -373,7 +373,7 @@ bool emberAfTestClusterClusterTestEmitTestEventRequestCallback(
 }
 
 bool emberAfTestClusterClusterTestListInt8UArgumentRequestCallback(
-    app::CommandHandler * commandObj, app::ConcreteCommandPath const & commandPath,
+    CommandHandler * commandObj, ConcreteCommandPath const & commandPath,
     Commands::TestListInt8UArgumentRequest::DecodableType const & commandData)
 {
     bool shouldReturnTrue = true;
