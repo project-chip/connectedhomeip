@@ -1931,6 +1931,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nullable arg1;
+- (instancetype)init;
+@end
+
 @interface CHIPMessagingClusterDisplayMessageParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull messageId;
 @property (strong, nonatomic) NSNumber * _Nonnull messageControl;

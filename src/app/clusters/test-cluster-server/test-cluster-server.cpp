@@ -87,7 +87,7 @@ uint8_t gListUint8Data[kAttributeListLength];
 OctetStringData gListOctetStringData[kAttributeListLength];
 OctetStringData gListOperationalCert[kAttributeListLength];
 Structs::TestListStructOctet::Type listStructOctetStringData[kAttributeListLength];
-Structs::SimpleStruct::Type gStructAttributeValue = { 0,          false,      SimpleEnum::EMBER_ZCL_SIMPLE_ENUM_VALUE_A,
+Structs::SimpleStruct::Type gStructAttributeValue = { 0,          false,      SimpleEnum::kValueA,
                                                       ByteSpan(), CharSpan(), BitFlags<SimpleBitmap>(),
                                                       0,          0 };
 
@@ -552,6 +552,16 @@ bool emberAfTestClusterClusterTimedInvokeRequestCallback(CommandHandler * comman
                                                          const Commands::TimedInvokeRequest::DecodableType & commandData)
 {
     commandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+    return true;
+}
+
+bool emberAfTestClusterClusterTestSimpleOptionalArgumentRequestCallback(
+    CommandHandler * commandObj, const ConcreteCommandPath & commandPath,
+    const Commands::TestSimpleOptionalArgumentRequest::DecodableType & commandData)
+{
+    Protocols::InteractionModel::Status status = commandData.arg1.HasValue() ? Protocols::InteractionModel::Status::Success
+                                                                             : Protocols::InteractionModel::Status::InvalidValue;
+    commandObj->AddStatus(commandPath, status);
     return true;
 }
 

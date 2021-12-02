@@ -93,6 +93,11 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mFabrics.Init(&mServerStorage);
     SuccessOrExit(err);
 
+    // Group data provider must be initialized after mServerStorage
+    err = mGroupsProvider.Init();
+    SuccessOrExit(err);
+    SetGroupDataProvider(&mGroupsProvider);
+
     // Init transport before operations with secure session mgr.
     err = mTransports.Init(
         UdpListenParameters(&DeviceLayer::InetLayer()).SetAddressType(IPAddressType::kIPv6).SetListenPort(mSecuredServicePort)

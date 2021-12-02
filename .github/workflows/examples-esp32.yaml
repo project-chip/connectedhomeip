@@ -46,6 +46,7 @@ jobs:
                   submodules: true
 
             - name: Set up environment for size reports
+              if: ${{ !env.ACT }}
               env:
                   GH_CONTEXT: ${{ toJson(github) }}
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"

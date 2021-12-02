@@ -2522,11 +2522,11 @@ void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAp
     auto & endPointManager = *reinterpret_cast<EndPointManager<TCPEndPoint> *>(aAppState);
     bool lTimerRequired    = IsIdleTimerRunning(endPointManager);
 
-    endPointManager.ForEachEndPoint([](TCPEndPoint * lEndPoint) -> bool {
+    endPointManager.ForEachEndPoint([](TCPEndPoint * lEndPoint) -> Loop {
         if (!lEndPoint->IsConnected())
-            return true;
+            return Loop::Continue;
         if (lEndPoint->mIdleTimeout == 0)
-            return true;
+            return Loop::Continue;
 
         if (lEndPoint->mRemainingIdleTime == 0)
         {
@@ -2537,7 +2537,7 @@ void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAp
             --lEndPoint->mRemainingIdleTime;
         }
 
-        return true;
+        return Loop::Continue;
     });
 
     if (lTimerRequired)
@@ -2550,7 +2550,9 @@ void TCPEndPoint::HandleIdleTimer(chip::System::Layer * aSystemLayer, void * aAp
 bool TCPEndPoint::IsIdleTimerRunning(EndPointManager<TCPEndPoint> & endPointManager)
 {
     // See if there are any TCP connections with the idle timer check in use.
-    return !endPointManager.ForEachEndPoint([](TCPEndPoint * lEndPoint) { return (lEndPoint->mIdleTimeout == 0); });
+    return Loop::Break == endPointManager.ForEachEndPoint([](TCPEndPoint * lEndPoint) {
+        return (lEndPoint->mIdleTimeout == 0) ? Loop::Continue : Loop::Break;
+    });
 }
 
 #endif // INET_TCP_IDLE_CHECK_INTERVAL > 0

@@ -45,16 +45,7 @@ using TestContext = chip::Test::MessagingContext;
 
 class PASETestLoopbackTransport : public Test::LoopbackTransport
 {
-    void MessageDropped() override
-    {
-        // Trigger a retransmit.
-        if (mContext != nullptr)
-        {
-            chip::test_utils::SleepMillis(65);
-            ReliableMessageMgr * rm = mContext->GetExchangeManager().GetReliableMessageMgr();
-            ReliableMessageMgr::Timeout(&mContext->GetSystemLayer(), rm);
-        }
-    }
+    void MessageDropped() override { mMessageDropped = true; }
 
 public:
     bool CanSendToPeer(const PeerAddress & address) override { return true; }
@@ -66,6 +57,7 @@ public:
     }
 
     TestContext * mContext = nullptr;
+    bool mMessageDropped   = false;
 };
 
 TransportMgrBase gTransportMgr;
@@ -94,6 +86,8 @@ public:
 
     void OnResponseTimeout(ExchangeContext * ec) override {}
 };
+
+using namespace System::Clock::Literals;
 
 void SecurePairingWaitTest(nlTestSuite * inSuite, void * inContext)
 {
@@ -179,10 +173,11 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
         NL_TEST_ASSERT(inSuite, rm != nullptr);
         NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-        rc->SetConfig({
-            1, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-            1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
-        });
+        contextCommissioner->GetSessionHandle().SetMRPConfig(&ctx.GetSecureSessionManager(),
+                                                             {
+                                                                 64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
+                                                                 64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+                                                             });
         gLoopback.mContext = &ctx;
     }
 
@@ -196,6 +191,13 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, P
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 0, contextCommissioner,
                                             &delegateCommissioner) == CHIP_NO_ERROR);
+
+    while (gLoopback.mMessageDropped)
+    {
+        chip::test_utils::SleepMillis(65);
+        gLoopback.mMessageDropped = false;
+        ReliableMessageMgr::Timeout(&ctx.GetSystemLayer(), ctx.GetExchangeManager().GetReliableMessageMgr());
+    };
 
     // Standalone acks also increment the mSentMessageCount. But some messages could be acked
     // via piggybacked acks. So we cannot check for a specific value of mSentMessageCount.
@@ -249,10 +251,11 @@ void SecurePairingFailedHandshake(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, rm != nullptr);
     NL_TEST_ASSERT(inSuite, rc != nullptr);
 
-    rc->SetConfig({
-        1, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
-        1, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
-    });
+    contextCommissioner->GetSessionHandle().SetMRPConfig(&ctx.GetSecureSessionManager(),
+                                                         {
+                                                             64_ms32, // CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL
+                                                             64_ms32, // CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL
+                                                         });
     gLoopback.mContext = &ctx;
 
     NL_TEST_ASSERT(inSuite,

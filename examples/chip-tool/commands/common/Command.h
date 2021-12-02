@@ -63,6 +63,8 @@ enum ArgumentType
     Number_int16,
     Number_int32,
     Number_int64,
+    Float,
+    Double,
     Boolean,
     String,
     CharString,
@@ -152,6 +154,9 @@ public:
     {
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint64, optional);
     }
+
+    size_t AddArgument(const char * name, float min, float max, float * out, bool optional = false);
+    size_t AddArgument(const char * name, double min, double max, double * out, bool optional = false);
 
     template <typename T, typename = std::enable_if_t<std::is_enum<T>::value>>
     size_t AddArgument(const char * name, int64_t min, uint64_t max, T * out, bool optional = false)

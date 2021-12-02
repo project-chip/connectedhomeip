@@ -357,6 +357,28 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         break;
     }
 
+    case ArgumentType::Float: {
+        if (arg.optional)
+            arg.value = &(static_cast<chip::Optional<float> *>(arg.value))->Emplace();
+        float * value = static_cast<float *>(arg.value);
+        std::stringstream ss;
+        ss << argValue;
+        ss >> *value;
+        isValidArgument = (!ss.fail() && ss.eof());
+        break;
+    }
+
+    case ArgumentType::Double: {
+        if (arg.optional)
+            arg.value = &(static_cast<chip::Optional<double> *>(arg.value))->Emplace();
+        double * value = static_cast<double *>(arg.value);
+        std::stringstream ss;
+        ss << argValue;
+        ss >> *value;
+        isValidArgument = (!ss.fail() && ss.eof());
+        break;
+    }
+
     case ArgumentType::Address: {
         if (arg.optional)
             arg.value = &(reinterpret_cast<chip::Optional<AddressWithInterface> *>(arg.value))->Emplace();
@@ -425,6 +447,30 @@ size_t Command::AddArgument(const char * name, AddressWithInterface * out, bool 
     arg.name     = name;
     arg.value    = reinterpret_cast<void *>(out);
     arg.optional = optional;
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, float min, float max, float * out, bool optional)
+{
+    Argument arg;
+    arg.type     = ArgumentType::Float;
+    arg.name     = name;
+    arg.value    = reinterpret_cast<void *>(out);
+    arg.optional = optional;
+    // Ignore min/max for now; they're always +-Infinity anyway.
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, double min, double max, double * out, bool optional)
+{
+    Argument arg;
+    arg.type     = ArgumentType::Double;
+    arg.name     = name;
+    arg.value    = reinterpret_cast<void *>(out);
+    arg.optional = optional;
+    // Ignore min/max for now; they're always +-Infinity anyway.
 
     return AddArgumentToList(std::move(arg));
 }

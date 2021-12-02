@@ -8842,6 +8842,12 @@ namespace Attributes {
 } // namespace Attributes
 } // namespace FixedLabel
 
+namespace UserLabel {
+namespace Attributes {
+
+} // namespace Attributes
+} // namespace UserLabel
+
 namespace BooleanState {
 namespace Attributes {
 

@@ -53,5 +53,6 @@ void OpenCommissioningWindowCommand::OnOpenCommissioningWindowResponse(void * co
 CHIP_ERROR OpenCommissioningWindowCommand::OpenCommissioningWindow()
 {
     return CurrentCommissioner().OpenCommissioningWindowWithCallback(
-        mNodeId, mTimeout, mIteration, mDiscriminator, mCommissioningWindowOption, &mOnOpenCommissioningWindowCallback);
+        mNodeId, mTimeout, mIteration, mDiscriminator, mCommissioningWindowOption, &mOnOpenCommissioningWindowCallback,
+        /* readVIDPIDAttributes */ true);
 }

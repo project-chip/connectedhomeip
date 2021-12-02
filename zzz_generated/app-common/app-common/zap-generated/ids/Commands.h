@@ -1692,6 +1692,10 @@ namespace TimedInvokeRequest {
 static constexpr CommandId Id = 0x00000012;
 } // namespace TimedInvokeRequest
 
+namespace TestSimpleOptionalArgumentRequest {
+static constexpr CommandId Id = 0x00000013;
+} // namespace TestSimpleOptionalArgumentRequest
+
 } // namespace Commands
 } // namespace TestCluster
 

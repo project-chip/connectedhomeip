@@ -52,7 +52,8 @@ public:
 private:
     static void AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClientHandle & aWriteClient);
     static void AddAttributeStatus(nlTestSuite * apSuite, void * apContext, WriteHandler & aWriteHandler);
-    static void GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
+    static void GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, bool aIsTimedWrite,
+                                     System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
 };
 
@@ -115,7 +116,8 @@ void TestWriteInteraction::AddAttributeStatus(nlTestSuite * apSuite, void * apCo
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload)
+void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, bool aIsTimedWrite,
+                                                System::PacketBufferHandle & aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
@@ -155,7 +157,7 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
 
     attributeDataIBsBuilder.EndOfAttributeDataIBs();
     NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
-    writeRequestBuilder.TimedRequest(false).IsFabricFiltered(false).EndOfWriteRequestMessage();
+    writeRequestBuilder.TimedRequest(aIsTimedWrite).IsFabricFiltered(false).EndOfWriteRequestMessage();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);
@@ -263,25 +265,48 @@ void TestWriteInteraction::TestWriteClientGroup(nlTestSuite * apSuite, void * ap
 
 void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apContext)
 {
+    using namespace Protocols::InteractionModel;
+
     TestContext & ctx = *static_cast<TestContext *>(apContext);
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    constexpr bool allBooleans[] = { true, false };
+    for (auto messageIsTimed : allBooleans)
+    {
+        for (auto transactionIsTimed : allBooleans)
+        {
+            CHIP_ERROR err = CHIP_NO_ERROR;
 
-    app::WriteHandler writeHandler;
+            app::WriteHandler writeHandler;
 
-    chip::app::InteractionModelDelegate IMdelegate;
-    System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = writeHandler.Init(&IMdelegate);
+            chip::app::InteractionModelDelegate IMdelegate;
+            System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+            err                            = writeHandler.Init(&IMdelegate);
 
-    GenerateWriteRequest(apSuite, apContext, buf);
+            GenerateWriteRequest(apSuite, apContext, messageIsTimed, buf);
 
-    TestExchangeDelegate delegate;
-    Messaging::ExchangeContext * exchange = ctx.NewExchangeToBob(&delegate);
-    err                                   = writeHandler.OnWriteRequest(exchange, std::move(buf));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+            TestExchangeDelegate delegate;
+            Messaging::ExchangeContext * exchange = ctx.NewExchangeToBob(&delegate);
+            Status status                         = writeHandler.OnWriteRequest(exchange, std::move(buf), transactionIsTimed);
+            if (messageIsTimed == transactionIsTimed)
+            {
+                NL_TEST_ASSERT(apSuite, status == Status::Success);
+            }
+            else
+            {
+                NL_TEST_ASSERT(apSuite, status == Status::UnsupportedAccess);
+                // In the normal code flow, the exchange would now get closed
+                // when we send the error status on it (of if that fails when
+                // the stack unwinds).  In the success case it's been closed
+                // already by the WriteHandler sending the response on it, but
+                // if we are in the error case we need to make sure it gets
+                // closed.
+                exchange->Close();
+            }
 
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+            Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+            NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+        }
+    }
 }
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * aWriteHandler)

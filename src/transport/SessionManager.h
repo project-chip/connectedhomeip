@@ -154,7 +154,7 @@ public:
 #ifndef NDEBUG
         mSessionCreationDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionCreationDelegate> * i) {
             VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
-            return true;
+            return Loop::Continue;
         });
 #endif
         std::reference_wrapper<SessionCreationDelegate> * slot = mSessionCreationDelegates.CreateObject(cb);
@@ -167,9 +167,9 @@ public:
             if (std::addressof(cb) == std::addressof(i->get()))
             {
                 mSessionCreationDelegates.ReleaseObject(i);
-                return false;
+                return Loop::Break;
             }
-            return true;
+            return Loop::Continue;
         });
     }
 
@@ -179,7 +179,7 @@ public:
 #ifndef NDEBUG
         mSessionReleaseDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionReleaseDelegate> * i) {
             VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
-            return true;
+            return Loop::Continue;
         });
 #endif
         std::reference_wrapper<SessionReleaseDelegate> * slot = mSessionReleaseDelegates.CreateObject(cb);
@@ -192,9 +192,9 @@ public:
             if (std::addressof(cb) == std::addressof(i->get()))
             {
                 mSessionReleaseDelegates.ReleaseObject(i);
-                return false;
+                return Loop::Break;
             }
-            return true;
+            return Loop::Continue;
         });
     }
 

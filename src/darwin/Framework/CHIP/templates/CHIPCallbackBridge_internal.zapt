@@ -45,6 +45,10 @@ typedef void (*CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase nam
 {{#>CHIPCallbackBridge header="1" type="Int64u"       isNullable=true  ns="chip"}}NullableInt64uAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge header="1" type="Int64s"       isNullable=false ns="chip"}}Int64sAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge header="1" type="Int64s"       isNullable=true  ns="chip"}}NullableInt64sAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" type="Single"       isNullable=false ns="chip"}}FloatAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" type="Single"       isNullable=true  ns="chip"}}NullableFloatAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" type="Double"       isNullable=false ns="chip"}}DoubleAttributeCallback{{/CHIPCallbackBridge}}
+{{#>CHIPCallbackBridge header="1" type="Double"       isNullable=true  ns="chip"}}NullableDoubleAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge header="1" type="vendor_id"    isNullable=false ns="chip"}}VendorIdAttributeCallback{{/CHIPCallbackBridge}}
 {{#>CHIPCallbackBridge header="1" type="vendor_id"    isNullable=true  ns="chip"}}NullableVendorIdAttributeCallback{{/CHIPCallbackBridge}}
 

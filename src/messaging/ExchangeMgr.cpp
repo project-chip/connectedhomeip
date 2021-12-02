@@ -86,7 +86,7 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
     sessionManager->RegisterReleaseDelegate(*this);
     sessionManager->SetMessageDelegate(this);
 
-    mReliableMessageMgr.Init(sessionManager->SystemLayer(), sessionManager);
+    mReliableMessageMgr.Init(sessionManager->SystemLayer());
     ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionManager));
 
     mState = State::kState_Initialized;
@@ -101,7 +101,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
     mContextPool.ForEachActiveObject([](auto * ec) {
         // There should be no active object in the pool
         VerifyOrDie(false);
-        return true;
+        return Loop::Continue;
     });
 
     if (mSessionManager != nullptr)
@@ -118,9 +118,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
 ExchangeContext * ExchangeManager::NewContext(SessionHandle session, ExchangeDelegate * delegate)
 {
-    ExchangeContext * context = mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
-    context->GetReliableMessageContext()->SetConfig(session.GetMRPConfig(GetSessionManager()));
-    return context;
+    return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate)
@@ -223,12 +221,15 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                     ec->SetMsgRcvdFromPeer(true);
                 }
 
+                ChipLogDetail(ExchangeManager, "Found matching exchange: " ChipLogFormatExchange ", Delegate: 0x%p",
+                              ChipLogValueExchange(ec), ec->GetDelegate());
+
                 // Matched ExchangeContext; send to message handler.
                 ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
                 found = true;
-                return false;
+                return Loop::Break;
             }
-            return true;
+            return Loop::Continue;
         });
 
         if (found)
@@ -322,7 +323,7 @@ void ExchangeManager::ExpireExchangesForSession(SessionHandle session)
             // Continue to iterate because there can be multiple exchanges
             // associated with the connection.
         }
-        return true;
+        return Loop::Continue;
     });
 }
 
@@ -338,7 +339,7 @@ void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * deleg
             ec->SetDelegate(nullptr);
             ec->Close();
         }
-        return true;
+        return Loop::Continue;
     });
 }
 

@@ -92,9 +92,20 @@ tests:
               - name: "groupId"
                 value: 0x1111
 
+    - label: "Get Group Membership 1 (all)"
+      command: "GetGroupMembership"
+      arguments:
+          values:
+              - name: "groupList"
+                value: []
+      response:
+          values:
+              - name: "capacity"
+                value: 0xff
+              - name: "groupList"
+                value: [0x01]
+
     - label: "Add Group 2 (new)"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "AddGroup"
       arguments:
           values:
@@ -110,8 +121,6 @@ tests:
                 value: 0x1111
 
     - label: "View Group 2 (new)"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "ViewGroup"
       arguments:
           values:
@@ -140,8 +149,6 @@ tests:
                 value: 0x7fff
 
     - label: "Add Group 3 (new)"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "AddGroup"
       arguments:
           values:
@@ -172,8 +179,6 @@ tests:
                 value: "Group #1"
 
     - label: "View Group 2 (existing)"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "ViewGroup"
       arguments:
           values:
@@ -188,39 +193,20 @@ tests:
               - name: "groupName"
                 value: "Group #2"
 
-    - label: "Get Group Membership 1"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
-      command: "GetGroupMembership"
-      arguments:
-          values:
-              - name: "groupList"
-                value: [0x01, 0x02, 0x03, 0x7fff]
-      response:
-          values:
-              - name: "capacity"
-                value: 0xff
-              - name: "groupList"
-                value: [0x01, 0x7fff]
-
     - label: "Get Group Membership 2"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "GetGroupMembership"
       arguments:
           values:
               - name: "groupList"
-                value: []
+                value: [0x02, 0x03, 0x7fff]
       response:
           values:
               - name: "capacity"
                 value: 0xff
               - name: "groupList"
-                value: [0x01, 0x1111, 0x7fff]
+                value: [0x7fff]
 
     - label: "View Group 3 (new)"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "ViewGroup"
       arguments:
           values:
@@ -262,8 +248,6 @@ tests:
                 value: 0x04
 
     - label: "Remove Group 2 (existing)"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "RemoveGroup"
       arguments:
           values:
@@ -305,8 +289,6 @@ tests:
                 value: 0x1111
 
     - label: "View Group 3 (not removed)"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "ViewGroup"
       arguments:
           values:
@@ -322,19 +304,17 @@ tests:
                 value: "Group #3"
 
     - label: "Get Group Membership 3"
-      # https://github.com/project-chip/connectedhomeip/issues/11312
-      disabled: true
       command: "GetGroupMembership"
       arguments:
           values:
               - name: "groupList"
-                value: [0x01, 0x02, 0x1111, 0x03, 0x7fff]
+                value: [0x01, 0x02, 0x1111, 0x03]
       response:
           values:
               - name: "capacity"
                 value: 0xff
               - name: "groupList"
-                value: [0x01, 0x7fff]
+                value: [0x01]
 
     - label: "Remove All"
       command: "RemoveAllGroups"
@@ -379,8 +359,6 @@ tests:
                 value: 0x7fff
 
     - label: "Get Group Membership 4"
-      # https://github.com/project-chip/connectedhomeip/issues/11495
-      disabled: true
       command: "GetGroupMembership"
       arguments:
           values:

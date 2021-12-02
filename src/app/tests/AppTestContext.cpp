@@ -36,6 +36,7 @@ CHIP_ERROR AppContext::Init()
 
 CHIP_ERROR AppContext::Shutdown()
 {
+    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
     ReturnErrorOnFailure(MessagingContext::Shutdown());
     ReturnErrorOnFailure(mIOContext.Shutdown());
     chip::Platform::MemoryShutdown();

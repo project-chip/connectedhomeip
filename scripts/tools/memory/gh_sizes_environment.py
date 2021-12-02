@@ -8,6 +8,7 @@ Typically run as:
 
 ```
     - name: Set up environment for size reports
+      if: ${{ !env.ACT }}
       env:
         GH_CONTEXT: ${{ toJson(github) }}
       run: gh_sizes_environment.py "${GH_CONTEXT}"
