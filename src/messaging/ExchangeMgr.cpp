@@ -221,7 +221,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                     ec->SetMsgRcvdFromPeer(true);
                 }
 
-                ChipLogDetail(ExchangeManager, "Found matching exchange: " ChipLogFormatExchange ", Delegate: 0x%p",
+                ChipLogDetail(ExchangeManager, "Found matching exchange: " ChipLogFormatExchange ", Delegate: %p",
                               ChipLogValueExchange(ec), ec->GetDelegate());
 
                 // Matched ExchangeContext; send to message handler.
@@ -290,7 +290,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             return;
         }
 
-        ChipLogDetail(ExchangeManager, "Handling via exchange: " ChipLogFormatExchange ", Delegate: 0x%p", ChipLogValueExchange(ec),
+        ChipLogDetail(ExchangeManager, "Handling via exchange: " ChipLogFormatExchange ", Delegate: %p", ChipLogValueExchange(ec),
                       ec->GetDelegate());
 
         if (ec->IsEncryptionRequired() != packetHeader.IsEncrypted())
