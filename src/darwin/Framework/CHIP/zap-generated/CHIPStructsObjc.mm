@@ -434,6 +434,19 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPDoorLockClusterDlCredential
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _credentialType = @(0);
+
+        _credentialIndex = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPIasAceClusterIasAceZoneStatusResult
 - (instancetype)init
 {

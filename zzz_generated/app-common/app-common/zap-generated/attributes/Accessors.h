@@ -1752,12 +1752,14 @@ namespace DoorLock {
 namespace Attributes {
 
 namespace LockState {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // DlLockState
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint8_t> & value);
 } // namespace LockState
 
 namespace LockType {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // DlLockType
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace LockType
 
@@ -1767,8 +1769,10 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace ActuatorEnabled
 
 namespace DoorState {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value); // DlDoorState
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+EmberAfStatus SetNull(chip::EndpointId endpoint);
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint8_t> & value);
 } // namespace DoorState
 
 namespace DoorOpenEvents {
@@ -1786,60 +1790,65 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace OpenPeriod
 
-namespace NumLockRecordsSupported {
+namespace NumberOfLogRecordsSupported {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace NumLockRecordsSupported
+} // namespace NumberOfLogRecordsSupported
 
-namespace NumTotalUsersSupported {
+namespace NumberOfTotalUsersSupported {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace NumTotalUsersSupported
+} // namespace NumberOfTotalUsersSupported
 
-namespace NumPinUsersSupported {
+namespace NumberOfPINUsersSupported {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace NumPinUsersSupported
+} // namespace NumberOfPINUsersSupported
 
-namespace NumRfidUsersSupported {
+namespace NumberOfRFIDUsersSupported {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace NumRfidUsersSupported
+} // namespace NumberOfRFIDUsersSupported
 
-namespace NumWeekdaySchedulesSupportedPerUser {
+namespace NumberOfWeekDaySchedulesSupportedPerUser {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace NumberOfWeekDaySchedulesSupportedPerUser
+
+namespace NumberOfYearDaySchedulesSupportedPerUser {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace NumberOfYearDaySchedulesSupportedPerUser
+
+namespace NumberOfHolidaySchedulesSupported {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace NumberOfHolidaySchedulesSupported
+
+namespace MaxPINCodeLength {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace NumWeekdaySchedulesSupportedPerUser
+} // namespace MaxPINCodeLength
 
-namespace NumYeardaySchedulesSupportedPerUser {
+namespace MinPINCodeLength {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace NumYeardaySchedulesSupportedPerUser
+} // namespace MinPINCodeLength
 
-namespace NumHolidaySchedulesSupportedPerUser {
+namespace MaxRFIDCodeLength {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace NumHolidaySchedulesSupportedPerUser
+} // namespace MaxRFIDCodeLength
 
-namespace MaxPinLength {
+namespace MinRFIDCodeLength {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace MaxPinLength
+} // namespace MinRFIDCodeLength
 
-namespace MinPinLength {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+namespace CredentialRulesSupport {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace MinPinLength
-
-namespace MaxRfidCodeLength {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace MaxRfidCodeLength
-
-namespace MinRfidCodeLength {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace MinRfidCodeLength
+} // namespace CredentialRulesSupport
 
 namespace EnableLogging {
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
@@ -1851,10 +1860,10 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // ch
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 } // namespace Language
 
-namespace LedSettings {
+namespace LEDSettings {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace LedSettings
+} // namespace LEDSettings
 
 namespace AutoRelockTime {
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // int32u
@@ -1867,7 +1876,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace SoundVolume
 
 namespace OperatingMode {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // DlOperatingMode
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace OperatingMode
 
@@ -1891,15 +1900,20 @@ EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace EnableOneTouchLocking
 
-namespace EnableInsideStatusLed {
+namespace EnableInsideStatusLED {
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace EnableInsideStatusLed
+} // namespace EnableInsideStatusLED
 
 namespace EnablePrivacyModeButton {
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace EnablePrivacyModeButton
+
+namespace LocalProgrammingFeatures {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // bitmap8
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace LocalProgrammingFeatures
 
 namespace WrongCodeEntryLimit {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
@@ -1911,20 +1925,20 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace UserCodeTemporaryDisableTime
 
-namespace SendPinOverTheAir {
+namespace SendPINOverTheAir {
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace SendPinOverTheAir
+} // namespace SendPINOverTheAir
 
-namespace RequirePinForRfOperation {
+namespace RequirePINforRemoteOperation {
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value); // boolean
 EmberAfStatus Set(chip::EndpointId endpoint, bool value);
-} // namespace RequirePinForRfOperation
+} // namespace RequirePINforRemoteOperation
 
-namespace ZigbeeSecurityLevel {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace ZigbeeSecurityLevel
+namespace ExpiringUserTimeout {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace ExpiringUserTimeout
 
 namespace AlarmMask {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
@@ -1936,35 +1950,35 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace KeypadOperationEventMask
 
-namespace RfOperationEventMask {
+namespace RemoteOperationEventMask {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace RfOperationEventMask
+} // namespace RemoteOperationEventMask
 
 namespace ManualOperationEventMask {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ManualOperationEventMask
 
-namespace RfidOperationEventMask {
+namespace RFIDOperationEventMask {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace RfidOperationEventMask
+} // namespace RFIDOperationEventMask
 
 namespace KeypadProgrammingEventMask {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace KeypadProgrammingEventMask
 
-namespace RfProgrammingEventMask {
+namespace RemoteProgrammingEventMask {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace RfProgrammingEventMask
+} // namespace RemoteProgrammingEventMask
 
-namespace RfidProgrammingEventMask {
+namespace RFIDProgrammingEventMask {
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // bitmap16
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace RfidProgrammingEventMask
+} // namespace RFIDProgrammingEventMask
 
 } // namespace Attributes
 } // namespace DoorLock

@@ -307,52 +307,20 @@ typedef void (*CHIPDescriptorClusterClusterRevisionAttributeCallbackType)(
 typedef void (*CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
     void *, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &);
 
-typedef void (*CHIPDoorLockClusterClearAllPinsResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterClearAllRfidsResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterClearHolidayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterClearPinResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearPinResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterClearRfidResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterClearYeardayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetLogRecordResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetPinResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetPinResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetRfidResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetRfidResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetPINCodeResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetRFIDCodeResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetUserTypeResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetYeardayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterLockDoorResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::LockDoorResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterSetHolidayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterSetPinResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetPinResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterSetRfidResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetRfidResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterSetUserTypeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterSetYeardayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterUnlockDoorResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &);
 
 typedef void (*CHIPDoorLockClusterLockStateAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo::DecodableArgType);

@@ -903,54 +903,48 @@ public:
     ~DoorLockCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR ClearAllPins(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ClearAllRfids(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ClearAllPINCodes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ClearAllRFIDCodes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ClearHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint8_t scheduleId);
-    CHIP_ERROR ClearPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId);
-    CHIP_ERROR ClearRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId);
-    CHIP_ERROR ClearWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint8_t scheduleId, uint16_t userId);
-    CHIP_ERROR ClearYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint8_t scheduleId, uint16_t userId);
+                                    uint8_t holidayIndex);
+    CHIP_ERROR ClearPINCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                            uint16_t pinSlotIndex);
+    CHIP_ERROR ClearRFIDCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                             uint16_t rfidSlotIndex);
+    CHIP_ERROR ClearWeekDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    uint8_t weekDayIndex, uint16_t userIndex);
+    CHIP_ERROR ClearYearDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                    uint8_t yearDayIndex, uint16_t userIndex);
     CHIP_ERROR GetHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t scheduleId);
+                                  uint8_t holidayIndex);
     CHIP_ERROR GetLogRecord(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t logIndex);
-    CHIP_ERROR GetPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId);
-    CHIP_ERROR GetRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId);
+    CHIP_ERROR GetPINCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId);
+    CHIP_ERROR GetRFIDCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId);
     CHIP_ERROR GetUserType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId);
-    CHIP_ERROR GetWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t scheduleId, uint16_t userId);
-    CHIP_ERROR GetYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t scheduleId, uint16_t userId);
-    CHIP_ERROR LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan pin);
+    CHIP_ERROR GetWeekDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint8_t weekDayIndex, uint16_t userIndex);
+    CHIP_ERROR GetYearDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint8_t yearDayIndex, uint16_t userIndex);
+    CHIP_ERROR LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan pinCode);
     CHIP_ERROR SetHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime,
-                                  uint8_t operatingModeDuringHoliday);
-    CHIP_ERROR SetPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId,
-                      uint8_t userStatus, uint8_t userType, chip::ByteSpan pin);
-    CHIP_ERROR SetRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId,
-                       uint8_t userStatus, uint8_t userType, chip::ByteSpan id);
+                                  uint8_t holidayIndex, uint32_t localStartTime, uint32_t localEndTime, uint8_t operatingMode);
+    CHIP_ERROR SetPINCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId,
+                          uint8_t userStatus, uint8_t userType, chip::ByteSpan pin);
+    CHIP_ERROR SetRFIDCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId,
+                           uint8_t userStatus, uint8_t userType, chip::ByteSpan rfidCode);
     CHIP_ERROR SetUserType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t userId,
                            uint8_t userType);
-    CHIP_ERROR SetWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour, uint8_t startMinute,
-                                  uint8_t endHour, uint8_t endMinute);
-    CHIP_ERROR SetYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                  uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime);
-    CHIP_ERROR UnlockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, chip::ByteSpan pin);
+    CHIP_ERROR SetWeekDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint8_t weekDayIndex, uint16_t userIndex, uint8_t daysMask, uint8_t startHour,
+                                  uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+    CHIP_ERROR SetYearDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                  uint8_t yearDayIndex, uint16_t userIndex, uint32_t localStartTime, uint32_t localEndTime);
+    CHIP_ERROR UnlockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                          chip::ByteSpan pinCode);
     CHIP_ERROR UnlockWithTimeout(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                 uint16_t timeoutInSeconds, chip::ByteSpan pin);
+                                 uint16_t timeout, chip::ByteSpan pinCode);
 
     // Cluster Attributes
-    CHIP_ERROR ReadAttributeLockState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeLockState(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeLockState(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeLockType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeLockType(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeLockType(Callback::Cancelable * onReportCallback);
     CHIP_ERROR ReadAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SubscribeAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
