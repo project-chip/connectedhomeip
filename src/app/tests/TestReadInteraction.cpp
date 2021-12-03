@@ -248,11 +248,13 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     }
 
     attributeData = aAttributeReport.CreateAttributeData();
+    attributeData.DataVersion(0);
+    ReturnErrorOnFailure(attributeData.GetError());
     attributePath = attributeData.CreatePath();
     attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePath.GetError());
     ReturnErrorOnFailure(AttributeValueEncoder(attributeData.GetWriter(), 0).Encode(kTestFieldValue1));
-    attributeData.DataVersion(0).EndOfAttributeDataIB();
+    attributeData.EndOfAttributeDataIB();
     ReturnErrorOnFailure(attributeData.GetError());
     return CHIP_NO_ERROR;
 }
@@ -298,9 +300,6 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
     err = reportDataMessageBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    reportDataMessageBuilder.SuppressResponse(aSuppressResponse);
-    NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
-
     AttributeReportIBs::Builder attributeReportIBsBuilder = reportDataMessageBuilder.CreateAttributeReportIBs();
     NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
 
@@ -309,6 +308,10 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
 
     AttributeDataIB::Builder attributeDataIBBuilder = attributeReportIBBuilder.CreateAttributeData();
     NL_TEST_ASSERT(apSuite, attributeReportIBBuilder.GetError() == CHIP_NO_ERROR);
+
+    attributeDataIBBuilder.DataVersion(2);
+    err = attributeDataIBBuilder.GetError();
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     AttributePathIB::Builder attributePathBuilder = attributeDataIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
@@ -323,10 +326,6 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
     }
 
     err = attributePathBuilder.GetError();
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    attributeDataIBBuilder.DataVersion(2);
-    err = attributeDataIBBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     // Construct attribute data
@@ -354,6 +353,9 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
     NL_TEST_ASSERT(apSuite, attributeReportIBsBuilder.GetError() == CHIP_NO_ERROR);
 
     reportDataMessageBuilder.MoreChunkedMessages(false);
+    NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
+
+    reportDataMessageBuilder.SuppressResponse(aSuppressResponse);
     NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
 
     reportDataMessageBuilder.EndOfReportDataMessage();
@@ -930,6 +932,15 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
     err = subscribeRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+    subscribeRequestBuilder.KeepSubscriptions(true);
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+    subscribeRequestBuilder.MinIntervalFloorSeconds(2);
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+    subscribeRequestBuilder.MaxIntervalCeilingSeconds(3);
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
     AttributePathIBs::Builder attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
@@ -943,15 +954,6 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
     attributePathListBuilder.EndOfAttributePathIBs();
     err = attributePathListBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-
-    subscribeRequestBuilder.MinIntervalFloorSeconds(2);
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
-
-    subscribeRequestBuilder.MaxIntervalCeilingSeconds(3);
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
-
-    subscribeRequestBuilder.KeepSubscriptions(true);
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     subscribeRequestBuilder.IsProxy(true);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);

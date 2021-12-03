@@ -45,6 +45,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'TrustedRootCertificates':
   case 'OtaSoftwareUpdateProvider':
   case 'OtaSoftwareUpdateRequestor':
+  case 'PowerSourceConfiguration':
     return 0;
   }
   return 1;
@@ -56,6 +57,8 @@ function asTestValue()
     return '[@"Test" dataUsingEncoding:NSUTF8StringEncoding]';
   } else if (StringHelper.isCharString(this.type)) {
     return '@"Test"';
+  } else if (this.isArray) {
+    return '[NSArray array]';
   } else {
     return `@(${this.min || this.max || 0})`;
   }

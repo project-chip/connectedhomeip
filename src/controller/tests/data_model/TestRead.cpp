@@ -77,13 +77,14 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
             i++;
         }
 
+        attributeData.DataVersion(0);
         AttributePathIB::Builder attributePath = attributeData.CreatePath();
         attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
 
         ReturnErrorOnFailure(DataModel::Encode(*(attributeData.GetWriter()),
                                                chip::TLV::ContextTag(chip::to_underlying(AttributeDataIB::Tag::kData)), value));
-        attributeData.DataVersion(0).EndOfAttributeDataIB();
+        attributeData.EndOfAttributeDataIB();
         return CHIP_NO_ERROR;
     }
     else

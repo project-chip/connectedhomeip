@@ -1037,6 +1037,30 @@ private:
     bool keepAlive;
 };
 
+class CHIPPowerSourceConfigurationSourcesAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceConfigurationClusterSourcesAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceConfigurationSourcesAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceConfigurationSourcesAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceConfigurationSourcesAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceConfigurationSourcesAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback
     : public chip::Callback::Callback<CHIPPumpConfigurationAndControlClusterLifetimeRunningHoursAttributeCallbackType>
 {

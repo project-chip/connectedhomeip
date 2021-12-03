@@ -63,7 +63,7 @@ tests:
       timedInteractionTimeoutMs: 1
       # Try to ensure that we are unresponsive for long enough that the timeout
       # expires.
-      busyWaitMs: 5
+      busyWaitMs: 100
       response:
           error: UNSUPPORTED_ACCESS
 
@@ -81,6 +81,6 @@ tests:
       timedInteractionTimeoutMs: 1
       # Try to ensure that we are unresponsive for long enough that the timeout
       # expires.
-      busyWaitMs: 5
+      busyWaitMs: 100
       response:
           error: UNSUPPORTED_ACCESS

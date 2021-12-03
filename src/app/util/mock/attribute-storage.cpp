@@ -239,6 +239,8 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
     }
 
     attributeData = aAttributeReport.CreateAttributeData();
+    attributeData.DataVersion(0);
+    ReturnErrorOnFailure(attributeData.GetError());
     attributePath = attributeData.CreatePath();
     attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePath.GetError());
@@ -271,7 +273,7 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
         return CHIP_ERROR_KEY_NOT_FOUND;
     }
 
-    attributeData.DataVersion(0).EndOfAttributeDataIB();
+    attributeData.EndOfAttributeDataIB();
     return attributeData.GetError();
 }
 

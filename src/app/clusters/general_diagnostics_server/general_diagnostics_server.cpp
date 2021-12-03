@@ -28,6 +28,7 @@
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
+using namespace chip::app::Clusters::GeneralDiagnostics;
 using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
 using namespace chip::DeviceLayer;
 using chip::DeviceLayer::ConnectivityMgr;
@@ -215,7 +216,8 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     }
 
     // Get called when the Node detects a hardware fault has been raised.
-    void OnHardwareFaultsDetected() override
+    void OnHardwareFaultsDetected(GeneralFaults<kMaxHardwareFaults> & previous,
+                                  GeneralFaults<kMaxHardwareFaults> & current) override
     {
         ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
@@ -236,7 +238,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     }
 
     // Get called when the Node detects a radio fault has been raised.
-    void OnRadioFaultsDetected() override
+    void OnRadioFaultsDetected(GeneralFaults<kMaxRadioFaults> & previous, GeneralFaults<kMaxRadioFaults> & current) override
     {
         ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
@@ -257,7 +259,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     }
 
     // Get called when the Node detects a network fault has been raised.
-    void OnNetworkFaultsDetected() override
+    void OnNetworkFaultsDetected(GeneralFaults<kMaxNetworkFaults> & previous, GeneralFaults<kMaxNetworkFaults> & current) override
     {
         ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
