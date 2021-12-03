@@ -7824,6 +7824,7 @@ struct TypeInfo
 
     static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Sources::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Sources
 namespace FeatureMap {
