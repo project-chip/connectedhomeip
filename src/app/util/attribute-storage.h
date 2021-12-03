@@ -241,10 +241,6 @@ void emberAfClusterMessageSentWithMfgCodeCallback(const chip::MessageSendDestina
                                                   uint16_t msgLen, uint8_t * message, EmberStatus status,
                                                   uint16_t manufacturerCode);
 
-// Used to retrieve a manufacturer code from an attribute metadata
-uint16_t emAfGetManufacturerCodeForCluster(EmberAfCluster * cluster);
-uint16_t emAfGetManufacturerCodeForAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * attMetaData);
-
 // Checks a cluster mask byte against ticks passed bitmask
 // returns true if the mask matches a passed interval
 bool emberAfCheckTick(EmberAfClusterMask mask, uint8_t passedMask);
