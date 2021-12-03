@@ -107,7 +107,7 @@ private:
 class LocalSessionMessageCounter : public MessageCounter
 {
 public:
-    static constexpr uint32_t kInitialValue = 1; ///< Used for initializing peer counter
+    static constexpr uint32_t kInitialValue                 = 1;         ///< Used for initializing peer counter
     static constexpr uint32_t kMessageCounterRandomInitMask = 0x0FFFFFF; ///< 28-bit mask
 
     /**
