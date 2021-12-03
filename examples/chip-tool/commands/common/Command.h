@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "controller/ExampleOperationalCredentialsIssuer.h"
 #include <app/data-model/Nullable.h>
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>

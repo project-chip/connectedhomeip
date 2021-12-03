@@ -21,7 +21,6 @@
 #include "../../config/PersistentStorage.h"
 #include "../common/CHIPCommand.h"
 #include <app/chip-zcl-zpro-codec.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/core/CHIPEncoding.h>
 
 class ModelCommand : public CHIPCommand
