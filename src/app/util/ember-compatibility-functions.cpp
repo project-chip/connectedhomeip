@@ -518,7 +518,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     Protocols::InteractionModel::Status imStatus = ToInteractionModelStatus(emberStatus);
     if (imStatus == Protocols::InteractionModel::Status::Success)
     {
-        SendSuccessStatus(attributeDataIBBuilder);
+        return SendSuccessStatus(attributeDataIBBuilder);
     }
 
     return SendFailureStatus(aPath, aAttributeReport, imStatus, backup);
