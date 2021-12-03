@@ -48,25 +48,9 @@ public:
 
     bool HasPeerAddress() const { return mPeerAddress.IsInitialized(); }
     Transport::PeerAddress GetPeerAddress() const { return mPeerAddress; }
-    const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
-    const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
     RendezvousParameters & SetPeerAddress(const Transport::PeerAddress & peerAddress)
     {
         mPeerAddress = peerAddress;
-        return *this;
-    }
-
-    // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of RendezvousParameter object.
-    RendezvousParameters & SetCSRNonce(ByteSpan csrNonce)
-    {
-        mCSRNonce.SetValue(csrNonce);
-        return *this;
-    }
-
-    // The lifetime of the buffer attestationNonce is pointing to, should exceed the lifetime of RendezvousParameter object.
-    RendezvousParameters & SetAttestationNonce(ByteSpan attestationNonce)
-    {
-        mAttestationNonce.SetValue(attestationNonce);
         return *this;
     }
 
@@ -79,8 +63,6 @@ public:
     }
 
     bool HasPASEVerifier() const { return mHasPASEVerifier; }
-    bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
-    bool HasAttestationNonce() const { return mAttestationNonce.HasValue(); }
     const PASEVerifier & GetPASEVerifier() const { return mPASEVerifier; }
     RendezvousParameters & SetPASEVerifier(PASEVerifier & verifier)
     {
@@ -113,8 +95,6 @@ private:
     Transport::PeerAddress mPeerAddress;  ///< the peer node address
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
-    Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
-    Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
 
     PASEVerifier mPASEVerifier;
     bool mHasPASEVerifier = false;
@@ -123,6 +103,33 @@ private:
     Ble::BleLayer * mBleLayer               = nullptr;
     BLE_CONNECTION_OBJECT mConnectionObject = 0;
 #endif // CONFIG_NETWORK_LAYER_BLE
+};
+
+class CommissioningParameters
+{
+public:
+    bool HasCSRNonce() const { return mCSRNonce.HasValue(); }
+    bool HasAttestationNonce() const { return mAttestationNonce.HasValue(); }
+    const Optional<ByteSpan> GetCSRNonce() const { return mCSRNonce; }
+    const Optional<ByteSpan> GetAttestationNonce() const { return mAttestationNonce; }
+
+    // The lifetime of the buffer csrNonce is pointing to, should exceed the lifetime of CommissioningParameters object.
+    CommissioningParameters & SetCSRNonce(ByteSpan csrNonce)
+    {
+        mCSRNonce.SetValue(csrNonce);
+        return *this;
+    }
+
+    // The lifetime of the buffer attestationNonce is pointing to, should exceed the lifetime of CommissioningParameters object.
+    CommissioningParameters & SetAttestationNonce(ByteSpan attestationNonce)
+    {
+        mAttestationNonce.SetValue(attestationNonce);
+        return *this;
+    }
+
+private:
+    Optional<ByteSpan> mCSRNonce;         ///< CSR Nonce passed by the commissioner
+    Optional<ByteSpan> mAttestationNonce; ///< Attestation Nonce passed by the commissioner
 };
 
 } // namespace chip

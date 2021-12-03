@@ -7963,6 +7963,18 @@ struct TypeInfo
 namespace PowerSourceConfiguration {
 
 namespace Attributes {
+namespace Sources {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const uint8_t>;
+    using DecodableType    = DataModel::DecodableList<uint8_t>;
+    using DecodableArgType = const DataModel::DecodableList<uint8_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::PowerSourceConfiguration::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::Sources::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace Sources
 namespace FeatureMap {
 struct TypeInfo
 {

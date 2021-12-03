@@ -139,23 +139,6 @@ public class ClusterWriteMapping {
     Map<String, InteractionInfo> writeBridgedActionsInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("bridgedActions", writeBridgedActionsInteractionInfo);
     Map<String, InteractionInfo> writeBridgedDeviceBasicInteractionInfo = new LinkedHashMap<>();
-    Map<String, CommandParameterInfo> writeBridgedDeviceBasicNodeLabelCommandParams =
-        new LinkedHashMap<String, CommandParameterInfo>();
-    CommandParameterInfo bridgedDeviceBasicnodeLabelCommandParameterInfo =
-        new CommandParameterInfo("value", String.class);
-    writeBridgedDeviceBasicNodeLabelCommandParams.put(
-        "value", bridgedDeviceBasicnodeLabelCommandParameterInfo);
-    InteractionInfo writeBridgedDeviceBasicNodeLabelAttributeInteractionInfo =
-        new InteractionInfo(
-            (cluster, callback, commandArguments) -> {
-              ((ChipClusters.BridgedDeviceBasicCluster) cluster)
-                  .writeNodeLabelAttribute(
-                      (DefaultClusterCallback) callback, (String) commandArguments.get("value"));
-            },
-            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
-            writeBridgedDeviceBasicNodeLabelCommandParams);
-    writeBridgedDeviceBasicInteractionInfo.put(
-        "writeNodeLabelAttribute", writeBridgedDeviceBasicNodeLabelAttributeInteractionInfo);
     writeAttributeMap.put("bridgedDeviceBasic", writeBridgedDeviceBasicInteractionInfo);
     Map<String, InteractionInfo> writeColorControlInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> writeColorControlColorControlOptionsCommandParams =
@@ -702,6 +685,9 @@ public class ClusterWriteMapping {
     writeAttributeMap.put("operationalCredentials", writeOperationalCredentialsInteractionInfo);
     Map<String, InteractionInfo> writePowerSourceInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("powerSource", writePowerSourceInteractionInfo);
+    Map<String, InteractionInfo> writePowerSourceConfigurationInteractionInfo =
+        new LinkedHashMap<>();
+    writeAttributeMap.put("powerSourceConfiguration", writePowerSourceConfigurationInteractionInfo);
     Map<String, InteractionInfo> writePressureMeasurementInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("pressureMeasurement", writePressureMeasurementInteractionInfo);
     Map<String, InteractionInfo> writePumpConfigurationAndControlInteractionInfo =

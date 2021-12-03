@@ -323,7 +323,7 @@ void BuildEventDataIB(nlTestSuite * apSuite, EventDataIB::Builder & aEventDataIB
     NL_TEST_ASSERT(apSuite, eventPathBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventPath(apSuite, eventPathBuilder);
 
-    aEventDataIBBuilder.Priority(2).EventNumber(3).EpochTimestamp(4).SystemTimestamp(5).DeltaEpochTimestamp(6).DeltaSystemTimestamp(
+    aEventDataIBBuilder.EventNumber(2).Priority(3).EpochTimestamp(4).SystemTimestamp(5).DeltaEpochTimestamp(6).DeltaSystemTimestamp(
         7);
     err = aEventDataIBBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -365,10 +365,10 @@ void ParseEventDataIB(nlTestSuite * apSuite, EventDataIB::Parser & aEventDataIBP
             err = aEventDataIBParser.GetPath(&eventPath);
             NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
         }
-        err = aEventDataIBParser.GetPriority(&priorityLevel);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && priorityLevel == 2);
         err = aEventDataIBParser.GetEventNumber(&number);
-        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && number == 3);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && number == 2);
+        err = aEventDataIBParser.GetPriority(&priorityLevel);
+        NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && priorityLevel == 3);
         err = aEventDataIBParser.GetEpochTimestamp(&EpochTimestamp);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && EpochTimestamp == 4);
         err = aEventDataIBParser.GetSystemTimestamp(&systemTimestamp);
@@ -535,6 +535,7 @@ void BuildAttributeDataIB(nlTestSuite * apSuite, AttributeDataIB::Builder & aAtt
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    aAttributeDataIBBuilder.DataVersion(2);
     AttributePathIB::Builder attributePathBuilder = aAttributeDataIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, aAttributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributePathIB(apSuite, attributePathBuilder);
@@ -553,7 +554,7 @@ void BuildAttributeDataIB(nlTestSuite * apSuite, AttributeDataIB::Builder & aAtt
         err = pWriter->EndContainer(dummyType);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
-    aAttributeDataIBBuilder.DataVersion(2);
+
     err = aAttributeDataIBBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     aAttributeDataIBBuilder.EndOfAttributeDataIB();
@@ -963,7 +964,7 @@ void BuildReportDataMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWrite
     err = reportDataMessageBuilder.Init(&aWriter);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    reportDataMessageBuilder.SuppressResponse(true).SubscriptionId(2);
+    reportDataMessageBuilder.SubscriptionId(2);
     NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
 
     AttributeReportIBs::Builder AttributeReportIBs = reportDataMessageBuilder.CreateAttributeReportIBs();
@@ -974,7 +975,7 @@ void BuildReportDataMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWrite
     NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventReports(apSuite, EventReportIBs);
 
-    reportDataMessageBuilder.MoreChunkedMessages(true);
+    reportDataMessageBuilder.MoreChunkedMessages(true).SuppressResponse(true);
     NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
 
     reportDataMessageBuilder.EndOfReportDataMessage();
@@ -1170,6 +1171,15 @@ void BuildSubscribeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & 
     err = subscribeRequestBuilder.Init(&aWriter);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
+    subscribeRequestBuilder.KeepSubscriptions(true);
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+    subscribeRequestBuilder.MinIntervalFloorSeconds(2);
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
+    subscribeRequestBuilder.MaxIntervalCeilingSeconds(3);
+    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
+
     AttributePathIBs::Builder attributePathIBs = subscribeRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributePathList(apSuite, attributePathIBs);
@@ -1181,15 +1191,6 @@ void BuildSubscribeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & 
     EventFilterIBs::Builder eventFilters = subscribeRequestBuilder.CreateEventFilters();
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventFilters(apSuite, eventFilters);
-
-    subscribeRequestBuilder.MinIntervalFloorSeconds(2);
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
-
-    subscribeRequestBuilder.MaxIntervalCeilingSeconds(3);
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
-
-    subscribeRequestBuilder.KeepSubscriptions(true);
-    NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     subscribeRequestBuilder.IsProxy(true);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);

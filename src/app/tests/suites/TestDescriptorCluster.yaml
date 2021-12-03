@@ -40,6 +40,7 @@ tests:
                   0x0028, # Basic Information
                   0x0029, # OTA Software Update Provider
                   0x002A, # OTA Software Update Requestor
+                  0x002E, # Power Source Configuration
                   0x0030, # General Commissioning
                   0x0031, # Network Commissioning
                   0x0032, # Diagnostic Logs

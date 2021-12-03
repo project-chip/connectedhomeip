@@ -42880,10 +42880,10 @@ private:
             chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 1));
         {
             using namespace chip::System::Clock::Literals;
-            // Busy-wait for 5 milliseconds.
+            // Busy-wait for 100 milliseconds.
             auto & clock = chip::System::SystemClock();
             auto start   = clock.GetMonotonicTimestamp();
-            while (clock.GetMonotonicTimestamp() - start < 5_ms)
+            while (clock.GetMonotonicTimestamp() - start < 100_ms)
                 ;
         }
         return CHIP_NO_ERROR;
@@ -42940,10 +42940,10 @@ private:
             chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 1));
         {
             using namespace chip::System::Clock::Literals;
-            // Busy-wait for 5 milliseconds.
+            // Busy-wait for 100 milliseconds.
             auto & clock = chip::System::SystemClock();
             auto start   = clock.GetMonotonicTimestamp();
-            while (clock.GetMonotonicTimestamp() - start < 5_ms)
+            while (clock.GetMonotonicTimestamp() - start < 100_ms)
                 ;
         }
         return CHIP_NO_ERROR;
@@ -46661,32 +46661,34 @@ private:
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 5));
         VerifyOrReturn(CheckValue("serverList[5]", iter.GetValue(), 42UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 6));
-        VerifyOrReturn(CheckValue("serverList[6]", iter.GetValue(), 48UL));
+        VerifyOrReturn(CheckValue("serverList[6]", iter.GetValue(), 46UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 7));
-        VerifyOrReturn(CheckValue("serverList[7]", iter.GetValue(), 49UL));
+        VerifyOrReturn(CheckValue("serverList[7]", iter.GetValue(), 48UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 8));
-        VerifyOrReturn(CheckValue("serverList[8]", iter.GetValue(), 50UL));
+        VerifyOrReturn(CheckValue("serverList[8]", iter.GetValue(), 49UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 9));
-        VerifyOrReturn(CheckValue("serverList[9]", iter.GetValue(), 51UL));
+        VerifyOrReturn(CheckValue("serverList[9]", iter.GetValue(), 50UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 10));
-        VerifyOrReturn(CheckValue("serverList[10]", iter.GetValue(), 52UL));
+        VerifyOrReturn(CheckValue("serverList[10]", iter.GetValue(), 51UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 11));
-        VerifyOrReturn(CheckValue("serverList[11]", iter.GetValue(), 53UL));
+        VerifyOrReturn(CheckValue("serverList[11]", iter.GetValue(), 52UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 12));
-        VerifyOrReturn(CheckValue("serverList[12]", iter.GetValue(), 54UL));
+        VerifyOrReturn(CheckValue("serverList[12]", iter.GetValue(), 53UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 13));
-        VerifyOrReturn(CheckValue("serverList[13]", iter.GetValue(), 55UL));
+        VerifyOrReturn(CheckValue("serverList[13]", iter.GetValue(), 54UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 14));
-        VerifyOrReturn(CheckValue("serverList[14]", iter.GetValue(), 60UL));
+        VerifyOrReturn(CheckValue("serverList[14]", iter.GetValue(), 55UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 15));
-        VerifyOrReturn(CheckValue("serverList[15]", iter.GetValue(), 62UL));
+        VerifyOrReturn(CheckValue("serverList[15]", iter.GetValue(), 60UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 16));
-        VerifyOrReturn(CheckValue("serverList[16]", iter.GetValue(), 1029UL));
+        VerifyOrReturn(CheckValue("serverList[16]", iter.GetValue(), 62UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 17));
-        VerifyOrReturn(CheckValue("serverList[17]", iter.GetValue(), 61440UL));
+        VerifyOrReturn(CheckValue("serverList[17]", iter.GetValue(), 1029UL));
         VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 18));
-        VerifyOrReturn(CheckValue("serverList[18]", iter.GetValue(), 61444UL));
-        VerifyOrReturn(CheckNoMoreListItems<decltype(serverList)>("serverList", iter, 19));
+        VerifyOrReturn(CheckValue("serverList[18]", iter.GetValue(), 61440UL));
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(serverList)>("serverList", iter, 19));
+        VerifyOrReturn(CheckValue("serverList[19]", iter.GetValue(), 61444UL));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(serverList)>("serverList", iter, 20));
 
         NextTest();
     }
