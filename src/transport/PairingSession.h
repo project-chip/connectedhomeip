@@ -92,11 +92,9 @@ public:
      * @brief
      *   Get the value of peer session counter which is synced during session establishment
      */
-    virtual const ReliableMessageProtocolConfig & GetMRPConfig() const
-    {
-        // TODO(#6652): This is a stub implementation, should be replaced by the real one when CASE and PASE is completed
-        return gDefaultMRPConfig;
-    }
+    virtual const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
+
+    void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
     virtual const char * GetI2RSessionInfo() const = 0;
 
@@ -186,6 +184,8 @@ private:
     Transport::PeerAddress mPeerAddress = Transport::PeerAddress::Uninitialized();
 
     Optional<uint16_t> mPeerSessionId;
+
+    ReliableMessageProtocolConfig mMRPConfig = gDefaultMRPConfig;
 };
 
 } // namespace chip

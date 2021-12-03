@@ -24780,7 +24780,7 @@ JNI_METHOD(void, TestClusterCluster, timedInvokeRequest)(JNIEnv * env, jobject s
     auto successFn = chip::Callback::Callback<CHIPDefaultSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall, 10000);
     VerifyOrReturn(err == CHIP_NO_ERROR,
                    AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command",
                                                                                        CHIP_ERROR_INCORRECT_STATE));

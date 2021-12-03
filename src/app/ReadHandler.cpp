@@ -271,7 +271,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     System::PacketBufferTLVReader reader;
 
     ReadRequestMessage::Parser readRequestParser;
-    EventPaths::Parser eventPathListParser;
+    EventPathIBs::Parser eventPathListParser;
 
     AttributePathIBs::Parser attributePathListParser;
 
@@ -410,7 +410,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadHandler::ProcessEventPaths(EventPaths::Parser & aEventPathsParser)
+CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
@@ -590,7 +590,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     }
     ReturnErrorOnFailure(err);
 
-    EventPaths::Parser eventPathListParser;
+    EventPathIBs::Parser eventPathListParser;
     err = subscribeRequestParser.GetEventRequests(&eventPathListParser);
     if (err == CHIP_END_OF_TLV)
     {

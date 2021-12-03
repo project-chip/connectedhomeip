@@ -1184,6 +1184,8 @@ typedef void (*CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponentsAt
     const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::TypeInfo::DecodableType &);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterActiveNetworkFaultsListAttributeCallbackType)(
     void *, const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::TypeInfo::DecodableType &);
+typedef void (*CHIPThreadNetworkDiagnosticsClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 

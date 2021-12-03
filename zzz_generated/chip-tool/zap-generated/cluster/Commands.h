@@ -3970,7 +3970,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnAccountLoginGetSetupPINResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -3994,7 +3994,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050E) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -4115,7 +4116,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -4143,7 +4145,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -4162,7 +4165,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003C) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -4289,7 +4293,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050D) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -5017,7 +5022,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050C) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnApplicationLauncherLaunchAppResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -5347,7 +5352,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -5370,7 +5376,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050B) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -5616,7 +5623,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -5635,7 +5643,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000103) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -6116,7 +6125,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000028) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8347,7 +8357,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000F000) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8373,7 +8384,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000F000) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8689,7 +8701,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000A) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8714,7 +8727,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x0000000B) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8738,7 +8752,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000008) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8763,7 +8778,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000009) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8787,7 +8803,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8812,7 +8829,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8836,7 +8854,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8861,7 +8880,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8885,7 +8905,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8909,7 +8930,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8934,7 +8956,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -8958,7 +8981,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000025) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -10662,7 +10686,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000044) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -10689,7 +10714,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000041) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -10717,7 +10743,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000040) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -10744,7 +10771,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000043) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -10772,7 +10800,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000042) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -10798,7 +10827,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000008) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -10827,7 +10857,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004B) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -10854,7 +10885,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -10881,7 +10913,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -10908,7 +10941,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -10934,7 +10968,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000000A) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -10962,7 +10997,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -10989,7 +11025,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -11015,7 +11052,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -11042,7 +11080,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000009) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -11072,7 +11111,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x0000004C) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -11100,7 +11140,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -11128,7 +11169,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -11152,7 +11194,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000300) command (0x00000047) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16201,7 +16244,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnContentLauncherLaunchContentResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16226,7 +16269,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050A) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnContentLauncherLaunchURLResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16654,7 +16697,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000032) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDiagnosticLogsRetrieveLogsResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16708,7 +16751,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16727,7 +16771,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16750,7 +16795,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000013) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16773,7 +16819,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16796,7 +16843,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16820,7 +16868,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000D) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16844,7 +16893,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000010) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16868,7 +16918,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000012) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDoorLockGetHolidayScheduleResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16892,7 +16942,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDoorLockGetLogRecordResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16916,7 +16966,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDoorLockGetPINCodeResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16940,7 +16990,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDoorLockGetRFIDCodeResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16964,7 +17014,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDoorLockGetUserTypeResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -16989,7 +17039,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000C) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDoorLockGetWeekDayScheduleResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -17014,7 +17064,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000F) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDoorLockGetYearDayScheduleResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -17037,7 +17087,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -17064,7 +17115,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000011) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -17092,7 +17144,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -17120,7 +17173,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -17145,7 +17199,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -17175,7 +17230,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000B) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -17201,7 +17257,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000E) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -17224,7 +17281,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -17248,7 +17306,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -18511,7 +18570,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000037) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -20020,7 +20080,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGeneralCommissioningArmFailSafeResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -20040,7 +20100,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGeneralCommissioningCommissioningCompleteResponseSuccess,
-                                               OnDefaultFailure, endpointId, mRequest);
+                                               OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -20068,7 +20128,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000030) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGeneralCommissioningSetRegulatoryConfigResponseSuccess,
-                                               OnDefaultFailure, endpointId, mRequest);
+                                               OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -21172,7 +21232,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGroupsAddGroupResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -21196,7 +21256,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -21220,7 +21281,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGroupsGetGroupMembershipResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -21239,7 +21300,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -21263,7 +21325,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGroupsRemoveGroupResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -21287,7 +21349,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000004) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnGroupsViewGroupResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -21496,7 +21558,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -21516,7 +21579,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnIdentifyIdentifyQueryResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -21542,7 +21605,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000003) command (0x00000040) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -22398,7 +22462,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000509) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnKeypadInputSendKeyResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -22542,7 +22606,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -22568,7 +22633,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -22592,7 +22658,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -22617,7 +22684,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -22645,7 +22713,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -22671,7 +22740,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -22695,7 +22765,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -22714,7 +22785,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000008) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24267,7 +24339,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000508) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24387,7 +24460,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24411,7 +24485,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24434,7 +24509,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24453,7 +24529,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000507) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24709,7 +24786,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaFastForwardResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24729,7 +24806,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaNextResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24749,7 +24826,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaPauseResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24769,7 +24846,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaPlayResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24789,7 +24866,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaPreviousResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24809,7 +24886,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaRewindResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24833,7 +24910,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x0000000A) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaSeekResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24857,7 +24934,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000009) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaSkipBackwardResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24881,7 +24958,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000008) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaSkipForwardResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24901,7 +24978,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaStartOverResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -24921,7 +24998,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000506) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnMediaPlaybackMediaStopResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -25734,7 +25811,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000050) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -26276,7 +26354,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningAddThreadNetworkResponseSuccess,
-                                               OnDefaultFailure, endpointId, mRequest);
+                                               OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -26303,7 +26381,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningAddWiFiNetworkResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -26329,7 +26407,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x0000000E) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningDisableNetworkResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -26355,7 +26433,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x0000000C) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningEnableNetworkResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -26381,7 +26459,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x0000000A) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningRemoveNetworkResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -26407,7 +26485,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningScanNetworksResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -26433,7 +26511,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000008) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningUpdateThreadNetworkResponseSuccess,
-                                               OnDefaultFailure, endpointId, mRequest);
+                                               OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -26460,7 +26538,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000031) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnNetworkCommissioningUpdateWiFiNetworkResponseSuccess,
-                                               OnDefaultFailure, endpointId, mRequest);
+                                               OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -26669,7 +26747,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOtaSoftwareUpdateProviderApplyUpdateResponseSuccess,
-                                               OnDefaultFailure, endpointId, mRequest);
+                                               OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -26693,7 +26771,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -26724,7 +26803,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000029) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOtaSoftwareUpdateProviderQueryImageResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -26850,7 +26929,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000002A) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -27540,7 +27620,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -27566,7 +27647,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000040) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -27585,7 +27667,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -27604,7 +27687,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000041) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -27630,7 +27714,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000042) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -27649,7 +27734,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000006) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -28704,7 +28790,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -28727,7 +28813,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000B) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -28751,7 +28838,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsAttestationResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -28775,7 +28862,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsCertificateChainResponseSuccess,
-                                               OnDefaultFailure, endpointId, mRequest);
+                                               OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -28799,7 +28886,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsOpCSRResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -28823,7 +28910,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000A) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -28846,7 +28933,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x0000000C) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -28870,7 +28958,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000009) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -28895,7 +28983,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000003E) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnOperationalCredentialsNOCResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -33483,7 +33571,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnScenesAddSceneResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -33507,7 +33595,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000006) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnScenesGetSceneMembershipResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -33532,7 +33620,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -33556,7 +33645,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnScenesRemoveAllScenesResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -33581,7 +33670,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnScenesRemoveSceneResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -33606,7 +33695,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnScenesStoreSceneResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -33631,7 +33720,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000005) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnScenesViewSceneResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -34181,7 +34270,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000034) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -35078,7 +35168,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTvChannelChangeChannelResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -35102,7 +35192,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -35125,7 +35216,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000504) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -35454,7 +35546,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x00000505) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTargetNavigatorNavigateTargetResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36145,7 +36237,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000011) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterSimpleStructResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36164,7 +36256,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36189,7 +36282,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterTestAddArgumentsResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36214,7 +36307,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000E) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterTestEnumsResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36238,7 +36331,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000A) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36262,7 +36355,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000D) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterTestListInt8UReverseResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36286,7 +36379,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000C) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36310,7 +36403,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000009) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36334,7 +36427,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000008) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36358,7 +36451,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000B) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36377,7 +36470,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36401,7 +36495,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x0000000F) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterTestNullableOptionalResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest);
+                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36424,7 +36518,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000013) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36444,7 +36539,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterTestSpecificResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36468,7 +36563,7 @@ public:
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnTestClusterBooleanResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest);
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36487,7 +36582,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -36506,7 +36602,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x0000050F) command (0x00000012) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -44955,7 +45052,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000003) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -44974,7 +45072,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -45001,7 +45100,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -45031,7 +45131,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -45055,7 +45156,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000201) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -47535,6 +47637,7 @@ private:
 | * ChannelMask                                                       | 0x003C |
 | * OperationalDatasetComponents                                      | 0x003D |
 | * ActiveNetworkFaultsList                                           | 0x003E |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -47550,7 +47653,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000035) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -52740,6 +52844,40 @@ private:
 };
 
 /*
+ * Attribute FeatureMap
+ */
+class ReadThreadNetworkDiagnosticsFeatureMap : public ModelCommand
+{
+public:
+    ReadThreadNetworkDiagnosticsFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThreadNetworkDiagnosticsFeatureMap()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0035) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
  * Attribute ClusterRevision
  */
 class ReadThreadNetworkDiagnosticsClusterRevision : public ModelCommand
@@ -53044,7 +53182,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000036) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -54340,7 +54479,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -54364,7 +54504,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000005) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -54387,7 +54528,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000004) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -54411,7 +54553,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000008) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -54434,7 +54577,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000007) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -54453,7 +54597,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000002) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -54472,7 +54617,8 @@ public:
     {
         ChipLogProgress(chipTool, "Sending cluster (0x00000102) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
+                                               mTimedInteractionTimeoutMs);
     }
 
 private:
@@ -57948,6 +58094,7 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
         make_unique<ReportThreadNetworkDiagnosticsChannelMask>(),                       //
         make_unique<ReadThreadNetworkDiagnosticsOperationalDatasetComponents>(),        //
         make_unique<ReadThreadNetworkDiagnosticsActiveNetworkFaultsList>(),             //
+        make_unique<ReadThreadNetworkDiagnosticsFeatureMap>(),                          //
         make_unique<ReadThreadNetworkDiagnosticsClusterRevision>(),                     //
         make_unique<ReportThreadNetworkDiagnosticsClusterRevision>(),                   //
     };

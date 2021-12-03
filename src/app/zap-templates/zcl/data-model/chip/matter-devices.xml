@@ -46,10 +46,12 @@ limitations under the License.
                 <requireAttribute>CLIENT_LIST</requireAttribute>
                 <requireAttribute>PARTS_LIST</requireAttribute>
             </include>
+            <include cluster="General Commissioning" client="false" server="true" clientLocked="true" serverLocked="true">
+                <requireCommand>SetRegulatoryConfig</requireCommand>
+            </include>
             <include cluster="Power Source Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Time Synchronization" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Group Key Management" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="General Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Network Commissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="AdministratorCommissioning" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Operational Credentials" client="false" server="true" clientLocked="true" serverLocked="true"></include>

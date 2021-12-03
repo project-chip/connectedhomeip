@@ -76,11 +76,10 @@ public:
          * The ReadClient object MUST continue to exist after this call is completed.
          *
          * This callback will be called when receiving event data received in the Read and Subscribe interactions
-         *
+         * only one of the apData and apStatus will be non-null.
          * @param[in] apReadClient: The read client object that initiated the read or subscribe transaction.
          * @param[in] aEventHeader: The event header in report response.
-         * @param[in] apData: A TLVReader positioned right on the payload of the event. This will be set to null if the apStatus is
-         * not null.
+         * @param[in] apData: A TLVReader positioned right on the payload of the event.
          * @param[in] apStatus: Event-specific status, containing an InteractionModel::Status code as well as an optional
          *                     cluster-specific status code.
          */
@@ -254,7 +253,7 @@ private:
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
 
-    CHIP_ERROR GenerateEventPaths(EventPaths::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
+    CHIP_ERROR GenerateEventPaths(EventPathIBs::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
                                   size_t aEventPathParamsListSize);
     CHIP_ERROR GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
                                          AttributePathParams * apAttributePathParamsList, size_t aAttributePathParamsListSize);

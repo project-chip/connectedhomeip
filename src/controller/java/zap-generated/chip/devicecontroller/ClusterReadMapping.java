@@ -6424,6 +6424,18 @@ public class ClusterReadMapping {
     readThreadNetworkDiagnosticsInteractionInfo.put(
         "readActiveNetworkFaultsListAttribute",
         readThreadNetworkDiagnosticsActiveNetworkFaultsListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readThreadNetworkDiagnosticsFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readThreadNetworkDiagnosticsFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ThreadNetworkDiagnosticsCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readThreadNetworkDiagnosticsFeatureMapCommandParams);
+    readThreadNetworkDiagnosticsInteractionInfo.put(
+        "readFeatureMapAttribute", readThreadNetworkDiagnosticsFeatureMapAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readThreadNetworkDiagnosticsClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readThreadNetworkDiagnosticsClusterRevisionAttributeInteractionInfo =

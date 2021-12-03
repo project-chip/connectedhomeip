@@ -31,7 +31,7 @@ CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
     CHIP_ERROR err      = CHIP_NO_ERROR;
     int TagPresenceMask = 0;
     TLV::TLVReader reader;
-    AttributeStatuses::Parser writeResponses;
+    AttributeStatusIBs::Parser writeResponses;
     PRETTY_PRINT("WriteResponseMessage =");
     PRETTY_PRINT("{");
 
@@ -82,14 +82,14 @@ CHIP_ERROR WriteResponseMessage::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR WriteResponseMessage::Parser::GetWriteResponses(AttributeStatuses::Parser * const apWriteResponses) const
+CHIP_ERROR WriteResponseMessage::Parser::GetWriteResponses(AttributeStatusIBs::Parser * const apWriteResponses) const
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kWriteResponses)), reader));
     return apWriteResponses->Init(reader);
 }
 
-AttributeStatuses::Builder & WriteResponseMessage::Builder::CreateWriteResponses()
+AttributeStatusIBs::Builder & WriteResponseMessage::Builder::CreateWriteResponses()
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
@@ -99,7 +99,7 @@ AttributeStatuses::Builder & WriteResponseMessage::Builder::CreateWriteResponses
     return mWriteResponses;
 }
 
-AttributeStatuses::Builder & WriteResponseMessage::Builder::GetWriteResponses()
+AttributeStatusIBs::Builder & WriteResponseMessage::Builder::GetWriteResponses()
 {
     return mWriteResponses;
 }

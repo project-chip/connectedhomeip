@@ -38,6 +38,7 @@ public:
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId);
+        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
     }
 
     /////////// CHIPCommand Interface /////////
@@ -45,6 +46,9 @@ public:
     chip::System::Clock::Timeout GetWaitDuration() const override { return chip::System::Clock::Seconds16(10); }
 
     virtual CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endPointId) = 0;
+
+protected:
+    chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
 
 private:
     chip::NodeId mNodeId;

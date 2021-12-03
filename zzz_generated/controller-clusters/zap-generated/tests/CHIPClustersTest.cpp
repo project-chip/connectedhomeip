@@ -3528,6 +3528,16 @@ CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeChannelMask(Callba
         chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::ChannelMask::Id), value));
     return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
+CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
+                                                                         Callback::Cancelable * onFailureCallback, uint32_t value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, ThreadNetworkDiagnostics::Attributes::FeatureMap::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
 CHIP_ERROR ThreadNetworkDiagnosticsClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                               Callback::Cancelable * onFailureCallback,
                                                                               uint16_t value)

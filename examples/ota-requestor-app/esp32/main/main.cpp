@@ -17,6 +17,8 @@
 
 #include "CHIPDeviceManager.h"
 #include "DeviceCallbacks.h"
+#include "app/util/af-enums.h"
+#include "app/util/af.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
 #include "esp_netif.h"
@@ -179,4 +181,15 @@ extern "C" void app_main()
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
     ESPInitConsole();
+}
+
+// TODO: We should use the function definition in /src/app/clusters/ota-requestor/ClusterInterface.cpp
+// Temporarily add this function.
+
+bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
+    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
+    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
+{
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }

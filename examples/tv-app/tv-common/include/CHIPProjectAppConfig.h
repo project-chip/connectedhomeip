@@ -27,9 +27,6 @@
 
 #pragma once
 
-// include the CHIPProjectConfig from config/standalone
-#include <CHIPProjectConfig.h>
-
 // TVs need to be commissioners and likely want to be discoverable
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY 1
 
@@ -48,3 +45,11 @@
 #define CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONABLE_DEVICE_NAME 1
 
 #define CHIP_DEVICE_CONFIG_DEVICE_NAME "Test TV"
+
+#define CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED 1
+
+// overrides CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT in CHIPProjectConfig
+#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 16
+
+// include the CHIPProjectConfig from config/standalone
+#include <CHIPProjectConfig.h>

@@ -71,11 +71,17 @@ void MakePrintableName(char (&location)[N], FullQName name)
 
 } // namespace
 
-class CheckOnlyServer : public ServerBase, public ParserDelegate, public TxtRecordDelegate
+class CheckOnlyServer : private chip::PoolImpl<ServerBase::EndpointInfo, 0, ServerBase::EndpointInfoPoolType::Interface>,
+                        public ServerBase,
+                        public ParserDelegate,
+                        public TxtRecordDelegate
 {
 public:
-    CheckOnlyServer(nlTestSuite * inSuite) : ServerBase(nullptr, 0), mInSuite(inSuite) { Reset(); }
-    CheckOnlyServer() : ServerBase(nullptr, 0), mInSuite(nullptr) { Reset(); }
+    CheckOnlyServer(nlTestSuite * inSuite) : ServerBase(*static_cast<ServerBase::EndpointInfoPoolType *>(this)), mInSuite(inSuite)
+    {
+        Reset();
+    }
+    CheckOnlyServer() : ServerBase(*static_cast<ServerBase::EndpointInfoPoolType *>(this)), mInSuite(nullptr) { Reset(); }
     ~CheckOnlyServer() {}
 
     // Parser delegates
@@ -393,7 +399,11 @@ private:
 
 struct ServerSwapper
 {
-    ServerSwapper(CheckOnlyServer * server) { chip::Dnssd::GlobalMinimalMdnsServer::Instance().SetReplacementServer(server); }
+    ServerSwapper(CheckOnlyServer * server)
+    {
+        chip::Dnssd::GlobalMinimalMdnsServer::Instance().Server().Shutdown();
+        chip::Dnssd::GlobalMinimalMdnsServer::Instance().SetReplacementServer(server);
+    }
     ~ServerSwapper() { chip::Dnssd::GlobalMinimalMdnsServer::Instance().SetReplacementServer(nullptr); }
 };
 
