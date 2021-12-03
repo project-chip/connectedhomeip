@@ -864,43 +864,18 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface CHIPDoorLockClusterLockDoorParams : NSObject
-@property (strong, nonatomic) NSData * _Nonnull pin;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterLockDoorResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (strong, nonatomic) NSData * _Nullable pinCode;
 - (instancetype)init;
 @end
 
 @interface CHIPDoorLockClusterUnlockDoorParams : NSObject
-@property (strong, nonatomic) NSData * _Nonnull pin;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterUnlockDoorResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterToggleParams : NSObject
-@property (strong, nonatomic) NSString * _Nonnull pin;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterToggleResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (strong, nonatomic) NSData * _Nullable pinCode;
 - (instancetype)init;
 @end
 
 @interface CHIPDoorLockClusterUnlockWithTimeoutParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull timeoutInSeconds;
-@property (strong, nonatomic) NSData * _Nonnull pin;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterUnlockWithTimeoutResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (strong, nonatomic) NSNumber * _Nonnull timeout;
+@property (strong, nonatomic) NSData * _Nullable pinCode;
 - (instancetype)init;
 @end
 
@@ -920,7 +895,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterSetPinParams : NSObject
+@interface CHIPDoorLockClusterSetPINCodeParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 @property (strong, nonatomic) NSNumber * _Nonnull userStatus;
 @property (strong, nonatomic) NSNumber * _Nonnull userType;
@@ -928,47 +903,27 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterSetPinResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterGetPinParams : NSObject
+@interface CHIPDoorLockClusterGetPINCodeParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterGetPinResponseParams : NSObject
+@interface CHIPDoorLockClusterGetPINCodeResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
-@property (strong, nonatomic) NSNumber * _Nonnull userStatus;
-@property (strong, nonatomic) NSNumber * _Nonnull userType;
-@property (strong, nonatomic) NSData * _Nonnull pin;
+@property (strong, nonatomic) NSNumber * _Nullable userStatus;
+@property (strong, nonatomic) NSNumber * _Nullable userType;
+@property (strong, nonatomic) NSData * _Nullable pin;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterClearPinParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterClearPinResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterClearAllPinsResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@interface CHIPDoorLockClusterClearPINCodeParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull pinSlotIndex;
 - (instancetype)init;
 @end
 
 @interface CHIPDoorLockClusterSetUserStatusParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 @property (strong, nonatomic) NSNumber * _Nonnull userStatus;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterSetUserStatusResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
 - (instancetype)init;
 @end
 
@@ -979,13 +934,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPDoorLockClusterGetUserStatusResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (strong, nonatomic) NSNumber * _Nonnull userStatus;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterSetWeekdayScheduleParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull scheduleId;
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
+@interface CHIPDoorLockClusterSetWeekDayScheduleParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull weekDayIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull daysMask;
 @property (strong, nonatomic) NSNumber * _Nonnull startHour;
 @property (strong, nonatomic) NSNumber * _Nonnull startMinute;
@@ -994,20 +949,15 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterSetWeekdayScheduleResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@interface CHIPDoorLockClusterGetWeekDayScheduleParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull weekDayIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterGetWeekdayScheduleParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull scheduleId;
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterGetWeekdayScheduleResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull scheduleId;
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
+@interface CHIPDoorLockClusterGetWeekDayScheduleResponseParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull weekDayIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull status;
 @property (strong, nonatomic) NSNumber * _Nonnull daysMask;
 @property (strong, nonatomic) NSNumber * _Nonnull startHour;
@@ -1017,101 +967,71 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterClearWeekdayScheduleParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull scheduleId;
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
+@interface CHIPDoorLockClusterClearWeekDayScheduleParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull weekDayIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterClearWeekdayScheduleResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterSetYeardayScheduleParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull scheduleId;
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
+@interface CHIPDoorLockClusterSetYearDayScheduleParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull yearDayIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull localStartTime;
 @property (strong, nonatomic) NSNumber * _Nonnull localEndTime;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterSetYeardayScheduleResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@interface CHIPDoorLockClusterGetYearDayScheduleParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull yearDayIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterGetYeardayScheduleParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull scheduleId;
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterGetYeardayScheduleResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull scheduleId;
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
+@interface CHIPDoorLockClusterGetYearDayScheduleResponseParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull yearDayIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull status;
 @property (strong, nonatomic) NSNumber * _Nonnull localStartTime;
 @property (strong, nonatomic) NSNumber * _Nonnull localEndTime;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterClearYeardayScheduleParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull scheduleId;
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterClearYeardayScheduleResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@interface CHIPDoorLockClusterClearYearDayScheduleParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull yearDayIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 - (instancetype)init;
 @end
 
 @interface CHIPDoorLockClusterSetHolidayScheduleParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull scheduleId;
+@property (strong, nonatomic) NSNumber * _Nonnull holidayIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull localStartTime;
 @property (strong, nonatomic) NSNumber * _Nonnull localEndTime;
-@property (strong, nonatomic) NSNumber * _Nonnull operatingModeDuringHoliday;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterSetHolidayScheduleResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (strong, nonatomic) NSNumber * _Nonnull operatingMode;
 - (instancetype)init;
 @end
 
 @interface CHIPDoorLockClusterGetHolidayScheduleParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull scheduleId;
+@property (strong, nonatomic) NSNumber * _Nonnull holidayIndex;
 - (instancetype)init;
 @end
 
 @interface CHIPDoorLockClusterGetHolidayScheduleResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull scheduleId;
+@property (strong, nonatomic) NSNumber * _Nonnull holidayIndex;
 @property (strong, nonatomic) NSNumber * _Nonnull status;
 @property (strong, nonatomic) NSNumber * _Nonnull localStartTime;
 @property (strong, nonatomic) NSNumber * _Nonnull localEndTime;
-@property (strong, nonatomic) NSNumber * _Nonnull operatingModeDuringHoliday;
+@property (strong, nonatomic) NSNumber * _Nonnull operatingMode;
 - (instancetype)init;
 @end
 
 @interface CHIPDoorLockClusterClearHolidayScheduleParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull scheduleId;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterClearHolidayScheduleResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (strong, nonatomic) NSNumber * _Nonnull holidayIndex;
 - (instancetype)init;
 @end
 
 @interface CHIPDoorLockClusterSetUserTypeParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 @property (strong, nonatomic) NSNumber * _Nonnull userType;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterSetUserTypeResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
 - (instancetype)init;
 @end
 
@@ -1126,66 +1046,119 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterSetRfidParams : NSObject
+@interface CHIPDoorLockClusterSetRFIDCodeParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 @property (strong, nonatomic) NSNumber * _Nonnull userStatus;
 @property (strong, nonatomic) NSNumber * _Nonnull userType;
-@property (strong, nonatomic) NSData * _Nonnull id;
+@property (strong, nonatomic) NSData * _Nonnull rfidCode;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterSetRfidResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
-- (instancetype)init;
-@end
-
-@interface CHIPDoorLockClusterGetRfidParams : NSObject
+@interface CHIPDoorLockClusterGetRFIDCodeParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterGetRfidResponseParams : NSObject
+@interface CHIPDoorLockClusterGetRFIDCodeResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
+@property (strong, nonatomic) NSNumber * _Nullable userStatus;
+@property (strong, nonatomic) NSNumber * _Nullable userType;
+@property (strong, nonatomic) NSData * _Nullable rfidCode;
+- (instancetype)init;
+@end
+
+@interface CHIPDoorLockClusterClearRFIDCodeParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull rfidSlotIndex;
+- (instancetype)init;
+@end
+
+@interface CHIPDoorLockClusterSetUserParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull operationType;
+@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (strong, nonatomic) NSString * _Nullable userName;
+@property (strong, nonatomic) NSNumber * _Nullable userUniqueId;
 @property (strong, nonatomic) NSNumber * _Nonnull userStatus;
 @property (strong, nonatomic) NSNumber * _Nonnull userType;
-@property (strong, nonatomic) NSData * _Nonnull rfid;
+@property (strong, nonatomic) NSNumber * _Nullable credentialRule;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterClearRfidParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull userId;
+@interface CHIPDoorLockClusterGetUserParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterClearRfidResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@interface CHIPDoorLockClusterGetUserResponseParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
+@property (strong, nonatomic) NSString * _Nullable userName;
+@property (strong, nonatomic) NSNumber * _Nullable userUniqueId;
+@property (strong, nonatomic) NSNumber * _Nullable userStatus;
+@property (strong, nonatomic) NSNumber * _Nullable userType;
+@property (strong, nonatomic) NSNumber * _Nullable credentialRule;
+@property (strong, nonatomic) NSArray * _Nullable credentials;
+@property (strong, nonatomic) NSNumber * _Nullable creatorFabricIndex;
+@property (strong, nonatomic) NSNumber * _Nullable lastModifiedFabricIndex;
+@property (strong, nonatomic) NSNumber * _Nonnull nextUserIndex;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterClearAllRfidsResponseParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull status;
+@interface CHIPDoorLockClusterClearUserParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull userIndex;
 - (instancetype)init;
 @end
 
-@interface CHIPDoorLockClusterOperationEventNotificationParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull source;
-@property (strong, nonatomic) NSNumber * _Nonnull eventCode;
+@interface CHIPDoorLockClusterOperatingEventNotificationParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull operationEventSource;
+@property (strong, nonatomic) NSNumber * _Nonnull operationEventCode;
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 @property (strong, nonatomic) NSData * _Nonnull pin;
-@property (strong, nonatomic) NSNumber * _Nonnull timeStamp;
-@property (strong, nonatomic) NSString * _Nonnull data;
+@property (strong, nonatomic) NSNumber * _Nonnull localTime;
+@property (strong, nonatomic) NSString * _Nullable data;
 - (instancetype)init;
 @end
 
 @interface CHIPDoorLockClusterProgrammingEventNotificationParams : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull source;
-@property (strong, nonatomic) NSNumber * _Nonnull eventCode;
+@property (strong, nonatomic) NSNumber * _Nonnull programEventSource;
+@property (strong, nonatomic) NSNumber * _Nonnull programEventCode;
 @property (strong, nonatomic) NSNumber * _Nonnull userId;
 @property (strong, nonatomic) NSData * _Nonnull pin;
 @property (strong, nonatomic) NSNumber * _Nonnull userType;
 @property (strong, nonatomic) NSNumber * _Nonnull userStatus;
-@property (strong, nonatomic) NSNumber * _Nonnull timeStamp;
-@property (strong, nonatomic) NSString * _Nonnull data;
+@property (strong, nonatomic) NSNumber * _Nonnull localTime;
+@property (strong, nonatomic) NSString * _Nullable data;
+- (instancetype)init;
+@end
+
+@interface CHIPDoorLockClusterSetCredentialParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull operationType;
+@property (strong, nonatomic) CHIPDoorLockClusterDlCredential * _Nonnull credential;
+@property (strong, nonatomic) NSData * _Nonnull credentialData;
+@property (strong, nonatomic) NSNumber * _Nullable userIndex;
+@property (strong, nonatomic) NSNumber * _Nullable userStatus;
+- (instancetype)init;
+@end
+
+@interface CHIPDoorLockClusterSetCredentialResponseParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull status;
+@property (strong, nonatomic) NSNumber * _Nullable userIndex;
+@property (strong, nonatomic) NSNumber * _Nullable nextCredentialIndex;
+- (instancetype)init;
+@end
+
+@interface CHIPDoorLockClusterGetCredentialStatusParams : NSObject
+@property (strong, nonatomic) CHIPDoorLockClusterDlCredential * _Nonnull credential;
+- (instancetype)init;
+@end
+
+@interface CHIPDoorLockClusterGetCredentialStatusResponseParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull credentialExists;
+@property (strong, nonatomic) NSNumber * _Nullable userIndex;
+@property (strong, nonatomic) NSNumber * _Nullable nextCredentialIndex;
+- (instancetype)init;
+@end
+
+@interface CHIPDoorLockClusterClearCredentialParams : NSObject
+@property (strong, nonatomic) CHIPDoorLockClusterDlCredential * _Nonnull credential;
 - (instancetype)init;
 @end
 

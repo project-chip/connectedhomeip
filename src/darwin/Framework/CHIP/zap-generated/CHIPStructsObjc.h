@@ -219,6 +219,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPDoorLockClusterDlCredential : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull credentialType;
+@property (strong, nonatomic) NSNumber * _Nonnull credentialIndex;
+- (instancetype)init;
+@end
+
 @interface CHIPIasAceClusterIasAceZoneStatusResult : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull zoneId;
 @property (strong, nonatomic) NSNumber * _Nonnull zoneStatus;
