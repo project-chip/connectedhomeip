@@ -30,15 +30,6 @@ using namespace chip;
 using namespace chip::Dnssd;
 using namespace chip::Dnssd::Internal;
 
-namespace chip {
-
-using namespace System::Clock::Literals;
-
-const ReliableMessageProtocolConfig gDefaultMRPConfig(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL,
-                                                      CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
-
-} // namespace chip
-
 namespace {
 
 ByteSpan GetSpan(char * key)
@@ -576,21 +567,23 @@ void TestIsDeviceSleepyIdle(nlTestSuite * inSuite, void * inContext)
     char key[4];
     char val[32];
     NodeData nodeData;
+    const ReliableMessageProtocolConfig defaultMRPConfig(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL,
+                                                         CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
 
     // No key/val set, so the device can't be sleepy
-    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy());
+    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is the default value, the device is not sleepy
     sprintf(key, "CRI");
     sprintf(val, "%d", CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count());
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy());
+    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
     sprintf(key, "CRI");
     sprintf(val, "%d", CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count() + 1);
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.IsDeviceTreatedAsSleepy());
+    NL_TEST_ASSERT(inSuite, nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 }
 
 // Test IsDeviceTreatedAsSleepy() with CRA
@@ -600,21 +593,23 @@ void TestIsDeviceSleepyActive(nlTestSuite * inSuite, void * inContext)
     char key[4];
     char val[32];
     NodeData nodeData;
+    const ReliableMessageProtocolConfig defaultMRPConfig(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL,
+                                                         CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
 
     // No key/val set, so the device can't be sleepy
-    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy());
+    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is the default value, the device is not sleepy
     sprintf(key, "CRA");
     sprintf(val, "%d", CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count());
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy());
+    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 
     // If the interval is greater than the default value, the device is sleepy
     sprintf(key, "CRA");
     sprintf(val, "%d", CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count() + 1);
     FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
-    NL_TEST_ASSERT(inSuite, nodeData.IsDeviceTreatedAsSleepy());
+    NL_TEST_ASSERT(inSuite, nodeData.IsDeviceTreatedAsSleepy(&defaultMRPConfig));
 }
 
 const nlTest sTests[] = {
