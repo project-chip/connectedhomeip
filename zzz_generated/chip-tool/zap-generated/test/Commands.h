@@ -42880,10 +42880,10 @@ private:
             chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 1));
         {
             using namespace chip::System::Clock::Literals;
-            // Busy-wait for 5 milliseconds.
+            // Busy-wait for 100 milliseconds.
             auto & clock = chip::System::SystemClock();
             auto start   = clock.GetMonotonicTimestamp();
-            while (clock.GetMonotonicTimestamp() - start < 5_ms)
+            while (clock.GetMonotonicTimestamp() - start < 100_ms)
                 ;
         }
         return CHIP_NO_ERROR;
@@ -42940,10 +42940,10 @@ private:
             chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 1));
         {
             using namespace chip::System::Clock::Literals;
-            // Busy-wait for 5 milliseconds.
+            // Busy-wait for 100 milliseconds.
             auto & clock = chip::System::SystemClock();
             auto start   = clock.GetMonotonicTimestamp();
-            while (clock.GetMonotonicTimestamp() - start < 5_ms)
+            while (clock.GetMonotonicTimestamp() - start < 100_ms)
                 ;
         }
         return CHIP_NO_ERROR;
