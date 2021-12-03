@@ -24,6 +24,8 @@
 
 #include <system/SystemConfig.h>
 
+#include <lib/support/Iterators.h>
+
 #include <atomic>
 #include <limits>
 #include <new>
@@ -31,13 +33,6 @@
 #include <utility>
 
 namespace chip {
-
-enum class Loop : uint8_t
-{
-    Continue,
-    Break,
-    Finish,
-};
 
 namespace internal {
 
