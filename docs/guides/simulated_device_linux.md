@@ -16,15 +16,14 @@ In order to generate specific tests for a given accessory, a
 file can be added into the application directory. The tests listed there are the
 one that will be executed once the application has been commissioned.
 
-Simulated Device: simulation of an application in which tests can be
-added. It is defined by a ZAP config file and tests can be added with a
+Simulated Device: simulation of an application in which tests can be added. It
+is defined by a ZAP config file and tests can be added with a
 [YAML file](../../src/app/tests/suites/certification/Test_TC_DM_1_3_Simulated.yaml).
 
 ### Prerequisite
 
 -   [Building Prerequisites](./BUILDING.md#prerequisites)
 -   [Prepare For Building](./BUILDING.md#prepare-for-building)
-
 
 ## Generating and building the default Simulated App with Script
 
@@ -106,9 +105,7 @@ interact with it using chip-tool
     ./out/debug/standalone/chip-tool onoff write on-time 1 0x654321 1
     ```
 
-    See
-    [chip-tool readme](../../examples/chip-tool)
-    for additional commands.
+    See [chip-tool readme](../../examples/chip-tool) for additional commands.
 
 ## Adding simulated Tests via YAML
 
