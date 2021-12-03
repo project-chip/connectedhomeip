@@ -1,8 +1,29 @@
+/*
+ *
+ *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 #include "BDXDownloader.h"
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <protocols/bdx/BdxMessages.h>
+#include <system/SystemClock.h> /* TODO:(#12520) remove */
+#include <system/SystemPacketBuffer.h>
+#include <transport/raw/MessageHeader.h>
 
 using chip::OTADownloader;
 using chip::bdx::TransferSession;
@@ -18,6 +39,9 @@ void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader,
     {
         ChipLogError(BDX, "unable to handle message: %" CHIP_ERROR_FORMAT, err.Format());
     }
+
+    // HandleMessageReceived() will only decode/parse the message. Need to Poll() in order to do the message handling work in
+    // HandleBdxEvent().
     PollTransferSession();
 }
 
@@ -25,7 +49,8 @@ CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::Transfe
 {
     VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
 
-    // Must call StartTransfer() here or otherwise the pointer data contained in bdxInitData could be freed before we can use it.
+    // Must call StartTransfer() here to store the the pointer data contained in bdxInitData in the TransferSession object.
+    // Otherwise it could be freed before we can use it.
     ReturnErrorOnFailure(mBdxTransfer.StartTransfer(chip::bdx::TransferRole::kReceiver, bdxInitData,
                                                     /* TODO:(#12520) */ chip::System::Clock::Seconds16(30)));
 
@@ -50,6 +75,8 @@ CHIP_ERROR BDXDownloader::OnPreparedForDownload(CHIP_ERROR status)
     if (status == CHIP_NO_ERROR)
     {
         mState = State::kInProgress;
+
+        // Must call here because StartTransfer() should have prepared a ReceiveInit message, and now we should send it.
         PollTransferSession();
     }
     else
@@ -75,7 +102,13 @@ void BDXDownloader::OnDownloadTimeout()
 {
     if (mState == State::kInProgress)
     {
-        mBdxTransfer.AbortTransfer(chip::bdx::StatusCode::kUnknown);
+        ChipLogDetail(BDX, "aborting due to timeout");
+        mBdxTransfer.Reset();
+        if (mImageProcessor != nullptr)
+        {
+            mImageProcessor->Abort();
+        }
+        mState = State::kIdle;
     }
     else
     {
@@ -87,26 +120,29 @@ void BDXDownloader::EndDownload(CHIP_ERROR reason)
 {
     if (mState == State::kInProgress)
     {
+        // There's no method for a BDX receiving driver to cleanly end a transfer
         mBdxTransfer.AbortTransfer(chip::bdx::StatusCode::kUnknown);
         if (mImageProcessor != nullptr)
         {
             mImageProcessor->Abort();
         }
+        mState = State::kIdle;
+
+        // Because AbortTransfer() will generate a StatusReport to send.
+        PollTransferSession();
     }
     else
     {
         ChipLogError(BDX, "no download in progress");
     }
-
-    // Because AbortTransfer() will generate a StatusReport to send.
-    PollTransferSession();
 }
 
 void BDXDownloader::PollTransferSession()
 {
     TransferSession::OutputEvent outEvent;
 
-    // TODO: Is this dangerous? What happens if the loop encounters two messages that need to be sent?
+    // WARNING: Is this dangerous? What happens if the loop encounters two messages that need to be sent? Does the ExchangeContext
+    // allow that?
     do
     {
         mBdxTransfer.PollOutput(outEvent, /* TODO:(#12520) */ chip::System::Clock::Seconds16(0));
@@ -117,7 +153,6 @@ void BDXDownloader::PollTransferSession()
 
 CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent)
 {
-    VerifyOrReturnError(mState == State::kInProgress, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mImageProcessor != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     switch (outEvent.EventType)
@@ -126,14 +161,17 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
         break;
     case TransferSession::OutputEventType::kAcceptReceived:
         ReturnErrorOnFailure(mBdxTransfer.PrepareBlockQuery());
-        // TODO: need to check ReceiveAccept parameters?
+        // TODO: need to check ReceiveAccept parameters
         break;
     case TransferSession::OutputEventType::kMsgToSend: {
         VerifyOrReturnError(mMsgDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(mMsgDelegate->SendMessage(outEvent));
         if (outEvent.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF))
         {
+            // BDX transfer is not complete until BlockAckEOF has been sent
             mState = State::kComplete;
+
+            // TODO: how/when to reset the BDXDownloader to be ready to handle another download
         }
         break;
     }

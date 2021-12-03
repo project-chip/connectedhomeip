@@ -208,7 +208,10 @@ int main(int argc, char * argv[])
     // Connect the Requestor and Requestor Driver objects
     requestorCore.SetOtaRequestorDriver(&requestorUser);
 
-    // Initialize the Image Processor object
+    // WARNING: this is probably not realistic to know such details of the image or to even have an OTADownloader instantiated at
+    // the beginning of program execution. We're using hardcoded values here for now since this is a reference application.
+    // TODO: instatiate and initialize these values when QueryImageResponse tells us an image is available
+    // TODO: add API for OTARequestor to pass QueryImageResponse info to the application to use for OTADownloader init
     OTAImageProcessorParams ipParams;
     ipParams.imageFile = CharSpan("test.txt");
     imageProcessor.SetOTAImageProcessorParams(ipParams);

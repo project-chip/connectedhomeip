@@ -365,6 +365,8 @@ void OTARequestor::mOnConnected(void * context, chip::DeviceProxy * deviceProxy)
     case kStartBDX: {
         VerifyOrReturn(mBdxDownloader != nullptr, ChipLogError(SoftwareUpdate, "downloader is null"));
 
+        // TODO: allow caller to provide their own OTADownloader instance and set BDX parameters
+
         TransferSession::TransferInitData initOptions;
         initOptions.TransferCtlFlags = chip::bdx::TransferControlFlags::kReceiverDrive;
         initOptions.MaxBlockSize     = 1024;

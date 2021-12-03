@@ -61,7 +61,7 @@ public:
     // The reason parameter should be used to indicate if this is a graceful end or a forceful abort.
     void virtual EndDownload(CHIP_ERROR reason = CHIP_NO_ERROR) = 0;
 
-    // Fetch the next set of data. May not make sense for asynchronous protocols.
+    // Fetch the next set of data. May be a no-op for asynchronous protocols.
     CHIP_ERROR virtual FetchNextData() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     // Skip ahead some number of bytes in the download of the image file. May not be supported by some transport protocols.
@@ -71,8 +71,6 @@ public:
     void SetImageProcessorDelegate(OTAImageProcessorInterface * delegate) { mImageProcessor = delegate; }
 
     State GetState() const { return mState; }
-
-    // API declarations end
 
     virtual ~OTADownloader() = default;
 

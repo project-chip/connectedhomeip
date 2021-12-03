@@ -97,6 +97,8 @@ void LinuxOTAImageProcessor::HandlePrepareDownload(intptr_t context)
         return;
     }
 
+    // TODO: if file already exists and is not empty, erase previous contents
+
     imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
@@ -110,6 +112,8 @@ void LinuxOTAImageProcessor::HandleFinalize(intptr_t context)
 
     imageProcessor->mOfs.close();
     imageProcessor->ReleaseBlock();
+
+    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mParams.imageFile.data());
 }
 
 void LinuxOTAImageProcessor::HandleAbort(intptr_t context)

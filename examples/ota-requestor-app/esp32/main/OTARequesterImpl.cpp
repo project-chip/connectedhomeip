@@ -72,7 +72,7 @@ enum OTARequestorCommands
 namespace {
 // TODO: Encapsulate these globals and the callbacks in some class
 ExchangeContext * exchangeCtx = nullptr;
-BDXDownloader bdxDownloader;
+BdxDownloader bdxDownloader;
 enum OTARequestorCommands operationalDeviceContext;
 
 constexpr uint8_t kMaxUpdateTokenLen       = 32; // must be between 8 and 32

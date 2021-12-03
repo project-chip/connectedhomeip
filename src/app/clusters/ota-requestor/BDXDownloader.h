@@ -16,13 +16,18 @@
  *    limitations under the License.
  */
 
+/* This file contains a definition for a class that implements OTADownloader and downloads CHIP OTA images using the BDX protocol.
+ * It should not execute any logic that is application specific.
+ */
+
+// TODO: unit tests
+
 #pragma once
 
 #include "OTADownloader.h"
 
 #include <lib/core/CHIPError.h>
 #include <protocols/bdx/BdxTransferSession.h>
-#include <system/SystemClock.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -31,6 +36,8 @@ namespace chip {
 class BDXDownloader : public chip::OTADownloader
 {
 public:
+    // A delegate for passing messages to/from BDXDownloader and some messaging layer. This is mainly to make BDXDownloader more
+    // easily unit-testable.
     class MessagingDelegate
     {
     public:
@@ -40,7 +47,9 @@ public:
 
     BDXDownloader() : chip::OTADownloader() {}
 
+    // To be called when there is an incoming message to handle (of any protocol type)
     void OnMessageReceived(const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle msg);
+
     void SetMessageDelegate(MessagingDelegate * delegate) { mMsgDelegate = delegate; }
 
     // Initialize a BDX transfer session but will not proceed until OnPreparedForDownload() is called.

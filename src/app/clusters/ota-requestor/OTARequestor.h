@@ -97,11 +97,12 @@ private:
             VerifyOrReturnError(mExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
             chip::Messaging::SendFlags sendFlags;
-            if (event.msgTypeData.MessageType == static_cast<uint8_t>(chip::bdx::MessageType::ReceiveInit))
+            if (event.msgTypeData.HasMessageType(chip::bdx::MessageType::ReceiveInit))
             {
                 sendFlags.Set(chip::Messaging::SendMessageFlags::kFromInitiator);
             }
-            if (event.msgTypeData.MessageType != static_cast<uint8_t>(chip::bdx::MessageType::BlockAckEOF))
+            if (!event.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF) &&
+                !event.msgTypeData.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
             {
                 sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
             }
@@ -123,6 +124,7 @@ private:
                 mDownloader->OnMessageReceived(payloadHeader, payload.Retain());
             }
 
+            // For a receiver using BDX Protocol, all received messages will require a response except for a StatusReport
             if (!payloadHeader.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
             {
                 ec->WillSendMessage();
@@ -159,8 +161,8 @@ private:
     chip::CASESessionManager * mCASESessionManager = nullptr;
     OnConnectedState onConnectedState              = kQueryImage;
     chip::Messaging::ExchangeContext * exchangeCtx = nullptr;
-    chip::BDXDownloader * mBdxDownloader;
-    BDXMessenger mBdxMessenger;
+    chip::BDXDownloader * mBdxDownloader; // TODO: this should be OTADownloader
+    BDXMessenger mBdxMessenger;           // TODO: ideally this is held by the application
 
     // TODO: Temporary until IP address resolution is implemented in the Exchange layer
     chip::Inet::IPAddress mIpAddress;
