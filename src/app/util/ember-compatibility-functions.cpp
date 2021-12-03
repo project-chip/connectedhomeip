@@ -212,6 +212,13 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 }
 
 namespace {
+
+CHIP_ERROR SendSuccessStatus(AttributeDataIB::Builder & aAttributeDataIBBuilder)
+{
+    aAttributeDataIBBuilder.DataVersion(kTemporaryDataVersion).EndOfAttributeDataIB();
+    return aAttributeDataIBBuilder.GetError();
+}
+
 CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeReportIB::Builder & aAttributeReport,
                              Protocols::InteractionModel::Status aStatus, const TLV::TLVWriter & aReportCheckpoint)
 {
@@ -227,8 +234,7 @@ CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeRepor
     statusIBBuilder.EncodeStatusIB(StatusIB(aStatus));
     ReturnErrorOnFailure(statusIBBuilder.GetError());
     attributeStatusIBBuilder.EndOfAttributeStatusIB();
-    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
-    return CHIP_NO_ERROR;
+    return attributeStatusIBBuilder.GetError();
 }
 
 } // anonymous namespace
@@ -239,26 +245,21 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     ChipLogDetail(DataManagement,
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
-    AttributeDataIB::Builder attributeDataIBBuilder;
-    AttributePathIB::Builder attributePathIBBuilder;
-    AttributeStatusIB::Builder attributeStatusIBBuilder;
-    TLV::TLVWriter * writer = nullptr;
+
     TLV::TLVWriter backup;
     aAttributeReport.Checkpoint(backup);
 
-    attributeDataIBBuilder = aAttributeReport.CreateAttributeData();
+    AttributeDataIB::Builder attributeDataIBBuilder = aAttributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
-    attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
-
+    AttributePathIB::Builder attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
     attributePathIBBuilder.Endpoint(aPath.mEndpointId)
         .Cluster(aPath.mClusterId)
         .Attribute(aPath.mAttributeId)
         .EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePathIBBuilder.GetError());
 
-    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
-    if (attrOverride != nullptr)
+    if (auto * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId))
     {
         const EmberAfAttributeMetadata * attributeMetadata =
             emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
@@ -272,35 +273,31 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
 
         // TODO: We should probably clone the writer and convert failures here
         // into status responses, unless our caller already does that.
-        writer = attributeDataIBBuilder.GetWriter();
+        TLV::TLVWriter * writer = attributeDataIBBuilder.GetWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
         AttributeValueEncoder valueEncoder(writer, aAccessingFabricIndex);
         ReturnErrorOnFailure(attrOverride->Read(aPath, valueEncoder));
 
         if (valueEncoder.TriedEncode())
         {
-            // TODO: Add DataVersion support
-            attributeDataIBBuilder.DataVersion(kTemporaryDataVersion).EndOfAttributeDataIB();
-            ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
-            return CHIP_NO_ERROR;
+            return SendSuccessStatus(attributeDataIBBuilder);
         }
     }
 
-    EmberAfAttributeMetadata * metadata = NULL;
-    EmberAfAttributeSearchRecord record;
-    record.endpoint           = aPath.mEndpointId;
-    record.clusterId          = aPath.mClusterId;
-    record.clusterMask        = CLUSTER_MASK_SERVER;
-    record.attributeId        = aPath.mAttributeId;
-    record.manufacturerCode   = EMBER_AF_NULL_MANUFACTURER_CODE;
-    EmberAfStatus emberStatus = emAfReadOrWriteAttribute(&record, &metadata, attributeData, sizeof(attributeData),
+    EmberAfAttributeMetadata * attributeMetadata = nullptr;
+    EmberAfAttributeSearchRecord record          = { .endpoint         = aPath.mEndpointId,
+                                            .clusterId        = aPath.mClusterId,
+                                            .clusterMask      = CLUSTER_MASK_SERVER,
+                                            .attributeId      = aPath.mAttributeId,
+                                            .manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE };
+    EmberAfStatus emberStatus = emAfReadOrWriteAttribute(&record, &attributeMetadata, attributeData, sizeof(attributeData),
                                                          /* write = */ false);
 
     if (emberStatus == EMBER_ZCL_STATUS_SUCCESS)
     {
-        EmberAfAttributeType attributeType = metadata->attributeType;
-        bool isNullable                    = metadata->IsNullable();
-        writer                             = attributeDataIBBuilder.GetWriter();
+        EmberAfAttributeType attributeType = attributeMetadata->attributeType;
+        bool isNullable                    = attributeMetadata->IsNullable();
+        TLV::TLVWriter * writer            = attributeDataIBBuilder.GetWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_NO_ERROR);
         TLV::Tag tag = TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData));
         switch (BaseType(attributeType))
@@ -521,16 +518,10 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     Protocols::InteractionModel::Status imStatus = ToInteractionModelStatus(emberStatus);
     if (imStatus == Protocols::InteractionModel::Status::Success)
     {
-        // TODO: Add DataVersion support
-        attributeDataIBBuilder.DataVersion(kTemporaryDataVersion).EndOfAttributeDataIB();
-        ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
-    }
-    else
-    {
-        ReturnErrorOnFailure(SendFailureStatus(aPath, aAttributeReport, imStatus, backup));
+        SendSuccessStatus(attributeDataIBBuilder);
     }
 
-    return CHIP_NO_ERROR;
+    return SendFailureStatus(aPath, aAttributeReport, imStatus, backup);
 }
 
 namespace {
@@ -669,42 +660,19 @@ CHIP_ERROR prepareWriteData(const EmberAfAttributeMetadata * metadata, TLV::TLVR
 }
 } // namespace
 
-static Protocols::InteractionModel::Status WriteSingleClusterDataInternal(const ConcreteAttributePath aPath,
-                                                                          const EmberAfAttributeMetadata * aMetadata,
-                                                                          TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
-{
-    CHIP_ERROR preparationError = CHIP_NO_ERROR;
-    uint16_t dataLen            = 0;
-    if ((preparationError = prepareWriteData(aMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
-    {
-        ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(preparationError));
-        return Protocols::InteractionModel::Status::InvalidValue;
-    }
-
-    if (dataLen > aMetadata->size)
-    {
-        ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
-        return Protocols::InteractionModel::Status::InvalidValue;
-    }
-
-    return ToInteractionModelStatus(emberAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
-                                                                  CLUSTER_MASK_SERVER, 0, attributeData, aMetadata->attributeType));
-}
-
+// TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
+// as the input argument.
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * apWriteHandler)
 {
-    // TODO: Refactor WriteSingleClusterData and all dependent functions to take ConcreteAttributePath instead of ClusterInfo
-    // as the input argument.
-    AttributePathParams attributePathParams;
-    attributePathParams.mEndpointId  = aClusterInfo.mEndpointId;
-    attributePathParams.mClusterId   = aClusterInfo.mClusterId;
-    attributePathParams.mAttributeId = aClusterInfo.mAttributeId;
-
     // Named aPath for now to reduce the amount of code change that needs to
     // happen when the above TODO is resolved.
     ConcreteDataAttributePath aPath(aClusterInfo.mEndpointId, aClusterInfo.mClusterId, aClusterInfo.mAttributeId);
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
+
+    AttributePathParams attributePathParams = { .mEndpointId  = aPath.mEndpointId,
+                                                .mClusterId   = aPath.mClusterId,
+                                                .mAttributeId = aPath.mAttributeId };
 
     if (attributeMetadata == nullptr)
     {
@@ -721,8 +689,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
         return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::NeedsTimedInteraction);
     }
 
-    AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId);
-    if (attrOverride != nullptr)
+    if (auto * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId))
     {
         AttributeValueDecoder valueDecoder(aReader, apWriteHandler->GetAccessingFabricIndex());
         ReturnErrorOnFailure(attrOverride->Write(aPath, valueDecoder));
@@ -733,8 +700,24 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
         }
     }
 
-    auto imCode = WriteSingleClusterDataInternal(aPath, attributeMetadata, aReader, apWriteHandler);
-    return apWriteHandler->AddStatus(attributePathParams, imCode);
+    CHIP_ERROR preparationError = CHIP_NO_ERROR;
+    uint16_t dataLen            = 0;
+    if ((preparationError = prepareWriteData(attributeMetadata, aReader, dataLen)) != CHIP_NO_ERROR)
+    {
+        ChipLogDetail(Zcl, "Failed to prepare data to write: %s", ErrorStr(preparationError));
+        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::InvalidValue);
+    }
+
+    if (dataLen > attributeMetadata->size)
+    {
+        ChipLogDetail(Zcl, "Data to write exceedes the attribute size claimed.");
+        return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::InvalidValue);
+    }
+
+    auto status = ToInteractionModelStatus(emberAfWriteAttributeExternal(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
+                                                                         CLUSTER_MASK_SERVER, 0, attributeData,
+                                                                         attributeMetadata->attributeType));
+    return apWriteHandler->AddStatus(attributePathParams, status);
 }
 
 } // namespace app
