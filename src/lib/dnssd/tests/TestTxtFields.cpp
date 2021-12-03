@@ -30,6 +30,15 @@ using namespace chip;
 using namespace chip::Dnssd;
 using namespace chip::Dnssd::Internal;
 
+namespace chip {
+
+using namespace System::Clock::Literals;
+
+const ReliableMessageProtocolConfig gDefaultMRPConfig(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL,
+                                                      CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL);
+
+} // namespace chip
+
 namespace {
 
 ByteSpan GetSpan(char * key)
@@ -560,6 +569,54 @@ void TxtFieldTcpSupport(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, nodeData.*supportsTcp == false);
 }
 
+// Test IsDeviceTreatedAsSleepy() with CRI
+template <class NodeData>
+void TestIsDeviceSleepyIdle(nlTestSuite * inSuite, void * inContext)
+{
+    char key[4];
+    char val[32];
+    NodeData nodeData;
+
+    // No key/val set, so the device can't be sleepy
+    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy());
+
+    // If the interval is the default value, the device is not sleepy
+    sprintf(key, "CRI");
+    sprintf(val, "%d", CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy());
+
+    // If the interval is greater than the default value, the device is sleepy
+    sprintf(key, "CRI");
+    sprintf(val, "%d", CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL.count() + 1);
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, nodeData.IsDeviceTreatedAsSleepy());
+}
+
+// Test IsDeviceTreatedAsSleepy() with CRA
+template <class NodeData>
+void TestIsDeviceSleepyActive(nlTestSuite * inSuite, void * inContext)
+{
+    char key[4];
+    char val[32];
+    NodeData nodeData;
+
+    // No key/val set, so the device can't be sleepy
+    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy());
+
+    // If the interval is the default value, the device is not sleepy
+    sprintf(key, "CRA");
+    sprintf(val, "%d", CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count());
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, !nodeData.IsDeviceTreatedAsSleepy());
+
+    // If the interval is greater than the default value, the device is sleepy
+    sprintf(key, "CRA");
+    sprintf(val, "%d", CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL.count() + 1);
+    FillNodeDataFromTxt(GetSpan(key), GetSpan(val), nodeData);
+    NL_TEST_ASSERT(inSuite, nodeData.IsDeviceTreatedAsSleepy());
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TxtFieldKey", TestGetTxtFieldKey),                                          //
     NL_TEST_DEF("TxtFieldKeyCaseInsensitive", TestGetTxtFieldKeyCaseInsensitive),            //
@@ -576,9 +633,13 @@ const nlTest sTests[] = {
     NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalIdle", TxtFieldMrpRetryIntervalIdle<DiscoveredNodeData>),
     NL_TEST_DEF("TxtDiscoveredFieldMrpRetryIntervalActive", TxtFieldMrpRetryIntervalActive<DiscoveredNodeData>),
     NL_TEST_DEF("TxtDiscoveredFieldTcpSupport", (TxtFieldTcpSupport<DiscoveredNodeData, &DiscoveredNodeData::supportsTcp>) ),
+    NL_TEST_DEF("TxtDiscoveredIsDeviceSleepyIdle", TestIsDeviceSleepyIdle<DiscoveredNodeData>),
+    NL_TEST_DEF("TxtDiscoveredIsDeviceSleepyActive", TestIsDeviceSleepyActive<DiscoveredNodeData>),
     NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalIdle", TxtFieldMrpRetryIntervalIdle<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedFieldMrpRetryIntervalActive", TxtFieldMrpRetryIntervalActive<ResolvedNodeData>),
     NL_TEST_DEF("TxtResolvedFieldTcpSupport", (TxtFieldTcpSupport<ResolvedNodeData, &ResolvedNodeData::mSupportsTcp>) ),
+    NL_TEST_DEF("TxtResolvedIsDeviceSleepyIdle", TestIsDeviceSleepyIdle<ResolvedNodeData>),
+    NL_TEST_DEF("TxtResolvedIsDeviceSleepyActive", TestIsDeviceSleepyActive<ResolvedNodeData>),
     NL_TEST_SENTINEL()
 };
 

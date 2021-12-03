@@ -62,6 +62,18 @@ struct ResolvedNodeData
     Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mMrpRetryIntervalIdle; }
     Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mMrpRetryIntervalActive; }
 
+    bool IsDeviceTreatedAsSleepy() const
+    {
+        // If either retry interval (Idle - CRI, Active - CRA) has a value and that value is greater
+        // than the default, then the peer device will be treated as if it is a Sleepy End Device (SED)
+        if ((mMrpRetryIntervalIdle.HasValue() && (mMrpRetryIntervalIdle.Value() > gDefaultMRPConfig.mIdleRetransTimeout)) ||
+            (mMrpRetryIntervalActive.HasValue() && (mMrpRetryIntervalActive.Value() > gDefaultMRPConfig.mActiveRetransTimeout)))
+        {
+            return true;
+        }
+        return false;
+    }
+
     PeerId mPeerId;
     size_t mNumIPs = 0;
     Inet::InterfaceId mInterfaceId;
@@ -133,6 +145,19 @@ struct DiscoveredNodeData
     bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
     Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mrpRetryIntervalIdle; }
     Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mrpRetryIntervalActive; }
+
+    bool IsDeviceTreatedAsSleepy() const
+    {
+        // If either retry interval (Idle - CRI, Active - CRA) has a value and that value is greater
+        // than the default, then the peer device will be treated as if it is a Sleepy End Device (SED)
+        if ((mrpRetryIntervalIdle.HasValue() && (mrpRetryIntervalIdle.Value() > gDefaultMRPConfig.mIdleRetransTimeout)) ||
+            (mrpRetryIntervalActive.HasValue() && (mrpRetryIntervalActive.Value() > gDefaultMRPConfig.mActiveRetransTimeout)))
+
+        {
+            return true;
+        }
+        return false;
+    }
 
     void LogDetail() const
     {
