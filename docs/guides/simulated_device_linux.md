@@ -18,11 +18,11 @@ one that will be executed once the application has been commissioned.
 
 Simulated Device: simulation of an application in which tests can be
 added. It is defined by a [ZAP config]() file and tests can be added with a
-[YAML file](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites/certification/Test_TC_DM_1_3_Simulated.yaml).
+[YAML file](../../src/app/tests/suites/certification/Test_TC_DM_1_3_Simulated.yaml).
 
 ### Prerequisite
 
--   [Building Prerequisites](https://github.com/project-chip/connectedhomeip/tree/master/docs/guides/BUILDING.md#prerequisites)
+-   [Building Prerequisites](./BUILDING.md#prerequisites)
 -   [Prepare For Building](https://github.com/project-chip/connectedhomeip/tree/master/docs/guides/BUILDING.md#prepare-for-building)
 
 
