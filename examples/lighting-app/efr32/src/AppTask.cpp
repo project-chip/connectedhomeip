@@ -88,12 +88,12 @@ StaticTask_t appTaskStruct;
 /**********************************************************
  * Identify Callbacks
  *********************************************************/
-namespace{
+namespace {
 void OnTriggerIdentifyEffectCompleted(chip::System::Layer * systemLayer, void * appState)
 {
     sIdentifyEffect = EMBER_ZCL_IDENTIFY_EFFECT_IDENTIFIER_STOP_EFFECT;
 }
-}
+} // namespace
 
 void OnTriggerIdentifyEffect(Identify * identify)
 {
