@@ -173,7 +173,7 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
     WriteResponseMessage::Builder writeResponseBuilder;
     err = writeResponseBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    AttributeStatuses::Builder attributeStatusesBuilder = writeResponseBuilder.CreateWriteResponses();
+    AttributeStatusIBs::Builder attributeStatusesBuilder = writeResponseBuilder.CreateWriteResponses();
     NL_TEST_ASSERT(apSuite, attributeStatusesBuilder.GetError() == CHIP_NO_ERROR);
     AttributeStatusIB::Builder attributeStatusIBBuilder = attributeStatusesBuilder.CreateAttributeStatus();
     NL_TEST_ASSERT(apSuite, attributeStatusIBBuilder.GetError() == CHIP_NO_ERROR);

@@ -274,6 +274,122 @@ CHIP_ERROR ShutdownCommissioner()
     return CHIP_NO_ERROR;
 }
 
+class PairingCommand : public chip::Controller::DevicePairingDelegate, public chip::Controller::DeviceAddressUpdateDelegate
+{
+    /////////// DevicePairingDelegate Interface /////////
+    void OnStatusUpdate(chip::Controller::DevicePairingDelegate::Status status) override;
+    void OnPairingComplete(CHIP_ERROR error) override;
+    void OnPairingDeleted(CHIP_ERROR error) override;
+    void OnCommissioningComplete(NodeId deviceId, CHIP_ERROR error) override;
+
+    /////////// DeviceAddressUpdateDelegate Interface /////////
+    void OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR error) override;
+
+    CHIP_ERROR UpdateNetworkAddress();
+};
+
+PairingCommand gPairingCommand;
+NodeId gRemoteId = kTestDeviceNodeId;
+
+CHIP_ERROR PairingCommand::UpdateNetworkAddress()
+{
+    ChipLogProgress(AppServer, "Mdns: Updating NodeId: %" PRIx64 " ...", gRemoteId);
+    return gCommissioner.UpdateDevice(gRemoteId);
+}
+
+void PairingCommand::OnAddressUpdateComplete(NodeId nodeId, CHIP_ERROR err)
+{
+    ChipLogProgress(AppServer, "OnAddressUpdateComplete: %s", ErrorStr(err));
+}
+
+void PairingCommand::OnStatusUpdate(DevicePairingDelegate::Status status)
+{
+    switch (status)
+    {
+    case DevicePairingDelegate::Status::SecurePairingSuccess:
+        ChipLogProgress(AppServer, "Secure Pairing Success");
+        break;
+    case DevicePairingDelegate::Status::SecurePairingFailed:
+        ChipLogError(AppServer, "Secure Pairing Failed");
+        break;
+    }
+}
+
+void PairingCommand::OnPairingComplete(CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Pairing Success");
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "Pairing Failure: %s", ErrorStr(err));
+        // For some devices, it may take more time to appear on the network and become discoverable
+        // over DNS-SD, so don't give up on failure and restart the address update. Note that this
+        // will not be repeated endlessly as each chip-tool command has a timeout (in the case of
+        // the `pairing` command it equals 120s).
+        // UpdateNetworkAddress();
+    }
+}
+
+void PairingCommand::OnPairingDeleted(CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Pairing Deleted Success");
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "Pairing Deleted Failure: %s", ErrorStr(err));
+    }
+}
+
+void PairingCommand::OnCommissioningComplete(NodeId nodeId, CHIP_ERROR err)
+{
+    if (err == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "Device commissioning completed with success");
+    }
+    else
+    {
+        ChipLogProgress(AppServer, "Device commissioning Failure: %s", ErrorStr(err));
+    }
+}
+
+CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, chip::Transport::PeerAddress address)
+{
+    RendezvousParameters params = RendezvousParameters().SetSetupPINCode(pincode).SetDiscriminator(disc).SetPeerAddress(address);
+
+    gCommissioner.RegisterDeviceAddressUpdateDelegate(&gPairingCommand);
+    gCommissioner.RegisterPairingDelegate(&gPairingCommand);
+    gCommissioner.PairDevice(gRemoteId, params);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index)
+{
+    UDCClientState * state = gCommissioner.GetUserDirectedCommissioningServer()->GetUDCClients().GetUDCClientState(index);
+    if (state == nullptr)
+    {
+        ChipLogProgress(AppServer, "udc client[%ld] null \r\n", index);
+        return CHIP_ERROR_KEY_NOT_FOUND;
+    }
+    else
+    {
+        Transport::PeerAddress peerAddress = state->GetPeerAddress();
+
+        state->SetUDCClientProcessingState(UDCClientProcessingState::kCommissioningNode);
+
+        return CommissionerPairOnNetwork(pincode, state->GetLongDiscriminator(), peerAddress);
+    }
+}
+
+DeviceCommissioner * GetDeviceCommissioner()
+{
+    return &gCommissioner;
+}
+
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 
 void ChipLinuxAppMainLoop()
@@ -307,7 +423,7 @@ void ChipLinuxAppMainLoop()
 #if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
     InitCommissioner();
 #if defined(ENABLE_CHIP_SHELL)
-    chip::Shell::RegisterControllerCommands(&gCommissioner);
+    chip::Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
 

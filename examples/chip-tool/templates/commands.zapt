@@ -445,7 +445,7 @@ public:
         {{/if}}
         {{/chip_cluster_command_non_expanded_arguments}}
 
-        return chip::Controller::InvokeCommand(device, this, {{#if hasSpecificResponse}}On{{asUpperCamelCase parent.name}}{{asUpperCamelCase response.name}}Success{{else}}OnDefaultSuccess{{/if}}, OnDefaultFailure, endpointId, mRequest);
+        return chip::Controller::InvokeCommand(device, this, {{#if hasSpecificResponse}}On{{asUpperCamelCase parent.name}}{{asUpperCamelCase response.name}}Success{{else}}OnDefaultSuccess{{/if}}, OnDefaultFailure, endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:

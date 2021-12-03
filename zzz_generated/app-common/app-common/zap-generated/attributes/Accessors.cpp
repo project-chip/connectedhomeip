@@ -9168,22 +9168,25 @@ namespace Attributes {
 
 namespace LockState {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     NumericAttributeTraits<uint8_t>::StorageType temp;
     uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    if (NumericAttributeTraits<uint8_t>::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 {
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -9191,6 +9194,24 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
     uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    NumericAttributeTraits<uint8_t>::StorageType value;
+    NumericAttributeTraits<uint8_t>::SetNull(value);
+    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace LockState
@@ -9255,22 +9276,25 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 
 namespace DoorState {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, DataModel::Nullable<uint8_t> & value)
 {
     NumericAttributeTraits<uint8_t>::StorageType temp;
     uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    if (NumericAttributeTraits<uint8_t>::IsNullValue(temp))
     {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+        value.SetNull();
     }
-    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    else
+    {
+        value.SetNonNull() = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    }
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 {
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ true, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
@@ -9278,6 +9302,24 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
     uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus SetNull(chip::EndpointId endpoint)
+{
+    NumericAttributeTraits<uint8_t>::StorageType value;
+    NumericAttributeTraits<uint8_t>::SetNull(value);
+    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(value);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+}
+
+EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<uint8_t> & value)
+{
+    if (value.IsNull())
+    {
+        return SetNull(endpoint);
+    }
+
+    return Set(endpoint, value.Value());
 }
 
 } // namespace DoorState
@@ -9369,7 +9411,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 } // namespace OpenPeriod
 
-namespace NumLockRecordsSupported {
+namespace NumberOfLogRecordsSupported {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
@@ -9396,38 +9438,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
-} // namespace NumLockRecordsSupported
+} // namespace NumberOfLogRecordsSupported
 
-namespace NumTotalUsersSupported {
-
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
-{
-    NumericAttributeTraits<uint16_t>::StorageType temp;
-    uint8_t * readable   = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    *value = NumericAttributeTraits<uint16_t>::StorageToWorking(temp);
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
-{
-    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    NumericAttributeTraits<uint16_t>::StorageType storageValue;
-    NumericAttributeTraits<uint16_t>::WorkingToStorage(value, storageValue);
-    uint8_t * writable = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
-}
-
-} // namespace NumTotalUsersSupported
-
-namespace NumPinUsersSupported {
+namespace NumberOfTotalUsersSupported {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
@@ -9454,9 +9467,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
-} // namespace NumPinUsersSupported
+} // namespace NumberOfTotalUsersSupported
 
-namespace NumRfidUsersSupported {
+namespace NumberOfPINUsersSupported {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
@@ -9483,9 +9496,125 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
-} // namespace NumRfidUsersSupported
+} // namespace NumberOfPINUsersSupported
 
-namespace NumWeekdaySchedulesSupportedPerUser {
+namespace NumberOfRFIDUsersSupported {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    NumericAttributeTraits<uint16_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<uint16_t>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<uint16_t>::StorageType storageValue;
+    NumericAttributeTraits<uint16_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace NumberOfRFIDUsersSupported
+
+namespace NumberOfWeekDaySchedulesSupportedPerUser {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    NumericAttributeTraits<uint16_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<uint16_t>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<uint16_t>::StorageType storageValue;
+    NumericAttributeTraits<uint16_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace NumberOfWeekDaySchedulesSupportedPerUser
+
+namespace NumberOfYearDaySchedulesSupportedPerUser {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    NumericAttributeTraits<uint16_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<uint16_t>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<uint16_t>::StorageType storageValue;
+    NumericAttributeTraits<uint16_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace NumberOfYearDaySchedulesSupportedPerUser
+
+namespace NumberOfHolidaySchedulesSupported {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
+{
+    NumericAttributeTraits<uint16_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<uint16_t>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
+{
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<uint16_t>::StorageType storageValue;
+    NumericAttributeTraits<uint16_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+}
+
+} // namespace NumberOfHolidaySchedulesSupported
+
+namespace MaxPINCodeLength {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
@@ -9512,38 +9641,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace NumWeekdaySchedulesSupportedPerUser
+} // namespace MaxPINCodeLength
 
-namespace NumYeardaySchedulesSupportedPerUser {
-
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
-{
-    NumericAttributeTraits<uint8_t>::StorageType temp;
-    uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
-{
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    NumericAttributeTraits<uint8_t>::StorageType storageValue;
-    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
-    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
-}
-
-} // namespace NumYeardaySchedulesSupportedPerUser
-
-namespace NumHolidaySchedulesSupportedPerUser {
+namespace MinPINCodeLength {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
@@ -9570,38 +9670,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace NumHolidaySchedulesSupportedPerUser
+} // namespace MinPINCodeLength
 
-namespace MaxPinLength {
-
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
-{
-    NumericAttributeTraits<uint8_t>::StorageType temp;
-    uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
-{
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    NumericAttributeTraits<uint8_t>::StorageType storageValue;
-    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
-    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
-}
-
-} // namespace MaxPinLength
-
-namespace MinPinLength {
+namespace MaxRFIDCodeLength {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
@@ -9628,38 +9699,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace MinPinLength
+} // namespace MaxRFIDCodeLength
 
-namespace MaxRfidCodeLength {
-
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
-{
-    NumericAttributeTraits<uint8_t>::StorageType temp;
-    uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
-{
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    NumericAttributeTraits<uint8_t>::StorageType storageValue;
-    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
-    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
-}
-
-} // namespace MaxRfidCodeLength
-
-namespace MinRfidCodeLength {
+namespace MinRFIDCodeLength {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
@@ -9686,7 +9728,36 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace MinRfidCodeLength
+} // namespace MinRFIDCodeLength
+
+namespace CredentialRulesSupport {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+{
+    NumericAttributeTraits<uint8_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<uint8_t>::StorageType storageValue;
+    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+}
+
+} // namespace CredentialRulesSupport
 
 namespace EnableLogging {
 
@@ -9721,7 +9792,7 @@ namespace Language {
 
 EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
 {
-    uint8_t zclString[2 + 1];
+    uint8_t zclString[3 + 1];
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, sizeof(zclString));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     size_t length = emberAfStringLength(zclString);
@@ -9730,16 +9801,16 @@ EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
 
-    VerifyOrReturnError(value.size() == 2, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
-    memcpy(value.data(), &zclString[1], 2);
+    VerifyOrReturnError(value.size() == 3, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    memcpy(value.data(), &zclString[1], 3);
     value.reduce_size(length);
     return status;
 }
 EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 {
-    static_assert(2 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
-    VerifyOrReturnError(value.size() <= 2, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
-    uint8_t zclString[2 + 1];
+    static_assert(3 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 3, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    uint8_t zclString[3 + 1];
     emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
     memcpy(&zclString[1], value.data(), value.size());
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
@@ -9747,7 +9818,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
 
 } // namespace Language
 
-namespace LedSettings {
+namespace LEDSettings {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
 {
@@ -9774,7 +9845,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-} // namespace LedSettings
+} // namespace LEDSettings
 
 namespace AutoRelockTime {
 
@@ -9979,7 +10050,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 
 } // namespace EnableOneTouchLocking
 
-namespace EnableInsideStatusLed {
+namespace EnableInsideStatusLED {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
 {
@@ -10006,7 +10077,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
-} // namespace EnableInsideStatusLed
+} // namespace EnableInsideStatusLED
 
 namespace EnablePrivacyModeButton {
 
@@ -10036,6 +10107,35 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
 }
 
 } // namespace EnablePrivacyModeButton
+
+namespace LocalProgrammingFeatures {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+{
+    NumericAttributeTraits<uint8_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<uint8_t>::StorageType storageValue;
+    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP8_ATTRIBUTE_TYPE);
+}
+
+} // namespace LocalProgrammingFeatures
 
 namespace WrongCodeEntryLimit {
 
@@ -10095,7 +10195,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 } // namespace UserCodeTemporaryDisableTime
 
-namespace SendPinOverTheAir {
+namespace SendPINOverTheAir {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
 {
@@ -10122,9 +10222,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
-} // namespace SendPinOverTheAir
+} // namespace SendPINOverTheAir
 
-namespace RequirePinForRfOperation {
+namespace RequirePINforRemoteOperation {
 
 EmberAfStatus Get(chip::EndpointId endpoint, bool * value)
 {
@@ -10151,36 +10251,36 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
 }
 
-} // namespace RequirePinForRfOperation
+} // namespace RequirePINforRemoteOperation
 
-namespace ZigbeeSecurityLevel {
+namespace ExpiringUserTimeout {
 
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
-    NumericAttributeTraits<uint8_t>::StorageType temp;
-    uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
+    NumericAttributeTraits<uint16_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::DoorLock::Id, Id, readable, sizeof(temp));
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, temp))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
-    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    *value = NumericAttributeTraits<uint16_t>::StorageToWorking(temp);
     return status;
 }
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 {
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
+    if (!NumericAttributeTraits<uint16_t>::CanRepresentValue(/* isNullable = */ false, value))
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
-    NumericAttributeTraits<uint8_t>::StorageType storageValue;
-    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
-    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+    NumericAttributeTraits<uint16_t>::StorageType storageValue;
+    NumericAttributeTraits<uint16_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
 }
 
-} // namespace ZigbeeSecurityLevel
+} // namespace ExpiringUserTimeout
 
 namespace AlarmMask {
 
@@ -10240,7 +10340,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 } // namespace KeypadOperationEventMask
 
-namespace RfOperationEventMask {
+namespace RemoteOperationEventMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
@@ -10267,7 +10367,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
-} // namespace RfOperationEventMask
+} // namespace RemoteOperationEventMask
 
 namespace ManualOperationEventMask {
 
@@ -10298,7 +10398,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 } // namespace ManualOperationEventMask
 
-namespace RfidOperationEventMask {
+namespace RFIDOperationEventMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
@@ -10325,7 +10425,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
-} // namespace RfidOperationEventMask
+} // namespace RFIDOperationEventMask
 
 namespace KeypadProgrammingEventMask {
 
@@ -10356,7 +10456,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 } // namespace KeypadProgrammingEventMask
 
-namespace RfProgrammingEventMask {
+namespace RemoteProgrammingEventMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
@@ -10383,9 +10483,9 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
-} // namespace RfProgrammingEventMask
+} // namespace RemoteProgrammingEventMask
 
-namespace RfidProgrammingEventMask {
+namespace RFIDProgrammingEventMask {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value)
 {
@@ -10412,7 +10512,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::DoorLock::Id, Id, writable, ZCL_BITMAP16_ATTRIBUTE_TYPE);
 }
 
-} // namespace RfidProgrammingEventMask
+} // namespace RFIDProgrammingEventMask
 
 } // namespace Attributes
 } // namespace DoorLock

@@ -128,12 +128,10 @@ private:
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableEventTypeInfo value;
-        VerifyOrExit(aEventHeader.mPath.mClusterId == DecodableEventTypeInfo::GetClusterId() &&
-                         aEventHeader.mPath.mEventId == DecodableEventTypeInfo::GetEventId(),
-                     CHIP_ERROR_SCHEMA_MISMATCH);
+
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        err = app::DataModel::Decode(*apData, value);
+        err = apReadClient->DecodeEvent(aEventHeader, value, *apData);
         SuccessOrExit(err);
 
         mOnSuccess(aEventHeader, value);

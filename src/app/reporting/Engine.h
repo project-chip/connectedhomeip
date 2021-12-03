@@ -88,6 +88,13 @@ public:
      */
     CHIP_ERROR SetDirty(ClusterInfo & aClusterInfo);
 
+    /**
+     * @brief
+     *  Schedule the urgent event delivery
+     *
+     */
+    CHIP_ERROR ScheduleUrgentEventDelivery(ConcreteEventPath & aPath);
+
 private:
     friend class TestReportingEngine;
     /**

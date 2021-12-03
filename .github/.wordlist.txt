@@ -4,11 +4,6 @@ aarch
 abcdef
 abfb
 ABI
-AES
-DMM
-ECDH
-ECDSA
-SHA
 ABIs
 ables
 accessor
@@ -31,6 +26,7 @@ AdvRouterAddr
 AdvSendAdvert
 AE
 aef
+AES
 algs
 alloc
 ameba
@@ -286,6 +282,7 @@ dialout
 diffstat
 diffsyms
 dimmable
+dirname
 dirs
 disambiguated
 discoverable
@@ -297,6 +294,7 @@ DK
 DL
 DM
 DMG
+DMM
 DNS
 Dnsmasq
 dnsmasqd
@@ -319,6 +317,8 @@ eabi
 EB
 ECC
 ECD
+ECDH
+ECDSA
 EchoMessage
 EchoRequests
 EchoResponse
@@ -498,15 +498,15 @@ IPv
 ISCAN
 itemName
 iterable
+JDK
 jinja
 jlink
-jre
-JDK
 JLink
 JLinkExe
 JLinkRTTClient
 JN
 jpg
+jre
 js
 json
 JTAG
@@ -684,11 +684,11 @@ Onboarding
 onboardingcodes
 oneshot
 onnetwork
-openjdk
 OnOff
 OnOffClusterTest
 OnPlatformEvent
 OO
+openjdk
 OpenOCD
 OpenSSL
 OpenThread
@@ -708,9 +708,9 @@ OTAImageProcessorDriver
 OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
+OTARequesterImpl
 OTARequestor
 OTARequestorDriver
-OTARequesterImpl
 OTARequestorSerialPort
 OTBR
 otcli
@@ -853,8 +853,8 @@ ScriptBinding
 SDC
 SDHC
 SDK
-sdkconfig
 SDK's
+sdkconfig
 SDKs
 SDKTARGETSYSROOT
 sdl
@@ -873,6 +873,7 @@ SetRequestorInstance
 SetUpPINCode
 SetupQRCode
 sexualized
+SHA
 shubhamdp
 SIGINT
 SiLabs
@@ -913,6 +914,7 @@ subcommand
 subcommands
 subdirectories
 subdirectory
+subfolder
 submodule
 submodules
 subprocess
@@ -1000,7 +1002,6 @@ unblur
 UNBLUR
 uncommissioned
 unfocus
-userguide
 Unicast
 UniFlash
 unpair
@@ -1012,6 +1013,7 @@ URI
 usbmodem
 USBtoUART
 uscif
+userguide
 USERINTERFACE
 UserLabel
 usermod

@@ -220,21 +220,21 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     ClusterInfo * clusterInfoList  = apReadHandler->GetEventClusterInfolist();
     EventNumber * eventNumberList  = apReadHandler->GetVendedEventNumberList();
     EventManagement & eventManager = EventManagement::GetInstance();
-    EventReports::Builder EventReports;
+    EventReportIBs::Builder EventReportIBs;
     bool hasMoreChunks = false;
 
     aReportDataBuilder.Checkpoint(backup);
 
     VerifyOrExit(clusterInfoList != nullptr, );
     VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    EventReports = aReportDataBuilder.CreateEventReports();
-    SuccessOrExit(err = EventReports.GetError());
-
-    memcpy(initialEvents, eventNumberList, sizeof(initialEvents));
     // If the eventManager is not valid or has not been initialized,
     // skip the rest of processing
-    VerifyOrExit(eventManager.IsValid(), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(eventManager.IsValid(), ChipLogError(DataManagement, "EventManagement has not yet initialized"));
+
+    EventReportIBs = aReportDataBuilder.CreateEventReports();
+    SuccessOrExit(err = EventReportIBs.GetError());
+
+    memcpy(initialEvents, eventNumberList, sizeof(initialEvents));
 
     for (size_t index = 0; index < kNumPriorityLevel; index++)
     {
@@ -256,7 +256,7 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     while (apReadHandler->GetCurrentPriority() != PriorityLevel::Invalid)
     {
         uint8_t priorityIndex = static_cast<uint8_t>(apReadHandler->GetCurrentPriority());
-        err = eventManager.FetchEventsSince(*(EventReports.GetWriter()), clusterInfoList, apReadHandler->GetCurrentPriority(),
+        err = eventManager.FetchEventsSince(*(EventReportIBs.GetWriter()), clusterInfoList, apReadHandler->GetCurrentPriority(),
                                             eventNumberList[priorityIndex], eventCount);
 
         if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
@@ -301,8 +301,8 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         }
     }
 
-    EventReports.EndOfEventReports();
-    SuccessOrExit(err = EventReports.GetError());
+    EventReportIBs.EndOfEventReports();
+    SuccessOrExit(err = EventReportIBs.GetError());
 
     ChipLogDetail(DataManagement, "Fetched %zu events", eventCount);
 
@@ -569,6 +569,23 @@ void Engine::OnReportConfirm()
 
     mNumReportsInFlight--;
     ChipLogDetail(DataManagement, "<RE> OnReportConfirm: NumReports = %" PRIu32, mNumReportsInFlight);
+}
+
+CHIP_ERROR Engine::ScheduleUrgentEventDelivery(ConcreteEventPath & aPath)
+{
+    for (auto & handler : InteractionModelEngine::GetInstance()->mReadHandlers)
+    {
+        for (auto clusterInfo = handler.GetEventClusterInfolist(); clusterInfo != nullptr; clusterInfo = clusterInfo->mpNext)
+        {
+            if (clusterInfo->IsEventPathSupersetOf(aPath))
+            {
+                ChipLogProgress(DataManagement, "<RE> Unblock Urgent Event Delivery for readHandler[%d]",
+                                InteractionModelEngine::GetInstance()->GetReadHandlerArrayIndex(&handler));
+                handler.UnblockUrgentEventDelivery();
+            }
+        }
+    }
+    return ScheduleRun();
 }
 
 }; // namespace reporting

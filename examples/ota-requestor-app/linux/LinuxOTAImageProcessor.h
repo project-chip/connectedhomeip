@@ -16,30 +16,43 @@
  *    limitations under the License.
  */
 
-/* This file contains the decalarions for the Linux implementation of the
- * the OTAImageProcessorDriver interface class
- */
+#pragma once
 
-#include "app/clusters/ota-requestor/OTAImageProcessor.h"
+#include <app/clusters/ota-requestor/OTAImageProcessor.h>
+#include <platform/CHIPDeviceLayer.h>
 
-class LinuxOTAImageProcessor : public OTAImageProcessorDriver
+#include <fstream>
+
+namespace chip {
+
+class LinuxOTAImageProcessor : public OTAImageProcessorInterface
 {
+public:
+    //////////// OTAImageProcessorInterface Implementation ///////////////
+    CHIP_ERROR PrepareDownload() override;
+    CHIP_ERROR Finalize() override;
+    CHIP_ERROR Abort() override;
+    CHIP_ERROR ProcessBlock(ByteSpan & block) override;
 
-    // Virtuial functions from OTAImageProcessorDriver -- start
-    // Open file, find block of space in persistent memory, or allocate a buffer, etc.
-    CHIP_ERROR PrepareDownload() { return CHIP_NO_ERROR; }
+private:
+    //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
+    static void HandlePrepareDownload(intptr_t context);
+    static void HandleFinalize(intptr_t context);
+    static void HandleAbort(intptr_t context);
+    static void HandleProcessBlock(intptr_t context);
 
-    // Must not be a blocking call to support cases that require IO to elements such as // external peripherals/radios
-    CHIP_ERROR ProcessBlock(chip::ByteSpan & data) { return CHIP_NO_ERROR; }
+    /**
+     * Called to allocate memory for mBlock if necessary and set it to block
+     */
+    CHIP_ERROR SetBlock(ByteSpan & block);
 
-    // Close file, close persistent storage, etc
-    CHIP_ERROR Finalize() { return CHIP_NO_ERROR; }
+    /**
+     * Called to release allocated memory for mBlock
+     */
+    CHIP_ERROR ReleaseBlock();
 
-    chip::Optional<uint8_t> PercentComplete() { return chip::Optional<uint8_t>(0); }
-
-    // Clean up the download which could mean erasing everything that was written,
-    // releasing buffers, etc.
-    CHIP_ERROR Abort() { return CHIP_NO_ERROR; }
-
-    // Virtuial functions from OTAImageProcessorDriver -- end
+    std::ofstream mOfs;
+    MutableByteSpan mBlock;
 };
+
+} // namespace chip

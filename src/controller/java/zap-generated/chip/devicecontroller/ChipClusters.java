@@ -4201,124 +4201,117 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void clearAllPins(ClearAllPinsResponseCallback callback) {
-      clearAllPins(chipClusterPtr, callback);
+    public void clearAllPINCodes(DefaultClusterCallback callback) {
+      clearAllPINCodes(chipClusterPtr, callback);
     }
 
-    public void clearAllRfids(ClearAllRfidsResponseCallback callback) {
-      clearAllRfids(chipClusterPtr, callback);
+    public void clearAllRFIDCodes(DefaultClusterCallback callback) {
+      clearAllRFIDCodes(chipClusterPtr, callback);
     }
 
-    public void clearHolidaySchedule(
-        ClearHolidayScheduleResponseCallback callback, Integer scheduleId) {
-      clearHolidaySchedule(chipClusterPtr, callback, scheduleId);
+    public void clearHolidaySchedule(DefaultClusterCallback callback, Integer holidayIndex) {
+      clearHolidaySchedule(chipClusterPtr, callback, holidayIndex);
     }
 
-    public void clearPin(ClearPinResponseCallback callback, Integer userId) {
-      clearPin(chipClusterPtr, callback, userId);
+    public void clearPINCode(DefaultClusterCallback callback, Integer pinSlotIndex) {
+      clearPINCode(chipClusterPtr, callback, pinSlotIndex);
     }
 
-    public void clearRfid(ClearRfidResponseCallback callback, Integer userId) {
-      clearRfid(chipClusterPtr, callback, userId);
+    public void clearRFIDCode(DefaultClusterCallback callback, Integer rfidSlotIndex) {
+      clearRFIDCode(chipClusterPtr, callback, rfidSlotIndex);
     }
 
-    public void clearWeekdaySchedule(
-        ClearWeekdayScheduleResponseCallback callback, Integer scheduleId, Integer userId) {
-      clearWeekdaySchedule(chipClusterPtr, callback, scheduleId, userId);
+    public void clearWeekDaySchedule(
+        DefaultClusterCallback callback, Integer weekDayIndex, Integer userIndex) {
+      clearWeekDaySchedule(chipClusterPtr, callback, weekDayIndex, userIndex);
     }
 
-    public void clearYeardaySchedule(
-        ClearYeardayScheduleResponseCallback callback, Integer scheduleId, Integer userId) {
-      clearYeardaySchedule(chipClusterPtr, callback, scheduleId, userId);
+    public void clearYearDaySchedule(
+        DefaultClusterCallback callback, Integer yearDayIndex, Integer userIndex) {
+      clearYearDaySchedule(chipClusterPtr, callback, yearDayIndex, userIndex);
     }
 
     public void getHolidaySchedule(
-        GetHolidayScheduleResponseCallback callback, Integer scheduleId) {
-      getHolidaySchedule(chipClusterPtr, callback, scheduleId);
+        GetHolidayScheduleResponseCallback callback, Integer holidayIndex) {
+      getHolidaySchedule(chipClusterPtr, callback, holidayIndex);
     }
 
     public void getLogRecord(GetLogRecordResponseCallback callback, Integer logIndex) {
       getLogRecord(chipClusterPtr, callback, logIndex);
     }
 
-    public void getPin(GetPinResponseCallback callback, Integer userId) {
-      getPin(chipClusterPtr, callback, userId);
+    public void getPINCode(GetPINCodeResponseCallback callback, Integer userId) {
+      getPINCode(chipClusterPtr, callback, userId);
     }
 
-    public void getRfid(GetRfidResponseCallback callback, Integer userId) {
-      getRfid(chipClusterPtr, callback, userId);
+    public void getRFIDCode(GetRFIDCodeResponseCallback callback, Integer userId) {
+      getRFIDCode(chipClusterPtr, callback, userId);
     }
 
     public void getUserType(GetUserTypeResponseCallback callback, Integer userId) {
       getUserType(chipClusterPtr, callback, userId);
     }
 
-    public void getWeekdaySchedule(
-        GetWeekdayScheduleResponseCallback callback, Integer scheduleId, Integer userId) {
-      getWeekdaySchedule(chipClusterPtr, callback, scheduleId, userId);
+    public void getWeekDaySchedule(
+        GetWeekDayScheduleResponseCallback callback, Integer weekDayIndex, Integer userIndex) {
+      getWeekDaySchedule(chipClusterPtr, callback, weekDayIndex, userIndex);
     }
 
-    public void getYeardaySchedule(
-        GetYeardayScheduleResponseCallback callback, Integer scheduleId, Integer userId) {
-      getYeardaySchedule(chipClusterPtr, callback, scheduleId, userId);
+    public void getYearDaySchedule(
+        GetYearDayScheduleResponseCallback callback, Integer yearDayIndex, Integer userIndex) {
+      getYearDaySchedule(chipClusterPtr, callback, yearDayIndex, userIndex);
     }
 
-    public void lockDoor(LockDoorResponseCallback callback, byte[] pin) {
-      lockDoor(chipClusterPtr, callback, pin);
+    public void lockDoor(DefaultClusterCallback callback, Optional<byte[]> pinCode) {
+      lockDoor(chipClusterPtr, callback, pinCode);
     }
 
     public void setHolidaySchedule(
-        SetHolidayScheduleResponseCallback callback,
-        Integer scheduleId,
+        DefaultClusterCallback callback,
+        Integer holidayIndex,
         Long localStartTime,
         Long localEndTime,
-        Integer operatingModeDuringHoliday) {
+        Integer operatingMode) {
       setHolidaySchedule(
-          chipClusterPtr,
-          callback,
-          scheduleId,
-          localStartTime,
-          localEndTime,
-          operatingModeDuringHoliday);
+          chipClusterPtr, callback, holidayIndex, localStartTime, localEndTime, operatingMode);
     }
 
-    public void setPin(
-        SetPinResponseCallback callback,
+    public void setPINCode(
+        DefaultClusterCallback callback,
         Integer userId,
         Integer userStatus,
         Integer userType,
         byte[] pin) {
-      setPin(chipClusterPtr, callback, userId, userStatus, userType, pin);
+      setPINCode(chipClusterPtr, callback, userId, userStatus, userType, pin);
     }
 
-    public void setRfid(
-        SetRfidResponseCallback callback,
+    public void setRFIDCode(
+        DefaultClusterCallback callback,
         Integer userId,
         Integer userStatus,
         Integer userType,
-        byte[] id) {
-      setRfid(chipClusterPtr, callback, userId, userStatus, userType, id);
+        byte[] rfidCode) {
+      setRFIDCode(chipClusterPtr, callback, userId, userStatus, userType, rfidCode);
     }
 
-    public void setUserType(
-        SetUserTypeResponseCallback callback, Integer userId, Integer userType) {
+    public void setUserType(DefaultClusterCallback callback, Integer userId, Integer userType) {
       setUserType(chipClusterPtr, callback, userId, userType);
     }
 
-    public void setWeekdaySchedule(
-        SetWeekdayScheduleResponseCallback callback,
-        Integer scheduleId,
-        Integer userId,
+    public void setWeekDaySchedule(
+        DefaultClusterCallback callback,
+        Integer weekDayIndex,
+        Integer userIndex,
         Integer daysMask,
         Integer startHour,
         Integer startMinute,
         Integer endHour,
         Integer endMinute) {
-      setWeekdaySchedule(
+      setWeekDaySchedule(
           chipClusterPtr,
           callback,
-          scheduleId,
-          userId,
+          weekDayIndex,
+          userIndex,
           daysMask,
           startHour,
           startMinute,
@@ -4326,187 +4319,142 @@ public class ChipClusters {
           endMinute);
     }
 
-    public void setYeardaySchedule(
-        SetYeardayScheduleResponseCallback callback,
-        Integer scheduleId,
-        Integer userId,
+    public void setYearDaySchedule(
+        DefaultClusterCallback callback,
+        Integer yearDayIndex,
+        Integer userIndex,
         Long localStartTime,
         Long localEndTime) {
-      setYeardaySchedule(
-          chipClusterPtr, callback, scheduleId, userId, localStartTime, localEndTime);
+      setYearDaySchedule(
+          chipClusterPtr, callback, yearDayIndex, userIndex, localStartTime, localEndTime);
     }
 
-    public void unlockDoor(UnlockDoorResponseCallback callback, byte[] pin) {
-      unlockDoor(chipClusterPtr, callback, pin);
+    public void unlockDoor(DefaultClusterCallback callback, Optional<byte[]> pinCode) {
+      unlockDoor(chipClusterPtr, callback, pinCode);
     }
 
     public void unlockWithTimeout(
-        UnlockWithTimeoutResponseCallback callback, Integer timeoutInSeconds, byte[] pin) {
-      unlockWithTimeout(chipClusterPtr, callback, timeoutInSeconds, pin);
+        DefaultClusterCallback callback, Integer timeout, Optional<byte[]> pinCode) {
+      unlockWithTimeout(chipClusterPtr, callback, timeout, pinCode);
     }
 
-    private native void clearAllPins(long chipClusterPtr, ClearAllPinsResponseCallback Callback);
+    private native void clearAllPINCodes(long chipClusterPtr, DefaultClusterCallback Callback);
 
-    private native void clearAllRfids(long chipClusterPtr, ClearAllRfidsResponseCallback Callback);
+    private native void clearAllRFIDCodes(long chipClusterPtr, DefaultClusterCallback Callback);
 
     private native void clearHolidaySchedule(
-        long chipClusterPtr, ClearHolidayScheduleResponseCallback Callback, Integer scheduleId);
+        long chipClusterPtr, DefaultClusterCallback Callback, Integer holidayIndex);
 
-    private native void clearPin(
-        long chipClusterPtr, ClearPinResponseCallback Callback, Integer userId);
+    private native void clearPINCode(
+        long chipClusterPtr, DefaultClusterCallback Callback, Integer pinSlotIndex);
 
-    private native void clearRfid(
-        long chipClusterPtr, ClearRfidResponseCallback Callback, Integer userId);
+    private native void clearRFIDCode(
+        long chipClusterPtr, DefaultClusterCallback Callback, Integer rfidSlotIndex);
 
-    private native void clearWeekdaySchedule(
+    private native void clearWeekDaySchedule(
         long chipClusterPtr,
-        ClearWeekdayScheduleResponseCallback Callback,
-        Integer scheduleId,
-        Integer userId);
+        DefaultClusterCallback Callback,
+        Integer weekDayIndex,
+        Integer userIndex);
 
-    private native void clearYeardaySchedule(
+    private native void clearYearDaySchedule(
         long chipClusterPtr,
-        ClearYeardayScheduleResponseCallback Callback,
-        Integer scheduleId,
-        Integer userId);
+        DefaultClusterCallback Callback,
+        Integer yearDayIndex,
+        Integer userIndex);
 
     private native void getHolidaySchedule(
-        long chipClusterPtr, GetHolidayScheduleResponseCallback Callback, Integer scheduleId);
+        long chipClusterPtr, GetHolidayScheduleResponseCallback Callback, Integer holidayIndex);
 
     private native void getLogRecord(
         long chipClusterPtr, GetLogRecordResponseCallback Callback, Integer logIndex);
 
-    private native void getPin(
-        long chipClusterPtr, GetPinResponseCallback Callback, Integer userId);
+    private native void getPINCode(
+        long chipClusterPtr, GetPINCodeResponseCallback Callback, Integer userId);
 
-    private native void getRfid(
-        long chipClusterPtr, GetRfidResponseCallback Callback, Integer userId);
+    private native void getRFIDCode(
+        long chipClusterPtr, GetRFIDCodeResponseCallback Callback, Integer userId);
 
     private native void getUserType(
         long chipClusterPtr, GetUserTypeResponseCallback Callback, Integer userId);
 
-    private native void getWeekdaySchedule(
+    private native void getWeekDaySchedule(
         long chipClusterPtr,
-        GetWeekdayScheduleResponseCallback Callback,
-        Integer scheduleId,
-        Integer userId);
+        GetWeekDayScheduleResponseCallback Callback,
+        Integer weekDayIndex,
+        Integer userIndex);
 
-    private native void getYeardaySchedule(
+    private native void getYearDaySchedule(
         long chipClusterPtr,
-        GetYeardayScheduleResponseCallback Callback,
-        Integer scheduleId,
-        Integer userId);
+        GetYearDayScheduleResponseCallback Callback,
+        Integer yearDayIndex,
+        Integer userIndex);
 
     private native void lockDoor(
-        long chipClusterPtr, LockDoorResponseCallback Callback, byte[] pin);
+        long chipClusterPtr, DefaultClusterCallback Callback, Optional<byte[]> pinCode);
 
     private native void setHolidaySchedule(
         long chipClusterPtr,
-        SetHolidayScheduleResponseCallback Callback,
-        Integer scheduleId,
+        DefaultClusterCallback Callback,
+        Integer holidayIndex,
         Long localStartTime,
         Long localEndTime,
-        Integer operatingModeDuringHoliday);
+        Integer operatingMode);
 
-    private native void setPin(
+    private native void setPINCode(
         long chipClusterPtr,
-        SetPinResponseCallback Callback,
+        DefaultClusterCallback Callback,
         Integer userId,
         Integer userStatus,
         Integer userType,
         byte[] pin);
 
-    private native void setRfid(
+    private native void setRFIDCode(
         long chipClusterPtr,
-        SetRfidResponseCallback Callback,
+        DefaultClusterCallback Callback,
         Integer userId,
         Integer userStatus,
         Integer userType,
-        byte[] id);
+        byte[] rfidCode);
 
     private native void setUserType(
-        long chipClusterPtr,
-        SetUserTypeResponseCallback Callback,
-        Integer userId,
-        Integer userType);
+        long chipClusterPtr, DefaultClusterCallback Callback, Integer userId, Integer userType);
 
-    private native void setWeekdaySchedule(
+    private native void setWeekDaySchedule(
         long chipClusterPtr,
-        SetWeekdayScheduleResponseCallback Callback,
-        Integer scheduleId,
-        Integer userId,
+        DefaultClusterCallback Callback,
+        Integer weekDayIndex,
+        Integer userIndex,
         Integer daysMask,
         Integer startHour,
         Integer startMinute,
         Integer endHour,
         Integer endMinute);
 
-    private native void setYeardaySchedule(
+    private native void setYearDaySchedule(
         long chipClusterPtr,
-        SetYeardayScheduleResponseCallback Callback,
-        Integer scheduleId,
-        Integer userId,
+        DefaultClusterCallback Callback,
+        Integer yearDayIndex,
+        Integer userIndex,
         Long localStartTime,
         Long localEndTime);
 
     private native void unlockDoor(
-        long chipClusterPtr, UnlockDoorResponseCallback Callback, byte[] pin);
+        long chipClusterPtr, DefaultClusterCallback Callback, Optional<byte[]> pinCode);
 
     private native void unlockWithTimeout(
         long chipClusterPtr,
-        UnlockWithTimeoutResponseCallback Callback,
-        Integer timeoutInSeconds,
-        byte[] pin);
-
-    public interface ClearAllPinsResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface ClearAllRfidsResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface ClearHolidayScheduleResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface ClearPinResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface ClearRfidResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface ClearWeekdayScheduleResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface ClearYeardayScheduleResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
+        DefaultClusterCallback Callback,
+        Integer timeout,
+        Optional<byte[]> pinCode);
 
     public interface GetHolidayScheduleResponseCallback {
       void onSuccess(
-          Integer scheduleId,
+          Integer holidayIndex,
           Integer status,
           Long localStartTime,
           Long localEndTime,
-          Integer operatingModeDuringHoliday);
+          Integer operatingMode);
 
       void onError(Exception error);
     }
@@ -4524,14 +4472,22 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface GetPinResponseCallback {
-      void onSuccess(Integer userId, Integer userStatus, Integer userType, byte[] pin);
+    public interface GetPINCodeResponseCallback {
+      void onSuccess(
+          Integer userId,
+          @Nullable Integer userStatus,
+          @Nullable Integer userType,
+          @Nullable byte[] pin);
 
       void onError(Exception error);
     }
 
-    public interface GetRfidResponseCallback {
-      void onSuccess(Integer userId, Integer userStatus, Integer userType, byte[] rfid);
+    public interface GetRFIDCodeResponseCallback {
+      void onSuccess(
+          Integer userId,
+          @Nullable Integer userStatus,
+          @Nullable Integer userType,
+          @Nullable byte[] rfidCode);
 
       void onError(Exception error);
     }
@@ -4542,10 +4498,10 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface GetWeekdayScheduleResponseCallback {
+    public interface GetWeekDayScheduleResponseCallback {
       void onSuccess(
-          Integer scheduleId,
-          Integer userId,
+          Integer weekDayIndex,
+          Integer userIndex,
           Integer status,
           Integer daysMask,
           Integer startHour,
@@ -4556,95 +4512,15 @@ public class ChipClusters {
       void onError(Exception error);
     }
 
-    public interface GetYeardayScheduleResponseCallback {
+    public interface GetYearDayScheduleResponseCallback {
       void onSuccess(
-          Integer scheduleId,
-          Integer userId,
+          Integer yearDayIndex,
+          Integer userIndex,
           Integer status,
           Long localStartTime,
           Long localEndTime);
 
       void onError(Exception error);
-    }
-
-    public interface LockDoorResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface SetHolidayScheduleResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface SetPinResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface SetRfidResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface SetUserTypeResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface SetWeekdayScheduleResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface SetYeardayScheduleResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface UnlockDoorResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public interface UnlockWithTimeoutResponseCallback {
-      void onSuccess(Integer status);
-
-      void onError(Exception error);
-    }
-
-    public void readLockStateAttribute(IntegerAttributeCallback callback) {
-      readLockStateAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeLockStateAttribute(
-        DefaultClusterCallback callback, int minInterval, int maxInterval) {
-      subscribeLockStateAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void reportLockStateAttribute(IntegerAttributeCallback callback) {
-      reportLockStateAttribute(chipClusterPtr, callback);
-    }
-
-    public void readLockTypeAttribute(IntegerAttributeCallback callback) {
-      readLockTypeAttribute(chipClusterPtr, callback);
-    }
-
-    public void subscribeLockTypeAttribute(
-        DefaultClusterCallback callback, int minInterval, int maxInterval) {
-      subscribeLockTypeAttribute(chipClusterPtr, callback, minInterval, maxInterval);
-    }
-
-    public void reportLockTypeAttribute(IntegerAttributeCallback callback) {
-      reportLockTypeAttribute(chipClusterPtr, callback);
     }
 
     public void readActuatorEnabledAttribute(BooleanAttributeCallback callback) {
@@ -4672,24 +4548,6 @@ public class ChipClusters {
     public void reportClusterRevisionAttribute(IntegerAttributeCallback callback) {
       reportClusterRevisionAttribute(chipClusterPtr, callback);
     }
-
-    private native void readLockStateAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void subscribeLockStateAttribute(
-        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
-
-    private native void reportLockStateAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void readLockTypeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
-
-    private native void subscribeLockTypeAttribute(
-        long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
-
-    private native void reportLockTypeAttribute(
-        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readActuatorEnabledAttribute(
         long chipClusterPtr, BooleanAttributeCallback callback);
@@ -6231,12 +6089,6 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
-    public interface LightSensorTypeAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-
-      void onError(Exception ex);
-    }
-
     public void readMeasuredValueAttribute(MeasuredValueAttributeCallback callback) {
       readMeasuredValueAttribute(chipClusterPtr, callback);
     }
@@ -6289,7 +6141,7 @@ public class ChipClusters {
       reportToleranceAttribute(chipClusterPtr, callback);
     }
 
-    public void readLightSensorTypeAttribute(LightSensorTypeAttributeCallback callback) {
+    public void readLightSensorTypeAttribute(IntegerAttributeCallback callback) {
       readLightSensorTypeAttribute(chipClusterPtr, callback);
     }
 
@@ -6352,7 +6204,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readLightSensorTypeAttribute(
-        long chipClusterPtr, LightSensorTypeAttributeCallback callback);
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void subscribeLightSensorTypeAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, int minInterval, int maxInterval);
@@ -6533,12 +6385,6 @@ public class ChipClusters {
 
     private native void stopWithOnOff(long chipClusterPtr, DefaultClusterCallback Callback);
 
-    public interface OnLevelAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-
-      void onError(Exception ex);
-    }
-
     public interface OnTransitionTimeAttributeCallback {
       void onSuccess(@Nullable Integer value);
 
@@ -6546,12 +6392,6 @@ public class ChipClusters {
     }
 
     public interface OffTransitionTimeAttributeCallback {
-      void onSuccess(@Nullable Integer value);
-
-      void onError(Exception ex);
-    }
-
-    public interface DefaultMoveRateAttributeCallback {
       void onSuccess(@Nullable Integer value);
 
       void onError(Exception ex);
@@ -6682,7 +6522,7 @@ public class ChipClusters {
       reportOnOffTransitionTimeAttribute(chipClusterPtr, callback);
     }
 
-    public void readOnLevelAttribute(OnLevelAttributeCallback callback) {
+    public void readOnLevelAttribute(IntegerAttributeCallback callback) {
       readOnLevelAttribute(chipClusterPtr, callback);
     }
 
@@ -6735,7 +6575,7 @@ public class ChipClusters {
       reportOffTransitionTimeAttribute(chipClusterPtr, callback);
     }
 
-    public void readDefaultMoveRateAttribute(DefaultMoveRateAttributeCallback callback) {
+    public void readDefaultMoveRateAttribute(IntegerAttributeCallback callback) {
       readDefaultMoveRateAttribute(chipClusterPtr, callback);
     }
 
@@ -6871,7 +6711,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readOnLevelAttribute(
-        long chipClusterPtr, OnLevelAttributeCallback callback);
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeOnLevelAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer value);
@@ -6907,7 +6747,7 @@ public class ChipClusters {
         long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void readDefaultMoveRateAttribute(
-        long chipClusterPtr, DefaultMoveRateAttributeCallback callback);
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeDefaultMoveRateAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer value);
@@ -11187,12 +11027,6 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
-    public interface NullableBitmap8AttributeCallback {
-      void onSuccess(@Nullable Integer value);
-
-      void onError(Exception ex);
-    }
-
     public interface NullableBitmap16AttributeCallback {
       void onSuccess(@Nullable Integer value);
 
@@ -11207,12 +11041,6 @@ public class ChipClusters {
 
     public interface NullableBitmap64AttributeCallback {
       void onSuccess(@Nullable Long value);
-
-      void onError(Exception ex);
-    }
-
-    public interface NullableInt8uAttributeCallback {
-      void onSuccess(@Nullable Integer value);
 
       void onError(Exception ex);
     }
@@ -11307,12 +11135,6 @@ public class ChipClusters {
       void onError(Exception ex);
     }
 
-    public interface NullableEnum8AttributeCallback {
-      void onSuccess(@Nullable Integer value);
-
-      void onError(Exception ex);
-    }
-
     public interface NullableEnum16AttributeCallback {
       void onSuccess(@Nullable Integer value);
 
@@ -11339,12 +11161,6 @@ public class ChipClusters {
 
     public interface NullableCharStringAttributeCallback {
       void onSuccess(@Nullable String value);
-
-      void onError(Exception ex);
-    }
-
-    public interface NullableRangeRestrictedInt8uAttributeCallback {
-      void onSuccess(@Nullable Integer value);
 
       void onError(Exception ex);
     }
@@ -12042,7 +11858,7 @@ public class ChipClusters {
       reportNullableBooleanAttribute(chipClusterPtr, callback);
     }
 
-    public void readNullableBitmap8Attribute(NullableBitmap8AttributeCallback callback) {
+    public void readNullableBitmap8Attribute(IntegerAttributeCallback callback) {
       readNullableBitmap8Attribute(chipClusterPtr, callback);
     }
 
@@ -12114,7 +11930,7 @@ public class ChipClusters {
       reportNullableBitmap64Attribute(chipClusterPtr, callback);
     }
 
-    public void readNullableInt8uAttribute(NullableInt8uAttributeCallback callback) {
+    public void readNullableInt8uAttribute(IntegerAttributeCallback callback) {
       readNullableInt8uAttribute(chipClusterPtr, callback);
     }
 
@@ -12402,7 +12218,7 @@ public class ChipClusters {
       reportNullableInt64sAttribute(chipClusterPtr, callback);
     }
 
-    public void readNullableEnum8Attribute(NullableEnum8AttributeCallback callback) {
+    public void readNullableEnum8Attribute(IntegerAttributeCallback callback) {
       readNullableEnum8Attribute(chipClusterPtr, callback);
     }
 
@@ -12510,8 +12326,7 @@ public class ChipClusters {
       reportNullableCharStringAttribute(chipClusterPtr, callback);
     }
 
-    public void readNullableRangeRestrictedInt8uAttribute(
-        NullableRangeRestrictedInt8uAttributeCallback callback) {
+    public void readNullableRangeRestrictedInt8uAttribute(IntegerAttributeCallback callback) {
       readNullableRangeRestrictedInt8uAttribute(chipClusterPtr, callback);
     }
 
@@ -13042,7 +12857,7 @@ public class ChipClusters {
         long chipClusterPtr, BooleanAttributeCallback callback);
 
     private native void readNullableBitmap8Attribute(
-        long chipClusterPtr, NullableBitmap8AttributeCallback callback);
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeNullableBitmap8Attribute(
         long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer value);
@@ -13090,7 +12905,7 @@ public class ChipClusters {
         long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readNullableInt8uAttribute(
-        long chipClusterPtr, NullableInt8uAttributeCallback callback);
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeNullableInt8uAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer value);
@@ -13282,7 +13097,7 @@ public class ChipClusters {
         long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readNullableEnum8Attribute(
-        long chipClusterPtr, NullableEnum8AttributeCallback callback);
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeNullableEnum8Attribute(
         long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer value);
@@ -13354,7 +13169,7 @@ public class ChipClusters {
         long chipClusterPtr, CharStringAttributeCallback callback);
 
     private native void readNullableRangeRestrictedInt8uAttribute(
-        long chipClusterPtr, NullableRangeRestrictedInt8uAttributeCallback callback);
+        long chipClusterPtr, IntegerAttributeCallback callback);
 
     private native void writeNullableRangeRestrictedInt8uAttribute(
         long chipClusterPtr, DefaultClusterCallback callback, @Nullable Integer value);
@@ -15231,6 +15046,10 @@ public class ChipClusters {
       readActiveNetworkFaultsListAttribute(chipClusterPtr, callback);
     }
 
+    public void readFeatureMapAttribute(LongAttributeCallback callback) {
+      readFeatureMapAttribute(chipClusterPtr, callback);
+    }
+
     public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
       readClusterRevisionAttribute(chipClusterPtr, callback);
     }
@@ -15777,6 +15596,9 @@ public class ChipClusters {
 
     private native void readActiveNetworkFaultsListAttribute(
         long chipClusterPtr, ActiveNetworkFaultsListAttributeCallback callback);
+
+    private native void readFeatureMapAttribute(
+        long chipClusterPtr, LongAttributeCallback callback);
 
     private native void readClusterRevisionAttribute(
         long chipClusterPtr, IntegerAttributeCallback callback);

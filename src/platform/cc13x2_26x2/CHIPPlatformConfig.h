@@ -109,6 +109,11 @@
 #define CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS 4
 #endif // CHIP_CONFIG_MAX_LOCAL_ADDR_UDP_ENDPOINTS
 
+// Limit the number of device admins to ensure enough ressources for handling them
+#ifndef CHIP_CONFIG_MAX_DEVICE_ADMINS
+#define CHIP_CONFIG_MAX_DEVICE_ADMINS 5
+#endif // CHIP_CONFIG_MAX_DEVICE_ADMINS
+
 // ==================== Security Configuration Overrides ====================
 
 #ifndef CHIP_CONFIG_MAX_APPLICATION_GROUPS

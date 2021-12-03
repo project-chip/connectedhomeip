@@ -21,6 +21,9 @@
 
 #include <commands/common/CommandInvoker.h>
 #include <commands/tests/TestCommand.h>
+#include <lib/core/Optional.h>
+#include <system/SystemClock.h>
+
 #include <math.h> // For INFINITY
 
 class TestList : public Command
@@ -42724,6 +42727,28 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Send Test Command with optional arg set to null.\n");
             err = TestSendTestCommandWithOptionalArgSetToNull_1();
             break;
+        case 2:
+            ChipLogProgress(chipTool, " ***** Test Step 2 : Send command that needs timed invoke without a timeout value\n");
+            err = TestSendCommandThatNeedsTimedInvokeWithoutATimeoutValue_2();
+            break;
+        case 3:
+            ChipLogProgress(chipTool, " ***** Test Step 3 : Send command that needs timed invoke with a long timeout value\n");
+            err = TestSendCommandThatNeedsTimedInvokeWithALongTimeoutValue_3();
+            break;
+        case 4:
+            ChipLogProgress(chipTool, " ***** Test Step 4 : Send command that needs timed invoke with a too-short timeout value\n");
+            err = TestSendCommandThatNeedsTimedInvokeWithATooShortTimeoutValue_4();
+            break;
+        case 5:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 5 : Send command that does not need timed invoke with a long timeout value\n");
+            err = TestSendCommandThatDoesNotNeedTimedInvokeWithALongTimeoutValue_5();
+            break;
+        case 6:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 6 : Send command that does not need timed invoke with a too-short timeout value\n");
+            err = TestSendCommandThatDoesNotNeedTimedInvokeWithATooShortTimeoutValue_6();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -42735,7 +42760,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 2;
+    const uint16_t mTestCount = 7;
 
     //
     // Tests methods
@@ -42783,6 +42808,154 @@ private:
 
         NextTest();
     }
+
+    CHIP_ERROR TestSendCommandThatNeedsTimedInvokeWithoutATimeoutValue_2()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_2();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_2(status);
+        };
+
+        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request,
+                                                             chip::NullOptional));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_2(uint8_t status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_NEEDS_TIMED_INTERACTION));
+        NextTest();
+    }
+
+    void OnSuccessResponse_2() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestSendCommandThatNeedsTimedInvokeWithALongTimeoutValue_3()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_3();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_3(status);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_3() { NextTest(); }
+
+    CHIP_ERROR TestSendCommandThatNeedsTimedInvokeWithATooShortTimeoutValue_4()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::TestCluster::Commands::TimedInvokeRequest::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_4();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_4(status);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 1));
+        {
+            using namespace chip::System::Clock::Literals;
+            // Busy-wait for 5 milliseconds.
+            auto & clock = chip::System::SystemClock();
+            auto start   = clock.GetMonotonicTimestamp();
+            while (clock.GetMonotonicTimestamp() - start < 5_ms)
+                ;
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_4(uint8_t status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS));
+        NextTest();
+    }
+
+    void OnSuccessResponse_4() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestSendCommandThatDoesNotNeedTimedInvokeWithALongTimeoutValue_5()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::TestCluster::Commands::Test::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_5();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_5(status);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_5() { NextTest(); }
+
+    CHIP_ERROR TestSendCommandThatDoesNotNeedTimedInvokeWithATooShortTimeoutValue_6()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        using RequestType               = chip::app::Clusters::TestCluster::Commands::Test::Type;
+
+        RequestType request;
+
+        auto success = [](void * context, const typename RequestType::ResponseType & data) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_6();
+        };
+
+        auto failure = [](void * context, EmberAfStatus status) {
+            (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_6(status);
+        };
+
+        ReturnErrorOnFailure(
+            chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request, 1));
+        {
+            using namespace chip::System::Clock::Literals;
+            // Busy-wait for 5 milliseconds.
+            auto & clock = chip::System::SystemClock();
+            auto start   = clock.GetMonotonicTimestamp();
+            while (clock.GetMonotonicTimestamp() - start < 5_ms)
+                ;
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_6(uint8_t status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS));
+        NextTest();
+    }
+
+    void OnSuccessResponse_6() { ThrowSuccessResponse(); }
 };
 
 class TestConstraints : public TestCommand

@@ -197,6 +197,13 @@ typedef struct _DeviceType
     uint16_t revision;
 } DeviceType;
 
+// Struct for DlCredential
+typedef struct _DlCredential
+{
+    uint8_t CredentialType;
+    uint16_t CredentialIndex;
+} DlCredential;
+
 // Struct for EndpointListStruct
 typedef struct _EndpointListStruct
 {

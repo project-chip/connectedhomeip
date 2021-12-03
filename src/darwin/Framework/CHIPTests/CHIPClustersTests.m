@@ -31501,129 +31501,6 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterAccessControlReadAttributeAclWithCompletionHandler
-{
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    XCTestExpectation * connectedExpectation =
-        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-    WaitForCommissionee(connectedExpectation, queue);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-
-    CHIPDevice * device = GetConnectedDevice();
-    CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    XCTestExpectation * expectation = [self expectationWithDescription:@"AccessControlReadAttributeAclWithCompletionHandler"];
-
-    [cluster readAttributeAclWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"AccessControl Acl Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterAccessControlWriteAttributeAclWithValue
-{
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    XCTestExpectation * connectedExpectation =
-        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-    WaitForCommissionee(connectedExpectation, queue);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-
-    CHIPDevice * device = GetConnectedDevice();
-    CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    XCTestExpectation * expectation = [self expectationWithDescription:@"AccessControlWriteAttributeAclWithValue"];
-
-    NSArray * _Nonnull value = @(0);
-    [cluster writeAttributeAclWithValue:value
-                      completionHandler:^(NSError * _Nullable err) {
-                          NSLog(@"AccessControl Acl Error: %@", err);
-                          XCTAssertEqual(err.code, 0);
-                          [expectation fulfill];
-                      }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterAccessControlReadAttributeExtensionWithCompletionHandler
-{
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    XCTestExpectation * connectedExpectation =
-        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-    WaitForCommissionee(connectedExpectation, queue);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-
-    CHIPDevice * device = GetConnectedDevice();
-    CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    XCTestExpectation * expectation = [self expectationWithDescription:@"AccessControlReadAttributeExtensionWithCompletionHandler"];
-
-    [cluster readAttributeExtensionWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"AccessControl Extension Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterAccessControlWriteAttributeExtensionWithValue
-{
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    XCTestExpectation * connectedExpectation =
-        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-    WaitForCommissionee(connectedExpectation, queue);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-
-    CHIPDevice * device = GetConnectedDevice();
-    CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    XCTestExpectation * expectation = [self expectationWithDescription:@"AccessControlWriteAttributeExtensionWithValue"];
-
-    NSArray * _Nonnull value = @(0);
-    [cluster writeAttributeExtensionWithValue:value
-                            completionHandler:^(NSError * _Nullable err) {
-                                NSLog(@"AccessControl Extension Error: %@", err);
-                                XCTAssertEqual(err.code, 0);
-                                [expectation fulfill];
-                            }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterAccessControlReadAttributeClusterRevisionWithCompletionHandler
-{
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    XCTestExpectation * connectedExpectation =
-        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-    WaitForCommissionee(connectedExpectation, queue);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-
-    CHIPDevice * device = GetConnectedDevice();
-    CHIPAccessControl * cluster = [[CHIPAccessControl alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    XCTestExpectation * expectation =
-        [self expectationWithDescription:@"AccessControlReadAttributeClusterRevisionWithCompletionHandler"];
-
-    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"AccessControl ClusterRevision Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
 - (void)testSendClusterAccountLoginReadAttributeClusterRevisionWithCompletionHandler
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -34724,54 +34601,6 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
 
     [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
         NSLog(@"Descriptor ClusterRevision Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterDoorLockReadAttributeLockStateWithCompletionHandler
-{
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    XCTestExpectation * connectedExpectation =
-        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-    WaitForCommissionee(connectedExpectation, queue);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-
-    CHIPDevice * device = GetConnectedDevice();
-    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    XCTestExpectation * expectation = [self expectationWithDescription:@"DoorLockReadAttributeLockStateWithCompletionHandler"];
-
-    [cluster readAttributeLockStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"DoorLock LockState Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterDoorLockReadAttributeLockTypeWithCompletionHandler
-{
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    XCTestExpectation * connectedExpectation =
-        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-    WaitForCommissionee(connectedExpectation, queue);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-
-    CHIPDevice * device = GetConnectedDevice();
-    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    XCTestExpectation * expectation = [self expectationWithDescription:@"DoorLockReadAttributeLockTypeWithCompletionHandler"];
-
-    [cluster readAttributeLockTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"DoorLock LockType Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
@@ -41965,6 +41794,31 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
 
     [cluster readAttributeActiveNetworkFaultsListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"ThreadNetworkDiagnostics ActiveNetworkFaultsList Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterThreadNetworkDiagnosticsReadAttributeFeatureMapWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ThreadNetworkDiagnosticsReadAttributeFeatureMapWithCompletionHandler"];
+
+    [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"ThreadNetworkDiagnostics FeatureMap Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

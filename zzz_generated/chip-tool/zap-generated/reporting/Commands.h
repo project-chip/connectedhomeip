@@ -148,8 +148,6 @@ public:
         delete onReportColorControlClusterRevisionCallback;
         delete onReportContentLauncherClusterRevisionCallback;
         delete onReportDescriptorClusterRevisionCallback;
-        delete onReportDoorLockLockStateCallback;
-        delete onReportDoorLockLockTypeCallback;
         delete onReportDoorLockActuatorEnabledCallback;
         delete onReportDoorLockClusterRevisionCallback;
         delete onReportElectricalMeasurementMeasurementTypeCallback;
@@ -803,10 +801,6 @@ public:
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x001D, 0xFFFD, onReportDescriptorClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0000, onReportDoorLockLockStateCallback->Cancel(),
-                                       BasicAttributeFilter<Int8uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0001, onReportDoorLockLockTypeCallback->Cancel(),
-                                       BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0002, onReportDoorLockActuatorEnabledCallback->Cancel(),
                                        BasicAttributeFilter<BooleanAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0xFFFD, onReportDoorLockClusterRevisionCallback->Cancel(),
@@ -2024,10 +2018,6 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportDescriptorClusterRevisionCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportDoorLockLockStateCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportDoorLockLockTypeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportDoorLockActuatorEnabledCallback =
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportDoorLockClusterRevisionCallback =

@@ -119,8 +119,11 @@ class TestDefinition:
                 server_is_listening = outpipe.CapturedLogContains(
                     "Server Listening")
             logging.debug('Server is listening. Can proceed.')
+            qrLine = outpipe.FindLastMatchingLine('.*SetupQRCode: *\\[(.*)]')
+            if not qrLine:
+                raise Exception("Unable to find QR code")
 
-            runner.RunSubprocess(tool_cmd + ['pairing', 'onnetwork-long', TEST_NODE_ID, '20202021', discriminator],
+            runner.RunSubprocess(tool_cmd + ['pairing', 'qrcode', TEST_NODE_ID, qrLine.group(1)],
                                  name='PAIR', dependencies=[app_process])
 
             runner.RunSubprocess(tool_cmd + ['tests', self.run_name, TEST_NODE_ID],
