@@ -58,7 +58,7 @@ namespace rpc {
 class MbedButton final : public Button
 {
 public:
-    pw::Status Event(ServerContext &, const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response)
+    pw::Status Event(const chip_rpc_ButtonEvent & request, pw_protobuf_Empty & response)
     {
         GetAppTask().ButtonEventHandler(request.idx, request.pushed);
         return pw::OkStatus();

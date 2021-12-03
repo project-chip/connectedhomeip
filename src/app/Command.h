@@ -50,7 +50,9 @@ public:
         Idle,                ///< Default state that the object starts out in, where no work has commenced
         AddingCommand,       ///< In the process of adding a command.
         AddedCommand,        ///< A command has been completely encoded and is awaiting transmission.
+        AwaitingTimedStatus, ///< Sent a Timed Request and waiting for response.
         CommandSent,         ///< The command has been sent successfully.
+        ResponseReceived,    ///< Received a response to our invoke and request and processing the response.
         AwaitingDestruction, ///< The object has completed its work and is awaiting destruction by the application.
     };
 

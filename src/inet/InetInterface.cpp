@@ -27,10 +27,9 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "InetInterface.h"
+#include <inet/InetInterface.h>
 
-#include "InetLayer.h"
-
+#include <inet/IPPrefix.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>

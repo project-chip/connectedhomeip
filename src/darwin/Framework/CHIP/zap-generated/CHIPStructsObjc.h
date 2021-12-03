@@ -200,6 +200,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPUserLabelClusterLabelStruct : NSObject
+@property (strong, nonatomic) NSString * _Nonnull label;
+@property (strong, nonatomic) NSString * _Nonnull value;
+- (instancetype)init;
+@end
+
 @interface CHIPModeSelectClusterModeOptionStruct : NSObject
 @property (strong, nonatomic) NSString * _Nonnull label;
 @property (strong, nonatomic) NSNumber * _Nonnull mode;
@@ -210,6 +216,12 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPModeSelectClusterSemanticTag : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull mfgCode;
 @property (strong, nonatomic) NSNumber * _Nonnull value;
+- (instancetype)init;
+@end
+
+@interface CHIPDoorLockClusterDlCredential : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull credentialType;
+@property (strong, nonatomic) NSNumber * _Nonnull credentialIndex;
 - (instancetype)init;
 @end
 

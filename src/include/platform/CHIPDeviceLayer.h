@@ -47,6 +47,8 @@ void SetSystemLayerForTesting(System::LayerImpl * layer);
 
 // These functions are defined in src/platform/Globals.cpp
 chip::Inet::InetLayer & InetLayer();
+chip::Inet::EndPointManager<Inet::UDPEndPoint> * UDPEndPointManager();
+chip::Inet::EndPointManager<Inet::TCPEndPoint> * TCPEndPointManager();
 chip::System::Layer & SystemLayer();
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

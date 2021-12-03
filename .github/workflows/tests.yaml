@@ -30,11 +30,11 @@ jobs:
 
         strategy:
           matrix:
-            type: [tsan]
-            eventloop: [eventloop_same, eventloop_separate]
+             build_variant: [no-ble-tsan]
+             chip_tool: ["", -same-event-loop]
         env:
-            USE_SEPARATE_EVENTLOOP: ${{ matrix.eventloop == 'eventloop_separate' }}
-            USE_TSAN: ${{ matrix.type == 'tsan' }}
+            BUILD_VARIANT: ${{matrix.build_variant}}
+            CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: ubuntu-latest
@@ -66,33 +66,27 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Build all clusters app
-              timeout-minutes: 5
+            - name: Build Apps
+              timeout-minutes: 20
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
-            - name: Build TV app
-              timeout-minutes: 5
-              run: |
-                  scripts/examples/gn_build_example.sh examples/tv-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN}
-            - name: Build chip-tool
-              timeout-minutes: 5
-              run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
-            - name: Copy objdir
-              run: |
-                  # The idea is to not upload our objdir unless builds have
-                  # actually succeeded, because that just wastes space.
-                  rsync -a out/debug/standalone/ objdir-clone || true
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target linux-x64-chip-tool-${BUILD_VARIANT}${CHIP_TOOL_VARIANT} \
+                        --target linux-x64-all-clusters-${BUILD_VARIANT} \
+                        --target linux-x64-tv-app-${BUILD_VARIANT} \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
             - name: Run Tests
               timeout-minutes: 30
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
-                     --chip-tool ./out/debug/standalone/chip-tool \
+                     --chip-tool ./out/linux-x64-chip-tool-${BUILD_VARIANT}${CHIP_TOOL_VARIANT}/chip-tool \
                      run \
-                     --iterations 2 \
-                     --all-clusters-app ./out/debug/standalone/chip-all-clusters-app \
-                     --tv-app ./out/debug/standalone/chip-tv-app \
+                     --iterations 1 \
+                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v2
@@ -116,13 +110,11 @@ jobs:
 
         strategy:
           matrix:
-            type: [tsan, asan]
-            eventloop: [eventloop_same, eventloop_separate]
+             build_variant: [no-ble-tsan, no-ble-asan]
+             chip_tool: ["", -same-event-loop]
         env:
-            USE_SEPARATE_EVENTLOOP: ${{ matrix.eventloop == 'eventloop_separate' }}
-            USE_TSAN: ${{ matrix.type == 'tsan' }}
-
-            USE_ASAN: ${{ matrix.type == 'asan' }}
+            BUILD_VARIANT: ${{matrix.build_variant}}
+            CHIP_TOOL_VARIANT: ${{matrix.chip_tool}}
 
         if: github.actor != 'restyled-io[bot]'
         runs-on: macos-latest
@@ -159,30 +151,26 @@ jobs:
                   path: |
                    .environment/gn_out/.ninja_log
                    .environment/pigweed-venv/*.log
-            - name: Run Build Test Server
-              timeout-minutes: 10
+            - name: Build Apps
+              timeout-minutes: 20
               run: |
-                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux out/debug/standalone/ chip_config_network_layer_ble=false is_tsan=${USE_TSAN} is_asan=${USE_ASAN}
-            - name: Build chip-tool
-              timeout-minutes: 10
-              run: |
-                  scripts/examples/gn_build_example.sh examples/chip-tool out/debug/standalone/ is_tsan=${USE_TSAN} is_asan=${USE_ASAN} config_use_separate_eventloop=${USE_SEPARATE_EVENTLOOP}
-            - name: Copy objdir
-              run: |
-                  # The idea is to not upload our objdir unless builds have
-                  # actually succeeded, because that just wastes space.
-                  rsync -a out/debug/standalone/ objdir-clone || true
+                  ./scripts/run_in_build_env.sh \
+                     "./scripts/build/build_examples.py \
+                        --target darwin-x64-chip-tool-${BUILD_VARIANT}${CHIP_TOOL_VARIANT} \
+                        --target darwin-x64-all-clusters-${BUILD_VARIANT} \
+                        build \
+                        --copy-artifacts-to objdir-clone \
+                     "
             - name: Run Tests
               timeout-minutes: 45
               run: |
                   ./scripts/run_in_build_env.sh \
                   "./scripts/tests/run_test_suite.py \
-                     --chip-tool ./out/debug/standalone/chip-tool \
-                     --target-skip-glob 'TV_*' \
+                     --chip-tool ./out/darwin-x64-chip-tool-${BUILD_VARIANT}${CHIP_TOOL_VARIANT}/chip-tool \
+                     --target-skip-glob 'TV*' \
                      run \
-                     --iterations 2 \
-                     --all-clusters-app ./out/debug/standalone/chip-all-clusters-app \
-                     --tv-app ./out/debug/standalone/chip-tv-app \
+                     --iterations 1 \
+                     --all-clusters-app ./out/darwin-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
                   "
             - name: Uploading core files
               uses: actions/upload-artifact@v2

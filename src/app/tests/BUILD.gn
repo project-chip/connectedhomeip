@@ -57,6 +57,7 @@ chip_test_suite("tests") {
     "TestReadInteraction.cpp",
     "TestReportingEngine.cpp",
     "TestStatusResponseMessage.cpp",
+    "TestTimedHandler.cpp",
     "TestWriteInteraction.cpp",
   ]
 

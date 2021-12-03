@@ -69,7 +69,12 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})
     auto successFn = chip::Callback::Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
 
-    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    err = cppCluster->InvokeCommand(request, onSuccess->mContext, successFn->mCall, failureFn->mCall
+    {{#if mustUseTimedInvoke}}
+      {{!TODO Fix Java API to pass in this information.  For now, 10 seconds.}}
+      , 10000
+    {{/if}}
+    );
     VerifyOrReturn(err == CHIP_NO_ERROR, AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error invoking command", CHIP_ERROR_INCORRECT_STATE));
 
     onSuccess.release();
@@ -77,6 +82,7 @@ JNI_METHOD(void, {{asUpperCamelCase ../name}}Cluster, {{asLowerCamelCase name}})
 }
 {{/chip_cluster_commands}}
 {{#chip_server_cluster_attributes}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#if isWritableAttribute}}
 {{! TODO: Lists not supported in attribute writes yet. }}
 {{#unless isList}}
@@ -148,6 +154,7 @@ JNI_METHOD(void, {{asCamelCased ../name false}}Cluster, report{{asCamelCased nam
 }
 {{/unless}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 {{/if}}

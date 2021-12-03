@@ -1450,8 +1450,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstanc
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     ConnectivityManager::SEDPollingConfig sedPollingConfig;
-    mPollingConfig.Clear();
-    sedPollingConfig.Clear();
+    using namespace System::Clock::Literals;
     sedPollingConfig.FastPollingIntervalMS = CHIP_DEVICE_CONFIG_SED_FAST_POLLING_INTERVAL;
     sedPollingConfig.SlowPollingIntervalMS = CHIP_DEVICE_CONFIG_SED_SLOW_POLLING_INTERVAL;
     err                                    = _SetSEDPollingConfig(sedPollingConfig);
@@ -1524,8 +1523,9 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetSEDPollingConfig(
     const ConnectivityManager::SEDPollingConfig & pollingConfig)
 {
-    if ((pollingConfig.SlowPollingIntervalMS < pollingConfig.FastPollingIntervalMS) || (pollingConfig.SlowPollingIntervalMS == 0) ||
-        (pollingConfig.FastPollingIntervalMS == 0))
+    using namespace System::Clock::Literals;
+    if ((pollingConfig.SlowPollingIntervalMS < pollingConfig.FastPollingIntervalMS) ||
+        (pollingConfig.SlowPollingIntervalMS == 0_ms32) || (pollingConfig.FastPollingIntervalMS == 0_ms32))
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
@@ -1547,7 +1547,7 @@ template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDPollingMode(ConnectivityManager::SEDPollingMode pollingType)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint32_t interval;
+    System::Clock::Milliseconds32 interval;
 
     if (pollingType == ConnectivityManager::SEDPollingMode::Idle)
     {
@@ -1567,17 +1567,17 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::SetSEDPollingMod
 
     uint32_t curPollingIntervalMS = otLinkGetPollPeriod(mOTInst);
 
-    if (interval != curPollingIntervalMS)
+    if (interval.count() != curPollingIntervalMS)
     {
-        otError otErr = otLinkSetPollPeriod(mOTInst, interval);
+        otError otErr = otLinkSetPollPeriod(mOTInst, interval.count());
         err           = MapOpenThreadError(otErr);
     }
 
     Impl()->UnlockThreadStack();
 
-    if (interval != curPollingIntervalMS)
+    if (interval.count() != curPollingIntervalMS)
     {
-        ChipLogProgress(DeviceLayer, "OpenThread polling interval set to %" PRId32 "ms", interval);
+        ChipLogProgress(DeviceLayer, "OpenThread polling interval set to %" PRId32 "ms", interval.count());
     }
 
     return err;

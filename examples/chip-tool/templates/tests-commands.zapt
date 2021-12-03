@@ -4,6 +4,10 @@
 
 #include <commands/tests/TestCommand.h>
 #include <commands/common/CommandInvoker.h>
+#include <lib/core/Optional.h>
+#include <system/SystemClock.h>
+
+#include <math.h> // For INFINITY
 
 class TestList : public Command
 {

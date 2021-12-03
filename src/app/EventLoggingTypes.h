@@ -117,9 +117,9 @@ struct Timestamp
     Timestamp(Type aType) : mType(aType) { mValue = 0; }
     Timestamp(Type aType, uint64_t aValue) : mType(aType), mValue(aValue) {}
     Timestamp(System::Clock::Timestamp aValue) : mType(Type::kSystem), mValue(aValue.count()) {}
-    static Timestamp UTC(uint64_t aValue)
+    static Timestamp Epoch(System::Clock::Timestamp aValue)
     {
-        Timestamp timestamp(Type::kEpoch, aValue);
+        Timestamp timestamp(Type::kEpoch, aValue.count());
         return timestamp;
     }
     static Timestamp System(System::Clock::Timestamp aValue)
@@ -128,8 +128,8 @@ struct Timestamp
         return timestamp;
     }
 
-    bool IsSystem() { return mType == Type::kSystem; }
-    bool IsEpoch() { return mType == Type::kEpoch; }
+    bool IsSystem() const { return mType == Type::kSystem; }
+    bool IsEpoch() const { return mType == Type::kEpoch; }
 
     Type mType      = Type::kSystem;
     uint64_t mValue = 0;
@@ -146,9 +146,9 @@ public:
         kUrgent = 0,
         kNotUrgent,
     };
-    EventOptions(void) : mTimestamp(Timestamp::Type::kSystem), mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
+    EventOptions(void) : mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
 
-    EventOptions(Type aType) : mTimestamp(Timestamp::Type::kSystem), mpEventSchema(nullptr), mUrgent(aType) {}
+    EventOptions(Type aType) : mpEventSchema(nullptr), mUrgent(aType) {}
 
     EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
 
@@ -157,8 +157,8 @@ public:
 
     EventSchema * mpEventSchema = nullptr; /**< A pointer to the schema of the cluster instance.*/
 
-    Type mUrgent = Type::kNotUrgent; /**< A flag denoting that the event is time sensitive.  When set, it causes the event log to be
-                                        flushed. */
+    Type mUrgent = Type::kNotUrgent; /**< A flag denoting if the event is time sensitive.  When kUrgent is set, it causes
+                                            the event log to be flushed. */
 };
 
 /**
@@ -168,18 +168,16 @@ public:
 struct EventLoadOutContext
 {
     EventLoadOutContext(TLV::TLVWriter & aWriter, PriorityLevel aPriority, EventNumber aStartingEventNumber) :
-        mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventNumber),
-        mCurrentSystemTime(Timestamp::Type::kSystem), mCurrentEventNumber(0), mCurrentUTCTime(Timestamp::Type::kEpoch), mFirst(true)
+        mWriter(aWriter), mPriority(aPriority), mStartingEventNumber(aStartingEventNumber), mCurrentEventNumber(0), mFirst(true)
     {}
 
     TLV::TLVWriter & mWriter;
     PriorityLevel mPriority          = PriorityLevel::Invalid;
     EventNumber mStartingEventNumber = 0;
-    Timestamp mPreviousSystemTime;
-    Timestamp mCurrentSystemTime;
-    EventNumber mCurrentEventNumber = 0;
-    size_t mEventCount              = 0;
-    Timestamp mCurrentUTCTime;
+    Timestamp mPreviousTime;
+    Timestamp mCurrentTime;
+    EventNumber mCurrentEventNumber      = 0;
+    size_t mEventCount                   = 0;
     ClusterInfo * mpInterestedEventPaths = nullptr;
     bool mFirst                          = true;
 };

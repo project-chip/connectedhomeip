@@ -33,14 +33,14 @@ public:
     AttestationVerificationResult VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
                                                                const ByteSpan & attestationChallengeBuffer,
                                                                const ByteSpan & attestationSignatureBuffer,
-                                                               const ByteSpan & paiCertDerBuffer, const ByteSpan & dacCertDerBuffer,
+                                                               const ByteSpan & paiDerBuffer, const ByteSpan & dacDerBuffer,
                                                                const ByteSpan & attestationNonce) override
     {
         (void) attestationInfoBuffer;
         (void) attestationChallengeBuffer;
         (void) attestationSignatureBuffer;
-        (void) paiCertDerBuffer;
-        (void) dacCertDerBuffer;
+        (void) paiDerBuffer;
+        (void) dacDerBuffer;
         (void) attestationNonce;
         return AttestationVerificationResult::kNotImplemented;
     }

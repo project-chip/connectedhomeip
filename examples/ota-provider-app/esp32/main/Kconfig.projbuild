@@ -47,4 +47,10 @@ menu "Demo"
        default 4 if RENDEZVOUS_MODE_THREAD
        default 8 if RENDEZVOUS_MODE_ETHERNET
 
+    config OTA_IMAGE_NAME
+        string "OTA image file name"
+        default "hello_world.bin"
+        help
+            Name of OTA image file which will be added to '/spiffs_image/' and sent to the OTA Requestor.
+
 endmenu

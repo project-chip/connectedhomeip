@@ -40,9 +40,9 @@
 
 namespace chip {
 namespace app {
-constexpr size_t kMaxEventSizeReserve  = 512;
-constexpr uint16_t kRequiredEventField = (1 << to_underlying(EventDataIB::Tag::kPriority)) |
-    (1 << to_underlying(EventDataIB::Tag::kDeltaSystemTimestamp)) | (1 << to_underlying(EventDataIB::Tag::kPath));
+constexpr size_t kMaxEventSizeReserve = 512;
+constexpr uint16_t kRequiredEventField =
+    (1 << to_underlying(EventDataIB::Tag::kPriority)) | (1 << to_underlying(EventDataIB::Tag::kPath));
 
 /**
  * @brief
@@ -137,10 +137,10 @@ public:
     EventNumber GetFirstEventNumber() { return mFirstEventNumber; }
     EventNumber GetLastEventNumber() { return mLastEventNumber; }
 
-    uint64_t GetFirstEventSystemTimestamp() { return mFirstEventSystemTimestamp.mValue; }
-    void SetFirstEventSystemTimestamp(uint64_t aValue) { mLastEventSystemTimestamp.mValue = aValue; }
+    uint64_t GetFirstEventTimestamp() { return mFirstEventTimestamp.mValue; }
+    void SetFirstEventTimestamp(uint64_t aValue) { mLastEventTimestamp.mValue = aValue; }
 
-    uint64_t GetLastEventSystemTimestamp() { return mLastEventSystemTimestamp.mValue; }
+    uint64_t GetLastEventTimestamp() { return mLastEventTimestamp.mValue; }
 
     virtual ~CircularEventBuffer() = default;
 
@@ -157,11 +157,11 @@ private:
     // The backup counter to use if no counter is provided for us.
     MonotonicallyIncreasingCounter mNonPersistedCounter;
 
-    size_t mRequiredSpaceForEvicted = 0;  ///< Required space for previous buffer to evict event to new buffer
-    EventNumber mFirstEventNumber   = 0;  ///< First event Number stored in the logging subsystem for this priority
-    EventNumber mLastEventNumber    = 0;  ///< Last event Number vended for this priority
-    Timestamp mFirstEventSystemTimestamp; ///< The timestamp of the first event in this buffer
-    Timestamp mLastEventSystemTimestamp;  ///< The timestamp of the last event in this buffer
+    size_t mRequiredSpaceForEvicted = 0; ///< Required space for previous buffer to evict event to new buffer
+    EventNumber mFirstEventNumber   = 0; ///< First event Number stored in the logging subsystem for this priority
+    EventNumber mLastEventNumber    = 0; ///< Last event Number vended for this priority
+    Timestamp mFirstEventTimestamp;      ///< The timestamp of the first event in this buffer
+    Timestamp mLastEventTimestamp;       ///< The timestamp of the last event in this buffer
 };
 
 class CircularEventReader;
@@ -397,39 +397,6 @@ public:
      */
     CHIP_ERROR FetchEventsSince(chip::TLV::TLVWriter & aWriter, ClusterInfo * apClusterInfolist, PriorityLevel aPriority,
                                 EventNumber & aEventNumber, size_t & aEventCount);
-
-    /**
-     * @brief
-     *  Schedule a log offload task.
-     *
-     * The function decides whether to schedule a task offload process,
-     * and if so, it schedules the `LoggingFlushHandler` to be run
-     * asynchronously on the Chip thread.
-     *
-     * The decision to schedule a flush is dependent on three factors:
-     *
-     * -- an explicit request to flush the buffer
-     *
-     * -- the state of the event buffer and the amount of data not yet
-     *    synchronized with the event consumers
-     *
-     * -- whether there is an already pending request flush request event.
-     *
-     * The explicit request to schedule a flush is passed via an input
-     * parameter.
-     *
-     * The automatic flush is typically scheduled when the event buffers
-     * contain enough data to merit starting a new offload.  Additional
-     * triggers -- such as minimum and maximum time between offloads --
-     * may also be taken into account depending on the offload strategy.
-     *
-     *
-     * @param aUrgent  indiate whether the flush should be scheduled if it is urgent
-     *
-     * @retval #CHIP_ERROR_INCORRECT_STATE EventManagement module was not initialized fully.
-     * @retval #CHIP_NO_ERROR              On success.
-     */
-    CHIP_ERROR ScheduleFlushIfNeeded(EventOptions::Type aUrgent);
 
     /**
      * @brief

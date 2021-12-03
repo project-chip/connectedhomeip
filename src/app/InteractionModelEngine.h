@@ -48,6 +48,7 @@
 #include <app/ReadClient.h>
 #include <app/ReadHandler.h>
 #include <app/StatusResponse.h>
+#include <app/TimedHandler.h>
 #include <app/WriteClient.h>
 #include <app/WriteHandler.h>
 #include <app/reporting/Engine.h>
@@ -175,6 +176,7 @@ public:
 
     uint16_t GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const;
 
+    uint16_t GetReadHandlerArrayIndex(const ReadHandler * const apReadHandler) const;
     /**
      * The Magic number of this InteractionModelEngine, the magic number is set during Init()
      */
@@ -194,9 +196,31 @@ public:
     CommandHandlerInterface * FindCommandHandler(EndpointId endpointId, ClusterId clusterId);
     void UnregisterCommandHandlers(EndpointId endpointId);
 
+    /**
+     * Called when a timed interaction has failed (i.e. the exchange it was
+     * happening on has closed while the exchange delegate was the timed
+     * handler).
+     */
+    void OnTimedInteractionFailed(TimedHandler * apTimedHandler);
+
+    /**
+     * Called when a timed invoke is received.  This function takes over all
+     * handling of the exchange, status reporting, and so forth.
+     */
+    void OnTimedInvoke(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                       const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+
+    /**
+     * Called when a timed write is received.  This function takes over all
+     * handling of the exchange, status reporting, and so forth.
+     */
+    void OnTimedWrite(TimedHandler * apTimedHandler, Messaging::ExchangeContext * apExchangeContext,
+                      const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload);
+
 private:
     friend class reporting::Engine;
     friend class TestCommandInteraction;
+    using Status = Protocols::InteractionModel::Status;
 
     void OnDone(CommandHandler & apCommandObj) override;
 
@@ -206,7 +230,8 @@ private:
      * expected to set it to success if it does not want an automatic status response message to be sent.
      */
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
-                                      System::PacketBufferHandle && aPayload, Protocols::InteractionModel::Status & aStatus);
+                                      System::PacketBufferHandle && aPayload, bool aIsTimedInvoke,
+                                      Protocols::InteractionModel::Status & aStatus);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
@@ -223,10 +248,19 @@ private:
 
     /**
      * Called when Interaction Model receives a Write Request message.  Errors processing
-     * the Write Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
+     * the Write Request are handled entirely within this function. If the
+     * status returned is not Status::Success, the caller will send a status
+     * response message with that status.
+     */
+    Status OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+                          System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
+
+    /**
+     * Called when Interaction Model receives a Timed Request message.  Errors processing
+     * the Timed Request are handled entirely within this function. The caller pre-sets status to failure and the callee is
      * expected to set it to success if it does not want an automatic status response message to be sent.
      */
-    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
+    CHIP_ERROR OnTimedRequest(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                               System::PacketBufferHandle && aPayload, Protocols::InteractionModel::Status & aStatus);
 
     /**This function handles processing of un-solicited ReportData messages on the client, which can
@@ -247,6 +281,7 @@ private:
     // TODO(#8006): investgate if we can disable some IM functions on some compact accessories.
     // TODO(#8006): investgate if we can provide more flexible object management on devices with more resources.
     BitMapObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
+    BitMapObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
     ReadClient mReadClients[CHIP_IM_MAX_NUM_READ_CLIENT];
     ReadHandler mReadHandlers[CHIP_IM_MAX_NUM_READ_HANDLER];
     WriteClient mWriteClients[CHIP_IM_MAX_NUM_WRITE_CLIENT];

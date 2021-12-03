@@ -71,12 +71,19 @@ using namespace chip::app::Clusters;
       ^(Cancelable * success, Cancelable * failure) {
         auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
         auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall
+        {{#if mustUseTimedInvoke}}
+          {{!TODO Fix Darwin API to pass in this information.  For now, 10 seconds.}}
+          , 10000
+          {{/if}}
+        );
     });
 }
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{! TODO: Need to add support for struct-type attibutes here, and enum-typed ones }}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 {{#*inline "callbackName"}}
   {{~#if isList~}}
@@ -158,6 +165,7 @@ using namespace chip::app::Clusters;
 
 {{/unless}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 
 @end

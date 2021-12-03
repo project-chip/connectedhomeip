@@ -162,8 +162,8 @@ static void printUserTables(void)
 }
 
 // Returns status byte for use in SetPinResponse and SetRfidResponse commands.
-static uint8_t setUser(uint16_t userId, uint8_t userStatus, uint8_t userType, const ByteSpan & code,
-                       EmberAfPluginDoorLockServerUser * userTable, uint8_t userTableSize)
+static EmberAfStatus setUser(uint16_t userId, DlUserStatus userStatus, DlUserType userType, const ByteSpan & code,
+                             EmberAfPluginDoorLockServerUser * userTable, uint8_t userTableSize)
 {
     bool success = false;
     // "code" (i.e. PIN/RFID) is stored in table entry in ZCL format (1-byte
@@ -194,7 +194,7 @@ static uint8_t setUser(uint16_t userId, uint8_t userStatus, uint8_t userType, co
 
         success = true;
     }
-    return (success ? 0x00 : 0x01); // See 7.3.2.17.6 and 7.3.2.17.23).
+    return (success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE); // See 7.3.2.17.6 and 7.3.2.17.23).
 }
 
 // Returns true for success, false for failure.
@@ -211,7 +211,7 @@ static bool getUser(uint16_t userId, EmberAfPluginDoorLockServerUser * userTable
 }
 
 // Returns status byte for use in ClearPin and ClearRfid response commands.
-static uint8_t clearUserPinOrRfid(uint16_t userId, EmberAfPluginDoorLockServerUser * userTable, uint8_t userTableSize)
+static EmberAfStatus clearUserPinOrRfid(uint16_t userId, EmberAfPluginDoorLockServerUser * userTable, uint8_t userTableSize)
 {
     bool success = false;
     if (userId < userTableSize)
@@ -222,7 +222,7 @@ static uint8_t clearUserPinOrRfid(uint16_t userId, EmberAfPluginDoorLockServerUs
                sizeof(userTable[userId].code));
         success = true;
     }
-    return (success ? 0x00 : 0x01); // See 7.3.2.17.8 and 7.3.2.17.25).
+    return (success ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE); // See 7.3.2.17.8 and 7.3.2.17.25).
 }
 
 bool emberAfDoorLockClusterGetUserTypeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
@@ -260,23 +260,12 @@ bool emberAfDoorLockClusterSetUserTypeCallback(app::CommandHandler * commandObj,
     auto & userId   = commandData.userId;
     auto & userType = commandData.userType;
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
     // TODO: Need to validate userType.  https://github.com/project-chip/connectedhomeip/issues/3580
-    uint8_t status = (emAfPluginDoorLockServerSetPinUserType(userId, static_cast<EmberAfDoorLockUserType>(userType))
-                          ? 0x00   // success (per 7.3.2.17.21)
-                          : 0x01); // failure (per 7.3.2.17.21)
+    EmberAfStatus status = (emAfPluginDoorLockServerSetPinUserType(userId, static_cast<EmberAfDoorLockUserType>(userType))
+                                ? EMBER_ZCL_STATUS_SUCCESS   // success (per 7.3.2.17.21)
+                                : EMBER_ZCL_STATUS_FAILURE); // failure (per 7.3.2.17.21)
 
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_SET_USER_TYPE_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
+    if (EMBER_ZCL_STATUS_SUCCESS != emberAfSendImmediateDefaultResponse(status))
     {
         ChipLogError(Zcl, "Failed to encode response command.");
     }
@@ -299,8 +288,8 @@ bool emAfPluginDoorLockServerSetPinUserType(uint16_t userId, EmberAfDoorLockUser
 // ------------------------------------------------------------------------------
 // PIN handling
 
-bool emberAfDoorLockClusterSetPinCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                          const Commands::SetPin::DecodableType & commandData)
+bool emberAfDoorLockClusterSetPINCodeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                              const Commands::SetPINCode::DecodableType & commandData)
 {
     auto & userId     = commandData.userId;
     auto & userStatus = commandData.userStatus;
@@ -309,21 +298,14 @@ bool emberAfDoorLockClusterSetPinCallback(app::CommandHandler * commandObj, cons
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     // send response
-    uint8_t status = setUser(userId, userStatus, userType, pin, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
+    EmberAfStatus status =
+        setUser(userId, userStatus, userType, pin, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
     uint16_t rfProgrammingEventMask = 0xffff; // send event by default
 
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_SET_PIN_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
+    VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == emberAfSendImmediateDefaultResponse(status), err = CHIP_ERROR_INCORRECT_STATE);
 
     // get bitmask so we can check if we should send event notification
-    emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_RF_PROGRAMMING_EVENT_MASK_ATTRIBUTE_ID,
+    emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ::Id, Attributes::RemoteProgrammingEventMask::Id,
                                (uint8_t *) &rfProgrammingEventMask, sizeof(rfProgrammingEventMask));
     if ((rfProgrammingEventMask & EMBER_BIT(2)) && !status && !pin.empty())
     {
@@ -357,8 +339,8 @@ static bool getSendPinOverTheAir(void)
     return sendPinOverTheAir;
 }
 
-bool emberAfDoorLockClusterGetPinCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                          const Commands::GetPin::DecodableType & commandData)
+bool emberAfDoorLockClusterGetPINCodeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                              const Commands::GetPINCode::DecodableType & commandData)
 {
     auto & userId = commandData.userId;
 
@@ -368,8 +350,8 @@ bool emberAfDoorLockClusterGetPinCallback(app::CommandHandler * commandObj, cons
     if (getUser(userId, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE, &user))
     {
         {
-            app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                                 ZCL_GET_PIN_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+            app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id, Commands::GetPINCodeResponse::Id,
+                                                 (app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -404,28 +386,20 @@ exit:
     return true;
 }
 
-bool emberAfDoorLockClusterClearPinCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                            const Commands::ClearPin::DecodableType & commandData)
+bool emberAfDoorLockClusterClearPINCodeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                const Commands::ClearPINCode::DecodableType & commandData)
 {
-    auto & userId = commandData.userId;
+    auto & userId = commandData.pinSlotIndex;
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t status = clearUserPinOrRfid(userId, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
+    CHIP_ERROR err       = CHIP_NO_ERROR;
+    EmberAfStatus status = clearUserPinOrRfid(userId, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
     // get bitmask so we can check if we should send event notification
     uint16_t rfProgrammingEventMask = 0xffff; // event sent by default
     uint8_t userPin                 = 0x00;   // Zero length Zigbee string
 
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_CLEAR_PIN_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
+    VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS != emberAfSendImmediateDefaultResponse(status), err = CHIP_ERROR_INCORRECT_STATE);
 
-    emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_RF_PROGRAMMING_EVENT_MASK_ATTRIBUTE_ID,
+    emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ::Id, Attributes::RemoteProgrammingEventMask::Id,
                                (uint8_t *) &rfProgrammingEventMask, sizeof(rfProgrammingEventMask));
     if ((rfProgrammingEventMask & EMBER_BIT(2)) && !status)
     {
@@ -449,28 +423,17 @@ exit:
     return true;
 }
 
-bool emberAfDoorLockClusterClearAllPinsCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                const Commands::ClearAllPins::DecodableType & commandData)
+bool emberAfDoorLockClusterClearAllPINCodesCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                    const Commands::ClearAllPINCodes::DecodableType & commandData)
 {
     uint8_t i;
-    CHIP_ERROR err = CHIP_NO_ERROR;
     for (i = 0; i < EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE; i++)
     {
         clearUserPinOrRfid(i, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
     }
 
     // 7.3.2.17.9 says that "0x00" indicates success.
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_CLEAR_ALL_PINS_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<uint8_t>(0)));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
+    if (EMBER_ZCL_STATUS_SUCCESS != emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS))
     {
         ChipLogError(Zcl, "Failed to encode response command.");
     }
@@ -480,37 +443,26 @@ exit:
 // ------------------------------------------------------------------------------
 // RFID handling
 
-bool emberAfDoorLockClusterSetRfidCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                           const Commands::SetRfid::DecodableType & commandData)
+bool emberAfDoorLockClusterSetRFIDCodeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                               const Commands::SetRFIDCode::DecodableType & commandData)
 {
     auto & userId     = commandData.userId;
     auto & userStatus = commandData.userStatus;
     auto & userType   = commandData.userType;
-    auto & rfid       = commandData.id;
+    auto & rfid       = commandData.rfidCode;
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t status =
+    EmberAfStatus status =
         setUser(userId, userStatus, userType, rfid, rfidUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE);
 
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_SET_RFID_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
+    if (EMBER_ZCL_STATUS_SUCCESS != emberAfSendImmediateDefaultResponse(status))
     {
         ChipLogError(Zcl, "Failed to encode response command.");
     }
     return true;
 }
 
-bool emberAfDoorLockClusterGetRfidCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                           const Commands::GetRfid::DecodableType & commandData)
+bool emberAfDoorLockClusterGetRFIDCodeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                               const Commands::GetRFIDCode::DecodableType & commandData)
 {
     auto & userId = commandData.userId;
 
@@ -521,7 +473,7 @@ bool emberAfDoorLockClusterGetRfidCallback(app::CommandHandler * commandObj, con
     {
         {
             app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                                 ZCL_GET_RFID_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
+                                                 Commands::GetRFIDCodeResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
             TLV::TLVWriter * writer          = nullptr;
             SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
             VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -549,52 +501,31 @@ exit:
     return true;
 }
 
-bool emberAfDoorLockClusterClearRfidCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                             const Commands::ClearRfid::DecodableType & commandData)
+bool emberAfDoorLockClusterClearRFIDCodeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                 const Commands::ClearRFIDCode::DecodableType & commandData)
 {
-    auto & userId = commandData.userId;
+    auto & userId = commandData.rfidSlotIndex;
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint8_t status = clearUserPinOrRfid(userId, rfidUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE);
+    EmberAfStatus status = clearUserPinOrRfid(userId, rfidUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE);
 
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_CLEAR_RFID_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
+    // 7.3.2.17.9 says that "0x00" indicates success.
+    if (EMBER_ZCL_STATUS_SUCCESS != emberAfSendImmediateDefaultResponse(status))
     {
         ChipLogError(Zcl, "Failed to encode response command.");
     }
     return true;
 }
 
-bool emberAfDoorLockClusterClearAllRfidsCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                 const Commands::ClearAllRfids::DecodableType & commandData)
+bool emberAfDoorLockClusterClearAllRFIDCodesCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+                                                     const Commands::ClearAllRFIDCodes::DecodableType & commandData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
     for (uint8_t i = 0; i < EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE; i++)
     {
         clearUserPinOrRfid(i, rfidUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_RFID_USER_TABLE_SIZE);
     }
 
     // 7.3.2.17.26 says that "0x00" indicates success.
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_CLEAR_ALL_RFIDS_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), static_cast<uint8_t>(0)));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
+    if (EMBER_ZCL_STATUS_SUCCESS != emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS))
     {
         ChipLogError(Zcl, "Failed to encode response command.");
     }
@@ -632,7 +563,7 @@ static bool verifyPin(const ByteSpan & pin, uint8_t * userId)
 
     status =
         emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                   ZCL_REQUIRE_PIN_FOR_RF_OPERATION_ATTRIBUTE_ID, (uint8_t *) &pinRequired, sizeof(pinRequired));
+                                   Attributes::RequirePINforRemoteOperation::Id, (uint8_t *) &pinRequired, sizeof(pinRequired));
     if (EMBER_ZCL_STATUS_SUCCESS != status || !pinRequired)
     {
         return true;
@@ -658,7 +589,10 @@ static bool verifyPin(const ByteSpan & pin, uint8_t * userId)
 bool emberAfDoorLockClusterLockDoorCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                             const Commands::LockDoor::DecodableType & commandData)
 {
-    auto & PIN = commandData.pin;
+    // NOTE: PIN code is optional for Lock commands in the Matter spec (5.2.4.1).
+    // Don't care that it is optional for now, this should be properly addressed in the upcoming door lock
+    // cluster implementation. For now we assume that the PIN code is always present.
+    auto & PIN = commandData.pinCode.Value();
 
     uint8_t userId                = 0;
     bool pinVerified              = verifyPin(PIN, &userId);
@@ -677,23 +611,18 @@ bool emberAfDoorLockClusterLockDoorCallback(app::CommandHandler * commandObj, co
 
     if (doorLocked)
     {
-        emberAfWriteServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID,
+        emberAfWriteServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, Attributes::LockState::Id,
                                     &lockStateLocked, ZCL_INT8U_ATTRIBUTE_TYPE);
     }
 
     // send response
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_LOCK_DOOR_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), doorLocked ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE));
-        SuccessOrExit(err = commandObj->FinishCommand());
+        auto status = doorLocked ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
+        VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == emberAfSendImmediateDefaultResponse(status), err = CHIP_ERROR_INCORRECT_STATE);
     }
 
     // check if we should send event notification
-    emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_RF_OPERATION_EVENT_MASK_ATTRIBUTE_ID,
+    emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, Attributes::RemoteOperationEventMask::Id,
                                (uint8_t *) &rfOperationEventMask, sizeof(rfOperationEventMask));
 
     // Possibly send operation event
@@ -702,7 +631,7 @@ bool emberAfDoorLockClusterLockDoorCallback(app::CommandHandler * commandObj, co
         if (rfOperationEventMask & EMBER_BIT(1) && !PIN.empty())
         {
             emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                      ZCL_OPERATION_EVENT_NOTIFICATION_COMMAND_ID, "uuvSwS", 0x01, 0x03, userId, PIN.data(),
+                                      Commands::OperatingEventNotification::Id, "uuvSwS", 0x01, 0x03, userId, PIN.data(),
                                       static_cast<uint8_t>(PIN.size()), 0X00, PIN.data(), static_cast<uint8_t>(PIN.size()));
         }
     }
@@ -711,7 +640,7 @@ bool emberAfDoorLockClusterLockDoorCallback(app::CommandHandler * commandObj, co
         if (rfOperationEventMask & EMBER_BIT(3) && !PIN.empty())
         {
             emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                      ZCL_OPERATION_EVENT_NOTIFICATION_COMMAND_ID, "uuvSwS", 0x01, 0x03, userId, PIN.data(),
+                                      Commands::OperatingEventNotification::Id, "uuvSwS", 0x01, 0x03, userId, PIN.data(),
                                       static_cast<uint8_t>(PIN.size()), 0x00, PIN.data(), static_cast<uint8_t>(PIN.size()));
         }
     }
@@ -727,7 +656,10 @@ exit:
 bool emberAfDoorLockClusterUnlockDoorCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                               const Commands::UnlockDoor::DecodableType & commandData)
 {
-    auto & pin = commandData.pin;
+    // NOTE: PIN code is optional for Unlock command in the Matter spec (5.2.4.2).
+    // Don't care that it is optional for now, this should be properly addressed in the upcoming door lock
+    // cluster implementation. For now we assume that the PIN code is always present.
+    auto & pin = commandData.pinCode.Value();
 
     uint8_t userId                = 0;
     bool pinVerified              = verifyPin(pin, &userId);
@@ -745,29 +677,24 @@ bool emberAfDoorLockClusterUnlockDoorCallback(app::CommandHandler * commandObj, 
     }
     if (doorUnlocked)
     {
-        emberAfWriteServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID,
+        emberAfWriteServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, Attributes::LockState::Id,
                                     &lockStateUnlocked, ZCL_INT8U_ATTRIBUTE_TYPE);
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_UNLOCK_DOOR_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), doorUnlocked ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE));
-        SuccessOrExit(err = commandObj->FinishCommand());
+        auto status = doorUnlocked ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_FAILURE;
+        VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == emberAfSendImmediateDefaultResponse(status), err = CHIP_ERROR_INCORRECT_STATE);
     }
 
     // get bitmask so we can check if we should send event notification
-    emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_RF_OPERATION_EVENT_MASK_ATTRIBUTE_ID,
+    emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, Attributes::RemoteOperationEventMask::Id,
                                (uint8_t *) &rfOperationEventMask, sizeof(rfOperationEventMask));
 
     // send operation event
     if (doorUnlocked && (rfOperationEventMask & EMBER_BIT(2)) && !pin.empty())
     {
         emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
-                                  ZCL_OPERATION_EVENT_NOTIFICATION_COMMAND_ID, "uuvSwS", EMBER_ZCL_DOOR_LOCK_EVENT_SOURCE_RF,
+                                  Commands::OperatingEventNotification::Id, "uuvSwS", EMBER_ZCL_DOOR_LOCK_EVENT_SOURCE_RF,
                                   EMBER_ZCL_DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK, userId, pin.data(),
                                   static_cast<uint8_t>(pin.size()), 0 /*emberAfGetCurrentTime() #2507 */, pin.data(),
                                   static_cast<uint8_t>(pin.size()));
@@ -920,13 +847,14 @@ void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttr
 bool emberAfDoorLockClusterUnlockWithTimeoutCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
                                                      const Commands::UnlockWithTimeout::DecodableType & commandData)
 {
-    auto & timeoutS = commandData.timeoutInSeconds;
-    auto & pin      = commandData.pin;
+    // NOTE: PIN code is optional for Lock With Timeout commands in the Matter spec (5.2.4.3).
+    // Don't care that it is optional for now, this should be properly addressed in the upcoming door lock
+    // cluster implementation. For now we assume that the PIN code is always present.
+    auto & timeoutS = commandData.timeout;
+    auto & pin      = commandData.pinCode.Value();
 
     uint8_t userId;
-    uint8_t status;
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
+    EmberAfStatus status;
     if (verifyPin(pin, &userId))
     {
         uint8_t lockState        = EMBER_ZCL_DOOR_LOCK_STATE_LOCKED;
@@ -938,25 +866,14 @@ bool emberAfDoorLockClusterUnlockWithTimeoutCallback(app::CommandHandler * comma
         }
 
         scheduleAutoRelock(timeoutS);
-        status = 0x00; // success (per 7.3.2.17.4)
+        status = EMBER_ZCL_STATUS_SUCCESS; // success (per 7.3.2.17.4)
     }
     else
     {
-        status = 0x01; // failure (per 7.3.2.17.4)
+        status = EMBER_ZCL_STATUS_FAILURE; // failure (per 7.3.2.17.4)
     }
 
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                             ZCL_UNLOCK_WITH_TIMEOUT_RESPONSE_COMMAND_ID,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
+    if (EMBER_ZCL_STATUS_SUCCESS != emberAfSendImmediateDefaultResponse(status))
     {
         ChipLogError(Zcl, "Failed to encode response command.");
     }

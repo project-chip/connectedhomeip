@@ -149,6 +149,7 @@ class {{filename}}: public TestCommand
     {{#if (isTestOnlyCluster cluster)}}
     CHIP_ERROR {{>testCommand}}()
     {
+        SetIdentity(kIdentity{{asUpperCamelCase identity}});
         return {{command}}({{#chip_tests_item_parameters}}{{#not_first}}, {{/not_first}}{{#if (isString type)}}"{{/if}}{{definedValue}}{{#if (isString type)}}"{{/if}}{{/chip_tests_item_parameters}});
     }
     {{else if isWait}}
@@ -171,6 +172,7 @@ class {{filename}}: public TestCommand
     {{#*inline "successArguments"}}{{#chip_tests_item_response_parameters}}{{#not_first}}, {{/not_first}}{{zapTypeToDecodableClusterObjectType type ns=parent.cluster isArgument=true}} {{asLowerCamelCase name}}{{/chip_tests_item_response_parameters}}{{/inline}}
     {{#*inline "doneArguments"}}{{/inline}}
 
+    {{#*inline "device"}}mDevices[kIdentity{{asUpperCamelCase identity}}]{{/inline}}
     CHIP_ERROR {{>testCommand}}()
     {
         {{#if isGroupCommand}}
@@ -194,14 +196,31 @@ class {{filename}}: public TestCommand
             (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevice, this, success, failure, endpoint, request));
+        ReturnErrorOnFailure(chip::Controller::{{#if isGroupCommand}}InvokeGroupCommand{{else}}InvokeCommand{{/if}}({{>device}}, this, success, failure,
+          {{#if isGroupCommand}}groupId{{else}}endpoint{{/if}},
+          request
+          {{#if timedInteractionTimeoutMs}}
+          , {{timedInteractionTimeoutMs}}
+          {{else if commandObject.mustUseTimedInvoke}}
+          , chip::NullOptional
+          {{/if}}
+          ));
+        {{#if busyWaitMs}}
+          {
+            using namespace chip::System::Clock::Literals;
+            // Busy-wait for {{busyWaitMs}} milliseconds.
+            auto & clock = chip::System::SystemClock();
+            auto start = clock.GetMonotonicTimestamp();
+            while (clock.GetMonotonicTimestamp() - start < {{busyWaitMs}}_ms);
+          }
+        {{/if}}
         {{#unless async}}return CHIP_NO_ERROR;{{/unless}}
         {{else}}
         chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
         {{#if isGroupCommand}}
-        cluster.AssociateWithGroup(mDevice, groupId);
+        cluster.AssociateWithGroup({{>device}}, groupId);
         {{else}}
-        cluster.Associate(mDevice, endpoint);
+        cluster.Associate({{>device}}, endpoint);
         {{/if}}
 
         {{#chip_tests_item_parameters}}

@@ -59,7 +59,7 @@ static const int kFixedLabelElementsOctetStringSize = 16;
 
 static EndpointId gCurrentEndpointId;
 static EndpointId gFirstDynamicEndpointId;
-static Device * gDevices[DYNAMIC_ENDPOINT_COUNT];
+static Device * gDevices[CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT];
 
 // ENDPOINT DEFINITIONS:
 // =================================================================================
@@ -184,7 +184,7 @@ DECLARE_DYNAMIC_ENDPOINT(bridgedSwitchEndpoint, bridgedSwitchClusters);
 int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceType)
 {
     uint8_t index = 0;
-    while (index < DYNAMIC_ENDPOINT_COUNT)
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         if (NULL == gDevices[index])
         {
@@ -219,7 +219,7 @@ int AddDeviceEndpoint(Device * dev, EmberAfEndpointType * ep, uint16_t deviceTyp
 int RemoveDeviceEndpoint(Device * dev)
 {
     uint8_t index = 0;
-    while (index < DYNAMIC_ENDPOINT_COUNT)
+    while (index < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         if (gDevices[index] == dev)
         {
@@ -460,7 +460,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 
     EmberAfStatus ret = EMBER_ZCL_STATUS_FAILURE;
 
-    if ((endpointIndex < DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != NULL))
+    if ((endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT) && (gDevices[endpointIndex] != NULL))
     {
         Device * dev = gDevices[endpointIndex];
 
@@ -496,7 +496,7 @@ EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, Cluster
 
     // ChipLogProgress(DeviceLayer, "emberAfExternalAttributeWriteCallback: ep=%d", endpoint);
 
-    if (endpointIndex < DYNAMIC_ENDPOINT_COUNT)
+    if (endpointIndex < CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT)
     {
         Device * dev = gDevices[endpointIndex];
 

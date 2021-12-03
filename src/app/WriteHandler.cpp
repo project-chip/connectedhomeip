@@ -26,6 +26,9 @@
 
 namespace chip {
 namespace app {
+
+using namespace Protocols::InteractionModel;
+
 CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
 {
     IgnoreUnusedVariable(apDelegate);
@@ -37,7 +40,7 @@ CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
     mMessageWriter.Init(std::move(packet));
     ReturnLogErrorOnFailure(mWriteResponseBuilder.Init(&mMessageWriter));
 
-    AttributeStatuses::Builder attributeStatusesBuilder = mWriteResponseBuilder.CreateWriteResponses();
+    AttributeStatusIBs::Builder attributeStatusesBuilder = mWriteResponseBuilder.CreateWriteResponses();
     ReturnLogErrorOnFailure(attributeStatusesBuilder.GetError());
 
     MoveToState(State::Initialized);
@@ -53,29 +56,31 @@ void WriteHandler::Shutdown()
     ClearState();
 }
 
-CHIP_ERROR WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload)
+Status WriteHandler::OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload,
+                                    bool aIsTimedWrite)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    mpExchangeCtx  = apExchangeContext;
+    mpExchangeCtx = apExchangeContext;
 
-    err = ProcessWriteRequest(std::move(aPayload));
-    SuccessOrExit(err);
+    Status status = ProcessWriteRequest(std::move(aPayload), aIsTimedWrite);
 
     // Do not send response on Group Write
-    if (!apExchangeContext->IsGroupExchangeContext())
+    if (status == Status::Success && !apExchangeContext->IsGroupExchangeContext())
     {
-        err = SendWriteResponse();
+        CHIP_ERROR err = SendWriteResponse();
+        if (err != CHIP_NO_ERROR)
+        {
+            status = Status::Failure;
+        }
     }
 
-exit:
     Shutdown();
-    return err;
+    return status;
 }
 
 CHIP_ERROR WriteHandler::FinalizeMessage(System::PacketBufferHandle & packet)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    AttributeStatuses::Builder attributeStatuses;
+    AttributeStatusIBs::Builder attributeStatuses;
     VerifyOrExit(mState == State::AddStatus, err = CHIP_ERROR_INCORRECT_STATE);
     attributeStatuses = mWriteResponseBuilder.GetWriteResponses().EndOfAttributeStatuses();
     err               = attributeStatuses.GetError();
@@ -190,7 +195,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload)
+Status WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayload, bool aIsTimedWrite)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVReader reader;
@@ -199,6 +204,14 @@ CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayl
     AttributeDataIBs::Parser AttributeDataIBsParser;
     TLV::TLVReader AttributeDataIBsReader;
     bool needSuppressResponse = false;
+    // Default to InvalidAction for our status; that's what we want if any of
+    // the parsing of our overall structure or paths fails.  Once we have a
+    // successfully parsed path, the only way we will get a failure return is if
+    // our path handling fails to AddStatus on us.
+    //
+    // TODO: That's not technically InvalidAction, and we should probably make
+    // our callees hand out Status as well.
+    Status status = Status::InvalidAction;
 
     reader.Init(std::move(aPayload));
 
@@ -228,11 +241,23 @@ CHIP_ERROR WriteHandler::ProcessWriteRequest(System::PacketBufferHandle && aPayl
     err = writeRequestParser.GetWriteRequests(&AttributeDataIBsParser);
     SuccessOrExit(err);
 
+    if (mIsTimedRequest != aIsTimedWrite)
+    {
+        // The message thinks it should be part of a timed interaction but it's
+        // not, or vice versa.  Spec says to Respond with UNSUPPORTED_ACCESS.
+        status = Status::UnsupportedAccess;
+        goto exit;
+    }
+
     AttributeDataIBsParser.GetReader(&AttributeDataIBsReader);
     err = ProcessAttributeDataIBs(AttributeDataIBsReader);
+    if (err == CHIP_NO_ERROR)
+    {
+        status = Status::Success;
+    }
 
 exit:
-    return err;
+    return status;
 }
 
 CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathParams,

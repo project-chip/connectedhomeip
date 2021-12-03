@@ -24,7 +24,8 @@ namespace Attributes {
 
 {{/first}}
 {{#if clusterRef}}
-{{#if (canHaveSimpleAccessors this)}}
+{{#if_is_struct type}}
+{{else if (canHaveSimpleAccessors this)}}
 namespace {{asUpperCamelCase label}} {
 EmberAfStatus Get(chip::EndpointId endpoint, {{accessorGetterType this}} value); // {{type}} {{isArray}}
 EmberAfStatus Set(chip::EndpointId endpoint, {{asUnderlyingZclType type}} value);
@@ -34,7 +35,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, const DataModel::Nullable<{{asUnder
 {{/if}}
 } // namespace {{asUpperCamelCase label}}
 
-{{/if}}
+{{/if_is_struct}}
 {{/if}}
 {{#last}}
 } // namespace Attributes

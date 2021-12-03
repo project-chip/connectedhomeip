@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Send Test Command with optional arg set to null."
       # Not in TestCluster.yaml for now because this test depends on
       # distinguishing "null" and "not sent" for a nullable+optional
@@ -38,3 +42,45 @@ tests:
                 value: true
               - name: "originalValue"
                 value: null
+
+    # The timed invoke tests are not in TestCluster.yaml for now because Darwin
+    # SDK APIs have not been updated to do timed invoke properly yet.
+
+    - label: "Send command that needs timed invoke without a timeout value"
+      command: "timedInvokeRequest"
+      response:
+          # No timed interaction timeout provided, so not doing a timed interaction.
+          error: NEEDS_TIMED_INTERACTION
+
+    - label: "Send command that needs timed invoke with a long timeout value"
+      # Expecting a success response here.
+      command: "timedInvokeRequest"
+      timedInteractionTimeoutMs: 10000
+
+    - label:
+          "Send command that needs timed invoke with a too-short timeout value"
+      command: "timedInvokeRequest"
+      timedInteractionTimeoutMs: 1
+      # Try to ensure that we are unresponsive for long enough that the timeout
+      # expires.
+      busyWaitMs: 5
+      response:
+          error: UNSUPPORTED_ACCESS
+
+    - label:
+          "Send command that does not need timed invoke with a long timeout
+          value"
+      # Expecting a success response here.
+      command: "test"
+      timedInteractionTimeoutMs: 10000
+
+    - label:
+          "Send command that does not need timed invoke with a too-short timeout
+          value"
+      command: "test"
+      timedInteractionTimeoutMs: 1
+      # Try to ensure that we are unresponsive for long enough that the timeout
+      # expires.
+      busyWaitMs: 5
+      response:
+          error: UNSUPPORTED_ACCESS

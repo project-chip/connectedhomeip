@@ -27,6 +27,10 @@
 
 class PersistentStorage;
 
+constexpr const char kIdentityAlpha[] = "alpha";
+constexpr const char kIdentityBeta[]  = "beta";
+constexpr const char kIdentityGamma[] = "gamma";
+
 class CHIPCommand : public Command
 {
 public:
@@ -69,6 +73,9 @@ protected:
     chip::SimpleFabricStorage mFabricStorage;
     chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
+    std::string GetIdentity();
+    void SetIdentity(const char * name);
+
     // This method returns the commissioner instance to be used for running the command.
     // The default commissioner instance name is "alpha", but it can be overriden by passing
     // --identity "instance name" when running a command.
@@ -77,7 +84,6 @@ protected:
 private:
     CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId);
     CHIP_ERROR ShutdownCommissioner(std::string key);
-    std::string CurrentCommissionerName();
     uint16_t CurrentCommissionerIndex();
     std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
     chip::Optional<char *> mCommissionerName;

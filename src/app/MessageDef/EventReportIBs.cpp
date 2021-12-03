@@ -17,11 +17,11 @@
  */
 /**
  *    @file
- *      This file defines EventReports parser and builder in CHIP interaction model
+ *      This file defines EventReportIBs parser and builder in CHIP interaction model
  *
  */
 
-#include "EventReports.h"
+#include "EventReportIBs.h"
 #include "MessageDefHelper.h"
 
 #include <inttypes.h>
@@ -33,13 +33,13 @@
 namespace chip {
 namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR EventReports::Parser::CheckSchemaValidity() const
+CHIP_ERROR EventReportIBs::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     size_t numEventReports = 0;
     TLV::TLVReader reader;
 
-    PRETTY_PRINT("EventReports =");
+    PRETTY_PRINT("EventReportIBs =");
     PRETTY_PRINT("[");
 
     // make a copy of the reader
@@ -82,7 +82,7 @@ CHIP_ERROR EventReports::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-EventReportIB::Builder & EventReports::Builder::CreateEventReport()
+EventReportIB::Builder & EventReportIBs::Builder::CreateEventReport()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -91,7 +91,7 @@ EventReportIB::Builder & EventReports::Builder::CreateEventReport()
     return mEventReport;
 }
 
-EventReports::Builder & EventReports::Builder::EndOfEventReports()
+EventReportIBs::Builder & EventReportIBs::Builder::EndOfEventReports()
 {
     EndOfContainer();
     return *this;

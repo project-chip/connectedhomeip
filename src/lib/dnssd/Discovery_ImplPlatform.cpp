@@ -136,45 +136,42 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
     // in with the correct values and set one level up from here.
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     chip::DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
-    sedPollingConfig.Clear();
     ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig));
     // Increment default MRP retry intervals by SED poll period to be on the safe side
     // and avoid unnecessary retransmissions.
     if (optionalMrp.HasValue())
     {
         auto mrp = optionalMrp.Value();
-        optionalMrp.SetValue(ReliableMessageProtocolConfig(
-            mrp.mIdleRetransTimeoutTick + (sedPollingConfig.SlowPollingIntervalMS >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT),
-            mrp.mActiveRetransTimeoutTick +
-                (sedPollingConfig.FastPollingIntervalMS >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)));
+        optionalMrp.SetValue(ReliableMessageProtocolConfig(mrp.mIdleRetransTimeout + sedPollingConfig.SlowPollingIntervalMS,
+                                                           mrp.mActiveRetransTimeout + sedPollingConfig.FastPollingIntervalMS));
     }
 #endif
     if (optionalMrp.HasValue())
     {
         auto mrp = optionalMrp.Value();
         {
-            if ((mrp.mIdleRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT) > kMaxRetryInterval)
+            if (mrp.mIdleRetransTimeout > kMaxRetryInterval)
             {
                 ChipLogProgress(Discovery,
                                 "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
-                mrp.mIdleRetransTimeoutTick = kMaxRetryInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
+                mrp.mIdleRetransTimeout = kMaxRetryInterval;
             }
-            size_t writtenCharactersNumber = snprintf(mrpRetryIdleStorage, sizeof(mrpRetryIdleStorage), "%" PRIu32,
-                                                      mrp.mIdleRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT);
+            size_t writtenCharactersNumber =
+                snprintf(mrpRetryIdleStorage, sizeof(mrpRetryIdleStorage), "%" PRIu32, mrp.mIdleRetransTimeout.count());
             VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalIdleMaxLength),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtEntryStorage[txtEntryIdx++] = { "CRI", Uint8::from_const_char(mrpRetryIdleStorage), strlen(mrpRetryIdleStorage) };
         }
 
         {
-            if ((mrp.mActiveRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT) > kMaxRetryInterval)
+            if (mrp.mActiveRetransTimeout > kMaxRetryInterval)
             {
                 ChipLogProgress(Discovery,
                                 "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
-                mrp.mActiveRetransTimeoutTick = kMaxRetryInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
+                mrp.mActiveRetransTimeout = kMaxRetryInterval;
             }
-            size_t writtenCharactersNumber = snprintf(mrpRetryActiveStorage, sizeof(mrpRetryActiveStorage), "%" PRIu32,
-                                                      mrp.mActiveRetransTimeoutTick << CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT);
+            size_t writtenCharactersNumber =
+                snprintf(mrpRetryActiveStorage, sizeof(mrpRetryActiveStorage), "%" PRIu32, mrp.mActiveRetransTimeout.count());
             VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalActiveMaxLength),
                                 CHIP_ERROR_INVALID_STRING_LENGTH);
             txtEntryStorage[txtEntryIdx++] = { "CRA", Uint8::from_const_char(mrpRetryActiveStorage),
@@ -534,7 +531,7 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, DnssdService * res
 CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(InitImpl());
-    char serviceName[kMaxCommisisonableServiceNameSize];
+    char serviceName[kMaxCommissionableServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
     return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
@@ -544,7 +541,7 @@ CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter
 CHIP_ERROR DiscoveryImplPlatform::FindCommissioners(DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(InitImpl());
-    char serviceName[kMaxCommisisonerServiceNameSize];
+    char serviceName[kMaxCommissionerServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
 
     return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,

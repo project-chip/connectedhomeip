@@ -87,7 +87,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
-    attributePathBuilder = attributePathListBuilder.CreateAttributePath();
+    attributePathBuilder = attributePathListBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
     attributePathBuilder = attributePathBuilder.Node(1)
                                .Endpoint(kTestEndpointId)
@@ -96,7 +96,7 @@ void TestReportingEngine::TestBuildAndSendSingleReportData(nlTestSuite * apSuite
                                .EndOfAttributePathIB();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributePathBuilder = attributePathListBuilder.CreateAttributePath();
+    attributePathBuilder = attributePathListBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
     attributePathBuilder = attributePathBuilder.Node(1)
                                .Endpoint(kTestEndpointId)

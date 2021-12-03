@@ -1397,13 +1397,13 @@ class ChipClusters:
         "commands": {
             0x00000008: {
                 "commandId": 0x00000008,
-                "commandName": "ClearAllPins",
+                "commandName": "ClearAllPINCodes",
                 "args": {
                 },
             },
             0x00000019: {
                 "commandId": 0x00000019,
-                "commandName": "ClearAllRfids",
+                "commandName": "ClearAllRFIDCodes",
                 "args": {
                 },
             },
@@ -1411,44 +1411,44 @@ class ChipClusters:
                 "commandId": 0x00000013,
                 "commandName": "ClearHolidaySchedule",
                 "args": {
-                    "scheduleId": "int",
+                    "holidayIndex": "int",
                 },
             },
             0x00000007: {
                 "commandId": 0x00000007,
-                "commandName": "ClearPin",
+                "commandName": "ClearPINCode",
                 "args": {
-                    "userId": "int",
+                    "pinSlotIndex": "int",
                 },
             },
             0x00000018: {
                 "commandId": 0x00000018,
-                "commandName": "ClearRfid",
+                "commandName": "ClearRFIDCode",
                 "args": {
-                    "userId": "int",
+                    "rfidSlotIndex": "int",
                 },
             },
             0x0000000D: {
                 "commandId": 0x0000000D,
-                "commandName": "ClearWeekdaySchedule",
+                "commandName": "ClearWeekDaySchedule",
                 "args": {
-                    "scheduleId": "int",
-                    "userId": "int",
+                    "weekDayIndex": "int",
+                    "userIndex": "int",
                 },
             },
             0x00000010: {
                 "commandId": 0x00000010,
-                "commandName": "ClearYeardaySchedule",
+                "commandName": "ClearYearDaySchedule",
                 "args": {
-                    "scheduleId": "int",
-                    "userId": "int",
+                    "yearDayIndex": "int",
+                    "userIndex": "int",
                 },
             },
             0x00000012: {
                 "commandId": 0x00000012,
                 "commandName": "GetHolidaySchedule",
                 "args": {
-                    "scheduleId": "int",
+                    "holidayIndex": "int",
                 },
             },
             0x00000004: {
@@ -1460,14 +1460,14 @@ class ChipClusters:
             },
             0x00000006: {
                 "commandId": 0x00000006,
-                "commandName": "GetPin",
+                "commandName": "GetPINCode",
                 "args": {
                     "userId": "int",
                 },
             },
             0x00000017: {
                 "commandId": 0x00000017,
-                "commandName": "GetRfid",
+                "commandName": "GetRFIDCode",
                 "args": {
                     "userId": "int",
                 },
@@ -1481,40 +1481,40 @@ class ChipClusters:
             },
             0x0000000C: {
                 "commandId": 0x0000000C,
-                "commandName": "GetWeekdaySchedule",
+                "commandName": "GetWeekDaySchedule",
                 "args": {
-                    "scheduleId": "int",
-                    "userId": "int",
+                    "weekDayIndex": "int",
+                    "userIndex": "int",
                 },
             },
             0x0000000F: {
                 "commandId": 0x0000000F,
-                "commandName": "GetYeardaySchedule",
+                "commandName": "GetYearDaySchedule",
                 "args": {
-                    "scheduleId": "int",
-                    "userId": "int",
+                    "yearDayIndex": "int",
+                    "userIndex": "int",
                 },
             },
             0x00000000: {
                 "commandId": 0x00000000,
                 "commandName": "LockDoor",
                 "args": {
-                    "pin": "bytes",
+                    "pinCode": "bytes",
                 },
             },
             0x00000011: {
                 "commandId": 0x00000011,
                 "commandName": "SetHolidaySchedule",
                 "args": {
-                    "scheduleId": "int",
+                    "holidayIndex": "int",
                     "localStartTime": "int",
                     "localEndTime": "int",
-                    "operatingModeDuringHoliday": "int",
+                    "operatingMode": "int",
                 },
             },
             0x00000005: {
                 "commandId": 0x00000005,
-                "commandName": "SetPin",
+                "commandName": "SetPINCode",
                 "args": {
                     "userId": "int",
                     "userStatus": "int",
@@ -1524,12 +1524,12 @@ class ChipClusters:
             },
             0x00000016: {
                 "commandId": 0x00000016,
-                "commandName": "SetRfid",
+                "commandName": "SetRFIDCode",
                 "args": {
                     "userId": "int",
                     "userStatus": "int",
                     "userType": "int",
-                    "id": "bytes",
+                    "rfidCode": "bytes",
                 },
             },
             0x00000014: {
@@ -1542,10 +1542,10 @@ class ChipClusters:
             },
             0x0000000B: {
                 "commandId": 0x0000000B,
-                "commandName": "SetWeekdaySchedule",
+                "commandName": "SetWeekDaySchedule",
                 "args": {
-                    "scheduleId": "int",
-                    "userId": "int",
+                    "weekDayIndex": "int",
+                    "userIndex": "int",
                     "daysMask": "int",
                     "startHour": "int",
                     "startMinute": "int",
@@ -1555,10 +1555,10 @@ class ChipClusters:
             },
             0x0000000E: {
                 "commandId": 0x0000000E,
-                "commandName": "SetYeardaySchedule",
+                "commandName": "SetYearDaySchedule",
                 "args": {
-                    "scheduleId": "int",
-                    "userId": "int",
+                    "yearDayIndex": "int",
+                    "userIndex": "int",
                     "localStartTime": "int",
                     "localEndTime": "int",
                 },
@@ -1567,15 +1567,15 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "UnlockDoor",
                 "args": {
-                    "pin": "bytes",
+                    "pinCode": "bytes",
                 },
             },
             0x00000003: {
                 "commandId": 0x00000003,
                 "commandName": "UnlockWithTimeout",
                 "args": {
-                    "timeoutInSeconds": "int",
-                    "pin": "bytes",
+                    "timeout": "int",
+                    "pinCode": "bytes",
                 },
             },
         },
@@ -1866,6 +1866,16 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "",
                 "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "RegulatoryConfig",
+                "attributeId": 0x00000002,
+                "type": "int",
+            },
+            0x00000003: {
+                "attributeName": "LocationCapability",
+                "attributeId": 0x00000003,
+                "type": "int",
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
@@ -3749,6 +3759,13 @@ class ChipClusters:
                     "arg1": "int",
                 },
             },
+            0x00000013: {
+                "commandId": 0x00000013,
+                "commandName": "TestSimpleOptionalArgumentRequest",
+                "args": {
+                    "arg1": "bool",
+                },
+            },
             0x00000002: {
                 "commandId": 0x00000002,
                 "commandName": "TestSpecific",
@@ -3772,6 +3789,12 @@ class ChipClusters:
             0x00000003: {
                 "commandId": 0x00000003,
                 "commandName": "TestUnknownCommand",
+                "args": {
+                },
+            },
+            0x00000012: {
+                "commandId": 0x00000012,
+                "commandName": "TimedInvokeRequest",
                 "args": {
                 },
             },
@@ -3826,9 +3849,37 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x00000007: {
+                "attributeName": "Int24u",
+                "attributeId": 0x00000007,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
             0x00000008: {
                 "attributeName": "Int32u",
                 "attributeId": 0x00000008,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000009: {
+                "attributeName": "Int40u",
+                "attributeId": 0x00000009,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000A: {
+                "attributeName": "Int48u",
+                "attributeId": 0x0000000A,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000000B: {
+                "attributeName": "Int56u",
+                "attributeId": 0x0000000B,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -3854,9 +3905,37 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x0000000F: {
+                "attributeName": "Int24s",
+                "attributeId": 0x0000000F,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
             0x00000010: {
                 "attributeName": "Int32s",
                 "attributeId": 0x00000010,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000011: {
+                "attributeName": "Int40s",
+                "attributeId": 0x00000011,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000012: {
+                "attributeName": "Int48s",
+                "attributeId": 0x00000012,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000013: {
+                "attributeName": "Int56s",
+                "attributeId": 0x00000013,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -3879,6 +3958,20 @@ class ChipClusters:
                 "attributeName": "Enum16",
                 "attributeId": 0x00000016,
                 "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000017: {
+                "attributeName": "FloatSingle",
+                "attributeId": 0x00000017,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000018: {
+                "attributeName": "FloatDouble",
+                "attributeId": 0x00000018,
+                "type": "",
                 "reportable": True,
                 "writable": True,
             },
@@ -3958,6 +4051,54 @@ class ChipClusters:
                 "type": "",
                 "reportable": True,
             },
+            0x00000024: {
+                "attributeName": "EnumAttr",
+                "attributeId": 0x00000024,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000025: {
+                "attributeName": "Struct",
+                "attributeId": 0x00000025,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000026: {
+                "attributeName": "RangeRestrictedInt8u",
+                "attributeId": 0x00000026,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000027: {
+                "attributeName": "RangeRestrictedInt8s",
+                "attributeId": 0x00000027,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000028: {
+                "attributeName": "RangeRestrictedInt16u",
+                "attributeId": 0x00000028,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000029: {
+                "attributeName": "RangeRestrictedInt16s",
+                "attributeId": 0x00000029,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000030: {
+                "attributeName": "TimedWriteBoolean",
+                "attributeId": 0x00000030,
+                "type": "bool",
+                "writable": True,
+            },
             0x000000FF: {
                 "attributeName": "Unsupported",
                 "attributeId": 0x000000FF,
@@ -4014,9 +4155,37 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x00008007: {
+                "attributeName": "NullableInt24u",
+                "attributeId": 0x00008007,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
             0x00008008: {
                 "attributeName": "NullableInt32u",
                 "attributeId": 0x00008008,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00008009: {
+                "attributeName": "NullableInt40u",
+                "attributeId": 0x00008009,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000800A: {
+                "attributeName": "NullableInt48u",
+                "attributeId": 0x0000800A,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000800B: {
+                "attributeName": "NullableInt56u",
+                "attributeId": 0x0000800B,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4042,9 +4211,37 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x0000800F: {
+                "attributeName": "NullableInt24s",
+                "attributeId": 0x0000800F,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
             0x00008010: {
                 "attributeName": "NullableInt32s",
                 "attributeId": 0x00008010,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00008011: {
+                "attributeName": "NullableInt40s",
+                "attributeId": 0x00008011,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00008012: {
+                "attributeName": "NullableInt48s",
+                "attributeId": 0x00008012,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00008013: {
+                "attributeName": "NullableInt56s",
+                "attributeId": 0x00008013,
                 "type": "int",
                 "reportable": True,
                 "writable": True,
@@ -4070,6 +4267,20 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x00008017: {
+                "attributeName": "NullableFloatSingle",
+                "attributeId": 0x00008017,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00008018: {
+                "attributeName": "NullableFloatDouble",
+                "attributeId": 0x00008018,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
             0x00008019: {
                 "attributeName": "NullableOctetString",
                 "attributeId": 0x00008019,
@@ -4081,6 +4292,48 @@ class ChipClusters:
                 "attributeName": "NullableCharString",
                 "attributeId": 0x0000801E,
                 "type": "str",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00008024: {
+                "attributeName": "NullableEnumAttr",
+                "attributeId": 0x00008024,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00008025: {
+                "attributeName": "NullableStruct",
+                "attributeId": 0x00008025,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00008026: {
+                "attributeName": "NullableRangeRestrictedInt8u",
+                "attributeId": 0x00008026,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00008027: {
+                "attributeName": "NullableRangeRestrictedInt8s",
+                "attributeId": 0x00008027,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00008028: {
+                "attributeName": "NullableRangeRestrictedInt16u",
+                "attributeId": 0x00008028,
+                "type": "int",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00008029: {
+                "attributeName": "NullableRangeRestrictedInt16s",
+                "attributeId": 0x00008029,
+                "type": "int",
                 "reportable": True,
                 "writable": True,
             },
@@ -4685,6 +4938,11 @@ class ChipClusters:
                 "attributeId": 0x0000003E,
                 "type": "int",
                 "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",

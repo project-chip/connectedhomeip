@@ -17,150 +17,157 @@
  */
 
 /**
- *    @file
- *      This file defines classes for abstracting access to and
- *      interactions with a platform- and system-specific Internet
- *      Protocol stack which, as of this implementation, may be either
- *      BSD/POSIX Sockets, LwIP or Network.framework.
- *
- *      Major abstractions provided are:
- *
- *        * Timers
- *        * Domain Name System (DNS) resolution
- *        * TCP network transport
- *        * UDP network transport
- *        * Raw network transport
- *
- *      For BSD/POSIX Sockets, event readiness notification is handled
- *      via file descriptors and a traditional poll / select
- *      implementation on the platform adaptation.
- *
- *      For LwIP, event readiness notification is handled via events /
- *      messages and platform- and system-specific hooks for the event
- *      / message system.
- *
+ * Provides access to UDP (and optionally TCP) EndPointManager.
  */
 
 #pragma once
 
-#ifndef __STDC_LIMIT_MACROS
-#define __STDC_LIMIT_MACROS
-#endif
-
-#include <inet/InetConfig.h>
-
-#include <inet/EndPointBasis.h>
-#include <inet/IANAConstants.h>
-#include <inet/IPAddress.h>
-#include <inet/IPPrefix.h>
-#include <inet/InetError.h>
-#include <inet/InetInterface.h>
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-#include <inet/TCPEndPoint.h>
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-#include <inet/UDPEndPoint.h>
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
+#include <lib/support/ObjectLifeCycle.h>
+#include <platform/LockTracker.h>
 #include <system/SystemLayer.h>
 #include <system/SystemStats.h>
-
-#include <lib/support/DLLUtil.h>
-#include <lib/support/ObjectLifeCycle.h>
 
 #include <stdint.h>
 
 namespace chip {
 namespace Inet {
 
-class InetLayer;
+/**
+ * Template providing traits for EndPoint types used by EndPointManager.
+ *
+ * Instances must define:
+ *      static constexpr const char * Name;
+ *      static constexpr int SystemStatsKey;
+ */
+template <class EndPointType>
+struct EndPointProperties;
 
 /**
- *  @class InetLayer
- *
- *  @brief
- *    This provides access to Internet services, including timers,
- *    Domain Name System (DNS) resolution, TCP network transport, UDP
- *    network transport, and raw network transport, for a single
- *    thread.
- *
- *    For BSD/POSIX Sockets, event readiness notification is handled
- *    via file descriptors and a traditional poll / select
- *    implementation on the platform adaptation.
- *
- *    For LwIP, event readiness notification is handle via events /
- *    messages and platform- and system-specific hooks for the event /
- *    message system.
- *
+ * Manage creating, deletion, and iteration of Inet::EndPoint types.
  */
-class DLL_EXPORT InetLayer
+template <class EndPointType>
+class EndPointManager
 {
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    friend class TCPEndPoint;
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    friend class UDPEndPoint;
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
 public:
-    InetLayer();
+    using EndPoint        = EndPointType;
+    using EndPointVisitor = Loop (*)(EndPoint *);
 
-    CHIP_ERROR Init(chip::System::Layer & aSystemLayer, void * aContext);
+    EndPointManager() {}
+    virtual ~EndPointManager() {}
 
-    // Must be called before System::Layer::Shutdown(), since this holds a pointer to that.
+    CHIP_ERROR Init(System::Layer & systemLayer)
+    {
+        mSystemLayer = &systemLayer;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR Shutdown() { return CHIP_NO_ERROR; }
+
+    System::Layer & SystemLayer() const { return *mSystemLayer; }
+
+    CHIP_ERROR NewEndPoint(EndPoint ** retEndPoint)
+    {
+        assertChipStackLockedByCurrentThread();
+
+        *retEndPoint = CreateEndPoint();
+        if (*retEndPoint == nullptr)
+        {
+            ChipLogError(Inet, "%s endpoint pool FULL", EndPointProperties<EndPointType>::Name);
+            return CHIP_ERROR_ENDPOINT_POOL_FULL;
+        }
+
+        // TODO: Use the Impl's underlying ObjectPool statistics
+        SYSTEM_STATS_INCREMENT(EndPointProperties<EndPointType>::SystemStatsKey);
+        return CHIP_NO_ERROR;
+    }
+
+    virtual EndPoint * CreateEndPoint()                         = 0;
+    virtual void DeleteEndPoint(EndPoint * endPoint)            = 0;
+    virtual Loop ForEachEndPoint(const EndPointVisitor visitor) = 0;
+
+private:
+    System::Layer * mSystemLayer;
+};
+
+template <typename EndPointImpl, unsigned int NUM_ENDPOINTS>
+class EndPointManagerImplPool : public EndPointManager<typename EndPointImpl::EndPoint>
+{
+public:
+    using Manager  = EndPointManager<typename EndPointImpl::EndPoint>;
+    using EndPoint = typename EndPointImpl::EndPoint;
+
+    EndPointManagerImplPool() = default;
+    ~EndPointManagerImplPool() { VerifyOrDie(sEndPointPool.Allocated() == 0); }
+
+    EndPoint * CreateEndPoint() override { return sEndPointPool.CreateObject(*this); }
+    void DeleteEndPoint(EndPoint * endPoint) override { sEndPointPool.ReleaseObject(static_cast<EndPointImpl *>(endPoint)); }
+    Loop ForEachEndPoint(const typename Manager::EndPointVisitor visitor) override
+    {
+        return sEndPointPool.ForEachActiveObject([&](EndPoint * endPoint) -> Loop { return visitor(endPoint); });
+    }
+
+private:
+    ObjectPool<EndPointImpl, NUM_ENDPOINTS> sEndPointPool;
+};
+
+class TCPEndPoint;
+class UDPEndPoint;
+
+/**
+ * Provides access to UDP (and optionally TCP) EndPointManager.
+ */
+class InetLayer
+{
+public:
+    InetLayer() = default;
+    ~InetLayer() { mLayerState.Destroy(); }
+
+    /**
+     *  This is the InetLayer explicit initializer. This must be called
+     *  and complete successfully before the InetLayer may be used.
+     *
+     *  The caller may provide an optional context argument which will be
+     *  passed back via any platform-specific hook functions. For
+     *  LwIP-based adaptations, this will typically be a pointer to the
+     *  event queue associated with the InetLayer instance.
+     *
+     *  @param[in]  aSystemLayer                A required instance of the chip System Layer already successfully initialized.
+     *  @param[in]  udpEndPointManager          A required instance of an implementation of EndPointManager<UDPEndPoint>.
+     *                                          This function will initialize the EndPointManager.
+     *
+     *  @retval   #CHIP_ERROR_INCORRECT_STATE   If the InetLayer is in an incorrect state.
+     *  @retval   #CHIP_NO_ERROR                On success.
+     *
+     */
+    CHIP_ERROR Init(System::Layer & aSystemLayer, EndPointManager<UDPEndPoint> * udpEndPointManager);
+
+    /**
+     *  This is the InetLayer explicit deinitializer and should be called
+     *  prior to disposing of an instantiated InetLayer instance.
+     *
+     *  Must be called before System::Layer::Shutdown(), since this holds a pointer to that.
+     *
+     *  @return #CHIP_NO_ERROR on success; otherwise, a specific error indicating
+     *          the reason for shutdown failure.
+     *
+     */
     CHIP_ERROR Shutdown();
+
+    EndPointManager<UDPEndPoint> * GetUDPEndPointManager() const { return mUDPEndPointManager; }
+
+    // Initialize the TCP EndPointManager. Must be called after Init() if the appication uses TCP.
+    CHIP_ERROR InitTCP(EndPointManager<TCPEndPoint> * tcpEndPointManager);
+    // Shut down the TCP EndPointManager. Must be called before Shutdown() if the appication uses TCP.
+    CHIP_ERROR ShutdownTCP();
+    EndPointManager<TCPEndPoint> * GetTCPEndPointManager() const { return mTCPEndPointManager; }
 
     chip::System::Layer * SystemLayer() const { return mSystemLayer; }
 
-    // End Points
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    CHIP_ERROR NewTCPEndPoint(TCPEndPoint ** retEndPoint);
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    CHIP_ERROR NewUDPEndPoint(UDPEndPoint ** retEndPoint);
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-    void * GetPlatformData();
-    void SetPlatformData(void * aPlatformData);
-
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-    static void HandleTCPInactivityTimer(chip::System::Layer * aSystemLayer, void * aAppState);
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-
 private:
     ObjectLifeCycle mLayerState;
-    void * mContext;
-    void * mPlatformData;
-    chip::System::Layer * mSystemLayer;
-
-    bool IsIdleTimerRunning();
-};
-
-/**
- *  @class IPPacketInfo
- *
- *  @brief
- *     Information about an incoming/outgoing message/connection.
- *
- *   @warning
- *     Do not alter the contents of this class without first reading and understanding
- *     the code/comments in UDPEndPoint::GetPacketInfo().
- */
-class IPPacketInfo
-{
-public:
-    IPAddress SrcAddress;  /**< The source IPAddress in the packet. */
-    IPAddress DestAddress; /**< The destination IPAddress in the packet. */
-    InterfaceId Interface; /**< The interface identifier for the connection. */
-    uint16_t SrcPort;      /**< The source port in the packet. */
-    uint16_t DestPort;     /**< The destination port in the packet. */
-
-    void Clear();
+    System::Layer * mSystemLayer;
+    EndPointManager<TCPEndPoint> * mTCPEndPointManager;
+    EndPointManager<UDPEndPoint> * mUDPEndPointManager;
 };
 
 } // namespace Inet

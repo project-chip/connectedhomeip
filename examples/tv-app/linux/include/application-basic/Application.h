@@ -18,15 +18,17 @@
 
 #pragma once
 
-#include <app-common/zap-generated/enums.h>
+#include <app-common/zap-generated/cluster-objects.h>
 
 struct Application
 {
-    char vendorName[32]                  = "";
-    char name[32]                        = "";
-    char id[32]                          = "";
-    uint16_t vendorId                    = 0;
-    uint16_t productId                   = 0;
-    uint16_t catalogVendorId             = 0;
-    EmberAfApplicationBasicStatus status = EMBER_ZCL_APPLICATION_BASIC_STATUS_STOPPED;
+    using ApplicationBasicStatus = chip::app::Clusters::ApplicationBasic::ApplicationBasicStatus;
+
+    char vendorName[32]           = "";
+    char name[32]                 = "";
+    char id[32]                   = "";
+    uint16_t vendorId             = 0;
+    uint16_t productId            = 0;
+    uint16_t catalogVendorId      = 0;
+    ApplicationBasicStatus status = ApplicationBasicStatus::kStopped;
 };

@@ -1,6 +1,7 @@
 /*
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,14 +16,19 @@
  *    limitations under the License.
  */
 
-const kType = 'STRUCT';
+/**
+ *    @file
+ *          Example project configuration file for CHIP.
+ *
+ *          This is a place to put application or project-specific overrides
+ *          to the default configuration values for general CHIP features.
+ *
+ */
 
-function isStruct(type)
-{
-  return type.toUpperCase() == kType;
-}
+#pragma once
 
-//
-// Module exports
-//
-exports.isStruct = isStruct;
+// overrides CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT in CHIPProjectConfig
+#define CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT 16
+
+// include the CHIPProjectConfig from config/standalone
+#include <CHIPProjectConfig.h>

@@ -307,52 +307,20 @@ typedef void (*CHIPDescriptorClusterClusterRevisionAttributeCallbackType)(
 typedef void (*CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
     void *, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &);
 
-typedef void (*CHIPDoorLockClusterClearAllPinsResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterClearAllRfidsResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterClearHolidayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterClearPinResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearPinResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterClearRfidResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterClearYeardayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetLogRecordResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetPinResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetPinResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetRfidResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetRfidResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetPINCodeResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetRFIDCodeResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType &);
 typedef void (*CHIPDoorLockClusterGetUserTypeResponseCallbackType)(
     void *, const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetYeardayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterLockDoorResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::LockDoorResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterSetHolidayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterSetPinResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetPinResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterSetRfidResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetRfidResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterSetUserTypeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterSetYeardayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterUnlockDoorResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &);
 
 typedef void (*CHIPDoorLockClusterLockStateAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo::DecodableArgType);
@@ -437,6 +405,10 @@ typedef void (*CHIPGeneralCommissioningClusterBreadcrumbAttributeCallbackType)(
     void *, chip::app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralCommissioningClusterBasicCommissioningInfoListAttributeCallbackType)(
     void *, const chip::app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfoList::TypeInfo::DecodableType &);
+typedef void (*CHIPGeneralCommissioningClusterRegulatoryConfigAttributeCallbackType)(
+    void *, chip::app::Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::TypeInfo::DecodableArgType);
+typedef void (*CHIPGeneralCommissioningClusterLocationCapabilityAttributeCallbackType)(
+    void *, chip::app::Clusters::GeneralCommissioning::Attributes::LocationCapability::TypeInfo::DecodableArgType);
 typedef void (*CHIPGeneralCommissioningClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::GeneralCommissioning::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -890,22 +862,42 @@ typedef void (*CHIPTestClusterClusterInt8uAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterInt16uAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterInt24uAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::Int24u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterInt32uAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterInt40uAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::Int40u::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterInt48uAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::Int48u::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterInt56uAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::Int56u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterInt64uAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterInt8sAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterInt16sAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterInt24sAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::Int24s::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterInt32sAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterInt40sAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::Int40s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterInt48sAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::Int48s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterInt56sAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::Int56s::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterInt64sAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterEnum8AttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterEnum16AttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterFloatSingleAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterFloatDoubleAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterOctetStringAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterListInt8uAttributeCallbackType)(
@@ -928,6 +920,20 @@ typedef void (*CHIPTestClusterClusterVendorIdAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterListNullablesAndOptionalsStructAttributeCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Attributes::ListNullablesAndOptionalsStruct::TypeInfo::DecodableType &);
+typedef void (*CHIPTestClusterClusterEnumAttrAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::EnumAttr::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterStructAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::Struct::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterRangeRestrictedInt8uAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterRangeRestrictedInt8sAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterRangeRestrictedInt16uAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterRangeRestrictedInt16sAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterTimedWriteBooleanAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterUnsupportedAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableBooleanAttributeCallbackType)(
@@ -944,26 +950,58 @@ typedef void (*CHIPTestClusterClusterNullableInt8uAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableInt16uAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableInt24uAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableInt24u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableInt32uAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableInt40uAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableInt40u::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableInt48uAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableInt48u::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableInt56uAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableInt56u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableInt64uAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableInt8sAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableInt16sAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableInt24sAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableInt24s::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableInt32sAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableInt40sAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableInt40s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableInt48sAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableInt48s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableInt56sAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableInt56s::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableInt64sAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableEnum8AttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableEnum16AttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableFloatSingleAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableFloatDoubleAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableOctetStringAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterNullableCharStringAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableEnumAttrAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableEnumAttr::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableStructAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableStruct::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableRangeRestrictedInt8uAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8u::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableRangeRestrictedInt8sAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableRangeRestrictedInt16uAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterNullableRangeRestrictedInt16sAttributeCallbackType)(
+    void *, chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 
@@ -1146,6 +1184,8 @@ typedef void (*CHIPThreadNetworkDiagnosticsClusterOperationalDatasetComponentsAt
     const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::TypeInfo::DecodableType &);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterActiveNetworkFaultsListAttributeCallbackType)(
     void *, const chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::TypeInfo::DecodableType &);
+typedef void (*CHIPThreadNetworkDiagnosticsClusterFeatureMapAttributeCallbackType)(
+    void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::FeatureMap::TypeInfo::DecodableArgType);
 typedef void (*CHIPThreadNetworkDiagnosticsClusterClusterRevisionAttributeCallbackType)(
     void *, chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 

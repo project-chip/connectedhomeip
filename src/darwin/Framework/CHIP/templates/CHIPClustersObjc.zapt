@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 - (void)read{{>attribute}}WithCompletionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler;
 {{#if isWritableAttribute}}
@@ -48,6 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) report{{>attribute}}WithResponseHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))responseHandler;
 {{/unless}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 
 @end

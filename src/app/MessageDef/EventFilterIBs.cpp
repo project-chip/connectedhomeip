@@ -14,7 +14,7 @@
  *    limitations under the License.
  */
 
-#include "InvokeResponses.h"
+#include "EventFilterIBs.h"
 
 #include "MessageDefHelper.h"
 
@@ -27,13 +27,13 @@
 namespace chip {
 namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR InvokeResponses::Parser::CheckSchemaValidity() const
+CHIP_ERROR EventFilterIBs::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err            = CHIP_NO_ERROR;
-    size_t numInvokeResponses = 0;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    size_t numEventFilters = 0;
     TLV::TLVReader reader;
 
-    PRETTY_PRINT("InvokeResponses =");
+    PRETTY_PRINT("EventFilterIBs =");
     PRETTY_PRINT("[");
 
     // make a copy of the reader
@@ -43,14 +43,14 @@ CHIP_ERROR InvokeResponses::Parser::CheckSchemaValidity() const
     {
         VerifyOrReturnError(TLV::AnonymousTag == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         {
-            InvokeResponseIB::Parser invokeResponse;
-            ReturnErrorOnFailure(invokeResponse.Init(reader));
+            EventFilterIB::Parser eventFilter;
+            ReturnErrorOnFailure(eventFilter.Init(reader));
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(invokeResponse.CheckSchemaValidity());
+            ReturnErrorOnFailure(eventFilter.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
         }
 
-        ++numInvokeResponses;
+        ++numEventFilters;
     }
 
     PRETTY_PRINT("],");
@@ -59,8 +59,8 @@ CHIP_ERROR InvokeResponses::Parser::CheckSchemaValidity() const
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // if we have at least one data element
-        if (numInvokeResponses > 0)
+        // if we have at least one event filter
+        if (numEventFilters > 0)
         {
             err = CHIP_NO_ERROR;
         }
@@ -71,19 +71,16 @@ CHIP_ERROR InvokeResponses::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-InvokeResponseIB::Builder & InvokeResponses::Builder::CreateInvokeResponse()
+EventFilterIB::Builder & EventFilterIBs::Builder::CreateEventFilter()
 {
-    if (mError == CHIP_NO_ERROR)
-    {
-        mError = mInvokeResponse.Init(mpWriter);
-    }
-    return mInvokeResponse;
+    mError = mEventFilter.Init(mpWriter);
+    return mEventFilter;
 }
 
-InvokeResponses::Builder & InvokeResponses::Builder::EndOfInvokeResponses()
+EventFilterIBs::Builder & EventFilterIBs::Builder::EndOfEventFilters()
 {
     EndOfContainer();
     return *this;
 }
-} // namespace app
-} // namespace chip
+}; // namespace app
+}; // namespace chip

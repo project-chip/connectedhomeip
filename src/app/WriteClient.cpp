@@ -93,7 +93,7 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     System::PacketBufferTLVReader reader;
     TLV::TLVReader attributeStatusesReader;
     WriteResponseMessage::Parser writeResponse;
-    AttributeStatuses::Parser attributeStatusesParser;
+    AttributeStatusIBs::Parser attributeStatusesParser;
 
     reader.Init(std::move(payload));
     err = reader.Next();
