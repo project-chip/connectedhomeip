@@ -215,7 +215,7 @@ namespace {
 
 CHIP_ERROR SendSuccessStatus(AttributeDataIB::Builder & aAttributeDataIBBuilder)
 {
-    aAttributeDataIBBuilder.DataVersion(kTemporaryDataVersion).EndOfAttributeDataIB();
+    aAttributeDataIBBuilder.EndOfAttributeDataIB();
     return aAttributeDataIBBuilder.GetError();
 }
 
@@ -252,7 +252,11 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     AttributeDataIB::Builder attributeDataIBBuilder = aAttributeReport.CreateAttributeData();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
+    attributeDataIBBuilder.DataVersion(kTemporaryDataVersion);
+    ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
+
     AttributePathIB::Builder attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
+    ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
     attributePathIBBuilder.Endpoint(aPath.mEndpointId)
         .Cluster(aPath.mClusterId)
         .Attribute(aPath.mAttributeId)

@@ -199,6 +199,26 @@ class ChipDeviceController(object):
                 self.devCtrl, nodeid)
         )
 
+    def EstablishPASESessionIP(self, ipaddr, setupPinCode, nodeid):
+        self.state = DCState.RENDEZVOUS_ONGOING
+        return self._ChipStack.CallAsync(
+            lambda: self._dmLib.pychip_DeviceController_EstablishPASESessionIP(
+                self.devCtrl, ipaddr, setupPinCode, nodeid)
+        )
+
+    def Commission(self, nodeid):
+        self._ChipStack.CallAsync(
+            lambda: self._dmLib.pychip_DeviceController_Commission(
+                self.devCtrl, nodeid)
+        )
+        # Wait up to 5 additional seconds for the commissioning complete event
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            self._ChipStack.commissioningCompleteEvent.wait(5.0)
+        if not self._ChipStack.commissioningCompleteEvent.isSet():
+            # Error 50 is a timeout
+            return False
+        return self._ChipStack.commissioningEventRes == 0
+
     def ConnectIP(self, ipaddr, setupPinCode, nodeid):
         # IP connection will run through full commissioning, so we need to wait
         # for the commissioning complete event, not just any callback.
@@ -653,6 +673,11 @@ class ChipDeviceController(object):
 
             self._dmLib.pychip_DeviceController_ConnectIP.argtypes = [
                 c_void_p, c_char_p, c_uint32, c_uint64]
+
+            self._dmLib.pychip_DeviceController_Commission.argtypes = [
+                c_void_p, c_uint64]
+            self._dmLib.pychip_DeviceController_Commission.restype = c_uint32
+
             self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [
                 c_void_p]
             self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.restype = c_uint32
@@ -677,6 +702,12 @@ class ChipDeviceController(object):
                 c_void_p]
             self._dmLib.pychip_DeviceController_DiscoverCommissionableNodesCommissioningEnabled.restype = c_uint32
 
+            self._dmLib.pychip_DeviceController_EstablishPASESessionIP.argtypes = [
+                c_void_p, c_char_p, c_uint32, c_uint64]
+            self._dmLib.pychip_DeviceController_EstablishPASESessionIP.restype = c_uint32
+
+            self._dmLib.pychip_DeviceController_DiscoverAllCommissionableNodes.argtypes = [
+                c_void_p]
             self._dmLib.pychip_DeviceController_PrintDiscoveredDevices.argtypes = [
                 c_void_p]
 

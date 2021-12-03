@@ -225,6 +225,7 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
                        "-DPW_RPC_BUTTON_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_LIGHTING_SERVICE=1"
-                       "-DPW_RPC_LOCKING_SERVICE=1")
+                       "-DPW_RPC_LOCKING_SERVICE=1"
+                       "-DPW_RPC_TRACING_SERVICE=1")
 
 endif (CONFIG_ENABLE_PW_RPC)

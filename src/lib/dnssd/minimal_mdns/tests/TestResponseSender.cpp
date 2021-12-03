@@ -21,6 +21,7 @@
 
 #include <lib/dnssd/minimal_mdns/RecordData.h>
 #include <lib/dnssd/minimal_mdns/core/FlatAllocatedQName.h>
+#include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 #include <lib/dnssd/minimal_mdns/responders/Ptr.h>
 #include <lib/dnssd/minimal_mdns/responders/Srv.h>
 #include <lib/dnssd/minimal_mdns/responders/Txt.h>
@@ -46,6 +47,7 @@ struct CommonTestElements
     uint8_t * requestNameStart   = requestStorage + ConstHeaderRef::kSizeBytes;
     Encoding::BigEndian::BufferWriter requestBufferWriter =
         Encoding::BigEndian::BufferWriter(requestNameStart, sizeof(requestStorage) - HeaderRef::kSizeBytes);
+    RecordWriter recordWriter;
 
     uint8_t dnsSdServiceStorage[64];
     uint8_t serviceNameStorage[64];
@@ -71,6 +73,7 @@ struct CommonTestElements
     Inet::IPPacketInfo packetInfo;
 
     CommonTestElements(nlTestSuite * inSuite, const char * tag) :
+        recordWriter(&requestBufferWriter),
         dnsSd(FlatAllocatedQName::Build(dnsSdServiceStorage, "_services", "_dns-sd", "_udp", "local")),
         service(FlatAllocatedQName::Build(serviceNameStorage, tag, "service")),
         instance(FlatAllocatedQName::Build(instanceNameStorage, tag, "instance")),
@@ -90,7 +93,7 @@ void SrvAnyResponseToInstance(nlTestSuite * inSuite, void * inContext)
     common.queryResponder.AddResponder(&common.srvResponder);
 
     // Build a query for our srv record
-    common.instance.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.instance);
 
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
@@ -110,7 +113,7 @@ void SrvTxtAnyResponseToInstance(nlTestSuite * inSuite, void * inContext)
     common.queryResponder.AddResponder(&common.txtResponder);
 
     // Build a query for the instance name
-    common.instance.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.instance);
 
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
@@ -133,7 +136,7 @@ void PtrSrvTxtAnyResponseToServiceName(nlTestSuite * inSuite, void * inContext)
     common.queryResponder.AddResponder(&common.txtResponder);
 
     // Build a query for the service name
-    common.service.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.service);
 
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
@@ -158,7 +161,7 @@ void PtrSrvTxtAnyResponseToInstance(nlTestSuite * inSuite, void * inContext)
     common.queryResponder.AddResponder(&common.txtResponder);
 
     // Build a query for the instance name
-    common.instance.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.instance);
 
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
@@ -182,7 +185,7 @@ void PtrSrvTxtSrvResponseToInstance(nlTestSuite * inSuite, void * inContext)
     common.queryResponder.AddResponder(&common.txtResponder);
 
     // Build a query for the instance
-    common.instance.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.instance);
 
     QueryData queryData = QueryData(QType::SRV, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
@@ -205,7 +208,7 @@ void PtrSrvTxtAnyResponseToServiceListing(nlTestSuite * inSuite, void * inContex
     common.queryResponder.AddResponder(&common.txtResponder);
 
     // Build a query for the dns-sd services listing.
-    common.dnsSd.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.dnsSd);
 
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
@@ -226,15 +229,15 @@ void NoQueryResponder(nlTestSuite * inSuite, void * inContext)
 
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common.requestNameStart, common.requestBytesRange);
 
-    common.dnsSd.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.dnsSd);
     responseSender.Respond(1, queryData, &common.packetInfo);
     NL_TEST_ASSERT(inSuite, !common.server.GetSendCalled());
 
-    common.service.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.service);
     responseSender.Respond(1, queryData, &common.packetInfo);
     NL_TEST_ASSERT(inSuite, !common.server.GetSendCalled());
 
-    common.instance.Output(common.requestBufferWriter);
+    common.recordWriter.WriteQName(common.instance);
     responseSender.Respond(1, queryData, &common.packetInfo);
     NL_TEST_ASSERT(inSuite, !common.server.GetSendCalled());
 }
@@ -289,7 +292,7 @@ void PtrSrvTxtMultipleRespondersToInstance(nlTestSuite * inSuite, void * inConte
     common2.queryResponder.AddResponder(&common2.txtResponder);
 
     // Build a query for the second instance.
-    common2.instance.Output(common2.requestBufferWriter);
+    common2.recordWriter.WriteQName(common2.instance);
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common2.requestNameStart, common2.requestBytesRange);
 
     // Should get back answers from second instance only.
@@ -321,7 +324,7 @@ void PtrSrvTxtMultipleRespondersToServiceListing(nlTestSuite * inSuite, void * i
     common2.queryResponder.AddResponder(&common2.txtResponder);
 
     // Build a query for the instance
-    common1.dnsSd.Output(common1.requestBufferWriter);
+    common1.recordWriter.WriteQName(common1.dnsSd);
     QueryData queryData = QueryData(QType::ANY, QClass::IN, false, common1.requestNameStart, common1.requestBytesRange);
 
     // Should get service listing from both.

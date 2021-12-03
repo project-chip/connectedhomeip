@@ -66,7 +66,5 @@ enum class ResourceType
     kAdditional,
 };
 
-constexpr size_t kMaxQNamePartLength = 255;
-
 } // namespace Minimal
 } // namespace mdns

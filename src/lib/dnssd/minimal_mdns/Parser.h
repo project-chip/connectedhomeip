@@ -20,6 +20,7 @@
 #include <lib/dnssd/minimal_mdns/core/Constants.h>
 #include <lib/dnssd/minimal_mdns/core/DnsHeader.h>
 #include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 
 namespace mdns {
 namespace Minimal {
@@ -56,7 +57,7 @@ public:
     bool Parse(const BytesRange & validData, const uint8_t ** start);
 
     /// Write out this query data back into an output buffer.
-    bool Append(HeaderRef & hdr, chip::Encoding::BigEndian::BufferWriter & out) const;
+    bool Append(HeaderRef & hdr, RecordWriter & out) const;
 
 private:
     QType mType            = QType::ANY;

@@ -24,6 +24,7 @@ chip_test_suite("tests") {
   test_sources = [
     "TestFlatAllocatedQName.cpp",
     "TestQName.cpp",
+    "TestRecordWriter.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
