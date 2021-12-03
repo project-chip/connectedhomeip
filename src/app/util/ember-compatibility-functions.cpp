@@ -670,9 +670,7 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     const EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
 
-    AttributePathParams attributePathParams = { .mEndpointId  = aPath.mEndpointId,
-                                                .mClusterId   = aPath.mClusterId,
-                                                .mAttributeId = aPath.mAttributeId };
+    AttributePathParams attributePathParams(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId);
 
     if (attributeMetadata == nullptr)
     {
