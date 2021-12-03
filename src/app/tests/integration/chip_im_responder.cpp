@@ -114,12 +114,14 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
                                  AttributeReportIB::Builder & aAttributeReport)
 {
     AttributeDataIB::Builder attributeData = aAttributeReport.CreateAttributeData();
+    attributeData.DataVersion(0);
+    ReturnErrorOnFailure(attributeData.GetError());
     AttributePathIB::Builder attributePath = attributeData.CreatePath();
     VerifyOrReturnError(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
     attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePath.GetError());
     ReturnErrorOnFailure(AttributeValueEncoder(attributeData.GetWriter(), 0).Encode(kTestFieldValue1));
-    attributeData.DataVersion(0).EndOfAttributeDataIB();
+    attributeData.EndOfAttributeDataIB();
     ReturnErrorOnFailure(attributeData.GetError());
     return CHIP_NO_ERROR;
 }
