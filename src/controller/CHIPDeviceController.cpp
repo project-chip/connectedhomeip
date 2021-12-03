@@ -153,11 +153,11 @@ CHIP_ERROR DeviceController::Init(ControllerInitParams params)
     CASESessionManagerConfig sessionManagerConfig = {
         .sessionInitParams = deviceInitParams,
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-        .dnsResolver       = &mDNSResolver,
+        .dnsResolver = &mDNSResolver,
 #else
-        .dnsResolver       = nullptr,
+        .dnsResolver = nullptr,
 #endif
-        .dnsCache          = &mDNSCache,
+        .dnsCache = &mDNSCache,
     };
 
     mCASESessionManager = chip::Platform::New<CASESessionManager>(sessionManagerConfig);
@@ -1777,7 +1777,7 @@ void DeviceCommissioner::AdvanceCommissioningStage(CHIP_ERROR err)
 #if CONFIG_DEVICE_LAYER
         status = DeviceLayer::ConfigurationMgr().GetCountryCode(countryCodeStr, kMaxCountryCodeSize, actualCountryCodeSize);
 #else
-        status            = CHIP_ERROR_NOT_IMPLEMENTED;
+        status = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif
         if (status != CHIP_NO_ERROR)
         {
