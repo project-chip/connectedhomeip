@@ -67,10 +67,33 @@ class Efr32App(Enum):
 
 class Efr32Board(Enum):
     BRD4161A = 1
+    BRD4163A = 2
+    BRD4164A = 3
+    BRD4166A = 4
+    BRD4170A = 5
+    BRD4186A = 6
+    BRD4187A = 7
+    BRD4304A = 8
 
     def GnArgName(self):
         if self == Efr32Board.BRD4161A:
             return 'BRD4161A'
+        elif self == Efr32Board.BRD4163A:
+            return 'BRD4163A'
+        elif self == Efr32Board.BRD4164A:
+            return 'BRD4164A'
+        elif self == Efr32Board.BRD4166A:
+            return 'BRD4166A'
+        elif self == Efr32Board.BRD4170A:
+            return 'BRD4170A'
+        elif self == Efr32Board.BRD4186A:
+            return 'BRD4186A'
+        elif self == Efr32Board.BRD4187A:
+            return 'BRD4187A'
+        elif self == Efr32Board.BRD4304A:
+            return 'BRD4304A'
+        else:
+            raise Exception('Unknown board #: %r' % self)
 
 
 class Efr32Builder(GnBuilder):
