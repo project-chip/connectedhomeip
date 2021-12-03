@@ -100,7 +100,10 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
 
     // Initialize CASE session state with any MRP parameters that DNS-SD has provided.
     // It can be overridden by CASE session protocol messages that include MRP parameters.
-    mCASESession.SetMRPConfig(mMRPConfig);
+    if (mCASEClient)
+    {
+        mCASEClient->SetMRPIntervals(mMRPConfig);
+    }
 
     if (mState == State::NeedsAddress)
     {

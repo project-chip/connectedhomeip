@@ -53,7 +53,7 @@ struct DeviceProxyInitParams
     Messaging::ExchangeManager * exchangeMgr = nullptr;
     SessionIDAllocator * idAllocator         = nullptr;
     FabricInfo * fabricInfo                  = nullptr;
-    CASEClientPool * clientPool              = nullptr;
+    CASEClientPoolDelegate * clientPool      = nullptr;
 
     Controller::DeviceControllerInteractionModelDelegate * imDelegate = nullptr;
 

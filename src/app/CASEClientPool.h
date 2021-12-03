@@ -22,15 +22,26 @@
 
 namespace chip {
 
-class CASEClientPool
+class CASEClientPoolDelegate
 {
 public:
-    CASEClient * Allocate(CASEClientInitParams params) { return mClientPool.CreateObject(params); }
+    virtual CASEClient * Allocate(CASEClientInitParams params) = 0;
 
-    void Release(CASEClient * client) { mClientPool.ReleaseObject(client); }
+    virtual void Release(CASEClient * client) = 0;
+
+    virtual ~CASEClientPoolDelegate() {}
+};
+
+template <size_t N>
+class CASEClientPool : public CASEClientPoolDelegate
+{
+public:
+    CASEClient * Allocate(CASEClientInitParams params) override { return mClientPool.CreateObject(params); }
+
+    void Release(CASEClient * client) override { mClientPool.ReleaseObject(client); }
 
 private:
-    BitMapObjectPool<CASEClient, CHIP_CONFIG_MAX_ACTIVE_CASE_CLIENTS> mClientPool;
+    BitMapObjectPool<CASEClient, N, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode> mClientPool;
 };
 
 }; // namespace chip

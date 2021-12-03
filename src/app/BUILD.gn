@@ -124,6 +124,7 @@ static_library("app") {
     "MessageDef/WriteResponseMessage.cpp",
     "OperationalDeviceProxy.cpp",
     "OperationalDeviceProxy.h",
+    "OperationalDeviceProxyPool.h",
     "ReadClient.cpp",
     "ReadHandler.cpp",
     "StatusResponse.cpp",

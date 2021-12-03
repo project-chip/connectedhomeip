@@ -42,7 +42,7 @@ class DLL_EXPORT CASEClient : public SessionEstablishmentDelegate
 public:
     CASEClient(const CASEClientInitParams & params);
 
-    void SetMRPIntervals(uint32_t idleInterval, uint32_t activeInterval);
+    void SetMRPIntervals(const ReliableMessageProtocolConfig & mrpConfig);
 
     CHIP_ERROR EstablishSession(PeerId peer, const Transport::PeerAddress & peerAddress,
                                 const ReliableMessageProtocolConfig & mrpConfig, OnCASEConnected onConnection,

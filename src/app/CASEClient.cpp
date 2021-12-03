@@ -21,6 +21,11 @@ namespace chip {
 
 CASEClient::CASEClient(const CASEClientInitParams & params) : mInitParams(params) {}
 
+void CASEClient::SetMRPIntervals(const ReliableMessageProtocolConfig & mrpConfig)
+{
+    mCASESession.SetMRPConfig(mrpConfig);
+}
+
 CHIP_ERROR CASEClient::EstablishSession(PeerId peer, const Transport::PeerAddress & peerAddress,
                                         const ReliableMessageProtocolConfig & mrpConfig, OnCASEConnected onConnection,
                                         OnCASEConnectionFailure onFailure, void * context)

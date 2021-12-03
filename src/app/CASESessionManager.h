@@ -20,6 +20,7 @@
 
 #include <app/CASEClientPool.h>
 #include <app/OperationalDeviceProxy.h>
+#include <app/OperationalDeviceProxyPool.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/dnssd/DnssdCache.h>
@@ -34,6 +35,7 @@ struct CASESessionManagerConfig
 {
     DeviceProxyInitParams sessionInitParams;
     Dnssd::DnssdCache<CHIP_CONFIG_MDNS_CACHE_SIZE> * dnsCache = nullptr;
+    OperationalDeviceProxyPoolDelegate * devicePool           = nullptr;
 };
 
 /**
@@ -103,10 +105,6 @@ public:
 private:
     OperationalDeviceProxy * FindSession(SessionHandle session);
     void ReleaseSession(OperationalDeviceProxy * device);
-
-    BitMapObjectPool<OperationalDeviceProxy, CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES,
-                     OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode>
-        mActiveSessions;
 
     CASESessionManagerConfig mConfig;
 };
