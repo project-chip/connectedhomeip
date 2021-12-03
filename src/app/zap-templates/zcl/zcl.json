@@ -2,7 +2,6 @@
     "version": "ZCL Test Data",
     "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/"],
     "xmlFile": [
-        "ACL-cluster.xml",
         "account-login-cluster.xml",
         "administrator-commissioning-cluster.xml",
         "application-basic-cluster.xml",
@@ -53,6 +52,7 @@
         "thread-network-diagnostics-cluster.xml",
         "time-synchronization-cluster.xml",
         "tv-channel-cluster.xml",
+        "user-label-cluster.xml",
         "wake-on-lan-cluster.xml",
         "wifi-network-diagnostics-cluster.xml",
         "window-covering.xml",
@@ -62,7 +62,6 @@
         "ha-devices.xml",
         "ha.xml",
         "lo-devices.xml",
-        "sample-extensions.xml",
         "types.xml",
         "zll-devices.xml",
         "zll.xml"
@@ -82,5 +81,6 @@
         "bool": {
             "commandDiscovery": true
         }
-    }
+    },
+    "defaultReportable": true
 }

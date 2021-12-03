@@ -17,9 +17,8 @@
  *    limitations under the License.
  */
 
+#include <lib/support/CodeUtils.h>
 #include <lib/support/Pool.h>
-
-#include <nlassert.h>
 
 namespace chip {
 
@@ -68,24 +67,25 @@ void StaticAllocatorBitmap::Deallocate(void * element)
     size_t offset = index - (word * kBitChunkSize);
 
     // ensure the element is in the pool
-    assert(index < Capacity());
+    VerifyOrDie(index < Capacity());
 
     auto value = mUsage[word].fetch_and(~(kBit1 << offset));
-    nlASSERT((value & (kBit1 << offset)) != 0); // assert fail when free an unused slot
+    VerifyOrDie((value & (kBit1 << offset)) != 0); // assert fail when free an unused slot
     DecreaseUsage();
 }
 
 size_t StaticAllocatorBitmap::IndexOf(void * element)
 {
     std::ptrdiff_t diff = static_cast<uint8_t *>(element) - static_cast<uint8_t *>(mElements);
-    assert(diff >= 0);
-    assert(static_cast<size_t>(diff) % mElementSize == 0);
+    VerifyOrDie(diff >= 0);
+    VerifyOrDie(static_cast<size_t>(diff) % mElementSize == 0);
     auto index = static_cast<size_t>(diff) / mElementSize;
-    assert(index < Capacity());
+    VerifyOrDie(index < Capacity());
     return index;
 }
 
-bool StaticAllocatorBitmap::ForEachActiveObjectInner(void * context, bool lambda(void * context, void * object))
+using Lambda = Loop (*)(void *, void *);
+Loop StaticAllocatorBitmap::ForEachActiveObjectInner(void * context, Lambda lambda)
 {
     for (size_t word = 0; word * kBitChunkSize < Capacity(); ++word)
     {
@@ -95,12 +95,12 @@ bool StaticAllocatorBitmap::ForEachActiveObjectInner(void * context, bool lambda
         {
             if ((value & (kBit1 << offset)) != 0)
             {
-                if (!lambda(context, At(word * kBitChunkSize + offset)))
-                    return false;
+                if (lambda(context, At(word * kBitChunkSize + offset)) == Loop::Break)
+                    return Loop::Break;
             }
         }
     }
-    return true;
+    return Loop::Finish;
 }
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
@@ -117,20 +117,20 @@ HeapObjectListNode * HeapObjectList::FindNode(void * object) const
     return nullptr;
 }
 
-using Lambda = bool (*)(void *, void *);
-bool HeapObjectList::ForEachNode(void * context, bool lambda(void * context, void * object))
+using Lambda = Loop (*)(void *, void *);
+Loop HeapObjectList::ForEachNode(void * context, Lambda lambda)
 {
     ++mIterationDepth;
-    bool result            = true;
+    Loop result            = Loop::Finish;
     bool anyReleased       = false;
     HeapObjectListNode * p = mNext;
     while (p != this)
     {
         if (p->mObject != nullptr)
         {
-            if (!lambda(context, p->mObject))
+            if (lambda(context, p->mObject) == Loop::Break)
             {
-                result = false;
+                result = Loop::Break;
                 break;
             }
         }

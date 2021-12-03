@@ -81,7 +81,7 @@ CHIP_ERROR GenericPlatformManagerImpl<ImplClass>::_InitChipStack()
     SuccessOrExit(err);
 
     // Initialize the CHIP Inet layer.
-    err = InetLayer().Init(SystemLayer(), nullptr);
+    err = InetLayer().Init(SystemLayer(), UDPEndPointManager());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "InetLayer initialization failed: %s", ErrorStr(err));

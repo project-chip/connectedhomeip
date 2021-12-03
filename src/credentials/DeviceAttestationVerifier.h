@@ -99,6 +99,87 @@ struct DeviceInfoForAttestation
     uint16_t paaVendorId = VendorId::NotSpecified;
 };
 
+/**
+ * @brief Helper utility to model a basic trust store usable for device attestation verifiers.
+ *
+ * API is synchronous. Real commissioner implementations may entirely
+ * hide Product Attestation Authority cert lookup behind the DeviceAttestationVerifier and
+ * never use this interface at all. It is provided as a utility to help build DeviceAttestationVerifier
+ * implementations suitable for testing or examples.
+ */
+class AttestationTrustStore
+{
+public:
+    AttestationTrustStore()          = default;
+    virtual ~AttestationTrustStore() = default;
+
+    // Not copyable
+    AttestationTrustStore(const AttestationTrustStore &) = delete;
+    AttestationTrustStore & operator=(const AttestationTrustStore &) = delete;
+
+    /**
+     * @brief Look-up a PAA cert by SKID
+     *
+     * The implementations of this interface must have access to a set of PAAs to trust.
+     *
+     * Interface is synchronous, and therefore this should not be used unless to expose a PAA
+     * store that is both fully local and quick to access.
+     *
+     * @param[in] skid Buffer containing the subject key identifier (SKID) of the PAA to look-up
+     * @param[inout] outPaaDerBuffer Buffer to receive the contents of the PAA root cert, if found.
+     *                                  Size will be updated to match actual size.
+     *
+     * @returns CHIP_NO_ERROR on success, CHIP_INVALID_ARGUMENT if `skid` or `outPaaDerBuffer` arguments
+     *          are not usable, CHIP_BUFFER_TOO_SMALL if certificate doesn't fit in `outPaaDerBuffer`
+     *          span, CHIP_ERROR_CA_CERT_NOT_FOUND if no PAA found that matches `skid.
+     *
+     */
+    virtual CHIP_ERROR GetProductAttestationAuthorityCert(const ByteSpan & skid, MutableByteSpan & outPaaDerBuffer) const = 0;
+};
+
+/**
+ * @brief Basic AttestationTrustStore that holds all data within caller-owned memory.
+ *
+ * This is useful to wrap a fixed constant array of certificates into a trust store
+ * implementation.
+ */
+
+class ArrayAttestationTrustStore : public AttestationTrustStore
+{
+public:
+    ArrayAttestationTrustStore(const ByteSpan * derCerts, size_t numCerts) : mDerCerts(derCerts), mNumCerts(numCerts) {}
+
+    CHIP_ERROR GetProductAttestationAuthorityCert(const ByteSpan & skid, MutableByteSpan & outPaaDerBuffer) const override
+    {
+        VerifyOrReturnError(!skid.empty() && (skid.data() != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrReturnError(skid.size() == Crypto::kSubjectKeyIdentifierLength, CHIP_ERROR_INVALID_ARGUMENT);
+
+        size_t paaIdx;
+        ByteSpan candidate;
+
+        for (paaIdx = 0; paaIdx < mNumCerts; ++paaIdx)
+        {
+            uint8_t skidBuf[Crypto::kSubjectKeyIdentifierLength] = { 0 };
+            candidate                                            = mDerCerts[paaIdx];
+            MutableByteSpan candidateSkidSpan{ skidBuf };
+            VerifyOrReturnError(CHIP_NO_ERROR == Crypto::ExtractSKIDFromX509Cert(candidate, candidateSkidSpan),
+                                CHIP_ERROR_INTERNAL);
+
+            if (skid.data_equal(candidateSkidSpan))
+            {
+                // Found a match
+                return CopySpanToMutableSpan(candidate, outPaaDerBuffer);
+            }
+        }
+
+        return CHIP_ERROR_CA_CERT_NOT_FOUND;
+    }
+
+protected:
+    const ByteSpan * mDerCerts;
+    const size_t mNumCerts;
+};
+
 class DeviceAttestationVerifier
 {
 public:

@@ -36,13 +36,13 @@ class DLL_EXPORT ApplicationBasic
 public:
     virtual ~ApplicationBasic() = default;
 
-    virtual const char * GetVendorName()                                               = 0;
-    virtual uint16_t GetVendorId()                                                     = 0;
-    virtual const char * GetApplicationName()                                          = 0;
-    virtual uint16_t GetProductId()                                                    = 0;
-    virtual EmberAfApplicationBasicStatus GetApplicationStatus()                       = 0;
-    virtual const char * GetApplicationVersion()                                       = 0;
-    virtual void SetApplicationStatus(EmberAfApplicationBasicStatus applicationStatus) = 0;
+    virtual const char * GetVendorName()                                                                         = 0;
+    virtual uint16_t GetVendorId()                                                                               = 0;
+    virtual const char * GetApplicationName()                                                                    = 0;
+    virtual uint16_t GetProductId()                                                                              = 0;
+    virtual app::Clusters::ApplicationBasic::ApplicationBasicStatus GetApplicationStatus()                       = 0;
+    virtual const char * GetApplicationVersion()                                                                 = 0;
+    virtual void SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationBasicStatus applicationStatus) = 0;
 
     EmberAfStatus HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength);
     EmberAfStatus HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer);

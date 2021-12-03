@@ -47,6 +47,7 @@ class GnBuilder(Builder):
         if not os.path.exists(self.output_dir):
             cmd = [
                 'gn', 'gen', '--check', '--fail-on-unused-args',
+                '--export-compile-commands',
                 '--root=%s' % self.root
             ]
 

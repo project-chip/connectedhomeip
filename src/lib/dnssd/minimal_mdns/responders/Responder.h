@@ -20,7 +20,7 @@
 #include <lib/dnssd/minimal_mdns/core/QName.h>
 #include <lib/dnssd/minimal_mdns/records/ResourceRecord.h>
 
-#include <inet/InetLayer.h>
+#include <inet/IPPacketInfo.h>
 
 namespace mdns {
 namespace Minimal {

@@ -42,7 +42,7 @@ class {{asUpperCamelCase name}}(Cluster):
                 return ClusterObjectDescriptor(
                     Fields = [
                         {{#zcl_struct_items}}
-                            ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ index }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}),
+                            ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{ fieldIdentifier }}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.parent.name)}}),
                         {{/zcl_struct_items}}
                     ])
 
@@ -96,7 +96,7 @@ class {{asUpperCamelCase name}}(Cluster):
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
-                return {{ asHex code 4 }}
+                return {{ asMEI manufacturerCode code }}
 
             @ChipUtility.classproperty
             def attribute_type(cls) -> ClusterObjectFieldDescriptor:

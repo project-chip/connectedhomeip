@@ -64,9 +64,6 @@ static constexpr chip::ClusterId ZCL_APPLIANCE_CONTROL_CLUSTER_ID = 0x001B;
 // Definitions for cluster: Descriptor
 static constexpr chip::ClusterId ZCL_DESCRIPTOR_CLUSTER_ID = 0x001D;
 
-// Definitions for cluster: ACL
-static constexpr chip::ClusterId ZCL_ACL_CLUSTER_ID = 0x001F;
-
 // Definitions for cluster: Poll Control
 static constexpr chip::ClusterId ZCL_POLL_CONTROL_CLUSTER_ID = 0x0020;
 
@@ -124,9 +121,6 @@ static constexpr chip::ClusterId ZCL_ETHERNET_NETWORK_DIAGNOSTICS_CLUSTER_ID = 0
 // Definitions for cluster: Time Synchronization
 static constexpr chip::ClusterId ZCL_TIME_SYNCHRONIZATION_CLUSTER_ID = 0x0038;
 
-// Definitions for cluster: Bridged Device Basic Information
-static constexpr chip::ClusterId ZCL_BRIDGED_DEVICE_BASIC_INFORMATION_CLUSTER_ID = 0x0039;
-
 // Definitions for cluster: Bridged Device Basic
 static constexpr chip::ClusterId ZCL_BRIDGED_DEVICE_BASIC_CLUSTER_ID = 0x0039;
 
@@ -141,6 +135,9 @@ static constexpr chip::ClusterId ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID = 0x003E
 
 // Definitions for cluster: Fixed Label
 static constexpr chip::ClusterId ZCL_FIXED_LABEL_CLUSTER_ID = 0x0040;
+
+// Definitions for cluster: User Label
+static constexpr chip::ClusterId ZCL_USER_LABEL_CLUSTER_ID = 0x0041;
 
 // Definitions for cluster: Boolean State
 static constexpr chip::ClusterId ZCL_BOOLEAN_STATE_CLUSTER_ID = 0x0045;
@@ -360,9 +357,3 @@ static constexpr chip::ClusterId ZCL_BINDING_CLUSTER_ID = 0xF000;
 
 // Definitions for cluster: Group Key Management
 static constexpr chip::ClusterId ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID = 0xF004;
-
-// Definitions for cluster: Sample Mfg Specific Cluster
-static constexpr chip::ClusterId ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID = 0xFC00;
-
-// Definitions for cluster: Sample Mfg Specific Cluster 2
-static constexpr chip::ClusterId ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_2_ID = 0xFC00;

@@ -107,7 +107,7 @@ public:
     CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool mMoreChunks);
 
     bool IsFree() const { return mState == HandlerState::Uninitialized; }
-    bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport; }
+    bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (mDirty || !mHoldSync); }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
     virtual ~ReadHandler() = default;
@@ -145,6 +145,12 @@ public:
     bool IsDirty() { return mDirty; }
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
     FabricIndex GetAccessingFabricIndex() const { return mFabricIndex; }
+
+    void UnblockUrgentEventDelivery()
+    {
+        mHoldReport = false;
+        mDirty      = true;
+    }
 
 private:
     friend class TestReadInteraction;
@@ -214,6 +220,7 @@ private:
     FabricIndex mFabricIndex                                 = 0;
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
     bool mIsFabricFiltered                                   = false;
+    bool mHoldSync                                           = false;
 };
 } // namespace app
 } // namespace chip

@@ -67,9 +67,6 @@ static constexpr ClusterId Id = 0x0000001B;
 namespace Descriptor {
 static constexpr ClusterId Id = 0x0000001D;
 } // namespace Descriptor
-namespace Acl {
-static constexpr ClusterId Id = 0x0000001F;
-} // namespace Acl
 namespace PollControl {
 static constexpr ClusterId Id = 0x00000020;
 } // namespace PollControl
@@ -127,9 +124,6 @@ static constexpr ClusterId Id = 0x00000037;
 namespace TimeSynchronization {
 static constexpr ClusterId Id = 0x00000038;
 } // namespace TimeSynchronization
-namespace BridgedDeviceBasicInformation {
-static constexpr ClusterId Id = 0x00000039;
-} // namespace BridgedDeviceBasicInformation
 namespace BridgedDeviceBasic {
 static constexpr ClusterId Id = 0x00000039;
 } // namespace BridgedDeviceBasic
@@ -145,6 +139,9 @@ static constexpr ClusterId Id = 0x0000003E;
 namespace FixedLabel {
 static constexpr ClusterId Id = 0x00000040;
 } // namespace FixedLabel
+namespace UserLabel {
+static constexpr ClusterId Id = 0x00000041;
+} // namespace UserLabel
 namespace BooleanState {
 static constexpr ClusterId Id = 0x00000045;
 } // namespace BooleanState
@@ -364,12 +361,6 @@ static constexpr ClusterId Id = 0x0000F000;
 namespace GroupKeyManagement {
 static constexpr ClusterId Id = 0x0000F004;
 } // namespace GroupKeyManagement
-namespace SampleMfgSpecificCluster {
-static constexpr ClusterId Id = 0x1002FC00;
-} // namespace SampleMfgSpecificCluster
-namespace SampleMfgSpecificCluster2 {
-static constexpr ClusterId Id = 0x1049FC00;
-} // namespace SampleMfgSpecificCluster2
 
 } // namespace Clusters
 } // namespace app

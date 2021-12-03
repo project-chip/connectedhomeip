@@ -43,9 +43,19 @@ def ReplInit():
 def matterhelp(classOrObj=None):
     if (classOrObj == None):
         inspect(builtins.devCtrl, methods=True, help=True, private=False)
+        inspect(mattersetlog)
+        inspect(mattersetdebug)
     else:
         inspect(classOrObj, methods=True, help=True, private=False)
 
 
 def mattersetlog(level):
     logging.getLogger().setLevel(level)
+
+
+def mattersetdebug(enableDebugMode: bool = True):
+    ''' Enables debug mode that is utilized by some Matter modules
+        to better facilitate debugging of failures (e.g throwing exceptions instead
+        of returning well-formatted results).
+    '''
+    builtins.enableDebugMode = enableDebugMode

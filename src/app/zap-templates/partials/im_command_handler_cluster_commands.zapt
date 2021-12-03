@@ -1,4 +1,10 @@
 {{#if (isServer parent.side)}}
+{{#if mustUseTimedInvoke}}
+if (!apCommandObj->IsTimedInvoke()) {
+  apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+  return;
+}
+{{/if}}
 Commands::{{asUpperCamelCase name}}::DecodableType commandData;
 TLVError = DataModel::Decode(aDataTlv, commandData);
 if (TLVError == CHIP_NO_ERROR) {
@@ -8,7 +14,15 @@ wasHandled = emberAf{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase na
 {{#if (zcl_command_arguments_count this.id)}}
 expectArgumentCount = {{ zcl_command_arguments_count this.id }};
 {{#zcl_command_arguments}}
-{{asUnderlyingZclType type}} {{asSymbol label}};
+  {{#if isArray}}
+    {{asUnderlyingZclType type}} {{asSymbol label}};
+  {{else}}
+    {{#if_is_struct type}}
+      {{zapTypeToDecodableClusterObjectType type ns=parent.parent.name}} {{asSymbol label}};
+    {{else}}
+      {{asUnderlyingZclType type}} {{asSymbol label}};
+    {{/if_is_struct}}
+  {{/if}}
 {{/zcl_command_arguments}}
 bool argExists[{{zcl_command_arguments_count this.id}}];
 
@@ -45,7 +59,12 @@ while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
       // Just for compatibility, we will add array type support in IM later.
       TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>({{asSymbol label}}));
 {{else}}
+  {{#if_is_struct type}}
+      // Not supported, just error out.
+      TLVUnpackError = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT;
+  {{else}}
       TLVUnpackError = aDataTlv.Get({{asSymbol label}});
+  {{/if_is_struct}}
 {{/if}}
       break;
 {{/zcl_command_arguments}}

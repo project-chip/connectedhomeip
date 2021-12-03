@@ -1627,6 +1627,15 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
     {
         switch (aCommandPath.mCommandId)
         {
+        case Commands::SimpleStructEchoRequest::Id: {
+            Commands::SimpleStructEchoRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfTestClusterClusterSimpleStructEchoRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::Test::Id: {
             Commands::Test::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
@@ -1730,6 +1739,16 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             }
             break;
         }
+        case Commands::TestSimpleOptionalArgumentRequest::Id: {
+            Commands::TestSimpleOptionalArgumentRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled =
+                    emberAfTestClusterClusterTestSimpleOptionalArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
         case Commands::TestSpecific::Id: {
             Commands::TestSpecific::DecodableType commandData;
             TLVError = DataModel::Decode(aDataTlv, commandData);
@@ -1745,6 +1764,20 @@ void DispatchServerCommand(CommandHandler * apCommandObj, const ConcreteCommandP
             if (TLVError == CHIP_NO_ERROR)
             {
                 wasHandled = emberAfTestClusterClusterTestStructArgumentRequestCallback(apCommandObj, aCommandPath, commandData);
+            }
+            break;
+        }
+        case Commands::TimedInvokeRequest::Id: {
+            if (!apCommandObj->IsTimedInvoke())
+            {
+                apCommandObj->AddStatus(aCommandPath, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+                return;
+            }
+            Commands::TimedInvokeRequest::DecodableType commandData;
+            TLVError = DataModel::Decode(aDataTlv, commandData);
+            if (TLVError == CHIP_NO_ERROR)
+            {
+                wasHandled = emberAfTestClusterClusterTimedInvokeRequestCallback(apCommandObj, aCommandPath, commandData);
             }
             break;
         }

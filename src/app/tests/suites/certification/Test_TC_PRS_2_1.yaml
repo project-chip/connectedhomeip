@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Read the mandatory attribute constraints: MeasuredValue"
       command: "readAttribute"
       attribute: "MeasuredValue"
@@ -32,7 +36,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: MeasuredValue"
       command: "readAttribute"
@@ -53,7 +57,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: MinMeasuredValue"
       command: "readAttribute"
@@ -74,7 +78,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back mandatory attribute: MaxMeasuredValue"
       command: "readAttribute"
@@ -96,7 +100,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back optional attribute: Tolerance"
       disabled: true
@@ -120,7 +124,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back optional attribute: ScaledValue"
       disabled: true
@@ -143,7 +147,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back optional attribute: MinScaledValue"
       disabled: true
@@ -166,7 +170,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back optional attribute: MaxScaledValue"
       disabled: true
@@ -189,7 +193,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back optional attribute: ScaledTolerance"
       disabled: true
@@ -212,7 +216,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back optional attribute: Scale"
       disabled: true

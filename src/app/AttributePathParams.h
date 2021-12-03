@@ -21,7 +21,6 @@
 #include <app/util/basic-types.h>
 
 #include <app/ClusterInfo.h>
-#include <app/MessageDef/AttributePathIB.h>
 
 namespace chip {
 namespace app {
@@ -51,9 +50,7 @@ struct AttributePathParams
 
     AttributePathParams() {}
 
-    CHIP_ERROR BuildAttributePath(AttributePathIB::Builder & aBuilder) const;
-
-    bool HasWildcard() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
+    bool HasAttributeWildcard() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardAttributeId(); }
 
     /**
      * SPEC 8.9.2.2

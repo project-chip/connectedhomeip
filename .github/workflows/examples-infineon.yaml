@@ -26,12 +26,7 @@ concurrency:
 jobs:
     infineon:
         name: Infineon examples building
-        timeout-minutes: 30
-
-        env:
-            GH_EVENT_PR: ${{ github.event_name == 'pull_request' && github.event.number || 0 }}
-            GH_EVENT_HASH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-            GH_EVENT_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        timeout-minutes: 60
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
@@ -45,14 +40,11 @@ jobs:
               with:
                   submodules: true
 
-            - name: Get parent for size reports
-              run: |
-                MERGE_PARENT="$(git --no-pager log -1 --pretty=tformat:%s | sed -n -e 's/Merge [0-9a-f]\+ into //p')"
-                if test -z "${MERGE_PARENT}" || test "${GH_EVENT_PARENT}" = 0
-                then
-                  MERGE_PARENT=$GH_EVENT_BASE
-                fi
-                echo "GH_EVENT_PARENT=$MERGE_PARENT" >>$GITHUB_ENV
+            - name: Set up environment for size reports
+              if: ${{ !env.ACT }}
+              env:
+                  GH_CONTEXT: ${{ toJson(github) }}
+              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
 
             - name: Bootstrap
               timeout-minutes: 25
@@ -81,7 +73,14 @@ jobs:
                 .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
                     p6 default all-clusters-app \
                     out/infineon-p6-all-clusters/chip-p6-clusters-example.out
-
+            - name: Build lighting-app example
+              timeout-minutes: 10
+              run: |
+                scripts/run_in_build_env.sh \
+                  "scripts/build/build_examples.py --no-log-timestamps --target 'infineon-p6-light' build"
+                .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    p6 default light-app \
+                    out/infineon-p6-light/chip-p6-lighting-example.out
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
@@ -90,3 +89,4 @@ jobs:
                   path: |
                     out/infineon-p6-lock/p6-default-lock-app-sizes.json
                     out/infineon-p6-all-clusters/p6-default-all-clusters-app-sizes.json
+                    out/infineon-p6-light/p6-default-light-app-sizes.json

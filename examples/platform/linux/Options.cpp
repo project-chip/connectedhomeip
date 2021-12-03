@@ -174,9 +174,20 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
         LinuxDeviceOptions::GetInstance().payload.rendezvousInformation.SetRaw(static_cast<uint8_t>(atoi(aValue)));
         break;
 
-    case kDeviceOption_Discriminator:
-        LinuxDeviceOptions::GetInstance().payload.discriminator = static_cast<uint16_t>(atoi(aValue));
+    case kDeviceOption_Discriminator: {
+        uint16_t value = static_cast<uint16_t>(atoi(aValue));
+        if (value >= 4096)
+        {
+            PrintArgError("%s: invalid value specified for discriminator: %s\n", aProgram, aValue);
+            retval = false;
+        }
+        else
+        {
+            LinuxDeviceOptions::GetInstance().payload.discriminator = value;
+            DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(value);
+        }
         break;
+    }
 
     case kDeviceOption_Passcode:
         LinuxDeviceOptions::GetInstance().payload.setUpPINCode = static_cast<uint32_t>(atoi(aValue));

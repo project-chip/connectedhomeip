@@ -125,19 +125,22 @@ gn gen --check --fail-on-unused-args {out}/android-x86-chip-tool '--args=target_
 bash -c 'yes | TEST_ANDROID_HOME/tools/bin/sdkmanager --licenses >/dev/null'
 
 # Generating efr32-brd4161a-light
-gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-light
 
 # Generating efr32-brd4161a-light-rpc
-gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-light-rpc
 
 # Generating efr32-brd4161a-lock
-gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-lock
+
+# Generating efr32-brd4161a-lock-rpc
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/efr32 '--args=efr32_board="BRD4161A" import("//with_pw_rpc.gni")' {out}/efr32-brd4161a-lock-rpc
 
 # Generating efr32-brd4161a-unit-test
-gn gen --check --fail-on-unused-args --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-unit-test
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/src/test_driver/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-unit-test
 
 # Generating efr32-brd4161a-window-covering
-gn gen --check --fail-on-unused-args --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window-covering
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/window-app/efr32 '--args=efr32_board="BRD4161A"' {out}/efr32-brd4161a-window-covering
 
 # Generating esp32-c3devkit-all-clusters
 mkdir -p {out}/esp32-c3devkit-all-clusters
@@ -267,10 +270,13 @@ export SDKCONFIG_DEFAULTS={out}/esp32-m5stack-all-clusters-rpc-ipv6only/sdkconfi
 idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rpc-ipv6only reconfigure'
 
 # Generating infineon-p6-all-clusters
-gn gen --check --fail-on-unused-args --root={root}/examples/all-clusters-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-all-clusters
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/all-clusters-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-all-clusters
+
+# Generating infineon-p6-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-light
 
 # Generating infineon-p6-lock
-gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/p6 '--args=p6_board="CY8CKIT-062S2-43012"' {out}/infineon-p6-lock
 
 # Generating config mbed-CY8CPROTO_062_4343W-all-clusters-debug
 mbed-tools configure -t GCC_ARM -m CY8CPROTO_062_4343W -p {root}/examples/all-clusters-app/mbed -o {out}/mbed-CY8CPROTO_062_4343W-all-clusters-debug --mbed-os-path {root}/third_party/mbed-os/repo
@@ -423,7 +429,7 @@ export GNUARMEMB_TOOLCHAIN_PATH="$PW_PIGWEED_CIPD_INSTALL_DIR";
 west build --cmake-only -d {out}/nrf-nrf5340-shell -b nrf5340dk_nrf5340_cpuapp {root}/examples/shell/nrfconnect'
 
 # Generating qpg-qpg6100-lock
-gn gen --check --fail-on-unused-args --root={root}/examples/lock-app/qpg {out}/qpg-qpg6100-lock
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lock-app/qpg {out}/qpg-qpg6100-lock
 
 # Generating telink-tlsr9518adk80d-light
 bash -c 'export ZEPHYR_BASE="$TELINK_ZEPHYR_BASE"
@@ -433,7 +439,7 @@ source "$ZEPHYR_BASE/zephyr-env.sh";
 west build --cmake-only -d {out}/telink-tlsr9518adk80d-light -b tlsr9518adk80d {root}/examples/lighting-app/telink'
 
 # Generating tizen-arm-light
-gn gen --check --fail-on-unused-args --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light
+gn gen --check --fail-on-unused-args --export-compile-commands --root={root}/examples/lighting-app/linux '--args=target_os="tizen" target_cpu="arm" sysroot="TEST_TIZEN_HOME"' {out}/tizen-arm-light
 
 # Building ameba-amebad-all-clusters
 ninja -C {out}/ameba-amebad-all-clusters
@@ -587,6 +593,9 @@ ninja -C {out}/efr32-brd4161a-light-rpc
 # Building efr32-brd4161a-lock
 ninja -C {out}/efr32-brd4161a-lock
 
+# Building efr32-brd4161a-lock-rpc
+ninja -C {out}/efr32-brd4161a-lock-rpc
+
 # Building efr32-brd4161a-unit-test
 ninja -C {out}/efr32-brd4161a-unit-test
 
@@ -672,6 +681,9 @@ idf.py -C examples/all-clusters-app/esp32 -B {out}/esp32-m5stack-all-clusters-rp
 
 # Building infineon-p6-all-clusters
 ninja -C {out}/infineon-p6-all-clusters
+
+# Building infineon-p6-light
+ninja -C {out}/infineon-p6-light
 
 # Building infineon-p6-lock
 ninja -C {out}/infineon-p6-lock

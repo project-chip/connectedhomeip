@@ -21,6 +21,7 @@ limitations under the License.
     <item name="Ok" value="0x0"/>
     <item name="ValueOutsideRange" value="0x1"/>
     <item name="InvalidAuthentication" value="0x2"/>
+    <item name="NotCommissioning" value="0x3"/>    
   </enum>
   <enum name="RegulatoryLocationType" type="ENUM8">
     <cluster code="0x0030"/>
@@ -38,10 +39,10 @@ limitations under the License.
     <code>0x0030</code>
     <define>GENERAL_COMMISSIONING_CLUSTER</define>
     <description>This cluster is used to set, remove and update fabric information on a commissionee.</description>
-    <attribute side="server" code="0x00" define="BREADCRUMB" type="INT64U" min="0x0000000000000000" max="0xFFFFFFFFFFFFFFFF" writable="true" default="0x0000000000000000" optional="false">Breadcrumb</attribute>
+    <attribute side="server" code="0x00" define="BREADCRUMB" type="INT64U" writable="true" default="0x0000000000000000" optional="false">Breadcrumb</attribute>
     <attribute side="server" code="0x01" define="BASICCOMMISSIONINGINFO_LIST" type="ARRAY" entryType="BasicCommissioningInfoType" length="254" writable="false" optional="false">BasicCommissioningInfoList</attribute>
-    <attribute side="server" code="0x02" define="REGULATORYCONFIG_LIST" type="ARRAY" entryType="RegulatoryLocationType" length="254" writable="false" optional="true">RegulatoryConfigList</attribute>
-    <attribute side="server" code="0x03" define="LOCATIONCAPABILITY_LIST" type="ARRAY" entryType="RegulatoryLocationType" length="254" writable="false" optional="true">LocationCapabilityList</attribute>
+    <attribute side="server" code="0x02" define="REGULATORYCONFIG" type="ENUM8" writable="false" optional="true">RegulatoryConfig</attribute>
+    <attribute side="server" code="0x03" define="LOCATIONCAPABILITY" type="ENUM8" writable="false" optional="true">LocationCapability</attribute>
     <command source="client" code="0x00" name="ArmFailSafe" optional="false" cli="chip fabric_commissioning armfailsafe">
       <description>Arm the persistent fail-safe timer with an expiry time of now + ExpiryLengthSeconds using device clock</description>
       <arg name="expiryLengthSeconds" type="INT16U"/>
@@ -74,4 +75,10 @@ limitations under the License.
       <arg name="debugText" type="CHAR_STRING"/>
     </command>               
   </cluster>
+  <bitmap name="GeneralCommissioningFeature" type="BITMAP32">
+    <field name="GeneralCommissioning" mask="0x1"/>
+    <field name="WiFiNetworkInterface" mask="0x2"/>
+    <field name="ThreadNetworkInterface" mask="0x4"/>
+    <field name="EthernetNetworkInterface" mask="0x8"/>        
+  </bitmap>  
 </configurator>

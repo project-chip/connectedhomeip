@@ -76,11 +76,10 @@ public:
          * The ReadClient object MUST continue to exist after this call is completed.
          *
          * This callback will be called when receiving event data received in the Read and Subscribe interactions
-         *
+         * only one of the apData and apStatus will be non-null.
          * @param[in] apReadClient: The read client object that initiated the read or subscribe transaction.
          * @param[in] aEventHeader: The event header in report response.
-         * @param[in] apData: A TLVReader positioned right on the payload of the event. This will be set to null if the apStatus is
-         * not null.
+         * @param[in] apData: A TLVReader positioned right on the payload of the event.
          * @param[in] apStatus: Event-specific status, containing an InteractionModel::Status code as well as an optional
          *                     cluster-specific status code.
          */
@@ -294,12 +293,12 @@ private:
      * our exchange and don't need to manually close it.
      */
     void ShutdownInternal(CHIP_ERROR aError);
-    bool IsInitialReport() { return mInitialReport; }
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback * mpCallback                      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
-    bool mInitialReport                        = true;
+    bool mIsInitialReport                      = true;
+    bool mIsPrimingReports                     = true;
     bool mPendingMoreChunks                    = false;
     uint16_t mMinIntervalFloorSeconds          = 0;
     uint16_t mMaxIntervalCeilingSeconds        = 0;

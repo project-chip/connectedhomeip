@@ -132,11 +132,11 @@ EmberAfStatus ApplicationBasic::HandleWriteAttribute(chip::AttributeId attribute
     {
         if (*buffer)
         {
-            SetApplicationStatus(EMBER_ZCL_APPLICATION_BASIC_STATUS_ACTIVE_VISIBLE_FOCUS);
+            SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationBasicStatus::kActiveVisibleFocus);
         }
         else
         {
-            SetApplicationStatus(EMBER_ZCL_APPLICATION_BASIC_STATUS_ACTIVE_VISIBLE_NOT_FOCUS);
+            SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationBasicStatus::kActiveVisibleNotFocus);
         }
     }
     else

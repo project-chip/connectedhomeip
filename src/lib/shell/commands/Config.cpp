@@ -76,23 +76,23 @@ static CHIP_ERROR ConfigProductId(int argc, char ** argv)
     return ConfigGetProductId(false);
 }
 
-static CHIP_ERROR ConfigGetProductRevision(bool printHeader)
+static CHIP_ERROR ConfigGetHardwareVersion(bool printHeader)
 {
     streamer_t * sout = streamer_get();
     uint16_t value16;
 
-    ReturnErrorOnFailure(ConfigurationMgr().GetProductRevision(value16));
+    ReturnErrorOnFailure(ConfigurationMgr().GetHardwareVersion(value16));
     if (printHeader)
     {
-        streamer_printf(sout, "ProductRevision: ");
+        streamer_printf(sout, "HardwareVersion: ");
     }
     streamer_printf(sout, "%" PRIu16 " (0x%" PRIX16 ")\r\n", value16, value16);
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR ConfigProductRevision(int argc, char ** argv)
+static CHIP_ERROR ConfigHardwareVersion(int argc, char ** argv)
 {
-    return ConfigGetProductRevision(false);
+    return ConfigGetHardwareVersion(false);
 }
 
 static CHIP_ERROR ConfigGetSetupPinCode(bool printHeader)
@@ -166,7 +166,7 @@ static CHIP_ERROR PrintAllConfigs()
 {
     ReturnErrorOnFailure(ConfigGetVendorId(true));
     ReturnErrorOnFailure(ConfigGetProductId(true));
-    ReturnErrorOnFailure(ConfigGetProductRevision(true));
+    ReturnErrorOnFailure(ConfigGetHardwareVersion(true));
 
     ReturnErrorOnFailure(ConfigGetSetupPinCode(true));
     ReturnErrorOnFailure(ConfigGetSetupDiscriminator(true));
@@ -200,7 +200,7 @@ void RegisterConfigCommands()
         { &ConfigHelpHandler, "help", "Usage: config <subcommand>" },
         { &ConfigVendorId, "vendorid", "Get VendorId. Usage: config vendorid" },
         { &ConfigProductId, "productid", "Get ProductId. Usage: config productid" },
-        { &ConfigProductRevision, "productrev", "Get ProductRevision. Usage: config preductrev" },
+        { &ConfigHardwareVersion, "hardwarever", "Get HardwareVersion. Usage: config hardwarever" },
         { &ConfigPinCode, "pincode", "Get commissioning pincode. Usage: config pincode" },
         { &ConfigDiscriminator, "discriminator", "Get/Set commissioning discriminator. Usage: config discriminator [value]" },
     };

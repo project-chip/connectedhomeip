@@ -20,7 +20,7 @@
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DeviceAttestationVerifierExample.h>
+#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/ScopedBuffer.h>
 #include <lib/support/ThreadOperationalDataset.h>
@@ -108,6 +108,11 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
         chip::Platform::ScopedMemoryBuffer<uint8_t> rcac;
         chip::Crypto::P256Keypair ephemeralKey;
 
+        // Initialize device attestation verifier
+        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::GetDefaultDACVerifier(testingRootStore));
+
         err = gFabricStorage.Initialize(&gServerStorage);
         SuccessOrExit(err);
 
@@ -115,9 +120,6 @@ extern "C" chip::Controller::DeviceCommissioner * pychip_internal_Commissioner_N
 
         commissionerParams.pairingDelegate = &gPairingDelegate;
         commissionerParams.storageDelegate = &gServerStorage;
-
-        // Initialize device attestation verifier
-        chip::Credentials::SetDeviceAttestationVerifier(chip::Credentials::Examples::GetExampleDACVerifier());
 
         err = ephemeralKey.Initialize();
         SuccessOrExit(err);

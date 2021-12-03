@@ -20,12 +20,13 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app-common/zap-generated/command-id.h>
-#include <app-common/zap-generated/enums.h>
 #include <app/Command.h>
 #include <app/util/ContentAppPlatform.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
+#include <lib/support/TypeTraits.h>
 #include <lib/support/ZclString.h>
 
 #include <inipp/inipp.h>
@@ -155,9 +156,10 @@ Application ApplicationBasicManager::getApplicationForEndpoint(chip::EndpointId 
     return app;
 }
 
-bool applicationBasicClusterChangeApplicationStatus(EmberAfApplicationBasicStatus status, chip::EndpointId endpoint)
+bool applicationBasicClusterChangeApplicationStatus(app::Clusters::ApplicationBasic::ApplicationBasicStatus status,
+                                                    chip::EndpointId endpoint)
 {
-    ChipLogProgress(Zcl, "Sent an application status change request %d for endpoint %d", status, endpoint);
+    ChipLogProgress(Zcl, "Sent an application status change request %d for endpoint %d", to_underlying(status), endpoint);
 
 #if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
     ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);

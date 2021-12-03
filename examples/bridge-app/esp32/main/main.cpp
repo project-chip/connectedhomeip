@@ -334,7 +334,7 @@ void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
         uint8_t buffer[kFixedLabelAttributeArraySize];
         EmberAfAttributeMetadata am = { .attributeId  = ZCL_LABEL_LIST_ATTRIBUTE_ID,
                                         .size         = kFixedLabelAttributeArraySize,
-                                        .defaultValue = nullptr };
+                                        .defaultValue = static_cast<uint16_t>(0) };
 
         EncodeFixedLabel("room", dev->GetLocation(), buffer, sizeof(buffer), &am);
 

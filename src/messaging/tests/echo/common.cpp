@@ -48,6 +48,10 @@ void InitializeChip(void)
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
+    // Initialize TCP.
+    err = chip::DeviceLayer::InetLayer().InitTCP(chip::DeviceLayer::TCPEndPointManager());
+    SuccessOrExit(err);
+
 exit:
     if (err != CHIP_NO_ERROR)
     {

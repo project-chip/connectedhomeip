@@ -102,6 +102,7 @@ jobs:
                     --volume /tmp:/tmp \
                     -- ./gn_build.sh \
                     chip_build_tests=false \
+                    chip_enable_wifi=false \
                     enable_host_gcc_build=true \
                     enable_host_gcc_mbedtls_build=false \
                     enable_host_clang_build=false \

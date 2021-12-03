@@ -47,8 +47,6 @@ void __attribute__((weak)) MatterApplianceControlPluginClientInitCallback() {}
 void MatterApplianceControlPluginServerInitCallback();
 void __attribute__((weak)) MatterDescriptorPluginClientInitCallback() {}
 void MatterDescriptorPluginServerInitCallback();
-void __attribute__((weak)) MatterAclPluginClientInitCallback() {}
-void MatterAclPluginServerInitCallback();
 void __attribute__((weak)) MatterPollControlPluginClientInitCallback() {}
 void MatterPollControlPluginServerInitCallback();
 void __attribute__((weak)) MatterBridgedActionsPluginClientInitCallback() {}
@@ -87,8 +85,6 @@ void __attribute__((weak)) MatterEthernetNetworkDiagnosticsPluginClientInitCallb
 void MatterEthernetNetworkDiagnosticsPluginServerInitCallback();
 void __attribute__((weak)) MatterTimeSynchronizationPluginClientInitCallback() {}
 void MatterTimeSynchronizationPluginServerInitCallback();
-void __attribute__((weak)) MatterBridgedDeviceBasicInformationPluginClientInitCallback() {}
-void MatterBridgedDeviceBasicInformationPluginServerInitCallback();
 void __attribute__((weak)) MatterBridgedDeviceBasicPluginClientInitCallback() {}
 void MatterBridgedDeviceBasicPluginServerInitCallback();
 void __attribute__((weak)) MatterSwitchPluginClientInitCallback() {}
@@ -99,6 +95,8 @@ void __attribute__((weak)) MatterOperationalCredentialsPluginClientInitCallback(
 void MatterOperationalCredentialsPluginServerInitCallback();
 void __attribute__((weak)) MatterFixedLabelPluginClientInitCallback() {}
 void MatterFixedLabelPluginServerInitCallback();
+void __attribute__((weak)) MatterUserLabelPluginClientInitCallback() {}
+void MatterUserLabelPluginServerInitCallback();
 void __attribute__((weak)) MatterBooleanStatePluginClientInitCallback() {}
 void MatterBooleanStatePluginServerInitCallback();
 void __attribute__((weak)) MatterModeSelectPluginClientInitCallback() {}
@@ -245,7 +243,3 @@ void __attribute__((weak)) MatterBindingPluginClientInitCallback() {}
 void MatterBindingPluginServerInitCallback();
 void __attribute__((weak)) MatterGroupKeyManagementPluginClientInitCallback() {}
 void MatterGroupKeyManagementPluginServerInitCallback();
-void __attribute__((weak)) MatterSampleMfgSpecificClusterPluginClientInitCallback() {}
-void MatterSampleMfgSpecificClusterPluginServerInitCallback();
-void __attribute__((weak)) MatterSampleMfgSpecificCluster2PluginClientInitCallback() {}
-void MatterSampleMfgSpecificCluster2PluginServerInitCallback();

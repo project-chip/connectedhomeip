@@ -26,6 +26,7 @@ class HostApp(Enum):
     THERMOSTAT = auto()
     RPC_CONSOLE = auto()
     MIN_MDNS = auto()
+    TV_APP = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -38,6 +39,8 @@ class HostApp(Enum):
             return 'common/pigweed/rpc_console'
         if self == HostApp.MIN_MDNS:
             return 'minimal-mdns'
+        if self == HostApp.TV_APP:
+            return 'tv-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -60,6 +63,9 @@ class HostApp(Enum):
             yield 'minimal-mdns-client.map'
             yield 'minimal-mdns-server'
             yield 'minimal-mdns-server.map'
+        elif self == HostApp.TV_APP:
+            yield 'chip-tv-app'
+            yield 'chip-tv-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -99,7 +105,9 @@ class HostBoard(Enum):
 
 class HostBuilder(GnBuilder):
 
-    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True):
+    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
+                 enable_ble=True, use_tsan=False,  use_asan=False, separate_event_loop=True
+                 ):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
@@ -110,6 +118,18 @@ class HostBuilder(GnBuilder):
 
         if not enable_ipv4:
             self.extra_gn_options.append('chip_inet_config_enable_ipv4=false')
+
+        if not enable_ble:
+            self.extra_gn_options.append('chip_config_network_layer_ble=false')
+
+        if use_tsan:
+            self.extra_gn_options.append('is_tsan=true')
+
+        if use_asan:
+            self.extra_gn_options.append('is_asan=true')
+
+        if not separate_event_loop:
+            self.extra_gn_options.append('config_use_separate_eventloop=false')
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

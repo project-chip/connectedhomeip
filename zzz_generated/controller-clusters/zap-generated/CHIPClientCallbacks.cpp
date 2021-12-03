@@ -1967,6 +1967,21 @@ bool emberAfTestClusterClusterBooleanResponseCallback(EndpointId endpoint, app::
     return true;
 }
 
+bool emberAfTestClusterClusterSimpleStructResponseCallback(
+    EndpointId endpoint, app::CommandSender * commandObj,
+    chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType arg1)
+{
+    ChipLogProgress(Zcl, "SimpleStructResponse:");
+    ChipLogProgress(Zcl, "  arg1: Not sure how to log struct SimpleStruct");
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterSimpleStructResponseCallback");
+
+    Callback::Callback<TestClusterClusterSimpleStructResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterSimpleStructResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, SimpleStruct());
+    return true;
+}
+
 bool emberAfTestClusterClusterTestAddArgumentsResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
                                                                uint8_t returnValue)
 {

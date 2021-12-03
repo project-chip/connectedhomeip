@@ -133,6 +133,50 @@ public class ClusterInfoMapping {
     }
   }
 
+  public static class DelegatedFloatAttributeCallback implements ChipClusters.FloatAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(float value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "float");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
+  public static class DelegatedDoubleAttributeCallback implements ChipClusters.DoubleAttributeCallback, DelegatedClusterCallback {
+    private ClusterCommandCallback callback;
+
+    @Override
+    public void setCallbackDelegate(ClusterCommandCallback callback) {
+      this.callback = callback;
+    }
+
+    @Override
+    public void onSuccess(double value) {
+      Map<CommandResponseInfo, Object> responseValues = new LinkedHashMap<>();
+      CommandResponseInfo setupPINResponseValue = new CommandResponseInfo("value", "double");
+      responseValues.put(setupPINResponseValue, value);
+      callback.onSuccess(responseValues);
+    }
+
+    @Override
+    public void onError(Exception error) {
+      callback.onFailure(error);
+    }
+  }
+
   public static class DelegatedDefaultClusterCallback implements DefaultClusterCallback, DelegatedClusterCallback {
     private ClusterCommandCallback callback;
 
@@ -170,8 +214,13 @@ public class ClusterInfoMapping {
                // {{asSymbol label}}: {{asUnderlyingZclType type}}
                // Conversion from this type to Java is not properly implemented yet
              {{else}}
-           CommandResponseInfo {{asSymbol label}}ResponseValue = new CommandResponseInfo("{{asSymbol label}}", "{{asJavaBasicType type}}");
-           responseValues.put({{asSymbol label}}ResponseValue, {{asSymbol label}});
+             {{#if_is_struct type}}
+               // {{asSymbol label}}: Struct {{type}}
+               // Conversion from this type to Java is not properly implemented yet
+             {{else}}
+               CommandResponseInfo {{asSymbol label}}ResponseValue = new CommandResponseInfo("{{asSymbol label}}", "{{asJavaBasicType type}}");
+               responseValues.put({{asSymbol label}}ResponseValue, {{asSymbol label}});
+             {{/if_is_struct}}
              {{/if}}
            {{/chip_cluster_response_arguments}}
            callback.onSuccess(responseValues);
@@ -266,9 +315,12 @@ public class ClusterInfoMapping {
      {{! TODO: fill out parameter types }}
      {{#if (zcl_command_arguments_count this.id)}}
      {{#chip_cluster_command_arguments_with_structs_expanded}}
+     {{#if_is_struct type}}
+     {{else}}
        CommandParameterInfo {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo = new CommandParameterInfo("{{asLowerCamelCase label}}", {{asJavaBasicType type}}.class);
        {{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}CommandParams.put("{{asLowerCamelCase label}}",{{asLowerCamelCase ../../name}}{{asLowerCamelCase ../name}}{{asLowerCamelCase label}}CommandParameterInfo);
      {{#not_last}} {{/not_last}}
+     {{/if_is_struct}}
      {{/chip_cluster_command_arguments_with_structs_expanded}}
      {{else}}
      {{/if}}
@@ -278,9 +330,10 @@ public class ClusterInfoMapping {
          (cluster, callback, commandArguments) -> {
            ((ChipClusters.{{asUpperCamelCase ../name}}Cluster) cluster)
            .{{asLowerCamelCase name}}((ChipClusters.{{asUpperCamelCase ../name}}Cluster.{{asUpperCamelCase responseName}}Callback) callback
-           {{#chip_cluster_command_arguments_with_structs_expanded}},
+           {{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}},
            ({{#if isOptional}}Optional<{{/if}}{{asJavaBoxedType type}}{{#if isOptional}}>{{/if}})
            commandArguments.get("{{asLowerCamelCase label}}")
+           {{/if_is_struct}}
            {{/chip_cluster_command_arguments_with_structs_expanded}}
            );
          },

@@ -44,10 +44,10 @@ public:
     inline uint16_t GetVendorId() override { return mVendorId; };
     inline const char * GetApplicationName() override { return mApplicationName; };
     inline uint16_t GetProductId() override { return mProductId; };
-    inline EmberAfApplicationBasicStatus GetApplicationStatus() override { return mApplicationStatus; };
+    inline app::Clusters::ApplicationBasic::ApplicationBasicStatus GetApplicationStatus() override { return mApplicationStatus; };
     inline const char * GetApplicationVersion() override { return mApplicationVersion; };
 
-    inline void SetApplicationStatus(EmberAfApplicationBasicStatus applicationStatus) override
+    inline void SetApplicationStatus(app::Clusters::ApplicationBasic::ApplicationBasicStatus applicationStatus) override
     {
         mApplicationStatus = applicationStatus;
     };
@@ -67,7 +67,8 @@ protected:
     uint16_t mVendorId;
     char mApplicationName[kApplicationNameSize];
     uint16_t mProductId;
-    EmberAfApplicationBasicStatus mApplicationStatus = EMBER_ZCL_APPLICATION_BASIC_STATUS_STOPPED;
+    app::Clusters::ApplicationBasic::ApplicationBasicStatus mApplicationStatus =
+        app::Clusters::ApplicationBasic::ApplicationBasicStatus::kStopped;
     char mApplicationVersion[kApplicationVersionSize];
 };
 

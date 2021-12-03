@@ -18,7 +18,7 @@
  */
 
 #include "LightingManager.h"
-#include "qvCHIP.h"
+#include "qvIO.h"
 #include <lib/support/logging/CHIPLogging.h>
 
 // initialization values for Blue in XY color space
@@ -211,6 +211,6 @@ void LightingManager::Set(bool aOn)
 void LightingManager::UpdateLight()
 {
     ChipLogProgress(NotSpecified, "UpdateLight: %d L:%d R:%d G:%d B:%d", mState, mLevel, mRGB.r, mRGB.g, mRGB.b);
-    qvCHIP_PWMSetColor(mRGB.r, mRGB.g, mRGB.b);
-    qvCHIP_PWMColorOnOff(mState == kState_On);
+    qvIO_PWMSetColor(mRGB.r, mRGB.g, mRGB.b);
+    qvIO_PWMColorOnOff(mState == kState_On);
 }

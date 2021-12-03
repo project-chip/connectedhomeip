@@ -14,6 +14,9 @@
 
 import os
 
+from typing import Any, List
+from itertools import combinations
+
 from builders.android import AndroidBoard, AndroidApp, AndroidBuilder
 from builders.efr32 import Efr32Builder, Efr32App, Efr32Board
 from builders.esp32 import Esp32Builder, Esp32Board, Esp32App
@@ -93,6 +96,34 @@ class Target:
         return self.glob_blacklist_reason
 
 
+class AcceptAnyName:
+    def Accept(self, name: str):
+        return True
+
+
+class AcceptNameWithSubstring:
+    def __init__(self, substr: str):
+        self.substr = substr
+
+    def Accept(self, name: str):
+        return self.substr in name
+
+
+class HostBuildVariant:
+    def __init__(self, name: str, validator=AcceptAnyName(), conflicts: List[str] = [], **buildargs):
+        self.name = name
+        self.validator = validator
+        self.conflicts = conflicts
+        self.buildargs = buildargs
+
+
+def HasConflicts(items: List[HostBuildVariant]) -> bool:
+    for a, b in combinations(items, 2):
+        if (a.name in b.conflicts) or (b.name in a.conflicts):
+            return True
+    return False
+
+
 def HostTargets():
     target = Target(HostBoard.NATIVE.PlatformName(), HostBuilder)
     targets = [
@@ -106,9 +137,11 @@ def HostTargets():
 
     app_targets = []
 
-    # RPC console compilation only for native
+    # Don't cross  compile some builds
     app_targets.append(
         targets[0].Extend('rpc-console', app=HostApp.RPC_CONSOLE))
+    app_targets.append(
+        targets[0].Extend('tv-app', app=HostApp.TV_APP))
 
     for target in targets:
         app_targets.append(target.Extend(
@@ -117,10 +150,47 @@ def HostTargets():
         app_targets.append(target.Extend('thermostat', app=HostApp.THERMOSTAT))
         app_targets.append(target.Extend('minmdns', app=HostApp.MIN_MDNS))
 
+    # Possible build variants. Note that number of potential
+    # builds is exponential here
+    variants = [
+        HostBuildVariant(name="ipv6only", enable_ipv4=False),
+        HostBuildVariant(name="no-ble", enable_ble=False),
+        HostBuildVariant(name="tsan", conflicts=['asan'], use_tsan=True),
+        HostBuildVariant(name="asan", conflicts=['tsan'], use_asan=True),
+        HostBuildVariant(name="same-event-loop",
+                         validator=AcceptNameWithSubstring('-chip-tool'), separate_event_loop=False),
+    ]
+
+    glob_whitelist = set(['ipv6only'])
+
     for target in app_targets:
         yield target
-        if ('rpc-console' not in target.name):
-            yield target.Extend('ipv6only', enable_ipv4=False)
+
+        if 'rpc-console' in target.name:
+            # rpc console  has only one build variant right now
+            continue
+
+        # skip variants that do not work for  this target
+        ok_variants = [v for v in variants if v.validator.Accept(target.name)]
+
+        # Build every possible variant
+        for variant_count in range(1, len(ok_variants) + 1):
+            for subgroup in combinations(ok_variants, variant_count):
+                if HasConflicts(subgroup):
+                    continue
+
+                # Target ready to be created - no conflicts
+                variant_target = target.Clone()
+                for option in subgroup:
+                    variant_target = variant_target.Extend(
+                        option.name, **option.buildargs)
+
+                # Only a few are whitelisted for globs
+                if '-'.join([o.name for o in subgroup]) not in glob_whitelist:
+                    variant_target = variant_target.GlobBlacklist(
+                        'Reduce default build variants')
+
+                yield variant_target
 
 
 def Esp32Targets():
@@ -148,11 +218,11 @@ def Efr32Targets():
                         board=Efr32Board.BRD4161A)
 
     yield efr_target.Extend('window-covering', app=Efr32App.WINDOW_COVERING)
-    yield efr_target.Extend('lock', app=Efr32App.LOCK)
     yield efr_target.Extend('unit-test', app=Efr32App.UNIT_TEST)
 
     rpc_aware_targets = [
         efr_target.Extend('light', app=Efr32App.LIGHT),
+        efr_target.Extend('lock', app=Efr32App.LOCK)
     ]
 
     for target in rpc_aware_targets:
@@ -227,6 +297,7 @@ def InfineonTargets():
 
     yield target.Extend('p6-lock', board=InfineonBoard.P6BOARD, app=InfineonApp.LOCK)
     yield target.Extend('p6-all-clusters', board=InfineonBoard.P6BOARD, app=InfineonApp.ALL_CLUSTERS)
+    yield target.Extend('p6-light', board=InfineonBoard.P6BOARD, app=InfineonApp.LIGHT)
 
 
 ALL = []

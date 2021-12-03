@@ -163,6 +163,7 @@ function getTests()
 
   const Others = [
     'TestCluster',
+    'TestSaveAs',
     'TestConstraints',
     'TestDelayCommands',
     'TestDescriptorCluster',

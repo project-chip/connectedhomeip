@@ -35,24 +35,24 @@ class Device : public generated::Device<Device>
 public:
     virtual ~Device() = default;
 
-    virtual pw::Status FactoryReset(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    virtual pw::Status FactoryReset(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
         DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
         return pw::OkStatus();
     }
 
-    virtual pw::Status Reboot(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    virtual pw::Status Reboot(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
         return pw::Status::Unimplemented();
     }
 
-    virtual pw::Status TriggerOta(ServerContext & ctx, const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
+    virtual pw::Status TriggerOta(const pw_protobuf_Empty & request, pw_protobuf_Empty & response)
     {
         // TODO: auto err = DeviceLayer::SoftwareUpdateMgr().CheckNow();
         return pw::Status::Unimplemented();
     }
 
-    virtual pw::Status GetDeviceState(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceState & response)
+    virtual pw::Status GetDeviceState(const pw_protobuf_Empty & request, chip_rpc_DeviceState & response)
     {
         uint64_t time_since_boot_sec;
         DeviceLayer::GetDiagnosticDataProvider().GetUpTime(time_since_boot_sec);
@@ -71,12 +71,17 @@ public:
         return pw::OkStatus();
     }
 
-    virtual pw::Status GetDeviceInfo(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_DeviceInfo & response)
+    virtual pw::Status GetDeviceInfo(const pw_protobuf_Empty & request, chip_rpc_DeviceInfo & response)
     {
+
         uint16_t vendor_id;
         if (DeviceLayer::ConfigurationMgr().GetVendorId(vendor_id) == CHIP_NO_ERROR)
         {
             response.vendor_id = static_cast<uint32_t>(vendor_id);
+        }
+        else
+        {
+            response.vendor_id = CHIP_DEVICE_CONFIG_DEVICE_VENDOR_ID;
         }
 
         uint16_t product_id;
@@ -84,11 +89,19 @@ public:
         {
             response.product_id = static_cast<uint32_t>(product_id);
         }
+        else
+        {
+            response.product_id = CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID;
+        }
 
         uint16_t software_version;
-        if (DeviceLayer::ConfigurationMgr().GetFirmwareRevision(software_version) == CHIP_NO_ERROR)
+        if (DeviceLayer::ConfigurationMgr().GetSoftwareVersion(software_version) == CHIP_NO_ERROR)
         {
             response.software_version = software_version;
+        }
+        else
+        {
+            response.software_version = CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION;
         }
 
         uint32_t code;
@@ -105,12 +118,16 @@ public:
             response.has_pairing_info           = true;
         }
 
-        DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number));
+        if (DeviceLayer::ConfigurationMgr().GetSerialNumber(response.serial_number, sizeof(response.serial_number)) !=
+            CHIP_NO_ERROR)
+        {
+            snprintf(response.serial_number, sizeof(response.serial_number), CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
+        }
 
         return pw::OkStatus();
     }
 
-    virtual pw::Status SetPairingInfo(ServerContext &, const chip_rpc_PairingInfo & request, pw_protobuf_Empty & response)
+    virtual pw::Status SetPairingInfo(const chip_rpc_PairingInfo & request, pw_protobuf_Empty & response)
     {
         if (DeviceLayer::ConfigurationMgr().StoreSetupPinCode(request.code) != CHIP_NO_ERROR ||
             DeviceLayer::ConfigurationMgr().StoreSetupDiscriminator(request.discriminator) != CHIP_NO_ERROR)

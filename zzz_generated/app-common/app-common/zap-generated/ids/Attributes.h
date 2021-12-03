@@ -416,22 +416,6 @@ namespace OnOff {
 static constexpr AttributeId Id = 0x00000000;
 } // namespace OnOff
 
-namespace SampleMfgSpecificAttribute0x00000x1002 {
-static constexpr AttributeId Id = 0x10020000;
-} // namespace SampleMfgSpecificAttribute0x00000x1002
-
-namespace SampleMfgSpecificAttribute0x00000x1049 {
-static constexpr AttributeId Id = 0x10490000;
-} // namespace SampleMfgSpecificAttribute0x00000x1049
-
-namespace SampleMfgSpecificAttribute0x00010x1002 {
-static constexpr AttributeId Id = 0x10020001;
-} // namespace SampleMfgSpecificAttribute0x00010x1002
-
-namespace SampleMfgSpecificAttribute0x00010x1040 {
-static constexpr AttributeId Id = 0x10490001;
-} // namespace SampleMfgSpecificAttribute0x00010x1040
-
 namespace GlobalSceneControl {
 static constexpr AttributeId Id = 0x00004000;
 } // namespace GlobalSceneControl
@@ -762,20 +746,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace Descriptor
-
-namespace Acl {
-namespace Attributes {
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace Acl
 
 namespace PollControl {
 namespace Attributes {
@@ -1176,13 +1146,13 @@ namespace BasicCommissioningInfoList {
 static constexpr AttributeId Id = 0x00000001;
 } // namespace BasicCommissioningInfoList
 
-namespace RegulatoryConfigList {
+namespace RegulatoryConfig {
 static constexpr AttributeId Id = 0x00000002;
-} // namespace RegulatoryConfigList
+} // namespace RegulatoryConfig
 
-namespace LocationCapabilityList {
+namespace LocationCapability {
 static constexpr AttributeId Id = 0x00000003;
-} // namespace LocationCapabilityList
+} // namespace LocationCapability
 
 namespace FeatureMap {
 static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
@@ -1695,20 +1665,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 } // namespace Attributes
 } // namespace TimeSynchronization
 
-namespace BridgedDeviceBasicInformation {
-namespace Attributes {
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace BridgedDeviceBasicInformation
-
 namespace BridgedDeviceBasic {
 namespace Attributes {
 
@@ -1874,6 +1830,24 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace FixedLabel
+
+namespace UserLabel {
+namespace Attributes {
+
+namespace LabelList {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace LabelList
+
+namespace FeatureMap {
+static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
+} // namespace FeatureMap
+
+namespace ClusterRevision {
+static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
+} // namespace ClusterRevision
+
+} // namespace Attributes
+} // namespace UserLabel
 
 namespace BooleanState {
 namespace Attributes {
@@ -4542,9 +4516,25 @@ namespace Int16u {
 static constexpr AttributeId Id = 0x00000006;
 } // namespace Int16u
 
+namespace Int24u {
+static constexpr AttributeId Id = 0x00000007;
+} // namespace Int24u
+
 namespace Int32u {
 static constexpr AttributeId Id = 0x00000008;
 } // namespace Int32u
+
+namespace Int40u {
+static constexpr AttributeId Id = 0x00000009;
+} // namespace Int40u
+
+namespace Int48u {
+static constexpr AttributeId Id = 0x0000000A;
+} // namespace Int48u
+
+namespace Int56u {
+static constexpr AttributeId Id = 0x0000000B;
+} // namespace Int56u
 
 namespace Int64u {
 static constexpr AttributeId Id = 0x0000000C;
@@ -4558,9 +4548,25 @@ namespace Int16s {
 static constexpr AttributeId Id = 0x0000000E;
 } // namespace Int16s
 
+namespace Int24s {
+static constexpr AttributeId Id = 0x0000000F;
+} // namespace Int24s
+
 namespace Int32s {
 static constexpr AttributeId Id = 0x00000010;
 } // namespace Int32s
+
+namespace Int40s {
+static constexpr AttributeId Id = 0x00000011;
+} // namespace Int40s
+
+namespace Int48s {
+static constexpr AttributeId Id = 0x00000012;
+} // namespace Int48s
+
+namespace Int56s {
+static constexpr AttributeId Id = 0x00000013;
+} // namespace Int56s
 
 namespace Int64s {
 static constexpr AttributeId Id = 0x00000014;
@@ -4573,6 +4579,14 @@ static constexpr AttributeId Id = 0x00000015;
 namespace Enum16 {
 static constexpr AttributeId Id = 0x00000016;
 } // namespace Enum16
+
+namespace FloatSingle {
+static constexpr AttributeId Id = 0x00000017;
+} // namespace FloatSingle
+
+namespace FloatDouble {
+static constexpr AttributeId Id = 0x00000018;
+} // namespace FloatDouble
 
 namespace OctetString {
 static constexpr AttributeId Id = 0x00000019;
@@ -4618,6 +4632,34 @@ namespace ListNullablesAndOptionalsStruct {
 static constexpr AttributeId Id = 0x00000023;
 } // namespace ListNullablesAndOptionalsStruct
 
+namespace EnumAttr {
+static constexpr AttributeId Id = 0x00000024;
+} // namespace EnumAttr
+
+namespace Struct {
+static constexpr AttributeId Id = 0x00000025;
+} // namespace Struct
+
+namespace RangeRestrictedInt8u {
+static constexpr AttributeId Id = 0x00000026;
+} // namespace RangeRestrictedInt8u
+
+namespace RangeRestrictedInt8s {
+static constexpr AttributeId Id = 0x00000027;
+} // namespace RangeRestrictedInt8s
+
+namespace RangeRestrictedInt16u {
+static constexpr AttributeId Id = 0x00000028;
+} // namespace RangeRestrictedInt16u
+
+namespace RangeRestrictedInt16s {
+static constexpr AttributeId Id = 0x00000029;
+} // namespace RangeRestrictedInt16s
+
+namespace TimedWriteBoolean {
+static constexpr AttributeId Id = 0x00000030;
+} // namespace TimedWriteBoolean
+
 namespace Unsupported {
 static constexpr AttributeId Id = 0x000000FF;
 } // namespace Unsupported
@@ -4650,9 +4692,25 @@ namespace NullableInt16u {
 static constexpr AttributeId Id = 0x00008006;
 } // namespace NullableInt16u
 
+namespace NullableInt24u {
+static constexpr AttributeId Id = 0x00008007;
+} // namespace NullableInt24u
+
 namespace NullableInt32u {
 static constexpr AttributeId Id = 0x00008008;
 } // namespace NullableInt32u
+
+namespace NullableInt40u {
+static constexpr AttributeId Id = 0x00008009;
+} // namespace NullableInt40u
+
+namespace NullableInt48u {
+static constexpr AttributeId Id = 0x0000800A;
+} // namespace NullableInt48u
+
+namespace NullableInt56u {
+static constexpr AttributeId Id = 0x0000800B;
+} // namespace NullableInt56u
 
 namespace NullableInt64u {
 static constexpr AttributeId Id = 0x0000800C;
@@ -4666,9 +4724,25 @@ namespace NullableInt16s {
 static constexpr AttributeId Id = 0x0000800E;
 } // namespace NullableInt16s
 
+namespace NullableInt24s {
+static constexpr AttributeId Id = 0x0000800F;
+} // namespace NullableInt24s
+
 namespace NullableInt32s {
 static constexpr AttributeId Id = 0x00008010;
 } // namespace NullableInt32s
+
+namespace NullableInt40s {
+static constexpr AttributeId Id = 0x00008011;
+} // namespace NullableInt40s
+
+namespace NullableInt48s {
+static constexpr AttributeId Id = 0x00008012;
+} // namespace NullableInt48s
+
+namespace NullableInt56s {
+static constexpr AttributeId Id = 0x00008013;
+} // namespace NullableInt56s
 
 namespace NullableInt64s {
 static constexpr AttributeId Id = 0x00008014;
@@ -4682,6 +4756,14 @@ namespace NullableEnum16 {
 static constexpr AttributeId Id = 0x00008016;
 } // namespace NullableEnum16
 
+namespace NullableFloatSingle {
+static constexpr AttributeId Id = 0x00008017;
+} // namespace NullableFloatSingle
+
+namespace NullableFloatDouble {
+static constexpr AttributeId Id = 0x00008018;
+} // namespace NullableFloatDouble
+
 namespace NullableOctetString {
 static constexpr AttributeId Id = 0x00008019;
 } // namespace NullableOctetString
@@ -4689,6 +4771,30 @@ static constexpr AttributeId Id = 0x00008019;
 namespace NullableCharString {
 static constexpr AttributeId Id = 0x0000801E;
 } // namespace NullableCharString
+
+namespace NullableEnumAttr {
+static constexpr AttributeId Id = 0x00008024;
+} // namespace NullableEnumAttr
+
+namespace NullableStruct {
+static constexpr AttributeId Id = 0x00008025;
+} // namespace NullableStruct
+
+namespace NullableRangeRestrictedInt8u {
+static constexpr AttributeId Id = 0x00008026;
+} // namespace NullableRangeRestrictedInt8u
+
+namespace NullableRangeRestrictedInt8s {
+static constexpr AttributeId Id = 0x00008027;
+} // namespace NullableRangeRestrictedInt8s
+
+namespace NullableRangeRestrictedInt16u {
+static constexpr AttributeId Id = 0x00008028;
+} // namespace NullableRangeRestrictedInt16u
+
+namespace NullableRangeRestrictedInt16s {
+static constexpr AttributeId Id = 0x00008029;
+} // namespace NullableRangeRestrictedInt16s
 
 namespace FeatureMap {
 static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
@@ -5436,50 +5542,6 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 
 } // namespace Attributes
 } // namespace GroupKeyManagement
-
-namespace SampleMfgSpecificCluster {
-namespace Attributes {
-
-namespace EmberSampleAttribute {
-static constexpr AttributeId Id = 0x10020000;
-} // namespace EmberSampleAttribute
-
-namespace EmberSampleAttribute2 {
-static constexpr AttributeId Id = 0x10020001;
-} // namespace EmberSampleAttribute2
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace SampleMfgSpecificCluster
-
-namespace SampleMfgSpecificCluster2 {
-namespace Attributes {
-
-namespace EmberSampleAttribute3 {
-static constexpr AttributeId Id = 0x10490000;
-} // namespace EmberSampleAttribute3
-
-namespace EmberSampleAttribute4 {
-static constexpr AttributeId Id = 0x10490001;
-} // namespace EmberSampleAttribute4
-
-namespace FeatureMap {
-static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
-} // namespace FeatureMap
-
-namespace ClusterRevision {
-static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
-} // namespace ClusterRevision
-
-} // namespace Attributes
-} // namespace SampleMfgSpecificCluster2
 
 } // namespace Clusters
 } // namespace app

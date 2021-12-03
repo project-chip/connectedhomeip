@@ -15,6 +15,7 @@
 """Utitilies to flash or erase a device."""
 
 import argparse
+import pathlib
 import errno
 import locale
 import os
@@ -62,7 +63,8 @@ OPTIONS = {
             'help': 'Flash an image',
             'default': None,
             'argparse': {
-                'metavar': 'FILE'
+                'metavar': 'FILE',
+                'type': pathlib.Path,
             },
         },
         'verify_application': {
@@ -320,8 +322,8 @@ class Flasher:
                         ↦ ρᵢ if opt[name]==σᵢ
                           ρ otherwise
         """
-        if isinstance(template, str):
-            result = [template.format_map(opt)]
+        if isinstance(template, str) or isinstance(template, pathlib.Path):
+            result = [str(template).format_map(opt)]
         elif isinstance(template, list):
             result = []
             for i in template:
@@ -361,26 +363,6 @@ class Flasher:
         else:
             raise ValueError('Unknown: {}'.format(template))
         return result
-
-    def find_file(self, filename, dirs=None):
-        """Resolve a file name; also checks the script directory."""
-        if os.path.isabs(filename) or os.path.exists(filename):
-            return filename
-        dirs = dirs or []
-        if self.argv0:
-            dirs.append(os.path.dirname(self.argv0))
-        for directory in dirs:
-            name = os.path.join(directory, filename)
-            if os.path.exists(name):
-                return name
-        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT),
-                                filename)
-
-    def optional_file(self, filename, dirs=None):
-        """Resolve a file name, if present."""
-        if filename is None:
-            return None
-        return self.find_file(filename, dirs)
 
     def parse_argv(self, argv):
         """Handle command line options."""
@@ -426,10 +408,15 @@ class Flasher:
         defaults = []
         for key, value in vars(args).items():
             if key in self.option and value != getattr(self.option, key):
-                defaults.append('  {}: {},'.format(repr(key), repr(value)))
+                if isinstance(value, pathlib.Path):
+                    defaults.append('  {}: os.path.join(os.path.dirname(sys.argv[0]), {}),'.format(
+                        repr(key), repr(str(value))))
+                else:
+                    defaults.append('  {}: {},'.format(repr(key), repr(value)))
 
         script = """
             import sys
+            import os.path
 
             DEFAULTS = {{
             {defaults}

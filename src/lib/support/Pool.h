@@ -22,9 +22,8 @@
 
 #pragma once
 
-#include <lib/support/CodeUtils.h>
+#include <system/SystemConfig.h>
 
-#include <assert.h>
 #include <atomic>
 #include <limits>
 #include <new>
@@ -32,6 +31,13 @@
 #include <utility>
 
 namespace chip {
+
+enum class Loop : uint8_t
+{
+    Continue,
+    Break,
+    Finish,
+};
 
 namespace internal {
 
@@ -88,7 +94,7 @@ protected:
     void * At(size_t index) { return static_cast<uint8_t *>(mElements) + mElementSize * index; }
     size_t IndexOf(void * element);
 
-    bool ForEachActiveObjectInner(void * context, bool lambda(void * context, void * object));
+    Loop ForEachActiveObjectInner(void * context, Loop lambda(void * context, void * object));
 
 private:
     void * mElements;
@@ -113,7 +119,7 @@ class LambdaProxy
 {
 public:
     LambdaProxy(Function && function) : mFunction(std::move(function)) {}
-    static bool Call(void * context, void * target)
+    static Loop Call(void * context, void * target)
     {
         return static_cast<LambdaProxy *>(context)->mFunction(static_cast<T *>(target));
     }
@@ -151,7 +157,7 @@ struct HeapObjectList : HeapObjectListNode
 
     HeapObjectListNode * FindNode(void * object) const;
 
-    bool ForEachNode(void * context, bool lambda(void * context, void * object));
+    Loop ForEachNode(void * context, Loop lambda(void * context, void * object));
 
     size_t mIterationDepth;
 };
@@ -179,8 +185,8 @@ struct HeapObjectList : HeapObjectListNode
  *
  * @fn ForEachActiveObject
  * @memberof ObjectPool
- * @param visitor   A function that takes a T* and returns true to continue iterating or false to stop iterating.
- * @returns false if a visitor call returned false, true otherwise.
+ * @param visitor   A function that takes a T* and returns Loop::Continue to continue iterating or Loop::Break to stop iterating.
+ * @returns Loop::Break if a visitor call returned Loop::Break, Loop::Finish otherwise.
  *
  * Iteration may be nested. ReleaseObject() can be called during iteration, on the current object or any other.
  * CreateObject() can be called, but it is undefined whether or not a newly created object will be visited.
@@ -227,25 +233,27 @@ public:
      * @brief
      *   Run a functor for each active object in the pool
      *
-     *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
-     *  @return    bool     Returns false if broke during iteration
+     *  @param     function The functor of type `Loop (*)(T*)`, return Loop::Break to break the iteration
+     *  @return    Loop     Returns Break or Finish according to the iteration
      *
      * caution
      *   this function is not thread-safe, make sure all usage of the
      *   pool is protected by a lock, or else avoid using this function
      */
     template <typename Function>
-    bool ForEachActiveObject(Function && function)
+    Loop ForEachActiveObject(Function && function)
     {
+        static_assert(std::is_same<Loop, decltype(function(std::declval<T *>()))>::value,
+                      "The function must take T* and return Loop");
         internal::LambdaProxy<T, Function> proxy(std::forward<Function>(function));
         return ForEachActiveObjectInner(&proxy, &internal::LambdaProxy<T, Function>::Call);
     }
 
 private:
-    static bool ReleaseObject(void * context, void * object)
+    static Loop ReleaseObject(void * context, void * object)
     {
         static_cast<BitMapObjectPool *>(context)->ReleaseObject(static_cast<T *>(object));
-        return true;
+        return Loop::Continue;
     }
 
     std::atomic<tBitChunkType> mUsage[(N + kBitChunkSize - 1) / kBitChunkSize];
@@ -315,22 +323,23 @@ public:
      * @brief
      *   Run a functor for each active object in the pool
      *
-     *  @param     function The functor of type `bool (*)(T*)`, return false to break the iteration
-     *  @return    bool     Returns false if broke during iteration
+     *  @param     function The functor of type `Loop (*)(T*)`, return Loop::Break to break the iteration
+     *  @return    Loop     Returns Break or Finish according to the iteration
      */
     template <typename Function>
-    bool ForEachActiveObject(Function && function)
+    Loop ForEachActiveObject(Function && function)
     {
-        // return ForEachNode([function](void *object) { return function(static_cast<T*>(object)); });
+        static_assert(std::is_same<Loop, decltype(function(std::declval<T *>()))>::value,
+                      "The function must take T* and return Loop");
         internal::LambdaProxy<T, Function> proxy(std::forward<Function>(function));
         return mObjects.ForEachNode(&proxy, &internal::LambdaProxy<T, Function>::Call);
     }
 
 private:
-    static bool ReleaseObject(void * context, void * object)
+    static Loop ReleaseObject(void * context, void * object)
     {
         static_cast<HeapObjectPool *>(context)->ReleaseObject(static_cast<T *>(object));
-        return true;
+        return Loop::Continue;
     }
 
     internal::HeapObjectList mObjects;

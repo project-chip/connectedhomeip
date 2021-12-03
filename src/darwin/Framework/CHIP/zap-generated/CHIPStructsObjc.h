@@ -200,6 +200,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPUserLabelClusterLabelStruct : NSObject
+@property (strong, nonatomic) NSString * _Nonnull label;
+@property (strong, nonatomic) NSString * _Nonnull value;
+- (instancetype)init;
+@end
+
 @interface CHIPModeSelectClusterModeOptionStruct : NSObject
 @property (strong, nonatomic) NSString * _Nonnull label;
 @property (strong, nonatomic) NSNumber * _Nonnull mode;
@@ -313,6 +319,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (strong, nonatomic) NSData * _Nonnull d;
 @property (strong, nonatomic) NSString * _Nonnull e;
 @property (strong, nonatomic) NSNumber * _Nonnull f;
+@property (strong, nonatomic) NSNumber * _Nonnull g;
+@property (strong, nonatomic) NSNumber * _Nonnull h;
 - (instancetype)init;
 @end
 

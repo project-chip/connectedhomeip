@@ -96,6 +96,10 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
 
     mMRPConfig = config;
 
+    // Initialize CASE session state with any MRP parameters that DNS-SD has provided.
+    // It can be overridden by CASE session protocol messages that include MRP parameters.
+    mCASESession.SetMRPConfig(mMRPConfig);
+
     if (mState == State::NeedsAddress)
     {
         mState = State::Initialized;
@@ -120,7 +124,6 @@ CHIP_ERROR OperationalDeviceProxy::UpdateDeviceData(const Transport::PeerAddress
         if (secureSession != nullptr)
         {
             secureSession->SetPeerAddress(addr);
-            secureSession->SetMRPConfig(mMRPConfig);
         }
     }
 
@@ -226,7 +229,6 @@ void OperationalDeviceProxy::OnSessionEstablished()
     VerifyOrReturn(mState != State::Uninitialized,
                    ChipLogError(Controller, "OnSessionEstablished was called while the device was not initialized"));
 
-    // TODO Update the MRP params based on the MRP params extracted from CASE, when this is available.
     CHIP_ERROR err = mInitParams.sessionManager->NewPairing(
         Optional<Transport::PeerAddress>::Value(mDeviceAddress), mPeerId.GetNodeId(), &mCASESession,
         CryptoContext::SessionRole::kInitiator, mInitParams.fabricInfo->GetFabricIndex());

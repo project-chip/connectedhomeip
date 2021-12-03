@@ -78,7 +78,21 @@ public:
         delete onReportBooleanStateClusterRevisionCallback;
         delete onReportBridgedActionsSetupUrlCallback;
         delete onReportBridgedActionsClusterRevisionCallback;
-        delete onReportBridgedDeviceBasicInformationClusterRevisionCallback;
+        delete onReportBridgedDeviceBasicVendorNameCallback;
+        delete onReportBridgedDeviceBasicVendorIDCallback;
+        delete onReportBridgedDeviceBasicProductNameCallback;
+        delete onReportBridgedDeviceBasicNodeLabelCallback;
+        delete onReportBridgedDeviceBasicHardwareVersionCallback;
+        delete onReportBridgedDeviceBasicHardwareVersionStringCallback;
+        delete onReportBridgedDeviceBasicSoftwareVersionCallback;
+        delete onReportBridgedDeviceBasicSoftwareVersionStringCallback;
+        delete onReportBridgedDeviceBasicManufacturingDateCallback;
+        delete onReportBridgedDeviceBasicPartNumberCallback;
+        delete onReportBridgedDeviceBasicProductURLCallback;
+        delete onReportBridgedDeviceBasicProductLabelCallback;
+        delete onReportBridgedDeviceBasicSerialNumberCallback;
+        delete onReportBridgedDeviceBasicReachableCallback;
+        delete onReportBridgedDeviceBasicClusterRevisionCallback;
         delete onReportColorControlCurrentHueCallback;
         delete onReportColorControlCurrentSaturationCallback;
         delete onReportColorControlRemainingTimeCallback;
@@ -274,6 +288,8 @@ public:
         delete onReportPumpConfigurationAndControlEffectiveControlModeCallback;
         delete onReportPumpConfigurationAndControlCapacityCallback;
         delete onReportPumpConfigurationAndControlSpeedCallback;
+        delete onReportPumpConfigurationAndControlLifetimeRunningHoursCallback;
+        delete onReportPumpConfigurationAndControlPowerCallback;
         delete onReportPumpConfigurationAndControlLifetimeEnergyConsumedCallback;
         delete onReportPumpConfigurationAndControlOperationModeCallback;
         delete onReportPumpConfigurationAndControlControlModeCallback;
@@ -316,14 +332,24 @@ public:
         delete onReportTestClusterBitmap64Callback;
         delete onReportTestClusterInt8uCallback;
         delete onReportTestClusterInt16uCallback;
+        delete onReportTestClusterInt24uCallback;
         delete onReportTestClusterInt32uCallback;
+        delete onReportTestClusterInt40uCallback;
+        delete onReportTestClusterInt48uCallback;
+        delete onReportTestClusterInt56uCallback;
         delete onReportTestClusterInt64uCallback;
         delete onReportTestClusterInt8sCallback;
         delete onReportTestClusterInt16sCallback;
+        delete onReportTestClusterInt24sCallback;
         delete onReportTestClusterInt32sCallback;
+        delete onReportTestClusterInt40sCallback;
+        delete onReportTestClusterInt48sCallback;
+        delete onReportTestClusterInt56sCallback;
         delete onReportTestClusterInt64sCallback;
         delete onReportTestClusterEnum8Callback;
         delete onReportTestClusterEnum16Callback;
+        delete onReportTestClusterFloatSingleCallback;
+        delete onReportTestClusterFloatDoubleCallback;
         delete onReportTestClusterOctetStringCallback;
         delete onReportTestClusterLongOctetStringCallback;
         delete onReportTestClusterCharStringCallback;
@@ -331,6 +357,10 @@ public:
         delete onReportTestClusterEpochUsCallback;
         delete onReportTestClusterEpochSCallback;
         delete onReportTestClusterVendorIdCallback;
+        delete onReportTestClusterRangeRestrictedInt8uCallback;
+        delete onReportTestClusterRangeRestrictedInt8sCallback;
+        delete onReportTestClusterRangeRestrictedInt16uCallback;
+        delete onReportTestClusterRangeRestrictedInt16sCallback;
         delete onReportTestClusterUnsupportedCallback;
         delete onReportTestClusterNullableBooleanCallback;
         delete onReportTestClusterNullableBitmap8Callback;
@@ -339,16 +369,30 @@ public:
         delete onReportTestClusterNullableBitmap64Callback;
         delete onReportTestClusterNullableInt8uCallback;
         delete onReportTestClusterNullableInt16uCallback;
+        delete onReportTestClusterNullableInt24uCallback;
         delete onReportTestClusterNullableInt32uCallback;
+        delete onReportTestClusterNullableInt40uCallback;
+        delete onReportTestClusterNullableInt48uCallback;
+        delete onReportTestClusterNullableInt56uCallback;
         delete onReportTestClusterNullableInt64uCallback;
         delete onReportTestClusterNullableInt8sCallback;
         delete onReportTestClusterNullableInt16sCallback;
+        delete onReportTestClusterNullableInt24sCallback;
         delete onReportTestClusterNullableInt32sCallback;
+        delete onReportTestClusterNullableInt40sCallback;
+        delete onReportTestClusterNullableInt48sCallback;
+        delete onReportTestClusterNullableInt56sCallback;
         delete onReportTestClusterNullableInt64sCallback;
         delete onReportTestClusterNullableEnum8Callback;
         delete onReportTestClusterNullableEnum16Callback;
+        delete onReportTestClusterNullableFloatSingleCallback;
+        delete onReportTestClusterNullableFloatDoubleCallback;
         delete onReportTestClusterNullableOctetStringCallback;
         delete onReportTestClusterNullableCharStringCallback;
+        delete onReportTestClusterNullableRangeRestrictedInt8uCallback;
+        delete onReportTestClusterNullableRangeRestrictedInt8sCallback;
+        delete onReportTestClusterNullableRangeRestrictedInt16uCallback;
+        delete onReportTestClusterNullableRangeRestrictedInt16sCallback;
         delete onReportTestClusterClusterRevisionCallback;
         delete onReportThermostatLocalTemperatureCallback;
         delete onReportThermostatAbsMinHeatSetpointLimitCallback;
@@ -586,8 +630,44 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0025, 0xFFFD,
                                        onReportBridgedActionsClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0001, onReportBridgedDeviceBasicVendorNameCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0002, onReportBridgedDeviceBasicVendorIDCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0003,
+                                       onReportBridgedDeviceBasicProductNameCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0005, onReportBridgedDeviceBasicNodeLabelCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0007,
+                                       onReportBridgedDeviceBasicHardwareVersionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0008,
+                                       onReportBridgedDeviceBasicHardwareVersionStringCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0009,
+                                       onReportBridgedDeviceBasicSoftwareVersionCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x000A,
+                                       onReportBridgedDeviceBasicSoftwareVersionStringCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x000B,
+                                       onReportBridgedDeviceBasicManufacturingDateCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x000C, onReportBridgedDeviceBasicPartNumberCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x000D, onReportBridgedDeviceBasicProductURLCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x000E,
+                                       onReportBridgedDeviceBasicProductLabelCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x000F,
+                                       onReportBridgedDeviceBasicSerialNumberCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0011, onReportBridgedDeviceBasicReachableCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0xFFFD,
-                                       onReportBridgedDeviceBasicInformationClusterRevisionCallback->Cancel(),
+                                       onReportBridgedDeviceBasicClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0000, onReportColorControlCurrentHueCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
@@ -1087,6 +1167,12 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0014,
                                        onReportPumpConfigurationAndControlSpeedCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0015,
+                                       onReportPumpConfigurationAndControlLifetimeRunningHoursCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0016,
+                                       onReportPumpConfigurationAndControlPowerCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0017,
                                        onReportPumpConfigurationAndControlLifetimeEnergyConsumedCallback->Cancel(),
                                        BasicAttributeFilter<Int32uAttributeCallback>);
@@ -1192,22 +1278,42 @@ public:
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0006, onReportTestClusterInt16uCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0007, onReportTestClusterInt24uCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0008, onReportTestClusterInt32uCallback->Cancel(),
                                        BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0009, onReportTestClusterInt40uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x000A, onReportTestClusterInt48uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x000B, onReportTestClusterInt56uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x000C, onReportTestClusterInt64uCallback->Cancel(),
                                        BasicAttributeFilter<Int64uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x000D, onReportTestClusterInt8sCallback->Cancel(),
                                        BasicAttributeFilter<Int8sAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x000E, onReportTestClusterInt16sCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x000F, onReportTestClusterInt24sCallback->Cancel(),
+                                       BasicAttributeFilter<Int32sAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0010, onReportTestClusterInt32sCallback->Cancel(),
                                        BasicAttributeFilter<Int32sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0011, onReportTestClusterInt40sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0012, onReportTestClusterInt48sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0013, onReportTestClusterInt56sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0014, onReportTestClusterInt64sCallback->Cancel(),
                                        BasicAttributeFilter<Int64sAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0015, onReportTestClusterEnum8Callback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0016, onReportTestClusterEnum16Callback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0017, onReportTestClusterFloatSingleCallback->Cancel(),
+                                       BasicAttributeFilter<FloatAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0018, onReportTestClusterFloatDoubleCallback->Cancel(),
+                                       BasicAttributeFilter<DoubleAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0019, onReportTestClusterOctetStringCallback->Cancel(),
                                        BasicAttributeFilter<OctetStringAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x001D, onReportTestClusterLongOctetStringCallback->Cancel(),
@@ -1222,6 +1328,18 @@ public:
                                        BasicAttributeFilter<Int32uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0022, onReportTestClusterVendorIdCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0026,
+                                       onReportTestClusterRangeRestrictedInt8uCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0027,
+                                       onReportTestClusterRangeRestrictedInt8sCallback->Cancel(),
+                                       BasicAttributeFilter<Int8sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0028,
+                                       onReportTestClusterRangeRestrictedInt16uCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0029,
+                                       onReportTestClusterRangeRestrictedInt16sCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x00FF, onReportTestClusterUnsupportedCallback->Cancel(),
                                        BasicAttributeFilter<BooleanAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8000, onReportTestClusterNullableBooleanCallback->Cancel(),
@@ -1238,28 +1356,62 @@ public:
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8006, onReportTestClusterNullableInt16uCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8007, onReportTestClusterNullableInt24uCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8008, onReportTestClusterNullableInt32uCallback->Cancel(),
                                        BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8009, onReportTestClusterNullableInt40uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x800A, onReportTestClusterNullableInt48uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x800B, onReportTestClusterNullableInt56uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x800C, onReportTestClusterNullableInt64uCallback->Cancel(),
                                        BasicAttributeFilter<Int64uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x800D, onReportTestClusterNullableInt8sCallback->Cancel(),
                                        BasicAttributeFilter<Int8sAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x800E, onReportTestClusterNullableInt16sCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x800F, onReportTestClusterNullableInt24sCallback->Cancel(),
+                                       BasicAttributeFilter<Int32sAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8010, onReportTestClusterNullableInt32sCallback->Cancel(),
                                        BasicAttributeFilter<Int32sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8011, onReportTestClusterNullableInt40sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8012, onReportTestClusterNullableInt48sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8013, onReportTestClusterNullableInt56sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8014, onReportTestClusterNullableInt64sCallback->Cancel(),
                                        BasicAttributeFilter<Int64sAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8015, onReportTestClusterNullableEnum8Callback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8016, onReportTestClusterNullableEnum16Callback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8017,
+                                       onReportTestClusterNullableFloatSingleCallback->Cancel(),
+                                       BasicAttributeFilter<FloatAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8018,
+                                       onReportTestClusterNullableFloatDoubleCallback->Cancel(),
+                                       BasicAttributeFilter<DoubleAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8019,
                                        onReportTestClusterNullableOctetStringCallback->Cancel(),
                                        BasicAttributeFilter<OctetStringAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x801E,
                                        onReportTestClusterNullableCharStringCallback->Cancel(),
                                        BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8026,
+                                       onReportTestClusterNullableRangeRestrictedInt8uCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8027,
+                                       onReportTestClusterNullableRangeRestrictedInt8sCallback->Cancel(),
+                                       BasicAttributeFilter<Int8sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8028,
+                                       onReportTestClusterNullableRangeRestrictedInt16uCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8029,
+                                       onReportTestClusterNullableRangeRestrictedInt16sCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0xFFFD, onReportTestClusterClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0000, onReportThermostatLocalTemperatureCallback->Cancel(),
@@ -1328,7 +1480,7 @@ public:
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0000,
                                        onReportThreadNetworkDiagnosticsChannelCallback->Cancel(),
-                                       BasicAttributeFilter<Int8uAttributeCallback>);
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0001,
                                        onReportThreadNetworkDiagnosticsRoutingRoleCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
@@ -1732,7 +1884,35 @@ private:
         new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportBridgedActionsClusterRevisionCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBridgedDeviceBasicInformationClusterRevisionCallback =
+    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicVendorNameCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportBridgedDeviceBasicVendorIDCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicProductNameCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicNodeLabelCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportBridgedDeviceBasicHardwareVersionCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicHardwareVersionStringCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<Int32uAttributeCallback> * onReportBridgedDeviceBasicSoftwareVersionCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicSoftwareVersionStringCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicManufacturingDateCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicPartNumberCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicProductURLCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicProductLabelCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicSerialNumberCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<BooleanAttributeCallback> * onReportBridgedDeviceBasicReachableCallback =
+        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportBridgedDeviceBasicClusterRevisionCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentHueCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
@@ -2124,6 +2304,10 @@ private:
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlSpeedCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int32uAttributeCallback> * onReportPumpConfigurationAndControlLifetimeRunningHoursCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<Int32uAttributeCallback> * onReportPumpConfigurationAndControlPowerCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
     chip::Callback::Callback<Int32uAttributeCallback> * onReportPumpConfigurationAndControlLifetimeEnergyConsumedCallback =
         new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportPumpConfigurationAndControlOperationModeCallback =
@@ -2208,22 +2392,42 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterInt16uCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int32uAttributeCallback> * onReportTestClusterInt24uCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
     chip::Callback::Callback<Int32uAttributeCallback> * onReportTestClusterInt32uCallback =
         new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterInt40uCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterInt48uCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterInt56uCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
     chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterInt64uCallback =
         new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
     chip::Callback::Callback<Int8sAttributeCallback> * onReportTestClusterInt8sCallback =
         new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportTestClusterInt16sCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<Int32sAttributeCallback> * onReportTestClusterInt24sCallback =
+        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
     chip::Callback::Callback<Int32sAttributeCallback> * onReportTestClusterInt32sCallback =
         new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
+    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterInt40sCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
+    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterInt48sCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
+    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterInt56sCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
     chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterInt64sCallback =
         new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportTestClusterEnum8Callback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterEnum16Callback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<FloatAttributeCallback> * onReportTestClusterFloatSingleCallback =
+        new chip::Callback::Callback<FloatAttributeCallback>(OnFloatAttributeResponse, this);
+    chip::Callback::Callback<DoubleAttributeCallback> * onReportTestClusterFloatDoubleCallback =
+        new chip::Callback::Callback<DoubleAttributeCallback>(OnDoubleAttributeResponse, this);
     chip::Callback::Callback<OctetStringAttributeCallback> * onReportTestClusterOctetStringCallback =
         new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
     chip::Callback::Callback<OctetStringAttributeCallback> * onReportTestClusterLongOctetStringCallback =
@@ -2238,6 +2442,14 @@ private:
         new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterVendorIdCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportTestClusterRangeRestrictedInt8uCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int8sAttributeCallback> * onReportTestClusterRangeRestrictedInt8sCallback =
+        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterRangeRestrictedInt16uCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int16sAttributeCallback> * onReportTestClusterRangeRestrictedInt16sCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportTestClusterUnsupportedCallback =
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportTestClusterNullableBooleanCallback =
@@ -2254,26 +2466,54 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterNullableInt16uCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int32uAttributeCallback> * onReportTestClusterNullableInt24uCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
     chip::Callback::Callback<Int32uAttributeCallback> * onReportTestClusterNullableInt32uCallback =
         new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
+    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterNullableInt40uCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterNullableInt48uCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
+    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterNullableInt56uCallback =
+        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
     chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterNullableInt64uCallback =
         new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
     chip::Callback::Callback<Int8sAttributeCallback> * onReportTestClusterNullableInt8sCallback =
         new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportTestClusterNullableInt16sCallback =
         new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
+    chip::Callback::Callback<Int32sAttributeCallback> * onReportTestClusterNullableInt24sCallback =
+        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
     chip::Callback::Callback<Int32sAttributeCallback> * onReportTestClusterNullableInt32sCallback =
         new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
+    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterNullableInt40sCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
+    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterNullableInt48sCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
+    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterNullableInt56sCallback =
+        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
     chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterNullableInt64sCallback =
         new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportTestClusterNullableEnum8Callback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterNullableEnum16Callback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<FloatAttributeCallback> * onReportTestClusterNullableFloatSingleCallback =
+        new chip::Callback::Callback<FloatAttributeCallback>(OnFloatAttributeResponse, this);
+    chip::Callback::Callback<DoubleAttributeCallback> * onReportTestClusterNullableFloatDoubleCallback =
+        new chip::Callback::Callback<DoubleAttributeCallback>(OnDoubleAttributeResponse, this);
     chip::Callback::Callback<OctetStringAttributeCallback> * onReportTestClusterNullableOctetStringCallback =
         new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
     chip::Callback::Callback<CharStringAttributeCallback> * onReportTestClusterNullableCharStringCallback =
         new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
+    chip::Callback::Callback<Int8uAttributeCallback> * onReportTestClusterNullableRangeRestrictedInt8uCallback =
+        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int8sAttributeCallback> * onReportTestClusterNullableRangeRestrictedInt8sCallback =
+        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterNullableRangeRestrictedInt16uCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<Int16sAttributeCallback> * onReportTestClusterNullableRangeRestrictedInt16sCallback =
+        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterClusterRevisionCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatLocalTemperatureCallback =
@@ -2323,8 +2563,8 @@ private:
             new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportThermostatUserInterfaceConfigurationClusterRevisionCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThreadNetworkDiagnosticsChannelCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
+    chip::Callback::Callback<Int16uAttributeCallback> * onReportThreadNetworkDiagnosticsChannelCallback =
+        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportThreadNetworkDiagnosticsRoutingRoleCallback =
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<OctetStringAttributeCallback> * onReportThreadNetworkDiagnosticsNetworkNameCallback =

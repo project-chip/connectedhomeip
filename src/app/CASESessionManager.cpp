@@ -69,7 +69,8 @@ void CASESessionManager::ReleaseSession(NodeId nodeId)
 
 CHIP_ERROR CASESessionManager::ResolveDeviceAddress(NodeId nodeId)
 {
-    return Dnssd::Resolver::Instance().ResolveNodeId(GetFabricInfo()->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny);
+    return Dnssd::Resolver::Instance().ResolveNodeId(GetFabricInfo()->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny,
+                                                     Dnssd::Resolver::CacheBypass::On);
 }
 
 void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)
@@ -124,9 +125,9 @@ OperationalDeviceProxy * CASESessionManager::FindSession(SessionHandle session)
         if (activeSession->MatchesSession(session))
         {
             foundSession = activeSession;
-            return false;
+            return Loop::Break;
         }
-        return true;
+        return Loop::Continue;
     });
 
     return foundSession;
@@ -139,9 +140,9 @@ OperationalDeviceProxy * CASESessionManager::FindExistingSession(NodeId id)
         if (activeSession->GetDeviceId() == id)
         {
             foundSession = activeSession;
-            return false;
+            return Loop::Break;
         }
-        return true;
+        return Loop::Continue;
     });
 
     return foundSession;

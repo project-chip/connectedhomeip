@@ -20,20 +20,28 @@
 
 CHIP_ERROR TestCommand::RunCommand()
 {
-    return mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    if (mPICSFilePath.HasValue())
+    {
+        PICS.SetValue(PICSBooleanReader::Read(mPICSFilePath.Value()));
+    }
+
+    NextTest();
+
+    return CHIP_NO_ERROR;
 }
 
-void TestCommand::OnDeviceConnectedFn(void * context, chip::DeviceProxy * device)
+CHIP_ERROR TestCommand::WaitForCommissionee()
+{
+    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+}
+
+void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
 {
     ChipLogProgress(chipTool, " **** Test Setup: Device Connected\n");
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
-    command->mDevice = device;
+    command->mDevices[command->GetIdentity()] = device;
 
-    if (command->mPICSFilePath.HasValue())
-    {
-        command->PICS.SetValue(PICSBooleanReader::Read(command->mPICSFilePath.Value()));
-    }
     command->NextTest();
 }
 
@@ -60,7 +68,14 @@ CHIP_ERROR TestCommand::Wait(chip::System::Clock::Timeout duration)
 CHIP_ERROR TestCommand::Log(const char * message)
 {
     ChipLogDetail(chipTool, "%s", message);
-    WaitForMs(0);
+    ReturnErrorOnFailure(ContinueOnChipMainThread());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TestCommand::UserPrompt(const char * message)
+{
+    ChipLogDetail(chipTool, "USER_PROMPT: %s", message);
+    ReturnErrorOnFailure(ContinueOnChipMainThread());
     return CHIP_NO_ERROR;
 }
 
@@ -89,6 +104,30 @@ bool TestCommand::CheckConstraintType(const char * itemName, const char * curren
 bool TestCommand::CheckConstraintFormat(const char * itemName, const char * current, const char * expected)
 {
     ChipLogError(chipTool, "Warning: %s format checking is not implemented yet. Expected format: '%s'", itemName, expected);
+    return true;
+}
+
+bool TestCommand::CheckConstraintStartsWith(const char * itemName, const chip::Span<const char> current, const char * expected)
+{
+    std::string value(current.data(), current.size());
+    if (value.rfind(expected, 0) != 0)
+    {
+        Exit(std::string(itemName) + " (\"" + value + "\") does not starts with: \"" + std::string(expected) + "\"");
+        return false;
+    }
+
+    return true;
+}
+
+bool TestCommand::CheckConstraintEndsWith(const char * itemName, const chip::Span<const char> current, const char * expected)
+{
+    std::string value(current.data(), current.size());
+    if (value.find(expected, value.size() - strlen(expected)) == std::string::npos)
+    {
+        Exit(std::string(itemName) + " (\"" + value + "\") does not ends with: \"" + std::string(expected) + "\"");
+        return false;
+    }
+
     return true;
 }
 
@@ -151,7 +190,7 @@ bool TestCommand::ShouldSkip(const char * expression)
     if (shouldSkip)
     {
         ChipLogProgress(chipTool, " **** Skipping: %s == false\n", expression);
-        WaitForMs(0);
+        ContinueOnChipMainThread();
     }
     return shouldSkip;
 }

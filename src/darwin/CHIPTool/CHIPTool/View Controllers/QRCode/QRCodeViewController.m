@@ -548,10 +548,15 @@
                 params.timeoutMs = @(3000);
 
                 __weak typeof(self) weakSelf = self;
-                [self->_cluster addWiFiNetworkWithParams:params
-                                       completionHandler:^(NSError * error, NSDictionary * values) {
-                                           [weakSelf onAddNetworkResponse:error isWiFi:YES];
-                                       }];
+                [self->_cluster
+                    addWiFiNetworkWithParams:params
+                           completionHandler:^(CHIPNetworkCommissioningClusterAddWiFiNetworkResponseParams * _Nullable response,
+                               NSError * _Nullable error) {
+                               // TODO: addWiFiNetworkWithParams
+                               // returns status in its response,
+                               // not via the NSError!
+                               [weakSelf onAddNetworkResponse:error isWiFi:YES];
+                           }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
@@ -575,10 +580,15 @@
                 params.timeoutMs = @(3000);
 
                 __weak typeof(self) weakSelf = self;
-                [self->_cluster addThreadNetworkWithParams:params
-                                         completionHandler:^(NSError * error, NSDictionary * values) {
-                                             [weakSelf onAddNetworkResponse:error isWiFi:NO];
-                                         }];
+                [self->_cluster
+                    addThreadNetworkWithParams:params
+                             completionHandler:^(CHIPNetworkCommissioningClusterAddThreadNetworkResponseParams * _Nullable response,
+                                 NSError * _Nullable error) {
+                                 // TODO: addThreadNetworkWithParams
+                                 // returns status in its response,
+                                 // not via the NSError!
+                                 [weakSelf onAddNetworkResponse:error isWiFi:NO];
+                             }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
@@ -609,7 +619,10 @@
 
     __weak typeof(self) weakSelf = self;
     [_cluster enableNetworkWithParams:params
-                    completionHandler:^(NSError * err, NSDictionary * values) {
+                    completionHandler:^(
+                        CHIPNetworkCommissioningClusterEnableNetworkResponseParams * _Nullable response, NSError * _Nullable err) {
+                        // TODO: enableNetworkWithParams returns status in its
+                        // response, not via the NSError!
                         [weakSelf onEnableNetworkResponse:err];
                     }];
 }

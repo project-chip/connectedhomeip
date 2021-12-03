@@ -300,12 +300,9 @@ CHIP_ERROR SendReadRequest()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::app::EventPathParams eventPathParams[2];
-    eventPathParams[0].mNodeId     = kTestNodeId;
     eventPathParams[0].mEndpointId = kTestEndpointId;
     eventPathParams[0].mClusterId  = kTestClusterId;
-    eventPathParams[0].mEventId    = kTestChangeEvent1;
 
-    eventPathParams[1].mNodeId     = kTestNodeId;
     eventPathParams[1].mEndpointId = kTestEndpointId;
     eventPathParams[1].mClusterId  = kTestClusterId;
     eventPathParams[1].mEventId    = kTestChangeEvent2;
@@ -377,12 +374,10 @@ CHIP_ERROR SendSubscribeRequest()
     chip::app::EventPathParams eventPathParams[2];
     chip::app::AttributePathParams attributePathParams[1];
     readPrepareParams.mpEventPathParamsList                = eventPathParams;
-    readPrepareParams.mpEventPathParamsList[0].mNodeId     = kTestNodeId;
     readPrepareParams.mpEventPathParamsList[0].mEndpointId = kTestEndpointId;
     readPrepareParams.mpEventPathParamsList[0].mClusterId  = kTestClusterId;
     readPrepareParams.mpEventPathParamsList[0].mEventId    = kTestChangeEvent1;
 
-    readPrepareParams.mpEventPathParamsList[1].mNodeId     = kTestNodeId;
     readPrepareParams.mpEventPathParamsList[1].mEndpointId = kTestEndpointId;
     readPrepareParams.mpEventPathParamsList[1].mClusterId  = kTestClusterId;
     readPrepareParams.mpEventPathParamsList[1].mEventId    = kTestChangeEvent2;
