@@ -23,7 +23,6 @@
 #pragma once
 
 #include "AttributeDataIBs.h"
-#include "AttributeDataVersionList.h"
 #include "StructBuilder.h"
 #include "StructParser.h"
 #include <app/util/basic-types.h>

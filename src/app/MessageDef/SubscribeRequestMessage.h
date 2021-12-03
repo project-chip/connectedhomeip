@@ -17,8 +17,8 @@
 
 #pragma once
 
-#include "AttributeDataVersionList.h"
 #include "AttributePathIBs.h"
+#include "DataVersionFilterIBs.h"
 #include "EventFilterIBs.h"
 #include "EventPathIBs.h"
 #include "StructBuilder.h"
@@ -95,6 +95,14 @@ public:
     CHIP_ERROR GetAttributeRequests(AttributePathIBs::Parser * const apAttributeRequests) const;
 
     /**
+     *  @brief Get a TLVReader for the DataVersionFilterIBs. Next() must be called before accessing them.
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetDataVersionFilters(DataVersionFilterIBs::Parser * const apDataVersionFilters) const;
+
+    /**
      *  @brief Get a TLVReader for the EventPathIBs. Next() must be called before accessing them.
      *
      *  @return #CHIP_NO_ERROR on success
@@ -139,6 +147,7 @@ public:
     SubscribeRequestMessage::Builder & MinIntervalFloorSeconds(const uint16_t aMinIntervalFloorSeconds);
     SubscribeRequestMessage::Builder & MaxIntervalCeilingSeconds(const uint16_t aMinIntervalFloorSeconds);
     AttributePathIBs::Builder & CreateAttributeRequests();
+    DataVersionFilterIBs::Builder & CreateDataVersionFilters();
     EventPathIBs::Builder & CreateEventRequests();
     EventFilterIBs::Builder & CreateEventFilters();
 
@@ -162,6 +171,7 @@ public:
 
 private:
     AttributePathIBs::Builder mAttributeRequests;
+    DataVersionFilterIBs::Builder mDataVersionFilters;
     EventPathIBs::Builder mEventRequests;
     EventFilterIBs::Builder mEventFilters;
 };
