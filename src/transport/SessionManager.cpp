@@ -200,8 +200,8 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle sessionHandle, cons
             chip::Transport::PeerAddress multicastAddress =
                 Transport::PeerAddress::Multicast(sessionHandle.GetFabricIndex(), sessionHandle.GetGroupId().Value());
             destination = static_cast<Transport::PeerAddress *>(&multicastAddress);
-            char addressStr[72];
-            multicastAddress.ToString(addressStr, 72);
+            char addressStr[TInet::PeerAddress::kMaxToStringSize];
+            multicastAddress.ToString(addressStr, Inet::PeerAddress::kMaxToStringSize);
 
             ChipLogProgress(Inet,
                             "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to %d"

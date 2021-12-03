@@ -132,7 +132,7 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.append('config_use_separate_eventloop=false')
 
         if test_group:
-            self.extra_gn_options.append('chip_enable_Test_Group=true')
+            self.extra_gn_options.append('chip_enable_test_group=true')
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:

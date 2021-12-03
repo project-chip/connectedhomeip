@@ -17,7 +17,7 @@ import("${chip_root}/src/app/common_flags.gni")
 
 # Move this inside the GroupDataProvider once implemented Issue #11075
 declare_args() {
-  chip_enable_Test_Group = false
+  chip_enable_test_group = false
 }
 
 config("server_config") {
@@ -27,7 +27,7 @@ config("server_config") {
     defines += [ "CHIP_APP_USE_ECHO" ]
   }
 
-  if (chip_enable_Test_Group) {
+  if (chip_enable_test_group) {
     defines += [ "TEST_SUITE_GROUP" ]
   }
 }

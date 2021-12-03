@@ -127,8 +127,8 @@ void UDP::OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle 
 
 CHIP_ERROR UDP::MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join)
 {
-    char addressStr[72];
-    address.ToString(addressStr, 72);
+    char addressStr[Transport::PeerAddress::kMaxToStringSize];
+    address.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
 
     if (join)
     {

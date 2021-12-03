@@ -136,8 +136,6 @@ namespace {
 
 CHIP_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
-    // Skip verification of Interface since IsPresent() always fail
-    // VerifyOrReturnError(aInterfaceId.IsPresent(), INET_ERROR_UNKNOWN_INTERFACE);
     VerifyOrReturnError(aAddress.IsMulticast(), INET_ERROR_WRONG_ADDRESS_TYPE);
     return CHIP_NO_ERROR;
 }
