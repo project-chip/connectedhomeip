@@ -94,7 +94,7 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
             VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventRequests))), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << to_underlying(Tag::kEventRequests));
             {
-                EventPaths::Parser eventRequests;
+                EventPathIBs::Parser eventRequests;
                 ReturnErrorOnFailure(eventRequests.Init(reader));
 
                 PRETTY_PRINT_INCDEPTH();
@@ -107,7 +107,7 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
             VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventFilters))), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << to_underlying(Tag::kEventFilters));
             {
-                EventFilters::Parser eventFilters;
+                EventFilterIBs::Parser eventFilters;
                 ReturnErrorOnFailure(eventFilters.Init(reader));
 
                 PRETTY_PRINT_INCDEPTH();
@@ -190,14 +190,14 @@ CHIP_ERROR SubscribeRequestMessage::Parser::GetAttributeRequests(AttributePathIB
     return apAttributeRequests->Init(reader);
 }
 
-CHIP_ERROR SubscribeRequestMessage::Parser::GetEventRequests(EventPaths::Parser * const apEventRequests) const
+CHIP_ERROR SubscribeRequestMessage::Parser::GetEventRequests(EventPathIBs::Parser * const apEventRequests) const
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventRequests)), reader));
     return apEventRequests->Init(reader);
 }
 
-CHIP_ERROR SubscribeRequestMessage::Parser::GetEventFilters(EventFilters::Parser * const apEventFilters) const
+CHIP_ERROR SubscribeRequestMessage::Parser::GetEventFilters(EventFilterIBs::Parser * const apEventFilters) const
 {
     TLV::TLVReader reader;
     ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventFilters)), reader));
@@ -252,7 +252,7 @@ AttributePathIBs::Builder & SubscribeRequestMessage::Builder::CreateAttributeReq
     return mAttributeRequests;
 }
 
-EventPaths::Builder & SubscribeRequestMessage::Builder::CreateEventRequests()
+EventPathIBs::Builder & SubscribeRequestMessage::Builder::CreateEventRequests()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -261,7 +261,7 @@ EventPaths::Builder & SubscribeRequestMessage::Builder::CreateEventRequests()
     return mEventRequests;
 }
 
-EventFilters::Builder & SubscribeRequestMessage::Builder::CreateEventFilters()
+EventFilterIBs::Builder & SubscribeRequestMessage::Builder::CreateEventFilters()
 {
     if (mError == CHIP_NO_ERROR)
     {

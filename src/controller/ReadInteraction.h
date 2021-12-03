@@ -93,10 +93,11 @@ CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, const Sessio
  */
 template <typename DecodableEventTypeInfo>
 CHIP_ERROR ReadEvent(Messaging::ExchangeManager * apExchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
-                     ClusterId clusterId, EventId eventId,
                      typename TypedReadEventCallback<DecodableEventTypeInfo>::OnSuccessCallbackType onSuccessCb,
                      typename TypedReadEventCallback<DecodableEventTypeInfo>::OnErrorCallbackType onErrorCb)
 {
+    ClusterId clusterId = DecodableEventTypeInfo::GetClusterId();
+    EventId eventId     = DecodableEventTypeInfo::GetEventId();
     app::EventPathParams eventPath(endpointId, clusterId, eventId);
     app::ReadPrepareParams readParams(sessionHandle);
     app::ReadClient * readClient         = nullptr;
@@ -150,9 +151,7 @@ CHIP_ERROR ReadEvent(Messaging::ExchangeManager * aExchangeMgr, const SessionHan
                      typename TypedReadEventCallback<typename EventTypeInfo::DecodableType>::OnSuccessCallbackType onSuccessCb,
                      typename TypedReadEventCallback<typename EventTypeInfo::DecodableType>::OnErrorCallbackType onErrorCb)
 {
-    return ReadAttribute<typename EventTypeInfo::DecodableType>(aExchangeMgr, sessionHandle, endpointId,
-                                                                EventTypeInfo::GetClusterId(), EventTypeInfo::GetEventId(),
-                                                                onSuccessCb, onErrorCb);
+    return ReadEvent<typename EventTypeInfo::DecodableType>(aExchangeMgr, sessionHandle, endpointId, onSuccessCb, onErrorCb);
 }
 } // namespace Controller
 } // namespace chip

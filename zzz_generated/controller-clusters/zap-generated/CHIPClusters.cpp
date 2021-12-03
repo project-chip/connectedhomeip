@@ -5911,7 +5911,7 @@ exit:
 // DiagnosticLogs Cluster Attributes
 
 // DoorLock Cluster Commands
-CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DoorLockCluster::ClearAllPINCodes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -5923,7 +5923,7 @@ CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Cancelable * onSuccessCallbac
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearAllPins::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearAllPINCodes::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -5949,7 +5949,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::ClearAllRfids(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
+CHIP_ERROR DoorLockCluster::ClearAllRFIDCodes(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -5961,7 +5961,7 @@ CHIP_ERROR DoorLockCluster::ClearAllRfids(Callback::Cancelable * onSuccessCallba
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearAllRfids::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearAllRFIDCodes::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -5988,7 +5988,7 @@ exit:
 }
 
 CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t scheduleId)
+                                                 uint8_t holidayIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6011,8 +6011,8 @@ CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Cancelable * onSucces
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    // holidayIndex: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), holidayIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6028,8 +6028,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::ClearPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     uint16_t userId)
+CHIP_ERROR DoorLockCluster::ClearPINCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                         uint16_t pinSlotIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6041,7 +6041,7 @@ CHIP_ERROR DoorLockCluster::ClearPin(Callback::Cancelable * onSuccessCallback, C
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearPin::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearPINCode::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6052,8 +6052,8 @@ CHIP_ERROR DoorLockCluster::ClearPin(Callback::Cancelable * onSuccessCallback, C
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
+    // pinSlotIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pinSlotIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6069,8 +6069,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                      uint16_t userId)
+CHIP_ERROR DoorLockCluster::ClearRFIDCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                          uint16_t rfidSlotIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6082,7 +6082,7 @@ CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Cancelable * onSuccessCallback, 
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearRfid::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearRFIDCode::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6093,8 +6093,8 @@ CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Cancelable * onSuccessCallback, 
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
+    // rfidSlotIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), rfidSlotIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6110,8 +6110,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t scheduleId, uint16_t userId)
+CHIP_ERROR DoorLockCluster::ClearWeekDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint8_t weekDayIndex, uint16_t userIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6123,7 +6123,7 @@ CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Cancelable * onSucces
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearWeekdaySchedule::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearWeekDaySchedule::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6134,10 +6134,10 @@ CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Cancelable * onSucces
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
+    // weekDayIndex: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), weekDayIndex));
+    // userIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6153,8 +6153,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint8_t scheduleId, uint16_t userId)
+CHIP_ERROR DoorLockCluster::ClearYearDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                                 uint8_t yearDayIndex, uint16_t userIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6166,7 +6166,7 @@ CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Cancelable * onSucces
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearYeardaySchedule::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::ClearYearDaySchedule::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6177,10 +6177,10 @@ CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Cancelable * onSucces
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
+    // yearDayIndex: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), yearDayIndex));
+    // userIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6197,7 +6197,7 @@ exit:
 }
 
 CHIP_ERROR DoorLockCluster::GetHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId)
+                                               uint8_t holidayIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6220,8 +6220,8 @@ CHIP_ERROR DoorLockCluster::GetHolidaySchedule(Callback::Cancelable * onSuccessC
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+    // holidayIndex: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), holidayIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6278,8 +6278,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::GetPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint16_t userId)
+CHIP_ERROR DoorLockCluster::GetPINCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t userId)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6291,7 +6291,7 @@ CHIP_ERROR DoorLockCluster::GetPin(Callback::Cancelable * onSuccessCallback, Cal
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetPin::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetPINCode::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6319,8 +6319,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::GetRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint16_t userId)
+CHIP_ERROR DoorLockCluster::GetRFIDCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint16_t userId)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6332,7 +6332,7 @@ CHIP_ERROR DoorLockCluster::GetRfid(Callback::Cancelable * onSuccessCallback, Ca
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetRfid::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetRFIDCode::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6401,8 +6401,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint16_t userId)
+CHIP_ERROR DoorLockCluster::GetWeekDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint8_t weekDayIndex, uint16_t userIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6414,7 +6414,7 @@ CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Cancelable * onSuccessC
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetWeekdaySchedule::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetWeekDaySchedule::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6425,10 +6425,10 @@ CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Cancelable * onSuccessC
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
+    // weekDayIndex: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), weekDayIndex));
+    // userIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6444,8 +6444,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint16_t userId)
+CHIP_ERROR DoorLockCluster::GetYearDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint8_t yearDayIndex, uint16_t userIndex)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6457,7 +6457,7 @@ CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Cancelable * onSuccessC
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetYeardaySchedule::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::GetYearDaySchedule::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6468,10 +6468,10 @@ CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Cancelable * onSuccessC
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
+    // yearDayIndex: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), yearDayIndex));
+    // userIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userIndex));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6488,7 +6488,7 @@ exit:
 }
 
 CHIP_ERROR DoorLockCluster::LockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                     chip::ByteSpan pin)
+                                     chip::ByteSpan pinCode)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6511,8 +6511,8 @@ CHIP_ERROR DoorLockCluster::LockDoor(Callback::Cancelable * onSuccessCallback, C
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // pin: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pin));
+    // pinCode: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pinCode));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6529,8 +6529,8 @@ exit:
 }
 
 CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint32_t localStartTime, uint32_t localEndTime,
-                                               uint8_t operatingModeDuringHoliday)
+                                               uint8_t holidayIndex, uint32_t localStartTime, uint32_t localEndTime,
+                                               uint8_t operatingMode)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6553,14 +6553,14 @@ CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Cancelable * onSuccessC
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // localStartTime: int32u
+    // holidayIndex: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), holidayIndex));
+    // localStartTime: epochS
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), localStartTime));
-    // localEndTime: int32u
+    // localEndTime: epochS
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), localEndTime));
-    // operatingModeDuringHoliday: enum8
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), operatingModeDuringHoliday));
+    // operatingMode: dlOperatingMode
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), operatingMode));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6576,8 +6576,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::SetPin(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                   uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
+CHIP_ERROR DoorLockCluster::SetPINCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                       uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6589,7 +6589,7 @@ CHIP_ERROR DoorLockCluster::SetPin(Callback::Cancelable * onSuccessCallback, Cal
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetPin::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetPINCode::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6602,9 +6602,9 @@ CHIP_ERROR DoorLockCluster::SetPin(Callback::Cancelable * onSuccessCallback, Cal
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // userId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-    // userStatus: doorLockUserStatus
+    // userStatus: dlUserStatus
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userStatus));
-    // userType: doorLockUserType
+    // userType: dlUserType
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userType));
     // pin: octetString
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pin));
@@ -6623,8 +6623,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                    uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan id)
+CHIP_ERROR DoorLockCluster::SetRFIDCode(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                        uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan rfidCode)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6636,7 +6636,7 @@ CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Ca
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetRfid::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetRFIDCode::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6649,12 +6649,12 @@ CHIP_ERROR DoorLockCluster::SetRfid(Callback::Cancelable * onSuccessCallback, Ca
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // userId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-    // userStatus: doorLockUserStatus
+    // userStatus: dlUserStatus
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userStatus));
-    // userType: doorLockUserType
+    // userType: dlUserType
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userType));
-    // id: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), id));
+    // rfidCode: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), rfidCode));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6696,7 +6696,7 @@ CHIP_ERROR DoorLockCluster::SetUserType(Callback::Cancelable * onSuccessCallback
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // userId: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-    // userType: doorLockUserType
+    // userType: dlUserType
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userType));
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -6713,8 +6713,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint16_t userId, uint8_t daysMask, uint8_t startHour,
+CHIP_ERROR DoorLockCluster::SetWeekDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint8_t weekDayIndex, uint16_t userIndex, uint8_t daysMask, uint8_t startHour,
                                                uint8_t startMinute, uint8_t endHour, uint8_t endMinute)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
@@ -6727,7 +6727,7 @@ CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Cancelable * onSuccessC
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetWeekdaySchedule::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetWeekDaySchedule::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6738,11 +6738,11 @@ CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Cancelable * onSuccessC
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-    // daysMask: doorLockDayOfWeek
+    // weekDayIndex: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), weekDayIndex));
+    // userIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userIndex));
+    // daysMask: dlDaysMaskMap
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), daysMask));
     // startHour: int8u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), startHour));
@@ -6767,8 +6767,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                               uint8_t scheduleId, uint16_t userId, uint32_t localStartTime, uint32_t localEndTime)
+CHIP_ERROR DoorLockCluster::SetYearDaySchedule(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
+                                               uint8_t yearDayIndex, uint16_t userIndex, uint32_t localStartTime,
+                                               uint32_t localEndTime)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6780,7 +6781,7 @@ CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Cancelable * onSuccessC
 
     VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetYeardaySchedule::Id,
+    app::CommandPathParams cmdParams = { mEndpoint, /* group id */ 0, mClusterId, DoorLock::Commands::SetYearDaySchedule::Id,
                                          (app::CommandPathFlags::kEndpointIdValid) };
 
     CommandSenderHandle sender(
@@ -6791,13 +6792,13 @@ CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Cancelable * onSuccessC
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // scheduleId: int8u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), scheduleId));
-    // userId: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userId));
-    // localStartTime: int32u
+    // yearDayIndex: int8u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), yearDayIndex));
+    // userIndex: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), userIndex));
+    // localStartTime: epochS
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), localStartTime));
-    // localEndTime: int32u
+    // localEndTime: epochS
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), localEndTime));
 
     SuccessOrExit(err = sender->FinishCommand());
@@ -6815,7 +6816,7 @@ exit:
 }
 
 CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       chip::ByteSpan pin)
+                                       chip::ByteSpan pinCode)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6838,8 +6839,8 @@ CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Cancelable * onSuccessCallback,
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // pin: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pin));
+    // pinCode: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pinCode));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6856,7 +6857,7 @@ exit:
 }
 
 CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint16_t timeoutInSeconds, chip::ByteSpan pin)
+                                              uint16_t timeout, chip::ByteSpan pinCode)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLV::TLVWriter * writer = nullptr;
@@ -6879,10 +6880,10 @@ CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Cancelable * onSuccessCa
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    // timeoutInSeconds: int16u
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeoutInSeconds));
-    // pin: octetString
-    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pin));
+    // timeout: int16u
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), timeout));
+    // pinCode: octetString
+    SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), pinCode));
 
     SuccessOrExit(err = sender->FinishCommand());
 
@@ -6899,62 +6900,6 @@ exit:
 }
 
 // DoorLock Cluster Attributes
-CHIP_ERROR DoorLockCluster::ReadAttributeLockState(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000000;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeLockState(Callback::Cancelable * onSuccessCallback,
-                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                        uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = DoorLock::Attributes::LockState::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeLockState(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::LockState::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::ReadAttributeLockType(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000001;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR DoorLockCluster::SubscribeAttributeLockType(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval)
-{
-    chip::app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = DoorLock::Attributes::LockType::Id;
-    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
-}
-
-CHIP_ERROR DoorLockCluster::ReportAttributeLockType(Callback::Cancelable * onReportCallback)
-{
-    return RequestAttributeReporting(DoorLock::Attributes::LockType::Id, onReportCallback,
-                                     BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
 CHIP_ERROR DoorLockCluster::ReadAttributeActuatorEnabled(Callback::Cancelable * onSuccessCallback,
                                                          Callback::Cancelable * onFailureCallback)
 {
@@ -21918,6 +21863,17 @@ CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeActiveNetworkFaultsList
     attributePath.mAttributeId = 0x0000003E;
     return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
                                              ThreadNetworkDiagnosticsClusterActiveNetworkFaultsListListAttributeFilter);
+}
+
+CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
+                                                                    Callback::Cancelable * onFailureCallback)
+{
+    app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = 0x0000FFFC;
+    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
+                                             BasicAttributeFilter<Int32uAttributeCallback>);
 }
 
 CHIP_ERROR ThreadNetworkDiagnosticsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,

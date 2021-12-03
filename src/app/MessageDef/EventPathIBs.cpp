@@ -15,13 +15,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines EventPaths parser and builder in CHIP interaction model
- *
- */
 
-#include "EventPaths.h"
+#include "EventPathIBs.h"
 
 #include "MessageDefHelper.h"
 
@@ -34,16 +29,16 @@
 namespace chip {
 namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR EventPaths::Parser::CheckSchemaValidity() const
+CHIP_ERROR EventPathIBs::Parser::CheckSchemaValidity() const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     size_t NumPath = 0;
     TLV::TLVReader reader;
 
-    PRETTY_PRINT("EventPaths =");
+    PRETTY_PRINT("EventPathIBs =");
     PRETTY_PRINT("[");
 
-    // make a copy of the EventPaths reader
+    // make a copy of the EventPathIBs reader
     reader.Init(mReader);
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
@@ -77,7 +72,7 @@ CHIP_ERROR EventPaths::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-EventPathIB::Builder & EventPaths::Builder::CreatePath()
+EventPathIB::Builder & EventPathIBs::Builder::CreatePath()
 {
     if (mError == CHIP_NO_ERROR)
     {
@@ -86,7 +81,7 @@ EventPathIB::Builder & EventPaths::Builder::CreatePath()
     return mEventPath;
 }
 
-EventPaths::Builder & EventPaths::Builder::EndOfEventPaths()
+EventPathIBs::Builder & EventPathIBs::Builder::EndOfEventPaths()
 {
     EndOfContainer();
     return *this;

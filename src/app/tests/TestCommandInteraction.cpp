@@ -286,7 +286,7 @@ void TestCommandInteraction::GenerateInvokeResponse(nlTestSuite * apSuite, void 
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     invokeResponseMessageBuilder.SuppressResponse(true);
-    InvokeResponses::Builder invokeResponses = invokeResponseMessageBuilder.CreateInvokeResponses();
+    InvokeResponseIBs::Builder invokeResponses = invokeResponseMessageBuilder.CreateInvokeResponses();
     NL_TEST_ASSERT(apSuite, invokeResponseMessageBuilder.GetError() == CHIP_NO_ERROR);
 
     InvokeResponseIB::Builder invokeResponseIBBuilder = invokeResponses.CreateInvokeResponse();

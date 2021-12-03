@@ -407,6 +407,14 @@
               "outgoing": 0
             },
             {
+              "name": "SetRegulatoryConfig",
+              "code": 2,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
               "name": "CommissioningComplete",
               "code": 4,
               "mfgCode": null,
@@ -444,6 +452,14 @@
             {
               "name": "ArmFailSafeResponse",
               "code": 1,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "SetRegulatoryConfigResponse",
+              "code": 3,
               "mfgCode": null,
               "source": "server",
               "incoming": 0,

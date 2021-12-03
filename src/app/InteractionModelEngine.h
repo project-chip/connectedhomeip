@@ -176,6 +176,7 @@ public:
 
     uint16_t GetWriteClientArrayIndex(const WriteClient * const apWriteClient) const;
 
+    uint16_t GetReadHandlerArrayIndex(const ReadHandler * const apReadHandler) const;
     /**
      * The Magic number of this InteractionModelEngine, the magic number is set during Init()
      */

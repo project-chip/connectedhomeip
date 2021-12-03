@@ -196,7 +196,24 @@ class {{filename}}: public TestCommand
             (static_cast<{{filename}} *>(context))->OnFailureResponse_{{index}}(status);
         };
 
-        ReturnErrorOnFailure(chip::Controller::{{#if isGroupCommand}}InvokeGroupCommand{{else}}InvokeCommand{{/if}}({{>device}}, this, success, failure, {{#if isGroupCommand}}groupId{{else}}endpoint{{/if}}, request));
+        ReturnErrorOnFailure(chip::Controller::{{#if isGroupCommand}}InvokeGroupCommand{{else}}InvokeCommand{{/if}}({{>device}}, this, success, failure,
+          {{#if isGroupCommand}}groupId{{else}}endpoint{{/if}},
+          request
+          {{#if timedInteractionTimeoutMs}}
+          , {{timedInteractionTimeoutMs}}
+          {{else if commandObject.mustUseTimedInvoke}}
+          , chip::NullOptional
+          {{/if}}
+          ));
+        {{#if busyWaitMs}}
+          {
+            using namespace chip::System::Clock::Literals;
+            // Busy-wait for {{busyWaitMs}} milliseconds.
+            auto & clock = chip::System::SystemClock();
+            auto start = clock.GetMonotonicTimestamp();
+            while (clock.GetMonotonicTimestamp() - start < {{busyWaitMs}}_ms);
+          }
+        {{/if}}
         {{#unless async}}return CHIP_NO_ERROR;{{/unless}}
         {{else}}
         chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;

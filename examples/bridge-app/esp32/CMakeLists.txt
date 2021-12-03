@@ -23,9 +23,9 @@ set(EXTRA_COMPONENT_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/../../common/QRCode"
 )
 
+# TODO: add CHIPProjectAppConfig.h to esp32
 project(chip-bridge-app)
-idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++14;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H;-DDYNAMIC_ENDPOINT_COUNT=16" APPEND)
+idf_build_set_property(CXX_COMPILE_OPTIONS "-std=gnu++14;-Os;-DLWIP_IPV6_SCOPES=0;-DCHIP_HAVE_CONFIG_H;-DCHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT=16" APPEND)
 idf_build_set_property(C_COMPILE_OPTIONS "-Os;-DLWIP_IPV6_SCOPES=0" APPEND)
 
 flashing_script()
-

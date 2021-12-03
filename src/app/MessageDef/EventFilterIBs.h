@@ -1,7 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,18 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines EventPaths parser and builder in CHIP interaction model
- *
- */
 
 #pragma once
-
-#include "ArrayBuilder.h"
-#include "ArrayParser.h"
-#include "EventPathIB.h"
-#include "EventPaths.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -35,9 +24,13 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
+#include "ArrayBuilder.h"
+#include "ArrayParser.h"
+#include "EventFilterIB.h"
+
 namespace chip {
 namespace app {
-namespace EventPaths {
+namespace EventFilterIBs {
 class Parser : public ArrayParser
 {
 public:
@@ -63,22 +56,27 @@ class Builder : public ArrayBuilder
 {
 public:
     /**
-     *  @brief Initialize a EventPathIB::Builder for writing into the TLV stream
+     *  @brief Initialize a EventFilterIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to EventPathIB::Builder
+     *  @return A reference to EventFilterIB::Builder
      */
-    EventPathIB::Builder & CreatePath();
+    EventFilterIB::Builder & CreateEventFilter();
 
     /**
-     *  @brief Mark the end of this EventPaths
+     *  @return A reference to EventFilterIB::Builder
+     */
+    EventFilterIB::Builder & GetEventFilter() { return mEventFilter; };
+
+    /**
+     *  @brief Mark the end of this EventFilterIBs
      *
      *  @return A reference to *this
      */
-    EventPaths::Builder & EndOfEventPaths();
+    EventFilterIBs::Builder & EndOfEventFilters();
 
 private:
-    EventPathIB::Builder mEventPath;
+    EventFilterIB::Builder mEventFilter;
 };
-} // namespace EventPaths
-} // namespace app
-} // namespace chip
+}; // namespace EventFilterIBs
+}; // namespace app
+}; // namespace chip

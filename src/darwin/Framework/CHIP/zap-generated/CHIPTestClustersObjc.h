@@ -294,7 +294,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestDoorLock : CHIPDoorLock
 
-- (void)writeAttributeLockStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeLockStateWithValue:(NSNumber * _Nullable)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeLockTypeWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeActuatorEnabledWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
@@ -911,6 +911,7 @@ NS_ASSUME_NONNULL_BEGIN
                                           completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeActiveNetworkFaultsListWithValue:(NSArray * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 @end

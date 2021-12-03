@@ -105,7 +105,7 @@ private:
     int32_t mStatus;
 };
 
-void GenerateEvents(nlTestSuite * apSuite, void * apContext)
+void GenerateEvents(nlTestSuite * apSuite, void * apContext, bool aIsUrgent = false)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2;
@@ -117,8 +117,12 @@ void GenerateEvents(nlTestSuite * apSuite, void * apContext)
     chip::app::EventOptions options2;
     TestEventGenerator testEventGenerator;
 
-    options1.mpEventSchema               = &schema1;
-    options2.mpEventSchema               = &schema2;
+    options1.mpEventSchema = &schema1;
+    options2.mpEventSchema = &schema2;
+    if (aIsUrgent)
+    {
+        options2.mUrgent = chip::app::EventOptions::Type::kUrgent;
+    }
     chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
     testEventGenerator.SetStatus(0);
     err = logMgmt.LogEvent(&testEventGenerator, options1, eid1);
@@ -407,7 +411,7 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     AttributePathIBs::Builder attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePath();
+    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
     attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
@@ -536,7 +540,7 @@ void TestReadInteraction::TestReadHandlerInvalidAttributePath(nlTestSuite * apSu
     AttributePathIBs::Builder attributePathListBuilder = readRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePath();
+    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
     attributePathBuilder.Node(1).Endpoint(2).Cluster(3).ListIndex(5).EndOfAttributePathIB();
@@ -580,7 +584,7 @@ void TestReadInteraction::TestReadClientGenerateOneEventPaths(nlTestSuite * apSu
     eventPathParams[0].mClusterId  = 3;
     eventPathParams[0].mEventId    = 4;
 
-    EventPaths::Builder & eventPathListBuilder = request.CreateEventRequests();
+    EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
     err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 1 /*aEventPathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -632,7 +636,7 @@ void TestReadInteraction::TestReadClientGenerateTwoEventPaths(nlTestSuite * apSu
     eventPathParams[1].mClusterId  = 3;
     eventPathParams[1].mEventId    = 5;
 
-    EventPaths::Builder & eventPathListBuilder = request.CreateEventRequests();
+    EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
     err = readClient.GenerateEventPaths(eventPathListBuilder, eventPathParams, 2 /*aEventPathParamsListSize*/);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
@@ -929,7 +933,7 @@ void TestReadInteraction::TestProcessSubscribeRequest(nlTestSuite * apSuite, voi
     AttributePathIBs::Builder attributePathListBuilder = subscribeRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreateAttributePath();
+    AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
     attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
@@ -973,8 +977,6 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
     // Shouldn't have anything in the retransmit table when starting the test.
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
-
-    GenerateEvents(apSuite, apContext);
 
     MockInteractionModelApp delegate;
     auto * engine = chip::app::InteractionModelEngine::GetInstance();
@@ -1024,6 +1026,9 @@ void TestReadInteraction::TestSubscribeRoundtrip(nlTestSuite * apSuite, void * a
     NL_TEST_ASSERT(apSuite, delegate.mNumAttributeResponse == 2);
     NL_TEST_ASSERT(apSuite, delegate.mNumSubscriptions == 1);
 
+    GenerateEvents(apSuite, apContext, true /*aIsUrgent*/);
+    NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mHoldReport == false);
+    NL_TEST_ASSERT(apSuite, delegate.mpReadHandler->mDirty == true);
     chip::app::ClusterInfo dirtyPath1;
     dirtyPath1.mClusterId   = kTestClusterId;
     dirtyPath1.mEndpointId  = kTestEndpointId;

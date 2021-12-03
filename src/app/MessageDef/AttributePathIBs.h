@@ -61,7 +61,7 @@ public:
      *
      *  @return A reference to AttributePathIB::Builder
      */
-    AttributePathIB::Builder & CreateAttributePath();
+    AttributePathIB::Builder & CreatePath();
 
     /**
      *  @brief Mark the end of this AttributePathIB

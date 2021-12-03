@@ -61,7 +61,11 @@ CHIP_ERROR TimedHandler::OnMessageReceived(Messaging::ExchangeContext * aExchang
 
     if (mState == State::kExpectingFollowingAction)
     {
-        if (System::SystemClock().GetMonotonicTimestamp() > mTimeLimit)
+        System::Clock::Timestamp now = System::SystemClock().GetMonotonicTimestamp();
+        ChipLogDetail(DataManagement,
+                      "Timed following action arrived at 0x" ChipLogFormatX64 ": handler %p exchange " ChipLogFormatExchange,
+                      ChipLogValueX64(now.count()), this, ChipLogValueExchange(aExchangeContext));
+        if (now > mTimeLimit)
         {
             // Time is up.  Spec says to send UNSUPPORTED_ACCESS.
             ChipLogError(DataManagement, "Timeout expired: handler %p exchange " ChipLogFormatExchange, this,
@@ -135,6 +139,8 @@ CHIP_ERROR TimedHandler::HandleTimedRequestAction(Messaging::ExchangeContext * a
     // Now just wait for the client.
     mState     = State::kExpectingFollowingAction;
     mTimeLimit = System::SystemClock().GetMonotonicTimestamp() + delay;
+    ChipLogDetail(DataManagement, "Timed Request time limit 0x" ChipLogFormatX64 ": handler %p exchange " ChipLogFormatExchange,
+                  ChipLogValueX64(mTimeLimit.count()), this, ChipLogValueExchange(aExchangeContext));
     return CHIP_NO_ERROR;
 }
 

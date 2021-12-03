@@ -3394,6 +3394,21 @@
           ],
           "attributes": [
             {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "client",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
@@ -4362,6 +4377,21 @@
               "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0x000F",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -5906,7 +5936,7 @@
               "outgoing": 1
             },
             {
-              "name": "SetPin",
+              "name": "SetPINCode",
               "code": 5,
               "mfgCode": null,
               "source": "client",
@@ -5914,7 +5944,7 @@
               "outgoing": 1
             },
             {
-              "name": "GetPin",
+              "name": "GetPINCode",
               "code": 6,
               "mfgCode": null,
               "source": "client",
@@ -5922,7 +5952,7 @@
               "outgoing": 1
             },
             {
-              "name": "ClearPin",
+              "name": "ClearPINCode",
               "code": 7,
               "mfgCode": null,
               "source": "client",
@@ -5930,7 +5960,7 @@
               "outgoing": 1
             },
             {
-              "name": "ClearAllPins",
+              "name": "ClearAllPINCodes",
               "code": 8,
               "mfgCode": null,
               "source": "client",
@@ -5938,7 +5968,7 @@
               "outgoing": 1
             },
             {
-              "name": "SetWeekdaySchedule",
+              "name": "SetWeekDaySchedule",
               "code": 11,
               "mfgCode": null,
               "source": "client",
@@ -5946,7 +5976,7 @@
               "outgoing": 1
             },
             {
-              "name": "GetWeekdaySchedule",
+              "name": "GetWeekDaySchedule",
               "code": 12,
               "mfgCode": null,
               "source": "client",
@@ -5954,7 +5984,7 @@
               "outgoing": 1
             },
             {
-              "name": "ClearWeekdaySchedule",
+              "name": "ClearWeekDaySchedule",
               "code": 13,
               "mfgCode": null,
               "source": "client",
@@ -5962,7 +5992,7 @@
               "outgoing": 1
             },
             {
-              "name": "SetYeardaySchedule",
+              "name": "SetYearDaySchedule",
               "code": 14,
               "mfgCode": null,
               "source": "client",
@@ -5970,7 +6000,7 @@
               "outgoing": 1
             },
             {
-              "name": "GetYeardaySchedule",
+              "name": "GetYearDaySchedule",
               "code": 15,
               "mfgCode": null,
               "source": "client",
@@ -5978,7 +6008,7 @@
               "outgoing": 1
             },
             {
-              "name": "ClearYeardaySchedule",
+              "name": "ClearYearDaySchedule",
               "code": 16,
               "mfgCode": null,
               "source": "client",
@@ -6026,7 +6056,7 @@
               "outgoing": 1
             },
             {
-              "name": "SetRfid",
+              "name": "SetRFIDCode",
               "code": 22,
               "mfgCode": null,
               "source": "client",
@@ -6034,7 +6064,7 @@
               "outgoing": 1
             },
             {
-              "name": "GetRfid",
+              "name": "GetRFIDCode",
               "code": 23,
               "mfgCode": null,
               "source": "client",
@@ -6042,7 +6072,7 @@
               "outgoing": 1
             },
             {
-              "name": "ClearRfid",
+              "name": "ClearRFIDCode",
               "code": 24,
               "mfgCode": null,
               "source": "client",
@@ -6050,7 +6080,7 @@
               "outgoing": 1
             },
             {
-              "name": "ClearAllRfids",
+              "name": "ClearAllRFIDCodes",
               "code": 25,
               "mfgCode": null,
               "source": "client",
@@ -6085,30 +6115,6 @@
           "enabled": 0,
           "commands": [
             {
-              "name": "LockDoorResponse",
-              "code": 0,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "UnlockDoorResponse",
-              "code": 1,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "UnlockWithTimeoutResponse",
-              "code": 3,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
               "name": "GetLogRecordResponse",
               "code": 4,
               "mfgCode": null,
@@ -6117,44 +6123,12 @@
               "outgoing": 1
             },
             {
-              "name": "SetPinResponse",
-              "code": 5,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "GetPinResponse",
+              "name": "GetPINCodeResponse",
               "code": 6,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
               "outgoing": 1
-            },
-            {
-              "name": "ClearPinResponse",
-              "code": 7,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "ClearAllPinsResponse",
-              "code": 8,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "SetUserStatusResponse",
-              "code": 9,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 0,
-              "outgoing": 0
             },
             {
               "name": "GetUserStatusResponse",
@@ -6165,15 +6139,7 @@
               "outgoing": 0
             },
             {
-              "name": "SetWeekdayScheduleResponse",
-              "code": 11,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "GetWeekdayScheduleResponse",
+              "name": "GetWeekDayScheduleResponse",
               "code": 12,
               "mfgCode": null,
               "source": "server",
@@ -6181,40 +6147,8 @@
               "outgoing": 1
             },
             {
-              "name": "ClearWeekdayScheduleResponse",
-              "code": 13,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "SetYeardayScheduleResponse",
-              "code": 14,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "GetYeardayScheduleResponse",
+              "name": "GetYearDayScheduleResponse",
               "code": 15,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "ClearYeardayScheduleResponse",
-              "code": 16,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "SetHolidayScheduleResponse",
-              "code": 17,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -6229,22 +6163,6 @@
               "outgoing": 1
             },
             {
-              "name": "ClearHolidayScheduleResponse",
-              "code": 19,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "SetUserTypeResponse",
-              "code": 20,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
               "name": "GetUserTypeResponse",
               "code": 21,
               "mfgCode": null,
@@ -6253,32 +6171,8 @@
               "outgoing": 1
             },
             {
-              "name": "SetRfidResponse",
-              "code": 22,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "GetRfidResponse",
+              "name": "GetRFIDCodeResponse",
               "code": 23,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "ClearRfidResponse",
-              "code": 24,
-              "mfgCode": null,
-              "source": "server",
-              "incoming": 1,
-              "outgoing": 1
-            },
-            {
-              "name": "ClearAllRfidsResponse",
-              "code": 25,
               "mfgCode": null,
               "source": "server",
               "incoming": 1,
@@ -6287,7 +6181,7 @@
           ],
           "attributes": [
             {
-              "name": "lock state",
+              "name": "LockState",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -6302,7 +6196,7 @@
               "reportableChange": 0
             },
             {
-              "name": "lock type",
+              "name": "LockType",
               "code": 1,
               "mfgCode": null,
               "side": "server",
@@ -6317,7 +6211,7 @@
               "reportableChange": 0
             },
             {
-              "name": "actuator enabled",
+              "name": "ActuatorEnabled",
               "code": 2,
               "mfgCode": null,
               "side": "server",
@@ -6332,7 +6226,7 @@
               "reportableChange": 0
             },
             {
-              "name": "door state",
+              "name": "DoorState",
               "code": 3,
               "mfgCode": null,
               "side": "server",
@@ -6347,7 +6241,7 @@
               "reportableChange": 0
             },
             {
-              "name": "enable logging",
+              "name": "EnableLogging",
               "code": 32,
               "mfgCode": null,
               "side": "server",
@@ -6362,7 +6256,7 @@
               "reportableChange": 0
             },
             {
-              "name": "language",
+              "name": "Language",
               "code": 33,
               "mfgCode": null,
               "side": "server",
@@ -6377,7 +6271,7 @@
               "reportableChange": 0
             },
             {
-              "name": "led settings",
+              "name": "LEDSettings",
               "code": 34,
               "mfgCode": null,
               "side": "server",
@@ -6392,7 +6286,7 @@
               "reportableChange": 0
             },
             {
-              "name": "auto relock time",
+              "name": "AutoRelockTime",
               "code": 35,
               "mfgCode": null,
               "side": "server",
@@ -6407,7 +6301,7 @@
               "reportableChange": 0
             },
             {
-              "name": "sound volume",
+              "name": "SoundVolume",
               "code": 36,
               "mfgCode": null,
               "side": "server",
@@ -6422,7 +6316,7 @@
               "reportableChange": 0
             },
             {
-              "name": "operating mode",
+              "name": "OperatingMode",
               "code": 37,
               "mfgCode": null,
               "side": "server",
@@ -6437,7 +6331,7 @@
               "reportableChange": 0
             },
             {
-              "name": "default configuration register",
+              "name": "DefaultConfigurationRegister",
               "code": 39,
               "mfgCode": null,
               "side": "server",
@@ -6452,7 +6346,7 @@
               "reportableChange": 0
             },
             {
-              "name": "enable local programming",
+              "name": "EnableLocalProgramming",
               "code": 40,
               "mfgCode": null,
               "side": "server",
@@ -6467,7 +6361,7 @@
               "reportableChange": 0
             },
             {
-              "name": "enable one touch locking",
+              "name": "EnableOneTouchLocking",
               "code": 41,
               "mfgCode": null,
               "side": "server",
@@ -6482,7 +6376,7 @@
               "reportableChange": 0
             },
             {
-              "name": "enable inside status led",
+              "name": "EnableInsideStatusLED",
               "code": 42,
               "mfgCode": null,
               "side": "server",
@@ -6497,7 +6391,7 @@
               "reportableChange": 0
             },
             {
-              "name": "enable privacy mode button",
+              "name": "EnablePrivacyModeButton",
               "code": 43,
               "mfgCode": null,
               "side": "server",
@@ -6512,7 +6406,7 @@
               "reportableChange": 0
             },
             {
-              "name": "wrong code entry limit",
+              "name": "WrongCodeEntryLimit",
               "code": 48,
               "mfgCode": null,
               "side": "server",
@@ -6527,7 +6421,7 @@
               "reportableChange": 0
             },
             {
-              "name": "user code temporary disable time",
+              "name": "UserCodeTemporaryDisableTime",
               "code": 49,
               "mfgCode": null,
               "side": "server",
@@ -6542,7 +6436,7 @@
               "reportableChange": 0
             },
             {
-              "name": "send pin over the air",
+              "name": "SendPINOverTheAir",
               "code": 50,
               "mfgCode": null,
               "side": "server",
@@ -6557,7 +6451,7 @@
               "reportableChange": 0
             },
             {
-              "name": "require pin for rf operation",
+              "name": "RequirePINforRemoteOperation",
               "code": 51,
               "mfgCode": null,
               "side": "server",
@@ -6572,22 +6466,7 @@
               "reportableChange": 0
             },
             {
-              "name": "zigbee security level",
-              "code": 52,
-              "mfgCode": null,
-              "side": "server",
-              "included": 0,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x00",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "alarm mask",
+              "name": "AlarmMask",
               "code": 64,
               "mfgCode": null,
               "side": "server",
@@ -6602,7 +6481,7 @@
               "reportableChange": 0
             },
             {
-              "name": "keypad operation event mask",
+              "name": "KeypadOperationEventMask",
               "code": 65,
               "mfgCode": null,
               "side": "server",
@@ -6617,7 +6496,7 @@
               "reportableChange": 0
             },
             {
-              "name": "RF operation event mask",
+              "name": "RemoteOperationEventMask",
               "code": 66,
               "mfgCode": null,
               "side": "server",
@@ -6632,7 +6511,7 @@
               "reportableChange": 0
             },
             {
-              "name": "manual operation event mask",
+              "name": "ManualOperationEventMask",
               "code": 67,
               "mfgCode": null,
               "side": "server",
@@ -6647,7 +6526,7 @@
               "reportableChange": 0
             },
             {
-              "name": "rfid operation event mask",
+              "name": "RFIDOperationEventMask",
               "code": 68,
               "mfgCode": null,
               "side": "server",
@@ -6662,7 +6541,7 @@
               "reportableChange": 0
             },
             {
-              "name": "keypad programming event mask",
+              "name": "KeypadProgrammingEventMask",
               "code": 69,
               "mfgCode": null,
               "side": "server",
@@ -6677,7 +6556,7 @@
               "reportableChange": 0
             },
             {
-              "name": "rf programming event mask",
+              "name": "RemoteProgrammingEventMask",
               "code": 70,
               "mfgCode": null,
               "side": "server",
@@ -6692,7 +6571,7 @@
               "reportableChange": 0
             },
             {
-              "name": "rfid programming event mask",
+              "name": "RFIDProgrammingEventMask",
               "code": 71,
               "mfgCode": null,
               "side": "server",

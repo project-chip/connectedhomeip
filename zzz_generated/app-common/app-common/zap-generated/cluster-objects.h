@@ -13748,6 +13748,164 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ShadeConfiguration
 namespace DoorLock {
+// Enum for DlAlarmCode
+enum class DlAlarmCode : uint8_t
+{
+    kLockJammed              = 0x00,
+    kLockFactoryReset        = 0x01,
+    kLockRadioPowerCycled    = 0x03,
+    kWrongCodeEntryLimit     = 0x04,
+    kFrontEsceutcheonRemoved = 0x05,
+    kDoorForcedOpen          = 0x06,
+    kDoorAjar                = 0x07,
+    kForcedUser              = 0x08,
+};
+// Enum for DlCredentialRule
+enum class DlCredentialRule : uint8_t
+{
+    kSingle = 0x00,
+    kDouble = 0x01,
+    kTri    = 0x02,
+};
+// Enum for DlCredentialType
+enum class DlCredentialType : uint8_t
+{
+    kProgrammingPIN = 0x00,
+    kPin            = 0x01,
+    kRfid           = 0x02,
+    kFingerprint    = 0x03,
+    kFingerVein     = 0x04,
+    kFace           = 0x05,
+};
+// Enum for DlDataOperationType
+enum class DlDataOperationType : uint8_t
+{
+    kAdd    = 0x00,
+    kClear  = 0x01,
+    kModify = 0x02,
+};
+// Enum for DlDoorLockStatus
+enum class DlDoorLockStatus : uint8_t
+{
+    kDuplicate = 0x02,
+    kOccupied  = 0x03,
+};
+// Enum for DlDoorState
+enum class DlDoorState : uint8_t
+{
+    kDoorOpen             = 0x00,
+    kDoorClosed           = 0x01,
+    kDoorJammed           = 0x02,
+    kDoorForcedOpen       = 0x03,
+    kDoorUnspecifiedError = 0x04,
+    kDoorAjar             = 0x05,
+};
+// Enum for DlLockDataType
+enum class DlLockDataType : uint8_t
+{
+    kUnspecified     = 0x00,
+    kProgrammingCode = 0x01,
+    kUserIndex       = 0x02,
+    kWeekDaySchedule = 0x03,
+    kYearDaySchedule = 0x04,
+    kHolidaySchedule = 0x05,
+    kPin             = 0x06,
+    kRfid            = 0x07,
+    kFingerprint     = 0x08,
+};
+// Enum for DlLockOperationType
+enum class DlLockOperationType : uint8_t
+{
+    kLock               = 0x00,
+    kUnlock             = 0x01,
+    kNonAccessUserEvent = 0x02,
+    kForcedUserEvent    = 0x03,
+};
+// Enum for DlLockState
+enum class DlLockState : uint8_t
+{
+    kNotFullyLocked = 0x00,
+    kLocked         = 0x01,
+    kUnlocked       = 0x02,
+};
+// Enum for DlLockType
+enum class DlLockType : uint8_t
+{
+    kDeadBolt           = 0x00,
+    kMagnetic           = 0x01,
+    kOther              = 0x02,
+    kMortise            = 0x03,
+    kRim                = 0x04,
+    kLatchBolt          = 0x05,
+    kCylindricalLock    = 0x06,
+    kTubularLock        = 0x07,
+    kInterconnectedLock = 0x08,
+    kDeadLatch          = 0x09,
+    kDoorFurniture      = 0x0A,
+};
+// Enum for DlOperatingMode
+enum class DlOperatingMode : uint8_t
+{
+    kNormal             = 0x00,
+    kVacation           = 0x01,
+    kPrivacy            = 0x02,
+    kNoRemoteLockUnlock = 0x03,
+    kPassage            = 0x04,
+};
+// Enum for DlOperationError
+enum class DlOperationError : uint8_t
+{
+    kUnspecified         = 0x00,
+    kInvalidCredential   = 0x01,
+    kDisabledUserDenied  = 0x02,
+    kRestricted          = 0x03,
+    kInsufficientBattery = 0x04,
+};
+// Enum for DlOperationSource
+enum class DlOperationSource : uint8_t
+{
+    kUnspecified       = 0x00,
+    kManual            = 0x01,
+    kProprietaryRemote = 0x02,
+    kKeypad            = 0x03,
+    kAuto              = 0x04,
+    kButton            = 0x05,
+    kSchedule          = 0x06,
+    kRemote            = 0x07,
+    kRfid              = 0x08,
+    kBiometric         = 0x09,
+};
+// Enum for DlStatus
+enum class DlStatus : uint8_t
+{
+    kSuccess      = 0x00,
+    kFailure      = 0x01,
+    kDuplicate    = 0x02,
+    kOccupied     = 0x03,
+    kInvalidField = 0x85,
+    kNotFound     = 0x8B,
+};
+// Enum for DlUserStatus
+enum class DlUserStatus : uint8_t
+{
+    kAvailable        = 0x00,
+    kOccupiedEnabled  = 0x01,
+    kOccupiedDisabled = 0x03,
+};
+// Enum for DlUserType
+enum class DlUserType : uint8_t
+{
+    kUnrestrictedUser       = 0x00,
+    kYearDayScheduleUser    = 0x01,
+    kWeekDayScheduleUser    = 0x02,
+    kProgrammingUser        = 0x03,
+    kNonAccessUser          = 0x04,
+    kForcedUser             = 0x05,
+    kDisposableUser         = 0x06,
+    kExpiringUser           = 0x07,
+    kScheduleRestrictedUser = 0x08,
+    kRemoteOnlyUser         = 0x09,
+};
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -13829,6 +13987,151 @@ enum class DoorLockUserType : uint8_t
 using DoorLockUserType                = EmberAfDoorLockUserType;
 #endif
 
+// Bitmap for DlAlarmMask
+enum class DlAlarmMask : uint16_t
+{
+    kLockingMechanismJammed                 = 0x1,
+    kLockResetToFactoryDefaults             = 0x2,
+    kReserved                               = 0x4,
+    kRFModulePowerCycled                    = 0x8,
+    kWrongCodeEntryLimit                    = 0x10,
+    kFrontEscutcheonRemovedFromMain         = 0x20,
+    kForcedDoorOpenUnderDoorLockedCondition = 0x40,
+};
+
+// Bitmap for DlCredentialRulesSupport
+enum class DlCredentialRulesSupport : uint8_t
+{
+    kSingle = 0x1,
+    kDual   = 0x2,
+    kTri    = 0x4,
+};
+
+// Bitmap for DlDaysMaskMap
+enum class DlDaysMaskMap : uint8_t
+{
+    kSunday    = 0x1,
+    kMonday    = 0x2,
+    kTuesday   = 0x4,
+    kWednesday = 0x8,
+    kThursday  = 0x10,
+    kFriday    = 0x20,
+    kSaturday  = 0x40,
+};
+
+// Bitmap for DlDefaultConfigurationRegister
+enum class DlDefaultConfigurationRegister : uint16_t
+{
+    kEnableLocalProgrammingEnabled         = 0x1,
+    kKeypadInterfaceDefaultAccessEnabled   = 0x2,
+    kRemoteInterfaceDefaultAccessIsEnabled = 0x4,
+    kSoundEnabled                          = 0x20,
+    kAutoRelockTimeSet                     = 0x40,
+    kLEDSettingsSet                        = 0x80,
+};
+
+// Bitmap for DlKeypadOperationEventMask
+enum class DlKeypadOperationEventMask : uint16_t
+{
+    kUnknown               = 0x1,
+    kLock                  = 0x2,
+    kUnlock                = 0x4,
+    kLockInvalidPIN        = 0x8,
+    kLockInvalidSchedule   = 0x10,
+    kUnlockInvalidCode     = 0x20,
+    kUnlockInvalidSchedule = 0x40,
+    kNonAccessUserOpEvent  = 0x80,
+};
+
+// Bitmap for DlKeypadProgrammingEventMask
+enum class DlKeypadProgrammingEventMask : uint16_t
+{
+    kUnknown               = 0x1,
+    kProgrammingPINChanged = 0x2,
+    kPINAdded              = 0x4,
+    kPINCleared            = 0x8,
+    kPINChanged            = 0x10,
+};
+
+// Bitmap for DlLocalProgrammingFeatures
+enum class DlLocalProgrammingFeatures : uint8_t
+{
+    kAddUsersCredentialsSchedulesLocally    = 0x1,
+    kModifyUsersCredentialsSchedulesLocally = 0x2,
+    kClearUsersCredentialsSchedulesLocally  = 0x4,
+    kAdjustLockSettingsLocally              = 0x8,
+};
+
+// Bitmap for DlManualOperationEventMask
+enum class DlManualOperationEventMask : uint16_t
+{
+    kUnknown         = 0x1,
+    kThumbturnLock   = 0x2,
+    kThumbturnUnlock = 0x4,
+    kOneTouchLock    = 0x8,
+    kKeyLock         = 0x10,
+    kKeyUnlock       = 0x20,
+    kAutoLock        = 0x40,
+    kScheduleLock    = 0x80,
+    kScheduleUnlock  = 0x100,
+    kManualLock      = 0x200,
+    kManualUnlock    = 0x400,
+};
+
+// Bitmap for DlRFIDOperationEventMask
+enum class DlRFIDOperationEventMask : uint16_t
+{
+    kUnknown               = 0x1,
+    kLock                  = 0x2,
+    kUnlock                = 0x4,
+    kLockInvalidRFID       = 0x8,
+    kLockInvalidSchedule   = 0x10,
+    kUnlockInvalidRFID     = 0x20,
+    kUnlockInvalidSchedule = 0x40,
+};
+
+// Bitmap for DlRFIDProgrammingEventMask
+enum class DlRFIDProgrammingEventMask : uint16_t
+{
+    kUnknown         = 0x1,
+    kRFIDCodeAdded   = 0x20,
+    kRFIDCodeCleared = 0x40,
+};
+
+// Bitmap for DlRemoteOperationEventMask
+enum class DlRemoteOperationEventMask : uint16_t
+{
+    kUnknown               = 0x1,
+    kLock                  = 0x2,
+    kUnlock                = 0x4,
+    kLockInvalidCode       = 0x8,
+    kLockInvalidSchedule   = 0x10,
+    kUnlockInvalidCode     = 0x20,
+    kUnlockInvalidSchedule = 0x40,
+};
+
+// Bitmap for DlRemoteProgrammingEventMask
+enum class DlRemoteProgrammingEventMask : uint16_t
+{
+    kUnknown               = 0x1,
+    kProgrammingPINChanged = 0x2,
+    kPINAdded              = 0x4,
+    kPINCleared            = 0x8,
+    kPINChanged            = 0x10,
+    kRFIDCodeAdded         = 0x20,
+    kRFIDCodeCleared       = 0x40,
+};
+
+// Bitmap for DlSupportedOperatingModes
+enum class DlSupportedOperatingModes : uint16_t
+{
+    kNormal             = 0x1,
+    kVacation           = 0x2,
+    kPrivacy            = 0x4,
+    kNoRemoteLockUnlock = 0x8,
+    kPassage            = 0x10,
+};
+
 // Bitmap for DoorLockDayOfWeek
 enum class DoorLockDayOfWeek : uint8_t
 {
@@ -13841,6 +14144,29 @@ enum class DoorLockDayOfWeek : uint8_t
     kSaturday  = 0x40,
 };
 
+namespace Structs {
+namespace DlCredential {
+enum class Fields
+{
+    kCredentialType  = 1,
+    kCredentialIndex = 2,
+};
+
+struct Type
+{
+public:
+    DlCredentialType credentialType;
+    uint16_t credentialIndex;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace DlCredential
+} // namespace Structs
+
 namespace Commands {
 // Forward-declarations so we can reference these later.
 
@@ -13849,40 +14175,15 @@ struct Type;
 struct DecodableType;
 } // namespace LockDoor
 
-namespace LockDoorResponse {
-struct Type;
-struct DecodableType;
-} // namespace LockDoorResponse
-
 namespace UnlockDoor {
 struct Type;
 struct DecodableType;
 } // namespace UnlockDoor
 
-namespace UnlockDoorResponse {
-struct Type;
-struct DecodableType;
-} // namespace UnlockDoorResponse
-
-namespace Toggle {
-struct Type;
-struct DecodableType;
-} // namespace Toggle
-
-namespace ToggleResponse {
-struct Type;
-struct DecodableType;
-} // namespace ToggleResponse
-
 namespace UnlockWithTimeout {
 struct Type;
 struct DecodableType;
 } // namespace UnlockWithTimeout
-
-namespace UnlockWithTimeoutResponse {
-struct Type;
-struct DecodableType;
-} // namespace UnlockWithTimeoutResponse
 
 namespace GetLogRecord {
 struct Type;
@@ -13894,55 +14195,35 @@ struct Type;
 struct DecodableType;
 } // namespace GetLogRecordResponse
 
-namespace SetPin {
+namespace SetPINCode {
 struct Type;
 struct DecodableType;
-} // namespace SetPin
+} // namespace SetPINCode
 
-namespace SetPinResponse {
+namespace GetPINCode {
 struct Type;
 struct DecodableType;
-} // namespace SetPinResponse
+} // namespace GetPINCode
 
-namespace GetPin {
+namespace GetPINCodeResponse {
 struct Type;
 struct DecodableType;
-} // namespace GetPin
+} // namespace GetPINCodeResponse
 
-namespace GetPinResponse {
+namespace ClearPINCode {
 struct Type;
 struct DecodableType;
-} // namespace GetPinResponse
+} // namespace ClearPINCode
 
-namespace ClearPin {
+namespace ClearAllPINCodes {
 struct Type;
 struct DecodableType;
-} // namespace ClearPin
-
-namespace ClearPinResponse {
-struct Type;
-struct DecodableType;
-} // namespace ClearPinResponse
-
-namespace ClearAllPins {
-struct Type;
-struct DecodableType;
-} // namespace ClearAllPins
-
-namespace ClearAllPinsResponse {
-struct Type;
-struct DecodableType;
-} // namespace ClearAllPinsResponse
+} // namespace ClearAllPINCodes
 
 namespace SetUserStatus {
 struct Type;
 struct DecodableType;
 } // namespace SetUserStatus
-
-namespace SetUserStatusResponse {
-struct Type;
-struct DecodableType;
-} // namespace SetUserStatusResponse
 
 namespace GetUserStatus {
 struct Type;
@@ -13954,75 +14235,50 @@ struct Type;
 struct DecodableType;
 } // namespace GetUserStatusResponse
 
-namespace SetWeekdaySchedule {
+namespace SetWeekDaySchedule {
 struct Type;
 struct DecodableType;
-} // namespace SetWeekdaySchedule
+} // namespace SetWeekDaySchedule
 
-namespace SetWeekdayScheduleResponse {
+namespace GetWeekDaySchedule {
 struct Type;
 struct DecodableType;
-} // namespace SetWeekdayScheduleResponse
+} // namespace GetWeekDaySchedule
 
-namespace GetWeekdaySchedule {
+namespace GetWeekDayScheduleResponse {
 struct Type;
 struct DecodableType;
-} // namespace GetWeekdaySchedule
+} // namespace GetWeekDayScheduleResponse
 
-namespace GetWeekdayScheduleResponse {
+namespace ClearWeekDaySchedule {
 struct Type;
 struct DecodableType;
-} // namespace GetWeekdayScheduleResponse
+} // namespace ClearWeekDaySchedule
 
-namespace ClearWeekdaySchedule {
+namespace SetYearDaySchedule {
 struct Type;
 struct DecodableType;
-} // namespace ClearWeekdaySchedule
+} // namespace SetYearDaySchedule
 
-namespace ClearWeekdayScheduleResponse {
+namespace GetYearDaySchedule {
 struct Type;
 struct DecodableType;
-} // namespace ClearWeekdayScheduleResponse
+} // namespace GetYearDaySchedule
 
-namespace SetYeardaySchedule {
+namespace GetYearDayScheduleResponse {
 struct Type;
 struct DecodableType;
-} // namespace SetYeardaySchedule
+} // namespace GetYearDayScheduleResponse
 
-namespace SetYeardayScheduleResponse {
+namespace ClearYearDaySchedule {
 struct Type;
 struct DecodableType;
-} // namespace SetYeardayScheduleResponse
-
-namespace GetYeardaySchedule {
-struct Type;
-struct DecodableType;
-} // namespace GetYeardaySchedule
-
-namespace GetYeardayScheduleResponse {
-struct Type;
-struct DecodableType;
-} // namespace GetYeardayScheduleResponse
-
-namespace ClearYeardaySchedule {
-struct Type;
-struct DecodableType;
-} // namespace ClearYeardaySchedule
-
-namespace ClearYeardayScheduleResponse {
-struct Type;
-struct DecodableType;
-} // namespace ClearYeardayScheduleResponse
+} // namespace ClearYearDaySchedule
 
 namespace SetHolidaySchedule {
 struct Type;
 struct DecodableType;
 } // namespace SetHolidaySchedule
-
-namespace SetHolidayScheduleResponse {
-struct Type;
-struct DecodableType;
-} // namespace SetHolidayScheduleResponse
 
 namespace GetHolidaySchedule {
 struct Type;
@@ -14039,20 +14295,10 @@ struct Type;
 struct DecodableType;
 } // namespace ClearHolidaySchedule
 
-namespace ClearHolidayScheduleResponse {
-struct Type;
-struct DecodableType;
-} // namespace ClearHolidayScheduleResponse
-
 namespace SetUserType {
 struct Type;
 struct DecodableType;
 } // namespace SetUserType
-
-namespace SetUserTypeResponse {
-struct Type;
-struct DecodableType;
-} // namespace SetUserTypeResponse
 
 namespace GetUserType {
 struct Type;
@@ -14064,55 +14310,85 @@ struct Type;
 struct DecodableType;
 } // namespace GetUserTypeResponse
 
-namespace SetRfid {
+namespace SetRFIDCode {
 struct Type;
 struct DecodableType;
-} // namespace SetRfid
+} // namespace SetRFIDCode
 
-namespace SetRfidResponse {
+namespace GetRFIDCode {
 struct Type;
 struct DecodableType;
-} // namespace SetRfidResponse
+} // namespace GetRFIDCode
 
-namespace GetRfid {
+namespace GetRFIDCodeResponse {
 struct Type;
 struct DecodableType;
-} // namespace GetRfid
+} // namespace GetRFIDCodeResponse
 
-namespace GetRfidResponse {
+namespace ClearRFIDCode {
 struct Type;
 struct DecodableType;
-} // namespace GetRfidResponse
+} // namespace ClearRFIDCode
 
-namespace ClearRfid {
+namespace ClearAllRFIDCodes {
 struct Type;
 struct DecodableType;
-} // namespace ClearRfid
+} // namespace ClearAllRFIDCodes
 
-namespace ClearRfidResponse {
+namespace SetUser {
 struct Type;
 struct DecodableType;
-} // namespace ClearRfidResponse
+} // namespace SetUser
 
-namespace ClearAllRfids {
+namespace GetUser {
 struct Type;
 struct DecodableType;
-} // namespace ClearAllRfids
+} // namespace GetUser
 
-namespace ClearAllRfidsResponse {
+namespace GetUserResponse {
 struct Type;
 struct DecodableType;
-} // namespace ClearAllRfidsResponse
+} // namespace GetUserResponse
 
-namespace OperationEventNotification {
+namespace ClearUser {
 struct Type;
 struct DecodableType;
-} // namespace OperationEventNotification
+} // namespace ClearUser
+
+namespace OperatingEventNotification {
+struct Type;
+struct DecodableType;
+} // namespace OperatingEventNotification
 
 namespace ProgrammingEventNotification {
 struct Type;
 struct DecodableType;
 } // namespace ProgrammingEventNotification
+
+namespace SetCredential {
+struct Type;
+struct DecodableType;
+} // namespace SetCredential
+
+namespace SetCredentialResponse {
+struct Type;
+struct DecodableType;
+} // namespace SetCredentialResponse
+
+namespace GetCredentialStatus {
+struct Type;
+struct DecodableType;
+} // namespace GetCredentialStatus
+
+namespace GetCredentialStatusResponse {
+struct Type;
+struct DecodableType;
+} // namespace GetCredentialStatusResponse
+
+namespace ClearCredential {
+struct Type;
+struct DecodableType;
+} // namespace ClearCredential
 
 } // namespace Commands
 
@@ -14120,7 +14396,7 @@ namespace Commands {
 namespace LockDoor {
 enum class Fields
 {
-    kPin = 0,
+    kPinCode = 0,
 };
 
 struct Type
@@ -14130,11 +14406,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    chip::ByteSpan pin;
+    Optional<chip::ByteSpan> pinCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::DoorLock::Commands::LockDoorResponse::DecodableType;
+    using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -14145,46 +14421,14 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    chip::ByteSpan pin;
+    Optional<chip::ByteSpan> pinCode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LockDoor
-namespace LockDoorResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::LockDoorResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::LockDoorResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace LockDoorResponse
 namespace UnlockDoor {
 enum class Fields
 {
-    kPin = 0,
+    kPinCode = 0,
 };
 
 struct Type
@@ -14194,11 +14438,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::UnlockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    chip::ByteSpan pin;
+    Optional<chip::ByteSpan> pinCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType;
+    using ResponseType = DataModel::NullObjectType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -14209,111 +14453,15 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::UnlockDoor::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    chip::ByteSpan pin;
+    Optional<chip::ByteSpan> pinCode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace UnlockDoor
-namespace UnlockDoorResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::UnlockDoorResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::UnlockDoorResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace UnlockDoorResponse
-namespace Toggle {
-enum class Fields
-{
-    kPin = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::Toggle::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    chip::CharSpan pin;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::ToggleResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::Toggle::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    chip::CharSpan pin;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace Toggle
-namespace ToggleResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ToggleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ToggleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ToggleResponse
 namespace UnlockWithTimeout {
 enum class Fields
 {
-    kTimeoutInSeconds = 0,
-    kPin              = 1,
+    kTimeout = 0,
+    kPinCode = 1,
 };
 
 struct Type
@@ -14323,41 +14471,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::UnlockWithTimeout::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint16_t timeoutInSeconds;
-    chip::ByteSpan pin;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::UnlockWithTimeout::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint16_t timeoutInSeconds;
-    chip::ByteSpan pin;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace UnlockWithTimeout
-namespace UnlockWithTimeoutResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::UnlockWithTimeoutResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
+    uint16_t timeout;
+    Optional<chip::ByteSpan> pinCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -14369,13 +14484,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::UnlockWithTimeoutResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::UnlockWithTimeout::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t status;
+    uint16_t timeout;
+    Optional<chip::ByteSpan> pinCode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace UnlockWithTimeoutResponse
+}; // namespace UnlockWithTimeout
 namespace GetLogRecord {
 enum class Fields
 {
@@ -14458,7 +14574,7 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetLogRecordResponse
-namespace SetPin {
+namespace SetPINCode {
 enum class Fields
 {
     kUserId     = 0,
@@ -14471,48 +14587,13 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetPin::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetPINCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
-    DoorLockUserStatus userStatus;
-    DoorLockUserType userType;
+    DlUserStatus userStatus;
+    DlUserType userType;
     chip::ByteSpan pin;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::SetPinResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetPin::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint16_t userId;
-    DoorLockUserStatus userStatus;
-    DoorLockUserType userType;
-    chip::ByteSpan pin;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetPin
-namespace SetPinResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetPinResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    DoorLockSetPinOrIdStatus status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -14524,14 +14605,17 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SetPinResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetPINCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    DoorLockSetPinOrIdStatus status;
+    uint16_t userId;
+    DlUserStatus userStatus;
+    DlUserType userType;
+    chip::ByteSpan pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SetPinResponse
-namespace GetPin {
+}; // namespace SetPINCode
+namespace GetPINCode {
 enum class Fields
 {
     kUserId = 0,
@@ -14541,14 +14625,14 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetPin::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPINCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::DoorLock::Commands::GetPinResponse::DecodableType;
+    using ResponseType = Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -14556,14 +14640,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::GetPin::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPINCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace GetPin
-namespace GetPinResponse {
+}; // namespace GetPINCode
+namespace GetPINCodeResponse {
 enum class Fields
 {
     kUserId     = 0,
@@ -14576,13 +14660,13 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetPinResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPINCodeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
-    DoorLockUserStatus userStatus;
-    DoorLockUserType userType;
-    chip::ByteSpan pin;
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
+    DataModel::Nullable<chip::ByteSpan> pin;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -14594,62 +14678,30 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::GetPinResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetPINCodeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
-    DoorLockUserStatus userStatus;
-    DoorLockUserType userType;
-    chip::ByteSpan pin;
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
+    DataModel::Nullable<chip::ByteSpan> pin;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace GetPinResponse
-namespace ClearPin {
+}; // namespace GetPINCodeResponse
+namespace ClearPINCode {
 enum class Fields
 {
-    kUserId = 0,
+    kPinSlotIndex = 0,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearPin::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearPINCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint16_t userId;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::ClearPinResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearPin::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint16_t userId;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ClearPin
-namespace ClearPinResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearPinResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
+    uint16_t pinSlotIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -14661,14 +14713,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearPinResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearPINCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t status;
+    uint16_t pinSlotIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ClearPinResponse
-namespace ClearAllPins {
+}; // namespace ClearPINCode
+namespace ClearAllPINCodes {
 enum class Fields
 {
 };
@@ -14677,39 +14729,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearAllPins::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllPINCodes::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearAllPins::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ClearAllPins
-namespace ClearAllPinsResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearAllPinsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -14721,13 +14742,12 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearAllPinsResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllPINCodes::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ClearAllPinsResponse
+}; // namespace ClearAllPINCodes
 namespace SetUserStatus {
 enum class Fields
 {
@@ -14743,40 +14763,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
-    uint8_t userStatus;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::SetUserStatusResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetUserStatus::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint16_t userId;
-    uint8_t userStatus;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetUserStatus
-namespace SetUserStatusResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetUserStatusResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
+    DlUserStatus userStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -14788,13 +14775,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SetUserStatusResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetUserStatus::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t status;
+    uint16_t userId;
+    DlUserStatus userStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SetUserStatusResponse
+}; // namespace SetUserStatus
 namespace GetUserStatus {
 enum class Fields
 {
@@ -14830,8 +14818,8 @@ public:
 namespace GetUserStatusResponse {
 enum class Fields
 {
-    kUserId = 0,
-    kStatus = 1,
+    kUserId     = 0,
+    kUserStatus = 1,
 };
 
 struct Type
@@ -14842,7 +14830,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
-    uint8_t status;
+    DlUserStatus userStatus;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -14858,151 +14846,32 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
-    uint8_t status;
+    DlUserStatus userStatus;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetUserStatusResponse
-namespace SetWeekdaySchedule {
+namespace SetWeekDaySchedule {
 enum class Fields
 {
-    kScheduleId  = 0,
-    kUserId      = 1,
-    kDaysMask    = 2,
-    kStartHour   = 3,
-    kStartMinute = 4,
-    kEndHour     = 5,
-    kEndMinute   = 6,
+    kWeekDayIndex = 0,
+    kUserIndex    = 1,
+    kDaysMask     = 2,
+    kStartHour    = 3,
+    kStartMinute  = 4,
+    kEndHour      = 5,
+    kEndMinute    = 6,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetWeekdaySchedule::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetWeekDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
-    uint16_t userId;
-    chip::BitFlags<DoorLockDayOfWeek> daysMask;
-    uint8_t startHour;
-    uint8_t startMinute;
-    uint8_t endHour;
-    uint8_t endMinute;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetWeekdaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t scheduleId;
-    uint16_t userId;
-    chip::BitFlags<DoorLockDayOfWeek> daysMask;
-    uint8_t startHour;
-    uint8_t startMinute;
-    uint8_t endHour;
-    uint8_t endMinute;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetWeekdaySchedule
-namespace SetWeekdayScheduleResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetWeekdayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = DataModel::NullObjectType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetWeekdayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetWeekdayScheduleResponse
-namespace GetWeekdaySchedule {
-enum class Fields
-{
-    kScheduleId = 0,
-    kUserId     = 1,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetWeekdaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t scheduleId;
-    uint16_t userId;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::GetWeekdaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t scheduleId;
-    uint16_t userId;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace GetWeekdaySchedule
-namespace GetWeekdayScheduleResponse {
-enum class Fields
-{
-    kScheduleId  = 0,
-    kUserId      = 1,
-    kStatus      = 2,
-    kDaysMask    = 3,
-    kStartHour   = 4,
-    kStartMinute = 5,
-    kEndHour     = 6,
-    kEndMinute   = 7,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetWeekdayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t scheduleId;
-    uint16_t userId;
-    uint8_t status;
-    uint8_t daysMask;
+    uint8_t weekDayIndex;
+    uint16_t userIndex;
+    chip::BitFlags<DlDaysMaskMap> daysMask;
     uint8_t startHour;
     uint8_t startMinute;
     uint8_t endHour;
@@ -15018,40 +14887,39 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::GetWeekdayScheduleResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetWeekDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
-    uint16_t userId;
-    uint8_t status;
-    uint8_t daysMask;
+    uint8_t weekDayIndex;
+    uint16_t userIndex;
+    chip::BitFlags<DlDaysMaskMap> daysMask;
     uint8_t startHour;
     uint8_t startMinute;
     uint8_t endHour;
     uint8_t endMinute;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace GetWeekdayScheduleResponse
-namespace ClearWeekdaySchedule {
+}; // namespace SetWeekDaySchedule
+namespace GetWeekDaySchedule {
 enum class Fields
 {
-    kScheduleId = 0,
-    kUserId     = 1,
+    kWeekDayIndex = 0,
+    kUserIndex    = 1,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearWeekdaySchedule::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetWeekDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
-    uint16_t userId;
+    uint8_t weekDayIndex;
+    uint16_t userIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType;
+    using ResponseType = Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -15059,28 +14927,42 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearWeekdaySchedule::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetWeekDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
-    uint16_t userId;
+    uint8_t weekDayIndex;
+    uint16_t userIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ClearWeekdaySchedule
-namespace ClearWeekdayScheduleResponse {
+}; // namespace GetWeekDaySchedule
+namespace GetWeekDayScheduleResponse {
 enum class Fields
 {
-    kStatus = 0,
+    kWeekDayIndex = 0,
+    kUserIndex    = 1,
+    kStatus       = 2,
+    kDaysMask     = 3,
+    kStartHour    = 4,
+    kStartMinute  = 5,
+    kEndHour      = 6,
+    kEndMinute    = 7,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearWeekdayScheduleResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetWeekDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t status;
+    uint8_t weekDayIndex;
+    uint16_t userIndex;
+    DlStatus status;
+    chip::BitFlags<DlDaysMaskMap> daysMask;
+    uint8_t startHour;
+    uint8_t startMinute;
+    uint8_t endHour;
+    uint8_t endMinute;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15092,18 +14974,60 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearWeekdayScheduleResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetWeekDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t status;
+    uint8_t weekDayIndex;
+    uint16_t userIndex;
+    DlStatus status;
+    chip::BitFlags<DlDaysMaskMap> daysMask;
+    uint8_t startHour;
+    uint8_t startMinute;
+    uint8_t endHour;
+    uint8_t endMinute;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ClearWeekdayScheduleResponse
-namespace SetYeardaySchedule {
+}; // namespace GetWeekDayScheduleResponse
+namespace ClearWeekDaySchedule {
 enum class Fields
 {
-    kScheduleId     = 0,
-    kUserId         = 1,
+    kWeekDayIndex = 0,
+    kUserIndex    = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ClearWeekDaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    uint8_t weekDayIndex;
+    uint16_t userIndex;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ClearWeekDaySchedule::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    uint8_t weekDayIndex;
+    uint16_t userIndex;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearWeekDaySchedule
+namespace SetYearDaySchedule {
+enum class Fields
+{
+    kYearDayIndex   = 0,
+    kUserIndex      = 1,
     kLocalStartTime = 2,
     kLocalEndTime   = 3,
 };
@@ -15112,48 +15036,13 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetYeardaySchedule::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
-    uint16_t userId;
+    uint8_t yearDayIndex;
+    uint16_t userIndex;
     uint32_t localStartTime;
     uint32_t localEndTime;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetYeardaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t scheduleId;
-    uint16_t userId;
-    uint32_t localStartTime;
-    uint32_t localEndTime;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetYeardaySchedule
-namespace SetYeardayScheduleResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetYeardayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15165,33 +15054,36 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SetYeardayScheduleResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t status;
+    uint8_t yearDayIndex;
+    uint16_t userIndex;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SetYeardayScheduleResponse
-namespace GetYeardaySchedule {
+}; // namespace SetYearDaySchedule
+namespace GetYearDaySchedule {
 enum class Fields
 {
-    kScheduleId = 0,
-    kUserId     = 1,
+    kYearDayIndex = 0,
+    kUserIndex    = 1,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetYeardaySchedule::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
-    uint16_t userId;
+    uint8_t yearDayIndex;
+    uint16_t userIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType;
+    using ResponseType = Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -15199,19 +15091,19 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::GetYeardaySchedule::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
-    uint16_t userId;
+    uint8_t yearDayIndex;
+    uint16_t userIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace GetYeardaySchedule
-namespace GetYeardayScheduleResponse {
+}; // namespace GetYearDaySchedule
+namespace GetYearDayScheduleResponse {
 enum class Fields
 {
-    kScheduleId     = 0,
-    kUserId         = 1,
+    kYearDayIndex   = 0,
+    kUserIndex      = 1,
     kStatus         = 2,
     kLocalStartTime = 3,
     kLocalEndTime   = 4,
@@ -15221,12 +15113,12 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetYeardayScheduleResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetYearDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
-    uint16_t userId;
-    uint8_t status;
+    uint8_t yearDayIndex;
+    uint16_t userIndex;
+    DlStatus status;
     uint32_t localStartTime;
     uint32_t localEndTime;
 
@@ -15240,66 +15132,33 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::GetYeardayScheduleResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetYearDayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
-    uint16_t userId;
-    uint8_t status;
+    uint8_t yearDayIndex;
+    uint16_t userIndex;
+    DlStatus status;
     uint32_t localStartTime;
     uint32_t localEndTime;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace GetYeardayScheduleResponse
-namespace ClearYeardaySchedule {
+}; // namespace GetYearDayScheduleResponse
+namespace ClearYearDaySchedule {
 enum class Fields
 {
-    kScheduleId = 0,
-    kUserId     = 1,
+    kYearDayIndex = 0,
+    kUserIndex    = 1,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearYeardaySchedule::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
-    uint16_t userId;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearYeardaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t scheduleId;
-    uint16_t userId;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ClearYeardaySchedule
-namespace ClearYeardayScheduleResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearYeardayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
+    uint8_t yearDayIndex;
+    uint16_t userIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15311,20 +15170,21 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearYeardayScheduleResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearYearDaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t status;
+    uint8_t yearDayIndex;
+    uint16_t userIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ClearYeardayScheduleResponse
+}; // namespace ClearYearDaySchedule
 namespace SetHolidaySchedule {
 enum class Fields
 {
-    kScheduleId                 = 0,
-    kLocalStartTime             = 1,
-    kLocalEndTime               = 2,
-    kOperatingModeDuringHoliday = 3,
+    kHolidayIndex   = 0,
+    kLocalStartTime = 1,
+    kLocalEndTime   = 2,
+    kOperatingMode  = 3,
 };
 
 struct Type
@@ -15334,45 +15194,10 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::SetHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
+    uint8_t holidayIndex;
     uint32_t localStartTime;
     uint32_t localEndTime;
-    uint8_t operatingModeDuringHoliday;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetHolidaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t scheduleId;
-    uint32_t localStartTime;
-    uint32_t localEndTime;
-    uint8_t operatingModeDuringHoliday;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetHolidaySchedule
-namespace SetHolidayScheduleResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetHolidayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
+    DlOperatingMode operatingMode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15384,17 +15209,20 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SetHolidayScheduleResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t status;
+    uint8_t holidayIndex;
+    uint32_t localStartTime;
+    uint32_t localEndTime;
+    DlOperatingMode operatingMode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SetHolidayScheduleResponse
+}; // namespace SetHolidaySchedule
 namespace GetHolidaySchedule {
 enum class Fields
 {
-    kScheduleId = 0,
+    kHolidayIndex = 0,
 };
 
 struct Type
@@ -15404,7 +15232,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
+    uint8_t holidayIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15419,18 +15247,18 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
+    uint8_t holidayIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetHolidaySchedule
 namespace GetHolidayScheduleResponse {
 enum class Fields
 {
-    kScheduleId                 = 0,
-    kStatus                     = 1,
-    kLocalStartTime             = 2,
-    kLocalEndTime               = 3,
-    kOperatingModeDuringHoliday = 4,
+    kHolidayIndex   = 0,
+    kStatus         = 1,
+    kLocalStartTime = 2,
+    kLocalEndTime   = 3,
+    kOperatingMode  = 4,
 };
 
 struct Type
@@ -15440,11 +15268,11 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetHolidayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
-    uint8_t status;
+    uint8_t holidayIndex;
+    DlStatus status;
     uint32_t localStartTime;
     uint32_t localEndTime;
-    uint8_t operatingModeDuringHoliday;
+    DlOperatingMode operatingMode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15459,18 +15287,18 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::GetHolidayScheduleResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
-    uint8_t status;
+    uint8_t holidayIndex;
+    DlStatus status;
     uint32_t localStartTime;
     uint32_t localEndTime;
-    uint8_t operatingModeDuringHoliday;
+    DlOperatingMode operatingMode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetHolidayScheduleResponse
 namespace ClearHolidaySchedule {
 enum class Fields
 {
-    kScheduleId = 0,
+    kHolidayIndex = 0,
 };
 
 struct Type
@@ -15480,39 +15308,7 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ClearHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t scheduleId;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearHolidaySchedule::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t scheduleId;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ClearHolidaySchedule
-namespace ClearHolidayScheduleResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearHolidayScheduleResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
+    uint8_t holidayIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15524,13 +15320,13 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearHolidayScheduleResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearHolidaySchedule::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t status;
+    uint8_t holidayIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ClearHolidayScheduleResponse
+}; // namespace ClearHolidaySchedule
 namespace SetUserType {
 enum class Fields
 {
@@ -15546,40 +15342,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
-    DoorLockUserType userType;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetUserType::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint16_t userId;
-    DoorLockUserType userType;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetUserType
-namespace SetUserTypeResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetUserTypeResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
+    DlUserType userType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15591,13 +15354,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SetUserTypeResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetUserType::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t status;
+    uint16_t userId;
+    DlUserType userType;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SetUserTypeResponse
+}; // namespace SetUserType
 namespace GetUserType {
 enum class Fields
 {
@@ -15645,7 +15409,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
-    DoorLockUserType userType;
+    DlUserType userType;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15661,65 +15425,30 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
-    DoorLockUserType userType;
+    DlUserType userType;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace GetUserTypeResponse
-namespace SetRfid {
+namespace SetRFIDCode {
 enum class Fields
 {
     kUserId     = 0,
     kUserStatus = 1,
     kUserType   = 2,
-    kId         = 3,
+    kRfidCode   = 3,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetRfid::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetRFIDCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
-    DoorLockUserStatus userStatus;
-    DoorLockUserType userType;
-    chip::ByteSpan id;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::SetRfidResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::SetRfid::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint16_t userId;
-    DoorLockUserStatus userStatus;
-    DoorLockUserType userType;
-    chip::ByteSpan id;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace SetRfid
-namespace SetRfidResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::SetRfidResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    DoorLockSetPinOrIdStatus status;
+    DlUserStatus userStatus;
+    DlUserType userType;
+    chip::ByteSpan rfidCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15731,14 +15460,17 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::SetRfidResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetRFIDCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    DoorLockSetPinOrIdStatus status;
+    uint16_t userId;
+    DlUserStatus userStatus;
+    DlUserType userType;
+    chip::ByteSpan rfidCode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace SetRfidResponse
-namespace GetRfid {
+}; // namespace SetRFIDCode
+namespace GetRFIDCode {
 enum class Fields
 {
     kUserId = 0,
@@ -15748,14 +15480,14 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetRfid::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetRFIDCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
-    using ResponseType = Clusters::DoorLock::Commands::GetRfidResponse::DecodableType;
+    using ResponseType = Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType;
 
     static constexpr bool MustUseTimedInvoke() { return false; }
 };
@@ -15763,33 +15495,33 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::GetRfid::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetRFIDCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace GetRfid
-namespace GetRfidResponse {
+}; // namespace GetRFIDCode
+namespace GetRFIDCodeResponse {
 enum class Fields
 {
     kUserId     = 0,
     kUserStatus = 1,
     kUserType   = 2,
-    kRfid       = 3,
+    kRfidCode   = 3,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::GetRfidResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetRFIDCodeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
-    DoorLockUserStatus userStatus;
-    DoorLockUserType userType;
-    chip::ByteSpan rfid;
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
+    DataModel::Nullable<chip::ByteSpan> rfidCode;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15801,62 +15533,30 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::GetRfidResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::GetRFIDCodeResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
     uint16_t userId;
-    DoorLockUserStatus userStatus;
-    DoorLockUserType userType;
-    chip::ByteSpan rfid;
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
+    DataModel::Nullable<chip::ByteSpan> rfidCode;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace GetRfidResponse
-namespace ClearRfid {
+}; // namespace GetRFIDCodeResponse
+namespace ClearRFIDCode {
 enum class Fields
 {
-    kUserId = 0,
+    kRfidSlotIndex = 0,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearRfid::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearRFIDCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint16_t userId;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearRfid::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint16_t userId;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ClearRfid
-namespace ClearRfidResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearRfidResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
+    uint16_t rfidSlotIndex;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15868,14 +15568,14 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearRfidResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearRFIDCode::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t status;
+    uint16_t rfidSlotIndex;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ClearRfidResponse
-namespace ClearAllRfids {
+}; // namespace ClearRFIDCode
+namespace ClearAllRFIDCodes {
 enum class Fields
 {
 };
@@ -15884,39 +15584,8 @@ struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearAllRfids::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllRFIDCodes::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-
-    using ResponseType = Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType;
-
-    static constexpr bool MustUseTimedInvoke() { return false; }
-};
-
-struct DecodableType
-{
-public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearAllRfids::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-}; // namespace ClearAllRfids
-namespace ClearAllRfidsResponse {
-enum class Fields
-{
-    kStatus = 0,
-};
-
-struct Type
-{
-public:
-    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::ClearAllRfidsResponse::Id; }
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-
-    uint8_t status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15928,37 +15597,209 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::ClearAllRfidsResponse::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::ClearAllRFIDCodes::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t status;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace ClearAllRfidsResponse
-namespace OperationEventNotification {
+}; // namespace ClearAllRFIDCodes
+namespace SetUser {
 enum class Fields
 {
-    kSource    = 0,
-    kEventCode = 1,
-    kUserId    = 2,
-    kPin       = 3,
-    kTimeStamp = 4,
-    kData      = 5,
+    kOperationType  = 0,
+    kUserIndex      = 1,
+    kUserName       = 2,
+    kUserUniqueId   = 3,
+    kUserStatus     = 4,
+    kUserType       = 5,
+    kCredentialRule = 6,
 };
 
 struct Type
 {
 public:
     // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
-    static constexpr CommandId GetCommandId() { return Commands::OperationEventNotification::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::SetUser::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t source;
-    DoorLockOperationEventCode eventCode;
+    DlDataOperationType operationType;
+    uint16_t userIndex;
+    DataModel::Nullable<chip::CharSpan> userName;
+    DataModel::Nullable<uint32_t> userUniqueId;
+    DlUserStatus userStatus;
+    DlUserType userType;
+    DataModel::Nullable<DlCredentialRule> credentialRule;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetUser::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlDataOperationType operationType;
+    uint16_t userIndex;
+    DataModel::Nullable<chip::CharSpan> userName;
+    DataModel::Nullable<uint32_t> userUniqueId;
+    DlUserStatus userStatus;
+    DlUserType userType;
+    DataModel::Nullable<DlCredentialRule> credentialRule;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetUser
+namespace GetUser {
+enum class Fields
+{
+    kUserIndex = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetUser::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    uint16_t userIndex;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetUserResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetUser::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    uint16_t userIndex;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetUser
+namespace GetUserResponse {
+enum class Fields
+{
+    kUserIndex               = 0,
+    kUserName                = 1,
+    kUserUniqueId            = 2,
+    kUserStatus              = 3,
+    kUserType                = 4,
+    kCredentialRule          = 5,
+    kCredentials             = 6,
+    kCreatorFabricIndex      = 7,
+    kLastModifiedFabricIndex = 8,
+    kNextUserIndex           = 9,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetUserResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    uint16_t userIndex;
+    DataModel::Nullable<chip::CharSpan> userName;
+    DataModel::Nullable<uint32_t> userUniqueId;
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
+    DataModel::Nullable<DlCredentialRule> credentialRule;
+    DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>> credentials;
+    DataModel::Nullable<chip::FabricIndex> creatorFabricIndex;
+    DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
+    uint16_t nextUserIndex;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetUserResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    uint16_t userIndex;
+    DataModel::Nullable<chip::CharSpan> userName;
+    DataModel::Nullable<uint32_t> userUniqueId;
+    DataModel::Nullable<DlUserStatus> userStatus;
+    DataModel::Nullable<DlUserType> userType;
+    DataModel::Nullable<DlCredentialRule> credentialRule;
+    DataModel::Nullable<DataModel::DecodableList<Structs::DlCredential::DecodableType>> credentials;
+    DataModel::Nullable<chip::FabricIndex> creatorFabricIndex;
+    DataModel::Nullable<chip::FabricIndex> lastModifiedFabricIndex;
+    uint16_t nextUserIndex;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetUserResponse
+namespace ClearUser {
+enum class Fields
+{
+    kUserIndex = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ClearUser::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    uint16_t userIndex;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ClearUser::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    uint16_t userIndex;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearUser
+namespace OperatingEventNotification {
+enum class Fields
+{
+    kOperationEventSource = 0,
+    kOperationEventCode   = 1,
+    kUserId               = 2,
+    kPin                  = 3,
+    kLocalTime            = 4,
+    kData                 = 5,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::OperatingEventNotification::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    uint8_t operationEventSource;
+    uint8_t operationEventCode;
     uint16_t userId;
     chip::ByteSpan pin;
-    uint32_t timeStamp;
-    chip::CharSpan data;
+    uint32_t localTime;
+    Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -15970,29 +15811,29 @@ public:
 struct DecodableType
 {
 public:
-    static constexpr CommandId GetCommandId() { return Commands::OperationEventNotification::Id; }
+    static constexpr CommandId GetCommandId() { return Commands::OperatingEventNotification::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t source;
-    DoorLockOperationEventCode eventCode;
+    uint8_t operationEventSource;
+    uint8_t operationEventCode;
     uint16_t userId;
     chip::ByteSpan pin;
-    uint32_t timeStamp;
-    chip::CharSpan data;
+    uint32_t localTime;
+    Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
-}; // namespace OperationEventNotification
+}; // namespace OperatingEventNotification
 namespace ProgrammingEventNotification {
 enum class Fields
 {
-    kSource     = 0,
-    kEventCode  = 1,
-    kUserId     = 2,
-    kPin        = 3,
-    kUserType   = 4,
-    kUserStatus = 5,
-    kTimeStamp  = 6,
-    kData       = 7,
+    kProgramEventSource = 0,
+    kProgramEventCode   = 1,
+    kUserId             = 2,
+    kPin                = 3,
+    kUserType           = 4,
+    kUserStatus         = 5,
+    kLocalTime          = 6,
+    kData               = 7,
 };
 
 struct Type
@@ -16002,14 +15843,14 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ProgrammingEventNotification::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t source;
-    DoorLockProgrammingEventCode eventCode;
+    uint8_t programEventSource;
+    uint8_t programEventCode;
     uint16_t userId;
     chip::ByteSpan pin;
-    DoorLockUserType userType;
-    DoorLockUserStatus userStatus;
-    uint32_t timeStamp;
-    chip::CharSpan data;
+    DlUserType userType;
+    DlUserStatus userStatus;
+    uint32_t localTime;
+    Optional<chip::CharSpan> data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -16024,26 +15865,210 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::ProgrammingEventNotification::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
 
-    uint8_t source;
-    DoorLockProgrammingEventCode eventCode;
+    uint8_t programEventSource;
+    uint8_t programEventCode;
     uint16_t userId;
     chip::ByteSpan pin;
-    DoorLockUserType userType;
-    DoorLockUserStatus userStatus;
-    uint32_t timeStamp;
-    chip::CharSpan data;
+    DlUserType userType;
+    DlUserStatus userStatus;
+    uint32_t localTime;
+    Optional<chip::CharSpan> data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace ProgrammingEventNotification
+namespace SetCredential {
+enum class Fields
+{
+    kOperationType  = 0,
+    kCredential     = 1,
+    kCredentialData = 2,
+    kUserIndex      = 3,
+    kUserStatus     = 4,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetCredential::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlDataOperationType operationType;
+    Structs::DlCredential::Type credential;
+    chip::ByteSpan credentialData;
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<DlUserStatus> userStatus;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetCredential::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlDataOperationType operationType;
+    Structs::DlCredential::DecodableType credential;
+    chip::ByteSpan credentialData;
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<DlUserStatus> userStatus;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetCredential
+namespace SetCredentialResponse {
+enum class Fields
+{
+    kStatus              = 0,
+    kUserIndex           = 1,
+    kNextCredentialIndex = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::SetCredentialResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlStatus status;
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<uint16_t> nextCredentialIndex;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::SetCredentialResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlStatus status;
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<uint16_t> nextCredentialIndex;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace SetCredentialResponse
+namespace GetCredentialStatus {
+enum class Fields
+{
+    kCredential = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetCredentialStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    Structs::DlCredential::Type credential;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetCredentialStatus::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    Structs::DlCredential::DecodableType credential;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetCredentialStatus
+namespace GetCredentialStatusResponse {
+enum class Fields
+{
+    kCredentialExists    = 0,
+    kUserIndex           = 1,
+    kNextCredentialIndex = 2,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::GetCredentialStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    bool credentialExists;
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<uint16_t> nextCredentialIndex;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::GetCredentialStatusResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    bool credentialExists;
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<uint16_t> nextCredentialIndex;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace GetCredentialStatusResponse
+namespace ClearCredential {
+enum class Fields
+{
+    kCredential = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::ClearCredential::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    Structs::DlCredential::Type credential;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::ClearCredential::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    Structs::DlCredential::DecodableType credential;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace ClearCredential
 } // namespace Commands
 
 namespace Attributes {
 namespace LockState {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = DataModel::Nullable<DlLockState>;
+    using DecodableType    = DataModel::Nullable<DlLockState>;
+    using DecodableArgType = const DataModel::Nullable<DlLockState> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LockState::Id; }
@@ -16053,9 +16078,9 @@ struct TypeInfo
 namespace LockType {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = DlLockType;
+    using DecodableType    = DlLockType;
+    using DecodableArgType = DlLockType;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::LockType::Id; }
@@ -16077,9 +16102,9 @@ struct TypeInfo
 namespace DoorState {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = DataModel::Nullable<DlDoorState>;
+    using DecodableType    = DataModel::Nullable<DlDoorState>;
+    using DecodableArgType = const DataModel::Nullable<DlDoorState> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::DoorState::Id; }
@@ -16122,7 +16147,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace OpenPeriod
-namespace NumLockRecordsSupported {
+namespace NumberOfLogRecordsSupported {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -16130,11 +16155,11 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NumLockRecordsSupported::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfLogRecordsSupported::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace NumLockRecordsSupported
-namespace NumTotalUsersSupported {
+} // namespace NumberOfLogRecordsSupported
+namespace NumberOfTotalUsersSupported {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -16142,11 +16167,11 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NumTotalUsersSupported::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfTotalUsersSupported::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace NumTotalUsersSupported
-namespace NumPinUsersSupported {
+} // namespace NumberOfTotalUsersSupported
+namespace NumberOfPINUsersSupported {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -16154,11 +16179,11 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NumPinUsersSupported::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfPINUsersSupported::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace NumPinUsersSupported
-namespace NumRfidUsersSupported {
+} // namespace NumberOfPINUsersSupported
+namespace NumberOfRFIDUsersSupported {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -16166,11 +16191,47 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NumRfidUsersSupported::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfRFIDUsersSupported::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace NumRfidUsersSupported
-namespace NumWeekdaySchedulesSupportedPerUser {
+} // namespace NumberOfRFIDUsersSupported
+namespace NumberOfWeekDaySchedulesSupportedPerUser {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfWeekDaySchedulesSupportedPerUser::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NumberOfWeekDaySchedulesSupportedPerUser
+namespace NumberOfYearDaySchedulesSupportedPerUser {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfYearDaySchedulesSupportedPerUser::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NumberOfYearDaySchedulesSupportedPerUser
+namespace NumberOfHolidaySchedulesSupported {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::NumberOfHolidaySchedulesSupported::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace NumberOfHolidaySchedulesSupported
+namespace MaxPINCodeLength {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -16178,11 +16239,11 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NumWeekdaySchedulesSupportedPerUser::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxPINCodeLength::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace NumWeekdaySchedulesSupportedPerUser
-namespace NumYeardaySchedulesSupportedPerUser {
+} // namespace MaxPINCodeLength
+namespace MinPINCodeLength {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -16190,11 +16251,11 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NumYeardaySchedulesSupportedPerUser::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinPINCodeLength::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace NumYeardaySchedulesSupportedPerUser
-namespace NumHolidaySchedulesSupportedPerUser {
+} // namespace MinPINCodeLength
+namespace MaxRFIDCodeLength {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -16202,11 +16263,11 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::NumHolidaySchedulesSupportedPerUser::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MaxRFIDCodeLength::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace NumHolidaySchedulesSupportedPerUser
-namespace MaxPinLength {
+} // namespace MaxRFIDCodeLength
+namespace MinRFIDCodeLength {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -16214,11 +16275,11 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MaxPinLength::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::MinRFIDCodeLength::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace MaxPinLength
-namespace MinPinLength {
+} // namespace MinRFIDCodeLength
+namespace CredentialRulesSupport {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -16226,34 +16287,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MinPinLength::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CredentialRulesSupport::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace MinPinLength
-namespace MaxRfidCodeLength {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MaxRfidCodeLength::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace MaxRfidCodeLength
-namespace MinRfidCodeLength {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::MinRfidCodeLength::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace MinRfidCodeLength
+} // namespace CredentialRulesSupport
 namespace EnableLogging {
 struct TypeInfo
 {
@@ -16278,7 +16315,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Language
-namespace LedSettings {
+namespace LEDSettings {
 struct TypeInfo
 {
     using Type             = uint8_t;
@@ -16286,10 +16323,10 @@ struct TypeInfo
     using DecodableArgType = uint8_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::LedSettings::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LEDSettings::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace LedSettings
+} // namespace LEDSettings
 namespace AutoRelockTime {
 struct TypeInfo
 {
@@ -16317,9 +16354,9 @@ struct TypeInfo
 namespace OperatingMode {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = DlOperatingMode;
+    using DecodableType    = DlOperatingMode;
+    using DecodableArgType = DlOperatingMode;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::OperatingMode::Id; }
@@ -16374,7 +16411,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EnableOneTouchLocking
-namespace EnableInsideStatusLed {
+namespace EnableInsideStatusLED {
 struct TypeInfo
 {
     using Type             = bool;
@@ -16382,10 +16419,10 @@ struct TypeInfo
     using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::EnableInsideStatusLed::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::EnableInsideStatusLED::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace EnableInsideStatusLed
+} // namespace EnableInsideStatusLED
 namespace EnablePrivacyModeButton {
 struct TypeInfo
 {
@@ -16398,6 +16435,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace EnablePrivacyModeButton
+namespace LocalProgrammingFeatures {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::LocalProgrammingFeatures::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace LocalProgrammingFeatures
 namespace WrongCodeEntryLimit {
 struct TypeInfo
 {
@@ -16422,7 +16471,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace UserCodeTemporaryDisableTime
-namespace SendPinOverTheAir {
+namespace SendPINOverTheAir {
 struct TypeInfo
 {
     using Type             = bool;
@@ -16430,11 +16479,11 @@ struct TypeInfo
     using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SendPinOverTheAir::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SendPINOverTheAir::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SendPinOverTheAir
-namespace RequirePinForRfOperation {
+} // namespace SendPINOverTheAir
+namespace RequirePINforRemoteOperation {
 struct TypeInfo
 {
     using Type             = bool;
@@ -16442,22 +16491,22 @@ struct TypeInfo
     using DecodableArgType = bool;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RequirePinForRfOperation::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RequirePINforRemoteOperation::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace RequirePinForRfOperation
-namespace ZigbeeSecurityLevel {
+} // namespace RequirePINforRemoteOperation
+namespace ExpiringUserTimeout {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ZigbeeSecurityLevel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ExpiringUserTimeout::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace ZigbeeSecurityLevel
+} // namespace ExpiringUserTimeout
 namespace AlarmMask {
 struct TypeInfo
 {
@@ -16482,7 +16531,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace KeypadOperationEventMask
-namespace RfOperationEventMask {
+namespace RemoteOperationEventMask {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -16490,10 +16539,10 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RfOperationEventMask::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RemoteOperationEventMask::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace RfOperationEventMask
+} // namespace RemoteOperationEventMask
 namespace ManualOperationEventMask {
 struct TypeInfo
 {
@@ -16506,7 +16555,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ManualOperationEventMask
-namespace RfidOperationEventMask {
+namespace RFIDOperationEventMask {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -16514,10 +16563,10 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RfidOperationEventMask::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RFIDOperationEventMask::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace RfidOperationEventMask
+} // namespace RFIDOperationEventMask
 namespace KeypadProgrammingEventMask {
 struct TypeInfo
 {
@@ -16530,7 +16579,7 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace KeypadProgrammingEventMask
-namespace RfProgrammingEventMask {
+namespace RemoteProgrammingEventMask {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -16538,11 +16587,11 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RfProgrammingEventMask::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RemoteProgrammingEventMask::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace RfProgrammingEventMask
-namespace RfidProgrammingEventMask {
+} // namespace RemoteProgrammingEventMask
+namespace RFIDProgrammingEventMask {
 struct TypeInfo
 {
     using Type             = uint16_t;
@@ -16550,10 +16599,10 @@ struct TypeInfo
     using DecodableArgType = uint16_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::RfidProgrammingEventMask::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::RFIDProgrammingEventMask::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace RfidProgrammingEventMask
+} // namespace RFIDProgrammingEventMask
 namespace FeatureMap {
 struct TypeInfo
 {
@@ -16579,6 +16628,224 @@ struct TypeInfo
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace DoorLockAlarm {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kAlarmCode = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlAlarmCode alarmCode;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlAlarmCode alarmCode;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace DoorLockAlarm
+namespace DoorStateChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+    kDoorState = 0,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlDoorState doorState;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlDoorState doorState;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace DoorStateChange
+namespace LockOperation {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000002;
+
+enum class Fields
+{
+    kLockOperationType = 0,
+    kOperationSource   = 1,
+    kUserIndex         = 2,
+    kFabricIndex       = 3,
+    kSourceNode        = 4,
+    kCredentials       = 5,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlLockOperationType lockOperationType;
+    DlOperationSource operationSource;
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<chip::FabricIndex> fabricIndex;
+    DataModel::Nullable<chip::NodeId> sourceNode;
+    Optional<DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>>> credentials;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlLockOperationType lockOperationType;
+    DlOperationSource operationSource;
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<chip::FabricIndex> fabricIndex;
+    DataModel::Nullable<chip::NodeId> sourceNode;
+    Optional<DataModel::Nullable<DataModel::DecodableList<Structs::DlCredential::DecodableType>>> credentials;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace LockOperation
+namespace LockOperationError {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Critical;
+static constexpr EventId kEventId             = 0x00000003;
+
+enum class Fields
+{
+    kLockOperationType = 0,
+    kOperationSource   = 1,
+    kOperationError    = 2,
+    kUserIndex         = 3,
+    kFabricIndex       = 4,
+    kSourceNode        = 5,
+    kCredentials       = 6,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlLockOperationType lockOperationType;
+    DlOperationSource operationSource;
+    DlOperationError operationError;
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<chip::FabricIndex> fabricIndex;
+    DataModel::Nullable<chip::NodeId> sourceNode;
+    Optional<DataModel::Nullable<DataModel::List<const Structs::DlCredential::Type>>> credentials;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlLockOperationType lockOperationType;
+    DlOperationSource operationSource;
+    DlOperationError operationError;
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<chip::FabricIndex> fabricIndex;
+    DataModel::Nullable<chip::NodeId> sourceNode;
+    Optional<DataModel::Nullable<DataModel::DecodableList<Structs::DlCredential::DecodableType>>> credentials;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace LockOperationError
+namespace LockUserChange {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000004;
+
+enum class Fields
+{
+    kLockDataType      = 0,
+    kDataOperationType = 1,
+    kOperationSource   = 2,
+    kUserIndex         = 3,
+    kFabricIndex       = 4,
+    kSourceNode        = 5,
+    kDataIndex         = 6,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlLockDataType lockDataType;
+    DlDataOperationType dataOperationType;
+    DlOperationSource operationSource;
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<chip::FabricIndex> fabricIndex;
+    DataModel::Nullable<chip::NodeId> sourceNode;
+    DataModel::Nullable<uint16_t> dataIndex;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::DoorLock::Id; }
+
+    DlLockDataType lockDataType;
+    DlDataOperationType dataOperationType;
+    DlOperationSource operationSource;
+    DataModel::Nullable<uint16_t> userIndex;
+    DataModel::Nullable<chip::FabricIndex> fabricIndex;
+    DataModel::Nullable<chip::NodeId> sourceNode;
+    DataModel::Nullable<uint16_t> dataIndex;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace LockUserChange
+} // namespace Events
 } // namespace DoorLock
 namespace WindowCovering {
 
@@ -28601,9 +28868,6 @@ struct TypeInfo
 } // namespace Attributes
 } // namespace ApplicationLauncher
 namespace ApplicationBasic {
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 // Enum for ApplicationBasicStatus
 enum class ApplicationBasicStatus : uint8_t
 {
@@ -28612,9 +28876,6 @@ enum class ApplicationBasicStatus : uint8_t
     kActiveHidden          = 0x02,
     kActiveVisibleNotFocus = 0x03,
 };
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ApplicationBasicStatus          = EmberAfApplicationBasicStatus;
-#endif
 
 namespace Commands {
 // Forward-declarations so we can reference these later.

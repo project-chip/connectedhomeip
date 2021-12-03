@@ -16,11 +16,14 @@
  *    limitations under the License.
  */
 
+#include "AppImpl.h"
 #include "AppMain.h"
+#include "AppPlatformShellCommands.h"
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
 #include <app/Command.h>
+#include <app/util/ContentAppPlatform.h>
 #include <app/util/af.h>
 
 #include <iostream>
@@ -34,9 +37,14 @@
 #include "include/target-navigator/TargetNavigatorManager.h"
 #include "include/tv-channel/TvChannelManager.h"
 
+#if defined(ENABLE_CHIP_SHELL)
+#include <lib/shell/Engine.h>
+#endif
+
 using namespace chip;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
+using namespace chip::AppPlatform;
 
 bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 {
@@ -47,6 +55,10 @@ bool emberAfBasicClusterMfgSpecificPingCallback(chip::app::Command * commandObj)
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    chip::AppPlatform::ContentAppFactoryImpl factory;
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
 
     // Init Keypad Input manager
     err = KeypadInputManager().Init();
@@ -81,6 +93,18 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     VerifyOrDie(ChipLinuxAppInit(argc, argv) == 0);
+
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    chip::AppPlatform::AppPlatform::GetInstance().SetupAppPlatform();
+    chip::AppPlatform::AppPlatform::GetInstance().SetContentAppFactory(&factory);
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
+#if defined(ENABLE_CHIP_SHELL)
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    chip::Shell::RegisterAppPlatformCommands();
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+#endif
+
     ChipLinuxAppMainLoop();
 exit:
     if (err != CHIP_NO_ERROR)
