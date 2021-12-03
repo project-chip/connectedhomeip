@@ -156,7 +156,7 @@ void TestEncodeListOfBools2(nlTestSuite * aSuite, void * aContext)
 {
     TestSetup test(aSuite);
     bool list[]    = { true, false };
-    CHIP_ERROR err = test.encoder.EncodeList([&list](auto encoder) -> CHIP_ERROR {
+    CHIP_ERROR err = test.encoder.EncodeList([&list](const auto & encoder) -> CHIP_ERROR {
         for (auto & item : list)
         {
             ReturnErrorOnFailure(encoder.Encode(item));
@@ -243,7 +243,7 @@ void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
     AttributeValueEncoder::AttributeEncodeState state;
 
     bool list[]      = { true, false };
-    auto listEncoder = [&list](auto encoder) -> CHIP_ERROR {
+    auto listEncoder = [&list](const auto & encoder) -> CHIP_ERROR {
         for (auto & item : list)
         {
             ReturnErrorOnFailure(encoder.Encode(item));

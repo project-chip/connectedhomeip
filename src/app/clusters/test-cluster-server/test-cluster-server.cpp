@@ -234,7 +234,7 @@ CHIP_ERROR TestAttrAccess::WriteListOctetStringAttribute(AttributeValueDecoder &
 
 CHIP_ERROR TestAttrAccess::ReadListLongOctetStringAttribute(AttributeValueEncoder & aEncoder)
 {
-    // The ListOctetStringAttribute takes 512 bytes, and the whold attribute will exceed the IPv6 MTU, so we can test list chunking
+    // The ListOctetStringAttribute takes 512 bytes, and the whole attribute will exceed the IPv6 MTU, so we can test list chunking
     // feature with this attribute.
     char buf[513] = "0123456789abcdef"
                     "0123456789abcdef"
@@ -268,7 +268,7 @@ CHIP_ERROR TestAttrAccess::ReadListLongOctetStringAttribute(AttributeValueEncode
                     "0123456789abcdef" // 30
                     "0123456789abcdef"
                     "0123456789abcdef"; // 32 * 16 = 512
-    return aEncoder.EncodeList([buf](auto encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([buf](const auto & encoder) -> CHIP_ERROR {
         for (uint8_t index = 0; index < kAttributeListLength; index++)
         {
             ReturnErrorOnFailure(encoder.Encode(ByteSpan(chip::Uint8::from_const_char(buf), 512)));

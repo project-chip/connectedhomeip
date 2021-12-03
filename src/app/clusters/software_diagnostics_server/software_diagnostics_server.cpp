@@ -105,7 +105,7 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder
 
     if (DeviceLayer::GetDiagnosticDataProvider().GetThreadMetrics(&threadMetrics) == CHIP_NO_ERROR)
     {
-        err = aEncoder.EncodeList([&threadMetrics](auto encoder) -> CHIP_ERROR {
+        err = aEncoder.EncodeList([&threadMetrics](const auto & encoder) -> CHIP_ERROR {
             for (DeviceLayer::ThreadMetrics * thread = threadMetrics; thread != nullptr; thread = thread->Next)
             {
                 ReturnErrorOnFailure(encoder.Encode(*thread));
