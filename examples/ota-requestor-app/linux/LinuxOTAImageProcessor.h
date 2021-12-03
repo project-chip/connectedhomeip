@@ -35,7 +35,7 @@ public:
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
 
-    void SetOTADownloader(chip::OTADownloader * downloader) { mDownloader = downloader; }
+    void SetOTADownloader(OTADownloader * downloader) { mDownloader = downloader; }
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
