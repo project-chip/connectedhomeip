@@ -17,11 +17,12 @@ on:
     schedule:
         - cron: "*/5 * * * *"
 
-concurrency:
-    group: ${{ github.workflow }}
-    # Don't cancel an already-running bloat check just because it took more
-    # than 5 minutes to run and our cron job is trying to schedule a new one.
-    cancel-in-progress: false
+# Temporarely disabled until GH fixes (broken on 3 Dec 2021)
+# concurrency:
+#    group: ${{ github.workflow }}
+#    # Don't cancel an already-running bloat check just because it took more
+#    # than 5 minutes to run and our cron job is trying to schedule a new one.
+#    cancel-in-progress: false
   
 jobs:
     pull_request_update:

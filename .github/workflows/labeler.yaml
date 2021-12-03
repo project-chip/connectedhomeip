@@ -17,9 +17,10 @@ on:
     schedule:
         - cron: "*/5 * * * *"
 
-concurrency:
-    group: ${{ github.workflow }}
-    cancel-in-progress: true
+# Temporarely disabled until GH fixes (broken on 3 Dec 2021)
+# concurrency:
+#     group: ${{ github.workflow }}
+#     cancel-in-progress: true
   
 jobs:
     triage:
