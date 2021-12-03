@@ -1008,6 +1008,10 @@ static constexpr AttributeId Id = Globals::Attributes::ClusterRevision::Id;
 namespace PowerSourceConfiguration {
 namespace Attributes {
 
+namespace Sources {
+static constexpr AttributeId Id = 0x00000000;
+} // namespace Sources
+
 namespace FeatureMap {
 static constexpr AttributeId Id = Globals::Attributes::FeatureMap::Id;
 } // namespace FeatureMap

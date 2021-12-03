@@ -32,6 +32,8 @@
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
     MatterOnOffPluginServerInitCallback();                                                                                         \
     MatterOperationalCredentialsPluginServerInitCallback();                                                                        \
+    MatterPowerSourcePluginServerInitCallback();                                                                                   \
+    MatterPowerSourceConfigurationPluginServerInitCallback();                                                                      \
     MatterSoftwareDiagnosticsPluginServerInitCallback();                                                                           \
     MatterThreadNetworkDiagnosticsPluginServerInitCallback();                                                                      \
     MatterWiFiNetworkDiagnosticsPluginServerInitCallback();

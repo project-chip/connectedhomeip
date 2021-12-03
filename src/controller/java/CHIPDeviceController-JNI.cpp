@@ -185,18 +185,19 @@ JNI_METHOD(void, pairDevice)
 
     ChipLogProgress(Controller, "pairDevice() called with device ID, connection object, and pincode");
 
-    RendezvousParameters params = RendezvousParameters()
-                                      .SetSetupPINCode(pinCode)
+    RendezvousParameters rendezvousParams = RendezvousParameters()
+                                                .SetSetupPINCode(pinCode)
 #if CONFIG_NETWORK_LAYER_BLE
-                                      .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
+                                                .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
 #endif
-                                      .SetPeerAddress(Transport::PeerAddress::BLE());
+                                                .SetPeerAddress(Transport::PeerAddress::BLE());
+    CommissioningParameters commissioningParams = CommissioningParameters();
     if (csrNonce != nullptr)
     {
         JniByteArray jniCsrNonce(env, csrNonce);
-        params.SetCSRNonce(jniCsrNonce.byteSpan());
+        commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
-    err = wrapper->Controller()->PairDevice(deviceId, params);
+    err = wrapper->Controller()->PairDevice(deviceId, rendezvousParams, commissioningParams);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -221,16 +222,17 @@ JNI_METHOD(void, pairDeviceWithAddress)
                    ChipLogError(Controller, "Failed to parse IP address."),
                    JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT));
 
-    RendezvousParameters params = RendezvousParameters()
-                                      .SetDiscriminator(discriminator)
-                                      .SetSetupPINCode(pinCode)
-                                      .SetPeerAddress(Transport::PeerAddress::UDP(addr, port));
+    RendezvousParameters rendezvousParams = RendezvousParameters()
+                                                .SetDiscriminator(discriminator)
+                                                .SetSetupPINCode(pinCode)
+                                                .SetPeerAddress(Transport::PeerAddress::UDP(addr, port));
+    CommissioningParameters commissioningParams = CommissioningParameters();
     if (csrNonce != nullptr)
     {
         JniByteArray jniCsrNonce(env, csrNonce);
-        params.SetCSRNonce(jniCsrNonce.byteSpan());
+        commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
-    err = wrapper->Controller()->PairDevice(deviceId, params);
+    err = wrapper->Controller()->PairDevice(deviceId, rendezvousParams, commissioningParams);
 
     if (err != CHIP_NO_ERROR)
     {

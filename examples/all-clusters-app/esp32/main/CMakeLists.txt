@@ -74,6 +74,7 @@ set(SRC_DIRS_LIST
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ethernet_network_diagnostics_server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/wifi_network_diagnostics_server"                      
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/pump-configuration-and-control-server"
+                      "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/power-source-configuration-server"
                       "${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/src"
                       #${CMAKE_SOURCE_DIR}/third_party/connectedhomeip/src/app/clusters/ias-zone-client
 )
@@ -226,6 +227,7 @@ target_compile_options(${COMPONENT_LIB} PRIVATE
                        "-DPW_RPC_BUTTON_SERVICE=1"
                        "-DPW_RPC_DEVICE_SERVICE=1"
                        "-DPW_RPC_LIGHTING_SERVICE=1"
-                       "-DPW_RPC_LOCKING_SERVICE=1")
+                       "-DPW_RPC_LOCKING_SERVICE=1"
+                       "-DPW_RPC_TRACING_SERVICE=1")
 
 endif (CONFIG_ENABLE_PW_RPC)

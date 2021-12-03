@@ -744,6 +744,26 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         break;
     }
+    case 0x002E: // Power Source Configuration Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // Sources
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // INT8U
+            break;
+        }
+        }
+        break;
+    }
     case 0x0034: // Software Diagnostics Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -1345,6 +1365,15 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         switch (attributeId)
         {
         case 0x0012: // ActiveBatteryFaults
+            // uint8_t
+            entryLength = 1;
+            break;
+        }
+        break;
+    case 0x002E: // Power Source Configuration Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // Sources
             // uint8_t
             entryLength = 1;
             break;

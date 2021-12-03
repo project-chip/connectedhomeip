@@ -684,91 +684,6 @@ class ChipClusters:
         "commands": {
         },
         "attributes": {
-            0x00000001: {
-                "attributeName": "VendorName",
-                "attributeId": 0x00000001,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000002: {
-                "attributeName": "VendorID",
-                "attributeId": 0x00000002,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000003: {
-                "attributeName": "ProductName",
-                "attributeId": 0x00000003,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000005: {
-                "attributeName": "NodeLabel",
-                "attributeId": 0x00000005,
-                "type": "str",
-                "reportable": True,
-                "writable": True,
-            },
-            0x00000007: {
-                "attributeName": "HardwareVersion",
-                "attributeId": 0x00000007,
-                "type": "int",
-                "reportable": True,
-            },
-            0x00000008: {
-                "attributeName": "HardwareVersionString",
-                "attributeId": 0x00000008,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000009: {
-                "attributeName": "SoftwareVersion",
-                "attributeId": 0x00000009,
-                "type": "int",
-                "reportable": True,
-            },
-            0x0000000A: {
-                "attributeName": "SoftwareVersionString",
-                "attributeId": 0x0000000A,
-                "type": "str",
-                "reportable": True,
-            },
-            0x0000000B: {
-                "attributeName": "ManufacturingDate",
-                "attributeId": 0x0000000B,
-                "type": "str",
-                "reportable": True,
-            },
-            0x0000000C: {
-                "attributeName": "PartNumber",
-                "attributeId": 0x0000000C,
-                "type": "str",
-                "reportable": True,
-            },
-            0x0000000D: {
-                "attributeName": "ProductURL",
-                "attributeId": 0x0000000D,
-                "type": "str",
-                "reportable": True,
-            },
-            0x0000000E: {
-                "attributeName": "ProductLabel",
-                "attributeId": 0x0000000E,
-                "type": "str",
-                "reportable": True,
-            },
-            0x0000000F: {
-                "attributeName": "SerialNumber",
-                "attributeId": 0x0000000F,
-                "type": "str",
-                "reportable": True,
-            },
-            0x00000011: {
-                "attributeName": "Reachable",
-                "attributeId": 0x00000011,
-                "type": "bool",
-                "reportable": True,
-            },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
                 "attributeId": 0x0000FFFD,
@@ -3121,6 +3036,24 @@ class ChipClusters:
             },
         },
     }
+    _POWER_SOURCE_CONFIGURATION_CLUSTER_INFO = {
+        "clusterName": "PowerSourceConfiguration",
+        "clusterId": 0x0000002E,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Sources",
+                "attributeId": 0x00000000,
+                "type": "int",
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+            },
+        },
+    }
     _PRESSURE_MEASUREMENT_CLUSTER_INFO = {
         "clusterName": "PressureMeasurement",
         "clusterId": 0x00000403,
@@ -5323,6 +5256,7 @@ class ChipClusters:
         0x00000007: _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
         0x0000003E: _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
         0x0000002F: _POWER_SOURCE_CLUSTER_INFO,
+        0x0000002E: _POWER_SOURCE_CONFIGURATION_CLUSTER_INFO,
         0x00000403: _PRESSURE_MEASUREMENT_CLUSTER_INFO,
         0x00000200: _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         0x00000405: _RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_INFO,
@@ -5384,6 +5318,7 @@ class ChipClusters:
         "OnOffSwitchConfiguration": _ON_OFF_SWITCH_CONFIGURATION_CLUSTER_INFO,
         "OperationalCredentials": _OPERATIONAL_CREDENTIALS_CLUSTER_INFO,
         "PowerSource": _POWER_SOURCE_CLUSTER_INFO,
+        "PowerSourceConfiguration": _POWER_SOURCE_CONFIGURATION_CLUSTER_INFO,
         "PressureMeasurement": _PRESSURE_MEASUREMENT_CLUSTER_INFO,
         "PumpConfigurationAndControl": _PUMP_CONFIGURATION_AND_CONTROL_CLUSTER_INFO,
         "RelativeHumidityMeasurement": _RELATIVE_HUMIDITY_MEASUREMENT_CLUSTER_INFO,

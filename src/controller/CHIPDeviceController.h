@@ -48,6 +48,7 @@
 #include <lib/support/Pool.h>
 #include <lib/support/SerializableIntegerSet.h>
 #include <lib/support/Span.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/secure_channel/MessageCounterManager.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
@@ -490,9 +491,46 @@ public:
      *         in the Init() call.
      *
      * @param[in] remoteDeviceId        The remote device Id.
-     * @param[in] params                The Rendezvous connection parameters
+     * @param[in] rendezvousParams      The Rendezvous connection parameters
+     * @param[in] commssioningParams    The commissioning parameters (uses defualt if not supplied)
      */
-    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & params);
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams);
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & rendezvousParams,
+                          CommissioningParameters & commissioningParams);
+
+    /**
+     * @brief
+     *   Start establishing a PASE connection with a node for the purposes of commissioning.
+     *   Commissioners that wish to use the auto-commissioning functions should use the
+     *   supplied "PairDevice" functions above to automatically establish a connection then
+     *   perform commissioning. This function is intended to be use by commissioners that
+     *   are not using the supplied auto-commissioner.
+     *
+     *   This function is non-blocking. PASE is established once the DevicePairingDelegate
+     *   receives the OnPairingComplete call.
+     *
+     *   PASE connections can only be established with nodes that have their commissioning
+     *   window open. The PASE connection will fail if this window is not open and the
+     *   OnPairingComplete will be called with an error.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] rendezvousParams      The Rendezvous connection parameters
+     */
+    CHIP_ERROR EstablishPASEConnection(NodeId remoteDeviceId, RendezvousParameters & params);
+
+    /**
+     * @brief
+     *   Start the auto-commissioning process on a node after establishing a PASE connection.
+     *   This function is intended to be used in conjunction with the EstablishPASEConnection
+     *   function. It can be called either before or after the DevicePairingDelegate receives
+     *   the OnPairingComplete call. Commissioners that want to perform simple auto-commissioning
+     *   should use the supplied "PairDevice" functions above, which will establish the PASE
+     *   connection and commission automatically.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     * @param[in] params                The commissioning parameters
+     */
+    CHIP_ERROR Commission(NodeId remoteDeviceId, CommissioningParameters & params);
 
     CHIP_ERROR GetDeviceBeingCommissioned(NodeId deviceId, CommissioneeDeviceProxy ** device);
 
@@ -591,20 +629,22 @@ public:
 
     /**
      * @brief
+     *   Return the UDC Server instance
+     *
+     */
+    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+
+#if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
+    /**
+     * @brief
      *   Overrides method from AbstractDnssdDiscoveryController
      *
      * @param nodeData DNS-SD node information
      *
      */
     void OnNodeDiscoveryComplete(const chip::Dnssd::DiscoveredNodeData & nodeData) override;
-
-    /**
-     * @brief
-     *   Return the UDC Server instance
-     *
-     */
-    UserDirectedCommissioningServer * GetUserDirectedCommissioningServer() { return mUdcServer; }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY
+#endif
 
     void RegisterPairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
@@ -628,6 +668,7 @@ private:
     bool mPairedDevicesUpdated;
 
     CommissioningStage mCommissioningStage = CommissioningStage::kSecurePairing;
+    bool mRunCommissioningAfterConnection  = false;
 
     BitMapObjectPool<CommissioneeDeviceProxy, kNumMaxActiveDevices> mCommissioneeDevicePool;
 

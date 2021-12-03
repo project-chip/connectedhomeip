@@ -190,21 +190,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPTestBridgedDeviceBasic : CHIPBridgedDeviceBasic
 
-- (void)writeAttributeVendorNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeVendorIDWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeProductNameWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeHardwareVersionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeHardwareVersionStringWithValue:(NSString * _Nonnull)value
-                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeSoftwareVersionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeSoftwareVersionStringWithValue:(NSString * _Nonnull)value
-                                   completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeManufacturingDateWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributePartNumberWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeProductURLWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeProductLabelWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeSerialNumberWithValue:(NSString * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
-- (void)writeAttributeReachableWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 @end
@@ -644,6 +629,17 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)writeAttributeActiveBatteryFaultsWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeBatteryChargeStateWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+@end
+
+/**
+ * Cluster Power Source Configuration
+ *
+ */
+@interface CHIPTestPowerSourceConfiguration : CHIPPowerSourceConfiguration
+
+- (void)writeAttributeSourcesWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 @end

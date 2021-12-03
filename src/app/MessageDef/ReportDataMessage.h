@@ -40,11 +40,11 @@ namespace app {
 namespace ReportDataMessage {
 enum
 {
-    kCsTag_SuppressResponse    = 0,
-    kCsTag_SubscriptionId      = 1,
-    kCsTag_AttributeReportIBs  = 2,
-    kCsTag_EventReports        = 3,
-    kCsTag_MoreChunkedMessages = 4,
+    kCsTag_SubscriptionId      = 0,
+    kCsTag_AttributeReportIBs  = 1,
+    kCsTag_EventReports        = 2,
+    kCsTag_MoreChunkedMessages = 3,
+    kCsTag_SuppressResponse    = 4,
 };
 
 class Parser : public StructParser

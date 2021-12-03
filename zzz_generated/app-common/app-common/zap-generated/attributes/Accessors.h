@@ -919,6 +919,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, bool value);
 } // namespace Attributes
 } // namespace OtaSoftwareUpdateRequestor
 
+namespace PowerSourceConfiguration {
+namespace Attributes {
+
+} // namespace Attributes
+} // namespace PowerSourceConfiguration
+
 namespace PowerSource {
 namespace Attributes {
 

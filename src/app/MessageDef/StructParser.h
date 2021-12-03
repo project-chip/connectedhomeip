@@ -33,6 +33,8 @@ public:
      *  @return #CHIP_NO_ERROR on success
      */
     CHIP_ERROR Init(const TLV::TLVReader & aReader);
+
+    CHIP_ERROR CheckSchemaOrdering() const;
 };
 } // namespace app
 } // namespace chip
