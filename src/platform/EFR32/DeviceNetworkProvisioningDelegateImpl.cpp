@@ -16,6 +16,9 @@
  */
 
 #include "DeviceNetworkProvisioningDelegateImpl.h"
+#include "ServiceProvisioning.h"
+#include <support/ErrorStr.h>
+#include <support/logging/CHIPLogging.h>
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
@@ -38,6 +41,24 @@ exit:
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_ENABLE_OPENTHREAD
+}
+
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    ChipLogProgress(NetworkProvisioning, "EFR Wifi provision: SSID: %s", ssid);
+    err = SetWiFiStationProvisioning(ssid, key);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NetworkProvisioning, "ERR:WiFi:Provision network: %s", chip::ErrorStr(err));
+    }
+
+    return err;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
 }
 
 } // namespace DeviceLayer

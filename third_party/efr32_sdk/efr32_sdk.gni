@@ -38,6 +38,12 @@ template("efr32_sdk") {
   }
 
   assert(efr32_sdk_root != "", "efr32_sdk_root must be specified")
+  use_wf200 = false
+  if (defined(invoker.use_wf200)) {
+    if (invoker.use_wf200) {
+        use_wf200 = true
+    }
+  }
 
   sdk_target_name = target_name
 
@@ -133,13 +139,10 @@ template("efr32_sdk") {
       "${efr32_mcu}=1",
       "${efr32_board}=1",
       "SL_SUPRESS_DEPRECATION_WARNINGS_SDK_3_1",
+      "CHIP_KVS_SECTOR_COUNT=4",
       "CHIP_KVS_BASE_SECTOR_INDEX=((FLASH_SIZE/FLASH_PAGE_SIZE)-(CHIP_KVS_SECTOR_COUNT))",
       "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1",
       "__HEAP_SIZE=0",
-      "SL_CATALOG_FREERTOS_KERNEL_PRESENT=1",
-      "MBEDTLS_THREADING_C=1",
-      "MBEDTLS_THREADING_ALT=1",
-      "SL_THREADING_ALT=1",
 
       #"__STACK_SIZE=0",
     ]
@@ -171,10 +174,7 @@ template("efr32_sdk") {
         "${efr32_sdk_root}/platform/emdrv/nvm3/lib/libnvm3_CM4_gcc.a",
       ]
 
-      defines += [
-        "EFR32MG12",
-        "CHIP_KVS_SECTOR_COUNT=6",
-      ]
+      defines += [ "EFR32MG12" ]
     } else if (efr32_family == "efr32mg21") {
       _include_dirs += [
         "${efr32_sdk_root}/hardware/driver/memlcd/inc/memlcd_usart",
@@ -197,7 +197,6 @@ template("efr32_sdk") {
       defines += [
         "EFR32MG21",
         "EFR32_SERIES2_CONFIG1_MICRO",
-        "CHIP_KVS_SECTOR_COUNT=4",
       ]
     } else if (efr32_family == "efr32mg24") {
       _include_dirs += [
@@ -221,7 +220,15 @@ template("efr32_sdk") {
       defines += [
         "EFR32MG24",
         "EFR32_SERIES2_CONFIG4_MICRO",
-        "CHIP_KVS_SECTOR_COUNT=4",
+      ]
+    }
+    if (use_wf200) {
+      _include_dirs += [
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver",
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/bus",
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/firmware",
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/pds/brd8022a",
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/secure_link",
       ]
     }
 
@@ -443,6 +450,15 @@ template("efr32_sdk") {
         ]
       }
     }
+    if (use_wf200) {
+      sources += [
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/bus/sl_wfx_bus.c",
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/bus/sl_wfx_bus_spi.c",
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/secure_link/sl_wfx_secure_link.c",
+        "${efr32_sdk_root}/platform/radio/wifi/wfx_fmac_driver/sl_wfx.c",
+      ]
+    }
+
 
     if (efr32_family == "efr32mg12") {
       sources += [
