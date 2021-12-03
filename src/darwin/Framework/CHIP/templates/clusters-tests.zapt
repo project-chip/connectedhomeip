@@ -255,6 +255,7 @@ CHIPDevice * GetConnectedDevice()
 {{/unless}}
 {{/unless}}
 {{/unless}}
+{{/unless}}
 {{/chip_client_clusters}}
 
 @end
