@@ -1,8 +1,8 @@
 # Simulated Device How-To (Linux)
 
-This README contains instructions on how to build, run, and interact with a
+This document contains instructions on how to build, run, and interact with a
 simulated device. All virtual accessories live in
-[examples/placeholder/linux/apps](https://github.com/project-chip/connectedhomeip/tree/master/examples/placeholder/linux/apps).
+[examples/placeholder/linux/apps](../../examples/placeholder/linux/apps).
 
 Each accessory needs to be hosted into a subfolder. It will be the name of the
 application. For example `app1` will create a binary named `chip-app1`.
@@ -12,18 +12,18 @@ placed under an ‘include’ folder into the app folder. For example
 `examples/placeholder/linux/apps/app1/include/CHIPProjectConfig.h`
 
 In order to generate specific tests for a given accessory, a
-[examples/placeholder/linux/apps/app1/tests.js](https://github.com/project-chip/connectedhomeip/tree/master/examples/placeholder/linux/apps/app1/tests.js)
+[examples/placeholder/linux/apps/app1/tests.js](../../examples/placeholder/linux/apps/app1/tests.js)
 file can be added into the application directory. The tests listed there are the
 one that will be executed once the application has been commissioned.
 
 Simulated Device: simulation of an application in which tests can be
-added. It is defined by a [ZAP config]() file and tests can be added with a
+added. It is defined by a ZAP config file and tests can be added with a
 [YAML file](../../src/app/tests/suites/certification/Test_TC_DM_1_3_Simulated.yaml).
 
 ### Prerequisite
 
 -   [Building Prerequisites](./BUILDING.md#prerequisites)
--   [Prepare For Building](https://github.com/project-chip/connectedhomeip/tree/master/docs/guides/BUILDING.md#prepare-for-building)
+-   [Prepare For Building](./BUILDING.md#prepare-for-building)
 
 
 ## Generating and building the default Simulated App with Script
