@@ -132,6 +132,7 @@ static_library("app") {
 
   public_deps = [
     ":app_buildconfig",
+    "${chip_root}/src/access",
     "${chip_root}/src/app/util:device_callbacks_manager",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
