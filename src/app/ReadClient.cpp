@@ -140,6 +140,15 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
         err = request.Init(&writer);
         SuccessOrExit(err);
 
+        if (aReadPrepareParams.mAttributePathParamsListSize != 0 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
+        {
+            AttributePathIBs::Builder attributePathListBuilder = request.CreateAttributeRequests();
+            SuccessOrExit(err = attributePathListBuilder.GetError());
+            err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
+                                            aReadPrepareParams.mAttributePathParamsListSize);
+            SuccessOrExit(err);
+        }
+
         if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
         {
             EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
@@ -158,15 +167,6 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
                 eventFilters.EndOfEventFilters();
                 SuccessOrExit(err = eventFilters.GetError());
             }
-        }
-
-        if (aReadPrepareParams.mAttributePathParamsListSize != 0 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
-        {
-            AttributePathIBs::Builder attributePathListBuilder = request.CreateAttributeRequests();
-            SuccessOrExit(err = attributePathListBuilder.GetError());
-            err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
-                                            aReadPrepareParams.mAttributePathParamsListSize);
-            SuccessOrExit(err);
         }
 
         request.IsFabricFiltered(false).EndOfReadRequestMessage();
@@ -632,11 +632,26 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     VerifyOrExit(mpCallback != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(aReadPrepareParams.mMinIntervalFloorSeconds < aReadPrepareParams.mMaxIntervalCeilingSeconds,
+                 err = CHIP_ERROR_INVALID_ARGUMENT);
 
     writer.Init(std::move(msgBuf));
 
     err = request.Init(&writer);
     SuccessOrExit(err);
+
+    request.KeepSubscriptions(aReadPrepareParams.mKeepSubscriptions)
+        .MinIntervalFloorSeconds(aReadPrepareParams.mMinIntervalFloorSeconds)
+        .MaxIntervalCeilingSeconds(aReadPrepareParams.mMaxIntervalCeilingSeconds);
+
+    if (aReadPrepareParams.mAttributePathParamsListSize != 0 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
+    {
+        AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
+        SuccessOrExit(err = attributePathListBuilder.GetError());
+        err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
+                                        aReadPrepareParams.mAttributePathParamsListSize);
+        SuccessOrExit(err);
+    }
 
     if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
     {
@@ -659,22 +674,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         }
     }
 
-    if (aReadPrepareParams.mAttributePathParamsListSize != 0 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
-    {
-        AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
-        SuccessOrExit(err = attributePathListBuilder.GetError());
-        err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
-                                        aReadPrepareParams.mAttributePathParamsListSize);
-        SuccessOrExit(err);
-    }
-
-    VerifyOrExit(aReadPrepareParams.mMinIntervalFloorSeconds < aReadPrepareParams.mMaxIntervalCeilingSeconds,
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
-    request.MinIntervalFloorSeconds(aReadPrepareParams.mMinIntervalFloorSeconds)
-        .MaxIntervalCeilingSeconds(aReadPrepareParams.mMaxIntervalCeilingSeconds)
-        .KeepSubscriptions(aReadPrepareParams.mKeepSubscriptions)
-        .IsFabricFiltered(false)
-        .EndOfSubscribeRequestMessage();
+    request.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
     SuccessOrExit(err = request.GetError());
 
     err = writer.Finalize(&msgBuf);

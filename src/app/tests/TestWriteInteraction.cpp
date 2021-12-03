@@ -126,11 +126,15 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
     WriteRequestMessage::Builder writeRequestBuilder;
     err = writeRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    writeRequestBuilder.TimedRequest(aIsTimedWrite);
+    NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
     AttributeDataIBs::Builder attributeDataIBsBuilder = writeRequestBuilder.CreateWriteRequests();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
     AttributeDataIB::Builder attributeDataIBBuilder = attributeDataIBsBuilder.CreateAttributeDataIBBuilder();
     NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
 
+    attributeDataIBBuilder.DataVersion(0);
+    NL_TEST_ASSERT(apSuite, attributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
     AttributePathIB::Builder attributePathBuilder = attributeDataIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
     attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
@@ -152,12 +156,12 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
 
-    attributeDataIBBuilder.DataVersion(0).EndOfAttributeDataIB();
+    attributeDataIBBuilder.EndOfAttributeDataIB();
     NL_TEST_ASSERT(apSuite, attributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
 
     attributeDataIBsBuilder.EndOfAttributeDataIBs();
     NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
-    writeRequestBuilder.TimedRequest(aIsTimedWrite).IsFabricFiltered(false).EndOfWriteRequestMessage();
+    writeRequestBuilder.IsFabricFiltered(false).EndOfWriteRequestMessage();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);
