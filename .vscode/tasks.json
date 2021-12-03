@@ -172,25 +172,12 @@
             }
         },
         {
-            "label": "Build specific EFR32 example",
-            "type": "shell",
-            "command": "scripts/run_in_build_env.sh",
-            "args": [
-                "./scripts/build/build_examples.py --target efr32-${input:efr32Board}-${input:efr32App}  build"
-            ],
-            "group": "build",
-            "problemMatcher": {
-                "base": "$gcc"
-            }
-        },
-        {
             "label": "Flash EFR32 board",
             "type": "shell",
             "command": "python3",
             "args": [
-                "${workspaceFolder}/out/efr32-${input:efr32Board}-${input:efr32App}/chip-efr32-*.flash.py"
+                "${workspaceFolder}/out/${input:exampleTarget}/chip-efr32-*.flash.py"
             ],
-            "group": "build",
             "problemMatcher": {
                 "base": "$gcc"
             }
@@ -253,10 +240,45 @@
                 "android-x64-chip-tool",
                 "android-x86-chip-tool",
                 "efr32-brd4161a-light",
+                "efr32-brd4163a-light",
+                "efr32-brd4164a-light",
+                "efr32-brd4166a-light",
+                "efr32-brd4170a-light",
+                "efr32-brd4186a-light",
+                "efr32-brd4187a-light",
+                "efr32-brd4304a-light",
                 "efr32-brd4161a-light-rpc",
+                "efr32-brd4163a-light-rpc",
+                "efr32-brd4164a-light-rpc",
+                "efr32-brd4166a-light-rpc",
+                "efr32-brd4170a-light-rpc",
+                "efr32-brd4186a-light-rpc",
+                "efr32-brd4187a-light-rpc",
+                "efr32-brd4304a-light-rpc",
                 "efr32-brd4161a-lock",
+                "efr32-brd4163a-lock",
+                "efr32-brd4164a-lock",
+                "efr32-brd4166a-lock",
+                "efr32-brd4170a-lock",
+                "efr32-brd4186a-lock",
+                "efr32-brd4187a-lock",
+                "efr32-brd4304a-lock",
                 "efr32-brd4161a-unit-test",
+                "efr32-brd4163a-unit-test",
+                "efr32-brd4164a-unit-test",
+                "efr32-brd4166a-unit-test",
+                "efr32-brd4170a-unit-test",
+                "efr32-brd4186a-unit-test",
+                "efr32-brd4187a-unit-test",
+                "efr32-brd4304a-unit-test",
                 "efr32-brd4161a-window-covering",
+                "efr32-brd4163a-window-covering",
+                "efr32-brd4164a-window-covering",
+                "efr32-brd4166a-window-covering",
+                "efr32-brd4170a-window-covering",
+                "efr32-brd4186a-window-covering",
+                "efr32-brd4187a-window-covering",
+                "efr32-brd4304a-window-covering",
                 "esp32-c3devkit-all-clusters",
                 "esp32-devkitc-all-clusters",
                 "esp32-devkitc-all-clusters-ipv6only",
@@ -316,35 +338,6 @@
                 "telink-tlsr9518adk80d-light",
                 "tizen-arm-light"
             ]
-        },
-        {
-            "type": "pickString",
-            "id": "efr32App",
-            "description": "What mbed application do you want to use?",
-            "options": [
-                "light",
-                "light-rpc",
-                "lock",
-                "unit-test",
-                "window-covering"
-            ],
-            "default": "light"
-        },
-        {
-            "type": "pickString",
-            "id": "efr32Board",
-            "description": "What EFR32 board are you building for?",
-            "options": [
-                "brd4161a",
-                "brd4163a",
-                "brd4164a",
-                "brd4166a",
-                "brd4170a",
-                "brd4186a",
-                "brd4187a",
-                "brd4304a"
-            ],
-            "default": "brd4161a"
         }
     ]
 }
