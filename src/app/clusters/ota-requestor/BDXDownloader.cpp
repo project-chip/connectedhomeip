@@ -2,6 +2,7 @@
 
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
+#include <protocols/bdx/BdxMessages.h>
 
 using chip::OTADownloader;
 using chip::bdx::TransferSession;
@@ -130,17 +131,23 @@ CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::Outpu
     case TransferSession::OutputEventType::kMsgToSend: {
         VerifyOrReturnError(mMsgDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(mMsgDelegate->SendMessage(outEvent));
+        if (outEvent.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF))
+        {
+            mState = State::kComplete;
+        }
         break;
     }
     case TransferSession::OutputEventType::kBlockReceived: {
         chip::ByteSpan blockData(outEvent.blockdata.Data, outEvent.blockdata.Length);
         ReturnErrorOnFailure(mImageProcessor->ProcessBlock(blockData));
 
-        // TODO: could calling Finalize immediately after ProcessBlock cause issues?
+        // TODO: this will cause problems if Finalize() is not guaranteed to do its work after ProcessBlock().
         if (outEvent.blockdata.IsEof)
         {
+            mBdxTransfer.PrepareBlockAck();
             ReturnErrorOnFailure(mImageProcessor->Finalize());
         }
+
         break;
     }
     case TransferSession::OutputEventType::kStatusReceived:

@@ -121,8 +121,13 @@ private:
             else
             {
                 mDownloader->OnMessageReceived(payloadHeader, payload.Retain());
-                return CHIP_NO_ERROR;
             }
+
+            if (!payloadHeader.HasMessageType(chip::Protocols::SecureChannel::MsgType::StatusReport))
+            {
+                ec->WillSendMessage();
+            }
+            return CHIP_NO_ERROR;
         }
 
         void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override

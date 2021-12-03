@@ -54,7 +54,6 @@ CHIP_ERROR LinuxOTAImageProcessor::Abort()
 
 CHIP_ERROR LinuxOTAImageProcessor::ProcessBlock(ByteSpan & block)
 {
-    ChipLogDetail(BDX, "TREVOR %s", __FUNCTION__);
     if (!mOfs.is_open() || !mOfs.good())
     {
         return CHIP_ERROR_INTERNAL;
