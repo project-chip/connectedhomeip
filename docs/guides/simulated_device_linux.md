@@ -130,17 +130,17 @@ new code is generated.
     - <strong>`IMPORTANT`: The test name must end in Simulated with the
       capital.</strong>
 3. Available properties can be found in
-   [YAML Test Name](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites/README.md)
+   [YAML Test Name](../../src/app/tests/suites/README.md)
 4. An Additional property is as follows:
 
     | Name | Description                                                                 |
     | ---- | --------------------------------------------------------------------------- |
     | wait | The command that is expected to be received on the app from the controller. |
 
-5. [Test_TC_DM_1_3_Simulated](https://github.com/project-chip/connectedhomeip/blob/master/src/app/tests/suites/certification/Test_TC_DM_1_3_Simulated.yaml)
+5. [Test_TC_DM_1_3_Simulated](../../src/app/tests/suites/certification/Test_TC_DM_1_3_Simulated.yaml)
    is an example of a written test that runs on the simulated device.
 6. Next, it will need to be added to
-   [examples/placeholder/linux/apps/app1/tests.js](https://github.com/project-chip/connectedhomeip/tree/master/examples/placeholder/linux/apps/app1/tests.js).
+   [examples/placeholder/linux/apps/app1/tests.js](../../examples/placeholder/linux/apps/app1/tests.js).
    in the following array
     ```javascript
     const tests = ["Test_TC_DM_1_3_Simulated"];
