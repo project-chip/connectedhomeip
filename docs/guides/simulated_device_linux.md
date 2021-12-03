@@ -87,7 +87,7 @@ Now that the building the app and starting it is complete, you will be able to
 interact with it using chip-tool
 
 1. Follow the instruction to build chip-tool in the
-   [chip-tool readme](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool).
+   [chip-tool readme](../../examples/chip-tool).
 
 2. Run this command to initiate the pairing.
     ```
@@ -107,7 +107,7 @@ interact with it using chip-tool
     ```
 
     See
-    [chip-tool readme](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
+    [chip-tool readme](../../examples/chip-tool)
     for additional commands.
 
 ## Adding simulated Tests via YAML
@@ -117,7 +117,7 @@ the simulated device test framework. To achieve this, YAML files are created and
 new code is generated.
 
 1. YAML test file are located in
-   [YAML folder](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites/certification/)
+   [YAML folder](../../src/app/tests/suites/certification/)
 2. Test names must follow a strict format dues to CI of test recognition. The
    format is as follows:
     - Test_TC\_[`CATEGORY ABBREVIATION`]\_[`SECTION NUMBER`]\_[`SUBSECTION
