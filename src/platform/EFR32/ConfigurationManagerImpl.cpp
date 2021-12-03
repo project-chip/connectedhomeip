@@ -32,6 +32,10 @@
 
 #include "em_rmu.h"
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+#include "wfx_host_events.h"
+#endif
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -173,7 +177,7 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
 }
 
 CHIP_ERROR ConfigurationManagerImpl::ReadPersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
-                                                               uint32_t & value)
+                                                                uint32_t & value)
 {
     // This method reads CHIP Persisted Counter type nvm3 objects.
     // (where persistedStorageKey represents an index to the counter).
@@ -191,7 +195,7 @@ exit:
 }
 
 CHIP_ERROR ConfigurationManagerImpl::WritePersistedStorageValue(::chip::Platform::PersistedStorage::Key persistedStorageKey,
-                                                                uint32_t value)
+                                                                 uint32_t value)
 {
     // This method reads CHIP Persisted Counter type nvm3 objects.
     // (where persistedStorageKey represents an index to the counter).
@@ -287,10 +291,29 @@ void ConfigurationManagerImpl::DoFactoryReset(intptr_t arg)
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+    ChipLogProgress(DeviceLayer, "Clearing WiFi provision");
+    wfx_clear_wifi_provision();
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+
     // Restart the system.
     ChipLogProgress(DeviceLayer, "System restarting");
     NVIC_SystemReset();
 }
+
+CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+	sl_wfx_mac_address_t macaddr;
+	wfx_get_wifi_mac_addr (SL_WFX_STA_INTERFACE, &macaddr);
+	memcpy(buf, &macaddr.octet[0], sizeof(macaddr.octet));
+
+	return CHIP_NO_ERROR;
+#else
+	return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+}
+
 
 } // namespace DeviceLayer
 } // namespace chip
