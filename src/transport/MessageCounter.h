@@ -110,7 +110,7 @@ public:
     static constexpr uint32_t kInitialValue = 1; ///< Used for initializing peer counter
 
     /**
-     * Initialize a local message counter with random value between [0, 2^28-1].
+     * Initialize a local message counter with random value between [0, 2^28-1]. This increases the difficulty of traffic analysis attacks by making it harder to determine how long a particular session has been open.
      */
     LocalSessionMessageCounter() { value = Crypto::GetRandU32() & 0x0FFFFFFF; }
 
