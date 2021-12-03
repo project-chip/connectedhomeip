@@ -28,13 +28,23 @@ logger.setLevel(logging.INFO)
 NODE_ID = 1
 LIGHTING_ENDPOINT_ID = 1
 
+# Ignore failures decoding these attributes (e.g. not yet implemented)
+ignoreAttributeDecodeFailureList = [
+    '0/31/0', '0/31/1'
+]
+
+def _IgnoreAttributeDecodeFailure(path):
+    return path in ignoreAttributeDecodeFailureList
 
 def _AssumeAttributesDecodeSuccess(values):
     for k, v in values['Attributes'].items():
         print(f"{k} = {v}")
         if isinstance(v.Data, ValueDecodeFailure):
-            raise AssertionError(
-                f"Cannot decode value for path {k}, got error: '{str(v.Data.Reason)}', raw TLV data: '{v.Data.TLVValue}'")
+            if _IgnoreAttributeDecodeFailure(k):
+                print(f"Ignoring attribute decode failure for path {k}")
+            else:
+                raise AssertionError(
+                    f"Cannot decode value for path {k}, got error: '{str(v.Data.Reason)}', raw TLV data: '{v.Data.TLVValue}'")
 
 
 def _AssumeEventsDecodeSuccess(values):
