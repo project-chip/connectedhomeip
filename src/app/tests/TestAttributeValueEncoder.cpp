@@ -215,7 +215,7 @@ void TestEncodeListOfBools2(nlTestSuite * aSuite, void * aContext)
 void TestEncodeEmptyList(nlTestSuite * aSuite, void * aContext)
 {
     TestSetup test(aSuite);
-    CHIP_ERROR err = test.encoder.EncodeList([](auto encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
+    CHIP_ERROR err = test.encoder.EncodeList([](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
     NL_TEST_ASSERT(aSuite, err == CHIP_NO_ERROR);
     const uint8_t expected[] = {
         // clang-format off

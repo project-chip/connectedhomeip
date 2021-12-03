@@ -246,7 +246,7 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
             (apEncoderState == nullptr ? AttributeValueEncoder::AttributeEncodeState() : *apEncoderState);
         AttributeValueEncoder valueEncoder(aAttributeReports, aAccessingFabricIndex, aPath, 0, state);
 
-        CHIP_ERROR err = valueEncoder.EncodeList([](auto encoder) -> CHIP_ERROR {
+        CHIP_ERROR err = valueEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
             for (int i = 0; i < 6; i++)
             {
                 ReturnErrorOnFailure(encoder.Encode(chip::ByteSpan(mockAttribute4, sizeof(mockAttribute4))));
