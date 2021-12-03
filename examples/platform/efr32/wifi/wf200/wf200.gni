@@ -1,0 +1,33 @@
+import("//build_overrides/chip.gni")
+import("//build_overrides/efr32_sdk.gni")
+import("//build_overrides/pigweed.gni")
+
+examples_plat_dir = "${chip_root}/examples/platform/efr32"
+
+     wf200_defs = [
+        "SL_HEAP_SIZE=24576",
+        "WF200_WIFI=1",
+        "SL_WIFI=1",
+        "SL_WFX_USE_SPI",
+        "SL_WFX_DEBUG_MASK=0x0003",
+     ]
+     softap_defs = "SL_WFX_CONFIG_SOFTAP"
+     wifi_scan_defs = "SL_WFX_CONFIG_SCAN"
+     wf200_plat_incs = [
+         "${examples_plat_dir}/wifi",
+         "${examples_plat_dir}/wifi/wf200",
+     ]
+     wf200_plat_src = [
+        "${examples_plat_dir}/wifi/dhcp_client.cpp",
+        "${examples_plat_dir}/wifi/ethernetif.cpp",
+        "${examples_plat_dir}/wifi/lwip_netif.cpp",
+        "${examples_plat_dir}/wifi/wfx_notify.cpp",
+        "${examples_plat_dir}/wifi/wf200/sl_wfx_task.c",
+        "${examples_plat_dir}/wifi/wf200/wf200_init.c",
+        "${examples_plat_dir}/wifi/wf200/efr_gpio.c",
+        "${examples_plat_dir}/wifi/wf200/efr_spi.c",
+        "${examples_plat_dir}/wifi/wf200/host_if.cpp",
+     ]
+
+
+
