@@ -196,18 +196,19 @@ public:
      * @param[in] attestationInfoBuffer Buffer containing attestation information portion of Attestation Response (raw TLV)
      * @param[in] attestationChallengeBuffer Buffer containing the attestation challenge from the secure session
      * @param[in] attestationSignatureBuffer Buffer the signature portion of Attestation Response
-     * @param[in] paiCertDerBuffer Buffer containing the PAI certificate from device in DER format.
+     * @param[in] paiDerBuffer Buffer containing the PAI certificate from device in DER format.
      *                                If length zero, there was no PAI certificate.
-     * @param[in] dacCertDerBuffer Buffer containing the DAC certificate from device in DER format.
+     * @param[in] dacDerBuffer Buffer containing the DAC certificate from device in DER format.
      * @param[in] attestationNonce Buffer containing attestation nonce.
      *
      * @returns AttestationVerificationResult::kSuccess on success or another specific
      *          value from AttestationVerificationResult enum on failure.
      */
-    virtual AttestationVerificationResult
-    VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer, const ByteSpan & attestationChallengeBuffer,
-                                 const ByteSpan & attestationSignatureBuffer, const ByteSpan & paiCertDerBuffer,
-                                 const ByteSpan & dacCertDerBuffer, const ByteSpan & attestationNonce) = 0;
+    virtual AttestationVerificationResult VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
+                                                                       const ByteSpan & attestationChallengeBuffer,
+                                                                       const ByteSpan & attestationSignatureBuffer,
+                                                                       const ByteSpan & paiDerBuffer, const ByteSpan & dacDerBuffer,
+                                                                       const ByteSpan & attestationNonce) = 0;
 
     /**
      * @brief Verify a CMS Signed Data signature against the CSA certificate of Subject Key Identifier that matches
