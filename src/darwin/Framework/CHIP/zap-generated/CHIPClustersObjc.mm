@@ -24895,6 +24895,22 @@ using namespace chip::app::Clusters;
         });
 }
 
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler
+{
+    new CHIPInt32uAttributeCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            using TypeInfo = ThreadNetworkDiagnostics::Attributes::FeatureMap::TypeInfo;
+            auto successFn = Callback<Int32uAttributeCallback>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.ReadAttribute<TypeInfo>(successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler
 {

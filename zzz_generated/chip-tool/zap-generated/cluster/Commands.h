@@ -47923,6 +47923,7 @@ private:
 | * ChannelMask                                                       | 0x003C |
 | * OperationalDatasetComponents                                      | 0x003D |
 | * ActiveNetworkFaultsList                                           | 0x003E |
+| * FeatureMap                                                        | 0xFFFC |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -53123,6 +53124,40 @@ private:
     chip::Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback> * onSuccessCallback =
         new chip::Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>(
             OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeResponse, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+};
+
+/*
+ * Attribute FeatureMap
+ */
+class ReadThreadNetworkDiagnosticsFeatureMap : public ModelCommand
+{
+public:
+    ReadThreadNetworkDiagnosticsFeatureMap() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "feature-map");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadThreadNetworkDiagnosticsFeatureMap()
+    {
+        delete onSuccessCallback;
+        delete onFailureCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0035) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+    }
+
+private:
+    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
     chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
         new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
 };
@@ -58340,6 +58375,7 @@ void registerClusterThreadNetworkDiagnostics(Commands & commands)
         make_unique<ReportThreadNetworkDiagnosticsChannelMask>(),                       //
         make_unique<ReadThreadNetworkDiagnosticsOperationalDatasetComponents>(),        //
         make_unique<ReadThreadNetworkDiagnosticsActiveNetworkFaultsList>(),             //
+        make_unique<ReadThreadNetworkDiagnosticsFeatureMap>(),                          //
         make_unique<ReadThreadNetworkDiagnosticsClusterRevision>(),                     //
         make_unique<ReportThreadNetworkDiagnosticsClusterRevision>(),                   //
     };

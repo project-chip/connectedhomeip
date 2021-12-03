@@ -911,6 +911,7 @@ NS_ASSUME_NONNULL_BEGIN
                                           completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeActiveNetworkFaultsListWithValue:(NSArray * _Nonnull)value
                                      completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeFeatureMapWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 @end
