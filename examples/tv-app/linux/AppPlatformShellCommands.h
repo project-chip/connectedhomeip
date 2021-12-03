@@ -16,28 +16,18 @@
  *    limitations under the License.
  */
 
-#pragma once
+/**
+ * @brief Registers shell commands for a commissionee (eg. end device) related to commissioning.
+ */
 
-#include <iostream>
-#include <thread>
-
-#include <controller/CHIPDeviceController.h>
-#include <lib/core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/PlatformManager.h>
-#include <transport/TransportMgr.h>
 
-int ChipLinuxAppInit(int argc, char ** argv);
-void ChipLinuxAppMainLoop();
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+namespace chip {
+namespace Shell {
 
-#if CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+void RegisterAppPlatformCommands();
 
-using namespace chip::Transport;
-using namespace ::chip::Controller;
-
-CHIP_ERROR CommissionerPairOnNetwork(uint32_t pincode, uint16_t disc, chip::Transport::PeerAddress address);
-CHIP_ERROR CommissionerPairUDC(uint32_t pincode, size_t index);
-
-DeviceCommissioner * GetDeviceCommissioner();
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+} // namespace Shell
+} // namespace chip
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
