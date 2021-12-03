@@ -229,12 +229,12 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     err = commandPath.GetCommandId(&commandId);
     SuccessOrExit(err);
 
-    // TODO retrieve Endpoint ID with GroupDataProvider using GroupId and FabricId
-    // Issue 11075
-
-    // Using endpoint 1 for test purposes
     if (mpExchangeCtx != nullptr && mpExchangeCtx->IsGroupExchangeContext())
     {
+        // TODO retrieve Endpoint ID with GroupDataProvider using GroupId and FabricId
+        // Issue 11075
+
+        // Using endpoint 1 for test purposes
         endpointId = 1;
         err        = CHIP_NO_ERROR;
     }
