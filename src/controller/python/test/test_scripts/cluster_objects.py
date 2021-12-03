@@ -33,8 +33,10 @@ ignoreAttributeDecodeFailureList = [
     '0/31/0', '0/31/1'
 ]
 
+
 def _IgnoreAttributeDecodeFailure(path):
     return path in ignoreAttributeDecodeFailureList
+
 
 def _AssumeAttributesDecodeSuccess(values):
     for k, v in values['Attributes'].items():
