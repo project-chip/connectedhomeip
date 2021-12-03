@@ -34,7 +34,7 @@ using namespace chip::TLV;
 
 namespace {
 
-// These values are rasier to be recognized in the encoded buffer
+// These values are easier to be recognized in the encoded buffer
 constexpr EndpointId kRandomEndpointId   = 0x55;
 constexpr ClusterId kRandomClusterId     = 0xaa;
 constexpr AttributeId kRandomAttributeId = 0xcc;
@@ -110,12 +110,12 @@ void TestEncodeBool(nlTestSuite * aSuite, void * aContext)
         0x15, 0x36, 0x01, // Test overhead, Start Anonymous struct + Start 1 byte Tag Array + Tag (01)
         0x15, // Start anonymous struct
           0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
               0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
               0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
             0x18, // End of container
-            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             0x29, 0x02, // Tag (02) Value True (Attribute Value)
           0x18, // End of container
         0x18, // End of container
@@ -135,12 +135,12 @@ void TestEncodeListOfBools1(nlTestSuite * aSuite, void * aContext)
         0x15, 0x36, 0x01, // Test overhead, Start Anonymous struct + Start 1 byte Tag Array + Tag (01)
         0x15, // Start anonymous struct
           0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
               0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
               0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
             0x18, // End of container
-            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
               0x09, // True
               0x08, // False
@@ -169,12 +169,12 @@ void TestEncodeListOfBools2(nlTestSuite * aSuite, void * aContext)
         0x15, 0x36, 0x01, // Test overhead, Start Anonymous struct + Start 1 byte Tag Array + Tag (01)
         0x15, // Start anonymous struct
           0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
               0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
               0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
             0x18, // End of container
-            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             // Intended empty array
             0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
             0x18, // End of container
@@ -183,26 +183,26 @@ void TestEncodeListOfBools2(nlTestSuite * aSuite, void * aContext)
 
         0x15, // Start anonymous struct
           0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
               0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
               0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
               0x34, 0x05, // Tag (05) Null
             0x18, // End of container
-            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             0x29, 0x02, // Tag (02) Value True (Attribute Value)
           0x18, // End of container
         0x18, // End of container
 
         0x15, // Start anonymous struct
           0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
               0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
               0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
               0x34, 0x05, // Tag (05) Null
             0x18, // End of container
-            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             0x28, 0x02, // Tag (02) Value False (Attribute Value)
           0x18, // End of container
         0x18, // End of container
@@ -222,12 +222,12 @@ void TestEncodeEmptyList(nlTestSuite * aSuite, void * aContext)
         0x15, 0x36, 0x01, // Test overhead, Start Anonymous struct + Start 1 byte Tag Array + Tag (01)
         0x15, // Start anonymous struct
           0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
               0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
               0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
               0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
             0x18, // End of container
-            0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
             // Intended empty array
             0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
             0x18, // End of container
@@ -262,12 +262,12 @@ void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
             0x15, 0x36, 0x01, // Test overhead, Start Anonymous struct + Start 1 byte Tag Array + Tag (01)
             0x15, // Start anonymous struct
               0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+                0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
                 0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
                   0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
                   0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
                   0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
                 0x18, // End of container
-                0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
                 // Intended empty array
                 0x36, 0x02, // Start 1 byte tag array + Tag (02) (Attribute Value)
                 0x18, // End of container
@@ -276,13 +276,13 @@ void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
 
             0x15, // Start anonymous struct
               0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+                0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
                 0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
                   0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
                   0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
                   0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
                   0x34, 0x05, // Tag (05) Null
                 0x18, // End of container
-                0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
                 0x29, 0x02, // Tag (02) Value True (Attribute Value)
               0x18, // End of container
             0x18, // End of container
@@ -300,13 +300,13 @@ void TestEncodeListChunking(nlTestSuite * aSuite, void * aContext)
             0x15, 0x36, 0x01, // Test overhead, Start Anonymous struct + Start 1 byte Tag Array + Tag (01)
             0x15, // Start anonymous struct
               0x35, 0x01, // Start 1 byte tag struct + Tag (01)
+                0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
                 0x37, 0x01, // Start 1 byte tag list + Tag (01) (Attribute Path)
                   0x24, 0x02, 0x55, // Tag (02) Value (1 byte uint) 0x55
                   0x24, 0x03, 0xaa, // Tag (03) Value (1 byte uint) 0xaa
                   0x24, 0x04, 0xcc, // Tag (04) Value (1 byte uint) 0xcc
                   0x34, 0x05, // Tag (05) Null
                 0x18, // End of container
-                0x24, 0x00, 0x99, // Tag (00) Value (1 byte uint) 0x99 (Attribute Version)
                 0x28, 0x02, // Tag (02) Value False (Attribute Value)
               0x18, // End of container
             0x18, // End of container

@@ -24,24 +24,26 @@ namespace app {
 CHIP_ERROR AttributeReportBuilder::PrepareAttribute(AttributeReportIBs::Builder & aAttributeReportIBsBuilder,
                                                     const ConcreteDataAttributePath & aPath, DataVersion aDataVersion)
 {
-    mAttributeReportIBBuilder   = aAttributeReportIBsBuilder.CreateAttributeReport();
-    mAttributeDataIBBuilder     = mAttributeReportIBBuilder.CreateAttributeData();
-    auto attributePathIBBuilder = mAttributeDataIBBuilder.CreatePath();
+    mAttributeReportIBBuilder = aAttributeReportIBsBuilder.CreateAttributeReport();
+    ReturnErrorOnFailure(aAttributeReportIBsBuilder.GetError());
 
+    mAttributeDataIBBuilder = mAttributeReportIBBuilder.CreateAttributeData();
     ReturnErrorOnFailure(mAttributeReportIBBuilder.GetError());
+
+    mAttributeDataIBBuilder.DataVersion(aDataVersion);
+
+    auto attributePathIBBuilder = mAttributeDataIBBuilder.CreatePath();
     ReturnErrorOnFailure(mAttributeDataIBBuilder.GetError());
 
     attributePathIBBuilder.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId);
 
-    // Encode the list index field if we are encoding a single element in an list.
     if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        // The Null ListIndex (append operation)
+        // For list chunking, we encode an empty list with a series of append operation. (attribute path with null as ListIndex)
         attributePathIBBuilder.ListIndex(DataModel::Nullable<ListIndex>());
     }
 
     ReturnErrorOnFailure(attributePathIBBuilder.EndOfAttributePathIB().GetError());
-    mAttributeDataIBBuilder.DataVersion(aDataVersion);
 
     return mAttributeDataIBBuilder.GetError();
 }
@@ -69,7 +71,7 @@ CHIP_ERROR AttributeValueEncoder::EncodeEmptyList()
             ReturnErrorOnFailure(builder.PrepareAttribute(
                 mAttributeReportIBsBuilder, ConcreteDataAttributePath(mPath.mEndpointId, mPath.mClusterId, mPath.mAttributeId),
                 mDataVersion));
-            ReturnErrorOnFailure(builder.Encode(DataModel::List<uint8_t>()));
+            ReturnErrorOnFailure(builder.EncodeValue(DataModel::List<uint8_t>()));
 
             ReturnErrorOnFailure(builder.FinishAttribute());
             mEncodeState.mCurrentEncodingListIndex = 0;

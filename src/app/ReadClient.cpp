@@ -457,6 +457,7 @@ CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttribute
     {
         aAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
     }
+    // TODO: Add ListOperation::ReplaceItem support. (Attribute path with valid list index)
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
     return CHIP_NO_ERROR;
 }
