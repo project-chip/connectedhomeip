@@ -76,7 +76,7 @@ public:
     {
         mOnSuccessCalled++;
     }
-    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override { mOnErrorCalled++; }
+    void OnError(const WriteClient * apWriteClient, const StatusIB &, CHIP_ERROR chipError) override { mOnErrorCalled++; }
     void OnDone(WriteClient * apWriteClient) override { mOnDoneCalled++; }
 
     int mOnSuccessCalled = 0;
@@ -220,7 +220,7 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     TestWriteClientCallback callback;
-    err = writeClient.Init(&ctx.GetExchangeManager(), &callback);
+    err = writeClient.Init(&ctx.GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AddAttributeDataIB(apSuite, apContext, writeClientHandle);
 
@@ -252,7 +252,7 @@ void TestWriteInteraction::TestWriteClientGroup(nlTestSuite * apSuite, void * ap
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     TestWriteClientCallback callback;
-    err = writeClient.Init(&ctx.GetExchangeManager(), &callback);
+    err = writeClient.Init(&ctx.GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AddAttributeDataIB(apSuite, apContext, writeClientHandle);
 

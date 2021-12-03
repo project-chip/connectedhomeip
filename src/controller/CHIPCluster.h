@@ -111,15 +111,8 @@ public:
      */
     template <typename AttrType>
     CHIP_ERROR WriteAttribute(const AttrType & requestData, void * context, ClusterId clusterId, AttributeId attributeId,
-                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
-    {
-        return WriteAttribute(requestData, context, clusterId, attributeId, successCb, failureCb, nullptr /* doneCb */);
-    }
-
-    template <typename AttrType>
-    CHIP_ERROR WriteAttribute(const AttrType & requestData, void * context, ClusterId clusterId, AttributeId attributeId,
                               WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
-                              WriteResponseDoneCallback doneCb)
+                              const Optional<uint16_t> & aTimedWriteTimeoutMs, WriteResponseDoneCallback doneCb = nullptr)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -147,24 +140,33 @@ public:
 
         return chip::Controller::WriteAttribute<AttrType>(
             (mSessionHandle.HasValue() ? mSessionHandle.Value() : mDevice->GetSecureSession().Value()), mEndpoint, clusterId,
-            attributeId, requestData, onSuccessCb, onFailureCb, onDoneCb);
-    }
-
-    template <typename AttributeInfo>
-    CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
-                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb)
-    {
-        return WriteAttribute(requestData, context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb,
-                              failureCb);
+            attributeId, requestData, onSuccessCb, onFailureCb, aTimedWriteTimeoutMs, onDoneCb);
     }
 
     template <typename AttributeInfo>
     CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
                               WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
-                              WriteResponseDoneCallback doneCb)
+                              const Optional<uint16_t> & aTimedWriteTimeoutMs, WriteResponseDoneCallback doneCb = nullptr)
     {
         return WriteAttribute(requestData, context, AttributeInfo::GetClusterId(), AttributeInfo::GetAttributeId(), successCb,
-                              failureCb, doneCb);
+                              failureCb, aTimedWriteTimeoutMs, doneCb);
+    }
+
+    template <typename AttributeInfo>
+    CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
+                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
+                              uint16_t aTimedWriteTimeoutMs, WriteResponseDoneCallback doneCb = nullptr)
+    {
+        return WriteAttribute<AttributeInfo>(requestData, context, successCb, failureCb, MakeOptional(aTimedWriteTimeoutMs),
+                                             doneCb);
+    }
+
+    template <typename AttributeInfo, typename std::enable_if_t<!AttributeInfo::MustUseTimedWrite(), int> = 0>
+    CHIP_ERROR WriteAttribute(const typename AttributeInfo::Type & requestData, void * context,
+                              WriteResponseSuccessCallback successCb, WriteResponseFailureCallback failureCb,
+                              WriteResponseDoneCallback doneCb = nullptr)
+    {
+        return WriteAttribute<AttributeInfo>(requestData, context, successCb, failureCb, NullOptional, doneCb);
     }
 
     /**

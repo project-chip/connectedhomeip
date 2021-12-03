@@ -193,7 +193,7 @@ public:
                                  to_underlying(aStatus.mStatus));
     }
 
-    void OnError(const WriteClient * apWriteClient, CHIP_ERROR aProtocolError) override
+    void OnError(const WriteClient * apWriteClient, const StatusIB &, CHIP_ERROR aProtocolError) override
     {
         gOnWriteErrorCallback(mAppContext, aProtocolError.AsInteger());
     }

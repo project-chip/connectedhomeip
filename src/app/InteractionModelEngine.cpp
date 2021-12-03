@@ -261,7 +261,8 @@ CHIP_ERROR InteractionModelEngine::ShutdownSubscriptions(FabricIndex aFabricInde
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * apCallback)
+CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteClient, WriteClient::Callback * apCallback,
+                                                  const Optional<uint16_t> & aTimedWriteTimeoutMs)
 {
     apWriteClient.SetWriteClient(nullptr);
 
@@ -271,7 +272,7 @@ CHIP_ERROR InteractionModelEngine::NewWriteClient(WriteClientHandle & apWriteCli
         {
             continue;
         }
-        ReturnLogErrorOnFailure(writeClient.Init(mpExchangeMgr, apCallback));
+        ReturnLogErrorOnFailure(writeClient.Init(mpExchangeMgr, apCallback, aTimedWriteTimeoutMs));
         apWriteClient.SetWriteClient(&writeClient);
         return CHIP_NO_ERROR;
     }
