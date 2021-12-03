@@ -227,7 +227,7 @@ private:
     bool mIsFabricFiltered                                   = false;
     bool mHoldSync                                           = false;
     // The detailed encoding state for a single attribute, used by list chunking feature.
-    AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState = AttributeValueEncoder::AttributeEncodeState();
+    AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;
 };
 } // namespace app
 } // namespace chip

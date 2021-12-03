@@ -43,7 +43,7 @@ namespace chip {
 namespace app {
 
 /**
- * The AttributeValueEncoder is a helper class for filling a single report in AttributeReportIBs.
+ * The AttributeReportEncoder is a helper class for filling a single report in AttributeReportIBs.
  *
  * Possible usage of AttributeReportBuilder might be:
  *
@@ -60,6 +60,7 @@ public:
      * Path will be encoded according to section 10.5.4.3.1 in the spec.
      * Note: Only append is supported currently (encode a null list index), other operations won't encode a list index in the
      * attribute path field.
+     * TODO: Add support of encode a single element in the list (path with a valid list index).
      */
     CHIP_ERROR PrepareAttribute(AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteDataAttributePath & aPath,
                                 DataVersion aDataVersion);
@@ -69,8 +70,11 @@ public:
      */
     CHIP_ERROR FinishAttribute();
 
+    /**
+     * EncodeValue encodes the value field of the report, it should be called exactly once.
+     */
     template <typename... Ts>
-    CHIP_ERROR Encode(Ts... aArgs)
+    CHIP_ERROR EncodeValue(Ts... aArgs)
     {
         return DataModel::Encode(*mAttributeDataIBBuilder.GetWriter(), TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)),
                                  std::forward<Ts>(aArgs)...);
@@ -95,16 +99,16 @@ public:
     class ListEncodeHelper
     {
     public:
-        ListEncodeHelper(AttributeValueEncoder & encoder) : mAttributeValueEncoder(&encoder) {}
+        ListEncodeHelper(AttributeValueEncoder & encoder) : mAttributeValueEncoder(encoder) {}
 
         template <typename... Ts>
         CHIP_ERROR Encode(Ts... aArgs) const
         {
-            return mAttributeValueEncoder->EncodeListItem(std::forward<Ts>(aArgs)...);
+            return mAttributeValueEncoder.EncodeListItem(std::forward<Ts>(aArgs)...);
         }
 
     private:
-        AttributeValueEncoder * mAttributeValueEncoder;
+        AttributeValueEncoder & mAttributeValueEncoder;
     };
 
     class AttributeEncodeState
@@ -115,14 +119,21 @@ public:
 
     private:
         friend class AttributeValueEncoder;
-
-        bool mAllowPartialData              = false;
+        /**
+         * When TLVWriter failed to encode some field, the buffer may contain tailing dirty data (since the put was aborted). Thus
+         * report engine may revert the buffer.
+         * EncodeListItem will encode an AttributeReportIB atomicly, and we do want return a partial list to the client (chunking),
+         * in this case, mAllowPartialData is set to tell the report engine not to revert the buffer.
+         */
+        bool mAllowPartialData = false;
+        /**
+         * When a encoding session is interrupted by insufficient buffer, mCurrentEncodingListIndex will store the next item to be
+         * encoded. By default, an invalid list index means we have not started encoding the list and we need to encode a empty list
+         * first.
+         */
         ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
     };
 
-    /**
-     * AttributeReportBuilder offleads some code in AttributeValueEncoder::Encode to keep its content small.
-     */
     AttributeValueEncoder(AttributeReportIBs::Builder & aAttributeReportIBsBuilder, FabricIndex aAccessingFabricIndex,
                           const ConcreteAttributePath & aPath, DataVersion aDataVersion,
                           const AttributeEncodeState & aState = AttributeEncodeState()) :
@@ -130,6 +141,11 @@ public:
         mAccessingFabricIndex(aAccessingFabricIndex), mPath(aPath), mDataVersion(aDataVersion), mEncodeState(aState)
     {}
 
+    /**
+     * Encode builds a single AttributeReportIB in AttributeReportIBs.
+     * When we are enciding a single element in the list, the actual path in the report contains a null list index as "append"
+     * operation.
+     */
     template <typename... Ts>
     CHIP_ERROR Encode(Ts... aArgs)
     {
@@ -145,10 +161,51 @@ public:
                                           : ConcreteDataAttributePath::ListOperation::AppendItem,
                                       mCurrentEncodingListIndex),
             mDataVersion));
-        ReturnErrorOnFailure(builder.Encode(std::forward<Ts>(aArgs)...));
+        ReturnErrorOnFailure(builder.EncodeValue(std::forward<Ts>(aArgs)...));
 
         return builder.FinishAttribute();
     }
+
+    /**
+     * aCallback is expected to take a const TagBoundEncoder& argument and
+     * Encode() on it as many times as needed to encode all the list elements
+     * one by one.  If any of those Encode() calls returns failure, aCallback
+     * must stop encoding and return failure.  When all items are encoded
+     * aCallback is expected to return success.
+     *
+     * aCallback may not be called.  Consumers must not assume it will be
+     * called.
+     */
+    template <typename ListGenerator>
+    CHIP_ERROR EncodeList(ListGenerator aCallback)
+    {
+        mTriedEncode = true;
+        // Spec 10.5.4.3.1, 10.5.4.6 (Replace a list w/ Multiple IBs)
+        // EmptyList acts as the beginning of the whole array type attribute report.
+        // An empty list is encoded iff both mCurrentEncodingListIndex and mEncodeState.mCurrentEncodingListIndex are invalid
+        // values. After encoding the empty list, mEncodeState.mCurrentEncodingListIndex and mCurrentEncodingListIndex are set to 0.
+        ReturnErrorOnFailure(EncodeEmptyList());
+        ReturnErrorOnFailure(aCallback(ListEncodeHelper(*this)));
+        // The Encode procedure finished without any error, clear the state.
+        mEncodeState = AttributeEncodeState();
+        return CHIP_NO_ERROR;
+    }
+
+    bool TriedEncode() const { return mTriedEncode; }
+
+    /**
+     * The accessing fabric index for this read or subscribe interaction.
+     */
+    FabricIndex AccessingFabricIndex() const { return mAccessingFabricIndex; }
+
+    /**
+     * AttributeValueEncoder is a short lived object, and the state is presisted by mEncodeState and restored by constructor.
+     */
+    const AttributeEncodeState & GetState() const { return mEncodeState; }
+
+private:
+    // We made EncodeListItem() private, and ListEncoderHelper will expose it by Encode()
+    friend class ListEncodeHelper;
 
     template <typename... Ts>
     CHIP_ERROR EncodeListItem(Ts... aArgs)
@@ -156,6 +213,8 @@ public:
         // We make Encode atomic here, so need to tell the caller to not rollback when we encounter an error during encoding.
         mEncodeState.mAllowPartialData = true;
 
+        // EncodeListItem must be called after EncodeEmptyList(), thus mCurrentEncodingListIndex and
+        // mEncodeState.mCurrentEncodingListIndex are not invalid values.
         if (mCurrentEncodingListIndex < mEncodeState.mCurrentEncodingListIndex)
         {
             // We have encoded this element in previous chunks, skip it.
@@ -182,42 +241,10 @@ public:
     }
 
     /**
-     * aCallback is expected to take a const TagBoundEncoder& argument and
-     * Encode() on it as many times as needed to encode all the list elements
-     * one by one.  If any of those Encode() calls returns failure, aCallback
-     * must stop encoding and return failure.  When all items are encoded
-     * aCallback is expected to return success.
+     * EncodeEmptyList encodes the first item of one report with lists (an empty list).
      *
-     * aCallback may not be called.  Consumers must not assume it will be
-     * called.
-     */
-    template <typename ListGenerator>
-    CHIP_ERROR EncodeList(ListGenerator aCallback)
-    {
-        mTriedEncode = true;
-        // Spec 10.5.4.3.1, 10.5.4.6 (Replace a list w/ Multiple IBs)
-        // EmptyList acts as the beginning of the whole array type attribute report.
-        ReturnErrorOnFailure(EncodeEmptyList());
-        ReturnErrorOnFailure(aCallback(ListEncodeHelper(*this)));
-        // The Encode procedure finished without any error, clear the state.
-        mEncodeState = AttributeEncodeState();
-        return CHIP_NO_ERROR;
-    }
-
-    bool TriedEncode() const { return mTriedEncode; }
-
-    /**
-     * The accessing fabric index for this read or subscribe interaction.
-     */
-    FabricIndex AccessingFabricIndex() const { return mAccessingFabricIndex; }
-
-    AttributeEncodeState GetState() { return mEncodeState; }
-
-private:
-    /**
-     * EncodeListReportHeader encodes the first item of one report with lists (an empty list).
-     *
-     * If internal state indicates we have already encoded the empty list, this function will do nothing and return CHIP_NO_ERROR.
+     * If internal state indicates we have already encoded the empty list, this function will encode nothing, set
+     * mCurrentEncodingListIndex to 0 and return CHIP_NO_ERROR.
      */
     CHIP_ERROR EncodeEmptyList();
 

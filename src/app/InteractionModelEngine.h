@@ -316,7 +316,7 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
 
 /**
  *  Fetch attribute value and version info and write to the AttributeReport provided.
- *  The ReadSingleClusterData will do everying required for encoding an attribute, i.e. it will try to put one or more
+ *  The ReadSingleClusterData will do everyting required for encoding an attribute, i.e. it will try to put one or more
  * AttributeReportIB to the AttributeReportIBs::Builder.
  *  When the endpoint / cluster / attribute / event data specified by aClusterInfo does not exist, corresponding interaction model
  * error code will be put into the writer, and CHIP_NO_ERROR will be returned.

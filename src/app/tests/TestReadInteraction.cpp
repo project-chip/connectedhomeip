@@ -837,12 +837,13 @@ void TestReadInteraction::TestSetDirtyBetweenChunks(nlTestSuite * apSuite, void 
 
     int currentAttributeResponse = delegate.mNumAttributeResponse;
 
-    // At this time, we should sent 3 chunks, and in the middle of report for second item.
+    // At this time, we should have sent 3 chunks, and are in the middle of report for second item.
     InteractionModelEngine::GetInstance()->GetReportingEngine().SetDirty(dirtyPath);
 
     for (int i = 0; i < 5; i++)
     {
-        // Then start from the beginning. 5 is a magic number, just let the report engine be able to send all report chunks.
+        // Then start from the beginning. 5 (the loop termination condition) needs to be big enough to let the report engine send
+        // all report chunks.
         InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
     }
 
