@@ -220,9 +220,12 @@ CHIP_ERROR SendSuccessStatus(AttributeDataIB::Builder & aAttributeDataIBBuilder)
 }
 
 CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeReportIB::Builder & aAttributeReport,
-                             Protocols::InteractionModel::Status aStatus, const TLV::TLVWriter & aReportCheckpoint)
+                             Protocols::InteractionModel::Status aStatus, TLV::TLVWriter * aReportCheckpoint)
 {
-    aAttributeReport.Rollback(aReportCheckpoint);
+    if (aReportCheckpoint != nullptr)
+    {
+        aAttributeReport.Rollback(*aReportCheckpoint);
+    }
     AttributeStatusIB::Builder attributeStatusIBBuilder = aAttributeReport.CreateAttributeStatus();
     AttributePathIB::Builder attributePathIBBuilder     = attributeStatusIBBuilder.CreatePath();
     attributePathIBBuilder.Endpoint(aPath.mEndpointId)
@@ -247,24 +250,21 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
                   "Reading attribute: Cluster=" ChipLogFormatMEI " Endpoint=%" PRIx16 " AttributeId=" ChipLogFormatMEI,
                   ChipLogValueMEI(aPath.mClusterId), aPath.mEndpointId, ChipLogValueMEI(aPath.mAttributeId));
 
-    const EmberAfAttributeMetadata * attributeMetadata =
+    EmberAfAttributeMetadata * attributeMetadata =
         emberAfLocateAttributeMetadata(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId, CLUSTER_MASK_SERVER, 0);
 
     if (attributeMetadata == nullptr)
     {
         AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
-        TLV::TLVWriter writer;
-        attributeReport.Checkpoint(writer);
 
-        // This attribute (or even this cluster) is not actually supported
-        // on this endpoint.
+        // This path is not actually supported.
         ReturnErrorOnFailure(
-            SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, writer));
+            SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr));
         return attributeReport.EndOfAttributeReportIB().GetError();
     }
 
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
-    // Value encoder will encode the while AttributeReport, including the path, value and the version.
+    // Value encoder will encode the whole AttributeReport, including the path, value and the version.
     // The AttributeValueEncoder may encode more than one AttributeReportIB for the list chunking feature.
     if (attrOverride != nullptr)
     {
@@ -297,6 +297,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
 
     ReturnErrorOnFailure(aAttributeReports.GetError());
+    TLV::TLVWriter backup;
     attributeReport.Checkpoint(backup);
 
     // We have verified that the attribute exists.
@@ -312,7 +313,6 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         .EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePathIBBuilder.GetError());
 
-    EmberAfAttributeMetadata * attributeMetadata = NULL;
     EmberAfAttributeSearchRecord record;
     record.endpoint           = aPath.mEndpointId;
     record.clusterId          = aPath.mClusterId;
@@ -550,7 +550,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         return SendSuccessStatus(attributeDataIBBuilder);
     }
 
-    return SendFailureStatus(aPath, aAttributeReport, imStatus, backup);
+    return SendFailureStatus(aPath, attributeReport, imStatus, &backup);
 }
 
 namespace {

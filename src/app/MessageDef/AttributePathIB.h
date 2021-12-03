@@ -129,12 +129,13 @@ public:
     CHIP_ERROR GetListIndex(ListIndex * const apListIndex) const;
 
     /**
-     *  @brief Get the ListIndex, the list index can a null value.
+     *  @brief Get the ListIndex, the list index can be a null value.
      *
      *  @param [in] apListIndex    A pointer to apListIndex
      *
      *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types or null
+     *                                     type.
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetListIndex(DataModel::Nullable<ListIndex> * const apListIndex) const;
@@ -198,7 +199,7 @@ public:
      *  @return A reference to *this
      */
     AttributePathIB::Builder & ListIndex(const chip::ListIndex aListIndex);
-    AttributePathIB::Builder & ListIndex(const DataModel::Nullable<chip::ListIndex> aListIndex);
+    AttributePathIB::Builder & ListIndex(const DataModel::Nullable<chip::ListIndex> & aListIndex);
 
     /**
      *  @brief Mark the end of this AttributePathIB

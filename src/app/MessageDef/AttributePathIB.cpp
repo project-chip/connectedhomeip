@@ -24,6 +24,7 @@
 #include <stdio.h>
 
 #include <app/AppBuildConfig.h>
+#include <app/data-model/Encode.h>
 #include <app/data-model/Nullable.h>
 
 namespace chip {
@@ -247,19 +248,12 @@ AttributePathIB::Builder & AttributePathIB::Builder::Attribute(const AttributeId
     return *this;
 }
 
-AttributePathIB::Builder & AttributePathIB::Builder::ListIndex(const DataModel::Nullable<chip::ListIndex> aListIndex)
+AttributePathIB::Builder & AttributePathIB::Builder::ListIndex(const DataModel::Nullable<chip::ListIndex> & aListIndex)
 {
     // skip if error has already been set
     if (mError == CHIP_NO_ERROR)
     {
-        if (aListIndex.IsNull())
-        {
-            mError = mpWriter->PutNull(TLV::ContextTag(to_underlying(Tag::kListIndex)));
-        }
-        else
-        {
-            mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kListIndex)), aListIndex.Value());
-        }
+        mError = DataModel::Encode(*mpWriter, TLV::ContextTag(to_underlying(Tag::kListIndex)), aListIndex);
     }
     return *this;
 }
