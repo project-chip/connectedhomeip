@@ -197,6 +197,7 @@ CHIPDevice * GetConnectedDevice()
 
 {{#chip_client_clusters}}
 {{#unless (isStrEqual "Test Cluster" name)}}
+{{#unless (isStrEqual "Access Control" name)}}
 {{#unless (isStrEqual "Basic" name)}}
 {{#unless (isStrEqual "Thermostat" name)}}
 {{#chip_server_cluster_attributes}}
