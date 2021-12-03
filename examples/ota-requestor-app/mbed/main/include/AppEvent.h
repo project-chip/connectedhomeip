@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include <OTADownloaderImpl.h>
+#include <OTARequestorImpl.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <cstdint>
 
@@ -30,6 +32,8 @@ struct AppEvent
     enum AppEventTypes
     {
         kEventType_ota_provider_connect = 0,
+        kEventType_ota_provider_response,
+        kEventType_ota_download_completed,
     };
 
     uint16_t Type;
@@ -42,6 +46,16 @@ struct AppEvent
             chip::FabricIndex fabricIndex;
             const char * ipAddress;
         } OTAProviderConnectEvent;
+
+        struct
+        {
+            OTARequestorImpl::OTAUpdateDetails * imageDatails;
+        } OTAProviderResponseEvent;
+
+        struct
+        {
+            OTADownloaderImpl::ImageInfo * imageInfo;
+        } OTADownloadCompletedEvent;
     };
 
     EventHandler Handler;
