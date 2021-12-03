@@ -106,8 +106,14 @@ const char * Command::GetStateStr() const
     case CommandState::AddedCommand:
         return "AddedCommand";
 
+    case CommandState::AwaitingTimedStatus:
+        return "AwaitingTimedStatus";
+
     case CommandState::CommandSent:
         return "CommandSent";
+
+    case CommandState::ResponseReceived:
+        return "ResponseReceived";
 
     case CommandState::AwaitingDestruction:
         return "AwaitingDestruction";
