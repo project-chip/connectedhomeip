@@ -31,23 +31,36 @@
 
 class OTARequestorImpl
 {
-    typedef void (*ConnectToProviderCallback)(chip::NodeId, chip::FabricIndex, chip::Optional<chip::ByteSpan>);
-    typedef void (*DownloadUpdateCallback)(void);
+    static constexpr uint8_t kVersionBufLen = 32;
+    char mUpdateVersion[kVersionBufLen];
+
+    static constexpr size_t kFileNameBufLen = 256;
+    char mUpdateFileName[kFileNameBufLen]; // null-terminated
+
+    static constexpr uint8_t kTokenBufLen = 32;
+    uint8_t mUpdateToken[kTokenBufLen];
 
 public:
     struct OTAUpdateDetails
     {
-        uint8_t updateToken[32];
-        uint8_t updateTokenLen;
         uint32_t updateVersion;
+        chip::MutableCharSpan updateVersionString;
+        chip::MutableCharSpan updateFileName;
+        chip::MutableByteSpan updateToken;
     };
 
+private:
+    typedef void (*ConnectToProviderCallback)(chip::NodeId, chip::FabricIndex, chip::Optional<chip::ByteSpan>);
+    typedef void (*ProviderResponseCallback)(OTAUpdateDetails * updateDetails);
+
+public:
     static OTARequestorImpl & GetInstance() { return sInstance; }
 
-    void Init(ConnectToProviderCallback connectProviderCallback = nullptr, DownloadUpdateCallback downloadUpdateCallback = nullptr)
+    void Init(ConnectToProviderCallback connectProviderCallback = nullptr,
+              ProviderResponseCallback providerResponseCallback = nullptr)
     {
-        mConnectProviderCallback = connectProviderCallback;
-        mDownloadUpdateCallback  = downloadUpdateCallback;
+        mConnectProviderCallback  = connectProviderCallback;
+        mProviderResponseCallback = providerResponseCallback;
     }
 
     // Handler for the AnnounceOTAProvider command
@@ -85,6 +98,8 @@ private:
 
     static OTARequestorImpl sInstance;
 
+    chip::OperationalDeviceProxy * mOperationalDeviceProxy;
+
     chip::NodeId mProviderNodeId;
     chip::FabricIndex mProviderFabricIndex;
     EmberAfOTAAnnouncementReason mAnnouncementReason;
@@ -93,9 +108,11 @@ private:
     OTAUpdateDetails mUpdateDetails;
 
     ConnectToProviderCallback mConnectProviderCallback;
-    DownloadUpdateCallback mDownloadUpdateCallback;
+    ProviderResponseCallback mProviderResponseCallback;
 
     OTARequestorDriverImpl * mOtaRequestorDriver;
+
+    chip::CharSpan GetFileNameFromURI(chip::CharSpan imageURI);
 };
 
 inline void OTARequestorImpl::SetOtaRequestorDriver(OTARequestorDriverImpl * driver)

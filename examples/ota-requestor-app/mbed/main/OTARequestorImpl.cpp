@@ -69,9 +69,30 @@ static Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback(OnProvid
 
 OTARequestorImpl::OTARequestorImpl()
 {
-    mProviderNodeId          = chip::kUndefinedNodeId;
-    mProviderFabricIndex     = chip::kUndefinedFabricIndex;
-    mConnectProviderCallback = nullptr;
+    mOperationalDeviceProxy   = nullptr;
+    mProviderNodeId           = chip::kUndefinedNodeId;
+    mProviderFabricIndex      = chip::kUndefinedFabricIndex;
+    mConnectProviderCallback  = nullptr;
+    mProviderResponseCallback = nullptr;
+
+    mUpdateDetails.updateVersionString = chip::MutableCharSpan(mUpdateVersion, kVersionBufLen);
+    mUpdateDetails.updateFileName      = chip::MutableCharSpan(mUpdateFileName, kFileNameBufLen);
+    mUpdateDetails.updateToken         = chip::MutableByteSpan(mUpdateToken, kTokenBufLen);
+}
+
+chip::CharSpan OTARequestorImpl::GetFileNameFromURI(chip::CharSpan imageURI)
+{
+    constexpr char delimiter = '/';
+
+    char * ptr = strrchr(imageURI.data(), delimiter);
+
+    if (ptr != nullptr)
+    {
+        size_t offset = ptr - imageURI.data() + 1;
+        imageURI      = imageURI.SubSpan(offset, imageURI.size() - offset);
+    }
+
+    return imageURI;
 }
 
 bool OTARequestorImpl::HandleAnnounceOTAProvider(
@@ -93,7 +114,8 @@ bool OTARequestorImpl::HandleAnnounceOTAProvider(
     ChipLogProgress(SoftwareUpdate, "  FabricIndex: %" PRIu8, mProviderFabricIndex);
     ChipLogProgress(SoftwareUpdate, "  ProviderNodeID: %" PRIu64 " (0x%" PRIX64 ")", mProviderNodeId, mProviderNodeId);
     ChipLogProgress(SoftwareUpdate, "  VendorID: %" PRIu16 " (0x%" PRIX16 ")", commandData.vendorId, commandData.vendorId);
-    ChipLogProgress(SoftwareUpdate, "  ProviderIP: %s", reinterpret_cast<const char *>(mProviderIpAddress.Value().data()));
+    ChipLogProgress(SoftwareUpdate, "  ProviderIP: %.*s", static_cast<int>(mProviderIpAddress.Value().size()),
+                    reinterpret_cast<const char *>(mProviderIpAddress.Value().data()));
     ChipLogProgress(SoftwareUpdate, "  AnnouncementReason: %" PRIu8, mAnnouncementReason);
 
     if (mConnectProviderCallback)
@@ -122,24 +144,23 @@ void OTARequestorImpl::ConnectProvider(NodeId peerNodeId, FabricIndex peerFabric
         .imDelegate     = chip::Platform::New<chip::Controller::DeviceControllerInteractionModelDelegate>(),
     };
 
-    chip::OperationalDeviceProxy * operationalDeviceProxy =
-        chip::Platform::New<chip::OperationalDeviceProxy>(initParams, fabric->GetPeerIdForNode(peerNodeId));
-    if (operationalDeviceProxy == nullptr)
+    mOperationalDeviceProxy = chip::Platform::New<chip::OperationalDeviceProxy>(initParams, fabric->GetPeerIdForNode(peerNodeId));
+    if (mOperationalDeviceProxy == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Failed in creating an instance of OperationalDeviceProxy");
         return;
     }
 
-    server->SetOperationalDeviceProxy(operationalDeviceProxy);
+    server->SetOperationalDeviceProxy(mOperationalDeviceProxy);
 
     // Explicitly calling UpdateDeviceData() should not be needed once OperationalDeviceProxy can resolve IP address from node
     // ID and fabric index
     IPAddress ipAddr;
     IPAddress::FromString(ipAddress, ipAddr);
     PeerAddress addr = PeerAddress::UDP(ipAddr, CHIP_PORT);
-    operationalDeviceProxy->UpdateDeviceData(addr, operationalDeviceProxy->GetMRPConfig());
+    mOperationalDeviceProxy->UpdateDeviceData(addr, mOperationalDeviceProxy->GetMRPConfig());
 
-    CHIP_ERROR err = operationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
+    CHIP_ERROR err = mOperationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Cannot establish connection to peer device: %" CHIP_ERROR_FORMAT, err.Format());
@@ -223,31 +244,24 @@ bool OTARequestorImpl::HandleQueryImageResponse(void * context, uint8_t status, 
     }
 
     ChipLogProgress(SoftwareUpdate, "  Image URI: %.*s", static_cast<int>(imageURI.size()), imageURI.data());
-    ChipLogProgress(SoftwareUpdate, "  Version: %" PRIu32, softwareVersion);
+    ChipLogProgress(SoftwareUpdate, "  Version: %d name: %.*s", softwareVersion, static_cast<int>(softwareVersionString.size()),
+                    softwareVersionString.data());
 
-    if (updateToken.size() > sizeof(mUpdateDetails.updateToken))
+    mUpdateDetails.updateVersion = softwareVersion;
+    memcpy((void *) mUpdateDetails.updateVersionString.begin(), softwareVersionString.data(), softwareVersionString.size());
+    mUpdateDetails.updateVersionString.reduce_size(softwareVersionString.size());
+    auto fileName = GetFileNameFromURI(imageURI);
+    memcpy((void *) mUpdateDetails.updateFileName.begin(), fileName.data(), fileName.size());
+    mUpdateDetails.updateFileName.reduce_size(fileName.size());
+    memcpy((void *) mUpdateDetails.updateToken.begin(), updateToken.data(), updateToken.size());
+    mUpdateDetails.updateToken.reduce_size(updateToken.size());
+
+    ChipLogProgress(SoftwareUpdate, "  Image name: %.*s", static_cast<int>(mUpdateDetails.updateFileName.size()),
+                    mUpdateDetails.updateFileName.data());
+
+    if (mProviderResponseCallback)
     {
-        ChipLogError(SoftwareUpdate, "Update token too long");
-        return false;
-    }
-
-    memcpy(mUpdateDetails.updateToken, updateToken.data(), updateToken.size());
-    mUpdateDetails.updateTokenLen = static_cast<uint8_t>(updateToken.size());
-    mUpdateDetails.updateVersion  = softwareVersion;
-
-    if (mOtaRequestorDriver)
-    {
-        auto ret = mOtaRequestorDriver->CheckImageDownloadAllowed();
-        if (!ret)
-        {
-            ChipLogProgress(SoftwareUpdate, "Update download not allowed");
-            return false;
-        }
-    }
-
-    if (mDownloadUpdateCallback)
-    {
-        mDownloadUpdateCallback();
+        mProviderResponseCallback(&mUpdateDetails);
     }
     return false;
 }
