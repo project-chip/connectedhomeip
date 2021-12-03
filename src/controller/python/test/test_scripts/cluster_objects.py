@@ -35,7 +35,7 @@ ignoreAttributeDecodeFailureList = [
 
 
 def _IgnoreAttributeDecodeFailure(path):
-    return path in ignoreAttributeDecodeFailureList
+    return str(path) in ignoreAttributeDecodeFailureList
 
 
 def _AssumeAttributesDecodeSuccess(values):
