@@ -1073,7 +1073,7 @@ void TestStates(nlTestSuite * apSuite, void * apContext)
 
     // Entry 1 should remain, now at slot 0
     state1b.group        = 10;
-    state1b.keyset_id = 12;
+    state1b.keyset_id    = 12;
     state1b.fabric_index = 14;
     err                  = groups->GetGroupState(0, state1b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
@@ -1082,7 +1082,7 @@ void TestStates(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, kFabric1 == state1b.fabric_index);
 
     state1b.group        = 10;
-    state1b.keyset_id = 12;
+    state1b.keyset_id    = 12;
     state1b.fabric_index = 14;
     err                  = groups->GetGroupState(1, state1b);
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == err);

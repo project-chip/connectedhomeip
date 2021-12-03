@@ -105,8 +105,7 @@ public:
         uint16_t keyset_id = 0;
         bool operator==(const GroupState & other)
         {
-            return this->fabric_index == other.fabric_index && this->group == other.group &&
-                this->keyset_id == other.keyset_id;
+            return this->fabric_index == other.fabric_index && this->group == other.group && this->keyset_id == other.keyset_id;
         }
     };
 

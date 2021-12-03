@@ -343,7 +343,7 @@ struct StateData : public GroupDataProvider::GroupState, PersistentData<kPersist
     {
         fabric_index = 0;
         group        = kUndefinedGroupId;
-        keyset_id = 0;
+        keyset_id    = 0;
         next         = 0;
     }
 
@@ -982,8 +982,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupState(size_t state_index, const GroupS
         VerifyOrReturnError(0 == state_index, CHIP_ERROR_INVALID_ARGUMENT);
         states.first = 0;
         states.count = 1;
-        ReturnLogErrorOnFailure(
-            StateData(states.first, in_state.fabric_index, in_state.group, in_state.keyset_id).Save(mStorage));
+        ReturnLogErrorOnFailure(StateData(states.first, in_state.fabric_index, in_state.group, in_state.keyset_id).Save(mStorage));
         return states.Save(mStorage);
     }
 
@@ -1025,7 +1024,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupState(size_t state_index, const GroupS
         VerifyOrReturnError(state.fabric_index == in_state.fabric_index, CHIP_ERROR_ACCESS_DENIED);
         GroupState old_state = state;
         state.group          = in_state.group;
-        state.keyset_id   = in_state.keyset_id;
+        state.keyset_id      = in_state.keyset_id;
         ReturnErrorOnFailure(state.Save(mStorage));
         if (nullptr != mListener)
         {
@@ -1077,7 +1076,7 @@ CHIP_ERROR GroupDataProviderImpl::GetGroupState(size_t state_index, GroupState &
             // Target index found
             out_state.fabric_index = state.fabric_index;
             out_state.group        = state.group;
-            out_state.keyset_id = state.keyset_id;
+            out_state.keyset_id    = state.keyset_id;
             return CHIP_NO_ERROR;
         }
         state.id = state.next;
@@ -1184,7 +1183,7 @@ bool GroupDataProviderImpl::AllStatesIterator::Next(GroupState & item)
     mIndex            = state.next;
     item.fabric_index = state.fabric_index;
     item.group        = state.group;
-    item.keyset_id = state.keyset_id;
+    item.keyset_id    = state.keyset_id;
     return true;
 }
 
@@ -1243,7 +1242,7 @@ bool GroupDataProviderImpl::FabricStatesIterator::Next(GroupState & item)
         {
             item.fabric_index = state.fabric_index;
             item.group        = state.group;
-            item.keyset_id = state.keyset_id;
+            item.keyset_id    = state.keyset_id;
             mIndex            = state.id;
             return true;
         }
