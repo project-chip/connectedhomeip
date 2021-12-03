@@ -30,7 +30,7 @@
 
 namespace chip {
 namespace app {
-namespace InvokeResponses {
+namespace InvokeResponseIBs {
 class Parser : public ArrayParser
 {
 public:
@@ -68,15 +68,15 @@ public:
     InvokeResponseIB::Builder & GetInvokeResponse() { return mInvokeResponse; };
 
     /**
-     *  @brief Mark the end of this InvokeResponses
+     *  @brief Mark the end of this InvokeResponseIBs
      *
      *  @return A reference to *this
      */
-    InvokeResponses::Builder & EndOfInvokeResponses();
+    InvokeResponseIBs::Builder & EndOfInvokeResponses();
 
 private:
     InvokeResponseIB::Builder mInvokeResponse;
 };
-} // namespace InvokeResponses
+} // namespace InvokeResponseIBs
 } // namespace app
 } // namespace chip

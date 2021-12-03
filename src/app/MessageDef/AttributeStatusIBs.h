@@ -31,7 +31,7 @@
 
 namespace chip {
 namespace app {
-namespace AttributeStatuses {
+namespace AttributeStatusIBs {
 class Builder : public ArrayBuilder
 {
 public:
@@ -43,11 +43,11 @@ public:
     AttributeStatusIB::Builder & CreateAttributeStatus();
 
     /**
-     *  @brief Mark the end of this AttributeStatuses
+     *  @brief Mark the end of this AttributeStatusIBs
      *
      *  @return A reference to *this
      */
-    AttributeStatuses::Builder & EndOfAttributeStatuses();
+    AttributeStatusIBs::Builder & EndOfAttributeStatuses();
 
 private:
     AttributeStatusIB::Builder mAttributeStatus;
@@ -73,6 +73,6 @@ public:
     CHIP_ERROR CheckSchemaValidity() const;
 #endif
 };
-} // namespace AttributeStatuses
+} // namespace AttributeStatusIBs
 } // namespace app
 } // namespace chip

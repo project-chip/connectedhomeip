@@ -130,7 +130,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
     System::PacketBufferTLVReader reader;
     TLV::TLVReader invokeResponsesReader;
     InvokeResponseMessage::Parser invokeResponseMessage;
-    InvokeResponses::Parser invokeResponses;
+    InvokeResponseIBs::Parser invokeResponses;
     bool suppressResponse = false;
 
     reader.Init(std::move(payload));

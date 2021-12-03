@@ -13,13 +13,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines EventFilters parser and builder in CHIP interaction model
- *
- */
 
-#include "EventFilters.h"
+#include "InvokeResponseIBs.h"
 
 #include "MessageDefHelper.h"
 
@@ -32,13 +27,13 @@
 namespace chip {
 namespace app {
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
-CHIP_ERROR EventFilters::Parser::CheckSchemaValidity() const
+CHIP_ERROR InvokeResponseIBs::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    size_t numEventFilters = 0;
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    size_t numInvokeResponses = 0;
     TLV::TLVReader reader;
 
-    PRETTY_PRINT("EventFilters =");
+    PRETTY_PRINT("InvokeResponseIBs =");
     PRETTY_PRINT("[");
 
     // make a copy of the reader
@@ -48,14 +43,14 @@ CHIP_ERROR EventFilters::Parser::CheckSchemaValidity() const
     {
         VerifyOrReturnError(TLV::AnonymousTag == reader.GetTag(), CHIP_ERROR_INVALID_TLV_TAG);
         {
-            EventFilterIB::Parser eventFilter;
-            ReturnErrorOnFailure(eventFilter.Init(reader));
+            InvokeResponseIB::Parser invokeResponse;
+            ReturnErrorOnFailure(invokeResponse.Init(reader));
             PRETTY_PRINT_INCDEPTH();
-            ReturnErrorOnFailure(eventFilter.CheckSchemaValidity());
+            ReturnErrorOnFailure(invokeResponse.CheckSchemaValidity());
             PRETTY_PRINT_DECDEPTH();
         }
 
-        ++numEventFilters;
+        ++numInvokeResponses;
     }
 
     PRETTY_PRINT("],");
@@ -64,8 +59,8 @@ CHIP_ERROR EventFilters::Parser::CheckSchemaValidity() const
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
-        // if we have at least one event filter
-        if (numEventFilters > 0)
+        // if we have at least one data element
+        if (numInvokeResponses > 0)
         {
             err = CHIP_NO_ERROR;
         }
@@ -76,16 +71,19 @@ CHIP_ERROR EventFilters::Parser::CheckSchemaValidity() const
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-EventFilterIB::Builder & EventFilters::Builder::CreateEventFilter()
+InvokeResponseIB::Builder & InvokeResponseIBs::Builder::CreateInvokeResponse()
 {
-    mError = mEventFilter.Init(mpWriter);
-    return mEventFilter;
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mInvokeResponse.Init(mpWriter);
+    }
+    return mInvokeResponse;
 }
 
-EventFilters::Builder & EventFilters::Builder::EndOfEventFilters()
+InvokeResponseIBs::Builder & InvokeResponseIBs::Builder::EndOfInvokeResponses()
 {
     EndOfContainer();
     return *this;
 }
-}; // namespace app
-}; // namespace chip
+} // namespace app
+} // namespace chip
