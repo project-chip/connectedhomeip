@@ -1369,19 +1369,17 @@ bool emberAfGroupsClusterAddGroupResponseCallback(EndpointId endpoint, app::Comm
 }
 
 bool emberAfGroupsClusterGetGroupMembershipResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t capacity,
-                                                            uint8_t groupCount,
                                                             /* TYPE WARNING: array array defaults to */ uint8_t * groupList)
 {
     ChipLogProgress(Zcl, "GetGroupMembershipResponse:");
     ChipLogProgress(Zcl, "  capacity: %" PRIu8 "", capacity);
-    ChipLogProgress(Zcl, "  groupCount: %" PRIu8 "", groupCount);
     ChipLogProgress(Zcl, "  groupList: %p", groupList);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("GroupsClusterGetGroupMembershipResponseCallback");
 
     Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback> * cb =
         Callback::Callback<GroupsClusterGetGroupMembershipResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, capacity, groupCount, groupList);
+    cb->mCall(cb->mContext, capacity, groupList);
     return true;
 }
 
@@ -1966,6 +1964,21 @@ bool emberAfTestClusterClusterBooleanResponseCallback(EndpointId endpoint, app::
     Callback::Callback<TestClusterClusterBooleanResponseCallback> * cb =
         Callback::Callback<TestClusterClusterBooleanResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, value);
+    return true;
+}
+
+bool emberAfTestClusterClusterSimpleStructResponseCallback(
+    EndpointId endpoint, app::CommandSender * commandObj,
+    chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType arg1)
+{
+    ChipLogProgress(Zcl, "SimpleStructResponse:");
+    ChipLogProgress(Zcl, "  arg1: Not sure how to log struct SimpleStruct");
+
+    GET_CLUSTER_RESPONSE_CALLBACKS("TestClusterClusterSimpleStructResponseCallback");
+
+    Callback::Callback<TestClusterClusterSimpleStructResponseCallback> * cb =
+        Callback::Callback<TestClusterClusterSimpleStructResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, SimpleStruct());
     return true;
 }
 

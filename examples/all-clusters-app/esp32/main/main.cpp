@@ -682,10 +682,10 @@ extern "C" void app_main()
 
 #endif // CONFIG_HAVE_DISPLAY
 
+#if CONFIG_DEVICE_TYPE_M5STACK
     // Run the UI Loop
     while (true)
     {
-#if CONFIG_DEVICE_TYPE_M5STACK
         // TODO consider refactoring this example to use FreeRTOS tasks
 
         bool woken = false;
@@ -710,10 +710,9 @@ extern "C" void app_main()
             }
         }
 
-#endif // CONFIG_DEVICE_TYPE_M5STACK
-
         vTaskDelay(50 / portTICK_PERIOD_MS);
     }
+#endif // CONFIG_DEVICE_TYPE_M5STACK
 }
 
 bool lowPowerClusterSleep()

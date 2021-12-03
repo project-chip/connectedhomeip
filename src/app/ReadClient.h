@@ -24,6 +24,7 @@
 
 #pragma once
 #include <app/AttributePathParams.h>
+#include <app/ConcreteAttributePath.h>
 #include <app/EventHeader.h>
 #include <app/EventPathParams.h>
 #include <app/InteractionModelDelegate.h>
@@ -62,14 +63,23 @@ public:
         virtual ~Callback() = default;
 
         /**
+         * Used to signal the commencement of processing of the first attribute report received in a given exchange.
+         */
+        virtual void OnReportBegin(const ReadClient * apReadClient) {}
+
+        /**
+         * Used to signal the completion of processing of the last attribute report in a given exchange.
+         */
+        virtual void OnReportEnd(const ReadClient * apReadClient) {}
+
+        /**
          * The ReadClient object MUST continue to exist after this call is completed.
          *
          * This callback will be called when receiving event data received in the Read and Subscribe interactions
-         *
+         * only one of the apData and apStatus will be non-null.
          * @param[in] apReadClient: The read client object that initiated the read or subscribe transaction.
          * @param[in] aEventHeader: The event header in report response.
-         * @param[in] apData: A TLVReader positioned right on the payload of the event. This will be set to null if the apStatus is
-         * not null.
+         * @param[in] apData: A TLVReader positioned right on the payload of the event.
          * @param[in] apStatus: Event-specific status, containing an InteractionModel::Status code as well as an optional
          *                     cluster-specific status code.
          */
@@ -93,8 +103,8 @@ public:
          * @param[in] aStatus      Attribute-specific status, containing an InteractionModel::Status code as well as an
          *                         optional cluster-specific status code.
          */
-        virtual void OnAttributeData(const ReadClient * apReadClient, const ConcreteAttributePath & aPath, TLV::TLVReader * apData,
-                                     const StatusIB & aStatus)
+        virtual void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath,
+                                     TLV::TLVReader * apData, const StatusIB & aStatus)
         {}
 
         /**
@@ -239,7 +249,7 @@ private:
      *
      */
     bool IsFree() const { return mState == ClientState::Uninitialized; }
-    bool IsSubscriptionTypeIdle() const { return mState == ClientState::SubscriptionActive; }
+    bool IsSubscriptionIdle() const { return mState == ClientState::SubscriptionActive; }
     bool IsAwaitingInitialReport() const { return mState == ClientState::AwaitingInitialReport; }
     bool IsAwaitingSubscribeResponse() const { return mState == ClientState::AwaitingSubscribeResponse; }
 
@@ -283,12 +293,12 @@ private:
      * our exchange and don't need to manually close it.
      */
     void ShutdownInternal(CHIP_ERROR aError);
-    bool IsInitialReport() { return mInitialReport; }
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback * mpCallback                      = nullptr;
     ClientState mState                         = ClientState::Uninitialized;
-    bool mInitialReport                        = true;
+    bool mIsInitialReport                      = true;
+    bool mIsPrimingReports                     = true;
     bool mPendingMoreChunks                    = false;
     uint16_t mMinIntervalFloorSeconds          = 0;
     uint16_t mMaxIntervalCeilingSeconds        = 0;

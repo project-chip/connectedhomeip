@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/BufferedReadCallback.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/InteractionModelDelegate.h>
 #include <app/data-model/Decode.h>
@@ -48,15 +49,23 @@ public:
     TypedReadAttributeCallback(ClusterId aClusterId, AttributeId aAttributeId, OnSuccessCallbackType aOnSuccess,
                                OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
         mClusterId(aClusterId),
-        mAttributeId(aAttributeId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
+        mAttributeId(aAttributeId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone), mBufferedReadAdapter(*this)
     {}
 
+    app::BufferedReadCallback & GetBufferedCallback() { return mBufferedReadAdapter; }
+
 private:
-    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteAttributePath & aPath, TLV::TLVReader * apData,
-                         const app::StatusIB & aStatus) override
+    void OnAttributeData(const app::ReadClient * apReadClient, const app::ConcreteDataAttributePath & aPath,
+                         TLV::TLVReader * apData, const app::StatusIB & aStatus) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableAttributeType value;
+
+        //
+        // We shouldn't be getting list item operations in the provided path since that should be handled by the buffered read
+        // callback. If we do, that's a bug.
+        //
+        VerifyOrDie(!aPath.IsListItemOperation());
 
         VerifyOrExit(aStatus.mStatus == Protocols::InteractionModel::Status::Success, err = CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
         VerifyOrExit(aPath.mClusterId == mClusterId && aPath.mAttributeId == mAttributeId, err = CHIP_ERROR_SCHEMA_MISMATCH);
@@ -95,6 +104,7 @@ private:
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
+    app::BufferedReadCallback mBufferedReadAdapter;
 };
 
 template <typename DecodableEventTypeInfo>
@@ -118,12 +128,10 @@ private:
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
         DecodableEventTypeInfo value;
-        VerifyOrExit(aEventHeader.mPath.mClusterId == DecodableEventTypeInfo::GetClusterId() &&
-                         aEventHeader.mPath.mEventId == DecodableEventTypeInfo::GetEventId(),
-                     CHIP_ERROR_SCHEMA_MISMATCH);
+
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        err = app::DataModel::Decode(*apData, value);
+        err = apReadClient->DecodeEvent(aEventHeader, value, *apData);
         SuccessOrExit(err);
 
         mOnSuccess(aEventHeader, value);

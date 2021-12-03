@@ -42,7 +42,7 @@ class TvAttrAccess : public app::AttributeAccessInterface
 public:
     TvAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), AttrTypeInfo::GetClusterId()) {}
 
-    CHIP_ERROR Read(const app::ConcreteAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
     {
         if (aPath.mAttributeId == AttrTypeInfo::GetAttributeId())
         {
@@ -195,7 +195,7 @@ public:
     ContentLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ContentLauncher::Id)
     {}
 
-    CHIP_ERROR Read(const app::ConcreteAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
     {
         if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::Id)
         {

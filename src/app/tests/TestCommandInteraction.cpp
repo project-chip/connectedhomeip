@@ -190,7 +190,7 @@ public:
 
 private:
     static void GenerateInvokeRequest(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
-                                      bool aNeedCommandData, EndpointId aEndpointId = kTestEndpointId,
+                                      bool aNeedCommandData, bool aIsTimedRequest, EndpointId aEndpointId = kTestEndpointId,
                                       ClusterId aClusterId = kTestClusterId, CommandId aCommandId = kTestCommandId);
     static void GenerateInvokeResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
                                        bool aNeedCommandData, EndpointId aEndpointId = kTestEndpointId,
@@ -219,8 +219,8 @@ CommandPathParams MakeTestCommandPath(CommandId aCommandId = kTestCommandId)
 }
 
 void TestCommandInteraction::GenerateInvokeRequest(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload,
-                                                   bool aNeedCommandData, EndpointId aEndpointId, ClusterId aClusterId,
-                                                   CommandId aCommandId)
+                                                   bool aNeedCommandData, bool aIsTimedRequest, EndpointId aEndpointId,
+                                                   ClusterId aClusterId, CommandId aCommandId)
 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -231,7 +231,7 @@ void TestCommandInteraction::GenerateInvokeRequest(nlTestSuite * apSuite, void *
     err = invokeRequestMessageBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    invokeRequestMessageBuilder.SuppressResponse(true).TimedRequest(true);
+    invokeRequestMessageBuilder.SuppressResponse(true).TimedRequest(aIsTimedRequest);
     InvokeRequests::Builder invokeRequests = invokeRequestMessageBuilder.CreateInvokeRequests();
     NL_TEST_ASSERT(apSuite, invokeRequestMessageBuilder.GetError() == CHIP_NO_ERROR);
 
@@ -548,8 +548,8 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedMsg(nlTestSuit
     app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
-    GenerateInvokeRequest(apSuite, apContext, commandDatabuf, true /*aNeedCommandData*/);
-    err = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf));
+    GenerateInvokeRequest(apSuite, apContext, commandDatabuf, true /*aNeedCommandData*/, /* aIsTimedRequest = */ false);
+    err = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
@@ -560,28 +560,42 @@ void TestCommandInteraction::TestCommandHandlerWithProcessReceivedNotExistComman
     System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
     // Use some invalid endpoint / cluster / command.
-    GenerateInvokeRequest(apSuite, apContext, commandDatabuf, false /*aNeedCommandData*/, 0xDE /* endpoint */, 0xADBE /* cluster */,
-                          0xEF /* command */);
+    GenerateInvokeRequest(apSuite, apContext, commandDatabuf, false /*aNeedCommandData*/, /* aIsTimedRequest = */ false,
+                          0xDE /* endpoint */, 0xADBE /* cluster */, 0xEF /* command */);
 
     // TODO: Need to find a way to get the response instead of only check if a function on key path is called.
     // We should not reach CommandDispatch if requested command does not exist.
     chip::isCommandDispatched = false;
-    err                       = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf));
+    err                       = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), false);
     NL_TEST_ASSERT(apSuite, !chip::isCommandDispatched);
 }
 
 void TestCommandInteraction::TestCommandHandlerWithProcessReceivedEmptyDataMsg(nlTestSuite * apSuite, void * apContext)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
-    System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+    bool allBooleans[] = { true, false };
+    for (auto messageIsTimed : allBooleans)
+    {
+        for (auto transactionIsTimed : allBooleans)
+        {
+            CHIP_ERROR err = CHIP_NO_ERROR;
+            app::CommandHandler commandHandler(&mockCommandHandlerDelegate);
+            System::PacketBufferHandle commandDatabuf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
 
-    chip::isCommandDispatched = false;
+            chip::isCommandDispatched = false;
 
-    GenerateInvokeRequest(apSuite, apContext, commandDatabuf, false /*aNeedCommandData*/);
+            GenerateInvokeRequest(apSuite, apContext, commandDatabuf, false /*aNeedCommandData*/, messageIsTimed);
 
-    err = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf));
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && chip::isCommandDispatched);
+            err = commandHandler.ProcessInvokeRequest(std::move(commandDatabuf), transactionIsTimed);
+            if (messageIsTimed == transactionIsTimed)
+            {
+                NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && chip::isCommandDispatched);
+            }
+            else
+            {
+                NL_TEST_ASSERT(apSuite, err != CHIP_NO_ERROR && !chip::isCommandDispatched);
+            }
+        }
+    }
 }
 
 void TestCommandInteraction::TestCommandSenderCommandSuccessResponseFlow(nlTestSuite * apSuite, void * apContext)

@@ -4294,6 +4294,51 @@ static void CheckGetByteView(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+static void CheckCHIPTLVScopedBuffer(nlTestSuite * inSuite, void * inContext)
+{
+    Platform::ScopedMemoryBuffer<uint8_t> buf;
+    CHIP_ERROR err;
+
+    buf.Calloc(64);
+    NL_TEST_ASSERT(inSuite, buf.Get() != nullptr);
+
+    {
+        ScopedBufferTLVWriter writer(std::move(buf), 64);
+
+        NL_TEST_ASSERT(inSuite, buf.Get() == nullptr);
+
+        err = writer.Put(TLV::AnonymousTag, (uint8_t) 33);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = writer.Finalize(buf);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, buf.Get() != nullptr);
+
+        err = writer.Put(TLV::AnonymousTag, (uint8_t) 33);
+        NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    }
+
+    {
+        ScopedBufferTLVReader reader;
+        uint8_t val;
+
+        reader.Init(std::move(buf), 64);
+
+        err = reader.Next();
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+        err = reader.Get(val);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, val == 33);
+
+        reader.TakeBuffer(buf);
+        NL_TEST_ASSERT(inSuite, buf.Get() != nullptr);
+
+        err = reader.Get(val);
+        NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    }
+}
+
 // Test Suite
 
 /**
@@ -4323,6 +4368,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("CHIP TLV Printf, Circular TLV buf",   CheckCHIPTLVPutStringFCircular),
     NL_TEST_DEF("CHIP TLV Skip non-contiguous",        CheckCHIPTLVSkipCircular),
     NL_TEST_DEF("CHIP TLV ByteSpan",                   CheckCHIPTLVByteSpan),
+    NL_TEST_DEF("CHIP TLV Scoped Buffer",              CheckCHIPTLVScopedBuffer),
     NL_TEST_DEF("CHIP TLV Check reserve",              CheckCloseContainerReserve),
     NL_TEST_DEF("CHIP TLV Reader Fuzz Test",           TLVReaderFuzzTest),
     NL_TEST_DEF("CHIP TLV GetStringView Test",         CheckGetStringView),

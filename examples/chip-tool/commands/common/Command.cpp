@@ -357,6 +357,28 @@ bool Command::InitArgument(size_t argIndex, char * argValue)
         break;
     }
 
+    case ArgumentType::Float: {
+        if (arg.optional)
+            arg.value = &(static_cast<chip::Optional<float> *>(arg.value))->Emplace();
+        float * value = static_cast<float *>(arg.value);
+        std::stringstream ss;
+        ss << argValue;
+        ss >> *value;
+        isValidArgument = (!ss.fail() && ss.eof());
+        break;
+    }
+
+    case ArgumentType::Double: {
+        if (arg.optional)
+            arg.value = &(static_cast<chip::Optional<double> *>(arg.value))->Emplace();
+        double * value = static_cast<double *>(arg.value);
+        std::stringstream ss;
+        ss << argValue;
+        ss >> *value;
+        isValidArgument = (!ss.fail() && ss.eof());
+        break;
+    }
+
     case ArgumentType::Address: {
         if (arg.optional)
             arg.value = &(reinterpret_cast<chip::Optional<AddressWithInterface> *>(arg.value))->Emplace();
@@ -382,8 +404,7 @@ size_t Command::AddArgument(const char * name, const char * value, bool optional
     arg.value    = const_cast<void *>(reinterpret_cast<const void *>(value));
     arg.optional = optional;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return AddArgumentToList(std::move(arg));
 }
 
 size_t Command::AddArgument(const char * name, char ** value, bool optional)
@@ -394,8 +415,7 @@ size_t Command::AddArgument(const char * name, char ** value, bool optional)
     arg.value    = reinterpret_cast<void *>(value);
     arg.optional = optional;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return AddArgumentToList(std::move(arg));
 }
 
 size_t Command::AddArgument(const char * name, chip::CharSpan * value, bool optional)
@@ -406,8 +426,7 @@ size_t Command::AddArgument(const char * name, chip::CharSpan * value, bool opti
     arg.value    = reinterpret_cast<void *>(value);
     arg.optional = optional;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return AddArgumentToList(std::move(arg));
 }
 
 size_t Command::AddArgument(const char * name, chip::ByteSpan * value, bool optional)
@@ -418,8 +437,7 @@ size_t Command::AddArgument(const char * name, chip::ByteSpan * value, bool opti
     arg.value    = reinterpret_cast<void *>(value);
     arg.optional = optional;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return AddArgumentToList(std::move(arg));
 }
 
 size_t Command::AddArgument(const char * name, AddressWithInterface * out, bool optional)
@@ -430,8 +448,31 @@ size_t Command::AddArgument(const char * name, AddressWithInterface * out, bool 
     arg.value    = reinterpret_cast<void *>(out);
     arg.optional = optional;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, float min, float max, float * out, bool optional)
+{
+    Argument arg;
+    arg.type     = ArgumentType::Float;
+    arg.name     = name;
+    arg.value    = reinterpret_cast<void *>(out);
+    arg.optional = optional;
+    // Ignore min/max for now; they're always +-Infinity anyway.
+
+    return AddArgumentToList(std::move(arg));
+}
+
+size_t Command::AddArgument(const char * name, double min, double max, double * out, bool optional)
+{
+    Argument arg;
+    arg.type     = ArgumentType::Double;
+    arg.name     = name;
+    arg.value    = reinterpret_cast<void *>(out);
+    arg.optional = optional;
+    // Ignore min/max for now; they're always +-Infinity anyway.
+
+    return AddArgumentToList(std::move(arg));
 }
 
 size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type, bool optional)
@@ -444,8 +485,7 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void *
     arg.max      = max;
     arg.optional = optional;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return AddArgumentToList(std::move(arg));
 }
 
 size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void * out, bool optional)
@@ -458,8 +498,7 @@ size_t Command::AddArgument(const char * name, int64_t min, uint64_t max, void *
     arg.max      = max;
     arg.optional = optional;
 
-    mArgs.emplace_back(arg);
-    return mArgs.size();
+    return AddArgumentToList(std::move(arg));
 }
 
 const char * Command::GetArgumentName(size_t index) const
@@ -485,4 +524,29 @@ const char * Command::GetAttribute(void) const
     }
 
     return nullptr;
+}
+
+size_t Command::AddArgumentToList(Argument && argument)
+{
+    if (argument.optional || mArgs.empty() || !mArgs.back().optional)
+    {
+        // Safe to just append.
+        mArgs.emplace_back(std::move(argument));
+        return mArgs.size();
+    }
+
+    // We're inserting a non-optional arg but we already have something optional
+    // in the list.  Insert before the first optional arg.
+    for (auto cur = mArgs.cbegin(), end = mArgs.cend(); cur != end; ++cur)
+    {
+        if ((*cur).optional)
+        {
+            mArgs.emplace(cur, std::move(argument));
+            return mArgs.size();
+        }
+    }
+
+    // Never reached.
+    VerifyOrDie(false);
+    return 0;
 }

@@ -23,7 +23,7 @@
 #include <app/reporting/reporting.h>
 #include <app/util/attribute-storage.h>
 #include <platform/ConnectivityManager.h>
-#include <platform/PlatformManager.h>
+#include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
 using namespace chip::app;
@@ -31,8 +31,8 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::GeneralDiagnostics::Attributes;
 using namespace chip::DeviceLayer;
 using chip::DeviceLayer::ConnectivityMgr;
-using chip::DeviceLayer::PlatformManager;
-using chip::DeviceLayer::PlatformMgr;
+using chip::DeviceLayer::DiagnosticDataProvider;
+using chip::DeviceLayer::GetDiagnosticDataProvider;
 
 namespace {
 
@@ -42,24 +42,24 @@ public:
     // Register for the GeneralDiagnostics cluster on all endpoints.
     GeneralDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), GeneralDiagnostics::Id) {}
 
-    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     template <typename T>
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &), AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &), AttributeValueEncoder & aEncoder);
 
     template <typename T>
-    CHIP_ERROR ReadListIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &), AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadListIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &), AttributeValueEncoder & aEncoder);
 
     CHIP_ERROR ReadNetworkInterfaces(AttributeValueEncoder & aEncoder);
 };
 
 template <typename T>
-CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &),
+CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
                                                         AttributeValueEncoder & aEncoder)
 {
     T data;
-    CHIP_ERROR err = (PlatformMgr().*getter)(data);
+    CHIP_ERROR err = (GetDiagnosticDataProvider().*getter)(data);
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
         data = 0;
@@ -73,13 +73,13 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMana
 }
 
 template <typename T>
-CHIP_ERROR GeneralDiagosticsAttrAccess::ReadListIfSupported(CHIP_ERROR (PlatformManager::*getter)(T &),
+CHIP_ERROR GeneralDiagosticsAttrAccess::ReadListIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
                                                             AttributeValueEncoder & aEncoder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     T faultList;
 
-    if ((PlatformMgr().*getter)(faultList) == CHIP_NO_ERROR)
+    if ((GetDiagnosticDataProvider().*getter)(faultList) == CHIP_NO_ERROR)
     {
         err = aEncoder.EncodeList([&faultList](const TagBoundEncoder & encoder) -> CHIP_ERROR {
             for (auto fault : faultList)
@@ -103,7 +103,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEnco
     CHIP_ERROR err = CHIP_NO_ERROR;
     DeviceLayer::NetworkInterface * netifs;
 
-    if (ConnectivityMgr().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
+    if (DeviceLayer::GetDiagnosticDataProvider().GetNetworkInterfaces(&netifs) == CHIP_NO_ERROR)
     {
         err = aEncoder.EncodeList([&netifs](const TagBoundEncoder & encoder) -> CHIP_ERROR {
             for (DeviceLayer::NetworkInterface * ifp = netifs; ifp != nullptr; ifp = ifp->Next)
@@ -114,7 +114,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEnco
             return CHIP_NO_ERROR;
         });
 
-        ConnectivityMgr().ReleaseNetworkInterfaces(netifs);
+        DeviceLayer::GetDiagnosticDataProvider().ReleaseNetworkInterfaces(netifs);
     }
     else
     {
@@ -126,7 +126,7 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::ReadNetworkInterfaces(AttributeValueEnco
 
 GeneralDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != GeneralDiagnostics::Id)
     {
@@ -140,25 +140,25 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath
         return ReadNetworkInterfaces(aEncoder);
     }
     case ActiveHardwareFaults::Id: {
-        return ReadListIfSupported(&PlatformManager::GetActiveHardwareFaults, aEncoder);
+        return ReadListIfSupported(&DiagnosticDataProvider::GetActiveHardwareFaults, aEncoder);
     }
     case ActiveRadioFaults::Id: {
-        return ReadListIfSupported(&PlatformManager::GetActiveRadioFaults, aEncoder);
+        return ReadListIfSupported(&DiagnosticDataProvider::GetActiveRadioFaults, aEncoder);
     }
     case ActiveNetworkFaults::Id: {
-        return ReadListIfSupported(&PlatformManager::GetActiveNetworkFaults, aEncoder);
+        return ReadListIfSupported(&DiagnosticDataProvider::GetActiveNetworkFaults, aEncoder);
     }
     case RebootCount::Id: {
-        return ReadIfSupported(&PlatformManager::GetRebootCount, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetRebootCount, aEncoder);
     }
     case UpTime::Id: {
-        return ReadIfSupported(&PlatformManager::GetUpTime, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetUpTime, aEncoder);
     }
     case TotalOperationalHours::Id: {
-        return ReadIfSupported(&PlatformManager::GetTotalOperationalHours, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetTotalOperationalHours, aEncoder);
     }
     case BootReasons::Id: {
-        return ReadIfSupported(&PlatformManager::GetBootReasons, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetBootReason, aEncoder);
     }
     default: {
         break;
@@ -167,13 +167,13 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath
     return CHIP_NO_ERROR;
 }
 
-class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegate, public DeviceLayer::PlatformManagerDelegate
+class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelegate, public DeviceLayer::GeneralDiagnosticsDelegate
 {
 
     // Gets called when any network interface on the Node is updated.
     void OnNetworkInfoChanged() override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnNetworkInfoChanged");
+        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnNetworkInfoChanged");
 
         for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
         {
@@ -194,7 +194,7 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
     // Gets called when the device has been rebooted.
     void OnDeviceRebooted() override
     {
-        ChipLogProgress(Zcl, "GeneralDiagnosticDelegate: OnDeviceRebooted");
+        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnDeviceRebooted");
 
         for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
         {
@@ -213,9 +213,72 @@ class GeneralDiagnosticDelegate : public DeviceLayer::ConnectivityManagerDelegat
             }
         }
     }
+
+    // Get called when the Node detects a hardware fault has been raised.
+    void OnHardwareFaultsDetected() override
+    {
+        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
+                }
+            }
+        }
+    }
+
+    // Get called when the Node detects a radio fault has been raised.
+    void OnRadioFaultsDetected() override
+    {
+        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
+                }
+            }
+        }
+    }
+
+    // Get called when the Node detects a network fault has been raised.
+    void OnNetworkFaultsDetected() override
+    {
+        ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
+                {
+                    // If General Diagnostics cluster is implemented on this endpoint
+                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
+                                                           GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
+                }
+            }
+        }
+    }
 };
 
-GeneralDiagnosticDelegate gDiagnosticDelegate;
+GeneralDiagnosticsDelegate gDiagnosticDelegate;
 
 } // anonymous namespace
 
@@ -223,6 +286,6 @@ void MatterGeneralDiagnosticsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
 
-    PlatformMgr().SetDelegate(&gDiagnosticDelegate);
     ConnectivityMgr().SetDelegate(&gDiagnosticDelegate);
+    GetDiagnosticDataProvider().SetGeneralDiagnosticsDelegate(&gDiagnosticDelegate);
 }

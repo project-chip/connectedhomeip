@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Read mandatory non-global attribute: StateValue"
       command: "readAttribute"
       attribute: "StateValue"
@@ -39,7 +43,7 @@ tests:
       arguments:
           value: 1
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Reads back the mandatory non-global attribute: StateValue"
       command: "readAttribute"

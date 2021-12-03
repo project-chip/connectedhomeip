@@ -82,6 +82,18 @@ static constexpr ClusterId Id = 0x00000029;
 namespace OtaSoftwareUpdateRequestor {
 static constexpr ClusterId Id = 0x0000002A;
 } // namespace OtaSoftwareUpdateRequestor
+namespace LocalizationConfiguration {
+static constexpr ClusterId Id = 0x0000002B;
+} // namespace LocalizationConfiguration
+namespace LocalizationTimeFormat {
+static constexpr ClusterId Id = 0x0000002C;
+} // namespace LocalizationTimeFormat
+namespace LocalizationUnit {
+static constexpr ClusterId Id = 0x0000002D;
+} // namespace LocalizationUnit
+namespace PowerSourceConfiguration {
+static constexpr ClusterId Id = 0x0000002E;
+} // namespace PowerSourceConfiguration
 namespace PowerSource {
 static constexpr ClusterId Id = 0x0000002F;
 } // namespace PowerSource
@@ -109,6 +121,9 @@ static constexpr ClusterId Id = 0x00000036;
 namespace EthernetNetworkDiagnostics {
 static constexpr ClusterId Id = 0x00000037;
 } // namespace EthernetNetworkDiagnostics
+namespace TimeSynchronization {
+static constexpr ClusterId Id = 0x00000038;
+} // namespace TimeSynchronization
 namespace BridgedDeviceBasic {
 static constexpr ClusterId Id = 0x00000039;
 } // namespace BridgedDeviceBasic
@@ -124,6 +139,9 @@ static constexpr ClusterId Id = 0x0000003E;
 namespace FixedLabel {
 static constexpr ClusterId Id = 0x00000040;
 } // namespace FixedLabel
+namespace UserLabel {
+static constexpr ClusterId Id = 0x00000041;
+} // namespace UserLabel
 namespace BooleanState {
 static constexpr ClusterId Id = 0x00000045;
 } // namespace BooleanState
@@ -343,12 +361,6 @@ static constexpr ClusterId Id = 0x0000F000;
 namespace GroupKeyManagement {
 static constexpr ClusterId Id = 0x0000F004;
 } // namespace GroupKeyManagement
-namespace SampleMfgSpecificCluster {
-static constexpr ClusterId Id = 0x1002FC00;
-} // namespace SampleMfgSpecificCluster
-namespace SampleMfgSpecificCluster2 {
-static constexpr ClusterId Id = 0x1049FC00;
-} // namespace SampleMfgSpecificCluster2
 
 } // namespace Clusters
 } // namespace app

@@ -87,7 +87,21 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_BootReason))
     {
-        err = StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
+        err = StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
+        SuccessOrExit(err);
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_RegulatoryConfig))
+    {
+        uint32_t location = EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR_OUTDOOR;
+        err               = WriteConfigValue(PosixConfig::kCounterKey_RegulatoryConfig, location);
+        SuccessOrExit(err);
+    }
+
+    if (!PosixConfig::ConfigValueExists(PosixConfig::kCounterKey_LocationCapability))
+    {
+        uint32_t location = EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR_OUTDOOR;
+        err               = WriteConfigValue(PosixConfig::kCounterKey_LocationCapability, location);
         SuccessOrExit(err);
     }
 
@@ -310,14 +324,44 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
     return WriteConfigValue(PosixConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetBootReasons(uint32_t & bootReasons)
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
-    return ReadConfigValue(PosixConfig::kCounterKey_BootReason, bootReasons);
+    return ReadConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::StoreBootReasons(uint32_t bootReasons)
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
 {
-    return WriteConfigValue(PosixConfig::kCounterKey_BootReason, bootReasons);
+    return WriteConfigValue(PosixConfig::kCounterKey_BootReason, bootReason);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRegulatoryConfig(uint8_t & location)
+{
+    uint32_t value = 0;
+
+    CHIP_ERROR err = ReadConfigValue(PosixConfig::kCounterKey_RegulatoryConfig, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetLocationCapability(uint8_t & location)
+{
+    uint32_t value = 0;
+
+    CHIP_ERROR err = ReadConfigValue(PosixConfig::kCounterKey_LocationCapability, value);
+
+    if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(value <= UINT8_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
+        location = static_cast<uint8_t>(value);
+    }
+
+    return err;
 }
 
 } // namespace DeviceLayer

@@ -37,6 +37,7 @@ endif()
 
 option(BUILD_WITH_DFU "Build target with Device Firmware Upgrade support" OFF)
 if(BUILD_WITH_DFU)
+    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-ota_requestor.conf)
     if(${BOARD} STREQUAL "nrf5340dk_nrf5340_cpuapp")
         list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-multi_image_dfu_support.conf)
         set(mcuboot_OVERLAY_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/configuration/mcuboot_multi_image_dfu.conf CACHE INTERNAL "")
@@ -61,6 +62,7 @@ target_compile_options(app PRIVATE -Werror)
 target_include_directories(app PRIVATE
                            main/include
                            ${LIGHTING_COMMON}
+                           ${GEN_DIR}
                            ${GEN_DIR}/app-common
                            ${GEN_DIR}/lighting-app
                            ${NLIO_ROOT}
@@ -74,13 +76,16 @@ target_sources(app PRIVATE
                main/ZclCallbacks.cpp
                ${GEN_DIR}/lighting-app/zap-generated/attribute-size.cpp
                ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
+               ${GEN_DIR}/lighting-app/zap-generated/CHIPClusters.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp)
 
 chip_configure_data_model(app
+    INCLUDE_CLIENT_CALLBACKS
     INCLUDE_SERVER
     ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../lighting-common/lighting-app.zap
+    GEN_DIR ${GEN_DIR}/lighting-app/zap-generated
 )
 
 if(BUILD_WITH_DFU)
@@ -155,9 +160,9 @@ pw_proto_library(lighting_service
 )
 
 target_sources(app PRIVATE
-  main/Rpc.cpp
   ../../common/pigweed/RpcService.cpp
   ../../common/pigweed/nrfconnect/PigweedLoggerMutex.cpp
+  ${NRFCONNECT_COMMON}/Rpc.cpp
   ${NRFCONNECT_COMMON}/util/PigweedLogger.cpp
 )
 
@@ -165,9 +170,16 @@ target_include_directories(app PRIVATE
   ${PIGWEED_ROOT}/pw_sys_io/public
   ${CHIP_ROOT}/src/lib/support
   ${CHIP_ROOT}/src/system
+  ${NRFCONNECT_COMMON}
   ../../common
   ../../common/pigweed
   ../../common/pigweed/nrfconnect)
+
+target_compile_options(app PRIVATE
+                       "-DPW_RPC_ATTRIBUTE_SERVICE=1"
+                       "-DPW_RPC_BUTTON_SERVICE=1"
+                       "-DPW_RPC_DEVICE_SERVICE=1"
+                       "-DPW_RPC_LIGHTING_SERVICE=1")
 
 target_link_libraries(app PRIVATE
   attributes_service.nanopb_rpc

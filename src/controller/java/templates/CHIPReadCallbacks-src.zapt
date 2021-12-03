@@ -11,6 +11,8 @@
 #include <platform/PlatformManager.h>
 
 {{#chip_server_global_responses}}
+{{! TODO: Add support for struct-typed attributes }}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 
 CHIP{{chipCallback.name}}AttributeCallback::CHIP{{chipCallback.name}}AttributeCallback(jobject javaCallback, bool keepAlive) :
     chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(CallbackFn, this), keepAlive(keepAlive)
@@ -78,11 +80,13 @@ void CHIP{{chipCallback.name}}AttributeCallback::CallbackFn(void * context, {{ch
     env->CallVoidMethod(javaCallbackRef, javaMethod, valueStr.jniValue());
     {{/if}}
 }
+{{/unless}}
 {{/chip_server_global_responses}}
 
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
-{{#if isList}}
+{{! TODO: Add support for struct-typed attributes }}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 
 {{! NOTE: Some of our helpers rely on broken ZAP APIs that sniff for "isArray"
     when we are just trying to work with the type of an array element.  Fix
@@ -92,8 +96,10 @@ void CHIP{{chipCallback.name}}AttributeCallback::CallbackFn(void * context, {{ch
 {{~#*inline "asUnboxedJniSignatureForEntry"}}{{> asUnboxedJniSignature isArray=false}}{{/inline~}}
 {{~#*inline "asBoxedJavaBasicType"}}{{asJavaBasicTypeForZclType type true}}{{/inline~}}
 {{~#*inline "asBoxedJavaBasicTypeForEntry"}}{{>asBoxedJavaBasicType isArray=false}}{{/inline~}}
-CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(jobject javaCallback) :
-    chip::Callback::Callback<{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}ListAttributeCallback>(CallbackFn, this)
+{{#if_in_global_responses}}
+{{else}}
+CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback(jobject javaCallback, bool keepAlive) :
+    chip::Callback::Callback<CHIP{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}AttributeCallbackType>(CallbackFn, this), keepAlive(keepAlive)
 {
     JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
     if (env == nullptr) {
@@ -116,7 +122,9 @@ CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::
     }
     env->DeleteGlobalRef(javaCallbackRef);
 }
+{{/if_in_global_responses}}
 
+{{#if isList}}
 void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} list)
 {
     chip::DeviceLayer::StackUnlock unlock;
@@ -126,7 +134,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
 
     VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
 
-    std::unique_ptr<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback> cppCallback(reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback *>(context));
+    std::unique_ptr<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback *>(context), maybeDestroy);
 
     // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
     javaCallbackRef = cppCallback.get()->javaCallbackRef;
@@ -178,7 +186,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         {{/if}}
 
         {{#if isOptional}}
-        {{chipType}} {{asLowerCamelCase name}}Value;
+        {{zapTypeToDecodableClusterObjectType type forceNotOptional=true forceNotNullable=true ns=parent.parent.name}} {{asLowerCamelCase name}}Value;
         {{#if isNullable}}
         {{asLowerCamelCase name}}HasValue = entry.{{asLowerCamelCase name}}.HasValue();
         if ({{asLowerCamelCase name}}HasValue) {
@@ -198,7 +206,7 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
 
         {{#unless isOptional}}
         {{#unless isNullable}}
-        {{chipType}} {{asLowerCamelCase name}}Value = entry.{{asLowerCamelCase name}};
+        {{zapTypeToDecodableClusterObjectType type ns=parent.parent.name}} {{asLowerCamelCase name}}Value = entry.{{asLowerCamelCase name}};
         {{/unless}}
         {{/unless}}
 
@@ -262,13 +270,13 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
         bool entryNull = false;
         {{#unless isStruct}}
         {{#if isNullable}}
-        {{chipType}} entryValue;
+        {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotList=true}} entryValue;
         entryNull = entry.IsNull();
         if (!entryNull) {
             entryValue = entry.Value();
         }
         {{else}}
-        {{chipType}} entryValue = entry;
+        {{zapTypeToDecodableClusterObjectType type ns=parent.name forceNotList=true}} entryValue = entry;
         {{/if}}
         {{/unless}}
 
@@ -311,7 +319,34 @@ void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallb
     env->ExceptionClear();
     env->CallVoidMethod(javaCallbackRef, javaMethod, arrayListObj);
 }
+{{else}}
+  {{#if_in_global_responses}}
+  {{else}}
+    void CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback::CallbackFn(void * context, {{zapTypeToDecodableClusterObjectType type ns=parent.name isArgument=true}} value)
+    {
+        chip::DeviceLayer::StackUnlock unlock;
+        CHIP_ERROR err = CHIP_NO_ERROR;
+        JNIEnv * env = chip::JniReferences::GetInstance().GetEnvForCurrentThread();
+        jobject javaCallbackRef;
+
+        VerifyOrReturn(env != nullptr, ChipLogError(Zcl, "Could not get JNI env"));
+        std::unique_ptr<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback, decltype(&maybeDestroy)> cppCallback(reinterpret_cast<CHIP{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}AttributeCallback *>(context), maybeDestroy);
+
+        // It's valid for javaCallbackRef to be nullptr if the Java code passed in a null callback.
+        javaCallbackRef = cppCallback.get()->javaCallbackRef;
+        VerifyOrReturn(javaCallbackRef != nullptr, ChipLogProgress(Zcl, "Early return from attribute callback since Java callback is null"));
+
+        jmethodID javaMethod;
+        err = chip::JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "({{#if isArray}}{{else if isStruct}}{{else if isOptional}}Ljava/util/Optional;{{else if (isOctetString type)}}[B{{else if (isCharString type)}}Ljava/lang/String;{{else}}{{asJniSignature type true}}{{/if}})V", &javaMethod);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Could not find onSuccess() method"));
+
+        {{>decode_value source="value" target="javaValue"}}
+
+        env->CallVoidMethod(javaCallbackRef, javaMethod, javaValue);
+    }
+  {{/if_in_global_responses}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 

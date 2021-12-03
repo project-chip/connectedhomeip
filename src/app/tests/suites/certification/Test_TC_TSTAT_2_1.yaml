@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     #issue  #11524 disabled steps are for attributes not supported in YAML framework
     - label: "Reads mandatory attributes from DUT: LocalTemperature"
       disabled: true
@@ -44,7 +48,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back mandatory attributes from DUT: LocalTemperature"
       disabled: true
@@ -78,7 +82,7 @@ tests:
       arguments:
           value: 700
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back mandatory attributes from DUT: AbsMinHeatSetpointLimit"
       command: "readAttribute"
@@ -111,7 +115,7 @@ tests:
       arguments:
           value: 3000
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back mandatory attributes from DUT: AbsMaxHeatSetpointLimit"
       command: "readAttribute"
@@ -144,7 +148,7 @@ tests:
       arguments:
           value: 1600
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back mandatory attributes from DUT: AbsMinCoolSetpointLimit"
       command: "readAttribute"
@@ -177,7 +181,7 @@ tests:
       arguments:
           value: 3200
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back mandatory attributes from DUT: AbsMaxCoolSetpointLimit"
       command: "readAttribute"
@@ -205,7 +209,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back mandatory attributes from DUT: PICoolingDemand"
       disabled: true
@@ -234,7 +238,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back mandatory attributes from DUT: PIHeatingDemand"
       disabled: true
@@ -787,7 +791,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back optional attributes from DUT: AlarmMask"
       disabled: true
@@ -824,7 +828,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back optional attributes from DUT: ThermostatRunningMode"
       disabled: true
@@ -850,7 +854,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back optional attributes from DUT: StartOfWeek"
       command: "readAttribute"
@@ -883,7 +887,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back optional attributes from DUT: NumberOfWeeklyTransitions"
       disabled: true
@@ -917,7 +921,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back optional attributes from DUT: NumberOfDailyTransitions"
       disabled: true
@@ -1059,7 +1063,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back optional attributes from DUT: ThermostatRunningState"
       disabled: true
@@ -1096,7 +1100,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back optional attributes from DUT: SetpointChangeSource"
       disabled: true
@@ -1131,7 +1135,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back optional attributes from DUT: SetpointChangeAmount"
       disabled: true
@@ -1166,7 +1170,7 @@ tests:
       arguments:
           value: 0
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label:
           "Read back optional attributes from DUT: SetpointChangeSourceTimestamp"
@@ -1203,7 +1207,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back optional attributes from DUT: OccupiedSetback"
       disabled: true
@@ -1307,7 +1311,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back optional attributes from DUT: UnoccupiedSetback"
       disabled: true
@@ -1640,7 +1644,7 @@ tests:
       arguments:
           value: null
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     - label: "Read back optional attributes from DUT: ACCoilTemperature"
       disabled: true

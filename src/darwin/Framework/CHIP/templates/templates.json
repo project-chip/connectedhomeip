@@ -3,6 +3,7 @@
     "version": "chip-v1",
     "helpers": [
         "../../../../../src/app/zap-templates/partials/helper.js",
+        "../../../../../src/app/zap-templates/common/ChipTypesHelper.js",
         "../../../../../src/app/zap-templates/common/StringHelper.js",
         "../../../../../src/app/zap-templates/templates/app/helper.js",
         "../../../../../src/app/zap-templates/templates/chip/helper.js",
@@ -39,6 +40,14 @@
         {
             "name": "check_test_value",
             "path": "partials/check_test_value.zapt"
+        },
+        {
+            "name": "init_struct_member",
+            "path": "partials/init_struct_member.zapt"
+        },
+        {
+            "name": "command_completion_type",
+            "path": "partials/command_completion_type.zapt"
         }
     ],
     "templates": [

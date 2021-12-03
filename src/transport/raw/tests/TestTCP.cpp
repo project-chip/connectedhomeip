@@ -29,7 +29,6 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/UnitTestRegistration.h>
 #include <system/SystemLayer.h>
-#include <system/SystemObject.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/TCP.h>
 

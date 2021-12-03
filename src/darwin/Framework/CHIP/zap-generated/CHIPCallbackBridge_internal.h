@@ -28,6 +28,9 @@ using CHIPCommandSuccessCallbackType = CommandSuccessCallback;
 typedef void (*CHIPDefaultSuccessCallbackType)(void *);
 typedef void (*CHIPDefaultFailureCallbackType)(void *, EmberAfStatus);
 
+typedef void (*VendorIdAttributeCallback)(void *, chip::VendorId);
+typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::VendorId> &);
+
 typedef void (*CHIPAccountLoginClusterGetSetupPINResponseCallbackType)(
     void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
 typedef void (*CHIPApplicationLauncherClusterLaunchAppResponseCallbackType)(
@@ -170,6 +173,8 @@ typedef void (*CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType)(
     void *, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterBooleanResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType &);
+typedef void (*CHIPTestClusterClusterSimpleStructResponseCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestAddArgumentsResponseCallbackType)(
     void *, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType &);
 typedef void (*CHIPTestClusterClusterTestEnumsResponseCallbackType)(
@@ -211,6 +216,16 @@ public:
     static void OnSuccessFn(void * context, chip::ByteSpan value);
 };
 
+class CHIPNullableOctetStringAttributeCallbackBridge : public CHIPCallbackBridge<NullableOctetStringAttributeCallback>
+{
+public:
+    CHIPNullableOctetStringAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                   bool keepAlive = false) :
+        CHIPCallbackBridge<NullableOctetStringAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
+};
+
 class CHIPCharStringAttributeCallbackBridge : public CHIPCallbackBridge<CharStringAttributeCallback>
 {
 public:
@@ -219,6 +234,16 @@ public:
         CHIPCallbackBridge<CharStringAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, chip::CharSpan value);
+};
+
+class CHIPNullableCharStringAttributeCallbackBridge : public CHIPCallbackBridge<NullableCharStringAttributeCallback>
+{
+public:
+    CHIPNullableCharStringAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                  bool keepAlive = false) :
+        CHIPCallbackBridge<NullableCharStringAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value);
 };
 
 class CHIPBooleanAttributeCallbackBridge : public CHIPCallbackBridge<BooleanAttributeCallback>
@@ -231,6 +256,16 @@ public:
     static void OnSuccessFn(void * context, bool value);
 };
 
+class CHIPNullableBooleanAttributeCallbackBridge : public CHIPCallbackBridge<NullableBooleanAttributeCallback>
+{
+public:
+    CHIPNullableBooleanAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                               bool keepAlive = false) :
+        CHIPCallbackBridge<NullableBooleanAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<bool> & value);
+};
+
 class CHIPInt8uAttributeCallbackBridge : public CHIPCallbackBridge<Int8uAttributeCallback>
 {
 public:
@@ -239,6 +274,16 @@ public:
         CHIPCallbackBridge<Int8uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, uint8_t value);
+};
+
+class CHIPNullableInt8uAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt8uAttributeCallback>
+{
+public:
+    CHIPNullableInt8uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                             bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt8uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPInt8sAttributeCallbackBridge : public CHIPCallbackBridge<Int8sAttributeCallback>
@@ -251,6 +296,16 @@ public:
     static void OnSuccessFn(void * context, int8_t value);
 };
 
+class CHIPNullableInt8sAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt8sAttributeCallback>
+{
+public:
+    CHIPNullableInt8sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                             bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt8sAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int8_t> & value);
+};
+
 class CHIPInt16uAttributeCallbackBridge : public CHIPCallbackBridge<Int16uAttributeCallback>
 {
 public:
@@ -259,6 +314,16 @@ public:
         CHIPCallbackBridge<Int16uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, uint16_t value);
+};
+
+class CHIPNullableInt16uAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt16uAttributeCallback>
+{
+public:
+    CHIPNullableInt16uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt16uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
 };
 
 class CHIPInt16sAttributeCallbackBridge : public CHIPCallbackBridge<Int16sAttributeCallback>
@@ -271,6 +336,16 @@ public:
     static void OnSuccessFn(void * context, int16_t value);
 };
 
+class CHIPNullableInt16sAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt16sAttributeCallback>
+{
+public:
+    CHIPNullableInt16sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt16sAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
+};
+
 class CHIPInt32uAttributeCallbackBridge : public CHIPCallbackBridge<Int32uAttributeCallback>
 {
 public:
@@ -279,6 +354,16 @@ public:
         CHIPCallbackBridge<Int32uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, uint32_t value);
+};
+
+class CHIPNullableInt32uAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt32uAttributeCallback>
+{
+public:
+    CHIPNullableInt32uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt32uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
 };
 
 class CHIPInt32sAttributeCallbackBridge : public CHIPCallbackBridge<Int32sAttributeCallback>
@@ -291,6 +376,16 @@ public:
     static void OnSuccessFn(void * context, int32_t value);
 };
 
+class CHIPNullableInt32sAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt32sAttributeCallback>
+{
+public:
+    CHIPNullableInt32sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt32sAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int32_t> & value);
+};
+
 class CHIPInt64uAttributeCallbackBridge : public CHIPCallbackBridge<Int64uAttributeCallback>
 {
 public:
@@ -299,6 +394,16 @@ public:
         CHIPCallbackBridge<Int64uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, uint64_t value);
+};
+
+class CHIPNullableInt64uAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt64uAttributeCallback>
+{
+public:
+    CHIPNullableInt64uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt64uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
 };
 
 class CHIPInt64sAttributeCallbackBridge : public CHIPCallbackBridge<Int64sAttributeCallback>
@@ -311,6 +416,76 @@ public:
     static void OnSuccessFn(void * context, int64_t value);
 };
 
+class CHIPNullableInt64sAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt64sAttributeCallback>
+{
+public:
+    CHIPNullableInt64sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt64sAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value);
+};
+
+class CHIPFloatAttributeCallbackBridge : public CHIPCallbackBridge<FloatAttributeCallback>
+{
+public:
+    CHIPFloatAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                     bool keepAlive = false) :
+        CHIPCallbackBridge<FloatAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, float value);
+};
+
+class CHIPNullableFloatAttributeCallbackBridge : public CHIPCallbackBridge<NullableFloatAttributeCallback>
+{
+public:
+    CHIPNullableFloatAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                             bool keepAlive = false) :
+        CHIPCallbackBridge<NullableFloatAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<float> & value);
+};
+
+class CHIPDoubleAttributeCallbackBridge : public CHIPCallbackBridge<DoubleAttributeCallback>
+{
+public:
+    CHIPDoubleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                      bool keepAlive = false) :
+        CHIPCallbackBridge<DoubleAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, double value);
+};
+
+class CHIPNullableDoubleAttributeCallbackBridge : public CHIPCallbackBridge<NullableDoubleAttributeCallback>
+{
+public:
+    CHIPNullableDoubleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableDoubleAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<double> & value);
+};
+
+class CHIPVendorIdAttributeCallbackBridge : public CHIPCallbackBridge<VendorIdAttributeCallback>
+{
+public:
+    CHIPVendorIdAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                        bool keepAlive = false) :
+        CHIPCallbackBridge<VendorIdAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::VendorId value);
+};
+
+class CHIPNullableVendorIdAttributeCallbackBridge : public CHIPCallbackBridge<NullableVendorIdAttributeCallback>
+{
+public:
+    CHIPNullableVendorIdAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                bool keepAlive = false) :
+        CHIPCallbackBridge<NullableVendorIdAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::VendorId> & value);
+};
+
 class CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ApplicationLauncherApplicationLauncherListListAttributeCallback>
 {
@@ -320,7 +495,7 @@ public:
         CHIPCallbackBridge<ApplicationLauncherApplicationLauncherListListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                             keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value);
 };
 
 class CHIPAudioOutputAudioOutputListListAttributeCallbackBridge
@@ -334,7 +509,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPBridgedActionsActionListListAttributeCallbackBridge
@@ -348,7 +523,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPBridgedActionsEndpointListListAttributeCallbackBridge
@@ -362,7 +537,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge
@@ -373,7 +548,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ContentLauncherAcceptsHeaderListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
 };
 
 class CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge
@@ -385,9 +560,9 @@ public:
         CHIPCallbackBridge<ContentLauncherSupportedStreamingTypesListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & list);
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value);
 };
 
 class CHIPDescriptorDeviceListListAttributeCallbackBridge : public CHIPCallbackBridge<DescriptorDeviceListListAttributeCallback>
@@ -399,7 +574,7 @@ public:
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & list);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & value);
 };
 
 class CHIPDescriptorServerListListAttributeCallbackBridge : public CHIPCallbackBridge<DescriptorServerListListAttributeCallback>
@@ -409,7 +584,7 @@ public:
                                                         bool keepAlive = false) :
         CHIPCallbackBridge<DescriptorServerListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value);
 };
 
 class CHIPDescriptorClientListListAttributeCallbackBridge : public CHIPCallbackBridge<DescriptorClientListListAttributeCallback>
@@ -419,7 +594,7 @@ public:
                                                         bool keepAlive = false) :
         CHIPCallbackBridge<DescriptorClientListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value);
 };
 
 class CHIPDescriptorPartsListListAttributeCallbackBridge : public CHIPCallbackBridge<DescriptorPartsListListAttributeCallback>
@@ -429,7 +604,7 @@ public:
                                                        bool keepAlive = false) :
         CHIPCallbackBridge<DescriptorPartsListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value);
 };
 
 class CHIPFixedLabelLabelListListAttributeCallbackBridge : public CHIPCallbackBridge<FixedLabelLabelListListAttributeCallback>
@@ -441,7 +616,7 @@ public:
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & list);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value);
 };
 
 class CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBridge
@@ -456,7 +631,7 @@ public:
     static void
     OnSuccessFn(void * context,
                 const chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & list);
+                    chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & value);
 };
 
 class CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge
@@ -470,7 +645,7 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & list);
+                                chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & value);
 };
 
 class CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge
@@ -482,7 +657,7 @@ public:
         CHIPCallbackBridge<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
 };
 
 class CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge
@@ -494,7 +669,7 @@ public:
         CHIPCallbackBridge<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
 };
 
 class CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge
@@ -506,7 +681,7 @@ public:
         CHIPCallbackBridge<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                        keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
 };
 
 class CHIPGroupKeyManagementGroupsListAttributeCallbackBridge
@@ -520,7 +695,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge
@@ -534,7 +709,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPMediaInputMediaInputListListAttributeCallbackBridge
@@ -547,7 +722,7 @@ public:
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & value);
 };
 
 class CHIPModeSelectSupportedModesListAttributeCallbackBridge
@@ -561,7 +736,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge
@@ -575,7 +750,7 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list);
+                                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & value);
 };
 
 class CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge
@@ -587,7 +762,7 @@ public:
         CHIPCallbackBridge<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
 };
 
 class CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
@@ -598,7 +773,7 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
 };
 
 class CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge
@@ -612,7 +787,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPTvChannelTvChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelTvChannelListListAttributeCallback>
@@ -624,7 +799,7 @@ public:
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value);
 };
 
 class CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge
@@ -638,7 +813,7 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & list);
+                                chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & value);
 };
 
 class CHIPTestClusterListInt8uListAttributeCallbackBridge : public CHIPCallbackBridge<TestClusterListInt8uListAttributeCallback>
@@ -648,7 +823,7 @@ public:
                                                         bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterListInt8uListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
 };
 
 class CHIPTestClusterListOctetStringListAttributeCallbackBridge
@@ -659,7 +834,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterListOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
 };
 
 class CHIPTestClusterListStructOctetStringListAttributeCallbackBridge
@@ -673,7 +848,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge
@@ -687,7 +862,7 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & list);
+                                chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge
@@ -701,7 +876,7 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & list);
+                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge
@@ -715,7 +890,7 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & list);
+                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge
@@ -729,7 +904,7 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & list);
+                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackBridge
@@ -746,7 +921,7 @@ public:
     static void
     OnSuccessFn(void * context,
                 const chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & list);
+                    chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge
@@ -760,7 +935,7 @@ public:
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & list);
+                const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value);
 };
 
 class CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge
@@ -1640,6 +1815,19 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & data);
+};
+
+class CHIPTestClusterClusterSimpleStructResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPTestClusterClusterSimpleStructResponseCallbackType>
+{
+public:
+    CHIPTestClusterClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPTestClusterClusterSimpleStructResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & data);
 };
 
 class CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge

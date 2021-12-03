@@ -18,7 +18,7 @@
 function getTests()
 {
   try {
-    const appTest = require('../linux/apps/' + process.env.TARGET_APP + '/tests.js');
+    const appTest = require('../linux/apps/app1/tests.js');
     return appTest.getTests();
   } catch (e) {
     console.info("No tests configuration has been found.");

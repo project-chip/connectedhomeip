@@ -29,9 +29,9 @@ ChannelHandle ChannelManager::EstablishChannel(const ChannelBuilder & builder, C
         if (context->MatchesBuilder(builder))
         {
             channelContext = context;
-            return false;
+            return Loop::Break;
         }
-        return true;
+        return Loop::Continue;
     });
 
     if (channelContext == nullptr)

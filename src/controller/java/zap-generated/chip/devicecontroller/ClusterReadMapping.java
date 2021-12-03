@@ -391,18 +391,18 @@ public class ClusterReadMapping {
             readBasicProductIDCommandParams);
     readBasicInteractionInfo.put(
         "readProductIDAttribute", readBasicProductIDAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBasicUserLabelCommandParams =
+    Map<String, CommandParameterInfo> readBasicNodeLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBasicUserLabelAttributeInteractionInfo =
+    InteractionInfo readBasicNodeLabelAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BasicCluster) cluster)
-                  .readUserLabelAttribute((ChipClusters.CharStringAttributeCallback) callback);
+                  .readNodeLabelAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBasicUserLabelCommandParams);
+            readBasicNodeLabelCommandParams);
     readBasicInteractionInfo.put(
-        "readUserLabelAttribute", readBasicUserLabelAttributeInteractionInfo);
+        "readNodeLabelAttribute", readBasicNodeLabelAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readBasicLocationCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readBasicLocationAttributeInteractionInfo =
@@ -553,6 +553,18 @@ public class ClusterReadMapping {
             readBasicReachableCommandParams);
     readBasicInteractionInfo.put(
         "readReachableAttribute", readBasicReachableAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readBasicUniqueIDCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readBasicUniqueIDAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.BasicCluster) cluster)
+                  .readUniqueIDAttribute((ChipClusters.CharStringAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
+            readBasicUniqueIDCommandParams);
+    readBasicInteractionInfo.put(
+        "readUniqueIDAttribute", readBasicUniqueIDAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readBasicClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readBasicClusterRevisionAttributeInteractionInfo =
@@ -746,18 +758,18 @@ public class ClusterReadMapping {
             readBridgedDeviceBasicProductNameCommandParams);
     readBridgedDeviceBasicInteractionInfo.put(
         "readProductNameAttribute", readBridgedDeviceBasicProductNameAttributeInteractionInfo);
-    Map<String, CommandParameterInfo> readBridgedDeviceBasicUserLabelCommandParams =
+    Map<String, CommandParameterInfo> readBridgedDeviceBasicNodeLabelCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
-    InteractionInfo readBridgedDeviceBasicUserLabelAttributeInteractionInfo =
+    InteractionInfo readBridgedDeviceBasicNodeLabelAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.BridgedDeviceBasicCluster) cluster)
-                  .readUserLabelAttribute((ChipClusters.CharStringAttributeCallback) callback);
+                  .readNodeLabelAttribute((ChipClusters.CharStringAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
-            readBridgedDeviceBasicUserLabelCommandParams);
+            readBridgedDeviceBasicNodeLabelCommandParams);
     readBridgedDeviceBasicInteractionInfo.put(
-        "readUserLabelAttribute", readBridgedDeviceBasicUserLabelAttributeInteractionInfo);
+        "readNodeLabelAttribute", readBridgedDeviceBasicNodeLabelAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readBridgedDeviceBasicHardwareVersionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readBridgedDeviceBasicHardwareVersionAttributeInteractionInfo =
@@ -2009,6 +2021,19 @@ public class ClusterReadMapping {
     readEthernetNetworkDiagnosticsInteractionInfo.put(
         "readTimeSinceResetAttribute",
         readEthernetNetworkDiagnosticsTimeSinceResetAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readEthernetNetworkDiagnosticsFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readEthernetNetworkDiagnosticsFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.EthernetNetworkDiagnosticsCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readEthernetNetworkDiagnosticsFeatureMapCommandParams);
+    readEthernetNetworkDiagnosticsInteractionInfo.put(
+        "readFeatureMapAttribute",
+        readEthernetNetworkDiagnosticsFeatureMapAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readEthernetNetworkDiagnosticsClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readEthernetNetworkDiagnosticsClusterRevisionAttributeInteractionInfo =
@@ -2145,6 +2170,33 @@ public class ClusterReadMapping {
     readGeneralCommissioningInteractionInfo.put(
         "readBasicCommissioningInfoListAttribute",
         readGeneralCommissioningBasicCommissioningInfoListAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readGeneralCommissioningRegulatoryConfigCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readGeneralCommissioningRegulatoryConfigAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GeneralCommissioningCluster) cluster)
+                  .readRegulatoryConfigAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readGeneralCommissioningRegulatoryConfigCommandParams);
+    readGeneralCommissioningInteractionInfo.put(
+        "readRegulatoryConfigAttribute",
+        readGeneralCommissioningRegulatoryConfigAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readGeneralCommissioningLocationCapabilityCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readGeneralCommissioningLocationCapabilityAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.GeneralCommissioningCluster) cluster)
+                  .readLocationCapabilityAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readGeneralCommissioningLocationCapabilityCommandParams);
+    readGeneralCommissioningInteractionInfo.put(
+        "readLocationCapabilityAttribute",
+        readGeneralCommissioningLocationCapabilityAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readGeneralCommissioningClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readGeneralCommissioningClusterRevisionAttributeInteractionInfo =
@@ -2396,7 +2448,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.IlluminanceMeasurementCluster) cluster)
-                  .readMeasuredValueAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMeasuredValueAttribute(
+                      (ChipClusters.IlluminanceMeasurementCluster.MeasuredValueAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readIlluminanceMeasurementMeasuredValueCommandParams);
@@ -2409,7 +2463,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.IlluminanceMeasurementCluster) cluster)
-                  .readMinMeasuredValueAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMinMeasuredValueAttribute(
+                      (ChipClusters.IlluminanceMeasurementCluster.MinMeasuredValueAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readIlluminanceMeasurementMinMeasuredValueCommandParams);
@@ -2422,7 +2478,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.IlluminanceMeasurementCluster) cluster)
-                  .readMaxMeasuredValueAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readMaxMeasuredValueAttribute(
+                      (ChipClusters.IlluminanceMeasurementCluster.MaxMeasuredValueAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readIlluminanceMeasurementMaxMeasuredValueCommandParams);
@@ -2447,7 +2505,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.IlluminanceMeasurementCluster) cluster)
-                  .readLightSensorTypeAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readLightSensorTypeAttribute(
+                      (ChipClusters.IlluminanceMeasurementCluster.LightSensorTypeAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readIlluminanceMeasurementLightSensorTypeCommandParams);
@@ -2599,7 +2659,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readOnLevelAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readOnLevelAttribute(
+                      (ChipClusters.LevelControlCluster.OnLevelAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlOnLevelCommandParams);
@@ -2611,7 +2672,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readOnTransitionTimeAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readOnTransitionTimeAttribute(
+                      (ChipClusters.LevelControlCluster.OnTransitionTimeAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlOnTransitionTimeCommandParams);
@@ -2623,7 +2686,9 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readOffTransitionTimeAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readOffTransitionTimeAttribute(
+                      (ChipClusters.LevelControlCluster.OffTransitionTimeAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlOffTransitionTimeCommandParams);
@@ -2636,7 +2701,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.LevelControlCluster) cluster)
-                  .readDefaultMoveRateAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readDefaultMoveRateAttribute(
+                      (ChipClusters.LevelControlCluster.DefaultMoveRateAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readLevelControlDefaultMoveRateCommandParams);
@@ -3243,7 +3309,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.OperationalCredentialsCluster) cluster)
                   .readCurrentFabricIndexAttribute(
-                      (ChipClusters.IntegerAttributeCallback) callback);
+                      (ChipClusters.OperationalCredentialsCluster
+                              .CurrentFabricIndexAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readOperationalCredentialsCurrentFabricIndexCommandParams);
@@ -3698,6 +3766,35 @@ public class ClusterReadMapping {
     readPumpConfigurationAndControlInteractionInfo.put(
         "readSpeedAttribute", readPumpConfigurationAndControlSpeedAttributeInteractionInfo);
     Map<String, CommandParameterInfo>
+        readPumpConfigurationAndControlLifetimeRunningHoursCommandParams =
+            new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPumpConfigurationAndControlLifetimeRunningHoursAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
+                  .readLifetimeRunningHoursAttribute(
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .LifetimeRunningHoursAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readPumpConfigurationAndControlLifetimeRunningHoursCommandParams);
+    readPumpConfigurationAndControlInteractionInfo.put(
+        "readLifetimeRunningHoursAttribute",
+        readPumpConfigurationAndControlLifetimeRunningHoursAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readPumpConfigurationAndControlPowerCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readPumpConfigurationAndControlPowerAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
+                  .readPowerAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readPumpConfigurationAndControlPowerCommandParams);
+    readPumpConfigurationAndControlInteractionInfo.put(
+        "readPowerAttribute", readPumpConfigurationAndControlPowerAttributeInteractionInfo);
+    Map<String, CommandParameterInfo>
         readPumpConfigurationAndControlLifetimeEnergyConsumedCommandParams =
             new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readPumpConfigurationAndControlLifetimeEnergyConsumedAttributeInteractionInfo =
@@ -3705,7 +3802,9 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.PumpConfigurationAndControlCluster) cluster)
                   .readLifetimeEnergyConsumedAttribute(
-                      (ChipClusters.LongAttributeCallback) callback);
+                      (ChipClusters.PumpConfigurationAndControlCluster
+                              .LifetimeEnergyConsumedAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readPumpConfigurationAndControlLifetimeEnergyConsumedCommandParams);
@@ -3975,6 +4074,18 @@ public class ClusterReadMapping {
     readSoftwareDiagnosticsInteractionInfo.put(
         "readCurrentHeapHighWatermarkAttribute",
         readSoftwareDiagnosticsCurrentHeapHighWatermarkAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readSoftwareDiagnosticsFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readSoftwareDiagnosticsFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.SoftwareDiagnosticsCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readSoftwareDiagnosticsFeatureMapCommandParams);
+    readSoftwareDiagnosticsInteractionInfo.put(
+        "readFeatureMapAttribute", readSoftwareDiagnosticsFeatureMapAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readSoftwareDiagnosticsClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readSoftwareDiagnosticsClusterRevisionAttributeInteractionInfo =
@@ -4284,6 +4395,18 @@ public class ClusterReadMapping {
             readTestClusterInt16uCommandParams);
     readTestClusterInteractionInfo.put(
         "readInt16uAttribute", readTestClusterInt16uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterInt24uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterInt24uAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readInt24uAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterInt24uCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readInt24uAttribute", readTestClusterInt24uAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterInt32uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterInt32uAttributeInteractionInfo =
@@ -4296,6 +4419,42 @@ public class ClusterReadMapping {
             readTestClusterInt32uCommandParams);
     readTestClusterInteractionInfo.put(
         "readInt32uAttribute", readTestClusterInt32uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterInt40uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterInt40uAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readInt40uAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterInt40uCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readInt40uAttribute", readTestClusterInt40uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterInt48uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterInt48uAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readInt48uAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterInt48uCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readInt48uAttribute", readTestClusterInt48uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterInt56uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterInt56uAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readInt56uAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterInt56uCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readInt56uAttribute", readTestClusterInt56uAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterInt64uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterInt64uAttributeInteractionInfo =
@@ -4332,6 +4491,18 @@ public class ClusterReadMapping {
             readTestClusterInt16sCommandParams);
     readTestClusterInteractionInfo.put(
         "readInt16sAttribute", readTestClusterInt16sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterInt24sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterInt24sAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readInt24sAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterInt24sCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readInt24sAttribute", readTestClusterInt24sAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterInt32sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterInt32sAttributeInteractionInfo =
@@ -4344,6 +4515,42 @@ public class ClusterReadMapping {
             readTestClusterInt32sCommandParams);
     readTestClusterInteractionInfo.put(
         "readInt32sAttribute", readTestClusterInt32sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterInt40sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterInt40sAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readInt40sAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterInt40sCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readInt40sAttribute", readTestClusterInt40sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterInt48sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterInt48sAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readInt48sAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterInt48sCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readInt48sAttribute", readTestClusterInt48sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterInt56sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterInt56sAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readInt56sAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterInt56sCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readInt56sAttribute", readTestClusterInt56sAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterInt64sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterInt64sAttributeInteractionInfo =
@@ -4380,6 +4587,30 @@ public class ClusterReadMapping {
             readTestClusterEnum16CommandParams);
     readTestClusterInteractionInfo.put(
         "readEnum16Attribute", readTestClusterEnum16AttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterFloatSingleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterFloatSingleAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readFloatSingleAttribute((ChipClusters.FloatAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedFloatAttributeCallback(),
+            readTestClusterFloatSingleCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readFloatSingleAttribute", readTestClusterFloatSingleAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterFloatDoubleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterFloatDoubleAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readFloatDoubleAttribute((ChipClusters.DoubleAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedDoubleAttributeCallback(),
+            readTestClusterFloatDoubleCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readFloatDoubleAttribute", readTestClusterFloatDoubleAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterOctetStringCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterOctetStringAttributeInteractionInfo =
@@ -4500,7 +4731,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readVendorIdAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readVendorIdAttribute(
+                      (ChipClusters.TestClusterCluster.VendorIdAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTestClusterVendorIdCommandParams);
@@ -4523,6 +4755,74 @@ public class ClusterReadMapping {
     readTestClusterInteractionInfo.put(
         "readListNullablesAndOptionalsStructAttribute",
         readTestClusterListNullablesAndOptionalsStructAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterRangeRestrictedInt8uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterRangeRestrictedInt8uAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readRangeRestrictedInt8uAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTestClusterRangeRestrictedInt8uCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readRangeRestrictedInt8uAttribute",
+        readTestClusterRangeRestrictedInt8uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterRangeRestrictedInt8sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterRangeRestrictedInt8sAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readRangeRestrictedInt8sAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTestClusterRangeRestrictedInt8sCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readRangeRestrictedInt8sAttribute",
+        readTestClusterRangeRestrictedInt8sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterRangeRestrictedInt16uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterRangeRestrictedInt16uAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readRangeRestrictedInt16uAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTestClusterRangeRestrictedInt16uCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readRangeRestrictedInt16uAttribute",
+        readTestClusterRangeRestrictedInt16uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterRangeRestrictedInt16sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterRangeRestrictedInt16sAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readRangeRestrictedInt16sAttribute(
+                      (ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTestClusterRangeRestrictedInt16sCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readRangeRestrictedInt16sAttribute",
+        readTestClusterRangeRestrictedInt16sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterTimedWriteBooleanCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterTimedWriteBooleanAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readTimedWriteBooleanAttribute((ChipClusters.BooleanAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
+            readTestClusterTimedWriteBooleanCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readTimedWriteBooleanAttribute", readTestClusterTimedWriteBooleanAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterUnsupportedCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterUnsupportedAttributeInteractionInfo =
@@ -4541,7 +4841,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableBooleanAttribute((ChipClusters.BooleanAttributeCallback) callback);
+                  .readNullableBooleanAttribute(
+                      (ChipClusters.TestClusterCluster.NullableBooleanAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedBooleanAttributeCallback(),
             readTestClusterNullableBooleanCommandParams);
@@ -4553,7 +4854,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableBitmap8Attribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readNullableBitmap8Attribute(
+                      (ChipClusters.TestClusterCluster.NullableBitmap8AttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTestClusterNullableBitmap8CommandParams);
@@ -4565,7 +4867,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableBitmap16Attribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readNullableBitmap16Attribute(
+                      (ChipClusters.TestClusterCluster.NullableBitmap16AttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTestClusterNullableBitmap16CommandParams);
@@ -4577,7 +4880,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableBitmap32Attribute((ChipClusters.LongAttributeCallback) callback);
+                  .readNullableBitmap32Attribute(
+                      (ChipClusters.TestClusterCluster.NullableBitmap32AttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readTestClusterNullableBitmap32CommandParams);
@@ -4589,7 +4893,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableBitmap64Attribute((ChipClusters.LongAttributeCallback) callback);
+                  .readNullableBitmap64Attribute(
+                      (ChipClusters.TestClusterCluster.NullableBitmap64AttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readTestClusterNullableBitmap64CommandParams);
@@ -4601,7 +4906,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableInt8uAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readNullableInt8uAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt8uAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTestClusterNullableInt8uCommandParams);
@@ -4613,31 +4919,86 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableInt16uAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readNullableInt16uAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt16uAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTestClusterNullableInt16uCommandParams);
     readTestClusterInteractionInfo.put(
         "readNullableInt16uAttribute", readTestClusterNullableInt16uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt24uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableInt24uAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt24uAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt24uAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterNullableInt24uCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableInt24uAttribute", readTestClusterNullableInt24uAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterNullableInt32uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterNullableInt32uAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableInt32uAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readNullableInt32uAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt32uAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readTestClusterNullableInt32uCommandParams);
     readTestClusterInteractionInfo.put(
         "readNullableInt32uAttribute", readTestClusterNullableInt32uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt40uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableInt40uAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt40uAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt40uAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterNullableInt40uCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableInt40uAttribute", readTestClusterNullableInt40uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt48uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableInt48uAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt48uAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt48uAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterNullableInt48uCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableInt48uAttribute", readTestClusterNullableInt48uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt56uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableInt56uAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt56uAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt56uAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterNullableInt56uCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableInt56uAttribute", readTestClusterNullableInt56uAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterNullableInt64uCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterNullableInt64uAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableInt64uAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readNullableInt64uAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt64uAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readTestClusterNullableInt64uCommandParams);
@@ -4649,7 +5010,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableInt8sAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readNullableInt8sAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt8sAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTestClusterNullableInt8sCommandParams);
@@ -4661,31 +5023,86 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableInt16sAttribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readNullableInt16sAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt16sAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTestClusterNullableInt16sCommandParams);
     readTestClusterInteractionInfo.put(
         "readNullableInt16sAttribute", readTestClusterNullableInt16sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt24sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableInt24sAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt24sAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt24sAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterNullableInt24sCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableInt24sAttribute", readTestClusterNullableInt24sAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterNullableInt32sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterNullableInt32sAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableInt32sAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readNullableInt32sAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt32sAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readTestClusterNullableInt32sCommandParams);
     readTestClusterInteractionInfo.put(
         "readNullableInt32sAttribute", readTestClusterNullableInt32sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt40sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableInt40sAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt40sAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt40sAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterNullableInt40sCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableInt40sAttribute", readTestClusterNullableInt40sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt48sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableInt48sAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt48sAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt48sAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterNullableInt48sCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableInt48sAttribute", readTestClusterNullableInt48sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableInt56sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableInt56sAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableInt56sAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt56sAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readTestClusterNullableInt56sCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableInt56sAttribute", readTestClusterNullableInt56sAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterNullableInt64sCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterNullableInt64sAttributeInteractionInfo =
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableInt64sAttribute((ChipClusters.LongAttributeCallback) callback);
+                  .readNullableInt64sAttribute(
+                      (ChipClusters.TestClusterCluster.NullableInt64sAttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
             readTestClusterNullableInt64sCommandParams);
@@ -4697,7 +5114,8 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableEnum8Attribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readNullableEnum8Attribute(
+                      (ChipClusters.TestClusterCluster.NullableEnum8AttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTestClusterNullableEnum8CommandParams);
@@ -4709,12 +5127,43 @@ public class ClusterReadMapping {
         new InteractionInfo(
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
-                  .readNullableEnum16Attribute((ChipClusters.IntegerAttributeCallback) callback);
+                  .readNullableEnum16Attribute(
+                      (ChipClusters.TestClusterCluster.NullableEnum16AttributeCallback) callback);
             },
             () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
             readTestClusterNullableEnum16CommandParams);
     readTestClusterInteractionInfo.put(
         "readNullableEnum16Attribute", readTestClusterNullableEnum16AttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableFloatSingleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableFloatSingleAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableFloatSingleAttribute(
+                      (ChipClusters.TestClusterCluster.NullableFloatSingleAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedFloatAttributeCallback(),
+            readTestClusterNullableFloatSingleCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableFloatSingleAttribute",
+        readTestClusterNullableFloatSingleAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableFloatDoubleCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableFloatDoubleAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableFloatDoubleAttribute(
+                      (ChipClusters.TestClusterCluster.NullableFloatDoubleAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedDoubleAttributeCallback(),
+            readTestClusterNullableFloatDoubleCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableFloatDoubleAttribute",
+        readTestClusterNullableFloatDoubleAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterNullableOctetStringCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterNullableOctetStringAttributeInteractionInfo =
@@ -4722,7 +5171,8 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
                   .readNullableOctetStringAttribute(
-                      (ChipClusters.OctetStringAttributeCallback) callback);
+                      (ChipClusters.TestClusterCluster.NullableOctetStringAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedOctetStringAttributeCallback(),
             readTestClusterNullableOctetStringCommandParams);
@@ -4736,13 +5186,78 @@ public class ClusterReadMapping {
             (cluster, callback, commandArguments) -> {
               ((ChipClusters.TestClusterCluster) cluster)
                   .readNullableCharStringAttribute(
-                      (ChipClusters.CharStringAttributeCallback) callback);
+                      (ChipClusters.TestClusterCluster.NullableCharStringAttributeCallback)
+                          callback);
             },
             () -> new ClusterInfoMapping.DelegatedCharStringAttributeCallback(),
             readTestClusterNullableCharStringCommandParams);
     readTestClusterInteractionInfo.put(
         "readNullableCharStringAttribute",
         readTestClusterNullableCharStringAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableRangeRestrictedInt8uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableRangeRestrictedInt8uAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableRangeRestrictedInt8uAttribute(
+                      (ChipClusters.TestClusterCluster
+                              .NullableRangeRestrictedInt8uAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTestClusterNullableRangeRestrictedInt8uCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableRangeRestrictedInt8uAttribute",
+        readTestClusterNullableRangeRestrictedInt8uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableRangeRestrictedInt8sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableRangeRestrictedInt8sAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableRangeRestrictedInt8sAttribute(
+                      (ChipClusters.TestClusterCluster
+                              .NullableRangeRestrictedInt8sAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTestClusterNullableRangeRestrictedInt8sCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableRangeRestrictedInt8sAttribute",
+        readTestClusterNullableRangeRestrictedInt8sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableRangeRestrictedInt16uCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableRangeRestrictedInt16uAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableRangeRestrictedInt16uAttribute(
+                      (ChipClusters.TestClusterCluster
+                              .NullableRangeRestrictedInt16uAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTestClusterNullableRangeRestrictedInt16uCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableRangeRestrictedInt16uAttribute",
+        readTestClusterNullableRangeRestrictedInt16uAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterNullableRangeRestrictedInt16sCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterNullableRangeRestrictedInt16sAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readNullableRangeRestrictedInt16sAttribute(
+                      (ChipClusters.TestClusterCluster
+                              .NullableRangeRestrictedInt16sAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readTestClusterNullableRangeRestrictedInt16sCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readNullableRangeRestrictedInt16sAttribute",
+        readTestClusterNullableRangeRestrictedInt16sAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterClusterRevisionAttributeInteractionInfo =
@@ -6155,6 +6670,18 @@ public class ClusterReadMapping {
     readWiFiNetworkDiagnosticsInteractionInfo.put(
         "readOverrunCountAttribute",
         readWiFiNetworkDiagnosticsOverrunCountAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readWiFiNetworkDiagnosticsFeatureMapCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readWiFiNetworkDiagnosticsFeatureMapAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.WiFiNetworkDiagnosticsCluster) cluster)
+                  .readFeatureMapAttribute((ChipClusters.LongAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedLongAttributeCallback(),
+            readWiFiNetworkDiagnosticsFeatureMapCommandParams);
+    readWiFiNetworkDiagnosticsInteractionInfo.put(
+        "readFeatureMapAttribute", readWiFiNetworkDiagnosticsFeatureMapAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readWiFiNetworkDiagnosticsClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readWiFiNetworkDiagnosticsClusterRevisionAttributeInteractionInfo =

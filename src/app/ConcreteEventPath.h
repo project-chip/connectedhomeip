@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include <app/ClusterInfo.h>
 #include <app/util/basic-types.h>
 
 namespace chip {
@@ -50,10 +49,6 @@ struct ConcreteEventPath
     {
         return mEndpointId == other.mEndpointId && mClusterId == other.mClusterId && mEventId == other.mEventId;
     }
-
-    bool IsValidEventPath() const { return !HasWildcardEventId(); }
-
-    inline bool HasWildcardEventId() const { return mEventId == ClusterInfo::kInvalidEventId; }
 
     EndpointId mEndpointId = 0;
     ClusterId mClusterId   = 0;

@@ -45,5 +45,9 @@ constexpr AttributeId MockClusterId(const uint16_t & id)
     return (0xFFF1'0000 | id);
 }
 
+constexpr EventId MockEventId(const uint16_t & id)
+{
+    return (0xFFF1'0000 | id);
+}
 } // namespace Test
 } // namespace chip

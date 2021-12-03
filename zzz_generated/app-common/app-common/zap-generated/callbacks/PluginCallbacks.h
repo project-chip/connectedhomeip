@@ -57,6 +57,14 @@ void __attribute__((weak)) MatterOtaSoftwareUpdateProviderPluginClientInitCallba
 void MatterOtaSoftwareUpdateProviderPluginServerInitCallback();
 void __attribute__((weak)) MatterOtaSoftwareUpdateRequestorPluginClientInitCallback() {}
 void MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();
+void __attribute__((weak)) MatterLocalizationConfigurationPluginClientInitCallback() {}
+void MatterLocalizationConfigurationPluginServerInitCallback();
+void __attribute__((weak)) MatterLocalizationTimeFormatPluginClientInitCallback() {}
+void MatterLocalizationTimeFormatPluginServerInitCallback();
+void __attribute__((weak)) MatterLocalizationUnitPluginClientInitCallback() {}
+void MatterLocalizationUnitPluginServerInitCallback();
+void __attribute__((weak)) MatterPowerSourceConfigurationPluginClientInitCallback() {}
+void MatterPowerSourceConfigurationPluginServerInitCallback();
 void __attribute__((weak)) MatterPowerSourcePluginClientInitCallback() {}
 void MatterPowerSourcePluginServerInitCallback();
 void __attribute__((weak)) MatterGeneralCommissioningPluginClientInitCallback() {}
@@ -75,6 +83,8 @@ void __attribute__((weak)) MatterWiFiNetworkDiagnosticsPluginClientInitCallback(
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback();
 void __attribute__((weak)) MatterEthernetNetworkDiagnosticsPluginClientInitCallback() {}
 void MatterEthernetNetworkDiagnosticsPluginServerInitCallback();
+void __attribute__((weak)) MatterTimeSynchronizationPluginClientInitCallback() {}
+void MatterTimeSynchronizationPluginServerInitCallback();
 void __attribute__((weak)) MatterBridgedDeviceBasicPluginClientInitCallback() {}
 void MatterBridgedDeviceBasicPluginServerInitCallback();
 void __attribute__((weak)) MatterSwitchPluginClientInitCallback() {}
@@ -85,6 +95,8 @@ void __attribute__((weak)) MatterOperationalCredentialsPluginClientInitCallback(
 void MatterOperationalCredentialsPluginServerInitCallback();
 void __attribute__((weak)) MatterFixedLabelPluginClientInitCallback() {}
 void MatterFixedLabelPluginServerInitCallback();
+void __attribute__((weak)) MatterUserLabelPluginClientInitCallback() {}
+void MatterUserLabelPluginServerInitCallback();
 void __attribute__((weak)) MatterBooleanStatePluginClientInitCallback() {}
 void MatterBooleanStatePluginServerInitCallback();
 void __attribute__((weak)) MatterModeSelectPluginClientInitCallback() {}
@@ -231,7 +243,3 @@ void __attribute__((weak)) MatterBindingPluginClientInitCallback() {}
 void MatterBindingPluginServerInitCallback();
 void __attribute__((weak)) MatterGroupKeyManagementPluginClientInitCallback() {}
 void MatterGroupKeyManagementPluginServerInitCallback();
-void __attribute__((weak)) MatterSampleMfgSpecificClusterPluginClientInitCallback() {}
-void MatterSampleMfgSpecificClusterPluginServerInitCallback();
-void __attribute__((weak)) MatterSampleMfgSpecificCluster2PluginClientInitCallback() {}
-void MatterSampleMfgSpecificCluster2PluginServerInitCallback();

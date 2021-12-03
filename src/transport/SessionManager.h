@@ -31,6 +31,7 @@
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <protocols/secure_channel/Constants.h>
 #include <transport/CryptoContext.h>
 #include <transport/MessageCounterManagerInterface.h>
@@ -153,7 +154,7 @@ public:
 #ifndef NDEBUG
         mSessionCreationDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionCreationDelegate> * i) {
             VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
-            return true;
+            return Loop::Continue;
         });
 #endif
         std::reference_wrapper<SessionCreationDelegate> * slot = mSessionCreationDelegates.CreateObject(cb);
@@ -166,9 +167,9 @@ public:
             if (std::addressof(cb) == std::addressof(i->get()))
             {
                 mSessionCreationDelegates.ReleaseObject(i);
-                return false;
+                return Loop::Break;
             }
-            return true;
+            return Loop::Continue;
         });
     }
 
@@ -178,7 +179,7 @@ public:
 #ifndef NDEBUG
         mSessionReleaseDelegates.ForEachActiveObject([&](std::reference_wrapper<SessionReleaseDelegate> * i) {
             VerifyOrDie(std::addressof(cb) != std::addressof(i->get()));
-            return true;
+            return Loop::Continue;
         });
 #endif
         std::reference_wrapper<SessionReleaseDelegate> * slot = mSessionReleaseDelegates.CreateObject(cb);
@@ -191,11 +192,15 @@ public:
             if (std::addressof(cb) == std::addressof(i->get()))
             {
                 mSessionReleaseDelegates.ReleaseObject(i);
-                return false;
+                return Loop::Break;
             }
-            return true;
+            return Loop::Continue;
         });
     }
+
+    void RegisterRecoveryDelegate(SessionRecoveryDelegate & cb);
+    void UnregisterRecoveryDelegate(SessionRecoveryDelegate & cb);
+    void RefreshSessionOperationalData(const SessionHandle & sessionHandle);
 
     /**
      * @brief
@@ -248,9 +253,11 @@ public:
      */
     void OnMessageReceived(const Transport::PeerAddress & source, System::PacketBufferHandle && msgBuf) override;
 
-    Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress)
+    Optional<SessionHandle> CreateUnauthenticatedSession(const Transport::PeerAddress & peerAddress,
+                                                         const ReliableMessageProtocolConfig & config)
     {
-        Optional<Transport::UnauthenticatedSessionHandle> session = mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress);
+        Optional<Transport::UnauthenticatedSessionHandle> session =
+            mUnauthenticatedSessions.FindOrAllocateEntry(peerAddress, config);
         return session.HasValue() ? MakeOptional<SessionHandle>(session.Value()) : NullOptional;
     }
 
@@ -287,6 +294,9 @@ private:
     //       delegate directly, in order to prevent dangling handles.
     BitMapObjectPool<std::reference_wrapper<SessionReleaseDelegate>, CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES>
         mSessionReleaseDelegates;
+
+    BitMapObjectPool<std::reference_wrapper<SessionRecoveryDelegate>, CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES>
+        mSessionRecoveryDelegates;
 
     TransportMgrBase * mTransportMgr                                   = nullptr;
     Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;

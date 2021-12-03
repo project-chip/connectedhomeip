@@ -136,14 +136,11 @@ exit:
 
 CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePathParams)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    AttributeDataIB::Builder AttributeDataIB = mWriteRequestBuilder.GetWriteRequests().CreateAttributeDataIBBuilder();
-    SuccessOrExit(AttributeDataIB.GetError());
-    err = ConstructAttributePath(attributePathParams, AttributeDataIB);
-
-exit:
-    return err;
+    VerifyOrReturnError(attributePathParams.IsValidAttributePath(), CHIP_ERROR_INVALID_PATH_LIST);
+    AttributeDataIB::Builder attributeDataIB = mWriteRequestBuilder.GetWriteRequests().CreateAttributeDataIBBuilder();
+    ReturnErrorOnFailure(attributeDataIB.GetError());
+    ReturnErrorOnFailure(attributeDataIB.CreatePath().Encode(attributePathParams));
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR WriteClient::FinishAttribute()
@@ -165,13 +162,6 @@ exit:
 TLV::TLVWriter * WriteClient::GetAttributeDataIBTLVWriter()
 {
     return mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder().GetWriter();
-}
-
-CHIP_ERROR WriteClient::ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                               AttributeDataIB::Builder aAttributeDataIB)
-{
-    VerifyOrReturnError(aAttributePathParams.IsValidAttributePath(), CHIP_ERROR_INVALID_PATH_LIST);
-    return aAttributePathParams.BuildAttributePath(aAttributeDataIB.CreatePath());
 }
 
 CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
@@ -264,6 +254,8 @@ exit:
     {
         // Always shutdown on Group communication
         ChipLogDetail(DataManagement, "Closing on group Communication ");
+
+        // onDone is called
         ShutdownInternal();
     }
 
@@ -344,7 +336,7 @@ CHIP_ERROR WriteClient::ProcessAttributeStatusIB(AttributeStatusIB::Parser & aAt
     }
     // TODO: (#11423) Attribute paths has a pattern of invalid paths, should add a function for checking invalid paths here.
     // NOTE: We don't support wildcard write for now, reject all wildcard paths.
-    VerifyOrExit(!attributePathParams.HasWildcard() && attributePathParams.IsValidAttributePath(),
+    VerifyOrExit(!attributePathParams.HasAttributeWildcard() && attributePathParams.IsValidAttributePath(),
                  err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
     err = aAttributeStatusIB.GetErrorStatus(&(StatusIBParser));

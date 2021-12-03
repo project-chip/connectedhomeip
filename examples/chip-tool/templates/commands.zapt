@@ -46,6 +46,13 @@ CHIP_ERROR LogValue(const char * label, size_t indent, X value)
     return CHIP_NO_ERROR;
 }
 
+template <typename X, typename std::enable_if_t<std::is_floating_point<X>::value, int> = 0>
+CHIP_ERROR LogValue(const char * label, size_t indent, X value)
+{
+    ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, std::to_string(value).c_str());
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR LogValue(const char * label, size_t indent, bool value)
 {
     ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, value ? "TRUE" : "FALSE");
@@ -302,6 +309,32 @@ static void OnInt64sAttributeResponse(void * context, int64_t value)
     command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
+static void OnFloatAttributeReport(void * context, float value)
+{
+    ChipLogProgress(chipTool, "Float attribute Response: %f", value);
+}
+
+static void OnFloatAttributeResponse(void * context, float value)
+{
+    OnFloatAttributeReport(context, value);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
+static void OnDoubleAttributeReport(void * context, double value)
+{
+    ChipLogProgress(chipTool, "Double attribute Response: %f", value);
+}
+
+static void OnDoubleAttributeResponse(void * context, double value)
+{
+    OnDoubleAttributeReport(context, value);
+
+    ModelCommand * command = static_cast<ModelCommand *>(context);
+    command->SetCommandExitStatus(CHIP_NO_ERROR);
+}
+
 static void OnOctetStringAttributeReport(void * context, const chip::ByteSpan value)
 {
     char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
@@ -422,6 +455,8 @@ private:
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{! TODO: Various types (floats, structs) not supported here. }}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 /*
  * Attribute {{asUpperCamelCase name}}
  */
@@ -468,7 +503,11 @@ public:
     Write{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}(): ModelCommand("write")
     {
         AddArgument("attr-name", "{{asDelimitedCommand (asUpperCamelCase name)}}");
-        {{#if (isString type)}}
+        {{#if isArray}}
+        // {{label}} Array parsing is not supported yet
+        {{else if isStruct}}
+        // {{label}} Struct parsing is not supported yet
+        {{else if (isString type)}}
         AddArgument("attr-value", &mValue);
         {{else}}
         AddArgument("attr-value", {{asTypeMinValue type}}, {{asTypeMaxValue type}}, &mValue);
@@ -500,6 +539,7 @@ private:
 {{/unless}}
 {{/if}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
 class Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}: public ModelCommand
 {
 public:
@@ -548,7 +588,9 @@ private:
     bool mWait;
 };
 
+{{/unless}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 {{/chip_client_clusters}}
 
@@ -565,6 +607,8 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         make_unique<{{asUpperCamelCase clusterName}}{{asUpperCamelCase name}}>(), //
         {{/chip_cluster_commands}}
         {{#chip_server_cluster_attributes}}
+        {{! TODO: Various types (floats, structs) not supported here. }}
+        {{#unless (isStrEqual chipCallback.name "Unsupported")}}
         make_unique<Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
         {{#if isWritableAttribute}}
         {{! No list support for writing yet.  Need to figure out how to
@@ -574,8 +618,11 @@ void registerCluster{{asUpperCamelCase name}}(Commands & commands)
         {{/unless}}
         {{/if}}
         {{#if isReportableAttribute}}
+        {{#unless isList}}
         make_unique<Report{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}>(), //
+        {{/unless}}
         {{/if}}
+        {{/unless}}
         {{/chip_server_cluster_attributes}}
     };
 

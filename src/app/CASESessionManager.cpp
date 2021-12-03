@@ -69,7 +69,8 @@ void CASESessionManager::ReleaseSession(NodeId nodeId)
 
 CHIP_ERROR CASESessionManager::ResolveDeviceAddress(NodeId nodeId)
 {
-    return Dnssd::Resolver::Instance().ResolveNodeId(GetFabricInfo()->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny);
+    return Dnssd::Resolver::Instance().ResolveNodeId(GetFabricInfo()->GetPeerIdForNode(nodeId), Inet::IPAddressType::kAny,
+                                                     Dnssd::Resolver::CacheBypass::On);
 }
 
 void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeData)
@@ -85,9 +86,7 @@ void CASESessionManager::OnNodeIdResolved(const Dnssd::ResolvedNodeData & nodeDa
     VerifyOrReturn(session != nullptr,
                    ChipLogDetail(Controller, "OnNodeIdResolved was called for a device with no active sessions, ignoring it."));
 
-    LogErrorOnFailure(session->UpdateDeviceData(
-        session->ToPeerAddress(nodeData), nodeData.GetMrpRetryIntervalIdle().ValueOr(CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL),
-        nodeData.GetMrpRetryIntervalActive().ValueOr(CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL)));
+    LogErrorOnFailure(session->UpdateDeviceData(session->ToPeerAddress(nodeData), nodeData.GetMRPConfig()));
 }
 
 void CASESessionManager::OnNodeIdResolutionFailed(const PeerId & peer, CHIP_ERROR error)
@@ -126,9 +125,9 @@ OperationalDeviceProxy * CASESessionManager::FindSession(SessionHandle session)
         if (activeSession->MatchesSession(session))
         {
             foundSession = activeSession;
-            return false;
+            return Loop::Break;
         }
-        return true;
+        return Loop::Continue;
     });
 
     return foundSession;
@@ -141,9 +140,9 @@ OperationalDeviceProxy * CASESessionManager::FindExistingSession(NodeId id)
         if (activeSession->GetDeviceId() == id)
         {
             foundSession = activeSession;
-            return false;
+            return Loop::Break;
         }
-        return true;
+        return Loop::Continue;
     });
 
     return foundSession;

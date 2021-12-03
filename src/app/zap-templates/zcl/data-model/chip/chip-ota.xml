@@ -87,6 +87,26 @@ limitations under the License.
         <item name="UpdateAvailable" value="0x1"/>
         <item name="UrgentUpdateAvailable" value="0x2"/>
     </enum>
+    <enum name="UpdateStateEnum" type="ENUM8">
+        <cluster code="0x002a"/>
+        <item name="Unknown" value="0x0"/>
+        <item name="Idle" value="0x1"/>
+        <item name="Querying" value="0x2"/>
+        <item name="DelayedOnQuery" value="0x3"/>
+        <item name="Downloading" value="0x4"/>
+        <item name="Applying" value="0x5"/>       
+        <item name="DelayedOnApply" value="0x6"/>
+        <item name="RollingBack" value="0x7"/>
+        <item name="DelayedOnUserConsent" value="0x8"/>            
+    </enum>
+    <enum name="ChangeReasonEnum" type="ENUM8">
+        <cluster code="0x002a"/>
+        <item name="Unknown" value="0x0"/>
+        <item name="Success" value="0x1"/>
+        <item name="Failure" value="0x2"/>
+        <item name="TimeOut" value="0x3"/>
+        <item name="DelayByProvider" value="0x4"/>
+    </enum>         
     <cluster>
         <name>OTA Software Update Requestor</name>
         <domain>CHIP</domain>
@@ -104,5 +124,24 @@ limitations under the License.
             <arg name="announcementReason" type="OTAAnnouncementReason"/>
             <arg name="metadataForNode" type="OCTET_STRING" length="512" optional="true"/>
         </command>
+        <event side="server" code="0x00" name="StateTransition" priority="info" optional="false">
+          <description>This event SHALL be generated when a change of the UpdateState attribute occurs due to an OTA Requestor moving through the states necessary to query for updates.</description>
+          <field id="0" name="PreviousState" type="UpdateStateEnum"/>
+          <field id="1" name="NewState" type="UpdateStateEnum"/>
+          <field id="2" name="Reason" type="ChangeReasonEnum"/>
+          <field id="3" name="TargetSoftwareVersion" type="INT32U"/>                 
+        </event> 
+        <event side="server" code="0x01" name="VersionApplied" priority="critical" optional="false">
+          <description>This event SHALL be generated whenever a new version starts executing after being applied due to a software update.</description>
+          <field id="0" name="SoftwareVersion" type="INT32U"/> 
+          <field id="1" name="ProductID" type="INT16U"/> 
+        </event>
+        <event side="server" code="0x02" name="DownloadError" priority="info" optional="false">
+          <description>This event SHALL be generated whenever an error occurs during OTA Requestor download operation.</description>
+          <field id="0" name="SoftwareVersion" type="INT32U"/> 
+          <field id="1" name="BytesDownloaded" type="INT64U"/>
+          <field id="2" name="ProgressPercent" type="INT8U"/> 
+          <field id="3" name="PlatformCode" type="INT64S"/>         
+        </event>                     
     </cluster>
 </configurator>

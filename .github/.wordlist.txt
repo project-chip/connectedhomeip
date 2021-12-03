@@ -4,6 +4,11 @@ aarch
 abcdef
 abfb
 ABI
+AES
+DMM
+ECDH
+ECDSA
+SHA
 ABIs
 ables
 accessor
@@ -51,6 +56,7 @@ armeabi
 ARMmbed
 armv
 asdk
+AssertionError
 ASYNC
 att
 attId
@@ -271,6 +277,7 @@ DevKitC
 DevKitM
 df
 dfu
+dhclient
 DHCP
 DHCPC
 DHCPv
@@ -387,6 +394,7 @@ FOTA
 FreeRTOS
 FreeRTOSConfig
 fsl
+fstab
 fsync
 fullclean
 gcloud
@@ -430,6 +438,7 @@ Gv
 gz
 hardcoded
 hardknott
+hardwarever
 HardwareVersion
 HardwareVersionString
 hci
@@ -541,6 +550,7 @@ lightin
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
+LinuxOTARequestorDriver
 LocalConfigDisabled
 localhost
 localstatedir
@@ -693,9 +703,13 @@ optionsMask
 optionsOverride
 orgs
 OTA
+OTADownloader
+OTAImageProcessorDriver
 OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
+OTARequestor
+OTARequestorDriver
 OTARequesterImpl
 OTARequestorSerialPort
 OTBR
@@ -743,8 +757,6 @@ prj
 ProductID
 ProductLabel
 ProductName
-productrev
-ProductRevision
 ProductURL
 proto
 protobuf
@@ -769,6 +781,7 @@ PyFunction
 pylint
 PyObject
 PyRun
+pytest
 QEMU
 Qorvo
 QPG
@@ -782,6 +795,7 @@ qvCHIP
 RADVD
 raspberryPi
 RasPi
+rAv
 RCP
 ReadConfigValue
 readelf
@@ -852,7 +866,10 @@ SERIALDEVICE
 SerialNumber
 ServiceId
 SetDns
+SetImageProcessorDelegate
+SetOtaRequestorDriver
 SetpointRaiseLower
+SetRequestorInstance
 SetUpPINCode
 SetupQRCode
 sexualized
@@ -867,6 +884,7 @@ SLAAC
 SLTB
 SLWSTK
 SmartThings
+smoketest
 SMP
 socat
 socio

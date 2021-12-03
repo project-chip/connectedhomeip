@@ -25,15 +25,15 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
-#include <platform/ConnectivityManager.h>
+#include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WiFiNetworkDiagnostics;
 using namespace chip::app::Clusters::WiFiNetworkDiagnostics::Attributes;
-using chip::DeviceLayer::ConnectivityManager;
-using chip::DeviceLayer::ConnectivityMgr;
+using chip::DeviceLayer::DiagnosticDataProvider;
+using chip::DeviceLayer::GetDiagnosticDataProvider;
 
 namespace {
 
@@ -43,21 +43,21 @@ public:
     // Register for the WiFiNetworkDiagnostics cluster on all endpoints.
     WiFiDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), WiFiNetworkDiagnostics::Id) {}
 
-    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     template <typename T>
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(T &), AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &), AttributeValueEncoder & aEncoder);
 
     CHIP_ERROR ReadWiFiBssId(AttributeValueEncoder & aEncoder);
 };
 
 template <typename T>
-CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (ConnectivityManager::*getter)(T &),
+CHIP_ERROR WiFiDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(T &),
                                                      AttributeValueEncoder & aEncoder)
 {
     T data;
-    CHIP_ERROR err = (DeviceLayer::ConnectivityMgr().*getter)(data);
+    CHIP_ERROR err = (DeviceLayer::GetDiagnosticDataProvider().*getter)(data);
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
         data = 0;
@@ -75,7 +75,7 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadWiFiBssId(AttributeValueEncoder & aEnco
     // TODO: Use Nullable<ByteSpan> after we get darwin converted over to the new APIs.
     Bssid::TypeInfo::Type bssid;
 
-    if (ConnectivityMgr().GetWiFiBssId(bssid) == CHIP_NO_ERROR)
+    if (DeviceLayer::GetDiagnosticDataProvider().GetWiFiBssId(bssid) == CHIP_NO_ERROR)
     {
         ChipLogProgress(Zcl, "Node is currently connected to Wi-Fi network with BSSID:");
         ChipLogByteSpan(Zcl, bssid);
@@ -90,7 +90,7 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::ReadWiFiBssId(AttributeValueEncoder & aEnco
 
 WiFiDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != WiFiNetworkDiagnostics::Id)
     {
@@ -104,40 +104,40 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, A
         return ReadWiFiBssId(aEncoder);
     }
     case Attributes::SecurityType::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetWiFiSecurityType, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiSecurityType, aEncoder);
     }
     case WiFiVersion::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetWiFiVersion, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiVersion, aEncoder);
     }
     case ChannelNumber::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetWiFiChannelNumber, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiChannelNumber, aEncoder);
     }
     case Rssi::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetWiFiRssi, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiRssi, aEncoder);
     }
     case BeaconLostCount::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetWiFiBeaconLostCount, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiBeaconLostCount, aEncoder);
     }
     case BeaconRxCount::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetWiFiBeaconRxCount, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiBeaconRxCount, aEncoder);
     }
     case PacketMulticastRxCount::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetWiFiPacketMulticastRxCount, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketMulticastRxCount, aEncoder);
     }
     case PacketMulticastTxCount::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetWiFiPacketMulticastTxCount, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketMulticastTxCount, aEncoder);
     }
     case PacketUnicastRxCount::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetWiFiPacketUnicastRxCount, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketUnicastRxCount, aEncoder);
     }
     case PacketUnicastTxCount::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetWiFiPacketUnicastTxCount, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiPacketUnicastTxCount, aEncoder);
     }
     case CurrentMaxRate::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetWiFiCurrentMaxRate, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiCurrentMaxRate, aEncoder);
     }
     case OverrunCount::Id: {
-        return ReadIfSupported(&ConnectivityManager::GetWiFiOverrunCount, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetWiFiOverrunCount, aEncoder);
     }
     default: {
         break;
@@ -145,6 +145,21 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, A
     }
     return CHIP_NO_ERROR;
 }
+
+class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
+{
+    // Gets called when the Node detects Node’s Wi-Fi connection has been disconnected.
+    void OnDisconnectionDetected() override { ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected"); }
+
+    // Gets called when the Node fails to associate or authenticate an access point.
+    void OnAssociationFailureDetected() override { ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnAssociationFailureDetected"); }
+
+    // Gets when the Node’s connection status to a Wi-Fi network has changed.
+    void OnConnectionStatusChanged() override { ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged"); }
+};
+
+WiFiDiagnosticsDelegate gDiagnosticDelegate;
+
 } // anonymous namespace
 
 bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
@@ -154,7 +169,7 @@ bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler
     EndpointId endpoint  = commandPath.mEndpointId;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
-    VerifyOrExit(DeviceLayer::ConnectivityMgr().ResetWiFiNetworkDiagnosticsCounts() == CHIP_NO_ERROR,
+    VerifyOrExit(DeviceLayer::GetDiagnosticDataProvider().ResetWiFiNetworkDiagnosticsCounts() == CHIP_NO_ERROR,
                  status = EMBER_ZCL_STATUS_FAILURE);
 
     status = WiFiNetworkDiagnostics::Attributes::BeaconLostCount::Set(endpoint, 0);
@@ -187,4 +202,5 @@ exit:
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
+    GetDiagnosticDataProvider().SetWiFiDiagnosticsDelegate(&gDiagnosticDelegate);
 }

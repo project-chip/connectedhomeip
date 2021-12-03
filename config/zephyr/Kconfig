@@ -101,6 +101,13 @@ config CHIP_ENABLE_SLEEPY_END_DEVICE_SUPPORT
 	help
 	  Enables Thread Sleepy End Device support in Matter.
 
+config CHIP_OTA_REQUESTOR
+	bool "Enable OTA requestor"
+	help
+	  Enables OTA (Over-the-air) Requestor role that allows a device to perform
+	  Device Firmware Upgrade by quering and downloading a new firmware image
+	  from an external OTA Provider node.
+
 config APP_LINK_WITH_CHIP
 	bool "Link 'app' with Connected Home over IP"
 	default y

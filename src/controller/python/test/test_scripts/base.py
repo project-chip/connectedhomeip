@@ -16,6 +16,7 @@
 #
 
 from dataclasses import dataclass
+from inspect import Attribute
 from typing import Any
 import typing
 from chip import ChipDeviceCtrl
@@ -151,10 +152,14 @@ class BaseTestHelper:
     def TestNetworkCommissioning(self, nodeid: int, endpoint: int, group: int, dataset: str, network_id: str):
         self.logger.info("Commissioning network to device {}".format(nodeid))
         try:
-            self.devCtrl.ZCLSend("NetworkCommissioning", "AddThreadNetwork", nodeid, endpoint, group, {
+            (err, resp) = self.devCtrl.ZCLSend("NetworkCommissioning", "AddThreadNetwork", nodeid, endpoint, group, {
                 "operationalDataset": bytes.fromhex(dataset),
                 "breadcrumb": 0,
                 "timeoutMs": 1000}, blocking=True)
+            self.logger.info(f"Received response: {resp}")
+            if resp.errorCode != 0:
+                self.logger.exception("Failed to add Thread network.")
+                return False
         except Exception as ex:
             self.logger.exception("Failed to send AddThreadNetwork command")
             return False
@@ -165,6 +170,10 @@ class BaseTestHelper:
                 "networkID": bytes.fromhex(network_id),
                 "breadcrumb": 0,
                 "timeoutMs": 1000}, blocking=True)
+            self.logger.info(f"Received response: {resp}")
+            if resp.errorCode != 0:
+                self.logger.exception("Failed to enable Thread network.")
+                return False
         except Exception as ex:
             self.logger.exception("Failed to send EnableNetwork command")
             return False
@@ -240,7 +249,7 @@ class BaseTestHelper:
             "VendorID": 9050,
             "ProductName": "TEST_PRODUCT",
             "ProductID": 65279,
-            "UserLabel": "Test",
+            "NodeLabel": "Test",
             "Location": "",
             "HardwareVersion": 0,
             "HardwareVersionString": "TEST_VERSION",
@@ -273,7 +282,7 @@ class BaseTestHelper:
             expected_status: IM.Status = IM.Status.Success
 
         requests = [
-            AttributeWriteRequest("Basic", "UserLabel", "Test"),
+            AttributeWriteRequest("Basic", "NodeLabel", "Test"),
             AttributeWriteRequest("Basic", "Location",
                                   "a pretty loooooooooooooog string", IM.Status.InvalidValue),
         ]
@@ -307,23 +316,20 @@ class BaseTestHelper:
         return True
 
     def TestSubscription(self, nodeid: int, endpoint: int):
-        class _subscriptionHandler(IM.OnSubscriptionReport):
-            def __init__(self, path: IM.AttributePath, logger: logging.Logger):
-                super(_subscriptionHandler, self).__init__()
-                self.subscriptionReceived = 0
-                self.path = path
-                self.countLock = threading.Lock()
-                self.cv = threading.Condition(self.countLock)
-                self.logger = logger
+        desiredPath = None
+        receivedUpdate = 0
+        updateLock = threading.Lock()
+        updateCv = threading.Condition(updateLock)
 
-            def OnData(self, path: IM.AttributePath, subscriptionId: int, data: typing.Any) -> None:
-                if path != self.path:
-                    return
-                logger.info(
-                    f"Received report from server: path: {path}, value: {data}, subscriptionId: {subscriptionId}")
-                with self.countLock:
-                    self.subscriptionReceived += 1
-                    self.cv.notify_all()
+        def OnValueChange(path: Clusters.Attribute.AttributePath, data: typing.Any) -> None:
+            nonlocal desiredPath, updateCv, updateLock, receivedUpdate
+            if path != desiredPath:
+                return
+            logger.info(
+                f"Received report from server: path: {path}, value: {data}")
+            with updateLock:
+                receivedUpdate += 1
+                updateCv.notify_all()
 
         class _conductAttributeChange(threading.Thread):
             def __init__(self, devCtrl: ChipDeviceCtrl.ChipDeviceController, nodeid: int, endpoint: int):
@@ -339,24 +345,22 @@ class BaseTestHelper:
                         "OnOff", "Toggle", self.nodeid, self.endpoint, 0, {})
 
         try:
-            subscribedPath = IM.AttributePath(
-                nodeId=nodeid, endpointId=endpoint, clusterId=6, attributeId=0)
+            desiredPath = Clusters.Attribute.AttributePath(
+                EndpointId=1, ClusterId=6, AttributeId=0)
             # OnOff Cluster, OnOff Attribute
-            handler = _subscriptionHandler(subscribedPath, self.logger)
-            IM.SetAttributeReportCallback(subscribedPath, handler)
-            self.devCtrl.ZCLSubscribeAttribute(
+            subscription = self.devCtrl.ZCLSubscribeAttribute(
                 "OnOff", "OnOff", nodeid, endpoint, 1, 10)
+            subscription.SetAttributeUpdateCallback(OnValueChange)
             changeThread = _conductAttributeChange(
                 self.devCtrl, nodeid, endpoint)
             # Reset the number of subscriptions received as subscribing causes a callback.
-            handler.subscriptionReceived = 0
             changeThread.start()
-            with handler.cv:
-                while handler.subscriptionReceived < 5:
+            with updateCv:
+                while receivedUpdate < 5:
                     # We should observe 5 attribute changes
                     # The changing thread will change the value after 3 seconds. If we're waiting more than 10, assume something
                     # is really wrong and bail out here with some information.
-                    if not handler.cv.wait(10.0):
+                    if not updateCv.wait(10.0):
                         self.logger.error(
                             f"Failed to receive subscription update")
                         break
@@ -367,7 +371,7 @@ class BaseTestHelper:
                 # Thread join timed out
                 self.logger.error(f"Failed to join change thread")
                 return False
-            return True if handler.subscriptionReceived == 5 else False
+            return True if receivedUpdate == 5 else False
 
         except Exception as ex:
             self.logger.exception(f"Failed to finish API test: {ex}")

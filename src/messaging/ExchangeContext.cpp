@@ -124,12 +124,7 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     // an error arising below. at the end, we have to close it.
     ExchangeHandle ref(*this);
 
-    // If sending via UDP and NoAutoRequestAck send flag is not specificed,
-    // request reliable transmission.
-    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
-    // Treat unknown peer address as "not UDP", because we have no idea whether
-    // it's safe to do MRP there.
-    bool isUDPTransport = peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
+    bool isUDPTransport = IsUDPTransport();
 
     // this check is ignored by the ExchangeMsgDispatch if !AutoRequestAck()
     bool reliableTransmissionRequested = isUDPTransport && !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck);
@@ -159,6 +154,12 @@ CHIP_ERROR ExchangeContext::SendMessage(Protocols::Id protocolId, uint8_t msgTyp
     }
 
     {
+        // ExchangeContext for group are supposed to always be Initiator
+        if (IsGroupExchangeContext() && !IsInitiator())
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+
         // Create a new scope for `err`, to avoid shadowing warning previous `err`.
         CHIP_ERROR err = mDispatch->SendMessage(mSession.Value(), mExchangeId, IsInitiator(), GetReliableMessageContext(),
                                                 reliableTransmissionRequested, protocolId, msgType, std::move(msgBuf));
@@ -199,7 +200,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     // needs to clear the MRP retransmission table immediately.
     if (clearRetransTable)
     {
-        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(static_cast<ReliableMessageContext *>(this));
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(this);
     }
 
     // Cancel the response timer.
@@ -445,8 +446,12 @@ CHIP_ERROR ExchangeContext::HandleMessage(uint32_t messageCounter, const Payload
         MessageHandled();
     });
 
-    ReturnErrorOnFailure(
-        mDispatch->OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
+    // TODO : Remove this bypass for group as to perform the MessagePermitted function Issue # 12101
+    if (!IsGroupExchangeContext())
+    {
+        ReturnErrorOnFailure(
+            mDispatch->OnMessageReceived(messageCounter, payloadHeader, peerAddress, msgFlags, GetReliableMessageContext()));
+    }
 
     if (IsAckPending() && !mDelegate)
     {
@@ -499,6 +504,44 @@ void ExchangeContext::MessageHandled()
     }
 
     Close();
+}
+
+bool ExchangeContext::IsUDPTransport()
+{
+    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
+    return peerAddress && peerAddress->GetTransportType() == Transport::Type::kUdp;
+}
+
+bool ExchangeContext::IsTCPTransport()
+{
+    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
+    return peerAddress && peerAddress->GetTransportType() == Transport::Type::kTcp;
+}
+
+bool ExchangeContext::IsBLETransport()
+{
+    const Transport::PeerAddress * peerAddress = GetSessionHandle().GetPeerAddress(mExchangeMgr->GetSessionManager());
+    return peerAddress && peerAddress->GetTransportType() == Transport::Type::kBle;
+}
+
+System::Clock::Milliseconds32 ExchangeContext::GetAckTimeout()
+{
+    System::Clock::Timeout timeout;
+    if (IsUDPTransport())
+    {
+        timeout = GetMRPConfig().mIdleRetransTimeout * (CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS + 1);
+    }
+    else if (IsTCPTransport())
+    {
+        // TODO: issue 12009, need actual tcp margin value considering restransmission
+        timeout = System::Clock::Seconds16(30);
+    }
+    return timeout;
+}
+
+const ReliableMessageProtocolConfig & ExchangeContext::GetMRPConfig() const
+{
+    return GetSessionHandle().GetMRPConfig(GetExchangeMgr()->GetSessionManager());
 }
 
 } // namespace Messaging

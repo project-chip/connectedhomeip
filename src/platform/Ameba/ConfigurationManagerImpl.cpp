@@ -79,7 +79,7 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
     if (!AmebaConfig::ConfigValueExists(AmebaConfig::kCounterKey_BootReason))
     {
-        err = StoreBootReasons(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
+        err = StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED);
         SuccessOrExit(err);
     }
 
@@ -119,14 +119,14 @@ CHIP_ERROR ConfigurationManagerImpl::StoreTotalOperationalHours(uint32_t totalOp
     return WriteConfigValue(AmebaConfig::kCounterKey_TotalOperationalHours, totalOperationalHours);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::GetBootReasons(uint32_t & bootReasons)
+CHIP_ERROR ConfigurationManagerImpl::GetBootReason(uint32_t & bootReason)
 {
-    return ReadConfigValue(AmebaConfig::kCounterKey_BootReason, bootReasons);
+    return ReadConfigValue(AmebaConfig::kCounterKey_BootReason, bootReason);
 }
 
-CHIP_ERROR ConfigurationManagerImpl::StoreBootReasons(uint32_t bootReasons)
+CHIP_ERROR ConfigurationManagerImpl::StoreBootReason(uint32_t bootReason)
 {
-    return WriteConfigValue(AmebaConfig::kCounterKey_BootReason, bootReasons);
+    return WriteConfigValue(AmebaConfig::kCounterKey_BootReason, bootReason);
 }
 
 CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
@@ -136,7 +136,15 @@ CHIP_ERROR ConfigurationManagerImpl::GetPrimaryWiFiMACAddress(uint8_t * buf)
     int i = 0;
 
     wifi_get_mac_address(temp);
-    sscanf(temp, "%02x:%02x:%02x:%02x:%02x:%02x", &mac[0], &mac[1], &mac[2], &mac[3], &mac[4], &mac[5]);
+
+    char * token = strtok(temp, ":");
+    while (token != NULL)
+    {
+        mac[i] = (uint32_t) strtol(token, NULL, 16);
+        token  = strtok(NULL, ":");
+        i++;
+    }
+
     for (i = 0; i < ETH_ALEN; i++)
         buf[i] = mac[i] & 0xFF;
 

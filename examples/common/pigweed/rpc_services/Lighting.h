@@ -35,7 +35,7 @@ public:
 
     virtual ~Lighting() = default;
 
-    virtual pw::Status Set(ServerContext &, const chip_rpc_LightingState & request, pw_protobuf_Empty & response)
+    virtual pw::Status Set(const chip_rpc_LightingState & request, pw_protobuf_Empty & response)
     {
         uint8_t on = request.on;
         RETURN_STATUS_IF_NOT_OK(
@@ -63,7 +63,7 @@ public:
         return pw::OkStatus();
     }
 
-    virtual pw::Status Get(ServerContext &, const pw_protobuf_Empty & request, chip_rpc_LightingState & response)
+    virtual pw::Status Get(const pw_protobuf_Empty & request, chip_rpc_LightingState & response)
     {
         uint8_t on;
         uint8_t level;

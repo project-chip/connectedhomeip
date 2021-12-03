@@ -1403,6 +1403,8 @@
  *  @note
  *    WARNING: This option makes it possible to circumvent basic chip security functionality,
  *    including message encryption. Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
+ *
+ *    To build with this flag, pass 'treat_warnings_as_errors=false' to gn/ninja.
  */
 #ifndef CHIP_CONFIG_SECURITY_TEST_MODE
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
@@ -2419,13 +2421,13 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *    The following definitions sets the maximum number of corresponding interaction model object pool size.
  *
  *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
- *      * #CHIP_IM_MAX_NUM_COMMAND_SENDER
  *      * #CHIP_IM_MAX_NUM_READ_HANDLER
  *      * #CHIP_IM_MAX_NUM_READ_CLIENT
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
  *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
  *      * #CHIP_IM_MAX_NUM_WRITE_HANDLER
  *      * #CHIP_IM_MAX_NUM_WRITE_CLIENT
+ *      * #CHIP_IM_MAX_NUM_TIMED_HANDLER
  *
  *  @{
  */
@@ -2437,15 +2439,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_COMMAND_HANDLER
 #define CHIP_IM_MAX_NUM_COMMAND_HANDLER 4
-#endif
-
-/**
- * @def CHIP_IM_MAX_NUM_COMMAND_SENDER
- *
- * @brief Defines the maximum number of CommandSender, limits the number of active command transactions on client.
- */
-#ifndef CHIP_IM_MAX_NUM_COMMAND_SENDER
-#define CHIP_IM_MAX_NUM_COMMAND_SENDER 4
 #endif
 
 /**
@@ -2500,6 +2493,26 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_WRITE_CLIENT
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_TIMED_HANDLER
+ *
+ * @brief Defines the maximum number of TimedHandler, limits the number of
+ *        active timed interactions waiting for the Invoke or Write.
+ */
+#ifndef CHIP_IM_MAX_NUM_TIMED_HANDLER
+#define CHIP_IM_MAX_NUM_TIMED_HANDLER 8
+#endif
+
+/**
+ * @def CONFIG_IM_BUILD_FOR_UNIT_TEST
+ *
+ * @brief Defines whether we're currently building the IM for unit testing, which enables a set of features
+ *        that are only utilized in those tests.
+ */
+#ifndef CONFIG_IM_BUILD_FOR_UNIT_TEST
+#define CONFIG_IM_BUILD_FOR_UNIT_TEST 0
 #endif
 
 /**
@@ -2581,6 +2594,15 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS
 #define CHIP_CONFIG_MAX_GROUP_CONCURRENT_ITERATORS 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_GROUP_NAME_LENGTH
+ *
+ * @brief Defines the maximum length of the group names
+ */
+#ifndef CHIP_CONFIG_MAX_GROUP_NAME_LENGTH
+#define CHIP_CONFIG_MAX_GROUP_NAME_LENGTH 16
 #endif
 
 /**
@@ -2689,6 +2711,25 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
 #define CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
+ *
+ * @brief Defines the max number of SessionRecoveryDelegate
+ */
+#ifndef CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
+#define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 3
+#endif
+
+/**
+ * @def CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
+ *
+ * @brief
+ *   Maximum number of CASE sessions that a device caches, that can be resumed
+ */
+#ifndef CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
+#define CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE 4
 #endif
 
 /**

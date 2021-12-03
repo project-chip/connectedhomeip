@@ -4,7 +4,7 @@ FROM connectedhomeip/chip-build:${VERSION} as build
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy --no-install-recommends \
-    wget=1.20.3-1ubuntu1 \
+    wget=1.20.3-1ubuntu2 \
     unzip=6.0-25ubuntu1 \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/ \
@@ -23,4 +23,4 @@ FROM connectedhomeip/chip-build:${VERSION}
 
 COPY --from=build /opt/sdk/sdks/ /opt/sdk/sdks/
 
-ENV K32W061_SDK_ROOT=/opt/sdk/sdks
+ENV NXP_K32W061_SDK_ROOT=/opt/sdk/sdks

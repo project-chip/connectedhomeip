@@ -18,14 +18,13 @@
 const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
 const ListHelper   = require('../../common/ListHelper.js');
 const StringHelper = require('../../common/StringHelper.js');
-const StructHelper = require('../../common/StructHelper.js');
+const cHelper      = require(zapPath + 'generator/helper-c.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
+const templateUtil = require(zapPath + 'generator/template-util.js')
+const zclUtil      = require(zapPath + 'util/zcl-util.js')
 
-// Issue #8202
-// The specification allow non-standard signed and unsigned integer with a width of 24, 40, 48 or 56, but those types does not have
-// proper support yet into the codebase and the resulting generated code can not be built with them.
-// Once they are supported, the following method could be removed.
-const unsupportedTypes = [ 'INT24S', 'INT40S', 'INT48S', 'INT56S', 'INT24U', 'INT40U', 'INT48U', 'INT56U', 'EUI64' ];
+// Not sure what to do with EUI64 yet.
+const unsupportedTypes = [ 'EUI64' ];
 function isUnsupportedType(type)
 {
   return unsupportedTypes.includes(type.toUpperCase());
@@ -41,10 +40,8 @@ function canHaveSimpleAccessors(attr)
     return false;
   }
 
-  if (StructHelper.isStruct(attr.type)) {
-    return false;
-  }
-
+  // We can't check for being a struct synchronously, so that's handled manually
+  // in the template.
   if (isUnsupportedType(attr.type)) {
     return false;
   }
@@ -75,8 +72,33 @@ async function accessorGetterType(attr)
   return type;
 }
 
+async function accessorTraitType(type)
+{
+  let temp    = type.toLowerCase();
+  let matches = temp.match(/^int([0-9]+)(s?)/i);
+  if (matches) {
+    let signed = matches[2] != "";
+    let size   = parseInt(matches[1]) / 8;
+
+    if (size != 1 && size != 2 && size != 4 && size != 8) {
+      return `OddSizedInteger<${size}, ${signed}>`;
+    }
+  }
+  return zclHelper.asUnderlyingZclType.call(this, type, { 'hash' : {} });
+}
+
+async function typeAsDelimitedMacro(type)
+{
+  const { db }   = this.global;
+  const pkgId    = await templateUtil.ensureZclPackageId(this);
+  const typeInfo = await zclUtil.determineType(db, type, pkgId);
+  return cHelper.asDelimitedMacro.call(this, typeInfo.atomicType);
+}
+
 //
 // Module exports
 //
 exports.canHaveSimpleAccessors = canHaveSimpleAccessors;
 exports.accessorGetterType     = accessorGetterType;
+exports.accessorTraitType      = accessorTraitType;
+exports.typeAsDelimitedMacro   = typeAsDelimitedMacro;

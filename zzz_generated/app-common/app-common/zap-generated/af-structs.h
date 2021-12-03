@@ -37,6 +37,8 @@ typedef struct _SimpleStruct
     chip::ByteSpan d;
     chip::CharSpan e;
     uint8_t f;
+    float g;
+    double h;
 } SimpleStruct;
 
 // Struct for NullablesAndOptionalsStruct
@@ -183,7 +185,7 @@ typedef struct _EndpointListStruct
     uint16_t EndpointListID;
     chip::CharSpan Name;
     uint8_t Type;
-    chip::ByteSpan Endpoints;
+    /* TYPE WARNING: array array defaults to */ uint8_t * Endpoints;
 } EndpointListStruct;
 
 // Struct for FabricDescriptor

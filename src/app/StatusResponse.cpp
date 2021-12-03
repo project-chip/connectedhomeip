@@ -21,8 +21,8 @@
 
 namespace chip {
 namespace app {
-CHIP_ERROR StatusResponse::SendStatusResponse(Protocols::InteractionModel::Status aStatus,
-                                              Messaging::ExchangeContext * apExchangeContext, bool aExpectResponse)
+CHIP_ERROR StatusResponse::Send(Protocols::InteractionModel::Status aStatus, Messaging::ExchangeContext * apExchangeContext,
+                                bool aExpectResponse)
 {
     VerifyOrReturnError(apExchangeContext != nullptr, CHIP_ERROR_INCORRECT_STATE);
     System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);

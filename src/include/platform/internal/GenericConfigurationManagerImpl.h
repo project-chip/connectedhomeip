@@ -57,11 +57,11 @@ public:
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override;
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override;
     CHIP_ERROR GetProductId(uint16_t & productId) override;
-    CHIP_ERROR GetProductRevisionString(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetProductRevision(uint16_t & productRev) override;
-    CHIP_ERROR StoreProductRevision(uint16_t productRev) override;
-    CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize) override;
-    CHIP_ERROR GetFirmwareRevision(uint16_t & firmwareRev) override;
+    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVer) override;
+    CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override;
+    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override;
+    CHIP_ERROR GetSoftwareVersion(uint16_t & softwareVer) override;
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override;
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override;
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override;
@@ -98,8 +98,8 @@ public:
     CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override;
     CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override;
     CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override;
-    CHIP_ERROR GetBootReasons(uint32_t & bootReasons) override;
-    CHIP_ERROR StoreBootReasons(uint32_t bootReasons) override;
+    CHIP_ERROR GetBootReason(uint32_t & bootReason) override;
+    CHIP_ERROR StoreBootReason(uint32_t bootReason) override;
     CHIP_ERROR RunUnitTests(void) override;
     bool IsFullyProvisioned() override;
     void InitiateFactoryReset() override;
@@ -144,9 +144,9 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductId(uin
 }
 
 template <class ConfigClass>
-inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetFirmwareRevision(uint16_t & firmwareRev)
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersion(uint16_t & softwareVer)
 {
-    firmwareRev = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION);
+    softwareVer = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
     return CHIP_NO_ERROR;
 }
 
