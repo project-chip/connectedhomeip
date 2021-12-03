@@ -131,19 +131,10 @@ class SoftwareDiagnosticsDelegate : public DeviceLayer::SoftwareDiagnosticsDeleg
     {
         ChipLogProgress(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 
-        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
-        {
-            if (emberAfEndpointIndexIsEnabled(index))
-            {
-                EndpointId endpointId = emberAfEndpointFromIndex(index);
-
-                if (emberAfContainsServer(endpointId, SoftwareDiagnostics::Id))
-                {
-                    // If Software Diagnostics cluster is implemented on this endpoint
-                    // TODO: Log SoftwareFault event
-                }
-            }
-        }
+        ForAllEndpointsWithServerCluster(GeneralDiagnostics::Id, [](EndpointId endpoint, intptr_t) -> Loop {
+            // TODO: Log SoftwareFault event and walk them all.
+            return Loop::Break;
+        });
     }
 };
 
