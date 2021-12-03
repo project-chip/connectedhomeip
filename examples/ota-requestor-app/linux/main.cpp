@@ -25,9 +25,11 @@
 
 #include "LinuxOTAImageProcessor.h"
 #include "LinuxOTARequestorDriver.h"
+#include "app/clusters/ota-requestor/BDXDownloader.h"
 #include "app/clusters/ota-requestor/OTADownloader.h"
 #include "app/clusters/ota-requestor/OTARequestor.h"
 
+using chip::BDXDownloader;
 using chip::ByteSpan;
 using chip::CharSpan;
 using chip::DeviceProxy;
@@ -38,6 +40,7 @@ using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
 using chip::OTADownloader;
+using chip::OTAImageProcessorParams;
 using chip::PeerId;
 using chip::Server;
 using chip::VendorId;
@@ -48,6 +51,11 @@ using chip::Transport::PeerAddress;
 using namespace chip::ArgParser;
 using namespace chip::Messaging;
 using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
+
+OTARequestor requestorCore;
+LinuxOTARequestorDriver requestorUser;
+BDXDownloader downloader;
+LinuxOTAImageProcessor imageProcessor;
 
 bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue);
 void OnStartDelayTimerHandler(Layer * systemLayer, void * appState);
@@ -195,25 +203,21 @@ int main(int argc, char * argv[])
     SetDeviceAttestationCredentialsProvider(chip::Credentials::Examples::GetExampleDACProvider());
 
     // Initialize and interconnect the Requestor and Image Processor objects -- START
-    // Initialize the instance of the main Requestor Class
-    OTARequestor * requestorCore = new OTARequestor;
-    SetRequestorInstance(requestorCore);
-
-    // Initialize an instance of the Requestor Driver
-    LinuxOTARequestorDriver * requestorUser = new LinuxOTARequestorDriver;
+    SetRequestorInstance(&requestorCore);
 
     // Connect the Requestor and Requestor Driver objects
-    requestorCore->SetOtaRequestorDriver(requestorUser);
-
-    // Initialize  the Downloader object
-    OTADownloader * downloaderCore = new OTADownloader;
-    // TODO: enable    SetDownloaderInstance(downloaderCore);
+    requestorCore.SetOtaRequestorDriver(&requestorUser);
 
     // Initialize the Image Processor object
-    LinuxOTAImageProcessor * downloaderUser = new LinuxOTAImageProcessor;
+    OTAImageProcessorParams ipParams;
+    ipParams.imageFile = CharSpan("test.txt");
+    imageProcessor.SetOTAImageProcessorParams(ipParams);
+    imageProcessor.SetOTADownloader(&downloader);
 
     // Connect the Downloader and Image Processor objects
-    downloaderCore->SetImageProcessorDelegate(downloaderUser);
+    downloader.SetImageProcessorDelegate(&imageProcessor);
+
+    requestorCore.SetBDXDownloader(&downloader);
     // Initialize and interconnect the Requestor and Image Processor objects -- END
 
     // Pass the IP Address to the OTARequestor object: Use of explicit IP address is temporary
@@ -221,14 +225,14 @@ int main(int argc, char * argv[])
     {
         IPAddress ipAddr;
         IPAddress::FromString(ipAddress, ipAddr);
-        requestorCore->SetIpAddress(ipAddr);
+        requestorCore.SetIpAddress(ipAddr);
     }
 
     // Test Mode operation: If a delay is provided, QueryImage after the timer expires
     if (delayQueryTimeInSec > 0)
     {
         // In this mode Provider node ID and fabric idx must be supplied explicitly from program args
-        requestorCore->TestModeSetProviderParameters(providerNodeId, providerFabricIndex);
+        requestorCore.TestModeSetProviderParameters(providerNodeId, providerFabricIndex);
 
         chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(delayQueryTimeInSec * 1000),
                                                     OnStartDelayTimerHandler, nullptr);

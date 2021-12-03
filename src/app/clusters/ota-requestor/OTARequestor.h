@@ -20,11 +20,13 @@
  * Applications implementing the OTA Requestor functionality must include this file.
  */
 
+#pragma once
+
 #include "BDXDownloader.h"
 #include "OTARequestorDriver.h"
 #include "OTARequestorInterface.h"
 #include <app/CASESessionManager.h>
-#pragma once
+#include <protocols/bdx/BdxMessages.h>
 
 // This class implements all of the core logic of the OTA Requestor
 class OTARequestor : public OTARequestorInterface
@@ -38,6 +40,11 @@ public:
 
     // A setter for the delegate class pointer
     void SetOtaRequestorDriver(OTARequestorDriver * driver) { mOtaRequestorDriver = driver; }
+
+    // TODO: this should really be OTADownloader, but right now OTARequestor has information that we need to initialize a
+    // BDXDownloader specifically.
+    // The BDXDownloader instance should already have the ImageProcessingDelegate set.
+    void SetBDXDownloader(chip::BDXDownloader * downloader) { mBdxDownloader = downloader; }
 
     // Application directs the Requestor to abort any processing related to
     // the image update
@@ -78,7 +85,68 @@ private:
         kStartBDX,
     };
 
+    // TODO: the application should define this, along with initializing the BDXDownloader
+
+    // This class is purely for delivering messages and sending outgoing messages to/from the BDXDownloader.
+    class BDXMessenger : public chip::BDXDownloader::MessagingDelegate, public chip::Messaging::ExchangeDelegate
+    {
+    public:
+        CHIP_ERROR SendMessage(const chip::bdx::TransferSession::OutputEvent & event) override
+        {
+            ChipLogDetail(SoftwareUpdate, "BDX::SendMessage");
+            VerifyOrReturnError(mExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+            chip::Messaging::SendFlags sendFlags;
+            if (event.msgTypeData.MessageType == static_cast<uint8_t>(chip::bdx::MessageType::ReceiveInit))
+            {
+                sendFlags.Set(chip::Messaging::SendMessageFlags::kFromInitiator);
+            }
+            if (event.msgTypeData.MessageType != static_cast<uint8_t>(chip::bdx::MessageType::BlockAckEOF))
+            {
+                sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
+            }
+            ReturnErrorOnFailure(mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType,
+                                                           event.MsgData.Retain(), sendFlags));
+            return CHIP_NO_ERROR;
+        }
+
+        CHIP_ERROR OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PayloadHeader & payloadHeader,
+                                     chip::System::PacketBufferHandle && payload) override
+        {
+            if (mDownloader == nullptr)
+            {
+                ChipLogError(BDX, "BDXDownloader instance is null, can't pass message");
+                return CHIP_NO_ERROR;
+            }
+            else
+            {
+                mDownloader->OnMessageReceived(payloadHeader, payload.Retain());
+                return CHIP_NO_ERROR;
+            }
+        }
+
+        void OnResponseTimeout(chip::Messaging::ExchangeContext * ec) override
+        {
+            ChipLogError(BDX, "exchange timed out");
+            if (mDownloader != nullptr)
+            {
+                mDownloader->OnDownloadTimeout();
+            }
+        }
+
+        void Init(chip::BDXDownloader * downloader, chip::Messaging::ExchangeContext * ec)
+        {
+            mExchangeCtx = ec;
+            mDownloader  = downloader;
+        }
+
+    private:
+        chip::Messaging::ExchangeContext * mExchangeCtx;
+        chip::BDXDownloader * mDownloader;
+    };
+
     // Variables
+    // TODO: align on variable naming standard
     OTARequestorDriver * mOtaRequestorDriver;
     chip::NodeId mProviderNodeId;
     chip::FabricIndex mProviderFabricIndex;
@@ -86,9 +154,10 @@ private:
     chip::CASESessionManager * mCASESessionManager = nullptr;
     OnConnectedState onConnectedState              = kQueryImage;
     chip::Messaging::ExchangeContext * exchangeCtx = nullptr;
-    BdxDownloader bdxDownloader;
+    chip::BDXDownloader * mBdxDownloader;
+    BDXMessenger mBdxMessenger;
 
-    // Temporary until IP address resolution is implemented in the Exchange layer
+    // TODO: Temporary until IP address resolution is implemented in the Exchange layer
     chip::Inet::IPAddress mIpAddress;
 
     // Functions

@@ -24,6 +24,7 @@
 #include <app/server/Server.h>
 #include <app/util/util.h>
 #include <lib/core/CHIPEncoding.h>
+#include <lib/support/CodeUtils.h>
 #include <platform/CHIPDeviceLayer.h>
 
 #include "BDXDownloader.h"
@@ -112,6 +113,18 @@ void OTARequestor::mOnQueryImageResponse(void * context, const QueryImageRespons
 {
     ChipLogDetail(SoftwareUpdate, "QueryImageResponse responded with action %" PRIu8, response.status);
 
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // TODO: handle QueryImageResponse status types
+    if (response.status != EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE)
+    {
+        return;
+    }
+
+    VerifyOrReturn(mBdxDownloader != nullptr, ChipLogError(SoftwareUpdate, "downloader is null"));
+
+    // TODO: allow caller to provide their own OTADownloader instance and set BDX parameters
+
     TransferSession::TransferInitData initOptions;
     initOptions.TransferCtlFlags = chip::bdx::TransferControlFlags::kReceiverDrive;
     initOptions.MaxBlockSize     = 1024;
@@ -126,7 +139,7 @@ void OTARequestor::mOnQueryImageResponse(void * context, const QueryImageRespons
         chip::Optional<chip::SessionHandle> session    = operationalDeviceProxy->GetSecureSession();
         if (exchangeMgr != nullptr && session.HasValue())
         {
-            exchangeCtx = exchangeMgr->NewContext(session.Value(), &bdxDownloader);
+            exchangeCtx = exchangeMgr->NewContext(session.Value(), &mBdxMessenger);
         }
 
         if (exchangeCtx == nullptr)
@@ -136,11 +149,14 @@ void OTARequestor::mOnQueryImageResponse(void * context, const QueryImageRespons
         }
     }
 
-    bdxDownloader.SetInitialExchange(exchangeCtx);
-
-    // This will kick of a timer which will regularly check for updates to the bdx::TransferSession state machine.
-    bdxDownloader.InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions,
-                                   chip::System::Clock::Seconds16(20));
+    mBdxMessenger.Init(mBdxDownloader, exchangeCtx);
+    mBdxDownloader->SetMessageDelegate(&mBdxMessenger);
+    err = mBdxDownloader->SetBDXParams(initOptions);
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(SoftwareUpdate, "Error init BDXDownloader: %" CHIP_ERROR_FORMAT, err.Format()));
+    err = mBdxDownloader->BeginPrepareDownload();
+    VerifyOrReturn(err == CHIP_NO_ERROR,
+                   ChipLogError(SoftwareUpdate, "Error init BDXDownloader: %" CHIP_ERROR_FORMAT, err.Format()));
 }
 
 EmberAfStatus OTARequestor::HandleAnnounceOTAProvider(
@@ -347,6 +363,8 @@ void OTARequestor::mOnConnected(void * context, chip::DeviceProxy * deviceProxy)
         break;
     }
     case kStartBDX: {
+        VerifyOrReturn(mBdxDownloader != nullptr, ChipLogError(SoftwareUpdate, "downloader is null"));
+
         TransferSession::TransferInitData initOptions;
         initOptions.TransferCtlFlags = chip::bdx::TransferControlFlags::kReceiverDrive;
         initOptions.MaxBlockSize     = 1024;
@@ -360,7 +378,7 @@ void OTARequestor::mOnConnected(void * context, chip::DeviceProxy * deviceProxy)
             chip::Optional<chip::SessionHandle> session    = deviceProxy->GetSecureSession();
             if (exchangeMgr != nullptr && session.HasValue())
             {
-                exchangeCtx = exchangeMgr->NewContext(session.Value(), &bdxDownloader);
+                exchangeCtx = exchangeMgr->NewContext(session.Value(), &mBdxMessenger);
             }
 
             if (exchangeCtx == nullptr)
@@ -370,11 +388,14 @@ void OTARequestor::mOnConnected(void * context, chip::DeviceProxy * deviceProxy)
             }
         }
 
-        bdxDownloader.SetInitialExchange(exchangeCtx);
-
-        // This will kick of a timer which will regularly check for updates to the bdx::TransferSession state machine.
-        bdxDownloader.InitiateTransfer(&chip::DeviceLayer::SystemLayer(), chip::bdx::TransferRole::kReceiver, initOptions,
-                                       chip::System::Clock::Seconds16(20));
+        mBdxMessenger.Init(mBdxDownloader, exchangeCtx);
+        mBdxDownloader->SetMessageDelegate(&mBdxMessenger);
+        CHIP_ERROR err = mBdxDownloader->SetBDXParams(initOptions);
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(SoftwareUpdate, "Error init BDXDownloader: %" CHIP_ERROR_FORMAT, err.Format()));
+        err = mBdxDownloader->BeginPrepareDownload();
+        VerifyOrReturn(err == CHIP_NO_ERROR,
+                       ChipLogError(SoftwareUpdate, "Error init BDXDownloader: %" CHIP_ERROR_FORMAT, err.Format()));
         break;
     }
     default:

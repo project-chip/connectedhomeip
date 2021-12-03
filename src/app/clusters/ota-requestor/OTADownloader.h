@@ -44,7 +44,7 @@ public:
         kComplete,
     };
 
-    OTADownloader() : mState(State::kIdle), mImageProcessor(nullptr) {}
+    OTADownloader() : mImageProcessor(nullptr), mState(State::kIdle) {}
 
     // Application calls this method to direct OTADownloader to begin the download.
     // OTADownloader should handle calling into OTAImageProcessorDriver::PrepareDownload().
@@ -80,11 +80,5 @@ protected:
     OTAImageProcessorInterface * mImageProcessor;
     State mState;
 };
-
-// Set the object implementing OTADownloader
-void SetDownloaderInstance(OTADownloader * instance);
-
-// Get the object implementing OTADownloaderInterface
-OTADownloader * GetDownloaderInstance();
 
 } // namespace chip

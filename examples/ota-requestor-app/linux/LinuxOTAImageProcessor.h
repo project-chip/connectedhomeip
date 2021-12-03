@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <app/clusters/ota-requestor/OTADownloader.h>
 #include <app/clusters/ota-requestor/OTAImageProcessor.h>
 #include <platform/CHIPDeviceLayer.h>
 
@@ -33,6 +34,8 @@ public:
     CHIP_ERROR Finalize() override;
     CHIP_ERROR Abort() override;
     CHIP_ERROR ProcessBlock(ByteSpan & block) override;
+
+    void SetOTADownloader(chip::OTADownloader * downloader) { mDownloader = downloader; }
 
 private:
     //////////// Actual handlers for the OTAImageProcessorInterface ///////////////
@@ -53,6 +56,7 @@ private:
 
     std::ofstream mOfs;
     MutableByteSpan mBlock;
+    OTADownloader * mDownloader;
 };
 
 } // namespace chip
