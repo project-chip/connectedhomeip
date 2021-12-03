@@ -26,7 +26,7 @@ using namespace chip;
 using namespace chip::System::Clock::Literals;
 using chip::System::Clock::Timeout;
 
-class MockClock : public System::Clock::ClockBase
+class MockClock : public System::Clock::ClockImpl
 {
 public:
     System::Clock::Microseconds64 GetMonotonicMicroseconds64() override { return mMsec; }

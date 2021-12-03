@@ -44,7 +44,8 @@ CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callback
     mMinIntervalFloorSeconds   = 0;
     mMaxIntervalCeilingSeconds = 0;
     mSubscriptionId            = 0;
-    mInitialReport             = true;
+    mIsInitialReport           = true;
+    mIsPrimingReports          = true;
     mInteractionType           = aInteractionType;
     AbortExistingExchangeContext();
 
@@ -79,7 +80,8 @@ void ReadClient::ShutdownInternal(CHIP_ERROR aError)
     mInteractionType           = InteractionType::Read;
     mpExchangeMgr              = nullptr;
     mpExchangeCtx              = nullptr;
-    mInitialReport             = true;
+    mIsInitialReport           = true;
+    mIsPrimingReports          = true;
     mPeerNodeId                = kUndefinedNodeId;
     mFabricIndex               = kUndefinedFabricIndex;
     MoveToState(ClientState::Uninitialized);
@@ -140,7 +142,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
         if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
         {
-            EventPaths::Builder & eventPathListBuilder = request.CreateEventRequests();
+            EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
             SuccessOrExit(err = eventPathListBuilder.GetError());
             err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
                                      aReadPrepareParams.mEventPathParamsListSize);
@@ -148,7 +150,7 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
             if (aReadPrepareParams.mEventNumber != 0)
             {
                 // EventFilter is optional
-                EventFilters::Builder eventFilters = request.CreateEventFilters();
+                EventFilterIBs::Builder eventFilters = request.CreateEventFilters();
                 SuccessOrExit(err = request.GetError());
                 EventFilterIB::Builder eventFilter = eventFilters.CreateEventFilter();
                 eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB();
@@ -197,7 +199,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadClient::GenerateEventPaths(EventPaths::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
+CHIP_ERROR ReadClient::GenerateEventPaths(EventPathIBs::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
                                           size_t aEventPathParamsListSize)
 {
     for (size_t index = 0; index < aEventPathParamsListSize; ++index)
@@ -217,7 +219,7 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAt
     for (size_t index = 0; index < aAttributePathParamsListSize; index++)
     {
         VerifyOrReturnError(apAttributePathParamsList[index].IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-        ReturnErrorOnFailure(aAttributePathIBsBuilder.CreateAttributePath().Encode(apAttributePathParamsList[index]));
+        ReturnErrorOnFailure(aAttributePathIBsBuilder.CreatePath().Encode(apAttributePathParamsList[index]));
     }
     aAttributePathIBsBuilder.EndOfAttributePathIBs();
     return aAttributePathIBsBuilder.GetError();
@@ -296,7 +298,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     bool isAttributeReportIBsPresent = false;
     bool suppressResponse            = true;
     uint64_t subscriptionId          = 0;
-    EventReports::Parser EventReports;
+    EventReportIBs::Parser eventReportIBs;
     AttributeReportIBs::Parser attributeReportIBs;
     System::PacketBufferTLVReader reader;
 
@@ -322,7 +324,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     err = report.GetSubscriptionId(&subscriptionId);
     if (CHIP_NO_ERROR == err)
     {
-        if (IsInitialReport())
+        if (mIsPrimingReports)
         {
             mSubscriptionId = subscriptionId;
         }
@@ -352,7 +354,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
     SuccessOrExit(err);
 
-    err                   = report.GetEventReports(&EventReports);
+    err                   = report.GetEventReports(&eventReportIBs);
     isEventReportsPresent = (err == CHIP_NO_ERROR);
     if (err == CHIP_END_OF_TLV)
     {
@@ -363,7 +365,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     if (isEventReportsPresent && nullptr != mpCallback)
     {
         chip::TLV::TLVReader EventReportsReader;
-        EventReports.GetReader(&EventReportsReader);
+        eventReportIBs.GetReader(&EventReportsReader);
         err = ProcessEventReportIBs(EventReportsReader);
         SuccessOrExit(err);
     }
@@ -380,9 +382,10 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         TLV::TLVReader attributeReportIBsReader;
         attributeReportIBs.GetReader(&attributeReportIBsReader);
 
-        if (IsInitialReport())
+        if (mIsInitialReport)
         {
             mpCallback->OnReportBegin(this);
+            mIsInitialReport = false;
         }
 
         err = ProcessAttributeReportIBs(attributeReportIBsReader);
@@ -391,6 +394,7 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         if (!mPendingMoreChunks)
         {
             mpCallback->OnReportEnd(this);
+            mIsInitialReport = true;
         }
     }
 
@@ -410,9 +414,9 @@ exit:
     if (!suppressResponse)
     {
         bool noResponseExpected = IsSubscriptionIdle() && !mPendingMoreChunks;
-        err = StatusResponse::SendStatusResponse(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
-                                                                      : Protocols::InteractionModel::Status::InvalidSubscription,
-                                                 mpExchangeCtx, !noResponseExpected);
+        err                     = StatusResponse::Send(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
+                                                        : Protocols::InteractionModel::Status::InvalidSubscription,
+                                   mpExchangeCtx, !noResponseExpected);
 
         if (noResponseExpected || (err != CHIP_NO_ERROR))
         {
@@ -420,7 +424,7 @@ exit:
         }
     }
 
-    mInitialReport = false;
+    mIsPrimingReports = false;
     return err;
 }
 
@@ -636,7 +640,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 
     if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
     {
-        EventPaths::Builder & eventPathListBuilder = request.CreateEventRequests();
+        EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
         SuccessOrExit(err = eventPathListBuilder.GetError());
         err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
                                  aReadPrepareParams.mEventPathParamsListSize);
@@ -645,7 +649,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         if (aReadPrepareParams.mEventNumber != 0)
         {
             // EventNumber is optional
-            EventFilters::Builder eventFilters = request.CreateEventFilters();
+            EventFilterIBs::Builder eventFilters = request.CreateEventFilters();
             SuccessOrExit(err = request.GetError());
             EventFilterIB::Builder eventFilter = eventFilters.CreateEventFilter();
             eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB();

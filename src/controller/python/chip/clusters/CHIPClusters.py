@@ -1397,13 +1397,13 @@ class ChipClusters:
         "commands": {
             0x00000008: {
                 "commandId": 0x00000008,
-                "commandName": "ClearAllPins",
+                "commandName": "ClearAllPINCodes",
                 "args": {
                 },
             },
             0x00000019: {
                 "commandId": 0x00000019,
-                "commandName": "ClearAllRfids",
+                "commandName": "ClearAllRFIDCodes",
                 "args": {
                 },
             },
@@ -1411,44 +1411,44 @@ class ChipClusters:
                 "commandId": 0x00000013,
                 "commandName": "ClearHolidaySchedule",
                 "args": {
-                    "scheduleId": "int",
+                    "holidayIndex": "int",
                 },
             },
             0x00000007: {
                 "commandId": 0x00000007,
-                "commandName": "ClearPin",
+                "commandName": "ClearPINCode",
                 "args": {
-                    "userId": "int",
+                    "pinSlotIndex": "int",
                 },
             },
             0x00000018: {
                 "commandId": 0x00000018,
-                "commandName": "ClearRfid",
+                "commandName": "ClearRFIDCode",
                 "args": {
-                    "userId": "int",
+                    "rfidSlotIndex": "int",
                 },
             },
             0x0000000D: {
                 "commandId": 0x0000000D,
-                "commandName": "ClearWeekdaySchedule",
+                "commandName": "ClearWeekDaySchedule",
                 "args": {
-                    "scheduleId": "int",
-                    "userId": "int",
+                    "weekDayIndex": "int",
+                    "userIndex": "int",
                 },
             },
             0x00000010: {
                 "commandId": 0x00000010,
-                "commandName": "ClearYeardaySchedule",
+                "commandName": "ClearYearDaySchedule",
                 "args": {
-                    "scheduleId": "int",
-                    "userId": "int",
+                    "yearDayIndex": "int",
+                    "userIndex": "int",
                 },
             },
             0x00000012: {
                 "commandId": 0x00000012,
                 "commandName": "GetHolidaySchedule",
                 "args": {
-                    "scheduleId": "int",
+                    "holidayIndex": "int",
                 },
             },
             0x00000004: {
@@ -1460,14 +1460,14 @@ class ChipClusters:
             },
             0x00000006: {
                 "commandId": 0x00000006,
-                "commandName": "GetPin",
+                "commandName": "GetPINCode",
                 "args": {
                     "userId": "int",
                 },
             },
             0x00000017: {
                 "commandId": 0x00000017,
-                "commandName": "GetRfid",
+                "commandName": "GetRFIDCode",
                 "args": {
                     "userId": "int",
                 },
@@ -1481,40 +1481,40 @@ class ChipClusters:
             },
             0x0000000C: {
                 "commandId": 0x0000000C,
-                "commandName": "GetWeekdaySchedule",
+                "commandName": "GetWeekDaySchedule",
                 "args": {
-                    "scheduleId": "int",
-                    "userId": "int",
+                    "weekDayIndex": "int",
+                    "userIndex": "int",
                 },
             },
             0x0000000F: {
                 "commandId": 0x0000000F,
-                "commandName": "GetYeardaySchedule",
+                "commandName": "GetYearDaySchedule",
                 "args": {
-                    "scheduleId": "int",
-                    "userId": "int",
+                    "yearDayIndex": "int",
+                    "userIndex": "int",
                 },
             },
             0x00000000: {
                 "commandId": 0x00000000,
                 "commandName": "LockDoor",
                 "args": {
-                    "pin": "bytes",
+                    "pinCode": "bytes",
                 },
             },
             0x00000011: {
                 "commandId": 0x00000011,
                 "commandName": "SetHolidaySchedule",
                 "args": {
-                    "scheduleId": "int",
+                    "holidayIndex": "int",
                     "localStartTime": "int",
                     "localEndTime": "int",
-                    "operatingModeDuringHoliday": "int",
+                    "operatingMode": "int",
                 },
             },
             0x00000005: {
                 "commandId": 0x00000005,
-                "commandName": "SetPin",
+                "commandName": "SetPINCode",
                 "args": {
                     "userId": "int",
                     "userStatus": "int",
@@ -1524,12 +1524,12 @@ class ChipClusters:
             },
             0x00000016: {
                 "commandId": 0x00000016,
-                "commandName": "SetRfid",
+                "commandName": "SetRFIDCode",
                 "args": {
                     "userId": "int",
                     "userStatus": "int",
                     "userType": "int",
-                    "id": "bytes",
+                    "rfidCode": "bytes",
                 },
             },
             0x00000014: {
@@ -1542,10 +1542,10 @@ class ChipClusters:
             },
             0x0000000B: {
                 "commandId": 0x0000000B,
-                "commandName": "SetWeekdaySchedule",
+                "commandName": "SetWeekDaySchedule",
                 "args": {
-                    "scheduleId": "int",
-                    "userId": "int",
+                    "weekDayIndex": "int",
+                    "userIndex": "int",
                     "daysMask": "int",
                     "startHour": "int",
                     "startMinute": "int",
@@ -1555,10 +1555,10 @@ class ChipClusters:
             },
             0x0000000E: {
                 "commandId": 0x0000000E,
-                "commandName": "SetYeardaySchedule",
+                "commandName": "SetYearDaySchedule",
                 "args": {
-                    "scheduleId": "int",
-                    "userId": "int",
+                    "yearDayIndex": "int",
+                    "userIndex": "int",
                     "localStartTime": "int",
                     "localEndTime": "int",
                 },
@@ -1567,15 +1567,15 @@ class ChipClusters:
                 "commandId": 0x00000001,
                 "commandName": "UnlockDoor",
                 "args": {
-                    "pin": "bytes",
+                    "pinCode": "bytes",
                 },
             },
             0x00000003: {
                 "commandId": 0x00000003,
                 "commandName": "UnlockWithTimeout",
                 "args": {
-                    "timeoutInSeconds": "int",
-                    "pin": "bytes",
+                    "timeout": "int",
+                    "pinCode": "bytes",
                 },
             },
         },
@@ -1866,6 +1866,16 @@ class ChipClusters:
                 "attributeId": 0x00000001,
                 "type": "",
                 "reportable": True,
+            },
+            0x00000002: {
+                "attributeName": "RegulatoryConfig",
+                "attributeId": 0x00000002,
+                "type": "int",
+            },
+            0x00000003: {
+                "attributeName": "LocationCapability",
+                "attributeId": 0x00000003,
+                "type": "int",
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",
@@ -3749,6 +3759,13 @@ class ChipClusters:
                     "arg1": "int",
                 },
             },
+            0x00000013: {
+                "commandId": 0x00000013,
+                "commandName": "TestSimpleOptionalArgumentRequest",
+                "args": {
+                    "arg1": "bool",
+                },
+            },
             0x00000002: {
                 "commandId": 0x00000002,
                 "commandName": "TestSpecific",
@@ -4921,6 +4938,11 @@ class ChipClusters:
                 "attributeId": 0x0000003E,
                 "type": "int",
                 "reportable": True,
+            },
+            0x0000FFFC: {
+                "attributeName": "FeatureMap",
+                "attributeId": 0x0000FFFC,
+                "type": "int",
             },
             0x0000FFFD: {
                 "attributeName": "ClusterRevision",

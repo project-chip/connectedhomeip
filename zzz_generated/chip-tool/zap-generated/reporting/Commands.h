@@ -148,8 +148,6 @@ public:
         delete onReportColorControlClusterRevisionCallback;
         delete onReportContentLauncherClusterRevisionCallback;
         delete onReportDescriptorClusterRevisionCallback;
-        delete onReportDoorLockLockStateCallback;
-        delete onReportDoorLockLockTypeCallback;
         delete onReportDoorLockActuatorEnabledCallback;
         delete onReportDoorLockClusterRevisionCallback;
         delete onReportElectricalMeasurementMeasurementTypeCallback;
@@ -348,6 +346,8 @@ public:
         delete onReportTestClusterInt64sCallback;
         delete onReportTestClusterEnum8Callback;
         delete onReportTestClusterEnum16Callback;
+        delete onReportTestClusterFloatSingleCallback;
+        delete onReportTestClusterFloatDoubleCallback;
         delete onReportTestClusterOctetStringCallback;
         delete onReportTestClusterLongOctetStringCallback;
         delete onReportTestClusterCharStringCallback;
@@ -383,6 +383,8 @@ public:
         delete onReportTestClusterNullableInt64sCallback;
         delete onReportTestClusterNullableEnum8Callback;
         delete onReportTestClusterNullableEnum16Callback;
+        delete onReportTestClusterNullableFloatSingleCallback;
+        delete onReportTestClusterNullableFloatDoubleCallback;
         delete onReportTestClusterNullableOctetStringCallback;
         delete onReportTestClusterNullableCharStringCallback;
         delete onReportTestClusterNullableRangeRestrictedInt8uCallback;
@@ -799,10 +801,6 @@ public:
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x001D, 0xFFFD, onReportDescriptorClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0000, onReportDoorLockLockStateCallback->Cancel(),
-                                       BasicAttributeFilter<Int8uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0001, onReportDoorLockLockTypeCallback->Cancel(),
-                                       BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0002, onReportDoorLockActuatorEnabledCallback->Cancel(),
                                        BasicAttributeFilter<BooleanAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0xFFFD, onReportDoorLockClusterRevisionCallback->Cancel(),
@@ -1306,6 +1304,10 @@ public:
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0016, onReportTestClusterEnum16Callback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0017, onReportTestClusterFloatSingleCallback->Cancel(),
+                                       BasicAttributeFilter<FloatAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0018, onReportTestClusterFloatDoubleCallback->Cancel(),
+                                       BasicAttributeFilter<DoubleAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0019, onReportTestClusterOctetStringCallback->Cancel(),
                                        BasicAttributeFilter<OctetStringAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x001D, onReportTestClusterLongOctetStringCallback->Cancel(),
@@ -1380,6 +1382,12 @@ public:
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8016, onReportTestClusterNullableEnum16Callback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8017,
+                                       onReportTestClusterNullableFloatSingleCallback->Cancel(),
+                                       BasicAttributeFilter<FloatAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8018,
+                                       onReportTestClusterNullableFloatDoubleCallback->Cancel(),
+                                       BasicAttributeFilter<DoubleAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8019,
                                        onReportTestClusterNullableOctetStringCallback->Cancel(),
                                        BasicAttributeFilter<OctetStringAttributeCallback>);
@@ -2010,10 +2018,6 @@ private:
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportDescriptorClusterRevisionCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportDoorLockLockStateCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportDoorLockLockTypeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<BooleanAttributeCallback> * onReportDoorLockActuatorEnabledCallback =
         new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportDoorLockClusterRevisionCallback =
@@ -2410,6 +2414,10 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterEnum16Callback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<FloatAttributeCallback> * onReportTestClusterFloatSingleCallback =
+        new chip::Callback::Callback<FloatAttributeCallback>(OnFloatAttributeResponse, this);
+    chip::Callback::Callback<DoubleAttributeCallback> * onReportTestClusterFloatDoubleCallback =
+        new chip::Callback::Callback<DoubleAttributeCallback>(OnDoubleAttributeResponse, this);
     chip::Callback::Callback<OctetStringAttributeCallback> * onReportTestClusterOctetStringCallback =
         new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
     chip::Callback::Callback<OctetStringAttributeCallback> * onReportTestClusterLongOctetStringCallback =
@@ -2480,6 +2488,10 @@ private:
         new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterNullableEnum16Callback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<FloatAttributeCallback> * onReportTestClusterNullableFloatSingleCallback =
+        new chip::Callback::Callback<FloatAttributeCallback>(OnFloatAttributeResponse, this);
+    chip::Callback::Callback<DoubleAttributeCallback> * onReportTestClusterNullableFloatDoubleCallback =
+        new chip::Callback::Callback<DoubleAttributeCallback>(OnDoubleAttributeResponse, this);
     chip::Callback::Callback<OctetStringAttributeCallback> * onReportTestClusterNullableOctetStringCallback =
         new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
     chip::Callback::Callback<CharStringAttributeCallback> * onReportTestClusterNullableCharStringCallback =

@@ -216,8 +216,8 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     // Test all combinations of invalid parameters
     TestCASESecurePairingDelegate delegateAccessory;
     TestCASESessionIPK pairingAccessory;
-    CASESessionSerializable serializableCommissioner;
-    CASESessionSerializable serializableAccessory;
+    CASESessionCachable serializableCommissioner;
+    CASESessionCachable serializableAccessory;
 
     gLoopback.mSentMessageCount = 0;
     NL_TEST_ASSERT(inSuite, pairingCommissioner.MessageDispatch().Init(&ctx.GetSecureSessionManager()) == CHIP_NO_ERROR);
@@ -242,8 +242,8 @@ void CASE_SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inConte
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 
-    NL_TEST_ASSERT(inSuite, pairingCommissioner.ToSerializable(serializableCommissioner) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, pairingAccessory.ToSerializable(serializableAccessory) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingCommissioner.ToCachable(serializableCommissioner) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, pairingAccessory.ToCachable(serializableAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    memcmp(serializableCommissioner.mSharedSecret, serializableAccessory.mSharedSecret,
                           serializableCommissioner.mSharedSecretLen) == 0);
@@ -389,65 +389,6 @@ void CASE_SecurePairingHandshakeServerTest(nlTestSuite * inSuite, void * inConte
 
     chip::Platform::Delete(pairingCommissioner);
     chip::Platform::Delete(pairingCommissioner1);
-}
-
-void CASE_SecurePairingDeserialize(nlTestSuite * inSuite, void * inContext, CASESession & pairingCommissioner,
-                                   CASESession & deserialized)
-{
-    CASESessionSerialized serialized;
-    NL_TEST_ASSERT(inSuite, pairingCommissioner.Serialize(serialized) == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, deserialized.Deserialize(serialized) == CHIP_NO_ERROR);
-
-    // Serialize from the deserialized session, and check we get the same string back
-    CASESessionSerialized serialized2;
-    NL_TEST_ASSERT(inSuite, deserialized.Serialize(serialized2) == CHIP_NO_ERROR);
-
-    NL_TEST_ASSERT(inSuite, strncmp(Uint8::to_char(serialized.inner), Uint8::to_char(serialized2.inner), sizeof(serialized)) == 0);
-}
-
-void CASE_SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
-{
-    TestCASESecurePairingDelegate delegateCommissioner;
-
-    // Allocate on the heap to avoid stack overflow in some restricted test scenarios (e.g. QEMU)
-    auto * testPairingSession1 = chip::Platform::New<TestCASESessionIPK>();
-    auto * testPairingSession2 = chip::Platform::New<TestCASESessionIPK>();
-
-    CASE_SecurePairingHandshakeTestCommon(inSuite, inContext, *testPairingSession1, delegateCommissioner);
-    CASE_SecurePairingDeserialize(inSuite, inContext, *testPairingSession1, *testPairingSession2);
-
-    const uint8_t plain_text[] = { 0x86, 0x74, 0x64, 0xe5, 0x0b, 0xd4, 0x0d, 0x90, 0xe1, 0x17, 0xa3, 0x2d, 0x4b, 0xd4, 0xe1, 0xe6 };
-    uint8_t encrypted[64];
-    PacketHeader header;
-    MessageAuthenticationCode mac;
-
-    header.SetSessionId(1);
-    NL_TEST_ASSERT(inSuite, header.IsEncrypted() == true);
-    NL_TEST_ASSERT(inSuite, header.MICTagLength() == 16);
-
-    // Let's try encrypting using original session, and decrypting using deserialized
-    {
-        CryptoContext session1;
-
-        NL_TEST_ASSERT(inSuite,
-                       testPairingSession1->DeriveSecureSession(session1, CryptoContext::SessionRole::kInitiator) == CHIP_NO_ERROR);
-
-        NL_TEST_ASSERT(inSuite, session1.Encrypt(plain_text, sizeof(plain_text), encrypted, header, mac) == CHIP_NO_ERROR);
-    }
-
-    {
-        CryptoContext session2;
-        NL_TEST_ASSERT(inSuite,
-                       testPairingSession2->DeriveSecureSession(session2, CryptoContext::SessionRole::kResponder) == CHIP_NO_ERROR);
-
-        uint8_t decrypted[64];
-        NL_TEST_ASSERT(inSuite, session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, mac) == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, memcmp(plain_text, decrypted, sizeof(plain_text)) == 0);
-    }
-
-    chip::Platform::Delete(testPairingSession1);
-    chip::Platform::Delete(testPairingSession2);
 }
 
 struct Sigma1Params
@@ -676,7 +617,6 @@ static const nlTest sTests[] =
     NL_TEST_DEF("Start",       CASE_SecurePairingStartTest),
     NL_TEST_DEF("Handshake",   CASE_SecurePairingHandshakeTest),
     NL_TEST_DEF("ServerHandshake", CASE_SecurePairingHandshakeServerTest),
-    NL_TEST_DEF("Serialize",   CASE_SecurePairingSerializeTest),
     NL_TEST_DEF("Sigma1Parsing", CASE_Sigma1ParsingTest),
 
     NL_TEST_SENTINEL()

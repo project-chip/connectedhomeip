@@ -41,6 +41,7 @@ jobs:
                   submodules: true
 
             - name: Set up environment for size reports
+              if: ${{ !env.ACT }}
               env:
                   GH_CONTEXT: ${{ toJson(github) }}
               run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
@@ -88,3 +89,4 @@ jobs:
                   path: |
                     out/infineon-p6-lock/p6-default-lock-app-sizes.json
                     out/infineon-p6-all-clusters/p6-default-all-clusters-app-sizes.json
+                    out/infineon-p6-light/p6-default-light-app-sizes.json

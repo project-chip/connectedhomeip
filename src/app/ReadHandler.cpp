@@ -58,7 +58,7 @@ CHIP_ERROR ReadHandler::Init(Messaging::ExchangeManager * apExchangeMgr, Interac
     mInteractionType    = aInteractionType;
     mInitiatorNodeId    = apExchangeContext->GetSessionHandle().GetPeerNodeId();
     mFabricIndex        = apExchangeContext->GetSessionHandle().GetFabricIndex();
-
+    mHoldSync           = false;
     if (apExchangeContext != nullptr)
     {
         apExchangeContext->SetDelegate(this);
@@ -110,6 +110,7 @@ void ReadHandler::Shutdown(ShutdownOptions aOptions)
     mActiveSubscription        = false;
     mIsChunkedReport           = false;
     mInitiatorNodeId           = kUndefinedNodeId;
+    mHoldSync                  = false;
 }
 
 CHIP_ERROR ReadHandler::OnReadInitialRequest(System::PacketBufferHandle && aPayload)
@@ -270,7 +271,7 @@ CHIP_ERROR ReadHandler::ProcessReadRequest(System::PacketBufferHandle && aPayloa
     System::PacketBufferTLVReader reader;
 
     ReadRequestMessage::Parser readRequestParser;
-    EventPaths::Parser eventPathListParser;
+    EventPathIBs::Parser eventPathListParser;
 
     AttributePathIBs::Parser attributePathListParser;
 
@@ -409,7 +410,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadHandler::ProcessEventPaths(EventPaths::Parser & aEventPathsParser)
+CHIP_ERROR ReadHandler::ProcessEventPaths(EventPathIBs::Parser & aEventPathsParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVReader reader;
@@ -589,7 +590,7 @@ CHIP_ERROR ReadHandler::ProcessSubscribeRequest(System::PacketBufferHandle && aP
     }
     ReturnErrorOnFailure(err);
 
-    EventPaths::Parser eventPathListParser;
+    EventPathIBs::Parser eventPathListParser;
     err = subscribeRequestParser.GetEventRequests(&eventPathListParser);
     if (err == CHIP_END_OF_TLV)
     {
@@ -637,17 +638,21 @@ void ReadHandler::OnUnblockHoldReportCallback(System::Layer * apSystemLayer, voi
 void ReadHandler::OnRefreshSubscribeTimerSyncCallback(System::Layer * apSystemLayer, void * apAppState)
 {
     VerifyOrReturn(apAppState != nullptr);
+    ReadHandler * readHandler = static_cast<ReadHandler *>(apAppState);
+    readHandler->mHoldSync    = false;
+    ChipLogProgress(DataManagement, "Refresh subscribe timer sync after max %d seconds", readHandler->mMaxIntervalCeilingSeconds);
     InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleRun();
 }
 
 CHIP_ERROR ReadHandler::RefreshSubscribeSyncTimer()
 {
-    ChipLogProgress(DataManagement, "ReadHandler::Refresh Subscribe Sync Timer with %d seconds", mMaxIntervalCeilingSeconds);
+    ChipLogProgress(DataManagement, "Refresh Subscribe Sync Timer with %d seconds", mMaxIntervalCeilingSeconds);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnUnblockHoldReportCallback, this);
     InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->CancelTimer(
         OnRefreshSubscribeTimerSyncCallback, this);
     mHoldReport = true;
+    mHoldSync   = true;
     ReturnErrorOnFailure(
         InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
             System::Clock::Seconds16(mMinIntervalFloorSeconds), OnUnblockHoldReportCallback, this));

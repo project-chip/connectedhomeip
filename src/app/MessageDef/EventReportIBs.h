@@ -1,6 +1,7 @@
 /**
  *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,11 +17,15 @@
  */
 /**
  *    @file
- *      This file defines EventFilters parser and builder in CHIP interaction model
+ *      This file defines EventReportIBs parser and builder in CHIP interaction model
  *
  */
 
 #pragma once
+
+#include "ArrayBuilder.h"
+#include "ArrayParser.h"
+#include "EventReportIB.h"
 
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
@@ -29,13 +34,9 @@
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "ArrayBuilder.h"
-#include "ArrayParser.h"
-#include "EventFilterIB.h"
-
 namespace chip {
 namespace app {
-namespace EventFilters {
+namespace EventReportIBs {
 class Parser : public ArrayParser
 {
 public:
@@ -61,27 +62,22 @@ class Builder : public ArrayBuilder
 {
 public:
     /**
-     *  @brief Initialize a EventFilterIB::Builder for writing into the TLV stream
+     *  @brief Initialize a EventReportIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to EventFilterIB::Builder
+     *  @return A reference to EventReportIB::Builder
      */
-    EventFilterIB::Builder & CreateEventFilter();
+    EventReportIB::Builder & CreateEventReport();
 
     /**
-     *  @return A reference to EventFilterIB::Builder
-     */
-    EventFilterIB::Builder & GetEventFilter() { return mEventFilter; };
-
-    /**
-     *  @brief Mark the end of this EventFilters
+     *  @brief Mark the end of this EventReportIBs
      *
      *  @return A reference to *this
      */
-    EventFilters::Builder & EndOfEventFilters();
+    EventReportIBs::Builder & EndOfEventReports();
 
 private:
-    EventFilterIB::Builder mEventFilter;
+    EventReportIB::Builder mEventReport;
 };
-}; // namespace EventFilters
-}; // namespace app
-}; // namespace chip
+} // namespace EventReportIBs
+} // namespace app
+} // namespace chip

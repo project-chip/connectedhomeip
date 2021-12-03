@@ -16,36 +16,82 @@
  *    limitations under the License.
  */
 
-/* This file contains the declarations for OTAImageProcessorDriver, a platform-agnostic
- * interface for processing downloaded chunks of OTA image data.
- * Each platform should provide an implementation of this interface.
- */
-
 #pragma once
 
-// This is a platform-agnostic interface for processing downloaded
-// chunks of OTA image data (data could be raw image data meant for flash or
-// metadata). Each platform should provide an implementation of this
-// interface.
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
+#include <lib/support/DLLUtil.h>
+#include <lib/support/Span.h>
 
-class OTAImageProcessorDriver
+namespace chip {
+
+struct OTAImageProcessorParams
+{
+    CharSpan imageFile;
+    uint64_t downloadedBytes;
+    uint64_t totalFileBytes;
+};
+
+/**
+ * @class OTAImageProcessorInterface
+ *
+ * @brief
+ *   This is a platform-agnostic interface for processing downloaded
+ *   chunks of OTA image data. The data could be raw image data meant for flash or
+ *   metadata. Each platform should provide an implementation of this
+ *   interface.
+ */
+class DLL_EXPORT OTAImageProcessorInterface
 {
 public:
-    // Open file, find block of space in persistent memory, or allocate a buffer, etc.
+    virtual ~OTAImageProcessorInterface() {}
+
+    /**
+     * Called to prepare for an OTA image download. This may include but not limited to opening the file, finding a block of space
+     * in persistent memory, and allocating a buffer. This must not be a blocking call.
+     */
     virtual CHIP_ERROR PrepareDownload() = 0;
 
-    // Must not be a blocking call to support cases that require IO to elements such as // external peripherals/radios
-    virtual CHIP_ERROR ProcessBlock(chip::ByteSpan & data) = 0;
-
-    // Close file, close persistent storage, etc
+    /**
+     * Called when the OTA image download process has completed. This may include but not limited to closing the file and persistent
+     * storage. This must not be a blocking call.
+     */
     virtual CHIP_ERROR Finalize() = 0;
 
-    virtual chip::Optional<uint8_t> PercentComplete() = 0;
-
-    // Clean up the download which could mean erasing everything that was written,
-    // releasing buffers, etc.
+    /**
+     * Called when the OTA image download process is incomplete or cannot continue. This may include but not limited to erasing
+     * everything that has been written and releasing buffers. This must not be a blocking call.
+     */
     virtual CHIP_ERROR Abort() = 0;
 
-    // Destructor
-    virtual ~OTAImageProcessorDriver() = default;
+    /**
+     * Called to process a downloaded block of data. This must not be a blocking call to support cases that require IO to elements
+     * such as external peripherals/radios. This must not be a blocking call.
+     */
+    virtual CHIP_ERROR ProcessBlock(ByteSpan & block) = 0;
+
+    /**
+     * Called to setup params for the OTA image download
+     */
+    virtual void SetOTAImageProcessorParams(OTAImageProcessorParams & params) { mParams = params; };
+
+    /**
+     * Called to check the current download status of the OTA image download.
+     */
+    virtual uint8_t GetPercentComplete()
+    {
+        if (mParams.totalFileBytes == 0)
+        {
+            return 0;
+        }
+        else
+        {
+            return static_cast<uint8_t>((mParams.downloadedBytes * 100) / mParams.totalFileBytes);
+        }
+    }
+
+protected:
+    OTAImageProcessorParams mParams;
 };
+
+} // namespace chip

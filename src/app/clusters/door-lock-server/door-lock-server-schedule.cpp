@@ -121,19 +121,19 @@ void emAfPluginDoorLockServerInitSchedule(void)
 #endif
 }
 
-bool emberAfDoorLockClusterSetWeekdayScheduleCallback(app::CommandHandler * commandObj,
+bool emberAfDoorLockClusterSetWeekDayScheduleCallback(app::CommandHandler * commandObj,
                                                       const app::ConcreteCommandPath & commandPath,
-                                                      const Commands::SetWeekdaySchedule::DecodableType & commandData)
+                                                      const Commands::SetWeekDaySchedule::DecodableType & commandData)
 {
-    auto & scheduleId  = commandData.scheduleId;
-    auto & userId      = commandData.userId;
+    auto & scheduleId  = commandData.weekDayIndex;
+    auto & userId      = commandData.userIndex;
     auto & daysMask    = commandData.daysMask;
     auto & startHour   = commandData.startHour;
     auto & startMinute = commandData.startMinute;
     auto & stopHour    = commandData.endHour;
     auto & stopMinute  = commandData.endMinute;
 
-    uint8_t status                  = 0x00;
+    EmberAfStatus status            = EMBER_ZCL_STATUS_SUCCESS;
     uint8_t userPin                 = 0x00;
     uint16_t rfProgrammingEventMask = 0xffff; // event sent by default
     CHIP_ERROR err                  = CHIP_NO_ERROR;
@@ -141,7 +141,7 @@ bool emberAfDoorLockClusterSetWeekdayScheduleCallback(app::CommandHandler * comm
                                                          EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_WEEKDAY_SCHEDULE_TABLE_SIZE) ||
         !emAfPluginDoorLockServerCheckForSufficientSpace(userId, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE))
     {
-        status = 0x01;
+        status = EMBER_ZCL_STATUS_FAILURE;
     }
     if (!status)
     {
@@ -157,18 +157,10 @@ bool emberAfDoorLockClusterSetWeekdayScheduleCallback(app::CommandHandler * comm
         printWeekdayScheduleTable();
     }
 
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
-                                             Commands::SetWeekdayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
+    VerifyOrExit(EMBER_ZCL_STATUS_SUCCESS == emberAfSendImmediateDefaultResponse(status), err = CHIP_ERROR_INCORRECT_STATE);
 
     // get bitmask so we can check if we should send event notification
-    Attributes::RfProgrammingEventMask::Get(DOOR_LOCK_SERVER_ENDPOINT, &rfProgrammingEventMask);
+    Attributes::RemoteProgrammingEventMask::Get(DOOR_LOCK_SERVER_ENDPOINT, &rfProgrammingEventMask);
 
     if (rfProgrammingEventMask & EMBER_BIT(0))
     {
@@ -185,12 +177,12 @@ exit:
     return true;
 }
 
-bool emberAfDoorLockClusterGetWeekdayScheduleCallback(app::CommandHandler * commandObj,
+bool emberAfDoorLockClusterGetWeekDayScheduleCallback(app::CommandHandler * commandObj,
                                                       const app::ConcreteCommandPath & commandPath,
-                                                      const Commands::GetWeekdaySchedule::DecodableType & commandData)
+                                                      const Commands::GetWeekDaySchedule::DecodableType & commandData)
 {
-    auto & scheduleId = commandData.scheduleId;
-    auto & userId     = commandData.userId;
+    auto & scheduleId = commandData.weekDayIndex;
+    auto & userId     = commandData.userIndex;
 
     EmberAfStatus zclStatus =
         ((scheduleId > EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_WEEKDAY_SCHEDULE_TABLE_SIZE) ? EMBER_ZCL_STATUS_INVALID_FIELD
@@ -206,7 +198,7 @@ bool emberAfDoorLockClusterGetWeekdayScheduleCallback(app::CommandHandler * comm
 
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
-                                             Commands::GetWeekdayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
+                                             Commands::GetWeekDayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -228,55 +220,42 @@ exit:
     return true;
 }
 
-bool emberAfDoorLockClusterClearWeekdayScheduleCallback(app::CommandHandler * commandObj,
+bool emberAfDoorLockClusterClearWeekDayScheduleCallback(app::CommandHandler * commandObj,
                                                         const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::ClearWeekdaySchedule::DecodableType & commandData)
+                                                        const Commands::ClearWeekDaySchedule::DecodableType & commandData)
 {
-    auto & scheduleId = commandData.scheduleId;
-    auto & userId     = commandData.userId;
+    auto & scheduleId = commandData.weekDayIndex;
+    auto & userId     = commandData.userIndex;
 
     EmberAfStatus zclStatus =
         ((scheduleId > EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_WEEKDAY_SCHEDULE_TABLE_SIZE) ? EMBER_ZCL_STATUS_INVALID_FIELD
                                                                                      : EMBER_ZCL_STATUS_SUCCESS);
-    CHIP_ERROR err = CHIP_NO_ERROR;
     if (zclStatus == EMBER_ZCL_STATUS_SUCCESS)
     {
         weekdayScheduleTable[scheduleId].inUse = false;
         emAfPluginDoorLockServerSetPinUserType(userId, EMBER_ZCL_DOOR_LOCK_USER_TYPE_UNRESTRICTED);
     }
 
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
-                                             Commands::ClearWeekdayScheduleResponse::Id,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), zclStatus));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
+    if (EMBER_ZCL_STATUS_SUCCESS != emberAfSendImmediateDefaultResponse(zclStatus))
     {
         ChipLogError(Zcl, "Failed to encode response command.");
     }
     return true;
 }
 
-bool emberAfDoorLockClusterSetYeardayScheduleCallback(app::CommandHandler * commandObj,
+bool emberAfDoorLockClusterSetYearDayScheduleCallback(app::CommandHandler * commandObj,
                                                       const app::ConcreteCommandPath & commandPath,
-                                                      const Commands::SetYeardaySchedule::DecodableType & commandData)
+                                                      const Commands::SetYearDaySchedule::DecodableType & commandData)
 {
-    auto & scheduleId     = commandData.scheduleId;
-    auto & userId         = commandData.userId;
+    auto & scheduleId     = commandData.yearDayIndex;
+    auto & userId         = commandData.userIndex;
     auto & localStartTime = commandData.localStartTime;
     auto & localEndTime   = commandData.localEndTime;
 
-    uint8_t status;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    EmberAfStatus status;
     if (scheduleId >= EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_YEARDAY_SCHEDULE_TABLE_SIZE)
     {
-        status = 0x01; // failure (per 7.3.2.17.15)
+        status = EMBER_ZCL_STATUS_FAILURE; // failure (per 7.3.2.17.15)
     }
     else
     {
@@ -284,32 +263,22 @@ bool emberAfDoorLockClusterSetYeardayScheduleCallback(app::CommandHandler * comm
         yeardayScheduleTable[scheduleId].localStartTime = localStartTime;
         yeardayScheduleTable[scheduleId].localEndTime   = localEndTime;
         yeardayScheduleTable[scheduleId].inUse          = true;
-        status                                          = 0x00; // success (per 7.3.2.17.15)
+        status                                          = EMBER_ZCL_STATUS_SUCCESS; // success (per 7.3.2.17.15)
     }
 
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
-                                             Commands::SetYeardayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
+    if (EMBER_ZCL_STATUS_SUCCESS != emberAfSendImmediateDefaultResponse(status))
     {
         ChipLogError(Zcl, "Failed to encode response command.");
     }
     return true;
 }
 
-bool emberAfDoorLockClusterGetYeardayScheduleCallback(app::CommandHandler * commandObj,
+bool emberAfDoorLockClusterGetYearDayScheduleCallback(app::CommandHandler * commandObj,
                                                       const app::ConcreteCommandPath & commandPath,
-                                                      const Commands::GetYeardaySchedule::DecodableType & commandData)
+                                                      const Commands::GetYearDaySchedule::DecodableType & commandData)
 {
-    auto & scheduleId = commandData.scheduleId;
-    auto & userId     = commandData.userId;
+    auto & scheduleId = commandData.yearDayIndex;
+    auto & userId     = commandData.userIndex;
 
     EmberAfPluginDoorLockServerYeardayScheduleEntry * entry = &yeardayScheduleTable[0];
     EmberAfStatus zclStatus;
@@ -334,7 +303,7 @@ bool emberAfDoorLockClusterGetYeardayScheduleCallback(app::CommandHandler * comm
 
     {
         app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
-                                             Commands::GetYeardayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
+                                             Commands::GetYearDayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
         TLV::TLVWriter * writer          = nullptr;
         SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -353,38 +322,26 @@ exit:
     return true;
 }
 
-bool emberAfDoorLockClusterClearYeardayScheduleCallback(app::CommandHandler * commandObj,
+bool emberAfDoorLockClusterClearYearDayScheduleCallback(app::CommandHandler * commandObj,
                                                         const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::ClearYeardaySchedule::DecodableType & commandData)
+                                                        const Commands::ClearYearDaySchedule::DecodableType & commandData)
 {
-    auto & scheduleId = commandData.scheduleId;
-    auto & userId     = commandData.userId;
+    auto & scheduleId = commandData.yearDayIndex;
+    auto & userId     = commandData.userIndex;
 
-    uint8_t status;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    EmberAfStatus status;
     if (scheduleId >= EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_YEARDAY_SCHEDULE_TABLE_SIZE)
     {
-        status = 0x01; // failure (per 7.3.2.17.17)
+        status = EMBER_ZCL_STATUS_FAILURE; // failure (per 7.3.2.17.17)
     }
     else
     {
         yeardayScheduleTable[scheduleId].inUse = false;
         emAfPluginDoorLockServerSetPinUserType(userId, EMBER_ZCL_DOOR_LOCK_USER_TYPE_UNRESTRICTED);
-        status = 0x00; // success (per 7.3.2.17.17)
+        status = EMBER_ZCL_STATUS_SUCCESS; // success (per 7.3.2.17.17)
     }
 
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
-                                             Commands::ClearYeardayScheduleResponse::Id,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
+    if (EMBER_ZCL_STATUS_SUCCESS != emberAfSendImmediateDefaultResponse(status))
     {
         ChipLogError(Zcl, "Failed to encode response command.");
     }
@@ -395,16 +352,15 @@ bool emberAfDoorLockClusterSetHolidayScheduleCallback(app::CommandHandler * comm
                                                       const app::ConcreteCommandPath & commandPath,
                                                       const Commands::SetHolidaySchedule::DecodableType & commandData)
 {
-    auto & holidayScheduleId          = commandData.scheduleId;
+    auto & holidayScheduleId          = commandData.holidayIndex;
     auto & localStartTime             = commandData.localStartTime;
     auto & localEndTime               = commandData.localEndTime;
-    auto & operatingModeDuringHoliday = commandData.operatingModeDuringHoliday;
+    auto & operatingModeDuringHoliday = commandData.operatingMode;
 
-    uint8_t status;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    EmberAfStatus status;
     if (holidayScheduleId >= EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_HOLIDAY_SCHEDULE_TABLE_SIZE)
     {
-        status = 0x01; // failure (per 7.3.2.17.18)
+        status = EMBER_ZCL_STATUS_FAILURE; // failure (per 7.3.2.17.18)
     }
     else
     {
@@ -414,20 +370,10 @@ bool emberAfDoorLockClusterSetHolidayScheduleCallback(app::CommandHandler * comm
         holidayScheduleTable[holidayScheduleId].operatingModeDuringHoliday =
             static_cast<EmberAfDoorLockOperatingMode>(operatingModeDuringHoliday);
         holidayScheduleTable[holidayScheduleId].inUse = true;
-        status                                        = 0x00; // success (per 7.3.2.17.18)
+        status                                        = EMBER_ZCL_STATUS_SUCCESS; // success (per 7.3.2.17.18)
     }
 
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
-                                             Commands::SetHolidayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
+    if (EMBER_ZCL_STATUS_SUCCESS != emberAfSendImmediateDefaultResponse(status))
     {
         ChipLogError(Zcl, "Failed to encode response command.");
     }
@@ -438,7 +384,7 @@ bool emberAfDoorLockClusterGetHolidayScheduleCallback(app::CommandHandler * comm
                                                       const app::ConcreteCommandPath & commandPath,
                                                       const Commands::GetHolidaySchedule::DecodableType & commandData)
 {
-    auto & holidayScheduleId = commandData.scheduleId;
+    auto & holidayScheduleId = commandData.holidayIndex;
 
     EmberAfPluginDoorLockServerHolidayScheduleEntry * entry = &holidayScheduleTable[0];
     EmberAfStatus zclStatus;
@@ -485,32 +431,20 @@ bool emberAfDoorLockClusterClearHolidayScheduleCallback(app::CommandHandler * co
                                                         const app::ConcreteCommandPath & commandPath,
                                                         const Commands::ClearHolidaySchedule::DecodableType & commandData)
 {
-    auto & holidayScheduleId = commandData.scheduleId;
+    auto & holidayScheduleId = commandData.holidayIndex;
 
-    uint8_t status;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    EmberAfStatus status;
     if (holidayScheduleId >= EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_YEARDAY_SCHEDULE_TABLE_SIZE)
     {
-        status = 0x01; // failure (per 7.3.2.17.20)
+        status = EMBER_ZCL_STATUS_FAILURE; // failure (per 7.3.2.17.20)
     }
     else
     {
         holidayScheduleTable[holidayScheduleId].inUse = false;
-        status                                        = 0x00; // success (per 7.3.2.17.20)
+        status                                        = EMBER_ZCL_STATUS_SUCCESS; // success (per 7.3.2.17.20)
     }
 
-    {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
-                                             Commands::ClearHolidayScheduleResponse::Id,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
-        VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-        SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
-        SuccessOrExit(err = commandObj->FinishCommand());
-    }
-exit:
-    if (err != CHIP_NO_ERROR)
+    if (EMBER_ZCL_STATUS_SUCCESS != emberAfSendImmediateDefaultResponse(status))
     {
         ChipLogError(Zcl, "Failed to encode response command.");
     }

@@ -42,6 +42,8 @@
 #include <signal.h>
 #include <unistd.h>
 
+using namespace ::chip::app::Clusters;
+
 namespace chip {
 namespace DeviceLayer {
 
@@ -84,18 +86,26 @@ void SignalHandler(int signum)
         ConfigurationMgr().StoreBootReason(EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_UPDATE_COMPLETED);
         err = CHIP_ERROR_REBOOT_SIGNAL_RECEIVED;
         break;
+    case SIGTRAP:
+        PlatformMgrImpl().HandleSoftwareFault(SoftwareDiagnostics::Events::SoftwareFault::kEventId);
+        break;
+    case SIGILL:
+        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::HardwareFaultChange::kEventId);
+        break;
+    case SIGALRM:
+        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::RadioFaultChange::kEventId);
+        break;
+    case SIGVTALRM:
+        PlatformMgrImpl().HandleGeneralFault(GeneralDiagnostics::Events::NetworkFaultChange::kEventId);
+        break;
     default:
         break;
     }
 
-    if (err != CHIP_NO_ERROR)
+    if (err == CHIP_ERROR_REBOOT_SIGNAL_RECEIVED)
     {
         PlatformMgr().Shutdown();
         exit(EXIT_FAILURE);
-    }
-    else
-    {
-        ChipLogDetail(DeviceLayer, "Ignore signal %d", signum);
     }
 }
 
@@ -253,11 +263,53 @@ CHIP_ERROR PlatformManagerImpl::_Shutdown()
 
 void PlatformManagerImpl::HandleDeviceRebooted(intptr_t arg)
 {
-    DiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetDelegate();
+    GeneralDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
 
     if (delegate != nullptr)
     {
         delegate->OnDeviceRebooted();
+    }
+}
+
+void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
+{
+    GeneralDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetGeneralDiagnosticsDelegate();
+
+    if (delegate != nullptr)
+    {
+        switch (EventId)
+        {
+        case GeneralDiagnostics::Events::HardwareFaultChange::kEventId:
+            delegate->OnHardwareFaultsDetected();
+            break;
+        case GeneralDiagnostics::Events::RadioFaultChange::kEventId:
+            delegate->OnRadioFaultsDetected();
+            break;
+        case GeneralDiagnostics::Events::NetworkFaultChange::kEventId:
+            delegate->OnNetworkFaultsDetected();
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void PlatformManagerImpl::HandleSoftwareFault(uint32_t EventId)
+{
+    SoftwareDiagnosticsDelegate * delegate = GetDiagnosticDataProvider().GetSoftwareDiagnosticsDelegate();
+
+    if (delegate != nullptr)
+    {
+        SoftwareDiagnostics::Structs::SoftwareFault::Type softwareFault;
+        char threadName[kMaxThreadNameLength + 1];
+
+        softwareFault.id = gettid();
+        strncpy(threadName, std::to_string(softwareFault.id).c_str(), kMaxThreadNameLength);
+        threadName[kMaxThreadNameLength] = '\0';
+        softwareFault.name               = CharSpan(threadName, strlen(threadName));
+        softwareFault.faultRecording     = ByteSpan(Uint8::from_const_char("FaultRecording"), strlen("FaultRecording"));
+
+        delegate->OnSoftwareFaultDetected(softwareFault);
     }
 }
 

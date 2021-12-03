@@ -48,6 +48,10 @@ chip_test_suite("tests") {
     sources += [ "CHIPCryptoPALTest.cpp" ]
   }
 
+  if (chip_device_platform == "esp32" || chip_device_platform == "nrfconnect") {
+    defines = [ "CURRENT_TIME_NOT_IMPLEMENTED=1" ]
+  }
+
   cflags = [ "-Wconversion" ]
 
   public_deps = [

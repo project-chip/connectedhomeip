@@ -393,6 +393,19 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPUserLabelClusterLabelStruct
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _label = @"";
+
+        _value = @"";
+    }
+    return self;
+}
+@end
+
 @implementation CHIPModeSelectClusterModeOptionStruct
 - (instancetype)init
 {
@@ -416,6 +429,19 @@ NS_ASSUME_NONNULL_BEGIN
         _mfgCode = @(0);
 
         _value = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterDlCredential
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _credentialType = @(0);
+
+        _credentialIndex = @(0);
     }
     return self;
 }

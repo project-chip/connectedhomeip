@@ -1259,88 +1259,54 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface CHIPDoorLock : CHIPCluster
 
-- (void)clearAllPinsWithCompletionHandler:(void (^)(CHIPDoorLockClusterClearAllPinsResponseParams * _Nullable data,
-                                              NSError * _Nullable error))completionHandler;
-- (void)clearAllRfidsWithCompletionHandler:(void (^)(CHIPDoorLockClusterClearAllRfidsResponseParams * _Nullable data,
-                                               NSError * _Nullable error))completionHandler;
+- (void)clearAllPINCodesWithCompletionHandler:(StatusCompletion)completionHandler;
+- (void)clearAllRFIDCodesWithCompletionHandler:(StatusCompletion)completionHandler;
 - (void)clearHolidayScheduleWithParams:(CHIPDoorLockClusterClearHolidayScheduleParams *)params
-                     completionHandler:(void (^)(CHIPDoorLockClusterClearHolidayScheduleResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler;
-- (void)clearPinWithParams:(CHIPDoorLockClusterClearPinParams *)params
-         completionHandler:
-             (void (^)(CHIPDoorLockClusterClearPinResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
-- (void)clearRfidWithParams:(CHIPDoorLockClusterClearRfidParams *)params
-          completionHandler:
-              (void (^)(CHIPDoorLockClusterClearRfidResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
-- (void)clearWeekdayScheduleWithParams:(CHIPDoorLockClusterClearWeekdayScheduleParams *)params
-                     completionHandler:(void (^)(CHIPDoorLockClusterClearWeekdayScheduleResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler;
-- (void)clearYeardayScheduleWithParams:(CHIPDoorLockClusterClearYeardayScheduleParams *)params
-                     completionHandler:(void (^)(CHIPDoorLockClusterClearYeardayScheduleResponseParams * _Nullable data,
-                                           NSError * _Nullable error))completionHandler;
+                     completionHandler:(StatusCompletion)completionHandler;
+- (void)clearPINCodeWithParams:(CHIPDoorLockClusterClearPINCodeParams *)params
+             completionHandler:(StatusCompletion)completionHandler;
+- (void)clearRFIDCodeWithParams:(CHIPDoorLockClusterClearRFIDCodeParams *)params
+              completionHandler:(StatusCompletion)completionHandler;
+- (void)clearWeekDayScheduleWithParams:(CHIPDoorLockClusterClearWeekDayScheduleParams *)params
+                     completionHandler:(StatusCompletion)completionHandler;
+- (void)clearYearDayScheduleWithParams:(CHIPDoorLockClusterClearYearDayScheduleParams *)params
+                     completionHandler:(StatusCompletion)completionHandler;
 - (void)getHolidayScheduleWithParams:(CHIPDoorLockClusterGetHolidayScheduleParams *)params
                    completionHandler:(void (^)(CHIPDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler;
 - (void)getLogRecordWithParams:(CHIPDoorLockClusterGetLogRecordParams *)params
              completionHandler:(void (^)(CHIPDoorLockClusterGetLogRecordResponseParams * _Nullable data,
                                    NSError * _Nullable error))completionHandler;
-- (void)getPinWithParams:(CHIPDoorLockClusterGetPinParams *)params
-       completionHandler:
-           (void (^)(CHIPDoorLockClusterGetPinResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
-- (void)getRfidWithParams:(CHIPDoorLockClusterGetRfidParams *)params
-        completionHandler:
-            (void (^)(CHIPDoorLockClusterGetRfidResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+- (void)getPINCodeWithParams:(CHIPDoorLockClusterGetPINCodeParams *)params
+           completionHandler:
+               (void (^)(CHIPDoorLockClusterGetPINCodeResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+- (void)getRFIDCodeWithParams:(CHIPDoorLockClusterGetRFIDCodeParams *)params
+            completionHandler:(void (^)(CHIPDoorLockClusterGetRFIDCodeResponseParams * _Nullable data,
+                                  NSError * _Nullable error))completionHandler;
 - (void)getUserTypeWithParams:(CHIPDoorLockClusterGetUserTypeParams *)params
             completionHandler:(void (^)(CHIPDoorLockClusterGetUserTypeResponseParams * _Nullable data,
                                   NSError * _Nullable error))completionHandler;
-- (void)getWeekdayScheduleWithParams:(CHIPDoorLockClusterGetWeekdayScheduleParams *)params
-                   completionHandler:(void (^)(CHIPDoorLockClusterGetWeekdayScheduleResponseParams * _Nullable data,
+- (void)getWeekDayScheduleWithParams:(CHIPDoorLockClusterGetWeekDayScheduleParams *)params
+                   completionHandler:(void (^)(CHIPDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler;
-- (void)getYeardayScheduleWithParams:(CHIPDoorLockClusterGetYeardayScheduleParams *)params
-                   completionHandler:(void (^)(CHIPDoorLockClusterGetYeardayScheduleResponseParams * _Nullable data,
+- (void)getYearDayScheduleWithParams:(CHIPDoorLockClusterGetYearDayScheduleParams *)params
+                   completionHandler:(void (^)(CHIPDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
                                          NSError * _Nullable error))completionHandler;
-- (void)lockDoorWithParams:(CHIPDoorLockClusterLockDoorParams *)params
-         completionHandler:
-             (void (^)(CHIPDoorLockClusterLockDoorResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+- (void)lockDoorWithParams:(CHIPDoorLockClusterLockDoorParams * _Nullable)params
+         completionHandler:(StatusCompletion)completionHandler;
 - (void)setHolidayScheduleWithParams:(CHIPDoorLockClusterSetHolidayScheduleParams *)params
-                   completionHandler:(void (^)(CHIPDoorLockClusterSetHolidayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
-- (void)setPinWithParams:(CHIPDoorLockClusterSetPinParams *)params
-       completionHandler:
-           (void (^)(CHIPDoorLockClusterSetPinResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
-- (void)setRfidWithParams:(CHIPDoorLockClusterSetRfidParams *)params
-        completionHandler:
-            (void (^)(CHIPDoorLockClusterSetRfidResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
-- (void)setUserTypeWithParams:(CHIPDoorLockClusterSetUserTypeParams *)params
-            completionHandler:(void (^)(CHIPDoorLockClusterSetUserTypeResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler;
-- (void)setWeekdayScheduleWithParams:(CHIPDoorLockClusterSetWeekdayScheduleParams *)params
-                   completionHandler:(void (^)(CHIPDoorLockClusterSetWeekdayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
-- (void)setYeardayScheduleWithParams:(CHIPDoorLockClusterSetYeardayScheduleParams *)params
-                   completionHandler:(void (^)(CHIPDoorLockClusterSetYeardayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler;
-- (void)unlockDoorWithParams:(CHIPDoorLockClusterUnlockDoorParams *)params
-           completionHandler:
-               (void (^)(CHIPDoorLockClusterUnlockDoorResponseParams * _Nullable data, NSError * _Nullable error))completionHandler;
+                   completionHandler:(StatusCompletion)completionHandler;
+- (void)setPINCodeWithParams:(CHIPDoorLockClusterSetPINCodeParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)setRFIDCodeWithParams:(CHIPDoorLockClusterSetRFIDCodeParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)setUserTypeWithParams:(CHIPDoorLockClusterSetUserTypeParams *)params completionHandler:(StatusCompletion)completionHandler;
+- (void)setWeekDayScheduleWithParams:(CHIPDoorLockClusterSetWeekDayScheduleParams *)params
+                   completionHandler:(StatusCompletion)completionHandler;
+- (void)setYearDayScheduleWithParams:(CHIPDoorLockClusterSetYearDayScheduleParams *)params
+                   completionHandler:(StatusCompletion)completionHandler;
+- (void)unlockDoorWithParams:(CHIPDoorLockClusterUnlockDoorParams * _Nullable)params
+           completionHandler:(StatusCompletion)completionHandler;
 - (void)unlockWithTimeoutWithParams:(CHIPDoorLockClusterUnlockWithTimeoutParams *)params
-                  completionHandler:(void (^)(CHIPDoorLockClusterUnlockWithTimeoutResponseParams * _Nullable data,
-                                        NSError * _Nullable error))completionHandler;
-
-- (void)readAttributeLockStateWithCompletionHandler:(void (^)(
-                                                        NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeLockStateWithMinInterval:(uint16_t)minInterval
-                                       maxInterval:(uint16_t)maxInterval
-                                   responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeLockStateWithResponseHandler:(void (^)(
-                                                        NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
-
-- (void)readAttributeLockTypeWithCompletionHandler:(void (^)(
-                                                       NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
-- (void)subscribeAttributeLockTypeWithMinInterval:(uint16_t)minInterval
-                                      maxInterval:(uint16_t)maxInterval
-                                  responseHandler:(ResponseHandler)responseHandler;
-- (void)reportAttributeLockTypeWithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+                  completionHandler:(StatusCompletion)completionHandler;
 
 - (void)readAttributeActuatorEnabledWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -1650,6 +1616,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeBasicCommissioningInfoListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                          NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeRegulatoryConfigWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeLocationCapabilityWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                 NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
@@ -3289,6 +3261,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)testNullableOptionalRequestWithParams:(CHIPTestClusterClusterTestNullableOptionalRequestParams * _Nullable)params
                             completionHandler:(void (^)(CHIPTestClusterClusterTestNullableOptionalResponseParams * _Nullable data,
                                                   NSError * _Nullable error))completionHandler;
+- (void)testSimpleOptionalArgumentRequestWithParams:
+            (CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams * _Nullable)params
+                                  completionHandler:(StatusCompletion)completionHandler;
 - (void)testSpecificWithCompletionHandler:(void (^)(CHIPTestClusterClusterTestSpecificResponseParams * _Nullable data,
                                               NSError * _Nullable error))completionHandler;
 - (void)testStructArgumentRequestWithParams:(CHIPTestClusterClusterTestStructArgumentRequestParams *)params
@@ -3462,6 +3437,24 @@ NS_ASSUME_NONNULL_BEGIN
                                     maxInterval:(uint16_t)maxInterval
                                 responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeEnum16WithResponseHandler:(void (^)(NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeFloatSingleWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeFloatSingleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeFloatSingleWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeFloatSingleWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeFloatDoubleWithCompletionHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+- (void)writeAttributeFloatDoubleWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeFloatDoubleWithMinInterval:(uint16_t)minInterval
+                                         maxInterval:(uint16_t)maxInterval
+                                     responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeFloatDoubleWithResponseHandler:(void (^)(
+                                                          NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
 
 - (void)readAttributeOctetStringWithCompletionHandler:(void (^)(
                                                           NSData * _Nullable value, NSError * _Nullable error))completionHandler;
@@ -3797,6 +3790,26 @@ NS_ASSUME_NONNULL_BEGIN
                                         responseHandler:(ResponseHandler)responseHandler;
 - (void)reportAttributeNullableEnum16WithResponseHandler:(void (^)(
                                                              NSNumber * _Nullable value, NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableFloatSingleWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableFloatSingleWithValue:(NSNumber * _Nullable)value
+                                 completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableFloatSingleWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableFloatSingleWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
+
+- (void)readAttributeNullableFloatDoubleWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))completionHandler;
+- (void)writeAttributeNullableFloatDoubleWithValue:(NSNumber * _Nullable)value
+                                 completionHandler:(StatusCompletion)completionHandler;
+- (void)subscribeAttributeNullableFloatDoubleWithMinInterval:(uint16_t)minInterval
+                                                 maxInterval:(uint16_t)maxInterval
+                                             responseHandler:(ResponseHandler)responseHandler;
+- (void)reportAttributeNullableFloatDoubleWithResponseHandler:(void (^)(NSNumber * _Nullable value,
+                                                                  NSError * _Nullable error))responseHandler;
 
 - (void)readAttributeNullableOctetStringWithCompletionHandler:(void (^)(NSData * _Nullable value,
                                                                   NSError * _Nullable error))completionHandler;
@@ -4577,6 +4590,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)readAttributeActiveNetworkFaultsListWithCompletionHandler:(void (^)(NSArray * _Nullable value,
                                                                       NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeFeatureMapWithCompletionHandler:(void (^)(
+                                                         NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
 
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;

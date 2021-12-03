@@ -33,21 +33,23 @@ public:
 
     virtual ~PoolInterface() {}
 
-    virtual U * CreateObject(ConstructorArguments &&... args)              = 0;
-    virtual void ReleaseObject(U * element)                                = 0;
-    virtual void ResetObject(U * element, ConstructorArguments &&... args) = 0;
+    virtual U * CreateObject(ConstructorArguments... args)              = 0;
+    virtual void ReleaseObject(U * element)                             = 0;
+    virtual void ResetObject(U * element, ConstructorArguments... args) = 0;
 
     template <typename Function>
-    bool ForEachActiveObject(Function && function)
+    Loop ForEachActiveObject(Function && function)
     {
-        auto proxy = [&](U * target) -> bool { return function(target); };
+        static_assert(std::is_same<Loop, decltype(function(std::declval<U *>()))>::value,
+                      "The function must take T* and return Loop");
+        auto proxy = [&](U * target) -> Loop { return function(target); };
         return ForEachActiveObjectInner(
-            &proxy, [](void * context, U * target) -> bool { return (*static_cast<decltype(proxy) *>(context))(target); });
+            &proxy, [](void * context, U * target) -> Loop { return (*static_cast<decltype(proxy) *>(context))(target); });
     }
 
 protected:
-    using Lambda                                                         = bool (*)(void *, U *);
-    virtual bool ForEachActiveObjectInner(void * context, Lambda lambda) = 0;
+    using Lambda                                                         = Loop (*)(void *, U *);
+    virtual Loop ForEachActiveObjectInner(void * context, Lambda lambda) = 0;
 };
 
 template <class T, size_t N, typename Interface>
@@ -62,20 +64,17 @@ public:
     PoolProxy() {}
     virtual ~PoolProxy() override {}
 
-    virtual U * CreateObject(ConstructorArguments &&... args) override
-    {
-        return Impl().CreateObject(std::forward<ConstructorArguments>(args)...);
-    }
+    virtual U * CreateObject(ConstructorArguments... args) override { return Impl().CreateObject(std::move(args)...); }
 
     virtual void ReleaseObject(U * element) override { Impl().ReleaseObject(static_cast<T *>(element)); }
 
-    virtual void ResetObject(U * element, ConstructorArguments &&... args) override
+    virtual void ResetObject(U * element, ConstructorArguments... args) override
     {
-        return Impl().ResetObject(static_cast<T *>(element), std::forward<ConstructorArguments>(args)...);
+        return Impl().ResetObject(static_cast<T *>(element), std::move(args)...);
     }
 
 protected:
-    virtual bool ForEachActiveObjectInner(void * context,
+    virtual Loop ForEachActiveObjectInner(void * context,
                                           typename PoolInterface<U, ConstructorArguments...>::Lambda lambda) override
     {
         return Impl().ForEachActiveObject([&](T * target) { return lambda(context, static_cast<U *>(target)); });

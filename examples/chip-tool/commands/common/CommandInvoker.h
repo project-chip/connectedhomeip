@@ -23,6 +23,7 @@
 #include <app/DeviceProxy.h>
 #include <app/InteractionModelEngine.h>
 #include <app/util/error-mapping.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace Controller {
@@ -84,14 +85,16 @@ public:
         return Platform::MakeUnique<CommandInvoker>(aContext, aOnSuccess, aOnError);
     }
 
-    CHIP_ERROR InvokeCommand(DeviceProxy * aDevice, EndpointId aEndpoint, const RequestType & aRequestData)
+    CHIP_ERROR InvokeCommand(DeviceProxy * aDevice, EndpointId aEndpoint, const RequestType & aRequestData,
+                             const Optional<uint16_t> & aTimedInvokeTimeoutMs)
     {
         app::CommandPathParams commandPath = { aEndpoint, 0 /* groupId */, RequestType::GetClusterId(), RequestType::GetCommandId(),
                                                (app::CommandPathFlags::kEndpointIdValid) };
-        auto commandSender                 = Platform::MakeUnique<app::CommandSender>(this, aDevice->GetExchangeManager());
+        auto commandSender =
+            Platform::MakeUnique<app::CommandSender>(this, aDevice->GetExchangeManager(), aTimedInvokeTimeoutMs.HasValue());
         VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-        ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, aRequestData));
+        ReturnErrorOnFailure(commandSender->AddRequestDataNoTimedCheck(commandPath, aRequestData, aTimedInvokeTimeoutMs));
         ReturnErrorOnFailure(commandSender->SendCommandRequest(aDevice->GetSecureSession().Value()));
         commandSender.release();
         return CHIP_NO_ERROR;
@@ -185,16 +188,36 @@ template <typename RequestType>
 CHIP_ERROR InvokeCommand(DeviceProxy * aDevice, void * aContext,
                          typename detail::CommandInvoker<RequestType>::SuccessCallback aSuccessCallback,
                          typename detail::CommandInvoker<RequestType>::FailureCallback aFailureCallback, EndpointId aEndpoint,
-                         const RequestType & aRequestData)
+                         const RequestType & aRequestData, const Optional<uint16_t> & aTimedInvokeTimeoutMs)
 {
     auto invoker = detail::CommandInvoker<RequestType>::Alloc(aContext, aSuccessCallback, aFailureCallback);
     VerifyOrReturnError(invoker != nullptr, CHIP_ERROR_NO_MEMORY);
-    ReturnErrorOnFailure(invoker->InvokeCommand(aDevice, aEndpoint, aRequestData));
+    ReturnErrorOnFailure(invoker->InvokeCommand(aDevice, aEndpoint, aRequestData, aTimedInvokeTimeoutMs));
     invoker.release();
     return CHIP_NO_ERROR;
 }
 
 template <typename RequestType>
+CHIP_ERROR InvokeCommand(DeviceProxy * aDevice, void * aContext,
+                         typename detail::CommandInvoker<RequestType>::SuccessCallback aSuccessCallback,
+                         typename detail::CommandInvoker<RequestType>::FailureCallback aFailureCallback, EndpointId aEndpoint,
+                         const RequestType & aRequestData, uint16_t aTimedInvokeTimeoutMs)
+{
+    return InvokeCommand(aDevice, aContext, aSuccessCallback, aFailureCallback, aEndpoint, aRequestData,
+                         MakeOptional(aTimedInvokeTimeoutMs));
+}
+
+template <typename RequestType, typename std::enable_if_t<!RequestType::MustUseTimedInvoke(), int> = 0>
+CHIP_ERROR InvokeCommand(DeviceProxy * aDevice, void * aContext,
+                         typename detail::CommandInvoker<RequestType>::SuccessCallback aSuccessCallback,
+                         typename detail::CommandInvoker<RequestType>::FailureCallback aFailureCallback, EndpointId aEndpoint,
+                         const RequestType & aRequestData)
+{
+    return InvokeCommand(aDevice, aContext, aSuccessCallback, aFailureCallback, aEndpoint, aRequestData, NullOptional);
+}
+
+// Group commands can't do timed invoke in a meaningful way.
+template <typename RequestType, typename std::enable_if_t<!RequestType::MustUseTimedInvoke(), int> = 0>
 CHIP_ERROR InvokeGroupCommand(DeviceProxy * aDevice, void * aContext,
                               typename detail::CommandInvoker<RequestType>::SuccessCallback aSuccessCallback,
                               typename detail::CommandInvoker<RequestType>::FailureCallback aFailureCallback, GroupId groupId,

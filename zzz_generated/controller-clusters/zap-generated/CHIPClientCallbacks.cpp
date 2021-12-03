@@ -966,116 +966,22 @@ bool emberAfDiagnosticLogsClusterRetrieveLogsResponseCallback(EndpointId endpoin
     return true;
 }
 
-bool emberAfDoorLockClusterClearAllPinsResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "ClearAllPinsResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearAllPinsResponseCallback");
-
-    Callback::Callback<DoorLockClusterClearAllPinsResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterClearAllPinsResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterClearAllRfidsResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "ClearAllRfidsResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearAllRfidsResponseCallback");
-
-    Callback::Callback<DoorLockClusterClearAllRfidsResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterClearAllRfidsResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterClearHolidayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                uint8_t status)
-{
-    ChipLogProgress(Zcl, "ClearHolidayScheduleResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearHolidayScheduleResponseCallback");
-
-    Callback::Callback<DoorLockClusterClearHolidayScheduleResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterClearHolidayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterClearPinResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "ClearPinResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearPinResponseCallback");
-
-    Callback::Callback<DoorLockClusterClearPinResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterClearPinResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterClearRfidResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "ClearRfidResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearRfidResponseCallback");
-
-    Callback::Callback<DoorLockClusterClearRfidResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterClearRfidResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterClearWeekdayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                uint8_t status)
-{
-    ChipLogProgress(Zcl, "ClearWeekdayScheduleResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearWeekdayScheduleResponseCallback");
-
-    Callback::Callback<DoorLockClusterClearWeekdayScheduleResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterClearWeekdayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterClearYeardayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                                uint8_t status)
-{
-    ChipLogProgress(Zcl, "ClearYeardayScheduleResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterClearYeardayScheduleResponseCallback");
-
-    Callback::Callback<DoorLockClusterClearYeardayScheduleResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterClearYeardayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
 bool emberAfDoorLockClusterGetHolidayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                              uint8_t scheduleId, uint8_t status, uint32_t localStartTime,
-                                                              uint32_t localEndTime, uint8_t operatingModeDuringHoliday)
+                                                              uint8_t holidayIndex, uint8_t status, uint32_t localStartTime,
+                                                              uint32_t localEndTime, uint8_t operatingMode)
 {
     ChipLogProgress(Zcl, "GetHolidayScheduleResponse:");
-    ChipLogProgress(Zcl, "  scheduleId: %" PRIu8 "", scheduleId);
+    ChipLogProgress(Zcl, "  holidayIndex: %" PRIu8 "", holidayIndex);
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
     ChipLogProgress(Zcl, "  localStartTime: %" PRIu32 "", localStartTime);
     ChipLogProgress(Zcl, "  localEndTime: %" PRIu32 "", localEndTime);
-    ChipLogProgress(Zcl, "  operatingModeDuringHoliday: %" PRIu8 "", operatingModeDuringHoliday);
+    ChipLogProgress(Zcl, "  operatingMode: %" PRIu8 "", operatingMode);
 
     GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetHolidayScheduleResponseCallback");
 
     Callback::Callback<DoorLockClusterGetHolidayScheduleResponseCallback> * cb =
         Callback::Callback<DoorLockClusterGetHolidayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, scheduleId, status, localStartTime, localEndTime, operatingModeDuringHoliday);
+    cb->mCall(cb->mContext, holidayIndex, status, localStartTime, localEndTime, operatingMode);
     return true;
 }
 
@@ -1100,37 +1006,37 @@ bool emberAfDoorLockClusterGetLogRecordResponseCallback(EndpointId endpoint, app
     return true;
 }
 
-bool emberAfDoorLockClusterGetPinResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                  uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
+bool emberAfDoorLockClusterGetPINCodeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
+                                                      uint8_t userStatus, uint8_t userType, chip::ByteSpan pin)
 {
-    ChipLogProgress(Zcl, "GetPinResponse:");
+    ChipLogProgress(Zcl, "GetPINCodeResponse:");
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
     ChipLogProgress(Zcl, "  userStatus: %" PRIu8 "", userStatus);
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
     ChipLogProgress(Zcl, "  pin: %zu", pin.size());
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetPinResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetPINCodeResponseCallback");
 
-    Callback::Callback<DoorLockClusterGetPinResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterGetPinResponseCallback>::FromCancelable(onSuccessCallback);
+    Callback::Callback<DoorLockClusterGetPINCodeResponseCallback> * cb =
+        Callback::Callback<DoorLockClusterGetPINCodeResponseCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, userId, userStatus, userType, pin);
     return true;
 }
 
-bool emberAfDoorLockClusterGetRfidResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
-                                                   uint8_t userStatus, uint8_t userType, chip::ByteSpan rfid)
+bool emberAfDoorLockClusterGetRFIDCodeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint16_t userId,
+                                                       uint8_t userStatus, uint8_t userType, chip::ByteSpan rfidCode)
 {
-    ChipLogProgress(Zcl, "GetRfidResponse:");
+    ChipLogProgress(Zcl, "GetRFIDCodeResponse:");
     ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
     ChipLogProgress(Zcl, "  userStatus: %" PRIu8 "", userStatus);
     ChipLogProgress(Zcl, "  userType: %" PRIu8 "", userType);
-    ChipLogProgress(Zcl, "  rfid: %zu", rfid.size());
+    ChipLogProgress(Zcl, "  rfidCode: %zu", rfidCode.size());
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetRfidResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetRFIDCodeResponseCallback");
 
-    Callback::Callback<DoorLockClusterGetRfidResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterGetRfidResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, userId, userStatus, userType, rfid);
+    Callback::Callback<DoorLockClusterGetRFIDCodeResponseCallback> * cb =
+        Callback::Callback<DoorLockClusterGetRFIDCodeResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, userId, userStatus, userType, rfidCode);
     return true;
 }
 
@@ -1149,14 +1055,14 @@ bool emberAfDoorLockClusterGetUserTypeResponseCallback(EndpointId endpoint, app:
     return true;
 }
 
-bool emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                              uint8_t scheduleId, uint16_t userId, uint8_t status, uint8_t daysMask,
-                                                              uint8_t startHour, uint8_t startMinute, uint8_t endHour,
-                                                              uint8_t endMinute)
+bool emberAfDoorLockClusterGetWeekDayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                              uint8_t weekDayIndex, uint16_t userIndex, uint8_t status,
+                                                              uint8_t daysMask, uint8_t startHour, uint8_t startMinute,
+                                                              uint8_t endHour, uint8_t endMinute)
 {
-    ChipLogProgress(Zcl, "GetWeekdayScheduleResponse:");
-    ChipLogProgress(Zcl, "  scheduleId: %" PRIu8 "", scheduleId);
-    ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
+    ChipLogProgress(Zcl, "GetWeekDayScheduleResponse:");
+    ChipLogProgress(Zcl, "  weekDayIndex: %" PRIu8 "", weekDayIndex);
+    ChipLogProgress(Zcl, "  userIndex: %" PRIu16 "", userIndex);
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
     ChipLogProgress(Zcl, "  daysMask: %" PRIu8 "", daysMask);
     ChipLogProgress(Zcl, "  startHour: %" PRIu8 "", startHour);
@@ -1164,147 +1070,30 @@ bool emberAfDoorLockClusterGetWeekdayScheduleResponseCallback(EndpointId endpoin
     ChipLogProgress(Zcl, "  endHour: %" PRIu8 "", endHour);
     ChipLogProgress(Zcl, "  endMinute: %" PRIu8 "", endMinute);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetWeekdayScheduleResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetWeekDayScheduleResponseCallback");
 
-    Callback::Callback<DoorLockClusterGetWeekdayScheduleResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterGetWeekdayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, scheduleId, userId, status, daysMask, startHour, startMinute, endHour, endMinute);
+    Callback::Callback<DoorLockClusterGetWeekDayScheduleResponseCallback> * cb =
+        Callback::Callback<DoorLockClusterGetWeekDayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, weekDayIndex, userIndex, status, daysMask, startHour, startMinute, endHour, endMinute);
     return true;
 }
 
-bool emberAfDoorLockClusterGetYeardayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
-                                                              uint8_t scheduleId, uint16_t userId, uint8_t status,
+bool emberAfDoorLockClusterGetYearDayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj,
+                                                              uint8_t yearDayIndex, uint16_t userIndex, uint8_t status,
                                                               uint32_t localStartTime, uint32_t localEndTime)
 {
-    ChipLogProgress(Zcl, "GetYeardayScheduleResponse:");
-    ChipLogProgress(Zcl, "  scheduleId: %" PRIu8 "", scheduleId);
-    ChipLogProgress(Zcl, "  userId: %" PRIu16 "", userId);
+    ChipLogProgress(Zcl, "GetYearDayScheduleResponse:");
+    ChipLogProgress(Zcl, "  yearDayIndex: %" PRIu8 "", yearDayIndex);
+    ChipLogProgress(Zcl, "  userIndex: %" PRIu16 "", userIndex);
     ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
     ChipLogProgress(Zcl, "  localStartTime: %" PRIu32 "", localStartTime);
     ChipLogProgress(Zcl, "  localEndTime: %" PRIu32 "", localEndTime);
 
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetYeardayScheduleResponseCallback");
+    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterGetYearDayScheduleResponseCallback");
 
-    Callback::Callback<DoorLockClusterGetYeardayScheduleResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterGetYeardayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, scheduleId, userId, status, localStartTime, localEndTime);
-    return true;
-}
-
-bool emberAfDoorLockClusterLockDoorResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "LockDoorResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterLockDoorResponseCallback");
-
-    Callback::Callback<DoorLockClusterLockDoorResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterLockDoorResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterSetHolidayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "SetHolidayScheduleResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterSetHolidayScheduleResponseCallback");
-
-    Callback::Callback<DoorLockClusterSetHolidayScheduleResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterSetHolidayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterSetPinResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "SetPinResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterSetPinResponseCallback");
-
-    Callback::Callback<DoorLockClusterSetPinResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterSetPinResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterSetRfidResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "SetRfidResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterSetRfidResponseCallback");
-
-    Callback::Callback<DoorLockClusterSetRfidResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterSetRfidResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterSetUserTypeResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "SetUserTypeResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterSetUserTypeResponseCallback");
-
-    Callback::Callback<DoorLockClusterSetUserTypeResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterSetUserTypeResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterSetWeekdayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "SetWeekdayScheduleResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterSetWeekdayScheduleResponseCallback");
-
-    Callback::Callback<DoorLockClusterSetWeekdayScheduleResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterSetWeekdayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterSetYeardayScheduleResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "SetYeardayScheduleResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterSetYeardayScheduleResponseCallback");
-
-    Callback::Callback<DoorLockClusterSetYeardayScheduleResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterSetYeardayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterUnlockDoorResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "UnlockDoorResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterUnlockDoorResponseCallback");
-
-    Callback::Callback<DoorLockClusterUnlockDoorResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterUnlockDoorResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
-    return true;
-}
-
-bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(EndpointId endpoint, app::CommandSender * commandObj, uint8_t status)
-{
-    ChipLogProgress(Zcl, "UnlockWithTimeoutResponse:");
-    ChipLogProgress(Zcl, "  status: %" PRIu8 "", status);
-
-    GET_CLUSTER_RESPONSE_CALLBACKS("DoorLockClusterUnlockWithTimeoutResponseCallback");
-
-    Callback::Callback<DoorLockClusterUnlockWithTimeoutResponseCallback> * cb =
-        Callback::Callback<DoorLockClusterUnlockWithTimeoutResponseCallback>::FromCancelable(onSuccessCallback);
-    cb->mCall(cb->mContext, status);
+    Callback::Callback<DoorLockClusterGetYearDayScheduleResponseCallback> * cb =
+        Callback::Callback<DoorLockClusterGetYearDayScheduleResponseCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, yearDayIndex, userIndex, status, localStartTime, localEndTime);
     return true;
 }
 

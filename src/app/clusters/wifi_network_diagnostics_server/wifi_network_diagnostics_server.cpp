@@ -33,6 +33,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::WiFiNetworkDiagnostics;
 using namespace chip::app::Clusters::WiFiNetworkDiagnostics::Attributes;
 using chip::DeviceLayer::DiagnosticDataProvider;
+using chip::DeviceLayer::GetDiagnosticDataProvider;
 
 namespace {
 
@@ -144,6 +145,21 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPat
     }
     return CHIP_NO_ERROR;
 }
+
+class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
+{
+    // Gets called when the Node detects Node’s Wi-Fi connection has been disconnected.
+    void OnDisconnectionDetected() override { ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected"); }
+
+    // Gets called when the Node fails to associate or authenticate an access point.
+    void OnAssociationFailureDetected() override { ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnAssociationFailureDetected"); }
+
+    // Gets when the Node’s connection status to a Wi-Fi network has changed.
+    void OnConnectionStatusChanged() override { ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged"); }
+};
+
+WiFiDiagnosticsDelegate gDiagnosticDelegate;
+
 } // anonymous namespace
 
 bool emberAfWiFiNetworkDiagnosticsClusterResetCountsCallback(app::CommandHandler * commandObj,
@@ -186,4 +202,5 @@ exit:
 void MatterWiFiNetworkDiagnosticsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
+    GetDiagnosticDataProvider().SetWiFiDiagnosticsDelegate(&gDiagnosticDelegate);
 }

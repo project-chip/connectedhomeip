@@ -33,6 +33,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoftwareDiagnostics;
 using namespace chip::app::Clusters::SoftwareDiagnostics::Attributes;
 using chip::DeviceLayer::DiagnosticDataProvider;
+using chip::DeviceLayer::GetDiagnosticDataProvider;
 
 namespace {
 
@@ -122,6 +123,32 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder
 
     return err;
 }
+
+class SoftwareDiagnosticsDelegate : public DeviceLayer::SoftwareDiagnosticsDelegate
+{
+    // Gets called when a software fault that has taken place on the Node.
+    void OnSoftwareFaultDetected(SoftwareDiagnostics::Structs::SoftwareFault::Type & softwareFault) override
+    {
+        ChipLogProgress(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
+
+        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
+        {
+            if (emberAfEndpointIndexIsEnabled(index))
+            {
+                EndpointId endpointId = emberAfEndpointFromIndex(index);
+
+                if (emberAfContainsServer(endpointId, SoftwareDiagnostics::Id))
+                {
+                    // If Software Diagnostics cluster is implemented on this endpoint
+                    // TODO: Log SoftwareFault event
+                }
+            }
+        }
+    }
+};
+
+SoftwareDiagnosticsDelegate gDiagnosticDelegate;
+
 } // anonymous namespace
 
 bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandler * commandObj,
@@ -151,4 +178,5 @@ exit:
 void MatterSoftwareDiagnosticsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
+    GetDiagnosticDataProvider().SetSoftwareDiagnosticsDelegate(&gDiagnosticDelegate);
 }

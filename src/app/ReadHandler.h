@@ -107,7 +107,7 @@ public:
     CHIP_ERROR SendReportData(System::PacketBufferHandle && aPayload, bool mMoreChunks);
 
     bool IsFree() const { return mState == HandlerState::Uninitialized; }
-    bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport; }
+    bool IsReportable() const { return mState == HandlerState::GeneratingReports && !mHoldReport && (mDirty || !mHoldSync); }
     bool IsGeneratingReports() const { return mState == HandlerState::GeneratingReports; }
     bool IsAwaitingReportResponse() const { return mState == HandlerState::AwaitingReportResponse; }
     virtual ~ReadHandler() = default;
@@ -146,6 +146,12 @@ public:
     NodeId GetInitiatorNodeId() const { return mInitiatorNodeId; }
     FabricIndex GetAccessingFabricIndex() const { return mFabricIndex; }
 
+    void UnblockUrgentEventDelivery()
+    {
+        mHoldReport = false;
+        mDirty      = true;
+    }
+
 private:
     friend class TestReadInteraction;
     enum class HandlerState
@@ -164,7 +170,7 @@ private:
     CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessAttributePathList(AttributePathIBs::Parser & aAttributePathListParser);
-    CHIP_ERROR ProcessEventPaths(EventPaths::Parser & aEventPathsParser);
+    CHIP_ERROR ProcessEventPaths(EventPathIBs::Parser & aEventPathsParser);
     CHIP_ERROR OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
@@ -214,6 +220,7 @@ private:
     FabricIndex mFabricIndex                                 = 0;
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
     bool mIsFabricFiltered                                   = false;
+    bool mHoldSync                                           = false;
 };
 } // namespace app
 } // namespace chip

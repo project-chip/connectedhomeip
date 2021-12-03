@@ -1829,18 +1829,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _pin = [NSData data];
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterLockDoorResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _pinCode = nil;
     }
     return self;
 }
@@ -1851,40 +1840,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _pin = [NSData data];
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterUnlockDoorResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterToggleParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _pin = @"";
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterToggleResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _pinCode = nil;
     }
     return self;
 }
@@ -1895,20 +1851,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _timeoutInSeconds = @(0);
+        _timeout = @(0);
 
-        _pin = [NSData data];
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterUnlockWithTimeoutResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _pinCode = nil;
     }
     return self;
 }
@@ -1948,7 +1893,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetPinParams
+@implementation CHIPDoorLockClusterSetPINCodeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1965,18 +1910,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetPinResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterGetPinParams
+@implementation CHIPDoorLockClusterGetPINCodeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -1987,51 +1921,29 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetPinResponseParams
+@implementation CHIPDoorLockClusterGetPINCodeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _userId = @(0);
 
-        _userStatus = @(0);
+        _userStatus = nil;
 
-        _userType = @(0);
+        _userType = nil;
 
-        _pin = [NSData data];
+        _pin = nil;
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterClearPinParams
+@implementation CHIPDoorLockClusterClearPINCodeParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _userId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterClearPinResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterClearAllPinsResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _pinSlotIndex = @(0);
     }
     return self;
 }
@@ -2045,17 +1957,6 @@ NS_ASSUME_NONNULL_BEGIN
         _userId = @(0);
 
         _userStatus = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterSetUserStatusResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
     }
     return self;
 }
@@ -2079,20 +1980,20 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userId = @(0);
 
-        _status = @(0);
+        _userStatus = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterSetWeekdayScheduleParams
+@implementation CHIPDoorLockClusterSetWeekDayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _weekDayIndex = @(0);
 
-        _userId = @(0);
+        _userIndex = @(0);
 
         _daysMask = @(0);
 
@@ -2108,38 +2009,27 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetWeekdayScheduleResponseParams
+@implementation CHIPDoorLockClusterGetWeekDayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _status = @(0);
+        _weekDayIndex = @(0);
+
+        _userIndex = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterGetWeekdayScheduleParams
+@implementation CHIPDoorLockClusterGetWeekDayScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _weekDayIndex = @(0);
 
-        _userId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterGetWeekdayScheduleResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _scheduleId = @(0);
-
-        _userId = @(0);
+        _userIndex = @(0);
 
         _status = @(0);
 
@@ -2157,38 +2047,27 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearWeekdayScheduleParams
+@implementation CHIPDoorLockClusterClearWeekDayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _weekDayIndex = @(0);
 
-        _userId = @(0);
+        _userIndex = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterClearWeekdayScheduleResponseParams
+@implementation CHIPDoorLockClusterSetYearDayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _status = @(0);
-    }
-    return self;
-}
-@end
+        _yearDayIndex = @(0);
 
-@implementation CHIPDoorLockClusterSetYeardayScheduleParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _scheduleId = @(0);
-
-        _userId = @(0);
+        _userIndex = @(0);
 
         _localStartTime = @(0);
 
@@ -2198,38 +2077,27 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetYeardayScheduleResponseParams
+@implementation CHIPDoorLockClusterGetYearDayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _status = @(0);
+        _yearDayIndex = @(0);
+
+        _userIndex = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterGetYeardayScheduleParams
+@implementation CHIPDoorLockClusterGetYearDayScheduleResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _yearDayIndex = @(0);
 
-        _userId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterGetYeardayScheduleResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _scheduleId = @(0);
-
-        _userId = @(0);
+        _userIndex = @(0);
 
         _status = @(0);
 
@@ -2241,25 +2109,14 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterClearYeardayScheduleParams
+@implementation CHIPDoorLockClusterClearYearDayScheduleParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _yearDayIndex = @(0);
 
-        _userId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterClearYeardayScheduleResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _userIndex = @(0);
     }
     return self;
 }
@@ -2270,24 +2127,13 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _holidayIndex = @(0);
 
         _localStartTime = @(0);
 
         _localEndTime = @(0);
 
-        _operatingModeDuringHoliday = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterSetHolidayScheduleResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _operatingMode = @(0);
     }
     return self;
 }
@@ -2298,7 +2144,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _holidayIndex = @(0);
     }
     return self;
 }
@@ -2309,7 +2155,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
+        _holidayIndex = @(0);
 
         _status = @(0);
 
@@ -2317,7 +2163,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _localEndTime = @(0);
 
-        _operatingModeDuringHoliday = @(0);
+        _operatingMode = @(0);
     }
     return self;
 }
@@ -2328,18 +2174,7 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _scheduleId = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterClearHolidayScheduleResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
+        _holidayIndex = @(0);
     }
     return self;
 }
@@ -2353,17 +2188,6 @@ NS_ASSUME_NONNULL_BEGIN
         _userId = @(0);
 
         _userType = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterSetUserTypeResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
     }
     return self;
 }
@@ -2393,7 +2217,7 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterSetRfidParams
+@implementation CHIPDoorLockClusterSetRFIDCodeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2404,24 +2228,13 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userType = @(0);
 
-        _id = [NSData data];
+        _rfidCode = [NSData data];
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterSetRfidResponseParams
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _status = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPDoorLockClusterGetRfidParams
+@implementation CHIPDoorLockClusterGetRFIDCodeParams
 - (instancetype)init
 {
     if (self = [super init]) {
@@ -2432,72 +2245,124 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPDoorLockClusterGetRfidResponseParams
+@implementation CHIPDoorLockClusterGetRFIDCodeResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
         _userId = @(0);
+
+        _userStatus = nil;
+
+        _userType = nil;
+
+        _rfidCode = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearRFIDCodeParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _rfidSlotIndex = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetUserParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _operationType = @(0);
+
+        _userIndex = @(0);
+
+        _userName = nil;
+
+        _userUniqueId = nil;
 
         _userStatus = @(0);
 
         _userType = @(0);
 
-        _rfid = [NSData data];
+        _credentialRule = nil;
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterClearRfidParams
+@implementation CHIPDoorLockClusterGetUserParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _userId = @(0);
+        _userIndex = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterClearRfidResponseParams
+@implementation CHIPDoorLockClusterGetUserResponseParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _status = @(0);
+        _userIndex = @(0);
+
+        _userName = nil;
+
+        _userUniqueId = nil;
+
+        _userStatus = nil;
+
+        _userType = nil;
+
+        _credentialRule = nil;
+
+        _credentials = nil;
+
+        _creatorFabricIndex = nil;
+
+        _lastModifiedFabricIndex = nil;
+
+        _nextUserIndex = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterClearAllRfidsResponseParams
+@implementation CHIPDoorLockClusterClearUserParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _status = @(0);
+        _userIndex = @(0);
     }
     return self;
 }
 @end
 
-@implementation CHIPDoorLockClusterOperationEventNotificationParams
+@implementation CHIPDoorLockClusterOperatingEventNotificationParams
 - (instancetype)init
 {
     if (self = [super init]) {
 
-        _source = @(0);
+        _operationEventSource = @(0);
 
-        _eventCode = @(0);
+        _operationEventCode = @(0);
 
         _userId = @(0);
 
         _pin = [NSData data];
 
-        _timeStamp = @(0);
+        _localTime = @(0);
 
-        _data = @"";
+        _data = nil;
     }
     return self;
 }
@@ -2508,9 +2373,9 @@ NS_ASSUME_NONNULL_BEGIN
 {
     if (self = [super init]) {
 
-        _source = @(0);
+        _programEventSource = @(0);
 
-        _eventCode = @(0);
+        _programEventCode = @(0);
 
         _userId = @(0);
 
@@ -2520,9 +2385,80 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userStatus = @(0);
 
-        _timeStamp = @(0);
+        _localTime = @(0);
 
-        _data = @"";
+        _data = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetCredentialParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _operationType = @(0);
+
+        _credential = [CHIPDoorLockClusterDlCredential new];
+
+        _credentialData = [NSData data];
+
+        _userIndex = nil;
+
+        _userStatus = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterSetCredentialResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _status = @(0);
+
+        _userIndex = nil;
+
+        _nextCredentialIndex = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetCredentialStatusParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _credential = [CHIPDoorLockClusterDlCredential new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterGetCredentialStatusResponseParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _credentialExists = @(0);
+
+        _userIndex = nil;
+
+        _nextCredentialIndex = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPDoorLockClusterClearCredentialParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _credential = [CHIPDoorLockClusterDlCredential new];
     }
     return self;
 }
@@ -4115,6 +4051,17 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _arg1 = [CHIPTestClusterClusterSimpleStruct new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _arg1 = nil;
     }
     return self;
 }

@@ -82,6 +82,21 @@ ClockBase * gClockBase = &gClockImpl;
 #define MONOTONIC_CLOCK_ID CLOCK_MONOTONIC
 #endif
 
+CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
 Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
 {
     struct timespec ts;
@@ -99,6 +114,21 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 #endif // HAVE_CLOCK_GETTIME
 
 #if HAVE_GETTIMEOFDAY
+
+CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
 
 Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
 {
@@ -121,12 +151,27 @@ Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 
 // -------------------- Default Get/SetClock Functions for LwIP Systems --------------------
 
-Microseconds64 ClockImpl::GetMonotonicMicroseconds64(void)
+CHIP_ERROR ClockImpl::GetClock_RealTime(Microseconds64 & aCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ClockImpl::GetClock_RealTimeMS(Milliseconds64 & aCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+CHIP_ERROR ClockImpl::SetClock_RealTime(Microseconds64 aNewCurTime)
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+
+Microseconds64 ClockImpl::GetMonotonicMicroseconds64()
 {
     return GetMonotonicMilliseconds64();
 }
 
-Milliseconds64 ClockImpl::GetMonotonicMilliseconds64(void)
+Milliseconds64 ClockImpl::GetMonotonicMilliseconds64()
 {
     static volatile uint64_t overflow        = 0;
     static volatile u32_t lastSample         = 0;

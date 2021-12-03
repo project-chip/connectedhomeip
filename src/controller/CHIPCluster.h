@@ -32,6 +32,7 @@
 #include <controller/InvokeInteraction.h>
 #include <controller/ReadInteraction.h>
 #include <controller/WriteInteraction.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace Controller {
@@ -68,7 +69,7 @@ public:
     template <typename RequestDataT>
     CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
                              CommandResponseSuccessCallback<typename RequestDataT::ResponseType> successCb,
-                             CommandResponseFailureCallback failureCb)
+                             CommandResponseFailureCallback failureCb, const Optional<uint16_t> & timedInvokeTimeoutMs)
     {
         VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -82,8 +83,24 @@ public:
         };
 
         return InvokeCommandRequest(mDevice->GetExchangeManager(), mDevice->GetSecureSession().Value(), mEndpoint, requestData,
-                                    onSuccessCb, onFailureCb);
-    };
+                                    onSuccessCb, onFailureCb, timedInvokeTimeoutMs);
+    }
+
+    template <typename RequestDataT>
+    CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
+                             CommandResponseSuccessCallback<typename RequestDataT::ResponseType> successCb,
+                             CommandResponseFailureCallback failureCb, uint16_t timedInvokeTimeoutMs)
+    {
+        return InvokeCommand(requestData, context, successCb, failureCb, MakeOptional(timedInvokeTimeoutMs));
+    }
+
+    template <typename RequestDataT, typename std::enable_if_t<!RequestDataT::MustUseTimedInvoke(), int> = 0>
+    CHIP_ERROR InvokeCommand(const RequestDataT & requestData, void * context,
+                             CommandResponseSuccessCallback<typename RequestDataT::ResponseType> successCb,
+                             CommandResponseFailureCallback failureCb)
+    {
+        return InvokeCommand(requestData, context, successCb, failureCb, NullOptional);
+    }
 
     /**
      * Functions for writing attributes.  We have lots of different

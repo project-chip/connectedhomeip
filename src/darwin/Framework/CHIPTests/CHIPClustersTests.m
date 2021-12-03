@@ -28,6 +28,8 @@
 
 #import <app/util/af-enums.h>
 
+#import <math.h> // For INFINITY
+
 // system dependencies
 #import <XCTest/XCTest.h>
 
@@ -241,7 +243,26 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_BI_1_1_000002_WriteAttribute
+- (void)testSendClusterTest_TC_BI_1_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBinaryInputBasic * cluster = [[CHIPTestBinaryInputBasic alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_BI_1_1_000003_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -264,7 +285,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_BI_1_1_000003_ReadAttribute
+- (void)testSendClusterTest_TC_BI_1_1_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
 
@@ -789,7 +810,26 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_BOOL_1_1_000002_WriteAttribute
+- (void)testSendClusterTest_TC_BOOL_1_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestBooleanState * cluster = [[CHIPTestBooleanState alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_BOOL_1_1_000003_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -812,7 +852,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_BOOL_1_1_000003_ReadAttribute
+- (void)testSendClusterTest_TC_BOOL_1_1_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
 
@@ -945,7 +985,26 @@ CHIPDevice * GetConnectedDevice()
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_1_1_000001_WriteAttribute
+- (void)testSendClusterTest_TC_CC_1_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints : ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints : ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_1_1_000002_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -5086,7 +5145,107 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_4_2_000005_Off
+- (void)testSendClusterTest_TC_CC_4_2_000005_MoveSaturation
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Move saturation up command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterMoveSaturationParams alloc] init];
+    params.moveMode = [NSNumber numberWithUnsignedChar:1];
+    params.rate = [NSNumber numberWithUnsignedChar:5];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveSaturationWithParams:params
+                    completionHandler:^(NSError * _Nullable err) {
+                        NSLog(@"Move saturation up command Error: %@", err);
+
+                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                        [expectation fulfill];
+                    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_4_2_000006_MoveSaturation
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Move saturation stop command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterMoveSaturationParams alloc] init];
+    params.moveMode = [NSNumber numberWithUnsignedChar:0];
+    params.rate = [NSNumber numberWithUnsignedChar:5];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveSaturationWithParams:params
+                    completionHandler:^(NSError * _Nullable err) {
+                        NSLog(@"Move saturation stop command Error: %@", err);
+
+                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                        [expectation fulfill];
+                    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_4_2_000007_MoveSaturation
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Move saturation down command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterMoveSaturationParams alloc] init];
+    params.moveMode = [NSNumber numberWithUnsignedChar:3];
+    params.rate = [NSNumber numberWithUnsignedChar:5];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveSaturationWithParams:params
+                    completionHandler:^(NSError * _Nullable err) {
+                        NSLog(@"Move saturation down command Error: %@", err);
+
+                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                        [expectation fulfill];
+                    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_4_2_000008_MoveSaturation
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Move saturation stop command"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestColorControl * cluster = [[CHIPTestColorControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPColorControlClusterMoveSaturationParams alloc] init];
+    params.moveMode = [NSNumber numberWithUnsignedChar:0];
+    params.rate = [NSNumber numberWithUnsignedChar:5];
+    params.optionsMask = [NSNumber numberWithUnsignedChar:0];
+    params.optionsOverride = [NSNumber numberWithUnsignedChar:0];
+    [cluster moveSaturationWithParams:params
+                    completionHandler:^(NSError * _Nullable err) {
+                        NSLog(@"Move saturation stop command Error: %@", err);
+
+                        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                        [expectation fulfill];
+                    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_CC_4_2_000009_Off
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Turn off light that we turned on"];
 
@@ -5105,7 +5264,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_CC_4_2_000006_ReadAttribute
+- (void)testSendClusterTest_TC_CC_4_2_000010_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Check on/off attribute value is false after off command"];
 
@@ -9375,7 +9534,26 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_EMR_1_1_000002_WriteAttribute
+- (void)testSendClusterTest_TC_EMR_1_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestElectricalMeasurement * cluster = [[CHIPTestElectricalMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_EMR_1_1_000003_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -9398,7 +9576,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_EMR_1_1_000003_ReadAttribute
+- (void)testSendClusterTest_TC_EMR_1_1_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
 
@@ -9431,7 +9609,26 @@ CHIPDevice * GetConnectedDevice()
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_FLW_1_1_000001_WriteAttribute
+- (void)testSendClusterTest_TC_FLW_1_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestFlowMeasurement * cluster = [[CHIPTestFlowMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_FLW_1_1_000002_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -9705,7 +9902,28 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_ILL_1_1_000002_WriteAttribute
+- (void)testSendClusterTest_TC_ILL_1_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestIlluminanceMeasurement * cluster = [[CHIPTestIlluminanceMeasurement alloc] initWithDevice:device
+                                                                                             endpoint:1
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_ILL_1_1_000003_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -9730,7 +9948,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_ILL_1_1_000003_ReadAttribute
+- (void)testSendClusterTest_TC_ILL_1_1_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
 
@@ -9765,7 +9983,26 @@ CHIPDevice * GetConnectedDevice()
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_LVL_1_1_000001_WriteAttribute
+- (void)testSendClusterTest_TC_LVL_1_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestLevelControl * cluster = [[CHIPTestLevelControl alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_LVL_1_1_000002_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -10715,16 +10952,33 @@ CHIPDevice * GetConnectedDevice()
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_MC_1_1_000001_WriteAttribute
+- (void)testSendClusterTest_TC_MC_1_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestMediaInput * cluster = [[CHIPTestMediaInput alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_MC_1_1_000002_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
     dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
-                                                                                                       endpoint:1
-                                                                                                          queue:queue];
+    CHIPTestMediaInput * cluster = [[CHIPTestMediaInput alloc] initWithDevice:device endpoint:1 queue:queue];
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
@@ -10900,7 +11154,26 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OCC_1_1_000002_WriteAttribute
+- (void)testSendClusterTest_TC_OCC_1_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOccupancySensing * cluster = [[CHIPTestOccupancySensing alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_OCC_1_1_000003_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -11243,7 +11516,26 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000003_WriteAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_OO_1_1_000004_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -11266,7 +11558,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000004_ReadAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000005_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
 
@@ -11290,7 +11582,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000005_ReadAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000006_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"read the optional global attribute: FeatureMap"];
 
@@ -11314,7 +11606,26 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000006_WriteAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000007_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the optional global attribute : FeatureMap"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestOnOff * cluster = [[CHIPTestOnOff alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the optional global attribute : FeatureMap Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_OO_1_1_000008_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to optional global attribute: FeatureMap"];
@@ -11336,7 +11647,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_OO_1_1_000007_ReadAttribute
+- (void)testSendClusterTest_TC_OO_1_1_000009_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back optional global attribute: FeatureMap"];
 
@@ -12989,30 +13300,6 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTest_TC_PRS_1_1_000001_ReadAttribute
 {
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute: ClusterRevision"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPressureMeasurement * cluster = [[CHIPTestPressureMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Read the global attribute: ClusterRevision Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], 2U);
-        }
-
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PRS_1_1_000002_ReadAttribute
-{
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
 
     CHIPDevice * device = GetConnectedDevice();
@@ -13030,7 +13317,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_PRS_1_1_000003_WriteAttribute
+- (void)testSendClusterTest_TC_PRS_1_1_000002_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write the default values to mandatory global attribute: ClusterRevision"];
@@ -13041,7 +13328,7 @@ CHIPDevice * GetConnectedDevice()
     XCTAssertNotNil(cluster);
 
     id clusterRevisionArgument;
-    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:2U];
+    clusterRevisionArgument = [NSNumber numberWithUnsignedShort:3U];
     [cluster
         writeAttributeClusterRevisionWithValue:clusterRevisionArgument
                              completionHandler:^(NSError * _Nullable err) {
@@ -13050,30 +13337,6 @@ CHIPDevice * GetConnectedDevice()
                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-- (void)testSendClusterTest_TC_PRS_1_1_000004_ReadAttribute
-{
-    XCTestExpectation * expectation = [self expectationWithDescription:@"Reads back global attribute: ClusterRevision"];
-
-    CHIPDevice * device = GetConnectedDevice();
-    dispatch_queue_t queue = dispatch_get_main_queue();
-    CHIPTestPressureMeasurement * cluster = [[CHIPTestPressureMeasurement alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"Reads back global attribute: ClusterRevision Error: %@", err);
-
-        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
-
-        {
-            id actualValue = value;
-            XCTAssertEqual([actualValue unsignedShortValue], 2U);
-        }
-
-        [expectation fulfill];
-    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -13295,7 +13558,28 @@ CHIPDevice * GetConnectedDevice()
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_PCC_1_1_000001_WriteAttribute
+- (void)testSendClusterTest_TC_PCC_1_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                       endpoint:1
+                                                                                                          queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_PCC_1_1_000002_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -13317,6 +13601,27 @@ CHIPDevice * GetConnectedDevice()
                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_PCC_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"read the optional global attribute: FeatureMap"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestPumpConfigurationAndControl * cluster = [[CHIPTestPumpConfigurationAndControl alloc] initWithDevice:device
+                                                                                                       endpoint:1
+                                                                                                          queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"read the optional global attribute: FeatureMap Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -13649,7 +13954,28 @@ CHIPDevice * GetConnectedDevice()
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_RH_1_1_000001_WriteAttribute
+- (void)testSendClusterTest_TC_RH_1_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestRelativeHumidityMeasurement * cluster = [[CHIPTestRelativeHumidityMeasurement alloc] initWithDevice:device
+                                                                                                       endpoint:1
+                                                                                                          queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_RH_1_1_000002_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -13816,7 +14142,28 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_TM_1_1_000002_WriteAttribute
+- (void)testSendClusterTest_TC_TM_1_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTemperatureMeasurement * cluster = [[CHIPTestTemperatureMeasurement alloc] initWithDevice:device
+                                                                                             endpoint:1
+                                                                                                queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TM_1_1_000003_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -13841,7 +14188,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_TM_1_1_000003_ReadAttribute
+- (void)testSendClusterTest_TC_TM_1_1_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
 
@@ -13957,7 +14304,26 @@ CHIPDevice * GetConnectedDevice()
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_TSTAT_1_1_000001_WriteAttribute
+- (void)testSendClusterTest_TC_TSTAT_1_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_1_1_000002_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -13977,6 +14343,26 @@ CHIPDevice * GetConnectedDevice()
                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_UNSUPPORTED_WRITE);
                                  [expectation fulfill];
                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSTAT_1_1_000003_ReadAttribute
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Read the optional global attribute constraints: FeatureMap"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostat * cluster = [[CHIPTestThermostat alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the optional global attribute constraints: FeatureMap Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -16734,7 +17120,27 @@ CHIPDevice * GetConnectedDevice()
     WaitForCommissionee(expectation, queue);
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_TSUIC_1_1_000001_WriteAttribute
+- (void)testSendClusterTest_TC_TSUIC_1_1_000001_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThermostatUserInterfaceConfiguration * cluster =
+        [[CHIPTestThermostatUserInterfaceConfiguration alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_TSUIC_1_1_000002_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -17401,7 +17807,28 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_DIAGTH_1_1_000002_WriteAttribute
+- (void)testSendClusterTest_TC_DIAGTH_1_1_000002_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read the global attribute constraints: ClusterRevision"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestThreadNetworkDiagnostics * cluster = [[CHIPTestThreadNetworkDiagnostics alloc] initWithDevice:device
+                                                                                                 endpoint:0
+                                                                                                    queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeClusterRevisionWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read the global attribute constraints: ClusterRevision Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTest_TC_DIAGTH_1_1_000003_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"write the default values to mandatory global attribute: ClusterRevision"];
@@ -17426,7 +17853,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTest_TC_DIAGTH_1_1_000003_ReadAttribute
+- (void)testSendClusterTest_TC_DIAGTH_1_1_000004_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"reads back global attribute: ClusterRevision"];
 
@@ -21103,6 +21530,422 @@ CHIPDevice * GetConnectedDevice()
 }
 - (void)testSendClusterTestCluster_000079_ReadAttribute
 {
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute SINGLE Default Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFloatSingleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute SINGLE Default Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue floatValue], 0.0f);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000080_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute SINGLE medium Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id floatSingleArgument;
+    floatSingleArgument = [NSNumber numberWithFloat:0.1f];
+    [cluster writeAttributeFloatSingleWithValue:floatSingleArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write attribute SINGLE medium Value Error: %@", err);
+
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000081_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute SINGLE medium Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFloatSingleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute SINGLE medium Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue floatValue], 0.1f);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000082_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute SINGLE large Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id floatSingleArgument;
+    floatSingleArgument = [NSNumber numberWithFloat:17000000000.0f];
+    [cluster writeAttributeFloatSingleWithValue:floatSingleArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write attribute SINGLE large Value Error: %@", err);
+
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000083_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute SINGLE large Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFloatSingleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute SINGLE large Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue floatValue], 17000000000.0f);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000084_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute SINGLE small Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id floatSingleArgument;
+    floatSingleArgument = [NSNumber numberWithFloat:1.7e-10f];
+    [cluster writeAttributeFloatSingleWithValue:floatSingleArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write attribute SINGLE small Value Error: %@", err);
+
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000085_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute SINGLE small Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFloatSingleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute SINGLE small Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue floatValue], 1.7e-10f);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000086_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute SINGLE Default Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id floatSingleArgument;
+    floatSingleArgument = [NSNumber numberWithFloat:0.0f];
+    [cluster writeAttributeFloatSingleWithValue:floatSingleArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write attribute SINGLE Default Value Error: %@", err);
+
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000087_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute SINGLE Default Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFloatSingleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute SINGLE Default Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue floatValue], 0.0f);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000088_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute DOUBLE Default Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFloatDoubleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute DOUBLE Default Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue doubleValue], 0);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000089_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute DOUBLE medium Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id floatDoubleArgument;
+    floatDoubleArgument = [NSNumber numberWithDouble:0.1234567890123];
+    [cluster writeAttributeFloatDoubleWithValue:floatDoubleArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write attribute DOUBLE medium Value Error: %@", err);
+
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000090_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute DOUBLE medium Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFloatDoubleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute DOUBLE medium Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue doubleValue], 0.1234567890123);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000091_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute DOUBLE large Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id floatDoubleArgument;
+    floatDoubleArgument = [NSNumber numberWithDouble:1.7e+200];
+    [cluster writeAttributeFloatDoubleWithValue:floatDoubleArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write attribute DOUBLE large Value Error: %@", err);
+
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000092_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute DOUBLE large Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFloatDoubleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute DOUBLE large Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue doubleValue], 1.7e+200);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000093_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute DOUBLE small Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id floatDoubleArgument;
+    floatDoubleArgument = [NSNumber numberWithDouble:1.7e-200];
+    [cluster writeAttributeFloatDoubleWithValue:floatDoubleArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write attribute DOUBLE small Value Error: %@", err);
+
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000094_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute DOUBLE small Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFloatDoubleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute DOUBLE small Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue doubleValue], 1.7e-200);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000095_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute DOUBLE Default Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id floatDoubleArgument;
+    floatDoubleArgument = [NSNumber numberWithDouble:0];
+    [cluster writeAttributeFloatDoubleWithValue:floatDoubleArgument
+                              completionHandler:^(NSError * _Nullable err) {
+                                  NSLog(@"Write attribute DOUBLE Default Value Error: %@", err);
+
+                                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                  [expectation fulfill];
+                              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000096_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute DOUBLE Default Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeFloatDoubleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute DOUBLE Default Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertEqual([actualValue doubleValue], 0);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000097_ReadAttribute
+{
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM8 Default Value"];
 
     CHIPDevice * device = GetConnectedDevice();
@@ -21125,7 +21968,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000080_WriteAttribute
+- (void)testSendClusterTestCluster_000098_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute ENUM8 Max Value"];
 
@@ -21147,7 +21990,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000081_ReadAttribute
+- (void)testSendClusterTestCluster_000099_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM8 Max Value"];
 
@@ -21171,7 +22014,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000082_WriteAttribute
+- (void)testSendClusterTestCluster_000100_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute ENUM8 Min Value"];
 
@@ -21193,7 +22036,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000083_ReadAttribute
+- (void)testSendClusterTestCluster_000101_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM8 Min Value"];
 
@@ -21217,7 +22060,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000084_ReadAttribute
+- (void)testSendClusterTestCluster_000102_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM16 Default Value"];
 
@@ -21241,7 +22084,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000085_WriteAttribute
+- (void)testSendClusterTestCluster_000103_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute ENUM16 Max Value"];
 
@@ -21263,7 +22106,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000086_ReadAttribute
+- (void)testSendClusterTestCluster_000104_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM16 Max Value"];
 
@@ -21287,7 +22130,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000087_WriteAttribute
+- (void)testSendClusterTestCluster_000105_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute ENUM16 Min Value"];
 
@@ -21309,7 +22152,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000088_ReadAttribute
+- (void)testSendClusterTestCluster_000106_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute ENUM16 Min Value"];
 
@@ -21333,7 +22176,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000089_ReadAttribute
+- (void)testSendClusterTestCluster_000107_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute OCTET_STRING Default Value"];
 
@@ -21357,7 +22200,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000090_WriteAttribute
+- (void)testSendClusterTestCluster_000108_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute OCTET_STRING with embedded null"];
 
@@ -21379,7 +22222,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000091_ReadAttribute
+- (void)testSendClusterTestCluster_000109_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute OCTET_STRING with embedded null"];
 
@@ -21403,7 +22246,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000092_WriteAttribute
+- (void)testSendClusterTestCluster_000110_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute OCTET_STRING"];
 
@@ -21425,7 +22268,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000093_ReadAttribute
+- (void)testSendClusterTestCluster_000111_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute OCTET_STRING"];
 
@@ -21449,7 +22292,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000094_WriteAttribute
+- (void)testSendClusterTestCluster_000112_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute OCTET_STRING"];
 
@@ -21470,7 +22313,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000095_ReadAttribute
+- (void)testSendClusterTestCluster_000113_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute OCTET_STRING"];
 
@@ -21494,7 +22337,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000096_WriteAttribute
+- (void)testSendClusterTestCluster_000114_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute OCTET_STRING"];
 
@@ -21516,7 +22359,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000097_ReadAttribute
+- (void)testSendClusterTestCluster_000115_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LONG_OCTET_STRING Default Value"];
 
@@ -21540,7 +22383,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000098_WriteAttribute
+- (void)testSendClusterTestCluster_000116_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute LONG_OCTET_STRING"];
 
@@ -21566,7 +22409,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000099_ReadAttribute
+- (void)testSendClusterTestCluster_000117_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LONG_OCTET_STRING"];
 
@@ -21596,7 +22439,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000100_WriteAttribute
+- (void)testSendClusterTestCluster_000118_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute LONG_OCTET_STRING"];
 
@@ -21618,7 +22461,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000101_ReadAttribute
+- (void)testSendClusterTestCluster_000119_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute CHAR_STRING Default Value"];
 
@@ -21642,7 +22485,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000102_WriteAttribute
+- (void)testSendClusterTestCluster_000120_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute CHAR_STRING"];
 
@@ -21664,7 +22507,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000103_ReadAttribute
+- (void)testSendClusterTestCluster_000121_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute CHAR_STRING"];
 
@@ -21688,7 +22531,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000104_WriteAttribute
+- (void)testSendClusterTestCluster_000122_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute CHAR_STRING - Value too long"];
 
@@ -21709,7 +22552,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000105_ReadAttribute
+- (void)testSendClusterTestCluster_000123_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute CHAR_STRING"];
 
@@ -21733,7 +22576,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000106_WriteAttribute
+- (void)testSendClusterTestCluster_000124_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute CHAR_STRING - Empty"];
 
@@ -21755,7 +22598,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000107_ReadAttribute
+- (void)testSendClusterTestCluster_000125_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LONG_CHAR_STRING Default Value"];
 
@@ -21779,7 +22622,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000108_WriteAttribute
+- (void)testSendClusterTestCluster_000126_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute LONG_CHAR_STRING"];
 
@@ -21804,7 +22647,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000109_ReadAttribute
+- (void)testSendClusterTestCluster_000127_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LONG_CHAR_STRING"];
 
@@ -21832,7 +22675,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000110_WriteAttribute
+- (void)testSendClusterTestCluster_000128_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute LONG_CHAR_STRING"];
 
@@ -21854,7 +22697,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000111_ReadAttribute
+- (void)testSendClusterTestCluster_000129_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_US Default Value"];
 
@@ -21878,7 +22721,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000112_WriteAttribute
+- (void)testSendClusterTestCluster_000130_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute EPOCH_US Max Value"];
 
@@ -21900,7 +22743,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000113_ReadAttribute
+- (void)testSendClusterTestCluster_000131_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_US Max Value"];
 
@@ -21924,7 +22767,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000114_WriteAttribute
+- (void)testSendClusterTestCluster_000132_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute EPOCH_US Min Value"];
 
@@ -21946,7 +22789,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000115_ReadAttribute
+- (void)testSendClusterTestCluster_000133_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_US Min Value"];
 
@@ -21970,7 +22813,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000116_ReadAttribute
+- (void)testSendClusterTestCluster_000134_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_S Default Value"];
 
@@ -21994,7 +22837,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000117_WriteAttribute
+- (void)testSendClusterTestCluster_000135_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute EPOCH_S Max Value"];
 
@@ -22016,7 +22859,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000118_ReadAttribute
+- (void)testSendClusterTestCluster_000136_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_S Max Value"];
 
@@ -22040,7 +22883,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000119_WriteAttribute
+- (void)testSendClusterTestCluster_000137_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute EPOCH_S Min Value"];
 
@@ -22062,7 +22905,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000120_ReadAttribute
+- (void)testSendClusterTestCluster_000138_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute EPOCH_S Min Value"];
 
@@ -22086,7 +22929,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000121_ReadAttribute
+- (void)testSendClusterTestCluster_000139_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute UNSUPPORTED"];
 
@@ -22115,7 +22958,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000122_WriteAttribute
+- (void)testSendClusterTestCluster_000140_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Writeattribute UNSUPPORTED"];
 
@@ -22142,7 +22985,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000123_Test
+- (void)testSendClusterTestCluster_000141_Test
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command to unsupported endpoint"];
 
@@ -22160,7 +23003,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000124_Test
+- (void)testSendClusterTestCluster_000142_Test
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command to unsupported cluster"];
 
@@ -22178,7 +23021,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000125_ReadAttribute
+- (void)testSendClusterTestCluster_000143_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute vendor_id Default Value"];
 
@@ -22202,7 +23045,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000126_WriteAttribute
+- (void)testSendClusterTestCluster_000144_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute vendor_id"];
 
@@ -22224,7 +23067,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000127_ReadAttribute
+- (void)testSendClusterTestCluster_000145_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute vendor_id"];
 
@@ -22248,7 +23091,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000128_WriteAttribute
+- (void)testSendClusterTestCluster_000146_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Restore attribute vendor_id"];
 
@@ -22270,7 +23113,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000129_TestEnumsRequest
+- (void)testSendClusterTestCluster_000147_TestEnumsRequest
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send a command with a vendor_id and enum"];
 
@@ -22303,7 +23146,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000130_TestStructArgumentRequest
+- (void)testSendClusterTestCluster_000148_TestStructArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With Struct Argument and arg1.b is true"];
@@ -22321,7 +23164,7 @@ CHIPDevice * GetConnectedDevice()
     ((CHIPTestClusterClusterSimpleStruct *) params.arg1).d = [[NSData alloc] initWithBytes:"octet_string" length:12];
     ((CHIPTestClusterClusterSimpleStruct *) params.arg1).e = @"char_string";
     ((CHIPTestClusterClusterSimpleStruct *) params.arg1).f = [NSNumber numberWithUnsignedChar:1];
-    ((CHIPTestClusterClusterSimpleStruct *) params.arg1).g = [NSNumber numberWithFloat:0];
+    ((CHIPTestClusterClusterSimpleStruct *) params.arg1).g = [NSNumber numberWithFloat:0.0f];
     ((CHIPTestClusterClusterSimpleStruct *) params.arg1).h = [NSNumber numberWithDouble:0];
 
     [cluster testStructArgumentRequestWithParams:params
@@ -22341,7 +23184,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000131_TestStructArgumentRequest
+- (void)testSendClusterTestCluster_000149_TestStructArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With Struct Argument and arg1.b is false"];
@@ -22359,7 +23202,7 @@ CHIPDevice * GetConnectedDevice()
     ((CHIPTestClusterClusterSimpleStruct *) params.arg1).d = [[NSData alloc] initWithBytes:"octet_string" length:12];
     ((CHIPTestClusterClusterSimpleStruct *) params.arg1).e = @"char_string";
     ((CHIPTestClusterClusterSimpleStruct *) params.arg1).f = [NSNumber numberWithUnsignedChar:1];
-    ((CHIPTestClusterClusterSimpleStruct *) params.arg1).g = [NSNumber numberWithFloat:0];
+    ((CHIPTestClusterClusterSimpleStruct *) params.arg1).g = [NSNumber numberWithFloat:0.0f];
     ((CHIPTestClusterClusterSimpleStruct *) params.arg1).h = [NSNumber numberWithDouble:0];
 
     [cluster testStructArgumentRequestWithParams:params
@@ -22379,7 +23222,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000132_TestNestedStructArgumentRequest
+- (void)testSendClusterTestCluster_000150_TestNestedStructArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With Nested Struct Argument and arg1.c.b is true"];
@@ -22406,7 +23249,7 @@ CHIPDevice * GetConnectedDevice()
     ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStruct *) params.arg1).c).f =
         [NSNumber numberWithUnsignedChar:1];
     ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStruct *) params.arg1).c).g =
-        [NSNumber numberWithFloat:0];
+        [NSNumber numberWithFloat:0.0f];
     ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStruct *) params.arg1).c).h =
         [NSNumber numberWithDouble:0];
 
@@ -22428,7 +23271,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000133_TestNestedStructArgumentRequest
+- (void)testSendClusterTestCluster_000151_TestNestedStructArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With Nested Struct Argument arg1.c.b is false"];
@@ -22455,7 +23298,7 @@ CHIPDevice * GetConnectedDevice()
     ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStruct *) params.arg1).c).f =
         [NSNumber numberWithUnsignedChar:1];
     ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStruct *) params.arg1).c).g =
-        [NSNumber numberWithFloat:0];
+        [NSNumber numberWithFloat:0.0f];
     ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStruct *) params.arg1).c).h =
         [NSNumber numberWithDouble:0];
 
@@ -22476,7 +23319,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000134_TestNestedStructListArgumentRequest
+- (void)testSendClusterTestCluster_000152_TestNestedStructListArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With Nested Struct List Argument and all fields b of arg1.d are true"];
@@ -22503,7 +23346,7 @@ CHIPDevice * GetConnectedDevice()
     ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStructList *) params.arg1).c).f =
         [NSNumber numberWithUnsignedChar:1];
     ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStructList *) params.arg1).c).g =
-        [NSNumber numberWithFloat:0];
+        [NSNumber numberWithFloat:0.0f];
     ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStructList *) params.arg1).c).h =
         [NSNumber numberWithDouble:0];
 
@@ -22516,7 +23359,7 @@ CHIPDevice * GetConnectedDevice()
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[0]).d = [[NSData alloc] initWithBytes:"nested_octet_string" length:19];
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[0]).e = @"nested_char_string";
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[0]).f = [NSNumber numberWithUnsignedChar:1];
-        ((CHIPTestClusterClusterSimpleStruct *) temp_1[0]).g = [NSNumber numberWithFloat:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp_1[0]).g = [NSNumber numberWithFloat:0.0f];
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[0]).h = [NSNumber numberWithDouble:0];
 
         temp_1[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
@@ -22526,7 +23369,7 @@ CHIPDevice * GetConnectedDevice()
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[1]).d = [[NSData alloc] initWithBytes:"nested_octet_string" length:19];
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[1]).e = @"nested_char_string";
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[1]).f = [NSNumber numberWithUnsignedChar:1];
-        ((CHIPTestClusterClusterSimpleStruct *) temp_1[1]).g = [NSNumber numberWithFloat:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp_1[1]).g = [NSNumber numberWithFloat:0.0f];
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[1]).h = [NSNumber numberWithDouble:0];
 
         ((CHIPTestClusterClusterNestedStructList *) params.arg1).d = temp_1;
@@ -22571,7 +23414,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000135_TestNestedStructListArgumentRequest
+- (void)testSendClusterTestCluster_000153_TestNestedStructListArgumentRequest
 {
     XCTestExpectation * expectation = [self
         expectationWithDescription:@"Send Test Command With Nested Struct List Argument and some fields b of arg1.d are false"];
@@ -22598,7 +23441,7 @@ CHIPDevice * GetConnectedDevice()
     ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStructList *) params.arg1).c).f =
         [NSNumber numberWithUnsignedChar:1];
     ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStructList *) params.arg1).c).g =
-        [NSNumber numberWithFloat:0];
+        [NSNumber numberWithFloat:0.0f];
     ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStructList *) params.arg1).c).h =
         [NSNumber numberWithDouble:0];
 
@@ -22611,7 +23454,7 @@ CHIPDevice * GetConnectedDevice()
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[0]).d = [[NSData alloc] initWithBytes:"nested_octet_string" length:19];
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[0]).e = @"nested_char_string";
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[0]).f = [NSNumber numberWithUnsignedChar:1];
-        ((CHIPTestClusterClusterSimpleStruct *) temp_1[0]).g = [NSNumber numberWithFloat:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp_1[0]).g = [NSNumber numberWithFloat:0.0f];
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[0]).h = [NSNumber numberWithDouble:0];
 
         temp_1[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
@@ -22621,7 +23464,7 @@ CHIPDevice * GetConnectedDevice()
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[1]).d = [[NSData alloc] initWithBytes:"nested_octet_string" length:19];
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[1]).e = @"nested_char_string";
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[1]).f = [NSNumber numberWithUnsignedChar:1];
-        ((CHIPTestClusterClusterSimpleStruct *) temp_1[1]).g = [NSNumber numberWithFloat:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp_1[1]).g = [NSNumber numberWithFloat:0.0f];
         ((CHIPTestClusterClusterSimpleStruct *) temp_1[1]).h = [NSNumber numberWithDouble:0];
 
         ((CHIPTestClusterClusterNestedStructList *) params.arg1).d = temp_1;
@@ -22666,7 +23509,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000136_SimpleStructEchoRequest
+- (void)testSendClusterTestCluster_000154_SimpleStructEchoRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With Struct Argument and see what we get back"];
@@ -22713,7 +23556,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000137_TestListInt8UArgumentRequest
+- (void)testSendClusterTestCluster_000155_TestListInt8UArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With List of INT8U and none of them is set to 0"];
@@ -22754,7 +23597,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000138_TestListInt8UArgumentRequest
+- (void)testSendClusterTestCluster_000156_TestListInt8UArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With List of INT8U and one of them is set to 0"];
@@ -22796,7 +23639,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000139_TestListInt8UReverseRequest
+- (void)testSendClusterTestCluster_000157_TestListInt8UReverseRequest
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command With List of INT8U and get it reversed"];
 
@@ -22845,7 +23688,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000140_TestListInt8UReverseRequest
+- (void)testSendClusterTestCluster_000158_TestListInt8UReverseRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With empty List of INT8U and get an empty list back"];
@@ -22877,7 +23720,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000141_TestListStructArgumentRequest
+- (void)testSendClusterTestCluster_000159_TestListStructArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With List of Struct Argument and arg1.b of first item is true"];
@@ -22897,7 +23740,7 @@ CHIPDevice * GetConnectedDevice()
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[0]).d = [[NSData alloc] initWithBytes:"first_octet_string" length:18];
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[0]).e = @"first_char_string";
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[0]).f = [NSNumber numberWithUnsignedChar:1];
-        ((CHIPTestClusterClusterSimpleStruct *) temp_0[0]).g = [NSNumber numberWithFloat:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp_0[0]).g = [NSNumber numberWithFloat:0.0f];
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[0]).h = [NSNumber numberWithDouble:0];
 
         temp_0[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
@@ -22907,7 +23750,7 @@ CHIPDevice * GetConnectedDevice()
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[1]).d = [[NSData alloc] initWithBytes:"second_octet_string" length:19];
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[1]).e = @"second_char_string";
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[1]).f = [NSNumber numberWithUnsignedChar:1];
-        ((CHIPTestClusterClusterSimpleStruct *) temp_0[1]).g = [NSNumber numberWithFloat:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp_0[1]).g = [NSNumber numberWithFloat:0.0f];
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[1]).h = [NSNumber numberWithDouble:0];
 
         params.arg1 = temp_0;
@@ -22932,7 +23775,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000142_TestListStructArgumentRequest
+- (void)testSendClusterTestCluster_000160_TestListStructArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Send Test Command With List of Struct Argument and arg1.b of first item is false"];
@@ -22952,7 +23795,7 @@ CHIPDevice * GetConnectedDevice()
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[0]).d = [[NSData alloc] initWithBytes:"second_octet_string" length:19];
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[0]).e = @"second_char_string";
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[0]).f = [NSNumber numberWithUnsignedChar:1];
-        ((CHIPTestClusterClusterSimpleStruct *) temp_0[0]).g = [NSNumber numberWithFloat:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp_0[0]).g = [NSNumber numberWithFloat:0.0f];
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[0]).h = [NSNumber numberWithDouble:0];
 
         temp_0[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
@@ -22962,7 +23805,7 @@ CHIPDevice * GetConnectedDevice()
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[1]).d = [[NSData alloc] initWithBytes:"first_octet_string" length:18];
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[1]).e = @"first_char_string";
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[1]).f = [NSNumber numberWithUnsignedChar:1];
-        ((CHIPTestClusterClusterSimpleStruct *) temp_0[1]).g = [NSNumber numberWithFloat:0];
+        ((CHIPTestClusterClusterSimpleStruct *) temp_0[1]).g = [NSNumber numberWithFloat:0.0f];
         ((CHIPTestClusterClusterSimpleStruct *) temp_0[1]).h = [NSNumber numberWithDouble:0];
 
         params.arg1 = temp_0;
@@ -22987,7 +23830,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000143_TestListNestedStructListArgumentRequest
+- (void)testSendClusterTestCluster_000161_TestListNestedStructListArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:
@@ -23017,7 +23860,7 @@ CHIPDevice * GetConnectedDevice()
         ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStructList *) temp_0[0]).c).f =
             [NSNumber numberWithUnsignedChar:1];
         ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStructList *) temp_0[0]).c).g =
-            [NSNumber numberWithFloat:0];
+            [NSNumber numberWithFloat:0.0f];
         ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStructList *) temp_0[0]).c).h =
             [NSNumber numberWithDouble:0];
 
@@ -23030,7 +23873,7 @@ CHIPDevice * GetConnectedDevice()
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[0]).d = [[NSData alloc] initWithBytes:"nested_octet_string" length:19];
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[0]).e = @"nested_char_string";
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[0]).f = [NSNumber numberWithUnsignedChar:1];
-            ((CHIPTestClusterClusterSimpleStruct *) temp_2[0]).g = [NSNumber numberWithFloat:0];
+            ((CHIPTestClusterClusterSimpleStruct *) temp_2[0]).g = [NSNumber numberWithFloat:0.0f];
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[0]).h = [NSNumber numberWithDouble:0];
 
             temp_2[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
@@ -23040,7 +23883,7 @@ CHIPDevice * GetConnectedDevice()
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[1]).d = [[NSData alloc] initWithBytes:"nested_octet_string" length:19];
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[1]).e = @"nested_char_string";
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[1]).f = [NSNumber numberWithUnsignedChar:1];
-            ((CHIPTestClusterClusterSimpleStruct *) temp_2[1]).g = [NSNumber numberWithFloat:0];
+            ((CHIPTestClusterClusterSimpleStruct *) temp_2[1]).g = [NSNumber numberWithFloat:0.0f];
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[1]).h = [NSNumber numberWithDouble:0];
 
             ((CHIPTestClusterClusterNestedStructList *) temp_0[0]).d = temp_2;
@@ -23087,7 +23930,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000144_TestListNestedStructListArgumentRequest
+- (void)testSendClusterTestCluster_000162_TestListNestedStructListArgumentRequest
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:
@@ -23117,7 +23960,7 @@ CHIPDevice * GetConnectedDevice()
         ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStructList *) temp_0[0]).c).f =
             [NSNumber numberWithUnsignedChar:1];
         ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStructList *) temp_0[0]).c).g =
-            [NSNumber numberWithFloat:0];
+            [NSNumber numberWithFloat:0.0f];
         ((CHIPTestClusterClusterSimpleStruct *) ((CHIPTestClusterClusterNestedStructList *) temp_0[0]).c).h =
             [NSNumber numberWithDouble:0];
 
@@ -23130,7 +23973,7 @@ CHIPDevice * GetConnectedDevice()
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[0]).d = [[NSData alloc] initWithBytes:"nested_octet_string" length:19];
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[0]).e = @"nested_char_string";
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[0]).f = [NSNumber numberWithUnsignedChar:1];
-            ((CHIPTestClusterClusterSimpleStruct *) temp_2[0]).g = [NSNumber numberWithFloat:0];
+            ((CHIPTestClusterClusterSimpleStruct *) temp_2[0]).g = [NSNumber numberWithFloat:0.0f];
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[0]).h = [NSNumber numberWithDouble:0];
 
             temp_2[1] = [[CHIPTestClusterClusterSimpleStruct alloc] init];
@@ -23140,7 +23983,7 @@ CHIPDevice * GetConnectedDevice()
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[1]).d = [[NSData alloc] initWithBytes:"nested_octet_string" length:19];
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[1]).e = @"nested_char_string";
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[1]).f = [NSNumber numberWithUnsignedChar:1];
-            ((CHIPTestClusterClusterSimpleStruct *) temp_2[1]).g = [NSNumber numberWithFloat:0];
+            ((CHIPTestClusterClusterSimpleStruct *) temp_2[1]).g = [NSNumber numberWithFloat:0.0f];
             ((CHIPTestClusterClusterSimpleStruct *) temp_2[1]).h = [NSNumber numberWithDouble:0];
 
             ((CHIPTestClusterClusterNestedStructList *) temp_0[0]).d = temp_2;
@@ -23187,7 +24030,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000145_WriteAttribute
+- (void)testSendClusterTestCluster_000163_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write attribute LIST With List of INT8U and none of them is set to 0"];
@@ -23217,7 +24060,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000146_ReadAttribute
+- (void)testSendClusterTestCluster_000164_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LIST With List of INT8U"];
 
@@ -23245,7 +24088,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000147_WriteAttribute
+- (void)testSendClusterTestCluster_000165_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute LIST With List of OCTET_STRING"];
 
@@ -23274,7 +24117,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000148_ReadAttribute
+- (void)testSendClusterTestCluster_000166_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute LIST With List of OCTET_STRING"];
 
@@ -23302,7 +24145,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000149_WriteAttribute
+- (void)testSendClusterTestCluster_000167_WriteAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Write attribute LIST With List of LIST_STRUCT_OCTET_STRING"];
@@ -23344,7 +24187,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000150_ReadAttribute
+- (void)testSendClusterTestCluster_000168_ReadAttribute
 {
     XCTestExpectation * expectation =
         [self expectationWithDescription:@"Read attribute LIST With List of LIST_STRUCT_OCTET_STRING"];
@@ -23385,7 +24228,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000151_TestNullableOptionalRequest
+- (void)testSendClusterTestCluster_000169_TestNullableOptionalRequest
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command with optional arg set."];
 
@@ -23426,7 +24269,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000152_TestNullableOptionalRequest
+- (void)testSendClusterTestCluster_000170_TestNullableOptionalRequest
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Send Test Command without its optional arg."];
 
@@ -23453,7 +24296,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000153_WriteAttribute
+- (void)testSendClusterTestCluster_000171_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BOOLEAN null"];
 
@@ -23475,7 +24318,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000154_ReadAttribute
+- (void)testSendClusterTestCluster_000172_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BOOLEAN null"];
 
@@ -23499,7 +24342,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000155_WriteAttribute
+- (void)testSendClusterTestCluster_000173_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BOOLEAN True"];
 
@@ -23521,7 +24364,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000156_ReadAttribute
+- (void)testSendClusterTestCluster_000174_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BOOLEAN True"];
 
@@ -23546,7 +24389,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000157_WriteAttribute
+- (void)testSendClusterTestCluster_000175_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP8 Max Value"];
 
@@ -23568,7 +24411,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000158_ReadAttribute
+- (void)testSendClusterTestCluster_000176_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP8 Max Value"];
 
@@ -23593,7 +24436,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000159_WriteAttribute
+- (void)testSendClusterTestCluster_000177_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP8 Invalid Value"];
 
@@ -23615,7 +24458,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000160_ReadAttribute
+- (void)testSendClusterTestCluster_000178_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP8 unchanged Value"];
 
@@ -23640,7 +24483,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000161_WriteAttribute
+- (void)testSendClusterTestCluster_000179_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP8 null Value"];
 
@@ -23662,7 +24505,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000162_ReadAttribute
+- (void)testSendClusterTestCluster_000180_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP8 null Value"];
 
@@ -23686,7 +24529,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000163_WriteAttribute
+- (void)testSendClusterTestCluster_000181_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP16 Max Value"];
 
@@ -23708,7 +24551,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000164_ReadAttribute
+- (void)testSendClusterTestCluster_000182_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP16 Max Value"];
 
@@ -23733,7 +24576,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000165_WriteAttribute
+- (void)testSendClusterTestCluster_000183_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP16 Invalid Value"];
 
@@ -23755,7 +24598,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000166_ReadAttribute
+- (void)testSendClusterTestCluster_000184_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP16 unchanged Value"];
 
@@ -23780,7 +24623,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000167_WriteAttribute
+- (void)testSendClusterTestCluster_000185_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP16 null Value"];
 
@@ -23802,7 +24645,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000168_ReadAttribute
+- (void)testSendClusterTestCluster_000186_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP16 null Value"];
 
@@ -23826,7 +24669,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000169_WriteAttribute
+- (void)testSendClusterTestCluster_000187_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP32 Max Value"];
 
@@ -23848,7 +24691,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000170_ReadAttribute
+- (void)testSendClusterTestCluster_000188_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP32 Max Value"];
 
@@ -23873,7 +24716,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000171_WriteAttribute
+- (void)testSendClusterTestCluster_000189_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP32 Invalid Value"];
 
@@ -23895,7 +24738,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000172_ReadAttribute
+- (void)testSendClusterTestCluster_000190_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP32 unchanged Value"];
 
@@ -23920,7 +24763,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000173_WriteAttribute
+- (void)testSendClusterTestCluster_000191_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP32 null Value"];
 
@@ -23942,7 +24785,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000174_ReadAttribute
+- (void)testSendClusterTestCluster_000192_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP32 null Value"];
 
@@ -23966,7 +24809,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000175_WriteAttribute
+- (void)testSendClusterTestCluster_000193_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP64 Max Value"];
 
@@ -23988,7 +24831,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000176_ReadAttribute
+- (void)testSendClusterTestCluster_000194_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP64 Max Value"];
 
@@ -24013,7 +24856,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000177_WriteAttribute
+- (void)testSendClusterTestCluster_000195_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP64 Invalid Value"];
 
@@ -24035,7 +24878,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000178_ReadAttribute
+- (void)testSendClusterTestCluster_000196_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP64 unchanged Value"];
 
@@ -24060,7 +24903,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000179_WriteAttribute
+- (void)testSendClusterTestCluster_000197_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_BITMAP64 null Value"];
 
@@ -24082,7 +24925,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000180_ReadAttribute
+- (void)testSendClusterTestCluster_000198_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_BITMAP64 null Value"];
 
@@ -24106,7 +24949,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000181_WriteAttribute
+- (void)testSendClusterTestCluster_000199_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8U Max Value"];
 
@@ -24128,7 +24971,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000182_ReadAttribute
+- (void)testSendClusterTestCluster_000200_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8U Max Value"];
 
@@ -24153,7 +24996,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000183_WriteAttribute
+- (void)testSendClusterTestCluster_000201_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8U Invalid Value"];
 
@@ -24174,7 +25017,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000184_ReadAttribute
+- (void)testSendClusterTestCluster_000202_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8U unchanged Value"];
 
@@ -24199,7 +25042,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000185_WriteAttribute
+- (void)testSendClusterTestCluster_000203_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8U null Value"];
 
@@ -24221,7 +25064,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000186_ReadAttribute
+- (void)testSendClusterTestCluster_000204_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8U null Value"];
 
@@ -24245,7 +25088,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000187_WriteAttribute
+- (void)testSendClusterTestCluster_000205_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16U Max Value"];
 
@@ -24267,7 +25110,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000188_ReadAttribute
+- (void)testSendClusterTestCluster_000206_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16U Max Value"];
 
@@ -24292,7 +25135,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000189_WriteAttribute
+- (void)testSendClusterTestCluster_000207_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16U Invalid Value"];
 
@@ -24314,7 +25157,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000190_ReadAttribute
+- (void)testSendClusterTestCluster_000208_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16U unchanged Value"];
 
@@ -24339,7 +25182,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000191_WriteAttribute
+- (void)testSendClusterTestCluster_000209_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16U null Value"];
 
@@ -24361,7 +25204,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000192_ReadAttribute
+- (void)testSendClusterTestCluster_000210_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16U null Value"];
 
@@ -24385,7 +25228,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000193_WriteAttribute
+- (void)testSendClusterTestCluster_000211_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32U Max Value"];
 
@@ -24407,7 +25250,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000194_ReadAttribute
+- (void)testSendClusterTestCluster_000212_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32U Max Value"];
 
@@ -24432,7 +25275,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000195_WriteAttribute
+- (void)testSendClusterTestCluster_000213_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32U Invalid Value"];
 
@@ -24454,7 +25297,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000196_ReadAttribute
+- (void)testSendClusterTestCluster_000214_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32U unchanged Value"];
 
@@ -24479,7 +25322,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000197_WriteAttribute
+- (void)testSendClusterTestCluster_000215_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32U null Value"];
 
@@ -24501,7 +25344,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000198_ReadAttribute
+- (void)testSendClusterTestCluster_000216_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32U null Value"];
 
@@ -24525,7 +25368,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000199_WriteAttribute
+- (void)testSendClusterTestCluster_000217_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64U Max Value"];
 
@@ -24547,7 +25390,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000200_ReadAttribute
+- (void)testSendClusterTestCluster_000218_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64U Max Value"];
 
@@ -24572,7 +25415,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000201_WriteAttribute
+- (void)testSendClusterTestCluster_000219_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64U Invalid Value"];
 
@@ -24594,7 +25437,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000202_ReadAttribute
+- (void)testSendClusterTestCluster_000220_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64U unchanged Value"];
 
@@ -24619,7 +25462,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000203_WriteAttribute
+- (void)testSendClusterTestCluster_000221_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64U null Value"];
 
@@ -24641,7 +25484,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000204_ReadAttribute
+- (void)testSendClusterTestCluster_000222_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64U null Value"];
 
@@ -24665,7 +25508,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000205_WriteAttribute
+- (void)testSendClusterTestCluster_000223_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8S Min Value"];
 
@@ -24687,7 +25530,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000206_ReadAttribute
+- (void)testSendClusterTestCluster_000224_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8S Min Value"];
 
@@ -24712,7 +25555,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000207_WriteAttribute
+- (void)testSendClusterTestCluster_000225_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8S Invalid Value"];
 
@@ -24733,7 +25576,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000208_ReadAttribute
+- (void)testSendClusterTestCluster_000226_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8S unchanged Value"];
 
@@ -24758,7 +25601,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000209_WriteAttribute
+- (void)testSendClusterTestCluster_000227_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT8S null Value"];
 
@@ -24780,7 +25623,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000210_ReadAttribute
+- (void)testSendClusterTestCluster_000228_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT8S null Value"];
 
@@ -24804,7 +25647,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000211_WriteAttribute
+- (void)testSendClusterTestCluster_000229_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16S Min Value"];
 
@@ -24826,7 +25669,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000212_ReadAttribute
+- (void)testSendClusterTestCluster_000230_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16S Min Value"];
 
@@ -24851,7 +25694,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000213_WriteAttribute
+- (void)testSendClusterTestCluster_000231_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16S Invalid Value"];
 
@@ -24873,7 +25716,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000214_ReadAttribute
+- (void)testSendClusterTestCluster_000232_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16S unchanged Value"];
 
@@ -24898,7 +25741,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000215_WriteAttribute
+- (void)testSendClusterTestCluster_000233_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT16S null Value"];
 
@@ -24920,7 +25763,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000216_ReadAttribute
+- (void)testSendClusterTestCluster_000234_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT16S null Value"];
 
@@ -24944,7 +25787,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000217_WriteAttribute
+- (void)testSendClusterTestCluster_000235_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32S Min Value"];
 
@@ -24966,7 +25809,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000218_ReadAttribute
+- (void)testSendClusterTestCluster_000236_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32S Min Value"];
 
@@ -24991,7 +25834,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000219_WriteAttribute
+- (void)testSendClusterTestCluster_000237_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32S Invalid Value"];
 
@@ -25013,7 +25856,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000220_ReadAttribute
+- (void)testSendClusterTestCluster_000238_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32S unchanged Value"];
 
@@ -25038,7 +25881,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000221_WriteAttribute
+- (void)testSendClusterTestCluster_000239_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT32S null Value"];
 
@@ -25060,7 +25903,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000222_ReadAttribute
+- (void)testSendClusterTestCluster_000240_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT32S null Value"];
 
@@ -25084,7 +25927,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000223_WriteAttribute
+- (void)testSendClusterTestCluster_000241_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64S Min Value"];
 
@@ -25106,7 +25949,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000224_ReadAttribute
+- (void)testSendClusterTestCluster_000242_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64S Min Value"];
 
@@ -25131,7 +25974,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000225_WriteAttribute
+- (void)testSendClusterTestCluster_000243_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64S Invalid Value"];
 
@@ -25153,7 +25996,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000226_ReadAttribute
+- (void)testSendClusterTestCluster_000244_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64S unchanged Value"];
 
@@ -25178,7 +26021,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000227_WriteAttribute
+- (void)testSendClusterTestCluster_000245_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_INT64S null Value"];
 
@@ -25200,7 +26043,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000228_ReadAttribute
+- (void)testSendClusterTestCluster_000246_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_INT64S null Value"];
 
@@ -25224,7 +26067,475 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000229_WriteAttribute
+- (void)testSendClusterTestCluster_000247_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SINGLE medium Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id nullableFloatSingleArgument;
+    nullableFloatSingleArgument = [NSNumber numberWithFloat:0.1f];
+    [cluster writeAttributeNullableFloatSingleWithValue:nullableFloatSingleArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute NULLABLE_SINGLE medium Value Error: %@", err);
+
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000248_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SINGLE medium Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNullableFloatSingleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute NULLABLE_SINGLE medium Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
+            XCTAssertEqual([actualValue floatValue], 0.1f);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000249_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SINGLE largest Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id nullableFloatSingleArgument;
+    nullableFloatSingleArgument = [NSNumber numberWithFloat:INFINITY];
+    [cluster writeAttributeNullableFloatSingleWithValue:nullableFloatSingleArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute NULLABLE_SINGLE largest Value Error: %@", err);
+
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000250_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SINGLE largest Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNullableFloatSingleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute NULLABLE_SINGLE largest Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
+            XCTAssertEqual([actualValue floatValue], INFINITY);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000251_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SINGLE smallest Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id nullableFloatSingleArgument;
+    nullableFloatSingleArgument = [NSNumber numberWithFloat:-INFINITY];
+    [cluster writeAttributeNullableFloatSingleWithValue:nullableFloatSingleArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute NULLABLE_SINGLE smallest Value Error: %@", err);
+
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000252_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SINGLE smallest Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNullableFloatSingleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute NULLABLE_SINGLE smallest Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
+            XCTAssertEqual([actualValue floatValue], -INFINITY);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000253_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SINGLE null Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id nullableFloatSingleArgument;
+    nullableFloatSingleArgument = nil;
+    [cluster writeAttributeNullableFloatSingleWithValue:nullableFloatSingleArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute NULLABLE_SINGLE null Value Error: %@", err);
+
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000254_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SINGLE null Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNullableFloatSingleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute NULLABLE_SINGLE null Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertTrue(actualValue == nil);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000255_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_SINGLE 0 Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id nullableFloatSingleArgument;
+    nullableFloatSingleArgument = [NSNumber numberWithFloat:0.0f];
+    [cluster writeAttributeNullableFloatSingleWithValue:nullableFloatSingleArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute NULLABLE_SINGLE 0 Value Error: %@", err);
+
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000256_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_SINGLE 0 Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNullableFloatSingleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute NULLABLE_SINGLE 0 Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
+            XCTAssertEqual([actualValue floatValue], 0.0f);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000257_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_DOUBLE medium Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id nullableFloatDoubleArgument;
+    nullableFloatDoubleArgument = [NSNumber numberWithDouble:0.1234567890123];
+    [cluster writeAttributeNullableFloatDoubleWithValue:nullableFloatDoubleArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute NULLABLE_DOUBLE medium Value Error: %@", err);
+
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000258_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_DOUBLE medium Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNullableFloatDoubleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute NULLABLE_DOUBLE medium Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
+            XCTAssertEqual([actualValue doubleValue], 0.1234567890123);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000259_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_DOUBLE largest Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id nullableFloatDoubleArgument;
+    nullableFloatDoubleArgument = [NSNumber numberWithDouble:INFINITY];
+    [cluster writeAttributeNullableFloatDoubleWithValue:nullableFloatDoubleArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute NULLABLE_DOUBLE largest Value Error: %@", err);
+
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000260_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_DOUBLE largest Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNullableFloatDoubleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute NULLABLE_DOUBLE largest Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
+            XCTAssertEqual([actualValue doubleValue], INFINITY);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000261_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_DOUBLE smallest Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id nullableFloatDoubleArgument;
+    nullableFloatDoubleArgument = [NSNumber numberWithDouble:-INFINITY];
+    [cluster writeAttributeNullableFloatDoubleWithValue:nullableFloatDoubleArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute NULLABLE_DOUBLE smallest Value Error: %@", err);
+
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000262_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_DOUBLE smallest Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNullableFloatDoubleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute NULLABLE_DOUBLE smallest Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
+            XCTAssertEqual([actualValue doubleValue], -INFINITY);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000263_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_DOUBLE null Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id nullableFloatDoubleArgument;
+    nullableFloatDoubleArgument = nil;
+    [cluster writeAttributeNullableFloatDoubleWithValue:nullableFloatDoubleArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute NULLABLE_DOUBLE null Value Error: %@", err);
+
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000264_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_DOUBLE null Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNullableFloatDoubleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute NULLABLE_DOUBLE null Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertTrue(actualValue == nil);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000265_WriteAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_DOUBLE 0 Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    id nullableFloatDoubleArgument;
+    nullableFloatDoubleArgument = [NSNumber numberWithDouble:0];
+    [cluster writeAttributeNullableFloatDoubleWithValue:nullableFloatDoubleArgument
+                                      completionHandler:^(NSError * _Nullable err) {
+                                          NSLog(@"Write attribute NULLABLE_DOUBLE 0 Value Error: %@", err);
+
+                                          XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                          [expectation fulfill];
+                                      }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000266_ReadAttribute
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_DOUBLE 0 Value"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    [cluster readAttributeNullableFloatDoubleWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"Read attribute NULLABLE_DOUBLE 0 Value Error: %@", err);
+
+        XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+        {
+            id actualValue = value;
+            XCTAssertFalse(actualValue == nil);
+            XCTAssertEqual([actualValue doubleValue], 0);
+        }
+
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000267_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM8 Max Value"];
 
@@ -25246,7 +26557,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000230_ReadAttribute
+- (void)testSendClusterTestCluster_000268_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM8 Max Value"];
 
@@ -25271,7 +26582,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000231_WriteAttribute
+- (void)testSendClusterTestCluster_000269_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM8 Invalid Value"];
 
@@ -25292,7 +26603,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000232_ReadAttribute
+- (void)testSendClusterTestCluster_000270_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM8 unchanged Value"];
 
@@ -25317,7 +26628,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000233_WriteAttribute
+- (void)testSendClusterTestCluster_000271_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM8 null Value"];
 
@@ -25339,7 +26650,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000234_ReadAttribute
+- (void)testSendClusterTestCluster_000272_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM8 null Value"];
 
@@ -25363,7 +26674,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000235_WriteAttribute
+- (void)testSendClusterTestCluster_000273_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM16 Max Value"];
 
@@ -25385,7 +26696,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000236_ReadAttribute
+- (void)testSendClusterTestCluster_000274_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM16 Max Value"];
 
@@ -25410,7 +26721,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000237_WriteAttribute
+- (void)testSendClusterTestCluster_000275_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM16 Invalid Value"];
 
@@ -25432,7 +26743,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000238_ReadAttribute
+- (void)testSendClusterTestCluster_000276_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM16 unchanged Value"];
 
@@ -25457,7 +26768,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000239_WriteAttribute
+- (void)testSendClusterTestCluster_000277_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_ENUM16 null Value"];
 
@@ -25479,7 +26790,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000240_ReadAttribute
+- (void)testSendClusterTestCluster_000278_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_ENUM16 null Value"];
 
@@ -25503,7 +26814,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000241_ReadAttribute
+- (void)testSendClusterTestCluster_000279_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_OCTET_STRING Default Value"];
 
@@ -25528,7 +26839,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000242_WriteAttribute
+- (void)testSendClusterTestCluster_000280_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_OCTET_STRING"];
 
@@ -25550,7 +26861,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000243_ReadAttribute
+- (void)testSendClusterTestCluster_000281_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_OCTET_STRING"];
 
@@ -25575,7 +26886,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000244_WriteAttribute
+- (void)testSendClusterTestCluster_000282_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_OCTET_STRING"];
 
@@ -25597,7 +26908,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000245_ReadAttribute
+- (void)testSendClusterTestCluster_000283_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_OCTET_STRING"];
 
@@ -25621,7 +26932,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000246_WriteAttribute
+- (void)testSendClusterTestCluster_000284_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_OCTET_STRING"];
 
@@ -25643,7 +26954,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000247_ReadAttribute
+- (void)testSendClusterTestCluster_000285_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_OCTET_STRING"];
 
@@ -25668,7 +26979,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000248_ReadAttribute
+- (void)testSendClusterTestCluster_000286_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_CHAR_STRING Default Value"];
 
@@ -25693,7 +27004,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000249_WriteAttribute
+- (void)testSendClusterTestCluster_000287_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_CHAR_STRING"];
 
@@ -25715,7 +27026,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000250_ReadAttribute
+- (void)testSendClusterTestCluster_000288_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_CHAR_STRING"];
 
@@ -25740,7 +27051,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000251_WriteAttribute
+- (void)testSendClusterTestCluster_000289_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_CHAR_STRING - Value too long"];
 
@@ -25762,7 +27073,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000252_ReadAttribute
+- (void)testSendClusterTestCluster_000290_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_CHAR_STRING"];
 
@@ -25786,7 +27097,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000253_WriteAttribute
+- (void)testSendClusterTestCluster_000291_WriteAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Write attribute NULLABLE_CHAR_STRING - Empty"];
 
@@ -25808,7 +27119,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000254_ReadAttribute
+- (void)testSendClusterTestCluster_000292_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute NULLABLE_CHAR_STRING"];
 
@@ -25833,7 +27144,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000255_ReadAttribute
+- (void)testSendClusterTestCluster_000293_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute from nonexistent endpoint."];
 
@@ -25851,7 +27162,7 @@ CHIPDevice * GetConnectedDevice()
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestCluster_000256_ReadAttribute
+- (void)testSendClusterTestCluster_000294_ReadAttribute
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Read attribute from nonexistent cluster."];
 
@@ -25866,6 +27177,52 @@ CHIPDevice * GetConnectedDevice()
         XCTAssertNotEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
         [expectation fulfill];
     }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000295_TestSimpleOptionalArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send a command that takes an optional parameter but do not set it."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams alloc] init];
+    [cluster
+        testSimpleOptionalArgumentRequestWithParams:params
+                                  completionHandler:^(NSError * _Nullable err) {
+                                      NSLog(@"Send a command that takes an optional parameter but do not set it. Error: %@", err);
+
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], EMBER_ZCL_STATUS_INVALID_VALUE);
+                                      [expectation fulfill];
+                                  }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestCluster_000296_TestSimpleOptionalArgumentRequest
+{
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"Send a command that takes an optional parameter but do not set it."];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestTestCluster * cluster = [[CHIPTestTestCluster alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams alloc] init];
+    params.arg1 = [NSNumber numberWithBool:1];
+    [cluster
+        testSimpleOptionalArgumentRequestWithParams:params
+                                  completionHandler:^(NSError * _Nullable err) {
+                                      NSLog(@"Send a command that takes an optional parameter but do not set it. Error: %@", err);
+
+                                      XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                                      [expectation fulfill];
+                                  }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -28770,7 +30127,110 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupsCluster_000006_ViewGroup
+- (void)testSendClusterTestGroupsCluster_000006_GetGroupMembership
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Get Group Membership 1 (all)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterGetGroupMembershipParams alloc] init];
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        params.groupList = temp_0;
+    }
+    [cluster getGroupMembershipWithParams:params
+                        completionHandler:^(
+                            CHIPGroupsClusterGetGroupMembershipResponseParams * _Nullable values, NSError * _Nullable err) {
+                            NSLog(@"Get Group Membership 1 (all) Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                            {
+                                id actualValue = values.capacity;
+                                XCTAssertEqual([actualValue unsignedCharValue], 255);
+                            }
+                            {
+                                id actualValue = values.groupList;
+                                XCTAssertEqual([actualValue count], 1);
+                                XCTAssertEqual([actualValue[0] unsignedShortValue], 1U);
+                            }
+
+                            [expectation fulfill];
+                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupsCluster_000007_AddGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Add Group 2 (new)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterAddGroupParams alloc] init];
+    params.groupId = [NSNumber numberWithUnsignedShort:4369U];
+    params.groupName = @"Group #2";
+    [cluster addGroupWithParams:params
+              completionHandler:^(CHIPGroupsClusterAddGroupResponseParams * _Nullable values, NSError * _Nullable err) {
+                  NSLog(@"Add Group 2 (new) Error: %@", err);
+
+                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                  {
+                      id actualValue = values.status;
+                      XCTAssertEqual([actualValue unsignedCharValue], 0);
+                  }
+                  {
+                      id actualValue = values.groupId;
+                      XCTAssertEqual([actualValue unsignedShortValue], 4369U);
+                  }
+
+                  [expectation fulfill];
+              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupsCluster_000008_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 2 (new)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
+    params.groupId = [NSNumber numberWithUnsignedShort:4369U];
+    [cluster viewGroupWithParams:params
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
+                   NSLog(@"View Group 2 (new) Error: %@", err);
+
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                   {
+                       id actualValue = values.status;
+                       XCTAssertEqual([actualValue unsignedCharValue], 0);
+                   }
+                   {
+                       id actualValue = values.groupId;
+                       XCTAssertEqual([actualValue unsignedShortValue], 4369U);
+                   }
+                   {
+                       id actualValue = values.groupName;
+                       XCTAssertTrue([actualValue isEqualToString:@"Group #2"]);
+                   }
+
+                   [expectation fulfill];
+               }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupsCluster_000009_ViewGroup
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 3 (not found)"];
 
@@ -28801,7 +30261,39 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupsCluster_000007_ViewGroup
+- (void)testSendClusterTestGroupsCluster_000010_AddGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Add Group 3 (new)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterAddGroupParams alloc] init];
+    params.groupId = [NSNumber numberWithUnsignedShort:32767U];
+    params.groupName = @"Group #3";
+    [cluster addGroupWithParams:params
+              completionHandler:^(CHIPGroupsClusterAddGroupResponseParams * _Nullable values, NSError * _Nullable err) {
+                  NSLog(@"Add Group 3 (new) Error: %@", err);
+
+                  XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                  {
+                      id actualValue = values.status;
+                      XCTAssertEqual([actualValue unsignedCharValue], 0);
+                  }
+                  {
+                      id actualValue = values.groupId;
+                      XCTAssertEqual([actualValue unsignedShortValue], 32767U);
+                  }
+
+                  [expectation fulfill];
+              }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupsCluster_000011_ViewGroup
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 1 (existing)"];
 
@@ -28836,7 +30328,116 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupsCluster_000008_RemoveGroup
+- (void)testSendClusterTestGroupsCluster_000012_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 2 (existing)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
+    params.groupId = [NSNumber numberWithUnsignedShort:4369U];
+    [cluster viewGroupWithParams:params
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
+                   NSLog(@"View Group 2 (existing) Error: %@", err);
+
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                   {
+                       id actualValue = values.status;
+                       XCTAssertEqual([actualValue unsignedCharValue], 0);
+                   }
+                   {
+                       id actualValue = values.groupId;
+                       XCTAssertEqual([actualValue unsignedShortValue], 4369U);
+                   }
+                   {
+                       id actualValue = values.groupName;
+                       XCTAssertTrue([actualValue isEqualToString:@"Group #2"]);
+                   }
+
+                   [expectation fulfill];
+               }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupsCluster_000013_GetGroupMembership
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Get Group Membership 2"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterGetGroupMembershipParams alloc] init];
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [NSNumber numberWithUnsignedShort:2U];
+        temp_0[1] = [NSNumber numberWithUnsignedShort:3U];
+        temp_0[2] = [NSNumber numberWithUnsignedShort:32767U];
+        params.groupList = temp_0;
+    }
+    [cluster getGroupMembershipWithParams:params
+                        completionHandler:^(
+                            CHIPGroupsClusterGetGroupMembershipResponseParams * _Nullable values, NSError * _Nullable err) {
+                            NSLog(@"Get Group Membership 2 Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                            {
+                                id actualValue = values.capacity;
+                                XCTAssertEqual([actualValue unsignedCharValue], 255);
+                            }
+                            {
+                                id actualValue = values.groupList;
+                                XCTAssertEqual([actualValue count], 1);
+                                XCTAssertEqual([actualValue[0] unsignedShortValue], 32767U);
+                            }
+
+                            [expectation fulfill];
+                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupsCluster_000014_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 3 (new)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
+    params.groupId = [NSNumber numberWithUnsignedShort:32767U];
+    [cluster viewGroupWithParams:params
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
+                   NSLog(@"View Group 3 (new) Error: %@", err);
+
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                   {
+                       id actualValue = values.status;
+                       XCTAssertEqual([actualValue unsignedCharValue], 0);
+                   }
+                   {
+                       id actualValue = values.groupId;
+                       XCTAssertEqual([actualValue unsignedShortValue], 32767U);
+                   }
+                   {
+                       id actualValue = values.groupName;
+                       XCTAssertTrue([actualValue isEqualToString:@"Group #3"]);
+                   }
+
+                   [expectation fulfill];
+               }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupsCluster_000015_RemoveGroup
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Remove Group 0 (invalid)"];
 
@@ -28867,7 +30468,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupsCluster_000009_RemoveGroup
+- (void)testSendClusterTestGroupsCluster_000016_RemoveGroup
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Remove Group 4 (not found)"];
 
@@ -28898,7 +30499,38 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupsCluster_000010_ViewGroup
+- (void)testSendClusterTestGroupsCluster_000017_RemoveGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Remove Group 2 (existing)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterRemoveGroupParams alloc] init];
+    params.groupId = [NSNumber numberWithUnsignedShort:4369U];
+    [cluster removeGroupWithParams:params
+                 completionHandler:^(CHIPGroupsClusterRemoveGroupResponseParams * _Nullable values, NSError * _Nullable err) {
+                     NSLog(@"Remove Group 2 (existing) Error: %@", err);
+
+                     XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                     {
+                         id actualValue = values.status;
+                         XCTAssertEqual([actualValue unsignedCharValue], 0);
+                     }
+                     {
+                         id actualValue = values.groupId;
+                         XCTAssertEqual([actualValue unsignedShortValue], 4369U);
+                     }
+
+                     [expectation fulfill];
+                 }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupsCluster_000018_ViewGroup
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 1 (not removed)"];
 
@@ -28933,7 +30565,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupsCluster_000011_ViewGroup
+- (void)testSendClusterTestGroupsCluster_000019_ViewGroup
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 2 (removed)"];
 
@@ -28964,7 +30596,82 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupsCluster_000012_RemoveAllGroups
+- (void)testSendClusterTestGroupsCluster_000020_ViewGroup
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 3 (not removed)"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterViewGroupParams alloc] init];
+    params.groupId = [NSNumber numberWithUnsignedShort:32767U];
+    [cluster viewGroupWithParams:params
+               completionHandler:^(CHIPGroupsClusterViewGroupResponseParams * _Nullable values, NSError * _Nullable err) {
+                   NSLog(@"View Group 3 (not removed) Error: %@", err);
+
+                   XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                   {
+                       id actualValue = values.status;
+                       XCTAssertEqual([actualValue unsignedCharValue], 0);
+                   }
+                   {
+                       id actualValue = values.groupId;
+                       XCTAssertEqual([actualValue unsignedShortValue], 32767U);
+                   }
+                   {
+                       id actualValue = values.groupName;
+                       XCTAssertTrue([actualValue isEqualToString:@"Group #3"]);
+                   }
+
+                   [expectation fulfill];
+               }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupsCluster_000021_GetGroupMembership
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Get Group Membership 3"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterGetGroupMembershipParams alloc] init];
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [NSNumber numberWithUnsignedShort:1U];
+        temp_0[1] = [NSNumber numberWithUnsignedShort:2U];
+        temp_0[2] = [NSNumber numberWithUnsignedShort:4369U];
+        temp_0[3] = [NSNumber numberWithUnsignedShort:3U];
+        params.groupList = temp_0;
+    }
+    [cluster getGroupMembershipWithParams:params
+                        completionHandler:^(
+                            CHIPGroupsClusterGetGroupMembershipResponseParams * _Nullable values, NSError * _Nullable err) {
+                            NSLog(@"Get Group Membership 3 Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                            {
+                                id actualValue = values.capacity;
+                                XCTAssertEqual([actualValue unsignedCharValue], 255);
+                            }
+                            {
+                                id actualValue = values.groupList;
+                                XCTAssertEqual([actualValue count], 1);
+                                XCTAssertEqual([actualValue[0] unsignedShortValue], 1U);
+                            }
+
+                            [expectation fulfill];
+                        }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupsCluster_000022_RemoveAllGroups
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"Remove All"];
 
@@ -28983,7 +30690,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupsCluster_000013_ViewGroup
+- (void)testSendClusterTestGroupsCluster_000023_ViewGroup
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 1 (removed)"];
 
@@ -29014,7 +30721,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupsCluster_000014_ViewGroup
+- (void)testSendClusterTestGroupsCluster_000024_ViewGroup
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 2 (still removed)"];
 
@@ -29045,7 +30752,7 @@ uint16_t readAttributeVendorIdDefaultValue;
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
-- (void)testSendClusterTestGroupsCluster_000015_ViewGroup
+- (void)testSendClusterTestGroupsCluster_000025_ViewGroup
 {
     XCTestExpectation * expectation = [self expectationWithDescription:@"View Group 3 (removed)"];
 
@@ -29073,6 +30780,46 @@ uint16_t readAttributeVendorIdDefaultValue;
 
                    [expectation fulfill];
                }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+- (void)testSendClusterTestGroupsCluster_000026_GetGroupMembership
+{
+    XCTestExpectation * expectation = [self expectationWithDescription:@"Get Group Membership 4"];
+
+    CHIPDevice * device = GetConnectedDevice();
+    dispatch_queue_t queue = dispatch_get_main_queue();
+    CHIPTestGroups * cluster = [[CHIPTestGroups alloc] initWithDevice:device endpoint:1 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    __auto_type * params = [[CHIPGroupsClusterGetGroupMembershipParams alloc] init];
+    {
+        NSMutableArray * temp_0 = [[NSMutableArray alloc] init];
+        temp_0[0] = [NSNumber numberWithUnsignedShort:1U];
+        temp_0[1] = [NSNumber numberWithUnsignedShort:2U];
+        temp_0[2] = [NSNumber numberWithUnsignedShort:4369U];
+        temp_0[3] = [NSNumber numberWithUnsignedShort:3U];
+        temp_0[4] = [NSNumber numberWithUnsignedShort:32767U];
+        params.groupList = temp_0;
+    }
+    [cluster getGroupMembershipWithParams:params
+                        completionHandler:^(
+                            CHIPGroupsClusterGetGroupMembershipResponseParams * _Nullable values, NSError * _Nullable err) {
+                            NSLog(@"Get Group Membership 4 Error: %@", err);
+
+                            XCTAssertEqual([CHIPErrorTestUtils errorToZCLErrorCode:err], 0);
+
+                            {
+                                id actualValue = values.capacity;
+                                XCTAssertEqual([actualValue unsignedCharValue], 255);
+                            }
+                            {
+                                id actualValue = values.groupList;
+                                XCTAssertEqual([actualValue count], 0);
+                            }
+
+                            [expectation fulfill];
+                        }];
 
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
@@ -32860,54 +34607,6 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
     [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
 }
 
-- (void)testSendClusterDoorLockReadAttributeLockStateWithCompletionHandler
-{
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    XCTestExpectation * connectedExpectation =
-        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-    WaitForCommissionee(connectedExpectation, queue);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-
-    CHIPDevice * device = GetConnectedDevice();
-    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    XCTestExpectation * expectation = [self expectationWithDescription:@"DoorLockReadAttributeLockStateWithCompletionHandler"];
-
-    [cluster readAttributeLockStateWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"DoorLock LockState Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
-- (void)testSendClusterDoorLockReadAttributeLockTypeWithCompletionHandler
-{
-    dispatch_queue_t queue = dispatch_get_main_queue();
-
-    XCTestExpectation * connectedExpectation =
-        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
-    WaitForCommissionee(connectedExpectation, queue);
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-
-    CHIPDevice * device = GetConnectedDevice();
-    CHIPDoorLock * cluster = [[CHIPDoorLock alloc] initWithDevice:device endpoint:1 queue:queue];
-    XCTAssertNotNil(cluster);
-
-    XCTestExpectation * expectation = [self expectationWithDescription:@"DoorLockReadAttributeLockTypeWithCompletionHandler"];
-
-    [cluster readAttributeLockTypeWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
-        NSLog(@"DoorLock LockType Error: %@", err);
-        XCTAssertEqual(err.code, 0);
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
-}
-
 - (void)testSendClusterDoorLockReadAttributeActuatorEnabledWithCompletionHandler
 {
     dispatch_queue_t queue = dispatch_get_main_queue();
@@ -33797,6 +35496,56 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
 
     [cluster readAttributeBasicCommissioningInfoListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"GeneralCommissioning BasicCommissioningInfoList Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterGeneralCommissioningReadAttributeRegulatoryConfigWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPGeneralCommissioning * cluster = [[CHIPGeneralCommissioning alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"GeneralCommissioningReadAttributeRegulatoryConfigWithCompletionHandler"];
+
+    [cluster readAttributeRegulatoryConfigWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"GeneralCommissioning RegulatoryConfig Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterGeneralCommissioningReadAttributeLocationCapabilityWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPGeneralCommissioning * cluster = [[CHIPGeneralCommissioning alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"GeneralCommissioningReadAttributeLocationCapabilityWithCompletionHandler"];
+
+    [cluster readAttributeLocationCapabilityWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"GeneralCommissioning LocationCapability Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];
@@ -40044,6 +41793,31 @@ bool testSendClusterTestSubscribe_OnOff_000002_WaitForReport_Fulfilled = false;
 
     [cluster readAttributeActiveNetworkFaultsListWithCompletionHandler:^(NSArray * _Nullable value, NSError * _Nullable err) {
         NSLog(@"ThreadNetworkDiagnostics ActiveNetworkFaultsList Error: %@", err);
+        XCTAssertEqual(err.code, 0);
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+}
+
+- (void)testSendClusterThreadNetworkDiagnosticsReadAttributeFeatureMapWithCompletionHandler
+{
+    dispatch_queue_t queue = dispatch_get_main_queue();
+
+    XCTestExpectation * connectedExpectation =
+        [self expectationWithDescription:@"Wait for the commissioned device to be retrieved"];
+    WaitForCommissionee(connectedExpectation, queue);
+    [self waitForExpectationsWithTimeout:kTimeoutInSeconds handler:nil];
+
+    CHIPDevice * device = GetConnectedDevice();
+    CHIPThreadNetworkDiagnostics * cluster = [[CHIPThreadNetworkDiagnostics alloc] initWithDevice:device endpoint:0 queue:queue];
+    XCTAssertNotNil(cluster);
+
+    XCTestExpectation * expectation =
+        [self expectationWithDescription:@"ThreadNetworkDiagnosticsReadAttributeFeatureMapWithCompletionHandler"];
+
+    [cluster readAttributeFeatureMapWithCompletionHandler:^(NSNumber * _Nullable value, NSError * _Nullable err) {
+        NSLog(@"ThreadNetworkDiagnostics FeatureMap Error: %@", err);
         XCTAssertEqual(err.code, 0);
         [expectation fulfill];
     }];

@@ -39,8 +39,7 @@
 namespace chip {
 namespace Messaging {
 
-ReliableMessageContext::ReliableMessageContext() : mConfig(gDefaultMRPConfig), mNextAckTimeTick(0), mPendingPeerAckMessageCounter(0)
-{}
+ReliableMessageContext::ReliableMessageContext() : mNextAckTime(0), mPendingPeerAckMessageCounter(0) {}
 
 bool ReliableMessageContext::AutoRequestAck() const
 {
@@ -108,17 +107,14 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
 
     if (IsAckPending())
     {
-        // Send the acknowledgment as a SecureChannel::StandStandaloneAck message
         err = SendStandaloneAckMessage();
 
         if (err == CHIP_NO_ERROR)
         {
-#if !defined(NDEBUG)
             ChipLogDetail(ExchangeManager,
                           "Flushed pending ack for MessageCounter:" ChipLogFormatMessageCounter
                           " on exchange " ChipLogFormatExchange,
                           mPendingPeerAckMessageCounter, ChipLogValueExchange(GetExchangeContext()));
-#endif
         }
     }
 
@@ -128,16 +124,6 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
 bool ReliableMessageContext::HasPiggybackAckPending() const
 {
     return mFlags.Has(Flags::kFlagAckMessageCounterIsValid);
-}
-
-uint64_t ReliableMessageContext::GetIdleRetransmitTimeoutTick()
-{
-    return mConfig.mIdleRetransTimeoutTick;
-}
-
-uint64_t ReliableMessageContext::GetActiveRetransmitTimeoutTick()
-{
-    return mConfig.mActiveRetransTimeoutTick;
 }
 
 /**
@@ -156,20 +142,16 @@ void ReliableMessageContext::HandleRcvdAck(uint32_t ackMessageCounter)
     {
         // This can happen quite easily due to a packet with a piggyback ack
         // being lost and retransmitted.
-#if !defined(NDEBUG)
         ChipLogDetail(ExchangeManager,
                       "CHIP MessageCounter:" ChipLogFormatMessageCounter " not in RetransTable on exchange " ChipLogFormatExchange,
                       ackMessageCounter, ChipLogValueExchange(GetExchangeContext()));
-#endif
     }
     else
     {
-#if !defined(NDEBUG)
         ChipLogDetail(ExchangeManager,
                       "Removed CHIP MessageCounter:" ChipLogFormatMessageCounter
                       " from RetransTable on exchange " ChipLogFormatExchange,
                       ackMessageCounter, ChipLogValueExchange(GetExchangeContext()));
-#endif
     }
 }
 
@@ -179,9 +161,6 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t messageCounter, BitFl
     // Skip processing ack if drop ack debug is enabled.
     if (ShouldDropAckDebug())
         return CHIP_NO_ERROR;
-
-    // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-    GetReliableMessageMgr()->ExpireTicks();
 
     CHIP_ERROR err = HandleNeedsAckInner(messageCounter, messageFlags);
 
@@ -198,13 +177,11 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
     // should not wait for one and just immediately send a standalone ack.
     if (messageFlags.Has(MessageFlagValues::kDuplicateMessage))
     {
-#if !defined(NDEBUG)
         ChipLogDetail(ExchangeManager,
                       "Forcing tx of solitary ack for duplicate MessageCounter:" ChipLogFormatMessageCounter
                       " on exchange " ChipLogFormatExchange,
                       messageCounter, ChipLogValueExchange(GetExchangeContext()));
-#endif
-        // Is there pending ack for a different message counter.
+
         bool wasAckPending = IsAckPending() && mPendingPeerAckMessageCounter != messageCounter;
 
         bool messageCounterWasValid = HasPiggybackAckPending();
@@ -212,13 +189,9 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
         // Temporary store currently pending ack message counter (even if there is none).
         uint32_t tempAckMessageCounter = mPendingPeerAckMessageCounter;
 
-        // Set the pending ack message counter.
         SetPendingPeerAckMessageCounter(messageCounter);
-
-        // Send the Ack for the duplication message in a SecureChannel::StandaloneAck message.
         CHIP_ERROR err = SendStandaloneAckMessage();
 
-        // If there was pending ack for a different message counter.
         if (wasAckPending)
         {
             // Restore previously pending ack message counter.
@@ -242,21 +215,18 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAckInner(uint32_t messageCounter, 
     {
         if (IsAckPending())
         {
-#if !defined(NDEBUG)
             ChipLogDetail(ExchangeManager,
                           "Pending ack queue full; forcing tx of solitary ack for MessageCounter:" ChipLogFormatMessageCounter
                           " on exchange " ChipLogFormatExchange,
                           mPendingPeerAckMessageCounter, ChipLogValueExchange(GetExchangeContext()));
-#endif
             // Send the Ack for the currently pending Ack in a SecureChannel::StandaloneAck message.
             ReturnErrorOnFailure(SendStandaloneAckMessage());
         }
 
         // Replace the Pending ack message counter.
         SetPendingPeerAckMessageCounter(messageCounter);
-        mNextAckTimeTick = static_cast<uint16_t>(
-            CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK +
-            GetReliableMessageMgr()->GetTickCounterFromTimeDelta(System::SystemClock().GetMonotonicTimestamp()));
+        using namespace System::Clock::Literals;
+        mNextAckTime = System::SystemClock().GetMonotonicTimestamp() + CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT;
         return CHIP_NO_ERROR;
     }
 }
@@ -271,11 +241,9 @@ CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
     }
 
     // Send the null message
-#if !defined(NDEBUG)
     ChipLogDetail(ExchangeManager,
                   "Sending Standalone Ack for MessageCounter:" ChipLogFormatMessageCounter " on exchange " ChipLogFormatExchange,
                   mPendingPeerAckMessageCounter, ChipLogValueExchange(GetExchangeContext()));
-#endif
 
     CHIP_ERROR err = GetExchangeContext()->SendMessage(Protocols::SecureChannel::MsgType::StandaloneAck, std::move(msgBuf),
                                                        BitFlags<SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });

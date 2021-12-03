@@ -27,6 +27,8 @@
 
 #pragma once
 
+namespace chip {
+
 // A class that abstracts the image download functionality from the particular
 // protocol used for that (BDX or possibly HTTPS)
 class OTADownloader
@@ -38,7 +40,7 @@ public:
     void virtual BeginDownload(){};
 
     // Platform calls this method upon the completion of PrepareDownload() processing
-    void virtual OnPreparedForDownload(){};
+    void virtual OnPreparedForDownload(CHIP_ERROR status){};
 
     // Action parameter type for the OnBlockProcessed()
     enum BlockActionType
@@ -48,10 +50,10 @@ public:
     };
 
     // Platform calls this method upon the completion of ProcessBlock() processing
-    void virtual OnBlockProcessed(BlockActionType action){};
+    void virtual OnBlockProcessed(CHIP_ERROR status, BlockActionType action){};
 
     // A setter for the delegate class pointer
-    void SetImageProcessorDelegate(OTAImageProcessorDriver * delegate) { mImageProcessorDelegate = delegate; }
+    void SetImageProcessorDelegate(OTAImageProcessorInterface * delegate) { mImageProcessorDelegate = delegate; }
 
     // API declarations end
 
@@ -59,7 +61,7 @@ public:
     virtual ~OTADownloader() = default;
 
 private:
-    OTAImageProcessorDriver * mImageProcessorDelegate;
+    OTAImageProcessorInterface * mImageProcessorDelegate;
 };
 
 // Set the object implementing OTADownloader
@@ -67,3 +69,5 @@ void SetDownloaderInstance(OTADownloader * instance);
 
 // Get the object implementing OTADownloaderInterface
 OTADownloader * GetDownloaderInstance();
+
+} // namespace chip

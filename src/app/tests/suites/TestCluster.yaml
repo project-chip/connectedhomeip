@@ -526,6 +526,118 @@ tests:
       response:
           value: 0
 
+    # Tests for float attribute
+
+    - label: "Read attribute SINGLE Default Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 0
+
+    - label: "Write attribute SINGLE medium Value"
+      command: "writeAttribute"
+      attribute: "float_single"
+      arguments:
+          value: 0.1
+
+    - label: "Read attribute SINGLE medium Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 0.1
+
+    - label: "Write attribute SINGLE large Value"
+      command: "writeAttribute"
+      attribute: "float_single"
+      arguments:
+          value: 1.7e10
+
+    - label: "Read attribute SINGLE large Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 1.7e10
+
+    - label: "Write attribute SINGLE small Value"
+      command: "writeAttribute"
+      attribute: "float_single"
+      arguments:
+          value: 1.7e-10
+
+    - label: "Read attribute SINGLE small Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 1.7e-10
+
+    - label: "Write attribute SINGLE Default Value"
+      command: "writeAttribute"
+      attribute: "float_single"
+      arguments:
+          value: 0
+
+    - label: "Read attribute SINGLE Default Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 0
+
+    # Tests for double attribute
+
+    - label: "Read attribute DOUBLE Default Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 0
+
+    - label: "Write attribute DOUBLE medium Value"
+      command: "writeAttribute"
+      attribute: "float_double"
+      arguments:
+          value: 0.1234567890123
+
+    - label: "Read attribute DOUBLE medium Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 0.1234567890123
+
+    - label: "Write attribute DOUBLE large Value"
+      command: "writeAttribute"
+      attribute: "float_double"
+      arguments:
+          value: 1.7e200
+
+    - label: "Read attribute DOUBLE large Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 1.7e200
+
+    - label: "Write attribute DOUBLE small Value"
+      command: "writeAttribute"
+      attribute: "float_double"
+      arguments:
+          value: 1.7e-200
+
+    - label: "Read attribute DOUBLE small Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 1.7e-200
+
+    - label: "Write attribute DOUBLE Default Value"
+      command: "writeAttribute"
+      attribute: "float_double"
+      arguments:
+          value: 0
+
+    - label: "Read attribute DOUBLE Default Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 0
+
     # Tests for Enum8 attribute
 
     - label: "Read attribute ENUM8 Default Value"
@@ -870,6 +982,7 @@ tests:
                 value: 20003
               - name: "arg2"
                 value: 101
+
     # Tests for Struct
 
     - label: "Send Test Command With Struct Argument and arg1.b is true"
@@ -1941,6 +2054,130 @@ tests:
       response:
           value: null
 
+    # Tests for float attribute
+
+    - label: "Write attribute NULLABLE_SINGLE medium Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: 0.1
+
+    - label: "Read attribute NULLABLE_SINGLE medium Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: 0.1
+
+    - label: "Write attribute NULLABLE_SINGLE largest Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: Infinity
+
+    - label: "Read attribute NULLABLE_SINGLE largest Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: Infinity
+
+    - label: "Write attribute NULLABLE_SINGLE smallest Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: -Infinity
+
+    - label: "Read attribute NULLABLE_SINGLE smallest Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: -Infinity
+
+    - label: "Write attribute NULLABLE_SINGLE null Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_SINGLE null Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: null
+
+    - label: "Write attribute NULLABLE_SINGLE 0 Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_SINGLE 0 Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: 0
+
+    # Tests for double attribute
+
+    - label: "Write attribute NULLABLE_DOUBLE medium Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: 0.1234567890123
+
+    - label: "Read attribute NULLABLE_DOUBLE medium Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: 0.1234567890123
+
+    - label: "Write attribute NULLABLE_DOUBLE largest Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: Infinity
+
+    - label: "Read attribute NULLABLE_DOUBLE largest Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: Infinity
+
+    - label: "Write attribute NULLABLE_DOUBLE smallest Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: -Infinity
+
+    - label: "Read attribute NULLABLE_DOUBLE smallest Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: -Infinity
+
+    - label: "Write attribute NULLABLE_DOUBLE null Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_DOUBLE null Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: null
+
+    - label: "Write attribute NULLABLE_DOUBLE 0 Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_DOUBLE 0 Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: 0
+
     # Tests for Enum8 attribute
 
     - label: "Write attribute NULLABLE_ENUM8 Max Value"
@@ -2124,3 +2361,18 @@ tests:
       response:
           # SDK returning wrong error code here so far.
           errorWrongValue: UNSUPPORTED_CLUSTER
+
+    # Tests for command with optional arguments
+    - label:
+          "Send a command that takes an optional parameter but do not set it."
+      command: "TestSimpleOptionalArgumentRequest"
+      response:
+          error: INVALID_VALUE
+
+    - label:
+          "Send a command that takes an optional parameter but do not set it."
+      command: "TestSimpleOptionalArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 1

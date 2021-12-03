@@ -28,6 +28,8 @@ chip_build_tests = false
 
 chip_mdns = "platform"
 
+chip_detail_logging = false
+
 mbedtls_target = "${chip_root}/third_party/nxp/k32w0_sdk:mbedtls"
 openthread_external_mbedtls = mbedtls_target
 
