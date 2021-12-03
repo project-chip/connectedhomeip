@@ -30,6 +30,7 @@ const appHelper       = require('../../../../../src/app/zap-templates/templates/
 function asExpectedEndpointForCluster(clusterName)
 {
   switch (clusterName) {
+  case 'AccessControl':
   case 'AdministratorCommissioning':
   case 'Basic':
   case 'Descriptor':
