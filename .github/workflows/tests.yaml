@@ -87,7 +87,7 @@ jobs:
                      --chip-tool ./out/linux-x64-chip-tool-${BUILD_VARIANT}${CHIP_TOOL_VARIANT}/chip-tool \
                      run \
                      --iterations 1 \
-                     --all-clusters-app ./out/linux-x64-all-clusters-${BUILD_VARIANT}/chip-all-clusters-app \
+                     --all-clusters-app ./out/linux-x64-all-clusters-${GROUP_VARIANT}/chip-all-clusters-app \
                      --tv-app ./out/linux-x64-tv-app-${BUILD_VARIANT}/chip-tv-app \
                   "
             - name: Uploading core files
