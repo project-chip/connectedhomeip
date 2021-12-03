@@ -744,6 +744,17 @@ public:
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
 };
 
+class CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceConfigurationSourcesListAttributeCallback>
+{
+public:
+    CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceConfigurationSourcesListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
+};
+
 class CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge
     : public CHIPCallbackBridge<SoftwareDiagnosticsThreadMetricsListAttributeCallback>
 {

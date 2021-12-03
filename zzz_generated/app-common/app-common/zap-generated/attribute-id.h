@@ -322,6 +322,7 @@
 // Client attributes
 
 // Server attributes
+#define ZCL_SOURCES_ATTRIBUTE_ID (0x0000)
 
 // Attribute ids for cluster: Power Source
 
