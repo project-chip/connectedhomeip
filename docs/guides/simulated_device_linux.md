@@ -15,23 +15,18 @@ In order to generate specific tests for a given accessory, a
 [examples/placeholder/linux/apps/app1/tests.js](https://github.com/project-chip/connectedhomeip/tree/master/examples/placeholder/linux/apps/app1/tests.js)
 file can be added into the application directory. The tests listed there are the
 one that will be executed once the application has been commissioned.
-<br><br>Simulated Device: simulation of an application in which tests can be
+
+Simulated Device: simulation of an application in which tests can be
 added. It is defined by a [ZAP config]() file and tests can be added with a
 [YAML file](https://github.com/project-chip/connectedhomeip/tree/master/src/app/tests/suites/certification/Test_TC_DM_1_3_Simulated.yaml).
-<br><br>
 
 ### Prerequisite
-
-<hr>
 
 -   [Building Prerequisites](https://github.com/project-chip/connectedhomeip/tree/master/docs/guides/BUILDING.md#prerequisites)
 -   [Prepare For Building](https://github.com/project-chip/connectedhomeip/tree/master/docs/guides/BUILDING.md#prepare-for-building)
 
-<hr>
 
-<a name="virtualization"></a>
-
-## Generating, and Building the default Simulated App with Script
+## Generating and building the default Simulated App with Script
 
 In order to utilize the app against a commissioner or controller, the app will
 need to be specifically built.
