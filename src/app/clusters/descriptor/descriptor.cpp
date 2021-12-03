@@ -59,7 +59,7 @@ CHIP_ERROR DescriptorAttrAccess::ReadPartsAttribute(EndpointId endpoint, Attribu
 
     if (endpoint == 0x00)
     {
-        err = aEncoder.EncodeList([](auto encoder) -> CHIP_ERROR {
+        err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
             for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
             {
                 if (emberAfEndpointIndexIsEnabled(index))
