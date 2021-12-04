@@ -1388,8 +1388,15 @@
             /* Endpoint: 0, Cluster: Access Control (server) */                                                                    \
             { 0x0000, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                     \
               ZAP_EMPTY_DEFAULT() }, /* ACL */                                                                                     \
-            { 0x0001, ZAP_TYPE(ARRAY), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE) | ZAP_ATTRIBUTE_MASK(WRITABLE),                     \
-              ZAP_EMPTY_DEFAULT() },                                   /* Extension */                                             \
+            {                                                                                                                      \
+                0x0001,                                                                                                            \
+                ZAP_TYPE(ARRAY),                                                                                                   \
+                ERROR : Extension,                                                                                                 \
+                invalid size,                                                                                                      \
+                array,                                                                                                             \
+                ZAP_ATTRIBUTE_MASK(WRITABLE),                                                                                      \
+                ZAP_EMPTY_DEFAULT()                                                                                                \
+            },                                                         /* Extension */                                             \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(1) }, /* ClusterRevision */                                       \
                                                                                                                                    \
             /* Endpoint: 0, Cluster: Basic (server) */                                                                             \
@@ -2222,7 +2229,14 @@
                 0x001D, ZAP_ATTRIBUTE_INDEX(3), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
             }, /* Endpoint: 0, Cluster: Descriptor (server) */                                                                     \
             {                                                                                                                      \
-                0x001F, ZAP_ATTRIBUTE_INDEX(8), 3, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
+                0x001F,                                                                                                            \
+                ZAP_ATTRIBUTE_INDEX(8),                                                                                            \
+                3,                                                                                                                 \
+                0ERROR : Extension,                                                                                                \
+                invalid size,                                                                                                      \
+                array2,                                                                                                            \
+                ZAP_CLUSTER_MASK(SERVER),                                                                                          \
+                NULL                                                                                                               \
             }, /* Endpoint: 0, Cluster: Access Control (server) */                                                                 \
             { 0x0028,                                                                                                              \
               ZAP_ATTRIBUTE_INDEX(11),                                                                                             \
@@ -2470,7 +2484,8 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 20, 1929 }, { ZAP_CLUSTER_INDEX(20), 44, 5400 }, { ZAP_CLUSTER_INDEX(64), 3, 18 },                 \
+        { ZAP_CLUSTER_INDEX(0), 20, 50ERROR : Extension, invalid size, array2687220227060173024758572482510 },                     \
+            { ZAP_CLUSTER_INDEX(20), 44, 5400 }, { ZAP_CLUSTER_INDEX(64), 3, 18 },                                                 \
     }
 
 // Largest attribute size is needed for various buffers
@@ -2480,7 +2495,10 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (689)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (7347)
+#define ATTRIBUTE_MAX_SIZE                                                                                                         \
+    (5ERROR                                                                                                                        \
+     : Extension, invalid size,                                                                                                    \
+       array223323323332654651733258653311332217120282541142420284100020888422117281880041111222222224444444444444444444444444444444444884050042711214444448842118888818422011002222222542542212121121121122142112121122212122112111200000000011614141814221114225421210113321112412212211112212222221242121122222222222222211223341124222222222222111111421112112221255211122122122122122122122221221221211122222222222221222222222222222222221112122812332254333322542188888882254122225425422541225411233233233212211248123456781234567812481100010021110028420101122111248123456781234567812481111101122244222222222221122142000001112)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (3)
