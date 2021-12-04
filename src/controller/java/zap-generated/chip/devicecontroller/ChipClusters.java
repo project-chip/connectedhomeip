@@ -1480,7 +1480,7 @@ public class ChipClusters {
     }
 
     public static long clusterId() {
-      return Long.parseUnsignedLong("61440");
+      return Long.parseUnsignedLong("30");
     }
 
     @Override
@@ -5371,7 +5371,7 @@ public class ChipClusters {
     }
 
     public static long clusterId() {
-      return Long.parseUnsignedLong("61444");
+      return Long.parseUnsignedLong("63");
     }
 
     @Override

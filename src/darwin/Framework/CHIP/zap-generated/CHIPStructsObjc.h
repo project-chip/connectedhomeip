@@ -216,6 +216,22 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPGroupKeyManagementClusterGroupKey : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull vendorId;
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeyIndex;
+@property (strong, nonatomic) NSData * _Nonnull groupKeyRoot;
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeyEpochStartTime;
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySecurityPolicy;
+- (instancetype)init;
+@end
+
+@interface CHIPGroupKeyManagementClusterGroupState : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull vendorId;
+@property (strong, nonatomic) NSNumber * _Nonnull vendorGroupId;
+@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetIndex;
+- (instancetype)init;
+@end
+
 @interface CHIPFixedLabelClusterLabelStruct : NSObject
 @property (strong, nonatomic) NSString * _Nonnull label;
 @property (strong, nonatomic) NSString * _Nonnull value;
@@ -394,22 +410,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPTestClusterClusterTestListStructOctet : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull fabricIndex;
 @property (strong, nonatomic) NSData * _Nonnull operationalCert;
-- (instancetype)init;
-@end
-
-@interface CHIPGroupKeyManagementClusterGroupKey : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull vendorId;
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeyIndex;
-@property (strong, nonatomic) NSData * _Nonnull groupKeyRoot;
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeyEpochStartTime;
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeySecurityPolicy;
-- (instancetype)init;
-@end
-
-@interface CHIPGroupKeyManagementClusterGroupState : NSObject
-@property (strong, nonatomic) NSNumber * _Nonnull vendorId;
-@property (strong, nonatomic) NSNumber * _Nonnull vendorGroupId;
-@property (strong, nonatomic) NSNumber * _Nonnull groupKeySetIndex;
 - (instancetype)init;
 @end
 

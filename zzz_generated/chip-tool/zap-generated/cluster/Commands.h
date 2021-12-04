@@ -85,6 +85,10 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::OperationalCredentials::Structs::NOCStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::UserLabel::Structs::LabelStruct::DecodableType & value);
@@ -132,10 +136,6 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::DoubleNestedStructList::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType & value);
 
 #if CHIP_PROGRESS_LOGGING
 std::string IndentStr(size_t indent)
@@ -1268,6 +1268,87 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("VendorId", indent + 1, value.vendorId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'VendorId'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroupKeyIndex", indent + 1, value.groupKeyIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupKeyIndex'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroupKeyRoot", indent + 1, value.groupKeyRoot);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupKeyRoot'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroupKeyEpochStartTime", indent + 1, value.groupKeyEpochStartTime);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupKeyEpochStartTime'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroupKeySecurityPolicy", indent + 1, value.groupKeySecurityPolicy);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupKeySecurityPolicy'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("VendorId", indent + 1, value.vendorId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'VendorId'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("VendorGroupId", indent + 1, value.vendorGroupId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'VendorGroupId'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("GroupKeySetIndex", indent + 1, value.groupKeySetIndex);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupKeySetIndex'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
@@ -2123,87 +2204,6 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         if (err != CHIP_NO_ERROR)
         {
             ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'OperationalCert'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("VendorId", indent + 1, value.vendorId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'VendorId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("GroupKeyIndex", indent + 1, value.groupKeyIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupKeyIndex'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("GroupKeyRoot", indent + 1, value.groupKeyRoot);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupKeyRoot'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("GroupKeyEpochStartTime", indent + 1, value.groupKeyEpochStartTime);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupKeyEpochStartTime'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("GroupKeySecurityPolicy", indent + 1, value.groupKeySecurityPolicy);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupKeySecurityPolicy'",
-                            IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("VendorId", indent + 1, value.vendorId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'VendorId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("VendorGroupId", indent + 1, value.vendorGroupId);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'VendorGroupId'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("GroupKeySetIndex", indent + 1, value.groupKeySetIndex);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'GroupKeySetIndex'",
                             IndentStr(indent + 1).c_str());
             return err;
         }
@@ -4029,7 +4029,7 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | BarrierControl                                                      | 0x0103 |
 | Basic                                                               | 0x0028 |
 | BinaryInputBasic                                                    | 0x000F |
-| Binding                                                             | 0xF000 |
+| Binding                                                             | 0x001E |
 | BooleanState                                                        | 0x0045 |
 | BridgedActions                                                      | 0x0025 |
 | BridgedDeviceBasic                                                  | 0x0039 |
@@ -4044,7 +4044,7 @@ static void OnTestClusterTestSpecificResponseSuccess(
 | FlowMeasurement                                                     | 0x0404 |
 | GeneralCommissioning                                                | 0x0030 |
 | GeneralDiagnostics                                                  | 0x0033 |
-| GroupKeyManagement                                                  | 0xF004 |
+| GroupKeyManagement                                                  | 0x003F |
 | Groups                                                              | 0x0004 |
 | Identify                                                            | 0x0003 |
 | IlluminanceMeasurement                                              | 0x0400 |
@@ -8581,7 +8581,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster Binding                                                     | 0xF000 |
+| Cluster Binding                                                     | 0x001E |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Bind                                                              |   0x00 |
@@ -8608,7 +8608,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000F000) command (0x00000000) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) command (0x00000000) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -8635,7 +8635,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x0000F000) command (0x00000001) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x0000001E) command (0x00000001) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
@@ -8665,7 +8665,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF000) command (0x00) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x001E) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::BindingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -8701,7 +8701,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF000) command (0x06) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x001E) command (0x06) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::BindingCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20031,7 +20031,7 @@ private:
 };
 
 /*----------------------------------------------------------------------------*\
-| Cluster GroupKeyManagement                                          | 0xF004 |
+| Cluster GroupKeyManagement                                          | 0x003F |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 |------------------------------------------------------------------------------|
@@ -20061,7 +20061,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF004) command (0x00) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20096,7 +20096,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF004) command (0x00) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20131,7 +20131,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF004) command (0x00) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x00) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
@@ -20167,7 +20167,7 @@ public:
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0xF004) command (0x06) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x003F) command (0x06) on endpoint %" PRIu8, endpointId);
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);

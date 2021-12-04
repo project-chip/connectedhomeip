@@ -603,7 +603,7 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x000F, 0xFFFD,
                                        onReportBinaryInputBasicClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0xF000, 0xFFFD, onReportBindingClusterRevisionCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x001E, 0xFFFD, onReportBindingClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0045, 0x0000, onReportBooleanStateStateValueCallback->Cancel(),
                                        BasicAttributeFilter<BooleanAttributeCallback>);
@@ -856,7 +856,7 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0033, 0xFFFD,
                                        onReportGeneralDiagnosticsClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0xF004, 0xFFFD,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003F, 0xFFFD,
                                        onReportGroupKeyManagementClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0004, 0x0000, onReportGroupsNameSupportCallback->Cancel(),

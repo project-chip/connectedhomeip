@@ -512,7 +512,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         break;
     }
-    case 0xF004: // Group Key Management Cluster
+    case 0x003F: // Group Key Management Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
@@ -1317,7 +1317,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
             break;
         }
         break;
-    case 0xF004: // Group Key Management Cluster
+    case 0x003F: // Group Key Management Cluster
         switch (attributeId)
         {
         case 0x0000: // groups
