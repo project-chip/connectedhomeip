@@ -836,6 +836,36 @@ bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
     }
 }
 
+namespace chip {
+namespace app {
+
+Loop ForAllEndpointsWithServerCluster(ClusterId clusterId, EndpointCallback callback, intptr_t context)
+{
+    uint16_t count = emberAfEndpointCount();
+    for (uint16_t index = 0; index < count; ++index)
+    {
+        if (!emberAfEndpointIndexIsEnabled(index))
+        {
+            continue;
+        }
+
+        if (!emberAfContainsServerFromIndex(index, clusterId))
+        {
+            continue;
+        }
+
+        if (callback(emberAfEndpointFromIndex(index), context) == Loop::Break)
+        {
+            return Loop::Break;
+        }
+    }
+
+    return Loop::Finish;
+}
+
+} // namespace app
+} // namespace chip
+
 // Finds the cluster that matches endpoint, clusterId, direction, and manufacturerCode.
 EmberAfCluster * emberAfFindClusterWithMfgCode(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask,
                                                uint16_t manufacturerCode)

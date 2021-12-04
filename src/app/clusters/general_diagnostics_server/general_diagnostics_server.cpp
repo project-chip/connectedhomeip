@@ -170,26 +170,23 @@ CHIP_ERROR GeneralDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & a
 
 class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelegate, public DeviceLayer::GeneralDiagnosticsDelegate
 {
+    static void ReportAttributeOnAllEndpoints(AttributeId attribute)
+    {
+        ForAllEndpointsWithServerCluster(
+            GeneralDiagnostics::Id,
+            [](EndpointId endpoint, intptr_t context) -> Loop {
+                MatterReportingAttributeChangeCallback(endpoint, GeneralDiagnostics::Id, static_cast<AttributeId>(context));
+                return Loop::Continue;
+            },
+            attribute);
+    }
 
     // Gets called when any network interface on the Node is updated.
     void OnNetworkInfoChanged() override
     {
         ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnNetworkInfoChanged");
 
-        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
-        {
-            if (emberAfEndpointIndexIsEnabled(index))
-            {
-                EndpointId endpointId = emberAfEndpointFromIndex(index);
-
-                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
-                {
-                    // If General Diagnostics cluster is implemented on this endpoint
-                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                           GeneralDiagnostics::Attributes::NetworkInterfaces::Id);
-                }
-            }
-        }
+        ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::NetworkInterfaces::Id);
     }
 
     // Gets called when the device has been rebooted.
@@ -197,22 +194,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     {
         ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnDeviceRebooted");
 
-        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
-        {
-            if (emberAfEndpointIndexIsEnabled(index))
-            {
-                EndpointId endpointId = emberAfEndpointFromIndex(index);
-
-                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
-                {
-                    // If General Diagnostics cluster is implemented on this endpoint
-                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                           GeneralDiagnostics::Attributes::RebootCount::Id);
-                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                           GeneralDiagnostics::Attributes::BootReasons::Id);
-                }
-            }
-        }
+        ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::BootReasons::Id);
     }
 
     // Get called when the Node detects a hardware fault has been raised.
@@ -221,20 +203,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     {
         ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
-        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
-        {
-            if (emberAfEndpointIndexIsEnabled(index))
-            {
-                EndpointId endpointId = emberAfEndpointFromIndex(index);
-
-                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
-                {
-                    // If General Diagnostics cluster is implemented on this endpoint
-                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                           GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
-                }
-            }
-        }
+        ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::ActiveHardwareFaults::Id);
     }
 
     // Get called when the Node detects a radio fault has been raised.
@@ -242,20 +211,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     {
         ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
-        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
-        {
-            if (emberAfEndpointIndexIsEnabled(index))
-            {
-                EndpointId endpointId = emberAfEndpointFromIndex(index);
-
-                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
-                {
-                    // If General Diagnostics cluster is implemented on this endpoint
-                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                           GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
-                }
-            }
-        }
+        ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::ActiveRadioFaults::Id);
     }
 
     // Get called when the Node detects a network fault has been raised.
@@ -263,20 +219,7 @@ class GeneralDiagnosticsDelegate : public DeviceLayer::ConnectivityManagerDelega
     {
         ChipLogProgress(Zcl, "GeneralDiagnosticsDelegate: OnHardwareFaultsDetected");
 
-        for (uint16_t index = 0; index < emberAfEndpointCount(); index++)
-        {
-            if (emberAfEndpointIndexIsEnabled(index))
-            {
-                EndpointId endpointId = emberAfEndpointFromIndex(index);
-
-                if (emberAfContainsServer(endpointId, GeneralDiagnostics::Id))
-                {
-                    // If General Diagnostics cluster is implemented on this endpoint
-                    MatterReportingAttributeChangeCallback(endpointId, GeneralDiagnostics::Id,
-                                                           GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
-                }
-            }
-        }
+        ReportAttributeOnAllEndpoints(GeneralDiagnostics::Attributes::ActiveNetworkFaults::Id);
     }
 };
 

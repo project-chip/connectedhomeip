@@ -23,7 +23,6 @@
 #include <app/data-model/DecodableList.h>
 #include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
 #include <app/tests/suites/pics/PICSBooleanReader.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/support/BitFlags.h>
 #include <lib/support/TypeTraits.h>
 #include <lib/support/UnitTestUtils.h>

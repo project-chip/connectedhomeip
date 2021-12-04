@@ -72,6 +72,7 @@
 #include <app/util/debug-printing.h>
 #include <app/util/ember-print.h>
 
+#include <lib/support/Iterators.h>
 #include <lib/support/SafeInt.h>
 
 /** @name Attribute Storage */
@@ -157,6 +158,24 @@ bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId)
  * and will not return any other clusters that share that id.
  */
 bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
+
+namespace chip {
+namespace app {
+
+using EndpointCallback = Loop (*)(EndpointId endpoint, intptr_t context);
+
+/**
+ * @brief calls user-supplied function for every endpoint that has the given
+ * server cluster, until either the function returns Loop::Break or we run out
+ * of endpoints.
+ *
+ * Returns Loop::Break if the callee did, or Loop::Finished if we ran out of
+ * endpoints.
+ */
+Loop ForAllEndpointsWithServerCluster(ClusterId clusterId, EndpointCallback callback, intptr_t context = 0);
+
+} // namespace app
+} // namespace chip
 
 /**
  * @brief Returns true if endpoint contains cluster client.
