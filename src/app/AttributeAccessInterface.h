@@ -138,7 +138,8 @@ public:
                           const ConcreteAttributePath & aPath, DataVersion aDataVersion,
                           const AttributeEncodeState & aState = AttributeEncodeState()) :
         mAttributeReportIBsBuilder(aAttributeReportIBsBuilder),
-        mAccessingFabricIndex(aAccessingFabricIndex), mPath(aPath), mDataVersion(aDataVersion), mEncodeState(aState)
+        mAccessingFabricIndex(aAccessingFabricIndex), mPath(aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId),
+        mDataVersion(aDataVersion), mEncodeState(aState)
     {}
 
     /**
@@ -152,15 +153,7 @@ public:
         mTriedEncode = true;
         AttributeReportBuilder builder;
 
-        ReturnErrorOnFailure(builder.PrepareAttribute(
-            mAttributeReportIBsBuilder,
-            ConcreteDataAttributePath(mPath.mEndpointId, mPath.mClusterId, mPath.mAttributeId,
-                                      // We only use the two operations here to indicate if we need to encode a null list index
-                                      mCurrentEncodingListIndex == kInvalidListIndex
-                                          ? ConcreteDataAttributePath::ListOperation::NotList
-                                          : ConcreteDataAttributePath::ListOperation::AppendItem,
-                                      mCurrentEncodingListIndex),
-            mDataVersion));
+        ReturnErrorOnFailure(builder.PrepareAttribute(mAttributeReportIBsBuilder, mPath, mDataVersion));
         ReturnErrorOnFailure(builder.EncodeValue(std::forward<Ts>(aArgs)...));
 
         return builder.FinishAttribute();
@@ -184,7 +177,11 @@ public:
         // EmptyList acts as the beginning of the whole array type attribute report.
         // An empty list is encoded iff both mCurrentEncodingListIndex and mEncodeState.mCurrentEncodingListIndex are invalid
         // values. After encoding the empty list, mEncodeState.mCurrentEncodingListIndex and mCurrentEncodingListIndex are set to 0.
+        mPath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
         ReturnErrorOnFailure(EncodeEmptyList());
+        // For all elements in the list, a report with append operation will be generated. This will not be changed during encoding
+        // of each reports since the users cannot access mPath.
+        mPath.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
         ReturnErrorOnFailure(aCallback(ListEncodeHelper(*this)));
         // The Encode procedure finished without any error, clear the state.
         mEncodeState = AttributeEncodeState();
@@ -251,7 +248,7 @@ private:
     bool mTriedEncode = false;
     AttributeReportIBs::Builder & mAttributeReportIBsBuilder;
     const FabricIndex mAccessingFabricIndex;
-    const ConcreteAttributePath mPath;
+    ConcreteDataAttributePath mPath;
     DataVersion mDataVersion;
     AttributeEncodeState mEncodeState;
     ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
