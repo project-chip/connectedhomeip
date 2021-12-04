@@ -107,19 +107,17 @@ private:
     app::BufferedReadCallback mBufferedReadAdapter;
 };
 
-template <typename DecodableEventTypeInfo>
+template <typename DecodableEventType>
 class TypedReadEventCallback final : public app::ReadClient::Callback
 {
 public:
-    using OnSuccessCallbackType = std::function<void(const app::EventHeader & aEventHeader, const DecodableEventTypeInfo & aData)>;
+    using OnSuccessCallbackType = std::function<void(const app::EventHeader & aEventHeader, const DecodableEventType & aData)>;
     using OnErrorCallbackType   = std::function<void(const app::EventHeader * apEventHeader,
                                                    Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError)>;
     using OnDoneCallbackType    = std::function<void(app::ReadClient * client, TypedReadEventCallback * callback)>;
 
-    TypedReadEventCallback(ClusterId aClusterId, EventId aEventId, OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError,
-                           OnDoneCallbackType aOnDone) :
-        mClusterId(aClusterId),
-        mEventId(aEventId), mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
+    TypedReadEventCallback(OnSuccessCallbackType aOnSuccess, OnErrorCallbackType aOnError, OnDoneCallbackType aOnDone) :
+        mOnSuccess(aOnSuccess), mOnError(aOnError), mOnDone(aOnDone)
     {}
 
 private:
@@ -127,11 +125,13 @@ private:
                      const app::StatusIB * apStatus) override
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
-        DecodableEventTypeInfo value;
+        DecodableEventType value;
 
         VerifyOrExit(apData != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-        err = apReadClient->DecodeEvent(aEventHeader, value, *apData);
+        VerifyOrExit((aEventHeader.mPath.mEventId == value.GetEventId()) && (aEventHeader.mPath.mClusterId == value.GetClusterId()),
+                     CHIP_ERROR_SCHEMA_MISMATCH);
+        err = app::DataModel::Decode(*apData, value);
         SuccessOrExit(err);
 
         mOnSuccess(aEventHeader, value);
@@ -150,8 +150,6 @@ private:
 
     void OnDone(app::ReadClient * apReadClient) override { mOnDone(apReadClient, this); }
 
-    ClusterId mClusterId;
-    EventId mEventId;
     OnSuccessCallbackType mOnSuccess;
     OnErrorCallbackType mOnError;
     OnDoneCallbackType mOnDone;
