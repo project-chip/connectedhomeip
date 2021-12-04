@@ -29,9 +29,7 @@ NODE_ID = 1
 LIGHTING_ENDPOINT_ID = 1
 
 # Ignore failures decoding these attributes (e.g. not yet implemented)
-ignoreAttributeDecodeFailureList = [
-    '0/31/0', '0/31/1'
-]
+ignoreAttributeDecodeFailureList = []
 
 
 def _IgnoreAttributeDecodeFailure(path):
