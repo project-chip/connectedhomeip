@@ -83,6 +83,7 @@ BasicCHIPRegression
 baudrate
 BD
 BDX
+BDXDownloader
 BeagleBone
 befc
 bitbake
@@ -550,6 +551,7 @@ lightin
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
+LinuxOTAImageProcessor
 LinuxOTARequestorDriver
 LocalConfigDisabled
 localhost
@@ -705,6 +707,7 @@ orgs
 OTA
 OTADownloader
 OTAImageProcessorDriver
+OTAImageProcessorInterface
 OTAProviderIpAddress
 OTAProviderNodeId
 OTAProviderSerialPort
