@@ -2,6 +2,7 @@
     "version": "ZCL Test Data",
     "xmlRoot": [".", "./data-model/chip/", "./data-model/silabs/"],
     "xmlFile": [
+        "access-control-cluster.xml",
         "account-login-cluster.xml",
         "administrator-commissioning-cluster.xml",
         "application-basic-cluster.xml",

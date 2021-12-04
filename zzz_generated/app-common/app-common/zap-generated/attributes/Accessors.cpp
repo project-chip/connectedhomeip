@@ -3823,6 +3823,12 @@ namespace Attributes {
 } // namespace Attributes
 } // namespace Descriptor
 
+namespace AccessControl {
+namespace Attributes {
+
+} // namespace Attributes
+} // namespace AccessControl
+
 namespace PollControl {
 namespace Attributes {
 

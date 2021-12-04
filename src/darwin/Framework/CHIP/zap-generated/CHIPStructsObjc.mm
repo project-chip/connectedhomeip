@@ -100,6 +100,53 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPAccessControlClusterTarget
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _cluster = nil;
+
+        _endpoint = nil;
+
+        _deviceType = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPAccessControlClusterAccessControlEntry
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+
+        _privilege = @(0);
+
+        _authMode = @(0);
+
+        _subjects = nil;
+
+        _targets = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPAccessControlClusterExtensionEntry
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+
+        _data = [NSData data];
+    }
+    return self;
+}
+@end
+
 @implementation CHIPBridgedActionsClusterActionStruct
 - (instancetype)init
 {

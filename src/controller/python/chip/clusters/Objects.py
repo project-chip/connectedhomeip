@@ -4383,6 +4383,147 @@ class Descriptor(Cluster):
 
 
 @dataclass
+class AccessControl(Cluster):
+    id: typing.ClassVar[int] = 0x001F
+
+    class Enums:
+        class AuthMode(IntEnum):
+            kPase = 0x01
+            kCase = 0x02
+            kGroup = 0x03
+
+        class Privilege(IntEnum):
+            kView = 0x01
+            kProxyView = 0x02
+            kOperate = 0x03
+            kManage = 0x04
+            kAdminister = 0x05
+
+    class Structs:
+        @dataclass
+        class Target(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="cluster", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(
+                            Label="endpoint", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(
+                            Label="deviceType", Tag=2, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            cluster: 'typing.Union[Nullable, uint]' = None
+            endpoint: 'typing.Union[Nullable, uint]' = None
+            deviceType: 'typing.Union[Nullable, uint]' = None
+
+        @dataclass
+        class AccessControlEntry(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="fabricIndex", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="privilege", Tag=1, Type=AccessControl.Enums.Privilege),
+                        ClusterObjectFieldDescriptor(
+                            Label="authMode", Tag=2, Type=AccessControl.Enums.AuthMode),
+                        ClusterObjectFieldDescriptor(
+                            Label="subjects", Tag=3, Type=typing.Union[Nullable, typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(
+                            Label="targets", Tag=4, Type=typing.Union[Nullable, typing.List[AccessControl.Structs.Target]]),
+                    ])
+
+            fabricIndex: 'uint' = None
+            privilege: 'AccessControl.Enums.Privilege' = None
+            authMode: 'AccessControl.Enums.AuthMode' = None
+            subjects: 'typing.Union[Nullable, typing.List[uint]]' = None
+            targets: 'typing.Union[Nullable, typing.List[AccessControl.Structs.Target]]' = None
+
+        @dataclass
+        class ExtensionEntry(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="fabricIndex", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="data", Tag=1, Type=bytes),
+                    ])
+
+            fabricIndex: 'uint' = None
+            data: 'bytes' = None
+
+    class Attributes:
+        @dataclass
+        class Acl(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[AccessControl.Structs.AccessControlEntry])
+
+            value: 'typing.List[AccessControl.Structs.AccessControlEntry]' = None
+
+        @dataclass
+        class Extension(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[AccessControl.Structs.ExtensionEntry])
+
+            value: 'typing.List[AccessControl.Structs.ExtensionEntry]' = None
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = None
+
+
+@dataclass
 class PollControl(Cluster):
     id: typing.ClassVar[int] = 0x0020
 

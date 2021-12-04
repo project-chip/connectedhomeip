@@ -29,6 +29,8 @@ import java.util.Map;
 public class ClusterWriteMapping {
   public Map<String, Map<String, InteractionInfo>> getWriteAttributeMap() {
     Map<String, Map<String, InteractionInfo>> writeAttributeMap = new HashMap<>();
+    Map<String, InteractionInfo> writeAccessControlInteractionInfo = new LinkedHashMap<>();
+    writeAttributeMap.put("accessControl", writeAccessControlInteractionInfo);
     Map<String, InteractionInfo> writeAccountLoginInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("accountLogin", writeAccountLoginInteractionInfo);
     Map<String, InteractionInfo> writeAdministratorCommissioningInteractionInfo =

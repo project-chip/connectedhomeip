@@ -29781,26 +29781,27 @@ uint16_t readAttributeVendorIdDefaultValue;
 
         {
             id actualValue = value;
-            XCTAssertEqual([actualValue count], 19);
+            XCTAssertEqual([actualValue count], 20);
             XCTAssertEqual([actualValue[0] unsignedIntValue], 3UL);
             XCTAssertEqual([actualValue[1] unsignedIntValue], 29UL);
-            XCTAssertEqual([actualValue[2] unsignedIntValue], 40UL);
-            XCTAssertEqual([actualValue[3] unsignedIntValue], 41UL);
-            XCTAssertEqual([actualValue[4] unsignedIntValue], 42UL);
-            XCTAssertEqual([actualValue[5] unsignedIntValue], 46UL);
-            XCTAssertEqual([actualValue[6] unsignedIntValue], 48UL);
-            XCTAssertEqual([actualValue[7] unsignedIntValue], 49UL);
-            XCTAssertEqual([actualValue[8] unsignedIntValue], 50UL);
-            XCTAssertEqual([actualValue[9] unsignedIntValue], 51UL);
-            XCTAssertEqual([actualValue[10] unsignedIntValue], 52UL);
-            XCTAssertEqual([actualValue[11] unsignedIntValue], 53UL);
-            XCTAssertEqual([actualValue[12] unsignedIntValue], 54UL);
-            XCTAssertEqual([actualValue[13] unsignedIntValue], 55UL);
-            XCTAssertEqual([actualValue[14] unsignedIntValue], 60UL);
-            XCTAssertEqual([actualValue[15] unsignedIntValue], 62UL);
-            XCTAssertEqual([actualValue[16] unsignedIntValue], 1029UL);
-            XCTAssertEqual([actualValue[17] unsignedIntValue], 61440UL);
-            XCTAssertEqual([actualValue[18] unsignedIntValue], 61444UL);
+            XCTAssertEqual([actualValue[2] unsignedIntValue], 31UL);
+            XCTAssertEqual([actualValue[3] unsignedIntValue], 40UL);
+            XCTAssertEqual([actualValue[4] unsignedIntValue], 41UL);
+            XCTAssertEqual([actualValue[5] unsignedIntValue], 42UL);
+            XCTAssertEqual([actualValue[6] unsignedIntValue], 46UL);
+            XCTAssertEqual([actualValue[7] unsignedIntValue], 48UL);
+            XCTAssertEqual([actualValue[8] unsignedIntValue], 49UL);
+            XCTAssertEqual([actualValue[9] unsignedIntValue], 50UL);
+            XCTAssertEqual([actualValue[10] unsignedIntValue], 51UL);
+            XCTAssertEqual([actualValue[11] unsignedIntValue], 52UL);
+            XCTAssertEqual([actualValue[12] unsignedIntValue], 53UL);
+            XCTAssertEqual([actualValue[13] unsignedIntValue], 54UL);
+            XCTAssertEqual([actualValue[14] unsignedIntValue], 55UL);
+            XCTAssertEqual([actualValue[15] unsignedIntValue], 60UL);
+            XCTAssertEqual([actualValue[16] unsignedIntValue], 62UL);
+            XCTAssertEqual([actualValue[17] unsignedIntValue], 1029UL);
+            XCTAssertEqual([actualValue[18] unsignedIntValue], 61440UL);
+            XCTAssertEqual([actualValue[19] unsignedIntValue], 61444UL);
         }
 
         [expectation fulfill];

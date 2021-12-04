@@ -285,6 +285,97 @@ void CHIPNullableVendorIdAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+        value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPAccessControlClusterAccessControlEntry * newElement_0;
+        newElement_0 = [CHIPAccessControlClusterAccessControlEntry new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+        newElement_0.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.privilege)];
+        newElement_0.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.authMode)];
+        if (entry_0.subjects.IsNull()) {
+            newElement_0.subjects = nil;
+        } else {
+            auto * array_NaN = [NSMutableArray new];
+            auto iter_NaN = entry_0.subjects.Value().begin();
+            while (iter_NaN.Next()) {
+                auto & entry_NaN = iter_NaN.GetValue();
+                NSNumber * newElement_NaN;
+                newElement_NaN = [NSNumber numberWithUnsignedLongLong:entry_NaN];
+                [array_NaN addObject:newElement_NaN];
+            }
+            if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+            }
+            newElement_0.subjects = array_NaN;
+        }
+        if (entry_0.targets.IsNull()) {
+            newElement_0.targets = nil;
+        } else {
+            auto * array_NaN = [NSMutableArray new];
+            auto iter_NaN = entry_0.targets.Value().begin();
+            while (iter_NaN.Next()) {
+                auto & entry_NaN = iter_NaN.GetValue();
+                CHIPAccessControlClusterTarget * newElement_NaN;
+                newElement_NaN = [CHIPAccessControlClusterTarget new];
+                if (entry_NaN.cluster.IsNull()) {
+                    newElement_NaN.cluster = nil;
+                } else {
+                    newElement_NaN.cluster = [NSNumber numberWithUnsignedInt:entry_NaN.cluster.Value()];
+                }
+                if (entry_NaN.endpoint.IsNull()) {
+                    newElement_NaN.endpoint = nil;
+                } else {
+                    newElement_NaN.endpoint = [NSNumber numberWithUnsignedShort:entry_NaN.endpoint.Value()];
+                }
+                if (entry_NaN.deviceType.IsNull()) {
+                    newElement_NaN.deviceType = nil;
+                } else {
+                    newElement_NaN.deviceType = [NSNumber numberWithUnsignedInt:entry_NaN.deviceType.Value()];
+                }
+                [array_NaN addObject:newElement_NaN];
+            }
+            if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+            }
+            newElement_0.targets = array_NaN;
+        }
+        [array_0 addObject:newElement_0];
+    }
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPAccessControlClusterExtensionEntry * newElement_0;
+        newElement_0 = [CHIPAccessControlClusterExtensionEntry new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+        newElement_0.data = [NSData dataWithBytes:entry_0.data.data() length:entry_0.data.size()];
+        [array_0 addObject:newElement_0];
+    }
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
 void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
 {

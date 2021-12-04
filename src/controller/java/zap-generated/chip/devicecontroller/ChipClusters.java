@@ -98,6 +98,105 @@ public class ChipClusters {
     }
   }
 
+  public static class AccessControlCluster extends BaseChipCluster {
+    public AccessControlCluster(long devicePtr, int endpointId) {
+      super(devicePtr, endpointId);
+    }
+
+    public static long clusterId() {
+      return Long.parseUnsignedLong("31");
+    }
+
+    @Override
+    public native long initWithDevice(long devicePtr, int endpointId);
+
+    public static class AclAttribute {
+      public Integer fabricIndex;
+      public Integer privilege;
+      public Integer authMode;
+
+      public AclAttribute(Integer fabricIndex, Integer privilege, Integer authMode) {
+        this.fabricIndex = fabricIndex;
+        this.privilege = privilege;
+        this.authMode = authMode;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int fabricIndex: ");
+        output.append(this.fabricIndex);
+        output.append("\n");
+
+        output.append("int privilege: ");
+        output.append(this.privilege);
+        output.append("\n");
+
+        output.append("int authMode: ");
+        output.append(this.authMode);
+        output.append("\n");
+
+        return output.toString();
+      }
+    }
+
+    public interface AclAttributeCallback {
+      void onSuccess(List<AclAttribute> valueList);
+
+      void onError(Exception ex);
+    }
+
+    public static class ExtensionAttribute {
+      public Integer fabricIndex;
+      public byte[] data;
+
+      public ExtensionAttribute(Integer fabricIndex, byte[] data) {
+        this.fabricIndex = fabricIndex;
+        this.data = data;
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder output = new StringBuilder("");
+        output.append("int fabricIndex: ");
+        output.append(this.fabricIndex);
+        output.append("\n");
+
+        output.append("byte[] ");
+        output.append(Arrays.toString(data));
+        output.append("\n");
+
+        return output.toString();
+      }
+    }
+
+    public interface ExtensionAttributeCallback {
+      void onSuccess(List<ExtensionAttribute> valueList);
+
+      void onError(Exception ex);
+    }
+
+    public void readAclAttribute(AclAttributeCallback callback) {
+      readAclAttribute(chipClusterPtr, callback);
+    }
+
+    public void readExtensionAttribute(ExtensionAttributeCallback callback) {
+      readExtensionAttribute(chipClusterPtr, callback);
+    }
+
+    public void readClusterRevisionAttribute(IntegerAttributeCallback callback) {
+      readClusterRevisionAttribute(chipClusterPtr, callback);
+    }
+
+    private native void readAclAttribute(long chipClusterPtr, AclAttributeCallback callback);
+
+    private native void readExtensionAttribute(
+        long chipClusterPtr, ExtensionAttributeCallback callback);
+
+    private native void readClusterRevisionAttribute(
+        long chipClusterPtr, IntegerAttributeCallback callback);
+  }
+
   public static class AccountLoginCluster extends BaseChipCluster {
     public AccountLoginCluster(long devicePtr, int endpointId) {
       super(devicePtr, endpointId);

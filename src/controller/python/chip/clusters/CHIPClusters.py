@@ -30,6 +30,33 @@ class ChipClusters:
     SUCCESS_DELEGATE = ctypes.CFUNCTYPE(None)
     FAILURE_DELEGATE = ctypes.CFUNCTYPE(None, ctypes.c_uint8)
 
+    _ACCESS_CONTROL_CLUSTER_INFO = {
+        "clusterName": "AccessControl",
+        "clusterId": 0x0000001F,
+        "commands": {
+        },
+        "attributes": {
+            0x00000000: {
+                "attributeName": "Acl",
+                "attributeId": 0x00000000,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
+            0x00000001: {
+                "attributeName": "Extension",
+                "attributeId": 0x00000001,
+                "type": "",
+                "reportable": True,
+                "writable": True,
+            },
+            0x0000FFFD: {
+                "attributeName": "ClusterRevision",
+                "attributeId": 0x0000FFFD,
+                "type": "int",
+            },
+        },
+    }
     _ACCOUNT_LOGIN_CLUSTER_INFO = {
         "clusterName": "AccountLogin",
         "clusterId": 0x0000050E,
@@ -5187,6 +5214,7 @@ class ChipClusters:
     }
 
     _CLUSTER_ID_DICT = {
+        0x0000001F: _ACCESS_CONTROL_CLUSTER_INFO,
         0x0000050E: _ACCOUNT_LOGIN_CLUSTER_INFO,
         0x0000003C: _ADMINISTRATOR_COMMISSIONING_CLUSTER_INFO,
         0x0000050D: _APPLICATION_BASIC_CLUSTER_INFO,
@@ -5248,6 +5276,7 @@ class ChipClusters:
     }
 
     _CLUSTER_NAME_DICT = {
+        "AccessControl": _ACCESS_CONTROL_CLUSTER_INFO,
         "AccountLogin": _ACCOUNT_LOGIN_CLUSTER_INFO,
         "AdministratorCommissioning": _ADMINISTRATOR_COMMISSIONING_CLUSTER_INFO,
         "ApplicationBasic": _APPLICATION_BASIC_CLUSTER_INFO,

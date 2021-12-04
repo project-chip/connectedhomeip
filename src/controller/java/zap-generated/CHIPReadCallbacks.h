@@ -308,6 +308,59 @@ private:
     bool keepAlive;
 };
 
+class CHIPAccessControlAclAttributeCallback : public chip::Callback::Callback<CHIPAccessControlClusterAclAttributeCallbackType>
+{
+public:
+    CHIPAccessControlAclAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPAccessControlAclAttributeCallback();
+
+    static void maybeDestroy(CHIPAccessControlAclAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPAccessControlAclAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPAccessControlExtensionAttributeCallback
+    : public chip::Callback::Callback<CHIPAccessControlClusterExtensionAttributeCallbackType>
+{
+public:
+    CHIPAccessControlExtensionAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPAccessControlExtensionAttributeCallback();
+
+    static void maybeDestroy(CHIPAccessControlExtensionAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPAccessControlExtensionAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> &
+            list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPApplicationLauncherApplicationLauncherListAttributeCallback
     : public chip::Callback::Callback<CHIPApplicationLauncherClusterApplicationLauncherListAttributeCallbackType>
 {
