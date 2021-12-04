@@ -79,6 +79,10 @@ CHIP_ERROR AttributeValueEncoder::EncodeEmptyList()
         mCurrentEncodingListIndex = 0;
     }
 
+    // After encoded the empty list, the remaining items are atomicly encoded into the buffer. Tell report engine that do not revert
+    // partial data.
+    mEncodeState.mAllowPartialData = true;
+
     return CHIP_NO_ERROR;
 }
 

@@ -104,9 +104,9 @@ private:
     CHIP_ERROR BuildAndSendSingleReportData(ReadHandler * apReadHandler);
 
     CHIP_ERROR BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
-                                                       bool * apHasMoreChunks);
+                                                       bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
-                                                 bool * apHasMoreChunks);
+                                                 bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
                                    const ConcreteReadAttributePath & aClusterInfo,
                                    AttributeValueEncoder::AttributeEncodeState * apEncoderState);
