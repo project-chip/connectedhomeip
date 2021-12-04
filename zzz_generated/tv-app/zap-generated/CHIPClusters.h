@@ -45,8 +45,6 @@ public:
 
     // Cluster Attributes
     CHIP_ERROR ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint64_t value);
     CHIP_ERROR SubscribeAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                             uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeBreadcrumb(Callback::Cancelable * onReportCallback);

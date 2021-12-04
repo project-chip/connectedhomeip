@@ -126,17 +126,6 @@ CHIP_ERROR IdentifyCluster::ReadAttributeIdentifyTime(Callback::Cancelable * onS
                                              BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-CHIP_ERROR IdentifyCluster::WriteAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    ReturnErrorOnFailure(
-        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
-        chip::app::AttributePathParams(mEndpoint, mClusterId, Identify::Attributes::IdentifyTime::Id), value));
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
 CHIP_ERROR IdentifyCluster::SubscribeAttributeIdentifyTime(Callback::Cancelable * onSuccessCallback,
                                                            Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                            uint16_t maxInterval)
