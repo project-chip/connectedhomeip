@@ -26,7 +26,6 @@
 #include "LinuxOTAImageProcessor.h"
 #include "LinuxOTARequestorDriver.h"
 #include "app/clusters/ota-requestor/BDXDownloader.h"
-#include "app/clusters/ota-requestor/OTADownloader.h"
 #include "app/clusters/ota-requestor/OTARequestor.h"
 
 using chip::BDXDownloader;
@@ -39,7 +38,6 @@ using chip::LinuxOTAImageProcessor;
 using chip::NodeId;
 using chip::OnDeviceConnected;
 using chip::OnDeviceConnectionFailure;
-using chip::OTADownloader;
 using chip::OTAImageProcessorParams;
 using chip::PeerId;
 using chip::Server;
