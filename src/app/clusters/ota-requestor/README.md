@@ -22,15 +22,15 @@ used by Matter applications for OTA software updates
     to the `OTARequestor` object by calling
     `OTARequestor::SetOtaRequestorDriver()`
 
--   Implement a class derived from `OTAImageProcessorDriver`, see for example
-    `LinuxOTARequestorDriver`. This class would typically be a part of the
+-   Implement a class derived from `OTAImageProcessorInterface`, see for example
+    `LinuxOTAImageProcessor`. This class would typically be a part of the
     platform.
 
 -   In the application initialization logic create an instance of the
-    `OTADownloader` class. (TODO: How do we register it?) Create an instance of
-    the `OTAImageProcessorDriver` implementation and connect it to the
-    `OTADownloader` object by calling
-    `OTADownloader::SetImageProcessorDelegate()`
+    `BDXDownloader` class. Create an instance of the
+    `OTAImageProcessorInterface`-derived implementation (e.g.
+    `LinuxOTAImageProcessor`) and connect it to the `BDXDownloader` object by
+    calling `BDXDownloader::SetImageProcessorDelegate()`
 
 -   See `examples/ota-requestor-app/linux/main.cpp` for an example of the
     initialization code discussed above
@@ -42,8 +42,8 @@ used by Matter applications for OTA software updates
 
 -   The interface between the core OTA Requestor functionality and the
     platform/application logic is realized through the virtual functions of
-    `OTARequestorDriver` and `OTAImageProcessorDriver` and through the
-    application interface methods of `OTARequestor` and `OTADownloader`.
+    `OTARequestorDriver` and `OTAImageProcessorInterface` and through the
+    application interface methods of `OTARequestor` and `BDXDownloader`.
 
 ## Design Overview
 

@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,21 +16,61 @@
  *    limitations under the License.
  */
 
-#include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeDelegate.h>
-#include <protocols/bdx/BdxTransferSession.h>
-#include <protocols/bdx/TransferFacilitator.h>
+/* This file contains a definition for a class that implements OTADownloader and downloads CHIP OTA images using the BDX protocol.
+ * It should not execute any logic that is application specific.
+ */
+
+// TODO: unit tests
 
 #pragma once
 
-class BdxDownloader : public chip::bdx::Initiator
+#include "OTADownloader.h"
+
+#include <lib/core/CHIPError.h>
+#include <protocols/bdx/BdxTransferSession.h>
+#include <system/SystemPacketBuffer.h>
+#include <transport/raw/MessageHeader.h>
+
+namespace chip {
+
+class BDXDownloader : public chip::OTADownloader
 {
 public:
-    void SetInitialExchange(chip::Messaging::ExchangeContext * ec);
+    // A delegate for passing messages to/from BDXDownloader and some messaging layer. This is mainly to make BDXDownloader more
+    // easily unit-testable.
+    class MessagingDelegate
+    {
+    public:
+        virtual CHIP_ERROR SendMessage(const chip::bdx::TransferSession::OutputEvent & msgEvent) = 0;
+        virtual ~MessagingDelegate() {}
+    };
+
+    BDXDownloader() : chip::OTADownloader() {}
+
+    // To be called when there is an incoming message to handle (of any protocol type)
+    void OnMessageReceived(const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle msg);
+
+    void SetMessageDelegate(MessagingDelegate * delegate) { mMsgDelegate = delegate; }
+
+    // Initialize a BDX transfer session but will not proceed until OnPreparedForDownload() is called.
+    CHIP_ERROR SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData);
+
+    // OTADownloader Overrides
+    CHIP_ERROR BeginPrepareDownload() override;
+    CHIP_ERROR OnPreparedForDownload(CHIP_ERROR status) override;
+    void OnDownloadTimeout() override;
+    // BDX does not provide a mechanism for the driver of a transfer to gracefully end the exchange, so it will abort the transfer
+    // instead.
+    void EndDownload(CHIP_ERROR reason = CHIP_NO_ERROR) override;
+    CHIP_ERROR FetchNextData() override;
+    // TODO: override SkipData
 
 private:
-    // inherited from bdx::Endpoint
-    void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event);
+    void PollTransferSession();
+    CHIP_ERROR HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent);
 
-    bool mIsTransferComplete = false;
+    chip::bdx::TransferSession mBdxTransfer;
+    MessagingDelegate * mMsgDelegate;
 };
+
+} // namespace chip
