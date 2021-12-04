@@ -415,7 +415,7 @@ exit:
     {
         bool noResponseExpected = IsSubscriptionIdle() && !mPendingMoreChunks;
         err                     = StatusResponse::Send(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
-                                                        : Protocols::InteractionModel::Status::InvalidSubscription,
+                                                                            : Protocols::InteractionModel::Status::InvalidSubscription,
                                    mpExchangeCtx, !noResponseExpected);
 
         if (noResponseExpected || (err != CHIP_NO_ERROR))
@@ -457,7 +457,11 @@ CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttribute
     {
         aAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
     }
-    // TODO: Add ListOperation::ReplaceItem support. (Attribute path with valid list index)
+    else
+    {
+        // TODO: Add ListOperation::ReplaceItem support. (Attribute path with valid list index)
+        err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+    }
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
     return CHIP_NO_ERROR;
 }

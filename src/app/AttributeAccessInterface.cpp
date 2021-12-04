@@ -39,7 +39,8 @@ CHIP_ERROR AttributeReportBuilder::PrepareAttribute(AttributeReportIBs::Builder 
 
     if (aPath.mListOp == ConcreteDataAttributePath::ListOperation::AppendItem)
     {
-        // For list chunking, we encode an empty list with a series of append operation. (attribute path with null as ListIndex)
+        // An append to a list (or a data chunk consisting just one list entry that's part of a bigger list) is represented by a
+        // null list index in the path.
         attributePathIBBuilder.ListIndex(DataModel::Nullable<ListIndex>());
     }
 
