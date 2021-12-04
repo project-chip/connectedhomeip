@@ -20,6 +20,27 @@ from .Types import Nullable, NullValue
 class {{asUpperCamelCase name}}(Cluster):
     id: typing.ClassVar[int] = {{asHex code 4}}
 
+    @ChipUtility.classproperty
+    def descriptor(cls) -> ClusterObjectDescriptor:
+        return ClusterObjectDescriptor(
+            Fields = [
+{{#zcl_attributes_server}}
+            {{#if entryType}}
+                ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{asMEI manufacturerCode code}}, Type={{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}),
+            {{else}}
+                ClusterObjectFieldDescriptor(Label="{{ asLowerCamelCase label }}", Tag={{asMEI manufacturerCode code}}, Type={{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}),
+            {{/if}}
+{{/zcl_attributes_server}}
+            ])
+
+{{#zcl_attributes_server}}
+{{#if entryType}}
+    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType entryType ns=(asUpperCamelCase parent.name)}}' = None
+{{else}}
+    {{ asLowerCamelCase label }}: '{{zapTypeToPythonClusterObjectType type ns=(asUpperCamelCase parent.name)}}' = None
+{{/if}}
+{{/zcl_attributes_server}}
+
 {{#zcl_enums}}
 {{#first}}
     class Enums:

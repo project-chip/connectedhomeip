@@ -18,7 +18,7 @@
 
 import chip.clusters as Clusters
 import logging
-from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure
+from chip.clusters.Attribute import AttributePath, AttributeReadResult, AttributeStatus, ValueDecodeFailure, TypedAttributePath, SubscriptionTransaction
 import chip.interaction_model
 import asyncio
 
@@ -33,18 +33,22 @@ ignoreAttributeDecodeFailureList = []
 
 
 def _IgnoreAttributeDecodeFailure(path):
-    return str(path) in ignoreAttributeDecodeFailureList
+    return path in ignoreAttributeDecodeFailureList
 
 
-def _AssumeAttributesDecodeSuccess(values):
-    for k, v in values['Attributes'].items():
-        print(f"{k} = {v}")
-        if isinstance(v.Data, ValueDecodeFailure):
-            if _IgnoreAttributeDecodeFailure(k):
-                print(f"Ignoring attribute decode failure for path {k}")
-            else:
-                raise AssertionError(
-                    f"Cannot decode value for path {k}, got error: '{str(v.Data.Reason)}', raw TLV data: '{v.Data.TLVValue}'")
+def VerifyDecodeSuccess(values):
+    for endpoint in values:
+        for cluster in values[endpoint]:
+            for attribute in values[endpoint][cluster]:
+                v = values[endpoint][cluster][attribute]
+                print(f"EP{endpoint}/{attribute} = {v}")
+                if (isinstance(v, ValueDecodeFailure)):
+                    if _IgnoreAttributeDecodeFailure((endpoint, cluster, attribute)):
+                        print(
+                            f"Ignoring attribute decode failure for path {endpoint}/{attribute}")
+                    else:
+                        raise AssertionError(
+                            f"Cannot decode value for path {k}, got error: '{str(v.Data.Reason)}', raw TLV data: '{v.Data.TLVValue}'")
 
 
 def _AssumeEventsDecodeSuccess(values):
@@ -124,8 +128,9 @@ class ClusterObjectTests:
         sub = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.OnOff.Attributes.OnOff)], reportInterval=(3, 10))
         updated = False
 
-        def subUpdate(path, value):
+        def subUpdate(path: TypedAttributePath, transaction: SubscriptionTransaction):
             nonlocal updated
+            value = transaction.GetAttribute(path)
             logger.info(
                 f"Received attribute update path {path}, New value {value}")
             updated = True
@@ -157,44 +162,51 @@ class ClusterObjectTests:
             (0, Clusters.Basic.Attributes.HardwareVersion),
         ]
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
-        if (len(res['Attributes']) != 3):
+        if ((0 not in res) or (Clusters.Basic not in res[0]) or (len(res[0][Clusters.Basic]) != 3)):
             raise AssertionError(
-                f"Got back {len(res['Attributes'])} data items instead of 3")
-        _AssumeAttributesDecodeSuccess(res)
+                f"Got back {len(res)} data items instead of 3")
+        VerifyDecodeSuccess(res)
 
         logger.info("2: Reading Ex Cx A*")
         req = [
             (0, Clusters.Basic),
         ]
-        _AssumeAttributesDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+        VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
         logger.info("3: Reading E* Cx Ax")
         req = [
             Clusters.Descriptor.Attributes.ServerList
         ]
-        _AssumeAttributesDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+        VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
         logger.info("4: Reading Ex C* A*")
         req = [
             0
         ]
-        _AssumeAttributesDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+        VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
         logger.info("5: Reading E* Cx A*")
         req = [
             Clusters.Descriptor
         ]
-        _AssumeAttributesDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+        VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
         logger.info("6: Reading E* C* A*")
         req = [
             '*'
         ]
-        _AssumeAttributesDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+        VerifyDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req, returnClusterObject=True)
+        logger.info(
+            f"Basic Cluster - Label: {res[0][Clusters.Basic].productLabel}")
+        logger.info(
+            f"Test Cluster - Struct: {res[1][Clusters.TestCluster].struct}")
+        logger.info(f"Test Cluster: {res[1][Clusters.TestCluster]}")
 
         logger.info("7: Reading Chunked List")
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListLongOctetString)])
-        if res.get('Attributes', {}).get(AttributePath(EndpointId=1, Attribute=Clusters.TestCluster.Attributes.ListLongOctetString)).Data.value != [b'0123456789abcdef' * 32] * 4:
+        if res[1][Clusters.TestCluster][Clusters.TestCluster.Attributes.ListLongOctetString] != [b'0123456789abcdef' * 32] * 4:
             raise AssertionError("Unexpected read result")
 
     @classmethod

@@ -214,7 +214,7 @@ class ClusterCommand(ClusterObject):
         raise NotImplementedError()
 
 
-class Cluster:
+class Cluster(ClusterObject):
     ''' This class does nothing, but a convenient class that generated clusters can inherit from.
     This gives the ability that the users can use issubclass(X, Cluster) to determine if the class represnents a Cluster.
     '''
