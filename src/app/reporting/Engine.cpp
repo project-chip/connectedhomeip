@@ -168,10 +168,8 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
 exit:
     if (attributeReportIBs.GetWriter()->GetLengthWritten() != emptyReportDataLength)
     {
-        ChipLogError(DataManagement, "--> attributeReportIBs written %d backup written %zd",
-                     attributeReportIBs.GetWriter()->GetLengthWritten(), emptyReportDataLength);
-        // We mey met BUFFER_TOO_SMALL with nothing actually written for the case of list chunking, so we check if we have actually
-        // encoded payload by checking the total length written.
+        // We may encounter BUFFER_TOO_SMALL with nothing actually written for the case of list chunking, so we check if we have
+        // actually
         attributeDataWritten = true;
     }
 
@@ -225,8 +223,9 @@ exit:
         aReportDataBuilder.Rollback(backup);
     }
 
-    // hasMoreChunks + no data encoded is a flag that we have encodered some trouble when processing the attribute.
-    // BuildAndSendSingleReportData will abort the read transaction if encoded no attribute and no events but hasMoreChunks is set.
+    // hasMoreChunks + no data encoded is a flag that we have encountered some trouble when processing the attribute.
+    // BuildAndSendSingleReportData will abort the read transaction if we encoded no attribute and no events but hasMoreChunks is
+    // set.
     if (apHasMoreChunks != nullptr)
     {
         *apHasMoreChunks = hasMoreChunks;
@@ -359,10 +358,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     ReportDataMessage::Builder reportDataBuilder;
     chip::System::PacketBufferHandle bufHandle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     uint16_t reservedSize                      = 0;
-    bool hasMoreChunksForAttributes            = false;
-    bool hasMoreChunksForEvents                = false;
-    bool hasEncodedAttributes                  = false;
-    bool hasEncodedEvents                      = false;
+    bool hasMoreChunks;
 
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
@@ -401,24 +397,34 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     SuccessOrExit(err = reportDataWriter.ReserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfReportMessage));
 
-    err = BuildSingleReportDataAttributeReportIBs(reportDataBuilder, apReadHandler, &hasMoreChunksForAttributes,
-                                                  &hasEncodedAttributes);
-    SuccessOrExit(err);
-
-    err = BuildSingleReportDataEventReports(reportDataBuilder, apReadHandler, &hasMoreChunksForEvents, &hasEncodedEvents);
-    SuccessOrExit(err);
-
-    if (!hasEncodedAttributes && !hasEncodedEvents && (hasMoreChunksForAttributes || hasMoreChunksForEvents))
     {
-        ChipLogError(DataManagement, "No data actually encoded but hasMoreChunks flag is set, abort report! (attribute too big?)");
-        ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
+        bool hasMoreChunksForAttributes = false;
+        bool hasMoreChunksForEvents     = false;
+        bool hasEncodedAttributes       = false;
+        bool hasEncodedEvents           = false;
+
+        err = BuildSingleReportDataAttributeReportIBs(reportDataBuilder, apReadHandler, &hasMoreChunksForAttributes,
+                                                      &hasEncodedAttributes);
+        SuccessOrExit(err);
+
+        err = BuildSingleReportDataEventReports(reportDataBuilder, apReadHandler, &hasMoreChunksForEvents, &hasEncodedEvents);
+        SuccessOrExit(err);
+
+        hasMoreChunks = hasMoreChunksForAttributes || hasMoreChunksForEvents;
+
+        if (!hasEncodedAttributes && !hasEncodedEvents && hasMoreChunks)
+        {
+            ChipLogError(DataManagement,
+                         "No data actually encoded but hasMoreChunks flag is set, abort report! (attribute too big?)");
+            ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
+        }
     }
 
     SuccessOrExit(reportDataBuilder.GetError());
     SuccessOrExit(err = reportDataWriter.UnreserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfReportMessage));
-    if (hasMoreChunksForAttributes || hasMoreChunksForEvents)
+    if (hasMoreChunks)
     {
-        reportDataBuilder.MoreChunkedMessages(hasMoreChunksForAttributes || hasMoreChunksForEvents);
+        reportDataBuilder.MoreChunkedMessages(true);
     }
     else if (apReadHandler->IsReadType())
     {
@@ -457,20 +463,19 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
     ChipLogDetail(DataManagement, "<RE> Sending report (payload has %" PRIu32 " bytes)...", reportDataWriter.GetLengthWritten());
-    err = SendReport(apReadHandler, std::move(bufHandle), hasMoreChunksForAttributes || hasMoreChunksForEvents);
+    err = SendReport(apReadHandler, std::move(bufHandle), hasMoreChunks);
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogError(DataManagement, "<RE> Error sending out report data with %" CHIP_ERROR_FORMAT "!", err.Format()));
 
     ChipLogDetail(DataManagement, "<RE> ReportsInFlight = %" PRIu32 " with readHandler %" PRIu32 ", RE has %s", mNumReportsInFlight,
-                  mCurReadHandlerIdx,
-                  (hasMoreChunksForAttributes || hasMoreChunksForEvents) ? "more messages" : "no more messages");
+                  mCurReadHandlerIdx, hasMoreChunks ? "more messages" : "no more messages");
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         apReadHandler->Shutdown(ReadHandler::ShutdownOptions::AbortCurrentExchange);
     }
-    else if (apReadHandler->IsReadType() && !(hasMoreChunksForAttributes || hasMoreChunksForEvents))
+    else if (apReadHandler->IsReadType() && !hasMoreChunks)
     {
         apReadHandler->Shutdown();
     }

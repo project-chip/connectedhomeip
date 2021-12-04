@@ -60,7 +60,7 @@ public:
      * Path will be encoded according to section 10.5.4.3.1 in the spec.
      * Note: Only append is supported currently (encode a null list index), other operations won't encode a list index in the
      * attribute path field.
-     * TODO: Add support of encode a single element in the list (path with a valid list index).
+     * TODO: Add support for encoding a single element in the list (path with a valid list index).
      */
     CHIP_ERROR PrepareAttribute(AttributeReportIBs::Builder & aAttributeReportIBs, const ConcreteDataAttributePath & aPath,
                                 DataVersion aDataVersion);
@@ -120,16 +120,22 @@ public:
     private:
         friend class AttributeValueEncoder;
         /**
-         * When TLVWriter failed to encode some field, the buffer may contain tailing dirty data (since the put was aborted). Thus
-         * report engine may revert the buffer.
-         * EncodeListItem will encode an AttributeReportIB atomicly, and we do want return a partial list to the client (chunking),
-         * in this case, mAllowPartialData is set to tell the report engine not to revert the buffer.
+         * When an attempt to encode an attribute returns an error, the buffer may contain tailing dirty data
+         * (since the put was aborted).  The report engine normally rolls back the buffer to right before encoding
+         * of the attribute started on errors.
+         *
+         * When chunking a list, EncodeListItem will atomically encode list items, ensuring that the
+         * state of the buffer is valid to send (i.e. contains no trailing garbage), and return an error
+         * if the list doesn't entirely fit.  In this situation, mAllowPartialData is set to communicate to the
+         * report engine that it should not roll back the list items.
          */
         bool mAllowPartialData = false;
         /**
-         * When a encoding session is interrupted by insufficient buffer, mCurrentEncodingListIndex will store the next item to be
-         * encoded. By default, an invalid list index means we have not started encoding the list and we need to encode a empty list
-         * first.
+         * If set to kInvalidListIndex, indicates that we have not encoded any data for the list yet and
+         * need to start by encoding an empty list before we start encoding any list items.
+         *
+         * When set to a valid ListIndex value, indicates the index of the next list item that needs to be
+         * encoded (i.e. the count of items encoded so far).
          */
         ListIndex mCurrentEncodingListIndex = kInvalidListIndex;
     };
@@ -144,23 +150,18 @@ public:
 
     /**
      * Encode builds a single AttributeReportIB in AttributeReportIBs.
-     * When we are enciding a single element in the list, the actual path in the report contains a null list index as "append"
+     * When we are encoding a single element in the list, the actual path in the report contains a null list index as "append"
      * operation.
      */
     template <typename... Ts>
     CHIP_ERROR Encode(Ts... aArgs)
     {
         mTriedEncode = true;
-        AttributeReportBuilder builder;
-
-        ReturnErrorOnFailure(builder.PrepareAttribute(mAttributeReportIBsBuilder, mPath, mDataVersion));
-        ReturnErrorOnFailure(builder.EncodeValue(std::forward<Ts>(aArgs)...));
-
-        return builder.FinishAttribute();
+        return EncodeAttributeReportIB(std::forward<Ts>(aArgs)...);
     }
 
     /**
-     * aCallback is expected to take a const TagBoundEncoder& argument and
+     * aCallback is expected to take a const auto & argument and
      * Encode() on it as many times as needed to encode all the list elements
      * one by one.  If any of those Encode() calls returns failure, aCallback
      * must stop encoding and return failure.  When all items are encoded
@@ -168,6 +169,8 @@ public:
      *
      * aCallback may not be called.  Consumers must not assume it will be
      * called.
+     *
+     * Consumers are allowed to make either one call to EncodeList or one call to Encode to handle a read.
      */
     template <typename ListGenerator>
     CHIP_ERROR EncodeList(ListGenerator aCallback)
@@ -180,7 +183,7 @@ public:
         mPath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
         ReturnErrorOnFailure(EncodeEmptyList());
         // For all elements in the list, a report with append operation will be generated. This will not be changed during encoding
-        // of each reports since the users cannot access mPath.
+        // of each report since the users cannot access mPath.
         mPath.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
         ReturnErrorOnFailure(aCallback(ListEncodeHelper(*this)));
         // The Encode procedure finished without any error, clear the state.
@@ -196,7 +199,7 @@ public:
     FabricIndex AccessingFabricIndex() const { return mAccessingFabricIndex; }
 
     /**
-     * AttributeValueEncoder is a short lived object, and the state is presisted by mEncodeState and restored by constructor.
+     * AttributeValueEncoder is a short lived object, and the state is persisted by mEncodeState and restored by constructor.
      */
     const AttributeEncodeState & GetState() const { return mEncodeState; }
 
@@ -219,7 +222,7 @@ private:
         TLV::TLVWriter backup;
         mAttributeReportIBsBuilder.Checkpoint(backup);
 
-        CHIP_ERROR err = Encode(std::forward<Ts>(aArgs)...);
+        CHIP_ERROR err = EncodeAttributeReportIB(std::forward<Ts>(aArgs)...);
         if (err != CHIP_NO_ERROR)
         {
             // For list chunking, ReportEngine should not rollback the buffer when CHIP_NO_MEMORY or similar error occurred.
@@ -232,6 +235,21 @@ private:
         mCurrentEncodingListIndex++;
         mEncodeState.mCurrentEncodingListIndex++;
         return CHIP_NO_ERROR;
+    }
+
+    /**
+     * Actual logic for encoding a single AttributeReportIB in AttributeReportIBs.
+     */
+    template <typename... Ts>
+    CHIP_ERROR EncodeAttributeReportIB(Ts... aArgs)
+    {
+        mTriedEncode = true;
+        AttributeReportBuilder builder;
+
+        ReturnErrorOnFailure(builder.PrepareAttribute(mAttributeReportIBsBuilder, mPath, mDataVersion));
+        ReturnErrorOnFailure(builder.EncodeValue(std::forward<Ts>(aArgs)...));
+
+        return builder.FinishAttribute();
     }
 
     /**

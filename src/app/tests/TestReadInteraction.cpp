@@ -316,7 +316,7 @@ void TestReadInteraction::GenerateReportData(nlTestSuite * apSuite, void * apCon
     }
     else
     {
-        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+        attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).EndOfAttributePathIB();
     }
 
     err = attributePathBuilder.GetError();
@@ -410,7 +410,7 @@ void TestReadInteraction::TestReadHandler(nlTestSuite * apSuite, void * apContex
     AttributePathIB::Builder attributePathBuilder = attributePathListBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathListBuilder.GetError() == CHIP_NO_ERROR);
 
-    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
+    attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
