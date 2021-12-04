@@ -223,6 +223,15 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
     // Shut down the interaction model
     app::InteractionModelEngine::GetInstance()->Shutdown();
 
+    // Shut down the TransportMgr. This holds Inet::UDPEndPoints so it must be shut down
+    // before PlatformMgr().Shutdown() shuts down Inet.
+    if (mTransportMgr != nullptr)
+    {
+        mTransportMgr->Close();
+        chip::Platform::Delete(mTransportMgr);
+        mTransportMgr = nullptr;
+    }
+
 #if CONFIG_DEVICE_LAYER
     //
     // We can safely call PlatformMgr().Shutdown(), which like DeviceController::Shutdown(),
@@ -247,11 +256,6 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
 
     mSystemLayer = nullptr;
     mInetLayer   = nullptr;
-    if (mTransportMgr != nullptr)
-    {
-        chip::Platform::Delete(mTransportMgr);
-        mTransportMgr = nullptr;
-    }
 
     if (mMessageCounterManager != nullptr)
     {

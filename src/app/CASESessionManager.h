@@ -103,7 +103,9 @@ private:
     OperationalDeviceProxy * FindSession(SessionHandle session);
     void ReleaseSession(OperationalDeviceProxy * device);
 
-    BitMapObjectPool<OperationalDeviceProxy, CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES> mActiveSessions;
+    BitMapObjectPool<OperationalDeviceProxy, CHIP_CONFIG_CONTROLLER_MAX_ACTIVE_DEVICES,
+                     OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode>
+        mActiveSessions;
 
     CASESessionManagerConfig mConfig;
 };
