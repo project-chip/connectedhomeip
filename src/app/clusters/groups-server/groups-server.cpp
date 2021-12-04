@@ -171,10 +171,9 @@ bool emberAfGroupsClusterAddGroupCallback(app::CommandHandler * commandObj, cons
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, Groups::Id, Commands::AddGroupResponse::Id,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+        app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), Groups::Id, Commands::AddGroupResponse::Id };
+        TLV::TLVWriter * writer       = nullptr;
+        SuccessOrExit(err = commandObj->PrepareCommand(path));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
@@ -230,10 +229,9 @@ bool emberAfGroupsClusterViewGroupCallback(app::CommandHandler * commandObj, con
     }
 
     {
-        app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, Groups::Id, Commands::ViewGroupResponse::Id,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+        app::ConcreteCommandPath path = { endpointId, Groups::Id, Commands::ViewGroupResponse::Id };
+        TLV::TLVWriter * writer       = nullptr;
+        SuccessOrExit(err = commandObj->PrepareCommand(path));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));
@@ -380,10 +378,9 @@ bool emberAfGroupsClusterRemoveGroupCallback(app::CommandHandler * commandObj, c
     emberAfScenesClusterRemoveScenesInGroupCallback(endpointId, groupId);
 #endif
     {
-        app::CommandPathParams cmdParams = { endpointId, /* group id */ 0, Groups::Id, Commands::RemoveGroupResponse::Id,
-                                             (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+        app::ConcreteCommandPath path = { endpointId, Groups::Id, Commands::RemoveGroupResponse::Id };
+        TLV::TLVWriter * writer       = nullptr;
+        SuccessOrExit(err = commandObj->PrepareCommand(path));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), status));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), groupId));

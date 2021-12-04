@@ -298,23 +298,23 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
 
 CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct)
 {
-    CommandDataIB::Builder commandData;
     ReturnLogErrorOnFailure(AllocateBuffer());
 
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
     VerifyOrReturnError(mState == CommandState::Idle, CHIP_ERROR_INCORRECT_STATE);
-
-    commandData = mInvokeRequestBuilder.GetInvokeRequests().CreateCommandData();
-    ReturnLogErrorOnFailure(commandData.GetError());
-
-    ReturnLogErrorOnFailure(ConstructCommandPath(aCommandPathParams, commandData.CreatePath()));
+    InvokeRequests::Builder & invokeRequests = mInvokeRequestBuilder.GetInvokeRequests();
+    CommandDataIB::Builder & invokeRequest   = invokeRequests.CreateCommandData();
+    ReturnErrorOnFailure(invokeRequests.GetError());
+    CommandPathIB::Builder & path = invokeRequest.CreatePath();
+    ReturnErrorOnFailure(invokeRequest.GetError());
+    ReturnErrorOnFailure(path.Encode(aCommandPathParams));
 
     if (aStartDataStruct)
     {
-        ReturnLogErrorOnFailure(commandData.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)),
-                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
+        ReturnLogErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)),
+                                                                          TLV::kTLVType_Structure, mDataElementContainerType));
     }
 
     MoveToState(CommandState::AddingCommand);

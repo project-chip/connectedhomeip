@@ -142,8 +142,8 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
 
         if (aReadPrepareParams.mAttributePathParamsListSize != 0 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
         {
-            AttributePathIBs::Builder attributePathListBuilder = request.CreateAttributeRequests();
-            SuccessOrExit(err = attributePathListBuilder.GetError());
+            AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
+            SuccessOrExit(err = request.GetError());
             err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
                                             aReadPrepareParams.mAttributePathParamsListSize);
             SuccessOrExit(err);
@@ -152,16 +152,17 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
         if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
         {
             EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
-            SuccessOrExit(err = eventPathListBuilder.GetError());
+            SuccessOrExit(err = request.GetError());
             err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
                                      aReadPrepareParams.mEventPathParamsListSize);
             SuccessOrExit(err);
             if (aReadPrepareParams.mEventNumber != 0)
             {
                 // EventFilter is optional
-                EventFilterIBs::Builder eventFilters = request.CreateEventFilters();
+                EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
                 SuccessOrExit(err = request.GetError());
-                EventFilterIB::Builder eventFilter = eventFilters.CreateEventFilter();
+                EventFilterIB::Builder & eventFilter = eventFilters.CreateEventFilter();
+                SuccessOrExit(err = eventFilters.GetError());
                 eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB();
                 SuccessOrExit(err = eventFilter.GetError());
                 eventFilters.EndOfEventFilters();
@@ -205,7 +206,9 @@ CHIP_ERROR ReadClient::GenerateEventPaths(EventPathIBs::Builder & aEventPathsBui
     for (size_t index = 0; index < aEventPathParamsListSize; ++index)
     {
         VerifyOrReturnError(apEventPathParamsList[index].IsValidEventPath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-        ReturnErrorOnFailure(aEventPathsBuilder.CreatePath().Encode(apEventPathParamsList[index]));
+        EventPathIB::Builder & path = aEventPathsBuilder.CreatePath();
+        ReturnErrorOnFailure(aEventPathsBuilder.GetError());
+        ReturnErrorOnFailure(path.Encode(apEventPathParamsList[index]));
     }
 
     aEventPathsBuilder.EndOfEventPaths();
@@ -219,7 +222,9 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAt
     for (size_t index = 0; index < aAttributePathParamsListSize; index++)
     {
         VerifyOrReturnError(apAttributePathParamsList[index].IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-        ReturnErrorOnFailure(aAttributePathIBsBuilder.CreatePath().Encode(apAttributePathParamsList[index]));
+        AttributePathIB::Builder path = aAttributePathIBsBuilder.CreatePath();
+        ReturnErrorOnFailure(aAttributePathIBsBuilder.GetError());
+        ReturnErrorOnFailure(path.Encode(apAttributePathParamsList[index]));
     }
     aAttributePathIBsBuilder.EndOfAttributePathIBs();
     return aAttributePathIBsBuilder.GetError();
@@ -662,9 +667,10 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         if (aReadPrepareParams.mEventNumber != 0)
         {
             // EventNumber is optional
-            EventFilterIBs::Builder eventFilters = request.CreateEventFilters();
+            EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
             SuccessOrExit(err = request.GetError());
-            EventFilterIB::Builder eventFilter = eventFilters.CreateEventFilter();
+            EventFilterIB::Builder & eventFilter = eventFilters.CreateEventFilter();
+            SuccessOrExit(err = eventFilters.GetError());
             eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB();
             SuccessOrExit(err = eventFilter.GetError());
             eventFilters.EndOfEventFilters();

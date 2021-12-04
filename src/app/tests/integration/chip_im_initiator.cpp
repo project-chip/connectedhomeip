@@ -630,13 +630,17 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
                                  AttributeReportIBs::Builder & aAttributeReports,
                                  AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
-    AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
-    AttributeStatusIB::Builder attributeStatus = attributeReport.CreateAttributeStatus();
-    AttributePathIB::Builder attributePath     = attributeStatus.CreatePath();
+    AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+    ReturnErrorOnFailure(aAttributeReports.GetError());
+    AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
+    ReturnErrorOnFailure(attributeReport.GetError());
+    AttributePathIB::Builder & attributePath = attributeStatus.CreatePath();
+    ReturnErrorOnFailure(attributeStatus.GetError());
     attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePath.GetError());
-    StatusIB::Builder errorStatus = attributeStatus.CreateErrorStatus();
+    StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
     errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::UnsupportedAttribute));
+    ReturnErrorOnFailure(errorStatus.GetError());
     attributeStatus.EndOfAttributeStatusIB();
     ReturnErrorOnFailure(attributeStatus.GetError());
     return attributeReport.EndOfAttributeReportIB().GetError();

@@ -68,21 +68,17 @@ public:
     /**
      * FinishAttribute encodes the "footer" part of an attribute report (it closes the containers opened in PrepareAttribute)
      */
-    CHIP_ERROR FinishAttribute();
+    CHIP_ERROR FinishAttribute(AttributeReportIBs::Builder & aAttributeReportIBs);
 
     /**
      * EncodeValue encodes the value field of the report, it should be called exactly once.
      */
     template <typename... Ts>
-    CHIP_ERROR EncodeValue(Ts... aArgs)
+    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, Ts... aArgs)
     {
-        return DataModel::Encode(*mAttributeDataIBBuilder.GetWriter(), TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)),
-                                 std::forward<Ts>(aArgs)...);
+        return DataModel::Encode(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()),
+                                 TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), std::forward<Ts>(aArgs)...);
     }
-
-private:
-    AttributeReportIB::Builder mAttributeReportIBBuilder;
-    AttributeDataIB::Builder mAttributeDataIBBuilder;
 };
 
 /**
@@ -252,9 +248,9 @@ private:
         AttributeReportBuilder builder;
 
         ReturnErrorOnFailure(builder.PrepareAttribute(mAttributeReportIBsBuilder, mPath, mDataVersion));
-        ReturnErrorOnFailure(builder.EncodeValue(std::forward<Ts>(aArgs)...));
+        ReturnErrorOnFailure(builder.EncodeValue(mAttributeReportIBsBuilder, std::forward<Ts>(aArgs)...));
 
-        return builder.FinishAttribute();
+        return builder.FinishAttribute(mAttributeReportIBsBuilder);
     }
 
     /**
