@@ -207,9 +207,6 @@ private:
     template <typename... Ts>
     CHIP_ERROR EncodeListItem(Ts... aArgs)
     {
-        // We make Encode atomic here, so need to tell the caller to not rollback when we encounter an error during encoding.
-        mEncodeState.mAllowPartialData = true;
-
         // EncodeListItem must be called after EncodeEmptyList(), thus mCurrentEncodingListIndex and
         // mEncodeState.mCurrentEncodingListIndex are not invalid values.
         if (mCurrentEncodingListIndex < mEncodeState.mCurrentEncodingListIndex)

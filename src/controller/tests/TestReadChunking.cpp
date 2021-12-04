@@ -55,6 +55,7 @@ constexpr EndpointId kTestEndpointId = 2;
 // Another endpoint, with a list attribute only.
 constexpr EndpointId kTestEndpointId3    = 3;
 constexpr AttributeId kTestListAttribute = 6;
+constexpr AttributeId kTestBadAttribute  = 7; // Reading this attribute will return CHIP_NO_MEMORY but nothing is actually encoded.
 
 class TestCommandInteraction
 {
@@ -62,6 +63,7 @@ public:
     TestCommandInteraction() {}
     static void TestChunking(nlTestSuite * apSuite, void * apContext);
     static void TestListChunking(nlTestSuite * apSuite, void * apContext);
+    static void TestBadChunking(nlTestSuite * apSuite, void * apContext);
 
 private:
 };
@@ -78,7 +80,8 @@ DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrs), DECLARE_DYNAMIC_CLUS
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint, testEndpointClusters);
 
 DECLARE_DYNAMIC_ATTRIBUTE_LIST_BEGIN(testClusterAttrsOnEndpoint3)
-DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
+DECLARE_DYNAMIC_ATTRIBUTE(kTestListAttribute, ARRAY, 1, 0), DECLARE_DYNAMIC_ATTRIBUTE(kTestBadAttribute, ARRAY, 1, 0),
+    DECLARE_DYNAMIC_ATTRIBUTE_LIST_END();
 
 DECLARE_DYNAMIC_CLUSTER_LIST_BEGIN(testEndpoint3Clusters)
 DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint3), DECLARE_DYNAMIC_CLUSTER_LIST_END;
@@ -86,6 +89,8 @@ DECLARE_DYNAMIC_CLUSTER(TestCluster::Id, testClusterAttrsOnEndpoint3), DECLARE_D
 DECLARE_DYNAMIC_ENDPOINT(testEndpoint3, testEndpoint3Clusters);
 
 //clang-format on
+
+uint8_t sAnStringThatCanNeverFitIntoTheMTU[4096] = { 0 };
 
 class TestReadCallback : public app::ReadClient::Callback
 {
@@ -152,6 +157,12 @@ CHIP_ERROR TestAttrAccess::Read(const app::ConcreteReadAttributePath & aPath, ap
                 ReturnErrorOnFailure(encoder.Encode((uint8_t) gIterationCount));
             }
             return CHIP_NO_ERROR;
+        });
+    case kTestBadAttribute:
+        // The "BadAttribute" is implemented by encoding a very large octet string, then the encode will always return
+        // CHIP_NO_MEMORY.
+        return aEncoder.EncodeList([](const auto & encoder) {
+            return encoder.Encode(ByteSpan(sAnStringThatCanNeverFitIntoTheMTU, sizeof(sAnStringThatCanNeverFitIntoTheMTU)));
         });
     default:
         return aEncoder.Encode((uint8_t) gIterationCount);
@@ -328,11 +339,68 @@ void TestCommandInteraction::TestListChunking(nlTestSuite * apSuite, void * apCo
     }
 }
 
+// Read an attribute that can never fit into the buffer. Result in an empty report, server should shutdown the transaction.
+void TestCommandInteraction::TestBadChunking(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx                    = *static_cast<TestContext *>(apContext);
+    auto sessionHandle                   = ctx.GetSessionBobToAlice();
+    app::InteractionModelEngine * engine = app::InteractionModelEngine::GetInstance();
+    app::ReadClient * readClient;
+    TestAttrAccess testServer;
+
+    // Initialize the ember side server logic
+    InitDataModelHandler(&ctx.GetExchangeManager());
+
+    // Register our fake dynamic endpoint.
+    emberAfSetDynamicEndpoint(0, kTestEndpointId3, &testEndpoint3, 0, 0);
+
+    // Register our fake attribute access interface.
+    registerAttributeAccessOverride(&testServer);
+
+    app::AttributePathParams attributePath(kTestEndpointId3, app::Clusters::TestCluster::Id, kTestBadAttribute);
+    app::ReadPrepareParams readParams(sessionHandle);
+
+    readParams.mpAttributePathParamsList    = &attributePath;
+    readParams.mAttributePathParamsListSize = 1;
+
+    TestReadCallback readCallback;
+
+    NL_TEST_ASSERT(apSuite,
+                   engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, &readCallback.mBufferedCallback) ==
+                       CHIP_NO_ERROR);
+    NL_TEST_ASSERT(apSuite, readClient->SendReadRequest(readParams) == CHIP_NO_ERROR);
+
+    //
+    // Service the IO + Engine till we get a ReportEnd callback on the client.
+    // The server should return an empty list as attribute data for the first report (for list chunking), and encodes nothing (then
+    // shuts down the read handler) for the second report.
+    //
+    for (int j = 0; j < 2; j++)
+    {
+        ctx.DrainAndServiceIO();
+        chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+        ctx.DrainAndServiceIO();
+    }
+
+    // Nothing is actually encoded. buffered callback does not handle the message to us.
+    NL_TEST_ASSERT(apSuite, readCallback.mAttributeCount == 0);
+
+    // The server should shutted down, while the client is still alive (pending for the attribute data.)
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
+
+    // On real apps, this is done by a timeout.
+    readClient->Shutdown();
+
+    // Sanity check
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
     NL_TEST_DEF("TestChunking", TestCommandInteraction::TestChunking),
     NL_TEST_DEF("TestListChunking", TestCommandInteraction::TestListChunking),
+    NL_TEST_DEF("TestBadChunking", TestCommandInteraction::TestBadChunking),
     NL_TEST_SENTINEL()
 };
 
