@@ -333,6 +333,7 @@ void PlatformManagerImpl::HandleGeneralFault(uint32_t EventId)
     }
     else
     {
+        ChipLogError(DeviceLayer, "Unknow event ID:%d", EventId);
     }
 }
 

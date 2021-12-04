@@ -149,13 +149,22 @@ CHIP_ERROR WiFiDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPat
 class WiFiDiagnosticsDelegate : public DeviceLayer::WiFiDiagnosticsDelegate
 {
     // Gets called when the Node detects Node’s Wi-Fi connection has been disconnected.
-    void OnDisconnectionDetected() override { ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected"); }
+    void OnDisconnectionDetected(uint16_t reasonCode) override
+    {
+        ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnDisconnectionDetected");
+    }
 
     // Gets called when the Node fails to associate or authenticate an access point.
-    void OnAssociationFailureDetected() override { ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnAssociationFailureDetected"); }
+    void OnAssociationFailureDetected(uint8_t associationFailureCause, uint16_t status) override
+    {
+        ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnAssociationFailureDetected");
+    }
 
     // Gets when the Node’s connection status to a Wi-Fi network has changed.
-    void OnConnectionStatusChanged() override { ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged"); }
+    void OnConnectionStatusChanged(uint8_t connectionStatus) override
+    {
+        ChipLogProgress(Zcl, "WiFiDiagnosticsDelegate: OnConnectionStatusChanged");
+    }
 };
 
 WiFiDiagnosticsDelegate gDiagnosticDelegate;
