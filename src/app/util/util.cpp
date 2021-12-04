@@ -309,6 +309,21 @@ void MatterOnOffSwitchConfigurationPluginServerInitCallback() {}
 void MatterPowerSourcePluginServerInitCallback() {}
 void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback() {}
 void MatterBridgedDeviceBasicInformationPluginServerInitCallback() {}
+void MatterPowerConfigurationPluginServerInitCallback() {}
+void MatterPowerProfilePluginServerInitCallback() {}
+void MatterPulseWidthModulationPluginServerInitCallback() {}
+void MatterAlarmsPluginServerInitCallback() {}
+void MatterTimePluginServerInitCallback() {}
+void MatterAclPluginServerInitCallback() {}
+void MatterPollControlPluginServerInitCallback() {}
+void MatterLocalizationConfigurationPluginServerInitCallback() {}
+void MatterLocalizationUnitPluginServerInitCallback() {}
+void MatterLocalizationTimeFormatPluginServerInitCallback() {}
+void MatterUserLabelPluginServerInitCallback() {}
+void MatterTimeSynchronizationPluginServerInitCallback() {}
+void MatterProxyValidPluginServerInitCallback() {}
+void MatterProxyDiscoveryPluginServerInitCallback() {}
+void MatterProxyConfigurationPluginServerInitCallback() {}
 
 // ****************************************
 // This function is called by the application when the stack goes down,

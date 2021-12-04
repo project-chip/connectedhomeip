@@ -493,7 +493,7 @@ class ChipClusters:
     }
     _BINDING_CLUSTER_INFO = {
         "clusterName": "Binding",
-        "clusterId": 0x0000F000,
+        "clusterId": 0x0000001E,
         "commands": {
             0x00000000: {
                 "commandId": 0x00000000,
@@ -1891,7 +1891,7 @@ class ChipClusters:
     }
     _GROUP_KEY_MANAGEMENT_CLUSTER_INFO = {
         "clusterName": "GroupKeyManagement",
-        "clusterId": 0x0000F004,
+        "clusterId": 0x0000003F,
         "commands": {
         },
         "attributes": {
@@ -5223,7 +5223,7 @@ class ChipClusters:
         0x00000103: _BARRIER_CONTROL_CLUSTER_INFO,
         0x00000028: _BASIC_CLUSTER_INFO,
         0x0000000F: _BINARY_INPUT_BASIC_CLUSTER_INFO,
-        0x0000F000: _BINDING_CLUSTER_INFO,
+        0x0000001E: _BINDING_CLUSTER_INFO,
         0x00000045: _BOOLEAN_STATE_CLUSTER_INFO,
         0x00000025: _BRIDGED_ACTIONS_CLUSTER_INFO,
         0x00000039: _BRIDGED_DEVICE_BASIC_CLUSTER_INFO,
@@ -5238,7 +5238,7 @@ class ChipClusters:
         0x00000404: _FLOW_MEASUREMENT_CLUSTER_INFO,
         0x00000030: _GENERAL_COMMISSIONING_CLUSTER_INFO,
         0x00000033: _GENERAL_DIAGNOSTICS_CLUSTER_INFO,
-        0x0000F004: _GROUP_KEY_MANAGEMENT_CLUSTER_INFO,
+        0x0000003F: _GROUP_KEY_MANAGEMENT_CLUSTER_INFO,
         0x00000004: _GROUPS_CLUSTER_INFO,
         0x00000003: _IDENTIFY_CLUSTER_INFO,
         0x00000400: _ILLUMINANCE_MEASUREMENT_CLUSTER_INFO,

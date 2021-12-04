@@ -427,6 +427,40 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPGroupKeyManagementClusterGroupKey
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _vendorId = @(0);
+
+        _groupKeyIndex = @(0);
+
+        _groupKeyRoot = [NSData data];
+
+        _groupKeyEpochStartTime = @(0);
+
+        _groupKeySecurityPolicy = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterGroupState
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _vendorId = @(0);
+
+        _vendorGroupId = @(0);
+
+        _groupKeySetIndex = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPFixedLabelClusterLabelStruct
 - (instancetype)init
 {
@@ -808,40 +842,6 @@ NS_ASSUME_NONNULL_BEGIN
         _fabricIndex = @(0);
 
         _operationalCert = [NSData data];
-    }
-    return self;
-}
-@end
-
-@implementation CHIPGroupKeyManagementClusterGroupKey
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _vendorId = @(0);
-
-        _groupKeyIndex = @(0);
-
-        _groupKeyRoot = [NSData data];
-
-        _groupKeyEpochStartTime = @(0);
-
-        _groupKeySecurityPolicy = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPGroupKeyManagementClusterGroupState
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _vendorId = @(0);
-
-        _vendorGroupId = @(0);
-
-        _groupKeySetIndex = @(0);
     }
     return self;
 }

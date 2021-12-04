@@ -12893,7 +12893,7 @@
         },
         {
           "name": "Binding",
-          "code": 61440,
+          "code": 30,
           "mfgCode": null,
           "define": "BINDING_CLUSTER",
           "side": "client",
@@ -12936,7 +12936,7 @@
         },
         {
           "name": "Binding",
-          "code": 61440,
+          "code": 30,
           "mfgCode": null,
           "define": "BINDING_CLUSTER",
           "side": "server",
@@ -12962,7 +12962,7 @@
         },
         {
           "name": "Group Key Management",
-          "code": 61444,
+          "code": 63,
           "mfgCode": null,
           "define": "GROUP_KEY_MANAGEMENT_CLUSTER",
           "side": "client",
@@ -12988,7 +12988,7 @@
         },
         {
           "name": "Group Key Management",
-          "code": 61444,
+          "code": 63,
           "mfgCode": null,
           "define": "GROUP_KEY_MANAGEMENT_CLUSTER",
           "side": "server",
