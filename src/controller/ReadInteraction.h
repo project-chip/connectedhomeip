@@ -45,7 +45,10 @@ template <typename DecodableAttributeType>
 CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
                          ClusterId clusterId, AttributeId attributeId,
                          typename TypedReadAttributeCallback<DecodableAttributeType>::OnSuccessCallbackType onSuccessCb,
-                         typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType onErrorCb)
+                         typename TypedReadAttributeCallback<DecodableAttributeType>::OnErrorCallbackType onErrorCb,
+                         uint16_t aMinIntervalFloorSeconds = 0, uint16_t aMaxIntervalCeilingSeconds = 0,
+                         bool aKeepSubscription                 = false,
+                         app::ReadClient::InteractionType aType = app::ReadClient::InteractionType::Read)
 {
     app::AttributePathParams attributePath(endpointId, clusterId, attributeId);
     app::ReadPrepareParams readParams(sessionHandle);
@@ -64,9 +67,19 @@ CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, const Sessio
                                                                                                    onSuccessCb, onErrorCb, onDone);
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, callback.get()));
+    ReturnErrorOnFailure(engine->NewReadClient(&readClient, aType, callback.get()));
 
-    err = readClient->SendReadRequest(readParams);
+    if (aType == app::ReadClient::InteractionType::Read)
+    {
+        err = readClient->SendReadRequest(readParams);
+    }
+    else
+    {
+        readParams.mMinIntervalFloorSeconds   = aMinIntervalFloorSeconds;
+        readParams.mMaxIntervalCeilingSeconds = aMaxIntervalCeilingSeconds;
+        readParams.mKeepSubscriptions         = aKeepSubscription;
+        err                                   = readClient->SendSubscribeRequest(readParams);
+    }
     if (err != CHIP_NO_ERROR)
     {
         readClient->Shutdown();
@@ -87,17 +100,19 @@ CHIP_ERROR ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, const Sessio
  * for a given attribute as well as callbacks for success and failure and either returns a decoded cluster-object representation
  * of the requested attribute through the provided success callback or calls the provided failure callback.
  *
- * The EventTypeInfo is generally expected to be a ClusterName::Events::EventName::TypeInfo struct, but any
+ * The DecodableEventType is generally expected to be a ClusterName::Events::EventName::DecodableEventType struct, but any
  * object that contains type information exposed through a 'DecodableType' type declaration as well as GetClusterId() and
  * GetEventId() methods is expected to work.
  */
-template <typename DecodableEventTypeInfo>
+template <typename DecodableEventType>
 CHIP_ERROR ReadEvent(Messaging::ExchangeManager * apExchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
-                     typename TypedReadEventCallback<DecodableEventTypeInfo>::OnSuccessCallbackType onSuccessCb,
-                     typename TypedReadEventCallback<DecodableEventTypeInfo>::OnErrorCallbackType onErrorCb)
+                     typename TypedReadEventCallback<DecodableEventType>::OnSuccessCallbackType onSuccessCb,
+                     typename TypedReadEventCallback<DecodableEventType>::OnErrorCallbackType onErrorCb,
+                     uint16_t aMinIntervalFloorSeconds = 0, uint16_t aMaxIntervalCeilingSeconds = 0, bool aKeepSubscription = false,
+                     app::ReadClient::InteractionType aType = app::ReadClient::InteractionType::Read)
 {
-    ClusterId clusterId = DecodableEventTypeInfo::GetClusterId();
-    EventId eventId     = DecodableEventTypeInfo::GetEventId();
+    ClusterId clusterId = DecodableEventType::GetClusterId();
+    EventId eventId     = DecodableEventType::GetEventId();
     app::EventPathParams eventPath(endpointId, clusterId, eventId);
     app::ReadPrepareParams readParams(sessionHandle);
     app::ReadClient * readClient         = nullptr;
@@ -107,19 +122,27 @@ CHIP_ERROR ReadEvent(Messaging::ExchangeManager * apExchangeMgr, const SessionHa
     readParams.mpEventPathParamsList    = &eventPath;
     readParams.mEventPathParamsListSize = 1;
 
-    auto onDone = [](app::ReadClient * apReadClient, TypedReadEventCallback<DecodableEventTypeInfo> * callback) {
+    auto onDone = [](app::ReadClient * apReadClient, TypedReadEventCallback<DecodableEventType> * callback) {
         chip::Platform::Delete(callback);
     };
 
-    auto callback = chip::Platform::MakeUnique<TypedReadEventCallback<DecodableEventTypeInfo>>(clusterId, eventId, onSuccessCb,
-                                                                                               onErrorCb, onDone);
+    auto callback = chip::Platform::MakeUnique<TypedReadEventCallback<DecodableEventType>>(onSuccessCb, onErrorCb, onDone);
 
     VerifyOrReturnError(callback != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(
-        engine->NewReadClient(&readClient, app::ReadClient::InteractionType::Read, &callback.get()->GetBufferedCallback()));
+    ReturnErrorOnFailure(engine->NewReadClient(&readClient, aType, callback.get()));
 
-    err = readClient->SendReadRequest(readParams);
+    if (aType == app::ReadClient::InteractionType::Read)
+    {
+        err = readClient->SendReadRequest(readParams);
+    }
+    else
+    {
+        readParams.mMinIntervalFloorSeconds   = aMinIntervalFloorSeconds;
+        readParams.mMaxIntervalCeilingSeconds = aMaxIntervalCeilingSeconds;
+        readParams.mKeepSubscriptions         = aKeepSubscription;
+        err                                   = readClient->SendSubscribeRequest(readParams);
+    }
     if (err != CHIP_NO_ERROR)
     {
         readClient->Shutdown();
@@ -139,19 +162,13 @@ template <typename AttributeTypeInfo>
 CHIP_ERROR
 ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
               typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnSuccessCallbackType onSuccessCb,
-              typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnErrorCallbackType onErrorCb)
+              typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnErrorCallbackType onErrorCb,
+              uint16_t aMinIntervalFloorSeconds = 0, uint16_t aMaxIntervalCeilingSeconds = 0, bool aKeepSubscription = false,
+              app::ReadClient::InteractionType aType = app::ReadClient::InteractionType::Read)
 {
-    return ReadAttribute<typename AttributeTypeInfo::DecodableType>(aExchangeMgr, sessionHandle, endpointId,
-                                                                    AttributeTypeInfo::GetClusterId(),
-                                                                    AttributeTypeInfo::GetAttributeId(), onSuccessCb, onErrorCb);
-}
-
-template <typename EventTypeInfo>
-CHIP_ERROR ReadEvent(Messaging::ExchangeManager * aExchangeMgr, const SessionHandle sessionHandle, EndpointId endpointId,
-                     typename TypedReadEventCallback<typename EventTypeInfo::DecodableType>::OnSuccessCallbackType onSuccessCb,
-                     typename TypedReadEventCallback<typename EventTypeInfo::DecodableType>::OnErrorCallbackType onErrorCb)
-{
-    return ReadEvent<typename EventTypeInfo::DecodableType>(aExchangeMgr, sessionHandle, endpointId, onSuccessCb, onErrorCb);
+    return ReadAttribute<typename AttributeTypeInfo::DecodableType>(
+        aExchangeMgr, sessionHandle, endpointId, AttributeTypeInfo::GetClusterId(), AttributeTypeInfo::GetAttributeId(),
+        onSuccessCb, onErrorCb, aMinIntervalFloorSeconds, aMaxIntervalCeilingSeconds, aKeepSubscription, aType);
 }
 } // namespace Controller
 } // namespace chip

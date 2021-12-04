@@ -119,14 +119,20 @@ class TestReadInteraction
 public:
     TestReadInteraction() {}
 
-    static void TestDataResponse(nlTestSuite * apSuite, void * apContext);
-    static void TestAttributeError(nlTestSuite * apSuite, void * apContext);
-    static void TestReadTimeout(nlTestSuite * apSuite, void * apContext);
+    static void TestReadAttributeResponse(nlTestSuite * apSuite, void * apContext);
+    static void TestReadAttributeError(nlTestSuite * apSuite, void * apContext);
+    static void TestReadAttributeTimeout(nlTestSuite * apSuite, void * apContext);
+    static void TestReadEventError(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeAttributeResponse(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeAttributeError(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeAttributeTimeout(nlTestSuite * apSuite, void * apContext);
+    static void TestReadEventResponse(nlTestSuite * apSuite, void * apContext);
+    static void TestSubscribeEventResponse(nlTestSuite * apSuite, void * apContext);
 
 private:
 };
 
-void TestReadInteraction::TestDataResponse(nlTestSuite * apSuite, void * apContext)
+void TestReadInteraction::TestReadAttributeResponse(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx       = *static_cast<TestContext *>(apContext);
     auto sessionHandle      = ctx.GetSessionBobToAlice();
@@ -171,7 +177,39 @@ void TestReadInteraction::TestDataResponse(nlTestSuite * apSuite, void * apConte
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-void TestReadInteraction::TestAttributeError(nlTestSuite * apSuite, void * apContext)
+void TestReadInteraction::TestReadEventResponse(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::EventHeader & eventHeader, const auto & EventResponse) {
+        // TODO: Need to add check when IM event server integration completes
+        IgnoreUnusedVariable(apSuite);
+        onSuccessCbInvoked = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked](const app::EventHeader * eventHeader, Protocols::InteractionModel::Status aIMStatus,
+                                             CHIP_ERROR aError) { onFailureCbInvoked = true; };
+
+    chip::Controller::ReadEvent<TestCluster::Events::TestEvent::DecodableType>(&ctx.GetExchangeManager(), sessionHandle,
+                                                                               kTestEndpointId, onSuccessCb, onFailureCb);
+
+    ctx.DrainAndServiceIO();
+    chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, !onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 0);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
+}
+
+void TestReadInteraction::TestReadAttributeError(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx       = *static_cast<TestContext *>(apContext);
     auto sessionHandle      = ctx.GetSessionBobToAlice();
@@ -206,7 +244,7 @@ void TestReadInteraction::TestAttributeError(nlTestSuite * apSuite, void * apCon
     NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
-void TestReadInteraction::TestReadTimeout(nlTestSuite * apSuite, void * apContext)
+void TestReadInteraction::TestReadAttributeTimeout(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx       = *static_cast<TestContext *>(apContext);
     auto sessionHandle      = ctx.GetSessionBobToAlice();
@@ -262,12 +300,183 @@ void TestReadInteraction::TestReadTimeout(nlTestSuite * apSuite, void * apContex
     // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 0);
 }
 
+void TestReadInteraction::TestSubscribeAttributeResponse(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+
+    responseDirective = kSendDataResponse;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath, const auto & dataResponse) {
+        uint8_t i = 0;
+
+        auto iter = dataResponse.begin();
+        while (iter.Next())
+        {
+            auto & item = iter.GetValue();
+            NL_TEST_ASSERT(apSuite, item.fabricIndex == i);
+            i++;
+        }
+
+        NL_TEST_ASSERT(apSuite, i == 4);
+        NL_TEST_ASSERT(apSuite, iter.GetStatus() == CHIP_NO_ERROR);
+
+        onSuccessCbInvoked = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked](const app::ConcreteAttributePath * attributePath, app::StatusIB aIMStatus,
+                                             CHIP_ERROR aError) { onFailureCbInvoked = true; };
+
+    chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 2 /*aMinIntervalFloorSeconds*/,
+        5 /*aMaxIntervalCeilingSeconds*/, false /*aKeepSubscription*/, app::ReadClient::InteractionType::Subscribe);
+
+    ctx.DrainAndServiceIO();
+    chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, onSuccessCbInvoked && !onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 1);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 1);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
+}
+
+void TestReadInteraction::TestSubscribeEventResponse(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [apSuite, &onSuccessCbInvoked](const app::EventHeader & eventHeader, const auto & EventResponse) {
+        // TODO: Need to add check when IM event server integration completes
+        IgnoreUnusedVariable(apSuite);
+        onSuccessCbInvoked = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked](const app::EventHeader * eventHeader, Protocols::InteractionModel::Status aIMStatus,
+                                             CHIP_ERROR aError) { onFailureCbInvoked = true; };
+
+    chip::Controller::ReadEvent<TestCluster::Events::TestEvent::DecodableType>(
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 2 /*aMinIntervalFloorSeconds*/,
+        5 /*aMaxIntervalCeilingSeconds*/, true /*aKeepSubscription*/, app::ReadClient::InteractionType::Subscribe);
+
+    ctx.DrainAndServiceIO();
+    chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, !onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 2);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 2);
+}
+
+void TestReadInteraction::TestSubscribeAttributeError(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+
+    responseDirective = kSendDataError;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath, const auto & dataResponse) {
+        onSuccessCbInvoked = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteAttributePath * attributePath,
+                                                      Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
+        NL_TEST_ASSERT(apSuite, (aError != CHIP_NO_ERROR) && (aIMStatus == Protocols::InteractionModel::Status::Busy));
+        onFailureCbInvoked = true;
+    };
+
+    chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 2 /*aMinIntervalFloorSeconds*/,
+        5 /*aMaxIntervalCeilingSeconds*/, true /*aKeepSubscription*/, app::ReadClient::InteractionType::Subscribe);
+
+    ctx.DrainAndServiceIO();
+    chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 3);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 3);
+    NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
+}
+
+void TestReadInteraction::TestSubscribeAttributeTimeout(nlTestSuite * apSuite, void * apContext)
+{
+    TestContext & ctx       = *static_cast<TestContext *>(apContext);
+    auto sessionHandle      = ctx.GetSessionBobToAlice();
+    bool onSuccessCbInvoked = false, onFailureCbInvoked = false;
+
+    responseDirective = kSendDataError;
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onSuccessCb = [&onSuccessCbInvoked](const app::ConcreteAttributePath & attributePath, const auto & dataResponse) {
+        onSuccessCbInvoked = true;
+    };
+
+    // Passing of stack variables by reference is only safe because of synchronous completion of the interaction. Otherwise, it's
+    // not safe to do so.
+    auto onFailureCb = [&onFailureCbInvoked, apSuite](const app::ConcreteAttributePath * attributePath,
+                                                      Protocols::InteractionModel::Status aIMStatus, CHIP_ERROR aError) {
+        NL_TEST_ASSERT(apSuite, aError == CHIP_ERROR_TIMEOUT);
+        onFailureCbInvoked = true;
+    };
+
+    chip::Controller::ReadAttribute<TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+        &ctx.GetExchangeManager(), sessionHandle, kTestEndpointId, onSuccessCb, onFailureCb, 2 /*aMinIntervalFloorSeconds*/,
+        5 /*aMaxIntervalCeilingSeconds*/, false /*aKeepSubscription*/, app::ReadClient::InteractionType::Subscribe);
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 4);
+
+    ctx.GetExchangeManager().ExpireExchangesForSession(ctx.GetSessionBobToAlice());
+
+    ctx.DrainAndServiceIO();
+
+    NL_TEST_ASSERT(apSuite, !onSuccessCbInvoked && onFailureCbInvoked);
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadClients() == 3);
+
+    //
+    // TODO: Figure out why I cannot enable this line below.
+    //
+    // NL_TEST_ASSERT(apSuite, ctx.GetExchangeManager().GetNumActiveExchanges() == 1);
+
+    ctx.DrainAndServiceIO();
+    chip::app::InteractionModelEngine::GetInstance()->GetReportingEngine().Run();
+    ctx.DrainAndServiceIO();
+
+    ctx.GetExchangeManager().ExpireExchangesForSession(ctx.GetSessionAliceToBob());
+
+    chip::app::InteractionModelEngine::GetInstance()->Shutdown();
+    NL_TEST_ASSERT(apSuite, chip::app::InteractionModelEngine::GetInstance()->GetNumActiveReadHandlers() == 0);
+}
+
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("TestDataResponse", TestReadInteraction::TestDataResponse),
-    NL_TEST_DEF("TestAttributeError", TestReadInteraction::TestAttributeError),
-    NL_TEST_DEF("TestReadTimeout", TestReadInteraction::TestReadTimeout),
+    NL_TEST_DEF("TestReadAttributeResponse", TestReadInteraction::TestReadAttributeResponse),
+    NL_TEST_DEF("TestReadEventResponse", TestReadInteraction::TestReadEventResponse),
+    NL_TEST_DEF("TestReadAttributeError", TestReadInteraction::TestReadAttributeError),
+    NL_TEST_DEF("TestReadAttributeTimeout", TestReadInteraction::TestReadAttributeTimeout),
+    NL_TEST_DEF("TestSubscribeAttributeResponse", TestReadInteraction::TestSubscribeAttributeResponse),
+    NL_TEST_DEF("TestSubscribeEventResponse", TestReadInteraction::TestSubscribeEventResponse),
+    NL_TEST_DEF("TestSubscribeAttributeError", TestReadInteraction::TestSubscribeAttributeError),
+    NL_TEST_DEF("TestSubscribeAttributeTimeout", TestReadInteraction::TestSubscribeAttributeTimeout),
     NL_TEST_SENTINEL()
 };
 // clang-format on
