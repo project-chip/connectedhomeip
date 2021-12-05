@@ -40,7 +40,7 @@ limitations under the License.
     <define>GENERAL_COMMISSIONING_CLUSTER</define>
     <description>This cluster is used to set, remove and update fabric information on a commissionee.</description>
     <attribute side="server" code="0x00" define="BREADCRUMB" type="INT64U" writable="true" default="0x0000000000000000" optional="false">Breadcrumb</attribute>
-    <attribute side="server" code="0x01" define="BASICCOMMISSIONINGINFO_LIST" type="ARRAY" entryType="BasicCommissioningInfoType" length="254" writable="false" optional="false">BasicCommissioningInfoList</attribute>
+    <attribute side="server" code="0x01" define="BASICCOMMISSIONINGINFO_LIST" type="ARRAY" array="true" entryType="BasicCommissioningInfoType" length="254" writable="false" optional="false">BasicCommissioningInfoList</attribute>
     <attribute side="server" code="0x02" define="REGULATORYCONFIG" type="ENUM8" writable="false" optional="true">RegulatoryConfig</attribute>
     <attribute side="server" code="0x03" define="LOCATIONCAPABILITY" type="ENUM8" writable="false" optional="true">LocationCapability</attribute>
     <command source="client" code="0x00" name="ArmFailSafe" optional="false" cli="chip fabric_commissioning armfailsafe">

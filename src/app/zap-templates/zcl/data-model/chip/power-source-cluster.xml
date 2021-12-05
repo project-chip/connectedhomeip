@@ -41,7 +41,7 @@ limitations under the License.
     <attribute side="server" code="0x0007" define="POWER_SOURCE_WIRED_NOMINAL_VOLTAGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredNominalVoltage</attribute>
     <attribute side="server" code="0x0008" define="POWER_SOURCE_WIRED_MAXIMUM_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">WiredMaximumCurrent</attribute>
     <attribute side="server" code="0x0009" define="POWER_SOURCE_WIRED_PRESENT" type="BOOLEAN" writable="false" optional="true">WiredPresent</attribute>
-    <attribute side="server" code="0x000A" define="POWER_SOURCE_ACTIVE_WIRED_FAULTS" type="ARRAY" entryType="ENUM8" length="8" writable="false" optional="true">ActiveWiredFaults</attribute>
+    <attribute side="server" code="0x000A" define="POWER_SOURCE_ACTIVE_WIRED_FAULTS" type="ARRAY" array="true" entryType="ENUM8" length="8" writable="false" optional="true">ActiveWiredFaults</attribute>
     <attribute side="server" code="0x000B" define="POWER_SOURCE_BAT_VOLTAGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryVoltage</attribute>
     <attribute side="server" code="0x000C" define="POWER_SOURCE_BAT_PERCENT_REMAINING" type="INT8U" min="0x00" max="0xC8" writable="false" optional="true">BatteryPercentRemaining</attribute>
     <attribute side="server" code="0x000D" define="POWER_SOURCE_BAT_TIME_REMAINING" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryTimeRemaining</attribute>
@@ -49,7 +49,7 @@ limitations under the License.
     <attribute side="server" code="0x000F" define="POWER_SOURCE_BAT_REPLACEMENT_NEEDED" type="BOOLEAN" writable="false" optional="true">BatteryReplacementNeeded</attribute>
     <attribute side="server" code="0x0010" define="POWER_SOURCE_BAT_REPLACEABILITY" type="ENUM8" min="0x00" max="0x03" writable="false" optional="true">BatteryReplaceability</attribute>
     <attribute side="server" code="0x0011" define="POWER_SOURCE_BAT_PRESENT" type="BOOLEAN" writable="false" optional="true">BatteryPresent</attribute>
-    <attribute side="server" code="0x0012" define="POWER_SOURCE_ACTIVE_BAT_FAULTS" type="ARRAY" entryType="ENUM8" length="8" writable="false" optional="true">ActiveBatteryFaults</attribute>
+    <attribute side="server" code="0x0012" define="POWER_SOURCE_ACTIVE_BAT_FAULTS" type="ARRAY" array="true" entryType="ENUM8" length="8" writable="false" optional="true">ActiveBatteryFaults</attribute>
     <attribute side="server" code="0x0013" define="POWER_SOURCE_BAT_REPLACEMENT_DESCRIPTION" type="CHAR_STRING" length="60" writable="false" optional="true">BatteryReplacementDescription</attribute>
     <attribute side="server" code="0x0014" define="POWER_SOURCE_BAT_COMMON_DESIGNATION" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryCommonDesignation</attribute>
     <attribute side="server" code="0x0015" define="POWER_SOURCE_BAT_ANSI_DESIGNATION" type="CHAR_STRING" length="20" writable="false" optional="true">BatteryANSIDesignation</attribute>
@@ -61,7 +61,7 @@ limitations under the License.
     <attribute side="server" code="0x001B" define="POWER_SOURCE_BAT_TIME_TO_FULL_CHARGE" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryTimeToFullCharge</attribute>
     <attribute side="server" code="0x001C" define="POWER_SOURCE_BAT_FUNCTIONAL_WHILE_CHARGING" type="BOOLEAN" writable="false" optional="true">BatteryFunctionalWhileCharging</attribute>
     <attribute side="server" code="0x001D" define="POWER_SOURCE_BAT_CHARGING_CURRENT" type="INT32U" min="0x00000000" max="0xFFFFFFFF" writable="false" optional="true">BatteryChargingCurrent</attribute>
-    <attribute side="server" code="0x001E" define="POWER_SOURCE_ACTIVE_BAT_CHARGE_FAULTS" type="ARRAY" entryType="ENUM8" length="16" writable="false" optional="true">ActiveBatteryChargeFaults</attribute>
+    <attribute side="server" code="0x001E" define="POWER_SOURCE_ACTIVE_BAT_CHARGE_FAULTS" type="ARRAY" array="true" entryType="ENUM8" length="16" writable="false" optional="true">ActiveBatteryChargeFaults</attribute>
 
     <!-- TODO: Do events work?
     <event code="0x0000" name="WiredFaultChange" priority="info" side="server">

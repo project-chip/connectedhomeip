@@ -25,7 +25,7 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for controlling the current TV Channel on a device.</description>
-    <attribute side="server" code="0x0000" define="TV_CHANNEL_LIST" type="ARRAY" entryType="TvChannelInfo" length="254" writable="false" optional="false">tv channel list</attribute>
+    <attribute side="server" code="0x0000" define="TV_CHANNEL_LIST" type="ARRAY" array="true" entryType="TvChannelInfo" length="254" writable="false" optional="false">tv channel list</attribute>
     <!-- TODO: Covert this to stuct one it is supported -->
     <attribute side="server" code="0x0001" define="TV_CHANNEL_LINEUP" type="OCTET_STRING" length="32" writable="false" optional="false">tv channel lineup</attribute>
     <!-- TODO: Covert this to stuct one it is supported -->

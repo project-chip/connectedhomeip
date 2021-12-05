@@ -45,7 +45,7 @@ limitations under the License.
     <code>0x003F</code>
     <define>GROUP_KEY_MANAGEMENT_CLUSTER</define>
     <description>The Group Key Management Cluster is the mechanism by which group keys are managed.</description>
-    <attribute side="server" code="0x0000" define="GROUPS" type="ARRAY" entryType="GroupState" length="254" writable="false" optional="false">groups</attribute>
-    <attribute side="server" code="0x0001" define="GROUPKEYS" type="ARRAY" entryType="GroupKey" length="254" writable="false" optional="false">group keys</attribute>
+    <attribute side="server" code="0x0000" define="GROUPS" type="ARRAY" array="true" entryType="GroupState" length="254" writable="false" optional="false">groups</attribute>
+    <attribute side="server" code="0x0001" define="GROUPKEYS" type="ARRAY" array="true" entryType="GroupKey" length="254" writable="false" optional="false">group keys</attribute>
   </cluster>
 </configurator>

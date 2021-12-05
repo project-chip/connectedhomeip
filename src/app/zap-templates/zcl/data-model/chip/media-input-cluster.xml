@@ -25,7 +25,7 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <!-- TODO: Add feature map once it is supported -->
     <description>This cluster provides an interface for controlling the Input Selector on a media device such as a TV.</description>
-    <attribute side="server" code="0x0000" define="MEDIA_INPUT_LIST" type="ARRAY" entryType="MediaInputInfo" length="254" writable="false" optional="false">media input list</attribute>
+    <attribute side="server" code="0x0000" define="MEDIA_INPUT_LIST" type="ARRAY" array="true" entryType="MediaInputInfo" length="254" writable="false" optional="false">media input list</attribute>
     <attribute side="server" code="0x0001" define="MEDIA_INPUT_CURRENT_INPUT" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">current media input</attribute>
 
     <command source="client" code="0x00" name="SelectInput" optional="false">

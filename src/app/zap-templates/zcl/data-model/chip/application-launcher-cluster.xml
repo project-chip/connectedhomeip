@@ -25,7 +25,7 @@ limitations under the License.
     <server init="false" tick="false">true</server>
     <description>This cluster provides an interface for launching content on a media player device such as a TV or Speaker.</description>
 
-    <attribute side="server" code="0x0000" define="APPLICATION_LAUNCHER_LIST" type="ARRAY" entryType="INT16U" length="254" writable="false" optional="false">application launcher list</attribute>
+    <attribute side="server" code="0x0000" define="APPLICATION_LAUNCHER_LIST" type="ARRAY" array="true" entryType="INT16U" length="254" writable="false" optional="false">application launcher list</attribute>
     <!-- TODO: Convert this to struct once it is supported -->
     <attribute side="server" code="0x0001" define="APPLICATION_LAUNCHER_CURRENT_APP_CATALOG_VENDOR_ID" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">catalog vendor id</attribute>
     <attribute side="server" code="0x0002" define="APPLICATION_LAUNCHER_CURRENT_APP_APPLICATION_ID" type="INT8U" min="0x00" max="0xFF" writable="false" default="0x00" optional="true">application id</attribute>
