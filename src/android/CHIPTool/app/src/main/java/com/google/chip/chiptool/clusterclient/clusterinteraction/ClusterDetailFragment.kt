@@ -113,7 +113,6 @@ class ClusterDetailFragment : Fragment() {
           mutableListOf(),
           null,
           null
-          // need to pass list of parameter<String,
         )
       )
       parameterList.forEach {

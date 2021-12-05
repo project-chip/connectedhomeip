@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.cluster_interaction_history_fragment.view.
 import com.google.chip.chiptool.clusterclient.clusterinteraction.ClusterDetailFragment.Companion.endpointId
 
 /**
- * A simple [Fragment] subclass.
+ * A simple [Fragment] subclass for the cluster interaction history component
  * Use the [ClusterInteractionHistoryFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
@@ -48,9 +48,6 @@ class ClusterInteractionHistoryFragment : Fragment() {
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
      * @return A new instance of fragment ClusterInteractionHistoryFragment.
      */
 

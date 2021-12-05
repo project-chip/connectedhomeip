@@ -20,8 +20,8 @@ import kotlinx.android.synthetic.main.cluster_parameter_item.view.clusterParamet
 import kotlinx.android.synthetic.main.cluster_parameter_item.view.clusterParameterTypeTv
 
 /**
- * EndpointAdapter implements the endpointList(RecycleView) Adapter and associates different
- * endpoint with the same onClick function provided in [ClusterInteractionFragment.EndpointListener]
+ * HistoryCommandAdapter implements the historyCommandList(RecycleView) Adapter and associates different
+ * history command with the same onClick function provided in [ClusterInteractionHistoryFragment.HistoryCommandListener]
  */
 class HistoryCommandAdapter(
   private val HistoryCommandList: List<HistoryCommand>,
