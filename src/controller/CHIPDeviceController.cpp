@@ -61,6 +61,7 @@
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
 #include <lib/support/ScopedBuffer.h>
+#include <lib/support/ThreadOperationalDataset.h>
 #include <lib/support/TimeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <messaging/ExchangeContext.h>
@@ -1830,14 +1831,65 @@ void DeviceCommissioner::PerformCommissioningStep(DeviceProxy * proxy, Commissio
     // Once these are implemented through the clusters, these should be moved into their separate stages and the callbacks
     // should advance the commissioning stage.
     case CommissioningStage::kConfigACL:
-    case CommissioningStage::kNetworkSetup:
-    case CommissioningStage::kScanNetworks:
         // TODO: Implement
         break;
-    case CommissioningStage::kNetworkEnable: {
-        ChipLogProgress(Controller, "Enabling Network");
-        // For on-network, this is a NO-OP becuase we now start operational advertising once credentials are provisioned.
-        // This is a placeholder for thread and wifi networks once that is implemented.
+    case CommissioningStage::kWifiNetworkSetup: {
+        if (!params.HasWifiCredentials())
+        {
+            CommissioningDelegate::CommissioningReport report;
+            report.stageCompleted = step;
+            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+        }
+        ChipLogProgress(Controller, "Adding wifi network");
+        NetworkCommissioningCluster netCom;
+        netCom.Associate(proxy, 0);
+        netCom.AddWiFiNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWifiCredentials().Value().ssid,
+                              params.GetWifiCredentials().Value().credentials, breadcrumb, kCommandTimeoutMs);
+    }
+    break;
+    case CommissioningStage::kThreadNetworkSetup: {
+        if (!params.HasThreadOperationalDataset())
+        {
+            CommissioningDelegate::CommissioningReport report;
+            report.stageCompleted = step;
+            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+        }
+        ChipLogProgress(Controller, "Adding thread network");
+        NetworkCommissioningCluster netCom;
+        netCom.Associate(proxy, 0);
+        netCom.AddThreadNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetThreadOperationalDataset().Value(), breadcrumb,
+                                kCommandTimeoutMs);
+    }
+    break;
+    case CommissioningStage::kWifiNetworkEnable: {
+        if (!params.HasWifiCredentials())
+        {
+            CommissioningDelegate::CommissioningReport report;
+            report.stageCompleted = step;
+            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+        }
+        ChipLogProgress(Controller, "Enabling wifi network");
+        NetworkCommissioningCluster netCom;
+        netCom.Associate(proxy, 0);
+        netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(), params.GetWifiCredentials().Value().ssid, breadcrumb,
+                             kCommandTimeoutMs);
+    }
+    break;
+    case CommissioningStage::kThreadNetworkEnable: {
+        ByteSpan extendedPanId;
+        chip::Thread::OperationalDataset operationalDataset;
+        if (!params.HasThreadOperationalDataset() ||
+            operationalDataset.Init(params.GetThreadOperationalDataset().Value()) != CHIP_NO_ERROR ||
+            operationalDataset.GetExtendedPanIdAsByteSpan(extendedPanId) != CHIP_NO_ERROR)
+        {
+            CommissioningDelegate::CommissioningReport report;
+            report.stageCompleted = step;
+            mCommissioningDelegate->CommissioningStepFinished(CHIP_ERROR_INVALID_ARGUMENT, report);
+        }
+        ChipLogProgress(Controller, "Enabling thread network");
+        NetworkCommissioningCluster netCom;
+        netCom.Associate(proxy, 0);
+        netCom.EnableNetwork(mSuccess.Cancel(), mFailure.Cancel(), extendedPanId, breadcrumb, kCommandTimeoutMs);
     }
     break;
     case CommissioningStage::kFindOperational: {

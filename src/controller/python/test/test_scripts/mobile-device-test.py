@@ -79,6 +79,9 @@ def main():
     FailIfNot(test.TestDiscovery(discriminator=TEST_DISCRIMINATOR),
               "Failed to discover any devices.")
 
+    FailIfNot(test.SetThreadOperationalDataset(dataset=TEST_THREAD_NETWORK_DATASET_TLV),
+              "Failed to finish network commissioning")
+
     logger.info("Testing key exchange")
     FailIfNot(test.TestKeyExchange(ip=options.deviceAddress,
                                    setuppin=20202021,
@@ -91,14 +94,6 @@ def main():
     logger.info("Testing resolve")
     FailIfNot(test.TestResolve(nodeid=1),
               "Failed to resolve nodeid")
-
-    logger.info("Testing network commissioning")
-    FailIfNot(test.TestNetworkCommissioning(nodeid=1,
-                                            endpoint=ENDPOINT_ID,
-                                            group=GROUP_ID,
-                                            dataset=TEST_THREAD_NETWORK_DATASET_TLV,
-                                            network_id=TEST_THREAD_NETWORK_ID),
-              "Failed to finish network commissioning")
 
     logger.info("Testing on off cluster")
     FailIfNot(test.TestOnOffCluster(nodeid=1,

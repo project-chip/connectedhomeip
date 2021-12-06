@@ -35,9 +35,10 @@ enum CommissioningStage : uint8_t
     kDeviceAttestation,
     kCheckCertificates,
     kConfigACL,
-    kNetworkSetup,
-    kScanNetworks, // optional stage if network setup fails (not yet implemented)
-    kNetworkEnable,
+    kWifiNetworkSetup,
+    kThreadNetworkSetup,
+    kWifiNetworkEnable,
+    kThreadNetworkEnable,
     kFindOperational,
     kSendComplete,
     kCleanup,

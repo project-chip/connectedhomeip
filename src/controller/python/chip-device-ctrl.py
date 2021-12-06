@@ -896,19 +896,33 @@ class DeviceMgrCmd(Cmd):
 
     def do_setpairingwificredential(self, line):
         """
-        set-pairing-wifi-credential
-
-        Removed, use network commissioning cluster instead.
+        set-pairing-wifi-credential ssid credentials
         """
-        print("Pairing WiFi Credential is nolonger available, use NetworkCommissioning cluster instead.")
+        try:
+            args = shlex.split(line)
+            if len(args) < 2:
+                print("Usage:")
+                self.do_help("set-pairing-wifi-credential")
+                return
+            self.devCtrl.SetWifiCredentials(args[0].encode("utf-8"), args[1].encode("utf-8"))
+        except Exception as ex:
+            print(str(ex))
+            return
 
     def do_setpairingthreadcredential(self, line):
         """
-        set-pairing-thread-credential
-
-        Removed, use network commissioning cluster instead.
+        set-pairing-thread-credential threadOperationalDataset
         """
-        print("Pairing Thread Credential is nolonger available, use NetworkCommissioning cluster instead.")
+        try:
+            args = shlex.split(line)
+            if len(args) < 1:
+                print("Usage:")
+                self.do_help("set-pairing-thread-credential")
+                return
+            self.devCtrl.SetThreadOperationalDataset(args[0].encode("utf-8"))
+        except Exception as ex:
+            print(str(ex))
+            return
 
     def do_opencommissioningwindow(self, line):
         """
