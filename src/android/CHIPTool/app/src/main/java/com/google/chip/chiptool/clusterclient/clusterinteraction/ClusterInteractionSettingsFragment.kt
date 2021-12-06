@@ -29,8 +29,6 @@ class ClusterInteractionSettingsFragment : Fragment() {
      *
      * @return A new instance of fragment ClusterInteractionSettingsFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    @JvmStatic
     fun newInstance() =
       ClusterInteractionSettingsFragment().apply {
         arguments = Bundle().apply {
