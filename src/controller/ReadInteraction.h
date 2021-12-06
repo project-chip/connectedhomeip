@@ -139,9 +139,9 @@ ReadAttribute(Messaging::ExchangeManager * aExchangeMgr, const SessionHandle ses
               typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnSuccessCallbackType onSuccessCb,
               typename TypedReadAttributeCallback<typename AttributeTypeInfo::DecodableType>::OnErrorCallbackType onErrorCb)
 {
-    return ReadAttribute<typename AttributeTypeInfo::DecodableType>(
-        aExchangeMgr, sessionHandle, endpointId, AttributeTypeInfo::GetClusterId(), AttributeTypeInfo::GetAttributeId(),
-        onSuccessCb, onErrorCb);
+    return ReadAttribute<typename AttributeTypeInfo::DecodableType>(aExchangeMgr, sessionHandle, endpointId,
+                                                                    AttributeTypeInfo::GetClusterId(),
+                                                                    AttributeTypeInfo::GetAttributeId(), onSuccessCb, onErrorCb);
 }
 } // namespace Controller
 } // namespace chip
