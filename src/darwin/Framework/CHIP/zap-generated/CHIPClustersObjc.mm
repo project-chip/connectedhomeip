@@ -5979,10 +5979,14 @@ using namespace chip::app::Clusters;
     return &_cppCluster;
 }
 
-- (void)clearAllPINCodesWithCompletionHandler:(StatusCompletion)completionHandler
+- (void)clearCredentialWithParams:(CHIPDoorLockClusterClearCredentialParams *)params
+                completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::ClearAllPINCodes::Type request;
+    DoorLock::Commands::ClearCredential::Type request;
+    request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
+        params.credential.credentialType.unsignedCharValue);
+    request.credential.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -5996,85 +6000,10 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)clearAllRFIDCodesWithCompletionHandler:(StatusCompletion)completionHandler
+- (void)clearUserWithParams:(CHIPDoorLockClusterClearUserParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::ClearAllRFIDCodes::Type request;
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)clearHolidayScheduleWithParams:(CHIPDoorLockClusterClearHolidayScheduleParams *)params
-                     completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::ClearHolidaySchedule::Type request;
-    request.holidayIndex = params.holidayIndex.unsignedCharValue;
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)clearPINCodeWithParams:(CHIPDoorLockClusterClearPINCodeParams *)params completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::ClearPINCode::Type request;
-    request.pinSlotIndex = params.pinSlotIndex.unsignedShortValue;
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)clearRFIDCodeWithParams:(CHIPDoorLockClusterClearRFIDCodeParams *)params
-              completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::ClearRFIDCode::Type request;
-    request.rfidSlotIndex = params.rfidSlotIndex.unsignedShortValue;
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)clearWeekDayScheduleWithParams:(CHIPDoorLockClusterClearWeekDayScheduleParams *)params
-                     completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::ClearWeekDaySchedule::Type request;
-    request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
+    DoorLock::Commands::ClearUser::Type request;
     request.userIndex = params.userIndex.unsignedShortValue;
 
     new CHIPCommandSuccessCallbackBridge(
@@ -6089,163 +6018,43 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)clearYearDayScheduleWithParams:(CHIPDoorLockClusterClearYearDayScheduleParams *)params
-                     completionHandler:(StatusCompletion)completionHandler
+- (void)getCredentialStatusWithParams:(CHIPDoorLockClusterGetCredentialStatusParams *)params
+                    completionHandler:(void (^)(CHIPDoorLockClusterGetCredentialStatusResponseParams * _Nullable data,
+                                          NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::ClearYearDaySchedule::Type request;
-    request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
+    DoorLock::Commands::GetCredentialStatus::Type request;
+    request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
+        params.credential.credentialType.unsignedCharValue);
+    request.credential.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
+
+    new CHIPDoorLockClusterGetCredentialStatusResponseCallbackBridge(
+        self.callbackQueue,
+        ^(NSError * _Nullable error, id _Nullable value) {
+            completionHandler(value, error);
+        },
+        ^(Cancelable * success, Cancelable * failure) {
+            auto successFn = Callback<CHIPDoorLockClusterGetCredentialStatusResponseCallbackType>::FromCancelable(success);
+            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
+        });
+}
+
+- (void)getUserWithParams:(CHIPDoorLockClusterGetUserParams *)params
+        completionHandler:
+            (void (^)(CHIPDoorLockClusterGetUserResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
+{
+    ListFreer listFreer;
+    DoorLock::Commands::GetUser::Type request;
     request.userIndex = params.userIndex.unsignedShortValue;
 
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getHolidayScheduleWithParams:(CHIPDoorLockClusterGetHolidayScheduleParams *)params
-                   completionHandler:(void (^)(CHIPDoorLockClusterGetHolidayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetHolidaySchedule::Type request;
-    request.holidayIndex = params.holidayIndex.unsignedCharValue;
-
-    new CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge(
+    new CHIPDoorLockClusterGetUserResponseCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
             completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getLogRecordWithParams:(CHIPDoorLockClusterGetLogRecordParams *)params
-             completionHandler:(void (^)(CHIPDoorLockClusterGetLogRecordResponseParams * _Nullable data,
-                                   NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetLogRecord::Type request;
-    request.logIndex = params.logIndex.unsignedShortValue;
-
-    new CHIPDoorLockClusterGetLogRecordResponseCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetLogRecordResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getPINCodeWithParams:(CHIPDoorLockClusterGetPINCodeParams *)params
-           completionHandler:
-               (void (^)(CHIPDoorLockClusterGetPINCodeResponseParams * _Nullable data, NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetPINCode::Type request;
-    request.userId = params.userId.unsignedShortValue;
-
-    new CHIPDoorLockClusterGetPINCodeResponseCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetPINCodeResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getRFIDCodeWithParams:(CHIPDoorLockClusterGetRFIDCodeParams *)params
-            completionHandler:(void (^)(CHIPDoorLockClusterGetRFIDCodeResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetRFIDCode::Type request;
-    request.userId = params.userId.unsignedShortValue;
-
-    new CHIPDoorLockClusterGetRFIDCodeResponseCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetRFIDCodeResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getUserTypeWithParams:(CHIPDoorLockClusterGetUserTypeParams *)params
-            completionHandler:(void (^)(CHIPDoorLockClusterGetUserTypeResponseParams * _Nullable data,
-                                  NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetUserType::Type request;
-    request.userId = params.userId.unsignedShortValue;
-
-    new CHIPDoorLockClusterGetUserTypeResponseCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetUserTypeResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getWeekDayScheduleWithParams:(CHIPDoorLockClusterGetWeekDayScheduleParams *)params
-                   completionHandler:(void (^)(CHIPDoorLockClusterGetWeekDayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetWeekDaySchedule::Type request;
-    request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
-    request.userIndex = params.userIndex.unsignedShortValue;
-
-    new CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)getYearDayScheduleWithParams:(CHIPDoorLockClusterGetYearDayScheduleParams *)params
-                   completionHandler:(void (^)(CHIPDoorLockClusterGetYearDayScheduleResponseParams * _Nullable data,
-                                         NSError * _Nullable error))completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::GetYearDaySchedule::Type request;
-    request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
-    request.userIndex = params.userIndex.unsignedShortValue;
-
-    new CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(value, error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPDoorLockClusterGetUserResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
@@ -6275,124 +6084,56 @@ using namespace chip::app::Clusters;
         });
 }
 
-- (void)setHolidayScheduleWithParams:(CHIPDoorLockClusterSetHolidayScheduleParams *)params
-                   completionHandler:(StatusCompletion)completionHandler
+- (void)setCredentialWithParams:(CHIPDoorLockClusterSetCredentialParams *)params
+              completionHandler:(void (^)(CHIPDoorLockClusterSetCredentialResponseParams * _Nullable data,
+                                    NSError * _Nullable error))completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::SetHolidaySchedule::Type request;
-    request.holidayIndex = params.holidayIndex.unsignedCharValue;
-    request.localStartTime = params.localStartTime.unsignedIntValue;
-    request.localEndTime = params.localEndTime.unsignedIntValue;
-    request.operatingMode
-        = static_cast<std::remove_reference_t<decltype(request.operatingMode)>>(params.operatingMode.unsignedCharValue);
+    DoorLock::Commands::SetCredential::Type request;
+    request.operationType
+        = static_cast<std::remove_reference_t<decltype(request.operationType)>>(params.operationType.unsignedCharValue);
+    request.credential.credentialType = static_cast<std::remove_reference_t<decltype(request.credential.credentialType)>>(
+        params.credential.credentialType.unsignedCharValue);
+    request.credential.credentialIndex = params.credential.credentialIndex.unsignedShortValue;
+    request.credentialData = [self asByteSpan:params.credentialData];
+    request.userIndex = params.userIndex.unsignedShortValue;
+    request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(params.userStatus.unsignedCharValue);
 
-    new CHIPCommandSuccessCallbackBridge(
+    new CHIPDoorLockClusterSetCredentialResponseCallbackBridge(
         self.callbackQueue,
         ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(error);
+            completionHandler(value, error);
         },
         ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
+            auto successFn = Callback<CHIPDoorLockClusterSetCredentialResponseCallbackType>::FromCancelable(success);
             auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
             return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
         });
 }
 
-- (void)setPINCodeWithParams:(CHIPDoorLockClusterSetPINCodeParams *)params completionHandler:(StatusCompletion)completionHandler
+- (void)setUserWithParams:(CHIPDoorLockClusterSetUserParams *)params completionHandler:(StatusCompletion)completionHandler
 {
     ListFreer listFreer;
-    DoorLock::Commands::SetPINCode::Type request;
-    request.userId = params.userId.unsignedShortValue;
+    DoorLock::Commands::SetUser::Type request;
+    request.operationType
+        = static_cast<std::remove_reference_t<decltype(request.operationType)>>(params.operationType.unsignedCharValue);
+    request.userIndex = params.userIndex.unsignedShortValue;
+    if (params.userName == nil) {
+        request.userName.SetNull();
+    } else {
+        auto & nonNullValue_0 = request.userName.SetNonNull();
+        nonNullValue_0 = [self asCharSpan:params.userName];
+    }
+    if (params.userUniqueId == nil) {
+        request.userUniqueId.SetNull();
+    } else {
+        auto & nonNullValue_0 = request.userUniqueId.SetNonNull();
+        nonNullValue_0 = params.userUniqueId.unsignedIntValue;
+    }
     request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(params.userStatus.unsignedCharValue);
     request.userType = static_cast<std::remove_reference_t<decltype(request.userType)>>(params.userType.unsignedCharValue);
-    request.pin = [self asByteSpan:params.pin];
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)setRFIDCodeWithParams:(CHIPDoorLockClusterSetRFIDCodeParams *)params completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::SetRFIDCode::Type request;
-    request.userId = params.userId.unsignedShortValue;
-    request.userStatus = static_cast<std::remove_reference_t<decltype(request.userStatus)>>(params.userStatus.unsignedCharValue);
-    request.userType = static_cast<std::remove_reference_t<decltype(request.userType)>>(params.userType.unsignedCharValue);
-    request.rfidCode = [self asByteSpan:params.rfidCode];
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)setUserTypeWithParams:(CHIPDoorLockClusterSetUserTypeParams *)params completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::SetUserType::Type request;
-    request.userId = params.userId.unsignedShortValue;
-    request.userType = static_cast<std::remove_reference_t<decltype(request.userType)>>(params.userType.unsignedCharValue);
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)setWeekDayScheduleWithParams:(CHIPDoorLockClusterSetWeekDayScheduleParams *)params
-                   completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::SetWeekDaySchedule::Type request;
-    request.weekDayIndex = params.weekDayIndex.unsignedCharValue;
-    request.userIndex = params.userIndex.unsignedShortValue;
-    request.daysMask = static_cast<std::remove_reference_t<decltype(request.daysMask)>>(params.daysMask.unsignedCharValue);
-    request.startHour = params.startHour.unsignedCharValue;
-    request.startMinute = params.startMinute.unsignedCharValue;
-    request.endHour = params.endHour.unsignedCharValue;
-    request.endMinute = params.endMinute.unsignedCharValue;
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)setYearDayScheduleWithParams:(CHIPDoorLockClusterSetYearDayScheduleParams *)params
-                   completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::SetYearDaySchedule::Type request;
-    request.yearDayIndex = params.yearDayIndex.unsignedCharValue;
-    request.userIndex = params.userIndex.unsignedShortValue;
-    request.localStartTime = params.localStartTime.unsignedIntValue;
-    request.localEndTime = params.localEndTime.unsignedIntValue;
+    request.credentialRule
+        = static_cast<std::remove_reference_t<decltype(request.credentialRule)>>(params.credentialRule.unsignedCharValue);
 
     new CHIPCommandSuccessCallbackBridge(
         self.callbackQueue,
@@ -6416,29 +6157,6 @@ using namespace chip::app::Clusters;
             auto & definedValue_0 = request.pinCode.Emplace();
             definedValue_0 = [self asByteSpan:params.pinCode];
         }
-    }
-
-    new CHIPCommandSuccessCallbackBridge(
-        self.callbackQueue,
-        ^(NSError * _Nullable error, id _Nullable value) {
-            completionHandler(error);
-        },
-        ^(Cancelable * success, Cancelable * failure) {
-            auto successFn = Callback<CHIPCommandSuccessCallbackType>::FromCancelable(success);
-            auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
-            return self.cppCluster.InvokeCommand(request, successFn->mContext, successFn->mCall, failureFn->mCall);
-        });
-}
-
-- (void)unlockWithTimeoutWithParams:(CHIPDoorLockClusterUnlockWithTimeoutParams *)params
-                  completionHandler:(StatusCompletion)completionHandler
-{
-    ListFreer listFreer;
-    DoorLock::Commands::UnlockWithTimeout::Type request;
-    request.timeout = params.timeout.unsignedShortValue;
-    if (params.pinCode != nil) {
-        auto & definedValue_0 = request.pinCode.Emplace();
-        definedValue_0 = [self asByteSpan:params.pinCode];
     }
 
     new CHIPCommandSuccessCallbackBridge(

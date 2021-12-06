@@ -2906,84 +2906,44 @@ static void OnDiagnosticLogsRetrieveLogsResponseSuccess(
     command->SetCommandExitStatus(err);
 };
 
-static void OnDoorLockGetHolidayScheduleResponseSuccess(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data)
+static void OnDoorLockGetCredentialStatusResponseSuccess(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data)
 {
-    ChipLogProgress(Zcl, "Received GetHolidayScheduleResponse:");
+    ChipLogProgress(Zcl, "Received GetCredentialStatusResponse:");
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("holidayIndex", 1, data.holidayIndex);
+        err = LogValue("credentialExists", 1, data.credentialExists);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
+        err = LogValue("userIndex", 1, data.userIndex);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("localStartTime", 1, data.localStartTime);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("localEndTime", 1, data.localEndTime);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("operatingMode", 1, data.operatingMode);
+        err = LogValue("nextCredentialIndex", 1, data.nextCredentialIndex);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(err);
 };
 
-static void
-OnDoorLockGetLogRecordResponseSuccess(void * context,
-                                      const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType & data)
+static void OnDoorLockGetUserResponseSuccess(void * context,
+                                             const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data)
 {
-    ChipLogProgress(Zcl, "Received GetLogRecordResponse:");
+    ChipLogProgress(Zcl, "Received GetUserResponse:");
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("logEntryId", 1, data.logEntryId);
+        err = LogValue("userIndex", 1, data.userIndex);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("timestamp", 1, data.timestamp);
+        err = LogValue("userName", 1, data.userName);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("eventType", 1, data.eventType);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("source", 1, data.source);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("eventIdOrAlarmCode", 1, data.eventIdOrAlarmCode);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userId", 1, data.userId);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("pin", 1, data.pin);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
-static void
-OnDoorLockGetPINCodeResponseSuccess(void * context,
-                                    const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received GetPINCodeResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userId", 1, data.userId);
+        err = LogValue("userUniqueId", 1, data.userUniqueId);
     }
     if (err == CHIP_NO_ERROR)
     {
@@ -2995,7 +2955,23 @@ OnDoorLockGetPINCodeResponseSuccess(void * context,
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("pin", 1, data.pin);
+        err = LogValue("credentialRule", 1, data.credentialRule);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("credentials", 1, data.credentials);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("creatorFabricIndex", 1, data.creatorFabricIndex);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("lastModifiedFabricIndex", 1, data.lastModifiedFabricIndex);
+    }
+    if (err == CHIP_NO_ERROR)
+    {
+        err = LogValue("nextUserIndex", 1, data.nextUserIndex);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -3003,59 +2979,14 @@ OnDoorLockGetPINCodeResponseSuccess(void * context,
 };
 
 static void
-OnDoorLockGetRFIDCodeResponseSuccess(void * context,
-                                     const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType & data)
+OnDoorLockSetCredentialResponseSuccess(void * context,
+                                       const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data)
 {
-    ChipLogProgress(Zcl, "Received GetRFIDCodeResponse:");
+    ChipLogProgress(Zcl, "Received SetCredentialResponse:");
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("userId", 1, data.userId);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userStatus", 1, data.userStatus);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userType", 1, data.userType);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("rfidCode", 1, data.rfidCode);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
-static void
-OnDoorLockGetUserTypeResponseSuccess(void * context,
-                                     const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received GetUserTypeResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userId", 1, data.userId);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userType", 1, data.userType);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
-static void OnDoorLockGetWeekDayScheduleResponseSuccess(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received GetWeekDayScheduleResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("weekDayIndex", 1, data.weekDayIndex);
+        err = LogValue("status", 1, data.status);
     }
     if (err == CHIP_NO_ERROR)
     {
@@ -3063,57 +2994,7 @@ static void OnDoorLockGetWeekDayScheduleResponseSuccess(
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("status", 1, data.status);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("daysMask", 1, data.daysMask);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("startHour", 1, data.startHour);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("startMinute", 1, data.startMinute);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("endHour", 1, data.endHour);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("endMinute", 1, data.endMinute);
-    }
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-};
-
-static void OnDoorLockGetYearDayScheduleResponseSuccess(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data)
-{
-    ChipLogProgress(Zcl, "Received GetYearDayScheduleResponse:");
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("yearDayIndex", 1, data.yearDayIndex);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("userIndex", 1, data.userIndex);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("status", 1, data.status);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("localStartTime", 1, data.localStartTime);
-    }
-    if (err == CHIP_NO_ERROR)
-    {
-        err = LogValue("localEndTime", 1, data.localEndTime);
+        err = LogValue("nextCredentialIndex", 1, data.nextCredentialIndex);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -15589,29 +15470,14 @@ private:
 | Cluster DoorLock                                                    | 0x0101 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
-| * ClearAllPINCodes                                                  |   0x08 |
-| * ClearAllRFIDCodes                                                 |   0x19 |
-| * ClearHolidaySchedule                                              |   0x13 |
-| * ClearPINCode                                                      |   0x07 |
-| * ClearRFIDCode                                                     |   0x18 |
-| * ClearWeekDaySchedule                                              |   0x0D |
-| * ClearYearDaySchedule                                              |   0x10 |
-| * GetHolidaySchedule                                                |   0x12 |
-| * GetLogRecord                                                      |   0x04 |
-| * GetPINCode                                                        |   0x06 |
-| * GetRFIDCode                                                       |   0x17 |
-| * GetUserType                                                       |   0x15 |
-| * GetWeekDaySchedule                                                |   0x0C |
-| * GetYearDaySchedule                                                |   0x0F |
+| * ClearCredential                                                   |   0x26 |
+| * ClearUser                                                         |   0x1D |
+| * GetCredentialStatus                                               |   0x24 |
+| * GetUser                                                           |   0x1B |
 | * LockDoor                                                          |   0x00 |
-| * SetHolidaySchedule                                                |   0x11 |
-| * SetPINCode                                                        |   0x05 |
-| * SetRFIDCode                                                       |   0x16 |
-| * SetUserType                                                       |   0x14 |
-| * SetWeekDaySchedule                                                |   0x0B |
-| * SetYearDaySchedule                                                |   0x0E |
+| * SetCredential                                                     |   0x22 |
+| * SetUser                                                           |   0x1A |
 | * UnlockDoor                                                        |   0x01 |
-| * UnlockWithTimeout                                                 |   0x03 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * LockState                                                         | 0x0000 |
@@ -15621,335 +15487,99 @@ private:
 \*----------------------------------------------------------------------------*/
 
 /*
- * Command ClearAllPINCodes
+ * Command ClearCredential
  */
-class DoorLockClearAllPINCodes : public ModelCommand
+class DoorLockClearCredential : public ModelCommand
 {
 public:
-    DoorLockClearAllPINCodes() : ModelCommand("clear-all-pincodes") { ModelCommand::AddArguments(); }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    DoorLockClearCredential() : ModelCommand("clear-credential")
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000008) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearAllPINCodes::Type mRequest;
-};
-
-/*
- * Command ClearAllRFIDCodes
- */
-class DoorLockClearAllRFIDCodes : public ModelCommand
-{
-public:
-    DoorLockClearAllRFIDCodes() : ModelCommand("clear-all-rfidcodes") { ModelCommand::AddArguments(); }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000019) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearAllRFIDCodes::Type mRequest;
-};
-
-/*
- * Command ClearHolidaySchedule
- */
-class DoorLockClearHolidaySchedule : public ModelCommand
-{
-public:
-    DoorLockClearHolidaySchedule() : ModelCommand("clear-holiday-schedule")
-    {
-        AddArgument("HolidayIndex", 0, UINT8_MAX, &mRequest.holidayIndex);
+        // credential Struct parsing is not supported yet
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000013) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000026) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::DoorLock::Commands::ClearHolidaySchedule::Type mRequest;
+    chip::app::Clusters::DoorLock::Commands::ClearCredential::Type mRequest;
 };
 
 /*
- * Command ClearPINCode
+ * Command ClearUser
  */
-class DoorLockClearPINCode : public ModelCommand
+class DoorLockClearUser : public ModelCommand
 {
 public:
-    DoorLockClearPINCode() : ModelCommand("clear-pincode")
+    DoorLockClearUser() : ModelCommand("clear-user")
     {
-        AddArgument("PinSlotIndex", 0, UINT16_MAX, &mRequest.pinSlotIndex);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000007) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearPINCode::Type mRequest;
-};
-
-/*
- * Command ClearRFIDCode
- */
-class DoorLockClearRFIDCode : public ModelCommand
-{
-public:
-    DoorLockClearRFIDCode() : ModelCommand("clear-rfidcode")
-    {
-        AddArgument("RfidSlotIndex", 0, UINT16_MAX, &mRequest.rfidSlotIndex);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000018) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearRFIDCode::Type mRequest;
-};
-
-/*
- * Command ClearWeekDaySchedule
- */
-class DoorLockClearWeekDaySchedule : public ModelCommand
-{
-public:
-    DoorLockClearWeekDaySchedule() : ModelCommand("clear-week-day-schedule")
-    {
-        AddArgument("WeekDayIndex", 0, UINT8_MAX, &mRequest.weekDayIndex);
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000D) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001D) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::DoorLock::Commands::ClearWeekDaySchedule::Type mRequest;
+    chip::app::Clusters::DoorLock::Commands::ClearUser::Type mRequest;
 };
 
 /*
- * Command ClearYearDaySchedule
+ * Command GetCredentialStatus
  */
-class DoorLockClearYearDaySchedule : public ModelCommand
+class DoorLockGetCredentialStatus : public ModelCommand
 {
 public:
-    DoorLockClearYearDaySchedule() : ModelCommand("clear-year-day-schedule")
+    DoorLockGetCredentialStatus() : ModelCommand("get-credential-status")
     {
-        AddArgument("YearDayIndex", 0, UINT8_MAX, &mRequest.yearDayIndex);
-        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        // credential Struct parsing is not supported yet
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000010) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000024) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::ClearYearDaySchedule::Type mRequest;
-};
-
-/*
- * Command GetHolidaySchedule
- */
-class DoorLockGetHolidaySchedule : public ModelCommand
-{
-public:
-    DoorLockGetHolidaySchedule() : ModelCommand("get-holiday-schedule")
-    {
-        AddArgument("HolidayIndex", 0, UINT8_MAX, &mRequest.holidayIndex);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000012) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetHolidayScheduleResponseSuccess, OnDefaultFailure,
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetCredentialStatusResponseSuccess, OnDefaultFailure,
                                                endpointId, mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::DoorLock::Commands::GetHolidaySchedule::Type mRequest;
+    chip::app::Clusters::DoorLock::Commands::GetCredentialStatus::Type mRequest;
 };
 
 /*
- * Command GetLogRecord
+ * Command GetUser
  */
-class DoorLockGetLogRecord : public ModelCommand
+class DoorLockGetUser : public ModelCommand
 {
 public:
-    DoorLockGetLogRecord() : ModelCommand("get-log-record")
+    DoorLockGetUser() : ModelCommand("get-user")
     {
-        AddArgument("LogIndex", 0, UINT16_MAX, &mRequest.logIndex);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000004) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetLogRecordResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetLogRecord::Type mRequest;
-};
-
-/*
- * Command GetPINCode
- */
-class DoorLockGetPINCode : public ModelCommand
-{
-public:
-    DoorLockGetPINCode() : ModelCommand("get-pincode")
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000006) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetPINCodeResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetPINCode::Type mRequest;
-};
-
-/*
- * Command GetRFIDCode
- */
-class DoorLockGetRFIDCode : public ModelCommand
-{
-public:
-    DoorLockGetRFIDCode() : ModelCommand("get-rfidcode")
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000017) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetRFIDCodeResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetRFIDCode::Type mRequest;
-};
-
-/*
- * Command GetUserType
- */
-class DoorLockGetUserType : public ModelCommand
-{
-public:
-    DoorLockGetUserType() : ModelCommand("get-user-type")
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000015) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetUserTypeResponseSuccess, OnDefaultFailure, endpointId,
-                                               mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetUserType::Type mRequest;
-};
-
-/*
- * Command GetWeekDaySchedule
- */
-class DoorLockGetWeekDaySchedule : public ModelCommand
-{
-public:
-    DoorLockGetWeekDaySchedule() : ModelCommand("get-week-day-schedule")
-    {
-        AddArgument("WeekDayIndex", 0, UINT8_MAX, &mRequest.weekDayIndex);
         AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000C) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001B) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetWeekDayScheduleResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetUserResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::DoorLock::Commands::GetWeekDaySchedule::Type mRequest;
-};
-
-/*
- * Command GetYearDaySchedule
- */
-class DoorLockGetYearDaySchedule : public ModelCommand
-{
-public:
-    DoorLockGetYearDaySchedule() : ModelCommand("get-year-day-schedule")
-    {
-        AddArgument("YearDayIndex", 0, UINT8_MAX, &mRequest.yearDayIndex);
-        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000F) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDoorLockGetYearDayScheduleResponseSuccess, OnDefaultFailure,
-                                               endpointId, mRequest, mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::GetYearDaySchedule::Type mRequest;
+    chip::app::Clusters::DoorLock::Commands::GetUser::Type mRequest;
 };
 
 /*
@@ -15977,173 +15607,67 @@ private:
 };
 
 /*
- * Command SetHolidaySchedule
+ * Command SetCredential
  */
-class DoorLockSetHolidaySchedule : public ModelCommand
+class DoorLockSetCredential : public ModelCommand
 {
 public:
-    DoorLockSetHolidaySchedule() : ModelCommand("set-holiday-schedule")
+    DoorLockSetCredential() : ModelCommand("set-credential")
     {
-        AddArgument("HolidayIndex", 0, UINT8_MAX, &mRequest.holidayIndex);
-        AddArgument("LocalStartTime", 0, UINT32_MAX, &mRequest.localStartTime);
-        AddArgument("LocalEndTime", 0, UINT32_MAX, &mRequest.localEndTime);
-        AddArgument("OperatingMode", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.operatingMode)> *>(&mRequest.operatingMode));
+        AddArgument("OperationType", 0, UINT8_MAX,
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.operationType)> *>(&mRequest.operationType));
+        // credential Struct parsing is not supported yet
+        AddArgument("CredentialData", &mRequest.credentialData);
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        AddArgument("UserStatus", 0, UINT8_MAX,
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000011) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000022) on endpoint %" PRIu8, endpointId);
 
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
+        return chip::Controller::InvokeCommand(device, this, OnDoorLockSetCredentialResponseSuccess, OnDefaultFailure, endpointId,
+                                               mRequest, mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::DoorLock::Commands::SetHolidaySchedule::Type mRequest;
+    chip::app::Clusters::DoorLock::Commands::SetCredential::Type mRequest;
 };
 
 /*
- * Command SetPINCode
+ * Command SetUser
  */
-class DoorLockSetPINCode : public ModelCommand
+class DoorLockSetUser : public ModelCommand
 {
 public:
-    DoorLockSetPINCode() : ModelCommand("set-pincode")
+    DoorLockSetUser() : ModelCommand("set-user")
     {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
+        AddArgument("OperationType", 0, UINT8_MAX,
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.operationType)> *>(&mRequest.operationType));
+        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
+        AddArgument("UserName", &mRequest.userName);
+        AddArgument("UserUniqueId", 0, UINT32_MAX, &mRequest.userUniqueId);
         AddArgument("UserStatus", 0, UINT8_MAX,
                     reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
         AddArgument("UserType", 0, UINT8_MAX,
                     reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType));
-        AddArgument("Pin", &mRequest.pin);
+        AddArgument("CredentialRule", 0, UINT8_MAX,
+                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.credentialRule)> *>(&mRequest.credentialRule));
         ModelCommand::AddArguments();
     }
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000005) on endpoint %" PRIu8, endpointId);
+        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000001A) on endpoint %" PRIu8, endpointId);
 
         return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
                                                mTimedInteractionTimeoutMs);
     }
 
 private:
-    chip::app::Clusters::DoorLock::Commands::SetPINCode::Type mRequest;
-};
-
-/*
- * Command SetRFIDCode
- */
-class DoorLockSetRFIDCode : public ModelCommand
-{
-public:
-    DoorLockSetRFIDCode() : ModelCommand("set-rfidcode")
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        AddArgument("UserStatus", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userStatus)> *>(&mRequest.userStatus));
-        AddArgument("UserType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType));
-        AddArgument("RfidCode", &mRequest.rfidCode);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000016) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetRFIDCode::Type mRequest;
-};
-
-/*
- * Command SetUserType
- */
-class DoorLockSetUserType : public ModelCommand
-{
-public:
-    DoorLockSetUserType() : ModelCommand("set-user-type")
-    {
-        AddArgument("UserId", 0, UINT16_MAX, &mRequest.userId);
-        AddArgument("UserType", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<decltype(mRequest.userType)> *>(&mRequest.userType));
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000014) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetUserType::Type mRequest;
-};
-
-/*
- * Command SetWeekDaySchedule
- */
-class DoorLockSetWeekDaySchedule : public ModelCommand
-{
-public:
-    DoorLockSetWeekDaySchedule() : ModelCommand("set-week-day-schedule")
-    {
-        AddArgument("WeekDayIndex", 0, UINT8_MAX, &mRequest.weekDayIndex);
-        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
-        AddArgument("DaysMask", 0, UINT8_MAX,
-                    reinterpret_cast<std::underlying_type_t<chip::app::Clusters::DoorLock::DlDaysMaskMap> *>(&mRequest.daysMask));
-        AddArgument("StartHour", 0, UINT8_MAX, &mRequest.startHour);
-        AddArgument("StartMinute", 0, UINT8_MAX, &mRequest.startMinute);
-        AddArgument("EndHour", 0, UINT8_MAX, &mRequest.endHour);
-        AddArgument("EndMinute", 0, UINT8_MAX, &mRequest.endMinute);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000B) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetWeekDaySchedule::Type mRequest;
-};
-
-/*
- * Command SetYearDaySchedule
- */
-class DoorLockSetYearDaySchedule : public ModelCommand
-{
-public:
-    DoorLockSetYearDaySchedule() : ModelCommand("set-year-day-schedule")
-    {
-        AddArgument("YearDayIndex", 0, UINT8_MAX, &mRequest.yearDayIndex);
-        AddArgument("UserIndex", 0, UINT16_MAX, &mRequest.userIndex);
-        AddArgument("LocalStartTime", 0, UINT32_MAX, &mRequest.localStartTime);
-        AddArgument("LocalEndTime", 0, UINT32_MAX, &mRequest.localEndTime);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x0000000E) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::SetYearDaySchedule::Type mRequest;
+    chip::app::Clusters::DoorLock::Commands::SetUser::Type mRequest;
 };
 
 /*
@@ -16168,31 +15692,6 @@ public:
 
 private:
     chip::app::Clusters::DoorLock::Commands::UnlockDoor::Type mRequest;
-};
-
-/*
- * Command UnlockWithTimeout
- */
-class DoorLockUnlockWithTimeout : public ModelCommand
-{
-public:
-    DoorLockUnlockWithTimeout() : ModelCommand("unlock-with-timeout")
-    {
-        AddArgument("Timeout", 0, UINT16_MAX, &mRequest.timeout);
-        AddArgument("PinCode", &mRequest.pinCode);
-        ModelCommand::AddArguments();
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x00000101) command (0x00000003) on endpoint %" PRIu8, endpointId);
-
-        return chip::Controller::InvokeCommand(device, this, OnDefaultSuccess, OnDefaultFailure, endpointId, mRequest,
-                                               mTimedInteractionTimeoutMs);
-    }
-
-private:
-    chip::app::Clusters::DoorLock::Commands::UnlockWithTimeout::Type mRequest;
 };
 
 /*
@@ -55130,29 +54629,14 @@ void registerClusterDoorLock(Commands & commands)
     const char * clusterName = "DoorLock";
 
     commands_list clusterCommands = {
-        make_unique<DoorLockClearAllPINCodes>(),      //
-        make_unique<DoorLockClearAllRFIDCodes>(),     //
-        make_unique<DoorLockClearHolidaySchedule>(),  //
-        make_unique<DoorLockClearPINCode>(),          //
-        make_unique<DoorLockClearRFIDCode>(),         //
-        make_unique<DoorLockClearWeekDaySchedule>(),  //
-        make_unique<DoorLockClearYearDaySchedule>(),  //
-        make_unique<DoorLockGetHolidaySchedule>(),    //
-        make_unique<DoorLockGetLogRecord>(),          //
-        make_unique<DoorLockGetPINCode>(),            //
-        make_unique<DoorLockGetRFIDCode>(),           //
-        make_unique<DoorLockGetUserType>(),           //
-        make_unique<DoorLockGetWeekDaySchedule>(),    //
-        make_unique<DoorLockGetYearDaySchedule>(),    //
+        make_unique<DoorLockClearCredential>(),       //
+        make_unique<DoorLockClearUser>(),             //
+        make_unique<DoorLockGetCredentialStatus>(),   //
+        make_unique<DoorLockGetUser>(),               //
         make_unique<DoorLockLockDoor>(),              //
-        make_unique<DoorLockSetHolidaySchedule>(),    //
-        make_unique<DoorLockSetPINCode>(),            //
-        make_unique<DoorLockSetRFIDCode>(),           //
-        make_unique<DoorLockSetUserType>(),           //
-        make_unique<DoorLockSetWeekDaySchedule>(),    //
-        make_unique<DoorLockSetYearDaySchedule>(),    //
+        make_unique<DoorLockSetCredential>(),         //
+        make_unique<DoorLockSetUser>(),               //
         make_unique<DoorLockUnlockDoor>(),            //
-        make_unique<DoorLockUnlockWithTimeout>(),     //
         make_unique<ReadDoorLockActuatorEnabled>(),   //
         make_unique<ReportDoorLockActuatorEnabled>(), //
         make_unique<ReadDoorLockClusterRevision>(),   //
