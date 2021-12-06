@@ -4,6 +4,7 @@ android-androidstudio-arm64-chip-tool
 android-androidstudio-x64-chip-tool
 android-androidstudio-x86-chip-tool
 android-arm-chip-tool
+android-arm-chip-tvserver
 android-arm64-chip-test
 android-arm64-chip-tool
 android-arm64-chip-tvserver
