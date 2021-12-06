@@ -74,6 +74,8 @@ public:
     static const Key kConfigKey_RegulatoryLocation;
     static const Key kConfigKey_CountryCode;
     static const Key kConfigKey_Breadcrumb;
+    static const Key kConfigKey_ProductId;
+    static const Key kConfigKey_ProductName;
 
     static const char kGroupKeyNamePrefix[];
 

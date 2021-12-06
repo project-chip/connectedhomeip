@@ -27,6 +27,7 @@
 #define GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
 
 #include <ble/CHIPBleServiceData.h>
+#include <cstdint>
 #include <inttypes.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/support/Base64.h>
@@ -63,10 +64,36 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetVendorName(char * bu
 }
 
 template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductId(uint16_t & productId)
+{
+    CHIP_ERROR err;
+    uint32_t u32ProductId = 0;
+    err = ReadConfigValue(ConfigClass::kConfigKey_ProductId, u32ProductId);
+
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+    }
+    else
+    {
+        productId = static_cast<uint16_t>(u32ProductId);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductName(char * buf, size_t bufSize)
 {
-    ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
-    strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
+    CHIP_ERROR err;
+    size_t productNameSize = 0; // without counting null-terminator
+    err                 = ReadConfigValueStr(ConfigClass::kConfigKey_ProductName, buf, bufSize, productNameSize);
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
+        strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME);
+    }
+
     return CHIP_NO_ERROR;
 }
 

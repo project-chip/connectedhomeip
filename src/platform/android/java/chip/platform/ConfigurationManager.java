@@ -34,6 +34,8 @@ public interface ConfigurationManager {
   String kConfigKey_ManufacturingDate = "mfg-date";
   String kConfigKey_SetupPinCode = "pin-code";
   String kConfigKey_SetupDiscriminator = "discriminator";
+  String kConfigKey_ProductId = "product-id";
+  String kConfigKey_ProductName = "product-name";
 
   // Keys stored in the Chip-config namespace
   String kConfigKey_FabricId = "fabric-id";

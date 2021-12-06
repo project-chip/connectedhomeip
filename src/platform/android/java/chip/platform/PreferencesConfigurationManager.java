@@ -20,6 +20,9 @@ package chip.platform;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import java.util.Base64;
 import java.util.Map;
 
@@ -38,6 +41,14 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
   public long readConfigValueLong(String namespace, String name)
       throws AndroidChipPlatformException {
     String key = getKey(namespace, name);
+
+    switch (key) {
+      case kConfigNamespace_ChipFactory+":"+kConfigKey_ProductId:
+        // The unique id assigned by the device vendor to identify the product or device type.  This
+        // number is scoped to the device vendor id. return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+        return 65278;
+    }
+
     if (preferences.contains(key)) {
       long value = preferences.getLong(key, Long.MAX_VALUE);
       return value;
@@ -51,6 +62,14 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
   public String readConfigValueStr(String namespace, String name)
       throws AndroidChipPlatformException {
     String key = getKey(namespace, name);
+
+    switch (key) {
+      case kConfigNamespace_ChipFactory+":"+kConfigKey_ProductName:
+        // Human readable name of the device model.
+        // return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+        return "TEST_ANDROID_PRODUCT";
+    }
+
     if (preferences.contains(key)) {
       String value = preferences.getString(key, null);
       return value;
