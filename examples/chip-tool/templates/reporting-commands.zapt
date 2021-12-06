@@ -3,7 +3,7 @@
 #pragma once
 
 #include <commands/reporting/ReportingCommand.h>
-
+#include "../cluster/Commands.h" // For the LogValue bits and read callbacks
 
 typedef void (*UnsupportedAttributeCallback)(void * context);
 
@@ -45,49 +45,14 @@ public:
 {{/chip_client_clusters}}
     }
 
-    static void OnDefaultSuccessResponse(void * context)
-    {
-        ChipLogProgress(chipTool, "Default Success Response");
-    }
-
-    static void OnDefaultFailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Default Failure Response: 0x%02x", status);
-    }
-
-    static void OnUnsupportedAttributeResponse(void * context)
-    {
-        ChipLogError(chipTool, "Unsupported attribute Response. This should never happen !");
-    }
-
-    static void OnBooleanAttributeResponse(void * context, bool value)
-    {
-        ChipLogProgress(chipTool, "Boolean attribute Response: %d", value);
-    }
-
-    static void OnInt8uAttributeResponse(void * context, uint8_t value)
-    {
-        ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
-    }
-
-    static void OnInt16uAttributeResponse(void * context, uint16_t value)
-    {
-        ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
-    }
-
-    static void OnInt16sAttributeResponse(void * context, int16_t value)
-    {
-        ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
-    }
-
 private:
 {{#chip_client_clusters}}
 {{#chip_server_cluster_attributes}}
 {{#if isReportableAttribute}}
 {{#unless isList}}
 {{#unless (isStrEqual chipCallback.name "Unsupported")}}
-    chip::Callback::Callback<{{chipCallback.name}}AttributeCallback> * onReport{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Callback = new chip::Callback::Callback<{{chipCallback.name}}AttributeCallback>(On{{chipCallback.name}}AttributeResponse, this);
-{{/unless}}
+    chip::Callback::Callback<decltype(&Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}::OnAttributeResponse)> * onReport{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}Callback = new chip::Callback::Callback<decltype(&Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}::OnAttributeResponse)>(Read{{asUpperCamelCase parent.name}}{{asUpperCamelCase name}}::OnAttributeResponse, this);
+    {{/unless}}
 {{/unless}}
 {{/if}}
 {{/chip_server_cluster_attributes}}
