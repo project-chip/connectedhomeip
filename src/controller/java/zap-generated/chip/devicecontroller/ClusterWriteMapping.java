@@ -369,6 +369,24 @@ public class ClusterWriteMapping {
         writeColorControlStartUpColorTemperatureMiredsAttributeInteractionInfo);
     writeAttributeMap.put("colorControl", writeColorControlInteractionInfo);
     Map<String, InteractionInfo> writeContentLauncherInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> writeContentLauncherSupportedStreamingProtocolsCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    CommandParameterInfo contentLaunchersupportedStreamingProtocolsCommandParameterInfo =
+        new CommandParameterInfo("value", long.class);
+    writeContentLauncherSupportedStreamingProtocolsCommandParams.put(
+        "value", contentLaunchersupportedStreamingProtocolsCommandParameterInfo);
+    InteractionInfo writeContentLauncherSupportedStreamingProtocolsAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.ContentLauncherCluster) cluster)
+                  .writeSupportedStreamingProtocolsAttribute(
+                      (DefaultClusterCallback) callback, (Long) commandArguments.get("value"));
+            },
+            () -> new ClusterInfoMapping.DelegatedDefaultClusterCallback(),
+            writeContentLauncherSupportedStreamingProtocolsCommandParams);
+    writeContentLauncherInteractionInfo.put(
+        "writeSupportedStreamingProtocolsAttribute",
+        writeContentLauncherSupportedStreamingProtocolsAttributeInteractionInfo);
     writeAttributeMap.put("contentLauncher", writeContentLauncherInteractionInfo);
     Map<String, InteractionInfo> writeDescriptorInteractionInfo = new LinkedHashMap<>();
     writeAttributeMap.put("descriptor", writeDescriptorInteractionInfo);

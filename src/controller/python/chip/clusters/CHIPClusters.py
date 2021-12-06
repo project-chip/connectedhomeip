@@ -191,20 +191,26 @@ class ChipClusters:
                     "type": "int",
                     "reportable": True,
                 },
-                0x00000005: {
-                    "attributeName": "ApplicationId",
-                    "attributeId": 0x00000005,
-                    "type": "str",
-                    "reportable": True,
+                0x00000004: {
+                    "attributeName": "ApplicationApp",
+                    "attributeId": 0x00000004,
+                    "type": "",
+                    "writable": True,
                 },
-                0x00000006: {
-                    "attributeName": "CatalogVendorId",
-                    "attributeId": 0x00000006,
+                0x00000005: {
+                    "attributeName": "ApplicationStatus",
+                    "attributeId": 0x00000005,
                     "type": "int",
                     "reportable": True,
                 },
+                0x00000006: {
+                    "attributeName": "ApplicationVersion",
+                    "attributeId": 0x00000006,
+                    "type": "str",
+                    "reportable": True,
+                },
                 0x00000007: {
-                    "attributeName": "ApplicationStatus",
+                    "attributeName": "AllowedVendorList",
                     "attributeId": 0x00000007,
                     "type": "int",
                     "reportable": True,
@@ -244,16 +250,10 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "CatalogVendorId",
+                    "attributeName": "ApplicationLauncherApp",
                     "attributeId": 0x00000001,
-                    "type": "int",
-                    "reportable": True,
-                },
-                0x00000002: {
-                    "attributeName": "ApplicationId",
-                    "attributeId": 0x00000002,
-                    "type": "int",
-                    "reportable": True,
+                    "type": "",
+                    "writable": True,
                 },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
@@ -1330,6 +1330,9 @@ class ChipClusters:
                     "args": {
                         "autoPlay": "bool",
                         "data": "str",
+                        "type": "int",
+                        "value": "str",
+                        "externalIDList": "",
                     },
                 },
             0x00000001: {
@@ -1338,6 +1341,12 @@ class ChipClusters:
                     "args": {
                         "contentURL": "str",
                         "displayString": "str",
+                        "providerName": "str",
+                        "background": "",
+                        "logo": "",
+                        "progressBar": "",
+                        "splash": "",
+                        "waterMark": "",
                     },
                 },
             },
@@ -1349,10 +1358,11 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "SupportedStreamingTypes",
+                    "attributeName": "SupportedStreamingProtocols",
                     "attributeId": 0x00000001,
                     "type": "int",
                     "reportable": True,
+                    "writable": True,
                 },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
@@ -2607,32 +2617,25 @@ class ChipClusters:
                     "reportable": True,
                 },
                 0x00000003: {
-                    "attributeName": "PositionUpdatedAt",
+                    "attributeName": "Position",
                     "attributeId": 0x00000003,
-                    "type": "int",
-                    "reportable": True,
+                    "type": "",
+                    "writable": True,
                 },
                 0x00000004: {
-                    "attributeName": "Position",
+                    "attributeName": "PlaybackSpeed",
                     "attributeId": 0x00000004,
-                    "type": "int",
-                    "reportable": True,
+                    "type": "",
                 },
                 0x00000005: {
-                    "attributeName": "PlaybackSpeed",
+                    "attributeName": "SeekRangeEnd",
                     "attributeId": 0x00000005,
                     "type": "int",
                     "reportable": True,
                 },
                 0x00000006: {
-                    "attributeName": "SeekRangeEnd",
-                    "attributeId": 0x00000006,
-                    "type": "int",
-                    "reportable": True,
-                },
-                0x00000007: {
                     "attributeName": "SeekRangeStart",
-                    "attributeId": 0x00000007,
+                    "attributeId": 0x00000006,
                     "type": "int",
                     "reportable": True,
                 },
@@ -3771,22 +3774,24 @@ class ChipClusters:
             },
             "attributes": {
                 0x00000000: {
-                    "attributeName": "TvChannelList",
+                    "attributeName": "ChannelList",
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
                 },
                 0x00000001: {
-                    "attributeName": "TvChannelLineup",
+                    "attributeName": "ChannelLineup",
                     "attributeId": 0x00000001,
-                    "type": "bytes",
+                    "type": "",
                     "reportable": True,
+                    "writable": True,
                 },
                 0x00000002: {
-                    "attributeName": "CurrentTvChannel",
+                    "attributeName": "CurrentChannel",
                     "attributeId": 0x00000002,
-                    "type": "bytes",
+                    "type": "",
                     "reportable": True,
+                    "writable": True,
                 },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",
@@ -3820,6 +3825,11 @@ class ChipClusters:
                     "attributeId": 0x00000000,
                     "type": "",
                     "reportable": True,
+                },
+                0x00000001: {
+                    "attributeName": "CurrentNavigatorTarget",
+                    "attributeId": 0x00000001,
+                    "type": "int",
                 },
                 0x0000FFFB: {
                     "attributeName": "AttributeList",

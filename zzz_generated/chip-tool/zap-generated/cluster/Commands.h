@@ -111,19 +111,23 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchDimension::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchAdditionalInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchParamater::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchBrandingInformation::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchDimension::DecodableType & value);
-CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchStyleInformation::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchBrandingInformation::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherEndpoint::DecodableType & value);
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApp::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::TestCluster::Structs::SimpleStruct::DecodableType & value);
 CHIP_ERROR LogValue(const char * label, size_t indent,
@@ -1679,6 +1683,37 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchDimension::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("Width", indent + 1, value.width);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Width'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Height", indent + 1, value.height);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Height'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Metric", indent + 1, value.metric);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Metric'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchAdditionalInfo::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
@@ -1727,6 +1762,37 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
         {
             ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ExternalIDList'",
                             IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchStyleInformation::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("ImageUrl", indent + 1, value.imageUrl);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ImageUrl'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Color", indent + 1, value.color);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Color'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Size", indent + 1, value.size);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Size'", IndentStr(indent + 1).c_str());
             return err;
         }
     }
@@ -1789,68 +1855,6 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchDimension::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("Width", indent + 1, value.width);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Width'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Height", indent + 1, value.height);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Height'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Metric", indent + 1, value.metric);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Metric'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
-                    const chip::app::Clusters::ContentLauncher::Structs::ContentLaunchStyleInformation::DecodableType & value)
-{
-    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
-    {
-        CHIP_ERROR err = LogValue("ImageUrl", indent + 1, value.imageUrl);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ImageUrl'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Color", indent + 1, value.color);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Color'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    {
-        CHIP_ERROR err = LogValue("Size", indent + 1, value.size);
-        if (err != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Size'", IndentStr(indent + 1).c_str());
-            return err;
-        }
-    }
-    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
-    return CHIP_NO_ERROR;
-}
-CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
@@ -1883,6 +1887,53 @@ CHIP_ERROR LogValue(const char * label, size_t indent,
 }
 CHIP_ERROR LogValue(const char * label, size_t indent,
                     const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherApp::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("CatalogVendorId", indent + 1, value.catalogVendorId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'CatalogVendorId'",
+                            IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("ApplicationId", indent + 1, value.applicationId);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'ApplicationId'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ApplicationLauncher::Structs::ApplicationLauncherEndpoint::DecodableType & value)
+{
+    ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
+    {
+        CHIP_ERROR err = LogValue("Application", indent + 1, value.application);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Application'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    {
+        CHIP_ERROR err = LogValue("Endpoint", indent + 1, value.endpoint);
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(chipTool, "%sStruct truncated due to invalid value for 'Endpoint'", IndentStr(indent + 1).c_str());
+            return err;
+        }
+    }
+    ChipLogProgress(chipTool, "%s}", IndentStr(indent).c_str());
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR LogValue(const char * label, size_t indent,
+                    const chip::app::Clusters::ApplicationBasic::Structs::ApplicationBasicApp::DecodableType & value)
 {
     ChipLogProgress(chipTool, "%s%s: {", IndentStr(indent).c_str(), label);
     {
@@ -2377,11 +2428,11 @@ static void OnContentLauncherLaunchContentResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("data", 1, data.data);
+        err = LogValue("contentLaunchStatus", 1, data.contentLaunchStatus);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("contentLaunchStatus", 1, data.contentLaunchStatus);
+        err = LogValue("data", 1, data.data);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -2395,11 +2446,11 @@ static void OnContentLauncherLaunchURLResponseSuccess(
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("data", 1, data.data);
+        err = LogValue("contentLaunchStatus", 1, data.contentLaunchStatus);
     }
     if (err == CHIP_NO_ERROR)
     {
-        err = LogValue("contentLaunchStatus", 1, data.contentLaunchStatus);
+        err = LogValue("data", 1, data.data);
     }
 
     ModelCommand * command = static_cast<ModelCommand *>(context);
@@ -4229,9 +4280,10 @@ private:
 | * VendorId                                                          | 0x0001 |
 | * ApplicationName                                                   | 0x0002 |
 | * ProductId                                                         | 0x0003 |
-| * ApplicationId                                                     | 0x0005 |
-| * CatalogVendorId                                                   | 0x0006 |
-| * ApplicationStatus                                                 | 0x0007 |
+| * ApplicationApp                                                    | 0x0004 |
+| * ApplicationStatus                                                 | 0x0005 |
+| * ApplicationVersion                                                | 0x0006 |
+| * AllowedVendorList                                                 | 0x0007 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -4590,170 +4642,6 @@ private:
 };
 
 /*
- * Attribute ApplicationId
- */
-class ReadApplicationBasicApplicationId : public ModelCommand
-{
-public:
-    ReadApplicationBasicApplicationId() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "application-id");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadApplicationBasicApplicationId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationId::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, chip::CharSpan value)
-    {
-        OnGeneralAttributeResponse(context, "ApplicationBasic.ApplicationId response", value);
-    }
-};
-
-class ReportApplicationBasicApplicationId : public ModelCommand
-{
-public:
-    ReportApplicationBasicApplicationId() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "application-id");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportApplicationBasicApplicationId()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        ReturnErrorOnFailure(cluster.ReportAttributeApplicationId(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeApplicationId(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeReport, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute CatalogVendorId
- */
-class ReadApplicationBasicCatalogVendorId : public ModelCommand
-{
-public:
-    ReadApplicationBasicCatalogVendorId() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "catalog-vendor-id");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadApplicationBasicCatalogVendorId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::CatalogVendorId::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint16_t value)
-    {
-        OnGeneralAttributeResponse(context, "ApplicationBasic.CatalogVendorId response", value);
-    }
-};
-
-class ReportApplicationBasicCatalogVendorId : public ModelCommand
-{
-public:
-    ReportApplicationBasicCatalogVendorId() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "catalog-vendor-id");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportApplicationBasicCatalogVendorId()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationBasicCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        ReturnErrorOnFailure(cluster.ReportAttributeCatalogVendorId(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeCatalogVendorId(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeReport, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
  * Attribute ApplicationStatus
  */
 class ReadApplicationBasicApplicationStatus : public ModelCommand
@@ -4834,6 +4722,119 @@ private:
     uint16_t mMinInterval;
     uint16_t mMaxInterval;
     bool mWait;
+};
+
+/*
+ * Attribute ApplicationVersion
+ */
+class ReadApplicationBasicApplicationVersion : public ModelCommand
+{
+public:
+    ReadApplicationBasicApplicationVersion() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "application-version");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadApplicationBasicApplicationVersion() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationBasic.ApplicationVersion response", value);
+    }
+};
+
+class ReportApplicationBasicApplicationVersion : public ModelCommand
+{
+public:
+    ReportApplicationBasicApplicationVersion() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "application-version");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportApplicationBasicApplicationVersion()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeApplicationVersion(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeApplicationVersion(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                            mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<CharStringAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
+};
+
+/*
+ * Attribute AllowedVendorList
+ */
+class ReadApplicationBasicAllowedVendorList : public ModelCommand
+{
+public:
+    ReadApplicationBasicAllowedVendorList() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "allowed-vendor-list");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadApplicationBasicAllowedVendorList() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050D) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ApplicationBasicCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationBasic.AllowedVendorList response", value);
+    }
 };
 
 /*
@@ -4956,8 +4957,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ApplicationLauncherList                                           | 0x0000 |
-| * CatalogVendorId                                                   | 0x0001 |
-| * ApplicationId                                                     | 0x0002 |
+| * ApplicationLauncherApp                                            | 0x0001 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -4971,8 +4971,7 @@ public:
     ApplicationLauncherLaunchApp() : ModelCommand("launch-app")
     {
         AddArgument("Data", &mRequest.data);
-        AddArgument("CatalogVendorId", 0, UINT16_MAX, &mRequest.catalogVendorId);
-        AddArgument("ApplicationId", &mRequest.applicationId);
+        // application Struct parsing is not supported yet
         ModelCommand::AddArguments();
     }
 
@@ -5016,170 +5015,6 @@ public:
     {
         OnGeneralAttributeResponse(context, "ApplicationLauncher.ApplicationLauncherList response", value);
     }
-};
-
-/*
- * Attribute CatalogVendorId
- */
-class ReadApplicationLauncherCatalogVendorId : public ModelCommand
-{
-public:
-    ReadApplicationLauncherCatalogVendorId() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "catalog-vendor-id");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadApplicationLauncherCatalogVendorId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint8_t value)
-    {
-        OnGeneralAttributeResponse(context, "ApplicationLauncher.CatalogVendorId response", value);
-    }
-};
-
-class ReportApplicationLauncherCatalogVendorId : public ModelCommand
-{
-public:
-    ReportApplicationLauncherCatalogVendorId() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "catalog-vendor-id");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportApplicationLauncherCatalogVendorId()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        ReturnErrorOnFailure(cluster.ReportAttributeCatalogVendorId(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeCatalogVendorId(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute ApplicationId
- */
-class ReadApplicationLauncherApplicationId : public ModelCommand
-{
-public:
-    ReadApplicationLauncherApplicationId() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "application-id");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadApplicationLauncherApplicationId() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationId::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint8_t value)
-    {
-        OnGeneralAttributeResponse(context, "ApplicationLauncher.ApplicationId response", value);
-    }
-};
-
-class ReportApplicationLauncherApplicationId : public ModelCommand
-{
-public:
-    ReportApplicationLauncherApplicationId() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "application-id");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportApplicationLauncherApplicationId()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x050C) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::ApplicationLauncherCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        ReturnErrorOnFailure(cluster.ReportAttributeApplicationId(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeApplicationId(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeReport, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
 };
 
 /*
@@ -14726,7 +14561,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * AcceptsHeaderList                                                 | 0x0000 |
-| * SupportedStreamingTypes                                           | 0x0001 |
+| * SupportedStreamingProtocols                                       | 0x0001 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -14741,6 +14576,7 @@ public:
     {
         AddArgument("AutoPlay", 0, 1, &mRequest.autoPlay);
         AddArgument("Data", &mRequest.data);
+        // search Array parsing is not supported yet
         ModelCommand::AddArguments();
     }
 
@@ -14766,6 +14602,7 @@ public:
     {
         AddArgument("ContentURL", &mRequest.contentURL);
         AddArgument("DisplayString", &mRequest.displayString);
+        // brandingInformation Array parsing is not supported yet
         ModelCommand::AddArguments();
     }
 
@@ -14812,18 +14649,18 @@ public:
 };
 
 /*
- * Attribute SupportedStreamingTypes
+ * Attribute SupportedStreamingProtocols
  */
-class ReadContentLauncherSupportedStreamingTypes : public ModelCommand
+class ReadContentLauncherSupportedStreamingProtocols : public ModelCommand
 {
 public:
-    ReadContentLauncherSupportedStreamingTypes() : ModelCommand("read")
+    ReadContentLauncherSupportedStreamingProtocols() : ModelCommand("read")
     {
-        AddArgument("attr-name", "supported-streaming-types");
+        AddArgument("attr-name", "supported-streaming-protocols");
         ModelCommand::AddArguments();
     }
 
-    ~ReadContentLauncherSupportedStreamingTypes() {}
+    ~ReadContentLauncherSupportedStreamingProtocols() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14831,16 +14668,93 @@ public:
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::TypeInfo>(
+        return cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo>(
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
+    static void OnAttributeResponse(void * context, uint32_t value)
     {
-        OnGeneralAttributeResponse(context, "ContentLauncher.SupportedStreamingTypes response", value);
+        OnGeneralAttributeResponse(context, "ContentLauncher.SupportedStreamingProtocols response", value);
     }
+};
+
+class WriteContentLauncherSupportedStreamingProtocols : public ModelCommand
+{
+public:
+    WriteContentLauncherSupportedStreamingProtocols() : ModelCommand("write")
+    {
+        AddArgument("attr-name", "supported-streaming-protocols");
+        AddArgument("attr-value", 0, UINT32_MAX, &mValue);
+        ModelCommand::AddArguments();
+    }
+
+    ~WriteContentLauncherSupportedStreamingProtocols() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050A) command (0x01) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ContentLauncherCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.WriteAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo>(
+            mValue, this, OnDefaultSuccessResponse, OnDefaultFailure, mTimedInteractionTimeoutMs);
+    }
+
+private:
+    uint32_t mValue;
+};
+
+class ReportContentLauncherSupportedStreamingProtocols : public ModelCommand
+{
+public:
+    ReportContentLauncherSupportedStreamingProtocols() : ModelCommand("report")
+    {
+        AddArgument("attr-name", "supported-streaming-protocols");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("wait", 0, 1, &mWait);
+        ModelCommand::AddArguments();
+    }
+
+    ~ReportContentLauncherSupportedStreamingProtocols()
+    {
+        delete onSuccessCallback;
+        delete onSuccessCallbackWithoutExit;
+        delete onFailureCallback;
+        delete onReportCallback;
+    }
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x050A) command (0x06) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::ContentLauncherCluster cluster;
+        cluster.Associate(device, endpointId);
+
+        ReturnErrorOnFailure(cluster.ReportAttributeSupportedStreamingProtocols(onReportCallback->Cancel()));
+
+        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
+        return cluster.SubscribeAttributeSupportedStreamingProtocols(successCallback, onFailureCallback->Cancel(), mMinInterval,
+                                                                     mMaxInterval);
+    }
+
+    chip::System::Clock::Timeout GetWaitDuration() const override
+    {
+        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
+    }
+
+private:
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
+    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
+        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
+    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
+        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    chip::Callback::Callback<Int32uAttributeCallback> * onReportCallback =
+        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeReport, this);
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    bool mWait;
 };
 
 /*
@@ -23587,11 +23501,10 @@ private:
 | * PlaybackState                                                     | 0x0000 |
 | * StartTime                                                         | 0x0001 |
 | * Duration                                                          | 0x0002 |
-| * PositionUpdatedAt                                                 | 0x0003 |
-| * Position                                                          | 0x0004 |
-| * PlaybackSpeed                                                     | 0x0005 |
-| * SeekRangeEnd                                                      | 0x0006 |
-| * SeekRangeStart                                                    | 0x0007 |
+| * Position                                                          | 0x0003 |
+| * PlaybackSpeed                                                     | 0x0004 |
+| * SeekRangeEnd                                                      | 0x0005 |
+| * SeekRangeStart                                                    | 0x0006 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -24075,171 +23988,6 @@ private:
 };
 
 /*
- * Attribute PositionUpdatedAt
- */
-class ReadMediaPlaybackPositionUpdatedAt : public ModelCommand
-{
-public:
-    ReadMediaPlaybackPositionUpdatedAt() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "position-updated-at");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadMediaPlaybackPositionUpdatedAt() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint64_t value)
-    {
-        OnGeneralAttributeResponse(context, "MediaPlayback.PositionUpdatedAt response", value);
-    }
-};
-
-class ReportMediaPlaybackPositionUpdatedAt : public ModelCommand
-{
-public:
-    ReportMediaPlaybackPositionUpdatedAt() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "position-updated-at");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportMediaPlaybackPositionUpdatedAt()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        ReturnErrorOnFailure(cluster.ReportAttributePositionUpdatedAt(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributePositionUpdatedAt(successCallback, onFailureCallback->Cancel(), mMinInterval,
-                                                           mMaxInterval);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeReport, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute Position
- */
-class ReadMediaPlaybackPosition : public ModelCommand
-{
-public:
-    ReadMediaPlaybackPosition() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "position");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadMediaPlaybackPosition() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::Position::TypeInfo>(this, OnAttributeResponse,
-                                                                                                         OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, uint64_t value)
-    {
-        OnGeneralAttributeResponse(context, "MediaPlayback.Position response", value);
-    }
-};
-
-class ReportMediaPlaybackPosition : public ModelCommand
-{
-public:
-    ReportMediaPlaybackPosition() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "position");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportMediaPlaybackPosition()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        ReturnErrorOnFailure(cluster.ReportAttributePosition(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributePosition(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeReport, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
  * Attribute PlaybackSpeed
  */
 class ReadMediaPlaybackPlaybackSpeed : public ModelCommand
@@ -24263,62 +24011,10 @@ public:
             this, OnAttributeResponse, OnDefaultFailure);
     }
 
-    static void OnAttributeResponse(void * context, uint64_t value)
+    static void OnAttributeResponse(void * context, float value)
     {
         OnGeneralAttributeResponse(context, "MediaPlayback.PlaybackSpeed response", value);
     }
-};
-
-class ReportMediaPlaybackPlaybackSpeed : public ModelCommand
-{
-public:
-    ReportMediaPlaybackPlaybackSpeed() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "playback-speed");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportMediaPlaybackPlaybackSpeed()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0506) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::MediaPlaybackCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        ReturnErrorOnFailure(cluster.ReportAttributePlaybackSpeed(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributePlaybackSpeed(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeReport, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
 };
 
 /*
@@ -34085,9 +33781,9 @@ private:
 | * SkipChannel                                                       |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
-| * TvChannelList                                                     | 0x0000 |
-| * TvChannelLineup                                                   | 0x0001 |
-| * CurrentTvChannel                                                  | 0x0002 |
+| * ChannelList                                                       | 0x0000 |
+| * ChannelLineup                                                     | 0x0001 |
+| * CurrentChannel                                                    | 0x0002 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -34166,18 +33862,18 @@ private:
 };
 
 /*
- * Attribute TvChannelList
+ * Attribute ChannelList
  */
-class ReadTvChannelTvChannelList : public ModelCommand
+class ReadTvChannelChannelList : public ModelCommand
 {
 public:
-    ReadTvChannelTvChannelList() : ModelCommand("read")
+    ReadTvChannelChannelList() : ModelCommand("read")
     {
-        AddArgument("attr-name", "tv-channel-list");
+        AddArgument("attr-name", "channel-list");
         ModelCommand::AddArguments();
     }
 
-    ~ReadTvChannelTvChannelList() {}
+    ~ReadTvChannelChannelList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -34185,180 +33881,16 @@ public:
 
         chip::Controller::TvChannelCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo>(this, OnAttributeResponse,
-                                                                                                          OnDefaultFailure);
+        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
     static void OnAttributeResponse(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
     {
-        OnGeneralAttributeResponse(context, "TvChannel.TvChannelList response", value);
+        OnGeneralAttributeResponse(context, "TvChannel.ChannelList response", value);
     }
-};
-
-/*
- * Attribute TvChannelLineup
- */
-class ReadTvChannelTvChannelLineup : public ModelCommand
-{
-public:
-    ReadTvChannelTvChannelLineup() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "tv-channel-lineup");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadTvChannelTvChannelLineup() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelLineup::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, chip::ByteSpan value)
-    {
-        OnGeneralAttributeResponse(context, "TvChannel.TvChannelLineup response", value);
-    }
-};
-
-class ReportTvChannelTvChannelLineup : public ModelCommand
-{
-public:
-    ReportTvChannelTvChannelLineup() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "tv-channel-lineup");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportTvChannelTvChannelLineup()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        ReturnErrorOnFailure(cluster.ReportAttributeTvChannelLineup(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeTvChannelLineup(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<OctetStringAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeReport, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
-};
-
-/*
- * Attribute CurrentTvChannel
- */
-class ReadTvChannelCurrentTvChannel : public ModelCommand
-{
-public:
-    ReadTvChannelCurrentTvChannel() : ModelCommand("read")
-    {
-        AddArgument("attr-name", "current-tv-channel");
-        ModelCommand::AddArguments();
-    }
-
-    ~ReadTvChannelCurrentTvChannel() {}
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x00) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::CurrentTvChannel::TypeInfo>(
-            this, OnAttributeResponse, OnDefaultFailure);
-    }
-
-    static void OnAttributeResponse(void * context, chip::ByteSpan value)
-    {
-        OnGeneralAttributeResponse(context, "TvChannel.CurrentTvChannel response", value);
-    }
-};
-
-class ReportTvChannelCurrentTvChannel : public ModelCommand
-{
-public:
-    ReportTvChannelCurrentTvChannel() : ModelCommand("report")
-    {
-        AddArgument("attr-name", "current-tv-channel");
-        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
-        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
-        AddArgument("wait", 0, 1, &mWait);
-        ModelCommand::AddArguments();
-    }
-
-    ~ReportTvChannelCurrentTvChannel()
-    {
-        delete onSuccessCallback;
-        delete onSuccessCallbackWithoutExit;
-        delete onFailureCallback;
-        delete onReportCallback;
-    }
-
-    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
-    {
-        ChipLogProgress(chipTool, "Sending cluster (0x0504) command (0x06) on endpoint %" PRIu8, endpointId);
-
-        chip::Controller::TvChannelCluster cluster;
-        cluster.Associate(device, endpointId);
-
-        ReturnErrorOnFailure(cluster.ReportAttributeCurrentTvChannel(onReportCallback->Cancel()));
-
-        chip::Callback::Cancelable * successCallback = mWait ? onSuccessCallbackWithoutExit->Cancel() : onSuccessCallback->Cancel();
-        return cluster.SubscribeAttributeCurrentTvChannel(successCallback, onFailureCallback->Cancel(), mMinInterval, mMaxInterval);
-    }
-
-    chip::System::Clock::Timeout GetWaitDuration() const override
-    {
-        return chip::System::Clock::Seconds16(mWait ? UINT16_MAX : 10);
-    }
-
-private:
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponse, this);
-    chip::Callback::Callback<DefaultSuccessCallback> * onSuccessCallbackWithoutExit =
-        new chip::Callback::Callback<DefaultSuccessCallback>(OnDefaultSuccessResponseWithoutExit, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
-    chip::Callback::Callback<OctetStringAttributeCallback> * onReportCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeReport, this);
-    uint16_t mMinInterval;
-    uint16_t mMaxInterval;
-    bool mWait;
 };
 
 /*
@@ -34481,6 +34013,7 @@ private:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * TargetNavigatorList                                               | 0x0000 |
+| * CurrentNavigatorTarget                                            | 0x0001 |
 | * AttributeList                                                     | 0xFFFB |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
@@ -34540,6 +34073,36 @@ public:
                             chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & value)
     {
         OnGeneralAttributeResponse(context, "TargetNavigator.TargetNavigatorList response", value);
+    }
+};
+
+/*
+ * Attribute CurrentNavigatorTarget
+ */
+class ReadTargetNavigatorCurrentNavigatorTarget : public ModelCommand
+{
+public:
+    ReadTargetNavigatorCurrentNavigatorTarget() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "current-navigator-target");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadTargetNavigatorCurrentNavigatorTarget() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x0505) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::TargetNavigatorCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::CurrentNavigatorTarget::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "TargetNavigator.CurrentNavigatorTarget response", value);
     }
 };
 
@@ -54552,24 +54115,23 @@ void registerClusterApplicationBasic(Commands & commands)
     const char * clusterName = "ApplicationBasic";
 
     commands_list clusterCommands = {
-        make_unique<ApplicationBasicChangeStatus>(),            //
-        make_unique<ReadApplicationBasicVendorName>(),          //
-        make_unique<ReportApplicationBasicVendorName>(),        //
-        make_unique<ReadApplicationBasicVendorId>(),            //
-        make_unique<ReportApplicationBasicVendorId>(),          //
-        make_unique<ReadApplicationBasicApplicationName>(),     //
-        make_unique<ReportApplicationBasicApplicationName>(),   //
-        make_unique<ReadApplicationBasicProductId>(),           //
-        make_unique<ReportApplicationBasicProductId>(),         //
-        make_unique<ReadApplicationBasicApplicationId>(),       //
-        make_unique<ReportApplicationBasicApplicationId>(),     //
-        make_unique<ReadApplicationBasicCatalogVendorId>(),     //
-        make_unique<ReportApplicationBasicCatalogVendorId>(),   //
-        make_unique<ReadApplicationBasicApplicationStatus>(),   //
-        make_unique<ReportApplicationBasicApplicationStatus>(), //
-        make_unique<ReadApplicationBasicAttributeList>(),       //
-        make_unique<ReadApplicationBasicClusterRevision>(),     //
-        make_unique<ReportApplicationBasicClusterRevision>(),   //
+        make_unique<ApplicationBasicChangeStatus>(),             //
+        make_unique<ReadApplicationBasicVendorName>(),           //
+        make_unique<ReportApplicationBasicVendorName>(),         //
+        make_unique<ReadApplicationBasicVendorId>(),             //
+        make_unique<ReportApplicationBasicVendorId>(),           //
+        make_unique<ReadApplicationBasicApplicationName>(),      //
+        make_unique<ReportApplicationBasicApplicationName>(),    //
+        make_unique<ReadApplicationBasicProductId>(),            //
+        make_unique<ReportApplicationBasicProductId>(),          //
+        make_unique<ReadApplicationBasicApplicationStatus>(),    //
+        make_unique<ReportApplicationBasicApplicationStatus>(),  //
+        make_unique<ReadApplicationBasicApplicationVersion>(),   //
+        make_unique<ReportApplicationBasicApplicationVersion>(), //
+        make_unique<ReadApplicationBasicAllowedVendorList>(),    //
+        make_unique<ReadApplicationBasicAttributeList>(),        //
+        make_unique<ReadApplicationBasicClusterRevision>(),      //
+        make_unique<ReportApplicationBasicClusterRevision>(),    //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -54581,10 +54143,6 @@ void registerClusterApplicationLauncher(Commands & commands)
     commands_list clusterCommands = {
         make_unique<ApplicationLauncherLaunchApp>(),                   //
         make_unique<ReadApplicationLauncherApplicationLauncherList>(), //
-        make_unique<ReadApplicationLauncherCatalogVendorId>(),         //
-        make_unique<ReportApplicationLauncherCatalogVendorId>(),       //
-        make_unique<ReadApplicationLauncherApplicationId>(),           //
-        make_unique<ReportApplicationLauncherApplicationId>(),         //
         make_unique<ReadApplicationLauncherAttributeList>(),           //
         make_unique<ReadApplicationLauncherClusterRevision>(),         //
         make_unique<ReportApplicationLauncherClusterRevision>(),       //
@@ -54925,13 +54483,15 @@ void registerClusterContentLauncher(Commands & commands)
     const char * clusterName = "ContentLauncher";
 
     commands_list clusterCommands = {
-        make_unique<ContentLauncherLaunchContent>(),               //
-        make_unique<ContentLauncherLaunchURL>(),                   //
-        make_unique<ReadContentLauncherAcceptsHeaderList>(),       //
-        make_unique<ReadContentLauncherSupportedStreamingTypes>(), //
-        make_unique<ReadContentLauncherAttributeList>(),           //
-        make_unique<ReadContentLauncherClusterRevision>(),         //
-        make_unique<ReportContentLauncherClusterRevision>(),       //
+        make_unique<ContentLauncherLaunchContent>(),                     //
+        make_unique<ContentLauncherLaunchURL>(),                         //
+        make_unique<ReadContentLauncherAcceptsHeaderList>(),             //
+        make_unique<ReadContentLauncherSupportedStreamingProtocols>(),   //
+        make_unique<WriteContentLauncherSupportedStreamingProtocols>(),  //
+        make_unique<ReportContentLauncherSupportedStreamingProtocols>(), //
+        make_unique<ReadContentLauncherAttributeList>(),                 //
+        make_unique<ReadContentLauncherClusterRevision>(),               //
+        make_unique<ReportContentLauncherClusterRevision>(),             //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -55329,36 +54889,31 @@ void registerClusterMediaPlayback(Commands & commands)
     const char * clusterName = "MediaPlayback";
 
     commands_list clusterCommands = {
-        make_unique<MediaPlaybackMediaFastForward>(),        //
-        make_unique<MediaPlaybackMediaNext>(),               //
-        make_unique<MediaPlaybackMediaPause>(),              //
-        make_unique<MediaPlaybackMediaPlay>(),               //
-        make_unique<MediaPlaybackMediaPrevious>(),           //
-        make_unique<MediaPlaybackMediaRewind>(),             //
-        make_unique<MediaPlaybackMediaSeek>(),               //
-        make_unique<MediaPlaybackMediaSkipBackward>(),       //
-        make_unique<MediaPlaybackMediaSkipForward>(),        //
-        make_unique<MediaPlaybackMediaStartOver>(),          //
-        make_unique<MediaPlaybackMediaStop>(),               //
-        make_unique<ReadMediaPlaybackPlaybackState>(),       //
-        make_unique<ReportMediaPlaybackPlaybackState>(),     //
-        make_unique<ReadMediaPlaybackStartTime>(),           //
-        make_unique<ReportMediaPlaybackStartTime>(),         //
-        make_unique<ReadMediaPlaybackDuration>(),            //
-        make_unique<ReportMediaPlaybackDuration>(),          //
-        make_unique<ReadMediaPlaybackPositionUpdatedAt>(),   //
-        make_unique<ReportMediaPlaybackPositionUpdatedAt>(), //
-        make_unique<ReadMediaPlaybackPosition>(),            //
-        make_unique<ReportMediaPlaybackPosition>(),          //
-        make_unique<ReadMediaPlaybackPlaybackSpeed>(),       //
-        make_unique<ReportMediaPlaybackPlaybackSpeed>(),     //
-        make_unique<ReadMediaPlaybackSeekRangeEnd>(),        //
-        make_unique<ReportMediaPlaybackSeekRangeEnd>(),      //
-        make_unique<ReadMediaPlaybackSeekRangeStart>(),      //
-        make_unique<ReportMediaPlaybackSeekRangeStart>(),    //
-        make_unique<ReadMediaPlaybackAttributeList>(),       //
-        make_unique<ReadMediaPlaybackClusterRevision>(),     //
-        make_unique<ReportMediaPlaybackClusterRevision>(),   //
+        make_unique<MediaPlaybackMediaFastForward>(),      //
+        make_unique<MediaPlaybackMediaNext>(),             //
+        make_unique<MediaPlaybackMediaPause>(),            //
+        make_unique<MediaPlaybackMediaPlay>(),             //
+        make_unique<MediaPlaybackMediaPrevious>(),         //
+        make_unique<MediaPlaybackMediaRewind>(),           //
+        make_unique<MediaPlaybackMediaSeek>(),             //
+        make_unique<MediaPlaybackMediaSkipBackward>(),     //
+        make_unique<MediaPlaybackMediaSkipForward>(),      //
+        make_unique<MediaPlaybackMediaStartOver>(),        //
+        make_unique<MediaPlaybackMediaStop>(),             //
+        make_unique<ReadMediaPlaybackPlaybackState>(),     //
+        make_unique<ReportMediaPlaybackPlaybackState>(),   //
+        make_unique<ReadMediaPlaybackStartTime>(),         //
+        make_unique<ReportMediaPlaybackStartTime>(),       //
+        make_unique<ReadMediaPlaybackDuration>(),          //
+        make_unique<ReportMediaPlaybackDuration>(),        //
+        make_unique<ReadMediaPlaybackPlaybackSpeed>(),     //
+        make_unique<ReadMediaPlaybackSeekRangeEnd>(),      //
+        make_unique<ReportMediaPlaybackSeekRangeEnd>(),    //
+        make_unique<ReadMediaPlaybackSeekRangeStart>(),    //
+        make_unique<ReportMediaPlaybackSeekRangeStart>(),  //
+        make_unique<ReadMediaPlaybackAttributeList>(),     //
+        make_unique<ReadMediaPlaybackClusterRevision>(),   //
+        make_unique<ReportMediaPlaybackClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -55760,17 +55315,13 @@ void registerClusterTvChannel(Commands & commands)
     const char * clusterName = "TvChannel";
 
     commands_list clusterCommands = {
-        make_unique<TvChannelChangeChannel>(),          //
-        make_unique<TvChannelChangeChannelByNumber>(),  //
-        make_unique<TvChannelSkipChannel>(),            //
-        make_unique<ReadTvChannelTvChannelList>(),      //
-        make_unique<ReadTvChannelTvChannelLineup>(),    //
-        make_unique<ReportTvChannelTvChannelLineup>(),  //
-        make_unique<ReadTvChannelCurrentTvChannel>(),   //
-        make_unique<ReportTvChannelCurrentTvChannel>(), //
-        make_unique<ReadTvChannelAttributeList>(),      //
-        make_unique<ReadTvChannelClusterRevision>(),    //
-        make_unique<ReportTvChannelClusterRevision>(),  //
+        make_unique<TvChannelChangeChannel>(),         //
+        make_unique<TvChannelChangeChannelByNumber>(), //
+        make_unique<TvChannelSkipChannel>(),           //
+        make_unique<ReadTvChannelChannelList>(),       //
+        make_unique<ReadTvChannelAttributeList>(),     //
+        make_unique<ReadTvChannelClusterRevision>(),   //
+        make_unique<ReportTvChannelClusterRevision>(), //
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -55780,11 +55331,12 @@ void registerClusterTargetNavigator(Commands & commands)
     const char * clusterName = "TargetNavigator";
 
     commands_list clusterCommands = {
-        make_unique<TargetNavigatorNavigateTarget>(),          //
-        make_unique<ReadTargetNavigatorTargetNavigatorList>(), //
-        make_unique<ReadTargetNavigatorAttributeList>(),       //
-        make_unique<ReadTargetNavigatorClusterRevision>(),     //
-        make_unique<ReportTargetNavigatorClusterRevision>(),   //
+        make_unique<TargetNavigatorNavigateTarget>(),             //
+        make_unique<ReadTargetNavigatorTargetNavigatorList>(),    //
+        make_unique<ReadTargetNavigatorCurrentNavigatorTarget>(), //
+        make_unique<ReadTargetNavigatorAttributeList>(),          //
+        make_unique<ReadTargetNavigatorClusterRevision>(),        //
+        make_unique<ReportTargetNavigatorClusterRevision>(),      //
     };
 
     commands.Register(clusterName, clusterCommands);
