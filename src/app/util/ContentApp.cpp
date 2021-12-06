@@ -160,5 +160,83 @@ EmberAfStatus AccountLogin::HandleWriteAttribute(chip::AttributeId attributeId, 
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
+EmberAfStatus KeypadInput::HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
+{
+    ChipLogProgress(DeviceLayer, "KeypadInput::HandleReadAttribute: attrId=%d, maxReadLength=%d",
+                    static_cast<uint16_t>(attributeId), maxReadLength);
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
+EmberAfStatus KeypadInput::HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer)
+{
+    ChipLogProgress(DeviceLayer, "KeypadInput::HandleWriteAttribute: attrId=%d", static_cast<uint16_t>(attributeId));
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
+EmberAfStatus ApplicationLauncher::HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
+{
+    ChipLogProgress(DeviceLayer, "ApplicationLauncher::HandleReadAttribute: attrId=%d, maxReadLength=%d",
+                    static_cast<uint16_t>(attributeId), maxReadLength);
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
+EmberAfStatus ApplicationLauncher::HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer)
+{
+    ChipLogProgress(DeviceLayer, "ApplicationLauncher::HandleWriteAttribute: attrId=%d", static_cast<uint16_t>(attributeId));
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
+EmberAfStatus ContentLauncher::HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
+{
+    ChipLogProgress(DeviceLayer, "ContentLauncher::HandleReadAttribute: attrId=%d, maxReadLength=%d",
+                    static_cast<uint16_t>(attributeId), maxReadLength);
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
+EmberAfStatus ContentLauncher::HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer)
+{
+    ChipLogProgress(DeviceLayer, "ContentLauncher::HandleWriteAttribute: attrId=%d", static_cast<uint16_t>(attributeId));
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
+EmberAfStatus MediaPlayback::HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
+{
+    ChipLogProgress(DeviceLayer, "MediaPlayback::HandleReadAttribute: attrId=%d, maxReadLength=%d",
+                    static_cast<uint16_t>(attributeId), maxReadLength);
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
+EmberAfStatus MediaPlayback::HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer)
+{
+    ChipLogProgress(DeviceLayer, "MediaPlayback::HandleWriteAttribute: attrId=%d", static_cast<uint16_t>(attributeId));
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
+EmberAfStatus TargetNavigator::HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
+{
+    ChipLogProgress(DeviceLayer, "TargetNavigator::HandleReadAttribute: attrId=%d, maxReadLength=%d",
+                    static_cast<uint16_t>(attributeId), maxReadLength);
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
+EmberAfStatus TargetNavigator::HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer)
+{
+    ChipLogProgress(DeviceLayer, "TargetNavigator::HandleWriteAttribute: attrId=%d", static_cast<uint16_t>(attributeId));
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
+EmberAfStatus Channel::HandleReadAttribute(chip::AttributeId attributeId, uint8_t * buffer, uint16_t maxReadLength)
+{
+    ChipLogProgress(DeviceLayer, "Channel::HandleReadAttribute: attrId=%d, maxReadLength=%d", static_cast<uint16_t>(attributeId),
+                    maxReadLength);
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
+EmberAfStatus Channel::HandleWriteAttribute(chip::AttributeId attributeId, uint8_t * buffer)
+{
+    ChipLogProgress(DeviceLayer, "Channel::HandleWriteAttribute: attrId=%d", static_cast<uint16_t>(attributeId));
+    return EMBER_ZCL_STATUS_FAILURE;
+}
+
 } // namespace AppPlatform
 } // namespace chip

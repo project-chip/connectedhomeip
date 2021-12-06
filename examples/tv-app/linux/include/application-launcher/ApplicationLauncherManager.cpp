@@ -20,10 +20,12 @@
 #include <app-common/zap-generated/af-structs.h>
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/clusters/application-launcher-server/application-launcher-server.h>
+#include <app/util/ContentAppPlatform.h>
 #include <app/util/af.h>
 #include <app/util/basic-types.h>
 
 using namespace std;
+using namespace chip::AppPlatform;
 
 CHIP_ERROR ApplicationLauncherManager::Init()
 {
@@ -36,6 +38,7 @@ exit:
 
 CHIP_ERROR ApplicationLauncherManager::proxyGetApplicationList(chip::app::AttributeValueEncoder & aEncoder)
 {
+    ChipLogProgress(Zcl, "ApplicationLauncherManager::proxyGetApplicationList");
     return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
         ReturnErrorOnFailure(encoder.Encode(123u));
         ReturnErrorOnFailure(encoder.Encode(456u));
@@ -43,8 +46,17 @@ CHIP_ERROR ApplicationLauncherManager::proxyGetApplicationList(chip::app::Attrib
     });
 }
 
-ApplicationLauncherResponse applicationLauncherClusterLaunchApp(ApplicationLauncherApp application, std::string data)
+ApplicationLauncherResponse applicationLauncherClusterLaunchApp(chip::EndpointId endpoint, ApplicationLauncherApp application,
+                                                                std::string data)
 {
+#if CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+    ContentApp * app = chip::AppPlatform::AppPlatform::GetInstance().GetContentAppByEndpointId(endpoint);
+    if (app != NULL)
+    {
+        return app->GetApplicationLauncher()->LaunchApp(application, data);
+    }
+#endif // CHIP_DEVICE_CONFIG_APP_PLATFORM_ENABLED
+
     // TODO: Insert your code
     ApplicationLauncherResponse response;
     const char * testData = "data";

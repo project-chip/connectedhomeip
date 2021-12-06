@@ -191,6 +191,22 @@ uint32_t AccountLoginImpl::GetSetupPIN(const char * tempAccountId)
     return mSetupPIN;
 }
 
+ApplicationLauncherResponse ApplicationLauncherImpl::LaunchApp(ApplicationLauncherApp application, std::string data)
+{
+    std::string appId(application.applicationId.data(), application.applicationId.size());
+    ChipLogProgress(DeviceLayer,
+                    "ApplicationLauncherResponse: LaunchApp application.catalogVendorId=%d "
+                    "application.catalogVendorId application.applicationId=%s data=%s",
+                    application.catalogVendorId, appId.c_str(), data.c_str());
+
+    ApplicationLauncherResponse response;
+    const char * testData = "data";
+    response.data         = (uint8_t *) testData;
+    response.status       = EMBER_ZCL_APPLICATION_LAUNCHER_STATUS_SUCCESS;
+
+    return response;
+}
+
 ContentAppFactoryImpl::ContentAppFactoryImpl()
 {
     mContentApps[1].GetAccountLogin()->SetSetupPIN(34567890);

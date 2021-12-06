@@ -85,6 +85,56 @@ protected:
     uint32_t mSetupPIN = 0;
 };
 
+class DLL_EXPORT KeypadInputImpl : public KeypadInput
+{
+public:
+    virtual ~KeypadInputImpl() {}
+
+protected:
+};
+
+class DLL_EXPORT ApplicationLauncherImpl : public ApplicationLauncher
+{
+public:
+    virtual ~ApplicationLauncherImpl() {}
+
+    ApplicationLauncherResponse LaunchApp(ApplicationLauncherApp application, std::string data) override;
+
+protected:
+};
+
+class DLL_EXPORT ContentLauncherImpl : public ContentLauncher
+{
+public:
+    virtual ~ContentLauncherImpl() {}
+
+protected:
+};
+
+class DLL_EXPORT MediaPlaybackImpl : public MediaPlayback
+{
+public:
+    virtual ~MediaPlaybackImpl() {}
+
+protected:
+};
+
+class DLL_EXPORT TargetNavigatorImpl : public TargetNavigator
+{
+public:
+    virtual ~TargetNavigatorImpl() {}
+
+protected:
+};
+
+class DLL_EXPORT ChannelImpl : public Channel
+{
+public:
+    virtual ~ChannelImpl() {}
+
+protected:
+};
+
 class DLL_EXPORT ContentAppImpl : public ContentApp
 {
 public:
@@ -94,10 +144,22 @@ public:
 
     inline ApplicationBasic * GetApplicationBasic() override { return &mApplicationBasic; };
     inline AccountLogin * GetAccountLogin() override { return &mAccountLogin; };
+    inline KeypadInput * GetKeypadInput() override { return &mKeypadInput; };
+    inline ApplicationLauncher * GetApplicationLauncher() override { return &mApplicationLauncher; };
+    inline ContentLauncher * GetContentLauncher() override { return &mContentLauncher; };
+    inline MediaPlayback * GetMediaPlayback() override { return &mMediaPlayback; };
+    inline TargetNavigator * GetTargetNavigator() override { return &mTargetNavigator; };
+    inline Channel * GetChannel() override { return &mChannel; };
 
 protected:
     ApplicationBasicImpl mApplicationBasic;
     AccountLoginImpl mAccountLogin;
+    KeypadInputImpl mKeypadInput;
+    ApplicationLauncherImpl mApplicationLauncher;
+    ContentLauncherImpl mContentLauncher;
+    MediaPlaybackImpl mMediaPlayback;
+    TargetNavigatorImpl mTargetNavigator;
+    ChannelImpl mChannel;
 };
 
 class DLL_EXPORT ContentAppFactoryImpl : public ContentAppFactory

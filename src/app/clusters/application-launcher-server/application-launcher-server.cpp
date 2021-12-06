@@ -34,7 +34,8 @@ using namespace chip;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::ApplicationLauncher;
 
-ApplicationLauncherResponse applicationLauncherClusterLaunchApp(::ApplicationLauncherApp application, std::string data);
+ApplicationLauncherResponse applicationLauncherClusterLaunchApp(EndpointId endpoint, ::ApplicationLauncherApp application,
+                                                                std::string data);
 
 bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * commandObj,
                                                         const app::ConcreteCommandPath & commandPath, EndpointId endpoint,
@@ -81,7 +82,8 @@ bool emberAfApplicationLauncherClusterLaunchAppCallback(app::CommandHandler * co
 
     ::ApplicationLauncherApp application = getApplicationFromCommand(requestApplicationCatalogVendorId, requestApplicationId);
     std::string reqestDataString(requestData.data(), requestData.size());
-    ApplicationLauncherResponse response = applicationLauncherClusterLaunchApp(application, reqestDataString);
+    ApplicationLauncherResponse response =
+        applicationLauncherClusterLaunchApp(emberAfCurrentEndpoint(), application, reqestDataString);
     sendResponse(command, response);
     return true;
 }
