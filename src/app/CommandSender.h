@@ -26,6 +26,7 @@
 
 #include <type_traits>
 
+#include <app/MessageDef/StatusIB.h>
 #include <app/data-model/Encode.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLVDebug.hpp>
@@ -222,10 +223,6 @@ private:
 
     CHIP_ERROR ProcessInvokeResponse(System::PacketBufferHandle && payload);
     CHIP_ERROR ProcessInvokeResponseIB(InvokeResponseIB::Parser & aInvokeResponse);
-
-    // SendTimedRequest expects to be called after the exchange has already been
-    // created and we know for sure we need to do a timed invoke.
-    CHIP_ERROR SendTimedRequest(uint16_t aTimeoutMs);
 
     // Handle a message received when we are expecting a status response to a
     // Timed Request.  The caller is assumed to have already checked that our

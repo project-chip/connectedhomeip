@@ -190,6 +190,20 @@ public:
         return AddArgument(name, min, max, &value->SetNonNull(), optional);
     }
 
+    size_t AddArgument(const char * name, float min, float max, chip::app::DataModel::Nullable<float> * value,
+                       bool optional = false)
+    {
+        // We always require our args to be provided for the moment.
+        return AddArgument(name, min, max, &value->SetNonNull(), optional);
+    }
+
+    size_t AddArgument(const char * name, double min, double max, chip::app::DataModel::Nullable<double> * value,
+                       bool optional = false)
+    {
+        // We always require our args to be provided for the moment.
+        return AddArgument(name, min, max, &value->SetNonNull(), optional);
+    }
+
     virtual CHIP_ERROR Run() = 0;
 
 private:

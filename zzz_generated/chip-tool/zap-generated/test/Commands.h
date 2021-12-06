@@ -311,8 +311,9 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status)
@@ -595,8 +596,9 @@ private:
         bool outOfServiceArgument;
         outOfServiceArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
-            outOfServiceArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
+            outOfServiceArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -650,8 +652,9 @@ private:
         bool presentValueArgument;
         presentValueArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
-            presentValueArgument, this, OnSuccessCallback_6, OnFailureCallback_6);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
+            presentValueArgument, this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -725,8 +728,9 @@ private:
         uint8_t statusFlagsArgument;
         statusFlagsArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
-            statusFlagsArgument, this, OnSuccessCallback_10, OnFailureCallback_10);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
+            statusFlagsArgument, this, OnSuccessCallback_10, OnFailureCallback_10));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_10(uint8_t status)
@@ -1237,8 +1241,9 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status)
@@ -1427,8 +1432,9 @@ private:
         bool stateValueArgument;
         stateValueArgument = 1;
 
-        return cluster.WriteAttribute<chip::app::Clusters::BooleanState::Attributes::StateValue::TypeInfo>(
-            stateValueArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::BooleanState::Attributes::StateValue::TypeInfo>(
+            stateValueArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status)
@@ -1570,8 +1576,9 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 4U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status)
@@ -3610,8 +3617,9 @@ private:
         uint8_t currentHueArgument;
         currentHueArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(
-            currentHueArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(
+            currentHueArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status)
@@ -3689,8 +3697,9 @@ private:
         uint8_t currentSaturationArgument;
         currentSaturationArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::TypeInfo>(
-            currentSaturationArgument, this, OnSuccessCallback_7, OnFailureCallback_7);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::TypeInfo>(
+            currentSaturationArgument, this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(uint8_t status)
@@ -3768,8 +3777,9 @@ private:
         uint16_t currentXArgument;
         currentXArgument = 24939U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentX::TypeInfo>(
-            currentXArgument, this, OnSuccessCallback_11, OnFailureCallback_11);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentX::TypeInfo>(
+            currentXArgument, this, OnSuccessCallback_11, OnFailureCallback_11));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_11(uint8_t status)
@@ -3847,8 +3857,9 @@ private:
         uint16_t currentYArgument;
         currentYArgument = 24701U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentY::TypeInfo>(
-            currentYArgument, this, OnSuccessCallback_15, OnFailureCallback_15);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentY::TypeInfo>(
+            currentYArgument, this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_15(uint8_t status)
@@ -3965,8 +3976,9 @@ private:
         uint8_t colorControlOptionsArgument;
         colorControlOptionsArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(
-            colorControlOptionsArgument, this, OnSuccessCallback_21, OnFailureCallback_21);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(
+            colorControlOptionsArgument, this, OnSuccessCallback_21, OnFailureCallback_21));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_21(uint8_t status) { ThrowFailureResponse(); }
@@ -4039,8 +4051,9 @@ private:
         uint16_t enhancedCurrentHueArgument;
         enhancedCurrentHueArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
-            enhancedCurrentHueArgument, this, OnSuccessCallback_25, OnFailureCallback_25);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
+            enhancedCurrentHueArgument, this, OnSuccessCallback_25, OnFailureCallback_25));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_25(uint8_t status)
@@ -4136,8 +4149,9 @@ private:
         uint8_t colorLoopActiveArgument;
         colorLoopActiveArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
-            colorLoopActiveArgument, this, OnSuccessCallback_30, OnFailureCallback_30);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
+            colorLoopActiveArgument, this, OnSuccessCallback_30, OnFailureCallback_30));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_30(uint8_t status)
@@ -4214,8 +4228,9 @@ private:
         uint8_t colorLoopDirectionArgument;
         colorLoopDirectionArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
-            colorLoopDirectionArgument, this, OnSuccessCallback_34, OnFailureCallback_34);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
+            colorLoopDirectionArgument, this, OnSuccessCallback_34, OnFailureCallback_34));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_34(uint8_t status)
@@ -4292,8 +4307,9 @@ private:
         uint16_t colorLoopTimeArgument;
         colorLoopTimeArgument = 25U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
-            colorLoopTimeArgument, this, OnSuccessCallback_38, OnFailureCallback_38);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
+            colorLoopTimeArgument, this, OnSuccessCallback_38, OnFailureCallback_38));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_38(uint8_t status)
@@ -4370,8 +4386,10 @@ private:
         uint16_t colorLoopStartEnhancedHueArgument;
         colorLoopStartEnhancedHueArgument = 8960U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
-            colorLoopStartEnhancedHueArgument, this, OnSuccessCallback_42, OnFailureCallback_42);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
+                colorLoopStartEnhancedHueArgument, this, OnSuccessCallback_42, OnFailureCallback_42));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_42(uint8_t status)
@@ -4448,8 +4466,10 @@ private:
         uint16_t colorLoopStoredEnhancedHueArgument;
         colorLoopStoredEnhancedHueArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
-            colorLoopStoredEnhancedHueArgument, this, OnSuccessCallback_46, OnFailureCallback_46);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
+                colorLoopStoredEnhancedHueArgument, this, OnSuccessCallback_46, OnFailureCallback_46));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_46(uint8_t status)
@@ -4527,8 +4547,9 @@ private:
         uint16_t colorCapabilitiesArgument;
         colorCapabilitiesArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo>(
-            colorCapabilitiesArgument, this, OnSuccessCallback_50, OnFailureCallback_50);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo>(
+            colorCapabilitiesArgument, this, OnSuccessCallback_50, OnFailureCallback_50));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_50(uint8_t status)
@@ -4606,8 +4627,9 @@ private:
         uint16_t colorTempPhysicalMinArgument;
         colorTempPhysicalMinArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo>(
-            colorTempPhysicalMinArgument, this, OnSuccessCallback_54, OnFailureCallback_54);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo>(
+            colorTempPhysicalMinArgument, this, OnSuccessCallback_54, OnFailureCallback_54));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_54(uint8_t status)
@@ -4685,8 +4707,9 @@ private:
         uint16_t colorTempPhysicalMaxArgument;
         colorTempPhysicalMaxArgument = 65279U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo>(
-            colorTempPhysicalMaxArgument, this, OnSuccessCallback_58, OnFailureCallback_58);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo>(
+            colorTempPhysicalMaxArgument, this, OnSuccessCallback_58, OnFailureCallback_58));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_58(uint8_t status)
@@ -4744,8 +4767,10 @@ private:
         uint16_t coupleColorTempToLevelMinMiredsArgument;
         coupleColorTempToLevelMinMiredsArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo>(
-            coupleColorTempToLevelMinMiredsArgument, this, OnSuccessCallback_61, OnFailureCallback_61);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo>(
+                coupleColorTempToLevelMinMiredsArgument, this, OnSuccessCallback_61, OnFailureCallback_61));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_61(uint8_t status)
@@ -4804,8 +4829,10 @@ private:
         uint16_t startUpColorTemperatureMiredsArgument;
         startUpColorTemperatureMiredsArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(
-            startUpColorTemperatureMiredsArgument, this, OnSuccessCallback_64, OnFailureCallback_64);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(
+                startUpColorTemperatureMiredsArgument, this, OnSuccessCallback_64, OnFailureCallback_64));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_64(uint8_t status) { ThrowFailureResponse(); }
@@ -4879,8 +4906,9 @@ private:
         uint16_t remainingTimeArgument;
         remainingTimeArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::RemainingTime::TypeInfo>(
-            remainingTimeArgument, this, OnSuccessCallback_68, OnFailureCallback_68);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::RemainingTime::TypeInfo>(
+            remainingTimeArgument, this, OnSuccessCallback_68, OnFailureCallback_68));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_68(uint8_t status)
@@ -4939,8 +4967,9 @@ private:
         uint8_t driftCompensationArgument;
         driftCompensationArgument = static_cast<uint8_t>(0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo>(
-            driftCompensationArgument, this, OnSuccessCallback_71, OnFailureCallback_71);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo>(
+            driftCompensationArgument, this, OnSuccessCallback_71, OnFailureCallback_71));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_71(uint8_t status)
@@ -5019,8 +5048,9 @@ private:
         uint8_t numberOfPrimariesArgument;
         numberOfPrimariesArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::NumberOfPrimaries::TypeInfo>(
-            numberOfPrimariesArgument, this, OnSuccessCallback_75, OnFailureCallback_75);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::NumberOfPrimaries::TypeInfo>(
+            numberOfPrimariesArgument, this, OnSuccessCallback_75, OnFailureCallback_75));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_75(uint8_t status)
@@ -5079,8 +5109,9 @@ private:
         uint16_t primary1XArgument;
         primary1XArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1X::TypeInfo>(
-            primary1XArgument, this, OnSuccessCallback_78, OnFailureCallback_78);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1X::TypeInfo>(
+            primary1XArgument, this, OnSuccessCallback_78, OnFailureCallback_78));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_78(uint8_t status)
@@ -5139,8 +5170,9 @@ private:
         uint16_t primary1YArgument;
         primary1YArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1Y::TypeInfo>(
-            primary1YArgument, this, OnSuccessCallback_81, OnFailureCallback_81);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1Y::TypeInfo>(
+            primary1YArgument, this, OnSuccessCallback_81, OnFailureCallback_81));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_81(uint8_t status)
@@ -5218,8 +5250,9 @@ private:
         uint16_t primary2XArgument;
         primary2XArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2X::TypeInfo>(
-            primary2XArgument, this, OnSuccessCallback_85, OnFailureCallback_85);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2X::TypeInfo>(
+            primary2XArgument, this, OnSuccessCallback_85, OnFailureCallback_85));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_85(uint8_t status)
@@ -5278,8 +5311,9 @@ private:
         uint16_t primary2YArgument;
         primary2YArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2Y::TypeInfo>(
-            primary2YArgument, this, OnSuccessCallback_88, OnFailureCallback_88);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2Y::TypeInfo>(
+            primary2YArgument, this, OnSuccessCallback_88, OnFailureCallback_88));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_88(uint8_t status)
@@ -5357,8 +5391,9 @@ private:
         uint16_t primary3XArgument;
         primary3XArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3X::TypeInfo>(
-            primary3XArgument, this, OnSuccessCallback_92, OnFailureCallback_92);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3X::TypeInfo>(
+            primary3XArgument, this, OnSuccessCallback_92, OnFailureCallback_92));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_92(uint8_t status)
@@ -5417,8 +5452,9 @@ private:
         uint16_t primary3YArgument;
         primary3YArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3Y::TypeInfo>(
-            primary3YArgument, this, OnSuccessCallback_95, OnFailureCallback_95);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3Y::TypeInfo>(
+            primary3YArgument, this, OnSuccessCallback_95, OnFailureCallback_95));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_95(uint8_t status)
@@ -5496,8 +5532,9 @@ private:
         uint16_t primary4XArgument;
         primary4XArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4X::TypeInfo>(
-            primary4XArgument, this, OnSuccessCallback_99, OnFailureCallback_99);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4X::TypeInfo>(
+            primary4XArgument, this, OnSuccessCallback_99, OnFailureCallback_99));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_99(uint8_t status)
@@ -5556,8 +5593,9 @@ private:
         uint16_t primary4YArgument;
         primary4YArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4Y::TypeInfo>(
-            primary4YArgument, this, OnSuccessCallback_102, OnFailureCallback_102);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4Y::TypeInfo>(
+            primary4YArgument, this, OnSuccessCallback_102, OnFailureCallback_102));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_102(uint8_t status)
@@ -5635,8 +5673,9 @@ private:
         uint16_t primary5XArgument;
         primary5XArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5X::TypeInfo>(
-            primary5XArgument, this, OnSuccessCallback_106, OnFailureCallback_106);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5X::TypeInfo>(
+            primary5XArgument, this, OnSuccessCallback_106, OnFailureCallback_106));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_106(uint8_t status)
@@ -5695,8 +5734,9 @@ private:
         uint16_t primary5YArgument;
         primary5YArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5Y::TypeInfo>(
-            primary5YArgument, this, OnSuccessCallback_109, OnFailureCallback_109);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5Y::TypeInfo>(
+            primary5YArgument, this, OnSuccessCallback_109, OnFailureCallback_109));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_109(uint8_t status)
@@ -5774,8 +5814,9 @@ private:
         uint16_t primary6XArgument;
         primary6XArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6X::TypeInfo>(
-            primary6XArgument, this, OnSuccessCallback_113, OnFailureCallback_113);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6X::TypeInfo>(
+            primary6XArgument, this, OnSuccessCallback_113, OnFailureCallback_113));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_113(uint8_t status)
@@ -5834,8 +5875,9 @@ private:
         uint16_t primary6YArgument;
         primary6YArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6Y::TypeInfo>(
-            primary6YArgument, this, OnSuccessCallback_116, OnFailureCallback_116);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6Y::TypeInfo>(
+            primary6YArgument, this, OnSuccessCallback_116, OnFailureCallback_116));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_116(uint8_t status)
@@ -5913,8 +5955,9 @@ private:
         uint16_t whitePointXArgument;
         whitePointXArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(
-            whitePointXArgument, this, OnSuccessCallback_120, OnFailureCallback_120);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(
+            whitePointXArgument, this, OnSuccessCallback_120, OnFailureCallback_120));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_120(uint8_t status) { ThrowFailureResponse(); }
@@ -5969,8 +6012,9 @@ private:
         uint16_t whitePointYArgument;
         whitePointYArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(
-            whitePointYArgument, this, OnSuccessCallback_123, OnFailureCallback_123);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(
+            whitePointYArgument, this, OnSuccessCallback_123, OnFailureCallback_123));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_123(uint8_t status) { ThrowFailureResponse(); }
@@ -6025,8 +6069,9 @@ private:
         uint16_t colorPointRXArgument;
         colorPointRXArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(
-            colorPointRXArgument, this, OnSuccessCallback_126, OnFailureCallback_126);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(
+            colorPointRXArgument, this, OnSuccessCallback_126, OnFailureCallback_126));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_126(uint8_t status) { ThrowFailureResponse(); }
@@ -6081,8 +6126,9 @@ private:
         uint16_t colorPointRYArgument;
         colorPointRYArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(
-            colorPointRYArgument, this, OnSuccessCallback_129, OnFailureCallback_129);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(
+            colorPointRYArgument, this, OnSuccessCallback_129, OnFailureCallback_129));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_129(uint8_t status) { ThrowFailureResponse(); }
@@ -6156,8 +6202,9 @@ private:
         uint16_t colorPointGXArgument;
         colorPointGXArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(
-            colorPointGXArgument, this, OnSuccessCallback_133, OnFailureCallback_133);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(
+            colorPointGXArgument, this, OnSuccessCallback_133, OnFailureCallback_133));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_133(uint8_t status) { ThrowFailureResponse(); }
@@ -6212,8 +6259,9 @@ private:
         uint16_t colorPointGYArgument;
         colorPointGYArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(
-            colorPointGYArgument, this, OnSuccessCallback_136, OnFailureCallback_136);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(
+            colorPointGYArgument, this, OnSuccessCallback_136, OnFailureCallback_136));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_136(uint8_t status) { ThrowFailureResponse(); }
@@ -6287,8 +6335,9 @@ private:
         uint16_t colorPointBXArgument;
         colorPointBXArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(
-            colorPointBXArgument, this, OnSuccessCallback_140, OnFailureCallback_140);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(
+            colorPointBXArgument, this, OnSuccessCallback_140, OnFailureCallback_140));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_140(uint8_t status) { ThrowFailureResponse(); }
@@ -6343,8 +6392,9 @@ private:
         uint16_t colorPointBYArgument;
         colorPointBYArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(
-            colorPointBYArgument, this, OnSuccessCallback_143, OnFailureCallback_143);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(
+            colorPointBYArgument, this, OnSuccessCallback_143, OnFailureCallback_143));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_143(uint8_t status) { ThrowFailureResponse(); }
@@ -14622,8 +14672,10 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo>(
+                clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status)
@@ -14765,8 +14817,9 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 2U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status)
@@ -15007,8 +15060,9 @@ private:
         int16_t minMeasuredValueArgument;
         minMeasuredValueArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
-            minMeasuredValueArgument, this, OnSuccessCallback_4, OnFailureCallback_4);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
+            minMeasuredValueArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status)
@@ -15028,8 +15082,9 @@ private:
         int16_t maxMeasuredValueArgument;
         maxMeasuredValueArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
-            maxMeasuredValueArgument, this, OnSuccessCallback_5, OnFailureCallback_5);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
+            maxMeasuredValueArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status)
@@ -15380,8 +15435,10 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
+                clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status)
@@ -15523,8 +15580,9 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 4U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status)
@@ -16283,8 +16341,9 @@ private:
         chip::app::DataModel::Nullable<uint8_t> defaultMoveRateArgument;
         defaultMoveRateArgument.SetNonNull() = 20;
 
-        return cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
-            defaultMoveRateArgument, this, OnSuccessCallback_10, OnFailureCallback_10);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
+            defaultMoveRateArgument, this, OnSuccessCallback_10, OnFailureCallback_10));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -17036,8 +17095,9 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::MediaInput::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::MediaInput::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status)
@@ -17916,8 +17976,9 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 2U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status)
@@ -18136,8 +18197,9 @@ private:
         uint8_t occupancyArgument;
         occupancyArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::Occupancy::TypeInfo>(
-            occupancyArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::Occupancy::TypeInfo>(
+            occupancyArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status)
@@ -18196,8 +18258,10 @@ private:
         uint8_t occupancySensorTypeArgument;
         occupancySensorTypeArgument = static_cast<uint8_t>(0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorType::TypeInfo>(
-            occupancySensorTypeArgument, this, OnSuccessCallback_5, OnFailureCallback_5);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorType::TypeInfo>(
+                occupancySensorTypeArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status)
@@ -18257,8 +18321,10 @@ private:
         uint8_t occupancySensorTypeBitmapArgument;
         occupancySensorTypeBitmapArgument = 1;
 
-        return cluster.WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorTypeBitmap::TypeInfo>(
-            occupancySensorTypeBitmapArgument, this, OnSuccessCallback_8, OnFailureCallback_8);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorTypeBitmap::TypeInfo>(
+                occupancySensorTypeBitmapArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(uint8_t status)
@@ -18634,8 +18700,9 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 3U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_4, OnFailureCallback_4);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status)
@@ -18712,8 +18779,9 @@ private:
         uint32_t featureMapArgument;
         featureMapArgument = 0UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(
-            featureMapArgument, this, OnSuccessCallback_8, OnFailureCallback_8);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(
+            featureMapArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(uint8_t status)
@@ -19083,8 +19151,9 @@ private:
         uint16_t onTimeArgument;
         onTimeArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
-            onTimeArgument, this, OnSuccessCallback_7, OnFailureCallback_7);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(
+            onTimeArgument, this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -19100,8 +19169,9 @@ private:
         uint16_t offWaitTimeArgument;
         offWaitTimeArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
-            offWaitTimeArgument, this, OnSuccessCallback_8, OnFailureCallback_8);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(
+            offWaitTimeArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -19117,8 +19187,9 @@ private:
         uint8_t startUpOnOffArgument;
         startUpOnOffArgument = static_cast<uint8_t>(0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
-            startUpOnOffArgument, this, OnSuccessCallback_9, OnFailureCallback_9);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(
+            startUpOnOffArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -21219,8 +21290,10 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 3U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::ClusterRevision::TypeInfo>(
+                clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status)
@@ -21434,8 +21507,9 @@ private:
         int16_t measuredValueArgument;
         measuredValueArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::TypeInfo>(
-            measuredValueArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::TypeInfo>(
+            measuredValueArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status)
@@ -21493,8 +21567,10 @@ private:
         int16_t minMeasuredValueArgument;
         minMeasuredValueArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
-            minMeasuredValueArgument, this, OnSuccessCallback_5, OnFailureCallback_5);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
+                minMeasuredValueArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status)
@@ -21552,8 +21628,10 @@ private:
         int16_t maxMeasuredValueArgument;
         maxMeasuredValueArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
-            maxMeasuredValueArgument, this, OnSuccessCallback_8, OnFailureCallback_8);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
+                maxMeasuredValueArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(uint8_t status)
@@ -21709,8 +21787,10 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 3U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ClusterRevision::TypeInfo>(
+                clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status)
@@ -22164,8 +22244,10 @@ private:
         uint8_t operationModeArgument;
         operationModeArgument = static_cast<uint8_t>(1);
 
-        return cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
-            operationModeArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
+                operationModeArgument, this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -22181,8 +22263,10 @@ private:
         uint8_t operationModeArgument;
         operationModeArgument = static_cast<uint8_t>(2);
 
-        return cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
-            operationModeArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
+                operationModeArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -22198,8 +22282,10 @@ private:
         uint8_t operationModeArgument;
         operationModeArgument = static_cast<uint8_t>(3);
 
-        return cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
-            operationModeArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
+                operationModeArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -22298,8 +22384,10 @@ private:
         uint8_t operationModeArgument;
         operationModeArgument = static_cast<uint8_t>(0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
-            operationModeArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
+                operationModeArgument, this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -22438,8 +22526,10 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::ClusterRevision::TypeInfo>(
+                clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status)
@@ -22858,8 +22948,10 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 3U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo>(
+                clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status)
@@ -23230,8 +23322,9 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 5U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status)
@@ -24225,8 +24318,9 @@ private:
         int16_t absMinHeatSetpointLimitArgument;
         absMinHeatSetpointLimitArgument = 700;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
-            absMinHeatSetpointLimitArgument, this, OnSuccessCallback_4, OnFailureCallback_4);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
+            absMinHeatSetpointLimitArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status)
@@ -24305,8 +24399,9 @@ private:
         int16_t absMaxHeatSetpointLimitArgument;
         absMaxHeatSetpointLimitArgument = 3000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
-            absMaxHeatSetpointLimitArgument, this, OnSuccessCallback_8, OnFailureCallback_8);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
+            absMaxHeatSetpointLimitArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(uint8_t status)
@@ -24385,8 +24480,9 @@ private:
         int16_t absMinCoolSetpointLimitArgument;
         absMinCoolSetpointLimitArgument = 1600;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
-            absMinCoolSetpointLimitArgument, this, OnSuccessCallback_12, OnFailureCallback_12);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
+            absMinCoolSetpointLimitArgument, this, OnSuccessCallback_12, OnFailureCallback_12));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_12(uint8_t status)
@@ -24465,8 +24561,9 @@ private:
         int16_t absMaxCoolSetpointLimitArgument;
         absMaxCoolSetpointLimitArgument = 3200;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
-            absMaxCoolSetpointLimitArgument, this, OnSuccessCallback_16, OnFailureCallback_16);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
+            absMaxCoolSetpointLimitArgument, this, OnSuccessCallback_16, OnFailureCallback_16));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_16(uint8_t status)
@@ -24545,8 +24642,9 @@ private:
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2600;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            occupiedCoolingSetpointArgument, this, OnSuccessCallback_20, OnFailureCallback_20);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_20, OnFailureCallback_20));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_20(uint8_t status) { ThrowFailureResponse(); }
@@ -24621,8 +24719,9 @@ private:
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 2000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            occupiedHeatingSetpointArgument, this, OnSuccessCallback_24, OnFailureCallback_24);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_24, OnFailureCallback_24));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_24(uint8_t status) { ThrowFailureResponse(); }
@@ -24697,8 +24796,9 @@ private:
         int16_t minHeatSetpointLimitArgument;
         minHeatSetpointLimitArgument = 700;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
-            minHeatSetpointLimitArgument, this, OnSuccessCallback_28, OnFailureCallback_28);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            minHeatSetpointLimitArgument, this, OnSuccessCallback_28, OnFailureCallback_28));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_28(uint8_t status) { ThrowFailureResponse(); }
@@ -24773,8 +24873,9 @@ private:
         int16_t maxHeatSetpointLimitArgument;
         maxHeatSetpointLimitArgument = 3000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
-            maxHeatSetpointLimitArgument, this, OnSuccessCallback_32, OnFailureCallback_32);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            maxHeatSetpointLimitArgument, this, OnSuccessCallback_32, OnFailureCallback_32));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_32(uint8_t status) { ThrowFailureResponse(); }
@@ -24849,8 +24950,9 @@ private:
         int16_t minCoolSetpointLimitArgument;
         minCoolSetpointLimitArgument = 1600;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
-            minCoolSetpointLimitArgument, this, OnSuccessCallback_36, OnFailureCallback_36);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            minCoolSetpointLimitArgument, this, OnSuccessCallback_36, OnFailureCallback_36));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_36(uint8_t status) { ThrowFailureResponse(); }
@@ -24925,8 +25027,9 @@ private:
         int16_t maxCoolSetpointLimitArgument;
         maxCoolSetpointLimitArgument = 3200;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
-            maxCoolSetpointLimitArgument, this, OnSuccessCallback_40, OnFailureCallback_40);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            maxCoolSetpointLimitArgument, this, OnSuccessCallback_40, OnFailureCallback_40));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_40(uint8_t status) { ThrowFailureResponse(); }
@@ -25000,8 +25103,10 @@ private:
         uint8_t controlSequenceOfOperationArgument;
         controlSequenceOfOperationArgument = static_cast<uint8_t>(4);
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
-            controlSequenceOfOperationArgument, this, OnSuccessCallback_44, OnFailureCallback_44);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
+                controlSequenceOfOperationArgument, this, OnSuccessCallback_44, OnFailureCallback_44));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_44(uint8_t status) { ThrowFailureResponse(); }
@@ -25075,8 +25180,9 @@ private:
         uint8_t systemModeArgument;
         systemModeArgument = static_cast<uint8_t>(1);
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(
-            systemModeArgument, this, OnSuccessCallback_48, OnFailureCallback_48);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(
+            systemModeArgument, this, OnSuccessCallback_48, OnFailureCallback_48));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_48(uint8_t status) { ThrowFailureResponse(); }
@@ -25150,8 +25256,9 @@ private:
         int8_t minSetpointDeadBandArgument;
         minSetpointDeadBandArgument = 25;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
-            minSetpointDeadBandArgument, this, OnSuccessCallback_52, OnFailureCallback_52);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
+            minSetpointDeadBandArgument, this, OnSuccessCallback_52, OnFailureCallback_52));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_52(uint8_t status) { ThrowFailureResponse(); }
@@ -25206,8 +25313,9 @@ private:
         uint8_t startOfWeekArgument;
         startOfWeekArgument = static_cast<uint8_t>(0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::StartOfWeek::TypeInfo>(
-            startOfWeekArgument, this, OnSuccessCallback_55, OnFailureCallback_55);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::StartOfWeek::TypeInfo>(
+            startOfWeekArgument, this, OnSuccessCallback_55, OnFailureCallback_55));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_55(uint8_t status)
@@ -25265,8 +25373,10 @@ private:
         uint8_t numberOfWeeklyTransitionsArgument;
         numberOfWeeklyTransitionsArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfWeeklyTransitions::TypeInfo>(
-            numberOfWeeklyTransitionsArgument, this, OnSuccessCallback_58, OnFailureCallback_58);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfWeeklyTransitions::TypeInfo>(
+                numberOfWeeklyTransitionsArgument, this, OnSuccessCallback_58, OnFailureCallback_58));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_58(uint8_t status)
@@ -25305,8 +25415,10 @@ private:
         uint8_t numberOfDailyTransitionsArgument;
         numberOfDailyTransitionsArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfDailyTransitions::TypeInfo>(
-            numberOfDailyTransitionsArgument, this, OnSuccessCallback_60, OnFailureCallback_60);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfDailyTransitions::TypeInfo>(
+                numberOfDailyTransitionsArgument, this, OnSuccessCallback_60, OnFailureCallback_60));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_60(uint8_t status)
@@ -26131,8 +26243,9 @@ private:
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            occupiedCoolingSetpointArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -26167,8 +26280,9 @@ private:
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 1600;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            occupiedCoolingSetpointArgument, this, OnSuccessCallback_4, OnFailureCallback_4);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -26184,8 +26298,9 @@ private:
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2600;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            occupiedCoolingSetpointArgument, this, OnSuccessCallback_5, OnFailureCallback_5);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -26220,8 +26335,9 @@ private:
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 2100;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            occupiedHeatingSetpointArgument, this, OnSuccessCallback_7, OnFailureCallback_7);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -26256,8 +26372,9 @@ private:
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 700;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            occupiedHeatingSetpointArgument, this, OnSuccessCallback_9, OnFailureCallback_9);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -26273,8 +26390,9 @@ private:
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 3000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            occupiedHeatingSetpointArgument, this, OnSuccessCallback_10, OnFailureCallback_10);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_10, OnFailureCallback_10));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -26309,8 +26427,9 @@ private:
         int16_t minHeatSetpointLimitArgument;
         minHeatSetpointLimitArgument = 2000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
-            minHeatSetpointLimitArgument, this, OnSuccessCallback_12, OnFailureCallback_12);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            minHeatSetpointLimitArgument, this, OnSuccessCallback_12, OnFailureCallback_12));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
@@ -26345,8 +26464,9 @@ private:
         int16_t minHeatSetpointLimitArgument;
         minHeatSetpointLimitArgument = 700;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
-            minHeatSetpointLimitArgument, this, OnSuccessCallback_14, OnFailureCallback_14);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            minHeatSetpointLimitArgument, this, OnSuccessCallback_14, OnFailureCallback_14));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
@@ -26362,8 +26482,9 @@ private:
         int16_t minHeatSetpointLimitArgument;
         minHeatSetpointLimitArgument = 3000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
-            minHeatSetpointLimitArgument, this, OnSuccessCallback_15, OnFailureCallback_15);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            minHeatSetpointLimitArgument, this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_15(uint8_t status) { ThrowFailureResponse(); }
@@ -26398,8 +26519,9 @@ private:
         int16_t maxHeatSetpointLimitArgument;
         maxHeatSetpointLimitArgument = 2000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
-            maxHeatSetpointLimitArgument, this, OnSuccessCallback_17, OnFailureCallback_17);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            maxHeatSetpointLimitArgument, this, OnSuccessCallback_17, OnFailureCallback_17));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_17(uint8_t status) { ThrowFailureResponse(); }
@@ -26434,8 +26556,9 @@ private:
         int16_t maxHeatSetpointLimitArgument;
         maxHeatSetpointLimitArgument = 700;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
-            maxHeatSetpointLimitArgument, this, OnSuccessCallback_19, OnFailureCallback_19);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            maxHeatSetpointLimitArgument, this, OnSuccessCallback_19, OnFailureCallback_19));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_19(uint8_t status) { ThrowFailureResponse(); }
@@ -26451,8 +26574,9 @@ private:
         int16_t maxHeatSetpointLimitArgument;
         maxHeatSetpointLimitArgument = 3000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
-            maxHeatSetpointLimitArgument, this, OnSuccessCallback_20, OnFailureCallback_20);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            maxHeatSetpointLimitArgument, this, OnSuccessCallback_20, OnFailureCallback_20));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_20(uint8_t status) { ThrowFailureResponse(); }
@@ -26487,8 +26611,9 @@ private:
         int16_t minCoolSetpointLimitArgument;
         minCoolSetpointLimitArgument = 2000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
-            minCoolSetpointLimitArgument, this, OnSuccessCallback_22, OnFailureCallback_22);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            minCoolSetpointLimitArgument, this, OnSuccessCallback_22, OnFailureCallback_22));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_22(uint8_t status) { ThrowFailureResponse(); }
@@ -26523,8 +26648,9 @@ private:
         int16_t minCoolSetpointLimitArgument;
         minCoolSetpointLimitArgument = 1600;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
-            minCoolSetpointLimitArgument, this, OnSuccessCallback_24, OnFailureCallback_24);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            minCoolSetpointLimitArgument, this, OnSuccessCallback_24, OnFailureCallback_24));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_24(uint8_t status) { ThrowFailureResponse(); }
@@ -26540,8 +26666,9 @@ private:
         int16_t minCoolSetpointLimitArgument;
         minCoolSetpointLimitArgument = 3200;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
-            minCoolSetpointLimitArgument, this, OnSuccessCallback_25, OnFailureCallback_25);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            minCoolSetpointLimitArgument, this, OnSuccessCallback_25, OnFailureCallback_25));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_25(uint8_t status) { ThrowFailureResponse(); }
@@ -26576,8 +26703,9 @@ private:
         int16_t maxCoolSetpointLimitArgument;
         maxCoolSetpointLimitArgument = 2000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
-            maxCoolSetpointLimitArgument, this, OnSuccessCallback_27, OnFailureCallback_27);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            maxCoolSetpointLimitArgument, this, OnSuccessCallback_27, OnFailureCallback_27));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_27(uint8_t status) { ThrowFailureResponse(); }
@@ -26612,8 +26740,9 @@ private:
         int16_t maxCoolSetpointLimitArgument;
         maxCoolSetpointLimitArgument = 1600;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
-            maxCoolSetpointLimitArgument, this, OnSuccessCallback_29, OnFailureCallback_29);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            maxCoolSetpointLimitArgument, this, OnSuccessCallback_29, OnFailureCallback_29));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_29(uint8_t status) { ThrowFailureResponse(); }
@@ -26629,8 +26758,9 @@ private:
         int16_t maxCoolSetpointLimitArgument;
         maxCoolSetpointLimitArgument = 3200;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
-            maxCoolSetpointLimitArgument, this, OnSuccessCallback_30, OnFailureCallback_30);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            maxCoolSetpointLimitArgument, this, OnSuccessCallback_30, OnFailureCallback_30));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_30(uint8_t status) { ThrowFailureResponse(); }
@@ -26646,8 +26776,9 @@ private:
         int16_t minHeatSetpointLimitArgument;
         minHeatSetpointLimitArgument = 700;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
-            minHeatSetpointLimitArgument, this, OnSuccessCallback_31, OnFailureCallback_31);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            minHeatSetpointLimitArgument, this, OnSuccessCallback_31, OnFailureCallback_31));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_31(uint8_t status) { ThrowFailureResponse(); }
@@ -26663,8 +26794,9 @@ private:
         int16_t minHeatSetpointLimitArgument;
         minHeatSetpointLimitArgument = 3000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
-            minHeatSetpointLimitArgument, this, OnSuccessCallback_32, OnFailureCallback_32);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            minHeatSetpointLimitArgument, this, OnSuccessCallback_32, OnFailureCallback_32));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_32(uint8_t status) { ThrowFailureResponse(); }
@@ -26680,8 +26812,9 @@ private:
         int16_t maxHeatSetpointLimitArgument;
         maxHeatSetpointLimitArgument = 700;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
-            maxHeatSetpointLimitArgument, this, OnSuccessCallback_33, OnFailureCallback_33);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            maxHeatSetpointLimitArgument, this, OnSuccessCallback_33, OnFailureCallback_33));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_33(uint8_t status) { ThrowFailureResponse(); }
@@ -26697,8 +26830,9 @@ private:
         int16_t maxHeatSetpointLimitArgument;
         maxHeatSetpointLimitArgument = 3000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
-            maxHeatSetpointLimitArgument, this, OnSuccessCallback_34, OnFailureCallback_34);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            maxHeatSetpointLimitArgument, this, OnSuccessCallback_34, OnFailureCallback_34));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_34(uint8_t status) { ThrowFailureResponse(); }
@@ -26714,8 +26848,9 @@ private:
         int16_t minCoolSetpointLimitArgument;
         minCoolSetpointLimitArgument = 1600;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
-            minCoolSetpointLimitArgument, this, OnSuccessCallback_35, OnFailureCallback_35);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            minCoolSetpointLimitArgument, this, OnSuccessCallback_35, OnFailureCallback_35));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_35(uint8_t status) { ThrowFailureResponse(); }
@@ -26731,8 +26866,9 @@ private:
         int16_t minCoolSetpointLimitArgument;
         minCoolSetpointLimitArgument = 3200;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
-            minCoolSetpointLimitArgument, this, OnSuccessCallback_36, OnFailureCallback_36);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            minCoolSetpointLimitArgument, this, OnSuccessCallback_36, OnFailureCallback_36));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_36(uint8_t status) { ThrowFailureResponse(); }
@@ -26748,8 +26884,9 @@ private:
         int16_t maxCoolSetpointLimitArgument;
         maxCoolSetpointLimitArgument = 1600;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
-            maxCoolSetpointLimitArgument, this, OnSuccessCallback_37, OnFailureCallback_37);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            maxCoolSetpointLimitArgument, this, OnSuccessCallback_37, OnFailureCallback_37));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_37(uint8_t status) { ThrowFailureResponse(); }
@@ -26765,8 +26902,9 @@ private:
         int16_t maxCoolSetpointLimitArgument;
         maxCoolSetpointLimitArgument = 3200;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
-            maxCoolSetpointLimitArgument, this, OnSuccessCallback_38, OnFailureCallback_38);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            maxCoolSetpointLimitArgument, this, OnSuccessCallback_38, OnFailureCallback_38));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_38(uint8_t status) { ThrowFailureResponse(); }
@@ -26801,8 +26939,10 @@ private:
         uint8_t controlSequenceOfOperationArgument;
         controlSequenceOfOperationArgument = static_cast<uint8_t>(2);
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
-            controlSequenceOfOperationArgument, this, OnSuccessCallback_40, OnFailureCallback_40);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
+                controlSequenceOfOperationArgument, this, OnSuccessCallback_40, OnFailureCallback_40));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_40(uint8_t status) { ThrowFailureResponse(); }
@@ -26837,8 +26977,9 @@ private:
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 2000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            occupiedHeatingSetpointArgument, this, OnSuccessCallback_42, OnFailureCallback_42);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_42, OnFailureCallback_42));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_42(uint8_t status) { ThrowFailureResponse(); }
@@ -26854,8 +26995,9 @@ private:
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 2000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            occupiedHeatingSetpointArgument, this, OnSuccessCallback_43, OnFailureCallback_43);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_43, OnFailureCallback_43));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_43(uint8_t status) { ThrowFailureResponse(); }
@@ -26871,8 +27013,9 @@ private:
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2600;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            occupiedCoolingSetpointArgument, this, OnSuccessCallback_44, OnFailureCallback_44);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_44, OnFailureCallback_44));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_44(uint8_t status) { ThrowFailureResponse(); }
@@ -26888,8 +27031,9 @@ private:
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2600;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            occupiedCoolingSetpointArgument, this, OnSuccessCallback_45, OnFailureCallback_45);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_45, OnFailureCallback_45));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_45(uint8_t status) { ThrowFailureResponse(); }
@@ -26905,8 +27049,9 @@ private:
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2600;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            occupiedCoolingSetpointArgument, this, OnSuccessCallback_46, OnFailureCallback_46);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_46, OnFailureCallback_46));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_46(uint8_t status) { ThrowFailureResponse(); }
@@ -26922,8 +27067,9 @@ private:
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 2000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            occupiedHeatingSetpointArgument, this, OnSuccessCallback_47, OnFailureCallback_47);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_47, OnFailureCallback_47));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_47(uint8_t status) { ThrowFailureResponse(); }
@@ -26939,8 +27085,9 @@ private:
         int16_t occupiedCoolingSetpointArgument;
         occupiedCoolingSetpointArgument = 2600;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
-            occupiedCoolingSetpointArgument, this, OnSuccessCallback_48, OnFailureCallback_48);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            occupiedCoolingSetpointArgument, this, OnSuccessCallback_48, OnFailureCallback_48));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_48(uint8_t status) { ThrowFailureResponse(); }
@@ -26956,8 +27103,9 @@ private:
         int16_t occupiedHeatingSetpointArgument;
         occupiedHeatingSetpointArgument = 2000;
 
-        return cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
-            occupiedHeatingSetpointArgument, this, OnSuccessCallback_49, OnFailureCallback_49);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            occupiedHeatingSetpointArgument, this, OnSuccessCallback_49, OnFailureCallback_49));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_49(uint8_t status) { ThrowFailureResponse(); }
@@ -27077,9 +27225,11 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 2U;
 
-        return cluster
-            .WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ClusterRevision::TypeInfo>(
-                clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(
+            cluster
+                .WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ClusterRevision::TypeInfo>(
+                    clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status)
@@ -27398,9 +27548,11 @@ private:
         uint8_t temperatureDisplayModeArgument;
         temperatureDisplayModeArgument = static_cast<uint8_t>(0);
 
-        return cluster.WriteAttribute<
-            chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
-            temperatureDisplayModeArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<
+                chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
+                temperatureDisplayModeArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -27496,9 +27648,10 @@ private:
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(0);
 
-        return cluster
-            .WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-                keypadLockoutArgument, this, OnSuccessCallback_8, OnFailureCallback_8);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
+                keypadLockoutArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -27594,9 +27747,11 @@ private:
         uint8_t scheduleProgrammingVisibilityArgument;
         scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(0);
 
-        return cluster.WriteAttribute<
-            chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
-            scheduleProgrammingVisibilityArgument, this, OnSuccessCallback_13, OnFailureCallback_13);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<
+                chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
+                scheduleProgrammingVisibilityArgument, this, OnSuccessCallback_13, OnFailureCallback_13));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
@@ -27828,9 +27983,11 @@ private:
         uint8_t temperatureDisplayModeArgument;
         temperatureDisplayModeArgument = static_cast<uint8_t>(0);
 
-        return cluster.WriteAttribute<
-            chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
-            temperatureDisplayModeArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<
+                chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
+                temperatureDisplayModeArgument, this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -27846,9 +28003,11 @@ private:
         uint8_t temperatureDisplayModeArgument;
         temperatureDisplayModeArgument = static_cast<uint8_t>(1);
 
-        return cluster.WriteAttribute<
-            chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
-            temperatureDisplayModeArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<
+                chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
+                temperatureDisplayModeArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -27864,9 +28023,10 @@ private:
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(0);
 
-        return cluster
-            .WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-                keypadLockoutArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
+                keypadLockoutArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
@@ -27882,9 +28042,10 @@ private:
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(1);
 
-        return cluster
-            .WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-                keypadLockoutArgument, this, OnSuccessCallback_4, OnFailureCallback_4);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
+                keypadLockoutArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -27900,9 +28061,10 @@ private:
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(2);
 
-        return cluster
-            .WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-                keypadLockoutArgument, this, OnSuccessCallback_5, OnFailureCallback_5);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
+                keypadLockoutArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -27918,9 +28080,10 @@ private:
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(3);
 
-        return cluster
-            .WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-                keypadLockoutArgument, this, OnSuccessCallback_6, OnFailureCallback_6);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
+                keypadLockoutArgument, this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -27936,9 +28099,10 @@ private:
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(4);
 
-        return cluster
-            .WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-                keypadLockoutArgument, this, OnSuccessCallback_7, OnFailureCallback_7);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
+                keypadLockoutArgument, this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -27954,9 +28118,10 @@ private:
         uint8_t keypadLockoutArgument;
         keypadLockoutArgument = static_cast<uint8_t>(5);
 
-        return cluster
-            .WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
-                keypadLockoutArgument, this, OnSuccessCallback_8, OnFailureCallback_8);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
+                keypadLockoutArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(uint8_t status) { ThrowFailureResponse(); }
@@ -27972,9 +28137,11 @@ private:
         uint8_t scheduleProgrammingVisibilityArgument;
         scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(0);
 
-        return cluster.WriteAttribute<
-            chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
-            scheduleProgrammingVisibilityArgument, this, OnSuccessCallback_9, OnFailureCallback_9);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<
+                chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
+                scheduleProgrammingVisibilityArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -27990,9 +28157,11 @@ private:
         uint8_t scheduleProgrammingVisibilityArgument;
         scheduleProgrammingVisibilityArgument = static_cast<uint8_t>(1);
 
-        return cluster.WriteAttribute<
-            chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
-            scheduleProgrammingVisibilityArgument, this, OnSuccessCallback_10, OnFailureCallback_10);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<
+                chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
+                scheduleProgrammingVisibilityArgument, this, OnSuccessCallback_10, OnFailureCallback_10));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -28158,8 +28327,10 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 1U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo>(
+                clusterRevisionArgument, this, OnSuccessCallback_3, OnFailureCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status)
@@ -28357,8 +28528,9 @@ private:
         uint16_t clusterRevisionArgument;
         clusterRevisionArgument = 201U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::ClusterRevision::TypeInfo>(
-            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::ClusterRevision::TypeInfo>(
+            clusterRevisionArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status)
@@ -28418,8 +28590,9 @@ private:
         uint32_t featureMapArgument;
         featureMapArgument = 32769UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::FeatureMap::TypeInfo>(
-            featureMapArgument, this, OnSuccessCallback_5, OnFailureCallback_5);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::FeatureMap::TypeInfo>(
+            featureMapArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status)
@@ -29272,8 +29445,9 @@ private:
         uint8_t typeArgument;
         typeArgument = static_cast<uint8_t>(250);
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(
-            typeArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(
+            typeArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status)
@@ -29333,8 +29507,9 @@ private:
         uint8_t configStatusArgument;
         configStatusArgument = 128;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::ConfigStatus::TypeInfo>(
-            configStatusArgument, this, OnSuccessCallback_5, OnFailureCallback_5);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::ConfigStatus::TypeInfo>(
+            configStatusArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status)
@@ -29394,8 +29569,9 @@ private:
         uint8_t operationalStatusArgument;
         operationalStatusArgument = 128;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
-            operationalStatusArgument, this, OnSuccessCallback_8, OnFailureCallback_8);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            operationalStatusArgument, this, OnSuccessCallback_8, OnFailureCallback_8));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_8(uint8_t status)
@@ -29455,8 +29631,9 @@ private:
         uint8_t endProductTypeArgument;
         endProductTypeArgument = static_cast<uint8_t>(250);
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
-            endProductTypeArgument, this, OnSuccessCallback_11, OnFailureCallback_11);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
+            endProductTypeArgument, this, OnSuccessCallback_11, OnFailureCallback_11));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_11(uint8_t status)
@@ -29516,8 +29693,9 @@ private:
         uint8_t modeArgument;
         modeArgument = 8;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(
-            modeArgument, this, OnSuccessCallback_14, OnFailureCallback_14);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(
+            modeArgument, this, OnSuccessCallback_14, OnFailureCallback_14));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
@@ -29573,8 +29751,10 @@ private:
         uint16_t targetPositionLiftPercent100thsArgument;
         targetPositionLiftPercent100thsArgument = 20000U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
-            targetPositionLiftPercent100thsArgument, this, OnSuccessCallback_17, OnFailureCallback_17);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
+                targetPositionLiftPercent100thsArgument, this, OnSuccessCallback_17, OnFailureCallback_17));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_17(uint8_t status)
@@ -29635,8 +29815,10 @@ private:
         uint16_t targetPositionTiltPercent100thsArgument;
         targetPositionTiltPercent100thsArgument = 20000U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
-            targetPositionTiltPercent100thsArgument, this, OnSuccessCallback_20, OnFailureCallback_20);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
+                targetPositionTiltPercent100thsArgument, this, OnSuccessCallback_20, OnFailureCallback_20));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_20(uint8_t status)
@@ -29697,8 +29879,10 @@ private:
         uint16_t currentPositionLiftPercent100thsArgument;
         currentPositionLiftPercent100thsArgument = 20000U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
-            currentPositionLiftPercent100thsArgument, this, OnSuccessCallback_23, OnFailureCallback_23);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+                currentPositionLiftPercent100thsArgument, this, OnSuccessCallback_23, OnFailureCallback_23));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_23(uint8_t status)
@@ -29759,8 +29943,10 @@ private:
         uint16_t currentPositionTiltPercent100thsArgument;
         currentPositionTiltPercent100thsArgument = 20000U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
-            currentPositionTiltPercent100thsArgument, this, OnSuccessCallback_26, OnFailureCallback_26);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+                currentPositionTiltPercent100thsArgument, this, OnSuccessCallback_26, OnFailureCallback_26));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_26(uint8_t status)
@@ -29820,8 +30006,10 @@ private:
         uint16_t installedOpenLimitLiftArgument;
         installedOpenLimitLiftArgument = 255U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitLift::TypeInfo>(
-            installedOpenLimitLiftArgument, this, OnSuccessCallback_29, OnFailureCallback_29);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitLift::TypeInfo>(
+                installedOpenLimitLiftArgument, this, OnSuccessCallback_29, OnFailureCallback_29));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_29(uint8_t status)
@@ -29881,8 +30069,10 @@ private:
         uint16_t installedClosedLimitLiftArgument;
         installedClosedLimitLiftArgument = 255U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitLift::TypeInfo>(
-            installedClosedLimitLiftArgument, this, OnSuccessCallback_32, OnFailureCallback_32);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitLift::TypeInfo>(
+                installedClosedLimitLiftArgument, this, OnSuccessCallback_32, OnFailureCallback_32));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_32(uint8_t status)
@@ -29942,8 +30132,10 @@ private:
         uint16_t installedOpenLimitTiltArgument;
         installedOpenLimitTiltArgument = 255U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitTilt::TypeInfo>(
-            installedOpenLimitTiltArgument, this, OnSuccessCallback_35, OnFailureCallback_35);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitTilt::TypeInfo>(
+                installedOpenLimitTiltArgument, this, OnSuccessCallback_35, OnFailureCallback_35));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_35(uint8_t status)
@@ -30003,8 +30195,10 @@ private:
         uint16_t installedClosedLimitTiltArgument;
         installedClosedLimitTiltArgument = 255U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitTilt::TypeInfo>(
-            installedClosedLimitTiltArgument, this, OnSuccessCallback_38, OnFailureCallback_38);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitTilt::TypeInfo>(
+                installedClosedLimitTiltArgument, this, OnSuccessCallback_38, OnFailureCallback_38));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_38(uint8_t status)
@@ -30064,8 +30258,9 @@ private:
         uint16_t safetyStatusArgument;
         safetyStatusArgument = 4096U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::SafetyStatus::TypeInfo>(
-            safetyStatusArgument, this, OnSuccessCallback_41, OnFailureCallback_41);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::SafetyStatus::TypeInfo>(
+            safetyStatusArgument, this, OnSuccessCallback_41, OnFailureCallback_41));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_41(uint8_t status)
@@ -30125,8 +30320,9 @@ private:
         uint16_t currentPositionLiftArgument;
         currentPositionLiftArgument = 255U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo>(
-            currentPositionLiftArgument, this, OnSuccessCallback_44, OnFailureCallback_44);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo>(
+            currentPositionLiftArgument, this, OnSuccessCallback_44, OnFailureCallback_44));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_44(uint8_t status)
@@ -30186,8 +30382,9 @@ private:
         uint16_t currentPositionTiltArgument;
         currentPositionTiltArgument = 255U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo>(
-            currentPositionTiltArgument, this, OnSuccessCallback_47, OnFailureCallback_47);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo>(
+            currentPositionTiltArgument, this, OnSuccessCallback_47, OnFailureCallback_47));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_47(uint8_t status)
@@ -30247,8 +30444,10 @@ private:
         uint8_t currentPositionLiftPercentageArgument;
         currentPositionLiftPercentageArgument = 200;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
-            currentPositionLiftPercentageArgument, this, OnSuccessCallback_50, OnFailureCallback_50);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
+                currentPositionLiftPercentageArgument, this, OnSuccessCallback_50, OnFailureCallback_50));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_50(uint8_t status)
@@ -30308,8 +30507,10 @@ private:
         uint8_t currentPositionTiltPercentageArgument;
         currentPositionTiltPercentageArgument = 200;
 
-        return cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
-            currentPositionTiltPercentageArgument, this, OnSuccessCallback_53, OnFailureCallback_53);
+        ReturnErrorOnFailure(
+            cluster.WriteAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
+                currentPositionTiltPercentageArgument, this, OnSuccessCallback_53, OnFailureCallback_53));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_53(uint8_t status)
@@ -36738,8 +36939,9 @@ private:
         bool booleanArgument;
         booleanArgument = 1;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-            booleanArgument, this, OnSuccessCallback_7, OnFailureCallback_7);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
+            booleanArgument, this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -36774,8 +36976,9 @@ private:
         bool booleanArgument;
         booleanArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-            booleanArgument, this, OnSuccessCallback_9, OnFailureCallback_9);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
+            booleanArgument, this, OnSuccessCallback_9, OnFailureCallback_9));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
@@ -36829,8 +37032,9 @@ private:
         uint8_t bitmap8Argument;
         bitmap8Argument = 255;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
-            bitmap8Argument, this, OnSuccessCallback_12, OnFailureCallback_12);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
+            bitmap8Argument, this, OnSuccessCallback_12, OnFailureCallback_12));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
@@ -36865,8 +37069,9 @@ private:
         uint8_t bitmap8Argument;
         bitmap8Argument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
-            bitmap8Argument, this, OnSuccessCallback_14, OnFailureCallback_14);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
+            bitmap8Argument, this, OnSuccessCallback_14, OnFailureCallback_14));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
@@ -36920,8 +37125,9 @@ private:
         uint16_t bitmap16Argument;
         bitmap16Argument = 65535U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
-            bitmap16Argument, this, OnSuccessCallback_17, OnFailureCallback_17);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
+            bitmap16Argument, this, OnSuccessCallback_17, OnFailureCallback_17));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_17(uint8_t status) { ThrowFailureResponse(); }
@@ -36956,8 +37162,9 @@ private:
         uint16_t bitmap16Argument;
         bitmap16Argument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
-            bitmap16Argument, this, OnSuccessCallback_19, OnFailureCallback_19);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
+            bitmap16Argument, this, OnSuccessCallback_19, OnFailureCallback_19));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_19(uint8_t status) { ThrowFailureResponse(); }
@@ -37011,8 +37218,9 @@ private:
         uint32_t bitmap32Argument;
         bitmap32Argument = 4294967295UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
-            bitmap32Argument, this, OnSuccessCallback_22, OnFailureCallback_22);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
+            bitmap32Argument, this, OnSuccessCallback_22, OnFailureCallback_22));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_22(uint8_t status) { ThrowFailureResponse(); }
@@ -37047,8 +37255,9 @@ private:
         uint32_t bitmap32Argument;
         bitmap32Argument = 0UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
-            bitmap32Argument, this, OnSuccessCallback_24, OnFailureCallback_24);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
+            bitmap32Argument, this, OnSuccessCallback_24, OnFailureCallback_24));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_24(uint8_t status) { ThrowFailureResponse(); }
@@ -37102,8 +37311,9 @@ private:
         uint64_t bitmap64Argument;
         bitmap64Argument = 18446744073709551615ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
-            bitmap64Argument, this, OnSuccessCallback_27, OnFailureCallback_27);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
+            bitmap64Argument, this, OnSuccessCallback_27, OnFailureCallback_27));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_27(uint8_t status) { ThrowFailureResponse(); }
@@ -37138,8 +37348,9 @@ private:
         uint64_t bitmap64Argument;
         bitmap64Argument = 0ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
-            bitmap64Argument, this, OnSuccessCallback_29, OnFailureCallback_29);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
+            bitmap64Argument, this, OnSuccessCallback_29, OnFailureCallback_29));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_29(uint8_t status) { ThrowFailureResponse(); }
@@ -37193,8 +37404,9 @@ private:
         uint8_t int8uArgument;
         int8uArgument = 255;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
-            int8uArgument, this, OnSuccessCallback_32, OnFailureCallback_32);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
+            int8uArgument, this, OnSuccessCallback_32, OnFailureCallback_32));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_32(uint8_t status) { ThrowFailureResponse(); }
@@ -37229,8 +37441,9 @@ private:
         uint8_t int8uArgument;
         int8uArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
-            int8uArgument, this, OnSuccessCallback_34, OnFailureCallback_34);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
+            int8uArgument, this, OnSuccessCallback_34, OnFailureCallback_34));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_34(uint8_t status) { ThrowFailureResponse(); }
@@ -37284,8 +37497,9 @@ private:
         uint16_t int16uArgument;
         int16uArgument = 65535U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
-            int16uArgument, this, OnSuccessCallback_37, OnFailureCallback_37);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
+            int16uArgument, this, OnSuccessCallback_37, OnFailureCallback_37));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_37(uint8_t status) { ThrowFailureResponse(); }
@@ -37320,8 +37534,9 @@ private:
         uint16_t int16uArgument;
         int16uArgument = 0U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
-            int16uArgument, this, OnSuccessCallback_39, OnFailureCallback_39);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
+            int16uArgument, this, OnSuccessCallback_39, OnFailureCallback_39));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_39(uint8_t status) { ThrowFailureResponse(); }
@@ -37375,8 +37590,9 @@ private:
         uint32_t int32uArgument;
         int32uArgument = 4294967295UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            int32uArgument, this, OnSuccessCallback_42, OnFailureCallback_42);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
+            int32uArgument, this, OnSuccessCallback_42, OnFailureCallback_42));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_42(uint8_t status) { ThrowFailureResponse(); }
@@ -37411,8 +37627,9 @@ private:
         uint32_t int32uArgument;
         int32uArgument = 0UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            int32uArgument, this, OnSuccessCallback_44, OnFailureCallback_44);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
+            int32uArgument, this, OnSuccessCallback_44, OnFailureCallback_44));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_44(uint8_t status) { ThrowFailureResponse(); }
@@ -37466,8 +37683,9 @@ private:
         uint64_t int64uArgument;
         int64uArgument = 18446744073709551615ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
-            int64uArgument, this, OnSuccessCallback_47, OnFailureCallback_47);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
+            int64uArgument, this, OnSuccessCallback_47, OnFailureCallback_47));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_47(uint8_t status) { ThrowFailureResponse(); }
@@ -37502,8 +37720,9 @@ private:
         uint64_t int64uArgument;
         int64uArgument = 0ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
-            int64uArgument, this, OnSuccessCallback_49, OnFailureCallback_49);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
+            int64uArgument, this, OnSuccessCallback_49, OnFailureCallback_49));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_49(uint8_t status) { ThrowFailureResponse(); }
@@ -37557,8 +37776,9 @@ private:
         int8_t int8sArgument;
         int8sArgument = 127;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
-            int8sArgument, this, OnSuccessCallback_52, OnFailureCallback_52);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
+            int8sArgument, this, OnSuccessCallback_52, OnFailureCallback_52));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_52(uint8_t status) { ThrowFailureResponse(); }
@@ -37593,8 +37813,9 @@ private:
         int8_t int8sArgument;
         int8sArgument = -128;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
-            int8sArgument, this, OnSuccessCallback_54, OnFailureCallback_54);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
+            int8sArgument, this, OnSuccessCallback_54, OnFailureCallback_54));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_54(uint8_t status) { ThrowFailureResponse(); }
@@ -37629,8 +37850,9 @@ private:
         int8_t int8sArgument;
         int8sArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
-            int8sArgument, this, OnSuccessCallback_56, OnFailureCallback_56);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
+            int8sArgument, this, OnSuccessCallback_56, OnFailureCallback_56));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_56(uint8_t status) { ThrowFailureResponse(); }
@@ -37684,8 +37906,9 @@ private:
         int16_t int16sArgument;
         int16sArgument = 32767;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
-            int16sArgument, this, OnSuccessCallback_59, OnFailureCallback_59);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
+            int16sArgument, this, OnSuccessCallback_59, OnFailureCallback_59));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_59(uint8_t status) { ThrowFailureResponse(); }
@@ -37720,8 +37943,9 @@ private:
         int16_t int16sArgument;
         int16sArgument = -32768;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
-            int16sArgument, this, OnSuccessCallback_61, OnFailureCallback_61);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
+            int16sArgument, this, OnSuccessCallback_61, OnFailureCallback_61));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_61(uint8_t status) { ThrowFailureResponse(); }
@@ -37756,8 +37980,9 @@ private:
         int16_t int16sArgument;
         int16sArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
-            int16sArgument, this, OnSuccessCallback_63, OnFailureCallback_63);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
+            int16sArgument, this, OnSuccessCallback_63, OnFailureCallback_63));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_63(uint8_t status) { ThrowFailureResponse(); }
@@ -37811,8 +38036,9 @@ private:
         int32_t int32sArgument;
         int32sArgument = 2147483647L;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
-            int32sArgument, this, OnSuccessCallback_66, OnFailureCallback_66);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
+            int32sArgument, this, OnSuccessCallback_66, OnFailureCallback_66));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_66(uint8_t status) { ThrowFailureResponse(); }
@@ -37847,8 +38073,9 @@ private:
         int32_t int32sArgument;
         int32sArgument = -2147483648L;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
-            int32sArgument, this, OnSuccessCallback_68, OnFailureCallback_68);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
+            int32sArgument, this, OnSuccessCallback_68, OnFailureCallback_68));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_68(uint8_t status) { ThrowFailureResponse(); }
@@ -37883,8 +38110,9 @@ private:
         int32_t int32sArgument;
         int32sArgument = 0L;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
-            int32sArgument, this, OnSuccessCallback_70, OnFailureCallback_70);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
+            int32sArgument, this, OnSuccessCallback_70, OnFailureCallback_70));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_70(uint8_t status) { ThrowFailureResponse(); }
@@ -37938,8 +38166,9 @@ private:
         int64_t int64sArgument;
         int64sArgument = 9223372036854775807LL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
-            int64sArgument, this, OnSuccessCallback_73, OnFailureCallback_73);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
+            int64sArgument, this, OnSuccessCallback_73, OnFailureCallback_73));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_73(uint8_t status) { ThrowFailureResponse(); }
@@ -37974,8 +38203,9 @@ private:
         int64_t int64sArgument;
         int64sArgument = -9223372036854775807LL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
-            int64sArgument, this, OnSuccessCallback_75, OnFailureCallback_75);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
+            int64sArgument, this, OnSuccessCallback_75, OnFailureCallback_75));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_75(uint8_t status) { ThrowFailureResponse(); }
@@ -38010,8 +38240,9 @@ private:
         int64_t int64sArgument;
         int64sArgument = 0LL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
-            int64sArgument, this, OnSuccessCallback_77, OnFailureCallback_77);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
+            int64sArgument, this, OnSuccessCallback_77, OnFailureCallback_77));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_77(uint8_t status) { ThrowFailureResponse(); }
@@ -38065,8 +38296,9 @@ private:
         float floatSingleArgument;
         floatSingleArgument = 0.1f;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
-            floatSingleArgument, this, OnSuccessCallback_80, OnFailureCallback_80);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+            floatSingleArgument, this, OnSuccessCallback_80, OnFailureCallback_80));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_80(uint8_t status) { ThrowFailureResponse(); }
@@ -38101,8 +38333,9 @@ private:
         float floatSingleArgument;
         floatSingleArgument = 17000000000.0f;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
-            floatSingleArgument, this, OnSuccessCallback_82, OnFailureCallback_82);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+            floatSingleArgument, this, OnSuccessCallback_82, OnFailureCallback_82));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_82(uint8_t status) { ThrowFailureResponse(); }
@@ -38137,8 +38370,9 @@ private:
         float floatSingleArgument;
         floatSingleArgument = 1.7e-10f;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
-            floatSingleArgument, this, OnSuccessCallback_84, OnFailureCallback_84);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+            floatSingleArgument, this, OnSuccessCallback_84, OnFailureCallback_84));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_84(uint8_t status) { ThrowFailureResponse(); }
@@ -38173,8 +38407,9 @@ private:
         float floatSingleArgument;
         floatSingleArgument = 0.0f;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
-            floatSingleArgument, this, OnSuccessCallback_86, OnFailureCallback_86);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(
+            floatSingleArgument, this, OnSuccessCallback_86, OnFailureCallback_86));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_86(uint8_t status) { ThrowFailureResponse(); }
@@ -38228,8 +38463,9 @@ private:
         double floatDoubleArgument;
         floatDoubleArgument = 0.1234567890123;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
-            floatDoubleArgument, this, OnSuccessCallback_89, OnFailureCallback_89);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+            floatDoubleArgument, this, OnSuccessCallback_89, OnFailureCallback_89));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_89(uint8_t status) { ThrowFailureResponse(); }
@@ -38264,8 +38500,9 @@ private:
         double floatDoubleArgument;
         floatDoubleArgument = 1.7e+200;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
-            floatDoubleArgument, this, OnSuccessCallback_91, OnFailureCallback_91);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+            floatDoubleArgument, this, OnSuccessCallback_91, OnFailureCallback_91));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_91(uint8_t status) { ThrowFailureResponse(); }
@@ -38300,8 +38537,9 @@ private:
         double floatDoubleArgument;
         floatDoubleArgument = 1.7e-200;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
-            floatDoubleArgument, this, OnSuccessCallback_93, OnFailureCallback_93);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+            floatDoubleArgument, this, OnSuccessCallback_93, OnFailureCallback_93));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_93(uint8_t status) { ThrowFailureResponse(); }
@@ -38336,8 +38574,9 @@ private:
         double floatDoubleArgument;
         floatDoubleArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
-            floatDoubleArgument, this, OnSuccessCallback_95, OnFailureCallback_95);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(
+            floatDoubleArgument, this, OnSuccessCallback_95, OnFailureCallback_95));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_95(uint8_t status) { ThrowFailureResponse(); }
@@ -38391,8 +38630,9 @@ private:
         uint8_t enum8Argument;
         enum8Argument = static_cast<uint8_t>(255);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
-            enum8Argument, this, OnSuccessCallback_98, OnFailureCallback_98);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
+            enum8Argument, this, OnSuccessCallback_98, OnFailureCallback_98));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_98(uint8_t status) { ThrowFailureResponse(); }
@@ -38427,8 +38667,9 @@ private:
         uint8_t enum8Argument;
         enum8Argument = static_cast<uint8_t>(0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
-            enum8Argument, this, OnSuccessCallback_100, OnFailureCallback_100);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
+            enum8Argument, this, OnSuccessCallback_100, OnFailureCallback_100));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_100(uint8_t status) { ThrowFailureResponse(); }
@@ -38482,8 +38723,9 @@ private:
         uint16_t enum16Argument;
         enum16Argument = static_cast<uint16_t>(65535);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
-            enum16Argument, this, OnSuccessCallback_103, OnFailureCallback_103);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
+            enum16Argument, this, OnSuccessCallback_103, OnFailureCallback_103));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_103(uint8_t status) { ThrowFailureResponse(); }
@@ -38518,8 +38760,9 @@ private:
         uint16_t enum16Argument;
         enum16Argument = static_cast<uint16_t>(0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
-            enum16Argument, this, OnSuccessCallback_105, OnFailureCallback_105);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
+            enum16Argument, this, OnSuccessCallback_105, OnFailureCallback_105));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_105(uint8_t status) { ThrowFailureResponse(); }
@@ -38573,8 +38816,9 @@ private:
         chip::ByteSpan octetStringArgument;
         octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("Tes\x00ti\x00nggarbage: not in length on purpose"), 9);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            octetStringArgument, this, OnSuccessCallback_108, OnFailureCallback_108);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+            octetStringArgument, this, OnSuccessCallback_108, OnFailureCallback_108));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_108(uint8_t status) { ThrowFailureResponse(); }
@@ -38610,8 +38854,9 @@ private:
         chip::ByteSpan octetStringArgument;
         octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("TestValuegarbage: not in length on purpose"), 9);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            octetStringArgument, this, OnSuccessCallback_110, OnFailureCallback_110);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+            octetStringArgument, this, OnSuccessCallback_110, OnFailureCallback_110));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_110(uint8_t status) { ThrowFailureResponse(); }
@@ -38648,8 +38893,9 @@ private:
         octetStringArgument =
             chip::ByteSpan(chip::Uint8::from_const_char("TestValueLongerThan10garbage: not in length on purpose"), 21);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            octetStringArgument, this, OnSuccessCallback_112, OnFailureCallback_112);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+            octetStringArgument, this, OnSuccessCallback_112, OnFailureCallback_112));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_112(uint8_t status)
@@ -38689,8 +38935,9 @@ private:
         chip::ByteSpan octetStringArgument;
         octetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
-            octetStringArgument, this, OnSuccessCallback_114, OnFailureCallback_114);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(
+            octetStringArgument, this, OnSuccessCallback_114, OnFailureCallback_114));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_114(uint8_t status) { ThrowFailureResponse(); }
@@ -38730,8 +38977,9 @@ private:
                 "111111111111111111111111111111111111111111111111111111111111111111111111garbage: not in length on purpose"),
             300);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
-            longOctetStringArgument, this, OnSuccessCallback_116, OnFailureCallback_116);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
+            longOctetStringArgument, this, OnSuccessCallback_116, OnFailureCallback_116));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_116(uint8_t status) { ThrowFailureResponse(); }
@@ -38773,8 +39021,9 @@ private:
         chip::ByteSpan longOctetStringArgument;
         longOctetStringArgument = chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
-            longOctetStringArgument, this, OnSuccessCallback_118, OnFailureCallback_118);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
+            longOctetStringArgument, this, OnSuccessCallback_118, OnFailureCallback_118));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_118(uint8_t status) { ThrowFailureResponse(); }
@@ -38809,8 +39058,9 @@ private:
         chip::CharSpan charStringArgument;
         charStringArgument = chip::Span<const char>("☉T☉garbage: not in length on purpose", 7);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            charStringArgument, this, OnSuccessCallback_120, OnFailureCallback_120);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_120, OnFailureCallback_120));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_120(uint8_t status) { ThrowFailureResponse(); }
@@ -38845,8 +39095,9 @@ private:
         chip::CharSpan charStringArgument;
         charStringArgument = chip::Span<const char>("☉TestValueLongerThan10☉garbage: not in length on purpose", 27);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            charStringArgument, this, OnSuccessCallback_122, OnFailureCallback_122);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_122, OnFailureCallback_122));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_122(uint8_t status)
@@ -38885,8 +39136,9 @@ private:
         chip::CharSpan charStringArgument;
         charStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            charStringArgument, this, OnSuccessCallback_124, OnFailureCallback_124);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_124, OnFailureCallback_124));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_124(uint8_t status) { ThrowFailureResponse(); }
@@ -38925,8 +39177,9 @@ private:
             "☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉☉garbage: not in length on purpose",
             900);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
-            longCharStringArgument, this, OnSuccessCallback_126, OnFailureCallback_126);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
+            longCharStringArgument, this, OnSuccessCallback_126, OnFailureCallback_126));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_126(uint8_t status) { ThrowFailureResponse(); }
@@ -38966,8 +39219,9 @@ private:
         chip::CharSpan longCharStringArgument;
         longCharStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
-            longCharStringArgument, this, OnSuccessCallback_128, OnFailureCallback_128);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
+            longCharStringArgument, this, OnSuccessCallback_128, OnFailureCallback_128));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_128(uint8_t status) { ThrowFailureResponse(); }
@@ -39066,8 +39320,9 @@ private:
         uint64_t epochUsArgument;
         epochUsArgument = 18446744073709551615ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            epochUsArgument, this, OnSuccessCallback_131, OnFailureCallback_131);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
+            epochUsArgument, this, OnSuccessCallback_131, OnFailureCallback_131));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_131(uint8_t status) { ThrowFailureResponse(); }
@@ -39102,8 +39357,9 @@ private:
         uint64_t epochUsArgument;
         epochUsArgument = 0ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            epochUsArgument, this, OnSuccessCallback_133, OnFailureCallback_133);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
+            epochUsArgument, this, OnSuccessCallback_133, OnFailureCallback_133));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_133(uint8_t status) { ThrowFailureResponse(); }
@@ -39157,8 +39413,9 @@ private:
         uint32_t epochSArgument;
         epochSArgument = 4294967295UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            epochSArgument, this, OnSuccessCallback_136, OnFailureCallback_136);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
+            epochSArgument, this, OnSuccessCallback_136, OnFailureCallback_136));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_136(uint8_t status) { ThrowFailureResponse(); }
@@ -39193,8 +39450,9 @@ private:
         uint32_t epochSArgument;
         epochSArgument = 0UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            epochSArgument, this, OnSuccessCallback_138, OnFailureCallback_138);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
+            epochSArgument, this, OnSuccessCallback_138, OnFailureCallback_138));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_138(uint8_t status) { ThrowFailureResponse(); }
@@ -39251,8 +39509,9 @@ private:
         bool unsupportedArgument;
         unsupportedArgument = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(
-            unsupportedArgument, this, OnSuccessCallback_141, OnFailureCallback_141);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(
+            unsupportedArgument, this, OnSuccessCallback_141, OnFailureCallback_141));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_141(uint8_t status)
@@ -39344,8 +39603,9 @@ private:
         chip::VendorId vendorIdArgument;
         vendorIdArgument = static_cast<chip::VendorId>(17);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-            vendorIdArgument, this, OnSuccessCallback_145, OnFailureCallback_145);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
+            vendorIdArgument, this, OnSuccessCallback_145, OnFailureCallback_145));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_145(uint8_t status) { ThrowFailureResponse(); }
@@ -39380,8 +39640,9 @@ private:
         chip::VendorId vendorIdArgument;
         vendorIdArgument = static_cast<chip::VendorId>(0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-            vendorIdArgument, this, OnSuccessCallback_147, OnFailureCallback_147);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
+            vendorIdArgument, this, OnSuccessCallback_147, OnFailureCallback_147));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_147(uint8_t status) { ThrowFailureResponse(); }
@@ -40228,8 +40489,9 @@ private:
         listInt8uList[3]  = 4;
         listInt8uArgument = listInt8uList;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(
-            listInt8uArgument, this, OnSuccessCallback_164, OnFailureCallback_164);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(
+            listInt8uArgument, this, OnSuccessCallback_164, OnFailureCallback_164));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_164(uint8_t status) { ThrowFailureResponse(); }
@@ -40279,8 +40541,9 @@ private:
         listOctetStringList[3]  = chip::ByteSpan(chip::Uint8::from_const_char("Test3garbage: not in length on purpose"), 5);
         listOctetStringArgument = listOctetStringList;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo>(
-            listOctetStringArgument, this, OnSuccessCallback_166, OnFailureCallback_166);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo>(
+            listOctetStringArgument, this, OnSuccessCallback_166, OnFailureCallback_166));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_166(uint8_t status) { ThrowFailureResponse(); }
@@ -40348,8 +40611,9 @@ private:
 
         listStructOctetStringArgument = listStructOctetStringList;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(
-            listStructOctetStringArgument, this, OnSuccessCallback_168, OnFailureCallback_168);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+            listStructOctetStringArgument, this, OnSuccessCallback_168, OnFailureCallback_168));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_168(uint8_t status) { ThrowFailureResponse(); }
@@ -40474,8 +40738,9 @@ private:
         chip::app::DataModel::Nullable<bool> nullableBooleanArgument;
         nullableBooleanArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
-            nullableBooleanArgument, this, OnSuccessCallback_172, OnFailureCallback_172);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
+            nullableBooleanArgument, this, OnSuccessCallback_172, OnFailureCallback_172));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_172(uint8_t status) { ThrowFailureResponse(); }
@@ -40510,8 +40775,9 @@ private:
         chip::app::DataModel::Nullable<bool> nullableBooleanArgument;
         nullableBooleanArgument.SetNonNull() = true;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
-            nullableBooleanArgument, this, OnSuccessCallback_174, OnFailureCallback_174);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
+            nullableBooleanArgument, this, OnSuccessCallback_174, OnFailureCallback_174));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_174(uint8_t status) { ThrowFailureResponse(); }
@@ -40547,8 +40813,9 @@ private:
         chip::app::DataModel::Nullable<uint8_t> nullableBitmap8Argument;
         nullableBitmap8Argument.SetNonNull() = 254;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
-            nullableBitmap8Argument, this, OnSuccessCallback_176, OnFailureCallback_176);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
+            nullableBitmap8Argument, this, OnSuccessCallback_176, OnFailureCallback_176));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_176(uint8_t status) { ThrowFailureResponse(); }
@@ -40584,8 +40851,9 @@ private:
         chip::app::DataModel::Nullable<uint8_t> nullableBitmap8Argument;
         nullableBitmap8Argument.SetNonNull() = 255;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
-            nullableBitmap8Argument, this, OnSuccessCallback_178, OnFailureCallback_178);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
+            nullableBitmap8Argument, this, OnSuccessCallback_178, OnFailureCallback_178));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_178(uint8_t status)
@@ -40625,8 +40893,9 @@ private:
         chip::app::DataModel::Nullable<uint8_t> nullableBitmap8Argument;
         nullableBitmap8Argument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
-            nullableBitmap8Argument, this, OnSuccessCallback_180, OnFailureCallback_180);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
+            nullableBitmap8Argument, this, OnSuccessCallback_180, OnFailureCallback_180));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_180(uint8_t status) { ThrowFailureResponse(); }
@@ -40661,8 +40930,9 @@ private:
         chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
         nullableBitmap16Argument.SetNonNull() = 65534U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
-            nullableBitmap16Argument, this, OnSuccessCallback_182, OnFailureCallback_182);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
+            nullableBitmap16Argument, this, OnSuccessCallback_182, OnFailureCallback_182));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_182(uint8_t status) { ThrowFailureResponse(); }
@@ -40698,8 +40968,9 @@ private:
         chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
         nullableBitmap16Argument.SetNonNull() = 65535U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
-            nullableBitmap16Argument, this, OnSuccessCallback_184, OnFailureCallback_184);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
+            nullableBitmap16Argument, this, OnSuccessCallback_184, OnFailureCallback_184));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_184(uint8_t status)
@@ -40739,8 +41010,9 @@ private:
         chip::app::DataModel::Nullable<uint16_t> nullableBitmap16Argument;
         nullableBitmap16Argument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
-            nullableBitmap16Argument, this, OnSuccessCallback_186, OnFailureCallback_186);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
+            nullableBitmap16Argument, this, OnSuccessCallback_186, OnFailureCallback_186));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_186(uint8_t status) { ThrowFailureResponse(); }
@@ -40775,8 +41047,9 @@ private:
         chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
         nullableBitmap32Argument.SetNonNull() = 4294967294UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
-            nullableBitmap32Argument, this, OnSuccessCallback_188, OnFailureCallback_188);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
+            nullableBitmap32Argument, this, OnSuccessCallback_188, OnFailureCallback_188));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_188(uint8_t status) { ThrowFailureResponse(); }
@@ -40812,8 +41085,9 @@ private:
         chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
         nullableBitmap32Argument.SetNonNull() = 4294967295UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
-            nullableBitmap32Argument, this, OnSuccessCallback_190, OnFailureCallback_190);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
+            nullableBitmap32Argument, this, OnSuccessCallback_190, OnFailureCallback_190));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_190(uint8_t status)
@@ -40853,8 +41127,9 @@ private:
         chip::app::DataModel::Nullable<uint32_t> nullableBitmap32Argument;
         nullableBitmap32Argument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
-            nullableBitmap32Argument, this, OnSuccessCallback_192, OnFailureCallback_192);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
+            nullableBitmap32Argument, this, OnSuccessCallback_192, OnFailureCallback_192));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_192(uint8_t status) { ThrowFailureResponse(); }
@@ -40889,8 +41164,9 @@ private:
         chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
         nullableBitmap64Argument.SetNonNull() = 18446744073709551614ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
-            nullableBitmap64Argument, this, OnSuccessCallback_194, OnFailureCallback_194);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
+            nullableBitmap64Argument, this, OnSuccessCallback_194, OnFailureCallback_194));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_194(uint8_t status) { ThrowFailureResponse(); }
@@ -40926,8 +41202,9 @@ private:
         chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
         nullableBitmap64Argument.SetNonNull() = 18446744073709551615ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
-            nullableBitmap64Argument, this, OnSuccessCallback_196, OnFailureCallback_196);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
+            nullableBitmap64Argument, this, OnSuccessCallback_196, OnFailureCallback_196));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_196(uint8_t status)
@@ -40967,8 +41244,9 @@ private:
         chip::app::DataModel::Nullable<uint64_t> nullableBitmap64Argument;
         nullableBitmap64Argument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
-            nullableBitmap64Argument, this, OnSuccessCallback_198, OnFailureCallback_198);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
+            nullableBitmap64Argument, this, OnSuccessCallback_198, OnFailureCallback_198));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_198(uint8_t status) { ThrowFailureResponse(); }
@@ -41003,8 +41281,9 @@ private:
         chip::app::DataModel::Nullable<uint8_t> nullableInt8uArgument;
         nullableInt8uArgument.SetNonNull() = 254;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            nullableInt8uArgument, this, OnSuccessCallback_200, OnFailureCallback_200);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
+            nullableInt8uArgument, this, OnSuccessCallback_200, OnFailureCallback_200));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_200(uint8_t status) { ThrowFailureResponse(); }
@@ -41040,8 +41319,9 @@ private:
         chip::app::DataModel::Nullable<uint8_t> nullableInt8uArgument;
         nullableInt8uArgument.SetNonNull() = 255;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            nullableInt8uArgument, this, OnSuccessCallback_202, OnFailureCallback_202);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
+            nullableInt8uArgument, this, OnSuccessCallback_202, OnFailureCallback_202));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_202(uint8_t status)
@@ -41081,8 +41361,9 @@ private:
         chip::app::DataModel::Nullable<uint8_t> nullableInt8uArgument;
         nullableInt8uArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
-            nullableInt8uArgument, this, OnSuccessCallback_204, OnFailureCallback_204);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
+            nullableInt8uArgument, this, OnSuccessCallback_204, OnFailureCallback_204));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_204(uint8_t status) { ThrowFailureResponse(); }
@@ -41117,8 +41398,9 @@ private:
         chip::app::DataModel::Nullable<uint16_t> nullableInt16uArgument;
         nullableInt16uArgument.SetNonNull() = 65534U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            nullableInt16uArgument, this, OnSuccessCallback_206, OnFailureCallback_206);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
+            nullableInt16uArgument, this, OnSuccessCallback_206, OnFailureCallback_206));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_206(uint8_t status) { ThrowFailureResponse(); }
@@ -41154,8 +41436,9 @@ private:
         chip::app::DataModel::Nullable<uint16_t> nullableInt16uArgument;
         nullableInt16uArgument.SetNonNull() = 65535U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            nullableInt16uArgument, this, OnSuccessCallback_208, OnFailureCallback_208);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
+            nullableInt16uArgument, this, OnSuccessCallback_208, OnFailureCallback_208));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_208(uint8_t status)
@@ -41195,8 +41478,9 @@ private:
         chip::app::DataModel::Nullable<uint16_t> nullableInt16uArgument;
         nullableInt16uArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
-            nullableInt16uArgument, this, OnSuccessCallback_210, OnFailureCallback_210);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
+            nullableInt16uArgument, this, OnSuccessCallback_210, OnFailureCallback_210));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_210(uint8_t status) { ThrowFailureResponse(); }
@@ -41231,8 +41515,9 @@ private:
         chip::app::DataModel::Nullable<uint32_t> nullableInt32uArgument;
         nullableInt32uArgument.SetNonNull() = 4294967294UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            nullableInt32uArgument, this, OnSuccessCallback_212, OnFailureCallback_212);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
+            nullableInt32uArgument, this, OnSuccessCallback_212, OnFailureCallback_212));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_212(uint8_t status) { ThrowFailureResponse(); }
@@ -41268,8 +41553,9 @@ private:
         chip::app::DataModel::Nullable<uint32_t> nullableInt32uArgument;
         nullableInt32uArgument.SetNonNull() = 4294967295UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            nullableInt32uArgument, this, OnSuccessCallback_214, OnFailureCallback_214);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
+            nullableInt32uArgument, this, OnSuccessCallback_214, OnFailureCallback_214));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_214(uint8_t status)
@@ -41309,8 +41595,9 @@ private:
         chip::app::DataModel::Nullable<uint32_t> nullableInt32uArgument;
         nullableInt32uArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
-            nullableInt32uArgument, this, OnSuccessCallback_216, OnFailureCallback_216);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
+            nullableInt32uArgument, this, OnSuccessCallback_216, OnFailureCallback_216));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_216(uint8_t status) { ThrowFailureResponse(); }
@@ -41345,8 +41632,9 @@ private:
         chip::app::DataModel::Nullable<uint64_t> nullableInt64uArgument;
         nullableInt64uArgument.SetNonNull() = 18446744073709551614ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            nullableInt64uArgument, this, OnSuccessCallback_218, OnFailureCallback_218);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
+            nullableInt64uArgument, this, OnSuccessCallback_218, OnFailureCallback_218));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_218(uint8_t status) { ThrowFailureResponse(); }
@@ -41382,8 +41670,9 @@ private:
         chip::app::DataModel::Nullable<uint64_t> nullableInt64uArgument;
         nullableInt64uArgument.SetNonNull() = 18446744073709551615ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            nullableInt64uArgument, this, OnSuccessCallback_220, OnFailureCallback_220);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
+            nullableInt64uArgument, this, OnSuccessCallback_220, OnFailureCallback_220));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_220(uint8_t status)
@@ -41423,8 +41712,9 @@ private:
         chip::app::DataModel::Nullable<uint64_t> nullableInt64uArgument;
         nullableInt64uArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
-            nullableInt64uArgument, this, OnSuccessCallback_222, OnFailureCallback_222);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
+            nullableInt64uArgument, this, OnSuccessCallback_222, OnFailureCallback_222));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_222(uint8_t status) { ThrowFailureResponse(); }
@@ -41459,8 +41749,9 @@ private:
         chip::app::DataModel::Nullable<int8_t> nullableInt8sArgument;
         nullableInt8sArgument.SetNonNull() = -127;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
-            nullableInt8sArgument, this, OnSuccessCallback_224, OnFailureCallback_224);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
+            nullableInt8sArgument, this, OnSuccessCallback_224, OnFailureCallback_224));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_224(uint8_t status) { ThrowFailureResponse(); }
@@ -41496,8 +41787,9 @@ private:
         chip::app::DataModel::Nullable<int8_t> nullableInt8sArgument;
         nullableInt8sArgument.SetNonNull() = -128;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
-            nullableInt8sArgument, this, OnSuccessCallback_226, OnFailureCallback_226);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
+            nullableInt8sArgument, this, OnSuccessCallback_226, OnFailureCallback_226));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_226(uint8_t status)
@@ -41537,8 +41829,9 @@ private:
         chip::app::DataModel::Nullable<int8_t> nullableInt8sArgument;
         nullableInt8sArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
-            nullableInt8sArgument, this, OnSuccessCallback_228, OnFailureCallback_228);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
+            nullableInt8sArgument, this, OnSuccessCallback_228, OnFailureCallback_228));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_228(uint8_t status) { ThrowFailureResponse(); }
@@ -41573,8 +41866,9 @@ private:
         chip::app::DataModel::Nullable<int16_t> nullableInt16sArgument;
         nullableInt16sArgument.SetNonNull() = -32767;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
-            nullableInt16sArgument, this, OnSuccessCallback_230, OnFailureCallback_230);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
+            nullableInt16sArgument, this, OnSuccessCallback_230, OnFailureCallback_230));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_230(uint8_t status) { ThrowFailureResponse(); }
@@ -41610,8 +41904,9 @@ private:
         chip::app::DataModel::Nullable<int16_t> nullableInt16sArgument;
         nullableInt16sArgument.SetNonNull() = -32768;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
-            nullableInt16sArgument, this, OnSuccessCallback_232, OnFailureCallback_232);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
+            nullableInt16sArgument, this, OnSuccessCallback_232, OnFailureCallback_232));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_232(uint8_t status)
@@ -41651,8 +41946,9 @@ private:
         chip::app::DataModel::Nullable<int16_t> nullableInt16sArgument;
         nullableInt16sArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
-            nullableInt16sArgument, this, OnSuccessCallback_234, OnFailureCallback_234);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
+            nullableInt16sArgument, this, OnSuccessCallback_234, OnFailureCallback_234));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_234(uint8_t status) { ThrowFailureResponse(); }
@@ -41687,8 +41983,9 @@ private:
         chip::app::DataModel::Nullable<int32_t> nullableInt32sArgument;
         nullableInt32sArgument.SetNonNull() = -2147483647L;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
-            nullableInt32sArgument, this, OnSuccessCallback_236, OnFailureCallback_236);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
+            nullableInt32sArgument, this, OnSuccessCallback_236, OnFailureCallback_236));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_236(uint8_t status) { ThrowFailureResponse(); }
@@ -41724,8 +42021,9 @@ private:
         chip::app::DataModel::Nullable<int32_t> nullableInt32sArgument;
         nullableInt32sArgument.SetNonNull() = -2147483648L;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
-            nullableInt32sArgument, this, OnSuccessCallback_238, OnFailureCallback_238);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
+            nullableInt32sArgument, this, OnSuccessCallback_238, OnFailureCallback_238));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_238(uint8_t status)
@@ -41765,8 +42063,9 @@ private:
         chip::app::DataModel::Nullable<int32_t> nullableInt32sArgument;
         nullableInt32sArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
-            nullableInt32sArgument, this, OnSuccessCallback_240, OnFailureCallback_240);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
+            nullableInt32sArgument, this, OnSuccessCallback_240, OnFailureCallback_240));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_240(uint8_t status) { ThrowFailureResponse(); }
@@ -41801,8 +42100,9 @@ private:
         chip::app::DataModel::Nullable<int64_t> nullableInt64sArgument;
         nullableInt64sArgument.SetNonNull() = -9223372036854775807LL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
-            nullableInt64sArgument, this, OnSuccessCallback_242, OnFailureCallback_242);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+            nullableInt64sArgument, this, OnSuccessCallback_242, OnFailureCallback_242));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_242(uint8_t status) { ThrowFailureResponse(); }
@@ -41838,8 +42138,9 @@ private:
         chip::app::DataModel::Nullable<int64_t> nullableInt64sArgument;
         nullableInt64sArgument.SetNonNull() = -9223372036854775807LL - 1;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
-            nullableInt64sArgument, this, OnSuccessCallback_244, OnFailureCallback_244);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+            nullableInt64sArgument, this, OnSuccessCallback_244, OnFailureCallback_244));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_244(uint8_t status)
@@ -41879,8 +42180,9 @@ private:
         chip::app::DataModel::Nullable<int64_t> nullableInt64sArgument;
         nullableInt64sArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
-            nullableInt64sArgument, this, OnSuccessCallback_246, OnFailureCallback_246);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+            nullableInt64sArgument, this, OnSuccessCallback_246, OnFailureCallback_246));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_246(uint8_t status) { ThrowFailureResponse(); }
@@ -41915,8 +42217,9 @@ private:
         chip::app::DataModel::Nullable<float> nullableFloatSingleArgument;
         nullableFloatSingleArgument.SetNonNull() = 0.1f;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
-            nullableFloatSingleArgument, this, OnSuccessCallback_248, OnFailureCallback_248);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            nullableFloatSingleArgument, this, OnSuccessCallback_248, OnFailureCallback_248));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_248(uint8_t status) { ThrowFailureResponse(); }
@@ -41952,8 +42255,9 @@ private:
         chip::app::DataModel::Nullable<float> nullableFloatSingleArgument;
         nullableFloatSingleArgument.SetNonNull() = INFINITY;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
-            nullableFloatSingleArgument, this, OnSuccessCallback_250, OnFailureCallback_250);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            nullableFloatSingleArgument, this, OnSuccessCallback_250, OnFailureCallback_250));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_250(uint8_t status) { ThrowFailureResponse(); }
@@ -41989,8 +42293,9 @@ private:
         chip::app::DataModel::Nullable<float> nullableFloatSingleArgument;
         nullableFloatSingleArgument.SetNonNull() = -INFINITY;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
-            nullableFloatSingleArgument, this, OnSuccessCallback_252, OnFailureCallback_252);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            nullableFloatSingleArgument, this, OnSuccessCallback_252, OnFailureCallback_252));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_252(uint8_t status) { ThrowFailureResponse(); }
@@ -42026,8 +42331,9 @@ private:
         chip::app::DataModel::Nullable<float> nullableFloatSingleArgument;
         nullableFloatSingleArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
-            nullableFloatSingleArgument, this, OnSuccessCallback_254, OnFailureCallback_254);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            nullableFloatSingleArgument, this, OnSuccessCallback_254, OnFailureCallback_254));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_254(uint8_t status) { ThrowFailureResponse(); }
@@ -42062,8 +42368,9 @@ private:
         chip::app::DataModel::Nullable<float> nullableFloatSingleArgument;
         nullableFloatSingleArgument.SetNonNull() = 0.0f;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
-            nullableFloatSingleArgument, this, OnSuccessCallback_256, OnFailureCallback_256);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            nullableFloatSingleArgument, this, OnSuccessCallback_256, OnFailureCallback_256));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_256(uint8_t status) { ThrowFailureResponse(); }
@@ -42099,8 +42406,9 @@ private:
         chip::app::DataModel::Nullable<double> nullableFloatDoubleArgument;
         nullableFloatDoubleArgument.SetNonNull() = 0.1234567890123;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
-            nullableFloatDoubleArgument, this, OnSuccessCallback_258, OnFailureCallback_258);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            nullableFloatDoubleArgument, this, OnSuccessCallback_258, OnFailureCallback_258));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_258(uint8_t status) { ThrowFailureResponse(); }
@@ -42136,8 +42444,9 @@ private:
         chip::app::DataModel::Nullable<double> nullableFloatDoubleArgument;
         nullableFloatDoubleArgument.SetNonNull() = INFINITY;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
-            nullableFloatDoubleArgument, this, OnSuccessCallback_260, OnFailureCallback_260);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            nullableFloatDoubleArgument, this, OnSuccessCallback_260, OnFailureCallback_260));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_260(uint8_t status) { ThrowFailureResponse(); }
@@ -42173,8 +42482,9 @@ private:
         chip::app::DataModel::Nullable<double> nullableFloatDoubleArgument;
         nullableFloatDoubleArgument.SetNonNull() = -INFINITY;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
-            nullableFloatDoubleArgument, this, OnSuccessCallback_262, OnFailureCallback_262);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            nullableFloatDoubleArgument, this, OnSuccessCallback_262, OnFailureCallback_262));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_262(uint8_t status) { ThrowFailureResponse(); }
@@ -42210,8 +42520,9 @@ private:
         chip::app::DataModel::Nullable<double> nullableFloatDoubleArgument;
         nullableFloatDoubleArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
-            nullableFloatDoubleArgument, this, OnSuccessCallback_264, OnFailureCallback_264);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            nullableFloatDoubleArgument, this, OnSuccessCallback_264, OnFailureCallback_264));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_264(uint8_t status) { ThrowFailureResponse(); }
@@ -42246,8 +42557,9 @@ private:
         chip::app::DataModel::Nullable<double> nullableFloatDoubleArgument;
         nullableFloatDoubleArgument.SetNonNull() = 0;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
-            nullableFloatDoubleArgument, this, OnSuccessCallback_266, OnFailureCallback_266);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            nullableFloatDoubleArgument, this, OnSuccessCallback_266, OnFailureCallback_266));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_266(uint8_t status) { ThrowFailureResponse(); }
@@ -42283,8 +42595,9 @@ private:
         chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
         nullableEnum8Argument.SetNonNull() = static_cast<uint8_t>(254);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
-            nullableEnum8Argument, this, OnSuccessCallback_268, OnFailureCallback_268);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+            nullableEnum8Argument, this, OnSuccessCallback_268, OnFailureCallback_268));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_268(uint8_t status) { ThrowFailureResponse(); }
@@ -42320,8 +42633,9 @@ private:
         chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
         nullableEnum8Argument.SetNonNull() = static_cast<uint8_t>(255);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
-            nullableEnum8Argument, this, OnSuccessCallback_270, OnFailureCallback_270);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+            nullableEnum8Argument, this, OnSuccessCallback_270, OnFailureCallback_270));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_270(uint8_t status)
@@ -42361,8 +42675,9 @@ private:
         chip::app::DataModel::Nullable<uint8_t> nullableEnum8Argument;
         nullableEnum8Argument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
-            nullableEnum8Argument, this, OnSuccessCallback_272, OnFailureCallback_272);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+            nullableEnum8Argument, this, OnSuccessCallback_272, OnFailureCallback_272));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_272(uint8_t status) { ThrowFailureResponse(); }
@@ -42397,8 +42712,9 @@ private:
         chip::app::DataModel::Nullable<uint16_t> nullableEnum16Argument;
         nullableEnum16Argument.SetNonNull() = static_cast<uint16_t>(65534);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
-            nullableEnum16Argument, this, OnSuccessCallback_274, OnFailureCallback_274);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
+            nullableEnum16Argument, this, OnSuccessCallback_274, OnFailureCallback_274));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_274(uint8_t status) { ThrowFailureResponse(); }
@@ -42434,8 +42750,9 @@ private:
         chip::app::DataModel::Nullable<uint16_t> nullableEnum16Argument;
         nullableEnum16Argument.SetNonNull() = static_cast<uint16_t>(65535);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
-            nullableEnum16Argument, this, OnSuccessCallback_276, OnFailureCallback_276);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
+            nullableEnum16Argument, this, OnSuccessCallback_276, OnFailureCallback_276));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_276(uint8_t status)
@@ -42475,8 +42792,9 @@ private:
         chip::app::DataModel::Nullable<uint16_t> nullableEnum16Argument;
         nullableEnum16Argument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
-            nullableEnum16Argument, this, OnSuccessCallback_278, OnFailureCallback_278);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
+            nullableEnum16Argument, this, OnSuccessCallback_278, OnFailureCallback_278));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_278(uint8_t status) { ThrowFailureResponse(); }
@@ -42533,8 +42851,9 @@ private:
         nullableOctetStringArgument.SetNonNull() =
             chip::ByteSpan(chip::Uint8::from_const_char("TestValuegarbage: not in length on purpose"), 9);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            nullableOctetStringArgument, this, OnSuccessCallback_281, OnFailureCallback_281);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
+            nullableOctetStringArgument, this, OnSuccessCallback_281, OnFailureCallback_281));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_281(uint8_t status) { ThrowFailureResponse(); }
@@ -42571,8 +42890,9 @@ private:
         chip::app::DataModel::Nullable<chip::ByteSpan> nullableOctetStringArgument;
         nullableOctetStringArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            nullableOctetStringArgument, this, OnSuccessCallback_283, OnFailureCallback_283);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
+            nullableOctetStringArgument, this, OnSuccessCallback_283, OnFailureCallback_283));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_283(uint8_t status) { ThrowFailureResponse(); }
@@ -42608,8 +42928,9 @@ private:
         nullableOctetStringArgument.SetNonNull() =
             chip::ByteSpan(chip::Uint8::from_const_char("garbage: not in length on purpose"), 0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
-            nullableOctetStringArgument, this, OnSuccessCallback_285, OnFailureCallback_285);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
+            nullableOctetStringArgument, this, OnSuccessCallback_285, OnFailureCallback_285));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_285(uint8_t status) { ThrowFailureResponse(); }
@@ -42666,8 +42987,9 @@ private:
         chip::app::DataModel::Nullable<chip::CharSpan> nullableCharStringArgument;
         nullableCharStringArgument.SetNonNull() = chip::Span<const char>("☉T☉garbage: not in length on purpose", 7);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            nullableCharStringArgument, this, OnSuccessCallback_288, OnFailureCallback_288);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
+            nullableCharStringArgument, this, OnSuccessCallback_288, OnFailureCallback_288));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_288(uint8_t status) { ThrowFailureResponse(); }
@@ -42703,8 +43025,9 @@ private:
         chip::app::DataModel::Nullable<chip::CharSpan> nullableCharStringArgument;
         nullableCharStringArgument.SetNull();
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            nullableCharStringArgument, this, OnSuccessCallback_290, OnFailureCallback_290);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
+            nullableCharStringArgument, this, OnSuccessCallback_290, OnFailureCallback_290));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_290(uint8_t status) { ThrowFailureResponse(); }
@@ -42739,8 +43062,9 @@ private:
         chip::app::DataModel::Nullable<chip::CharSpan> nullableCharStringArgument;
         nullableCharStringArgument.SetNonNull() = chip::Span<const char>("garbage: not in length on purpose", 0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
-            nullableCharStringArgument, this, OnSuccessCallback_292, OnFailureCallback_292);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
+            nullableCharStringArgument, this, OnSuccessCallback_292, OnFailureCallback_292));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_292(uint8_t status) { ThrowFailureResponse(); }
@@ -42915,6 +43239,65 @@ public:
                             " ***** Test Step 6 : Send command that does not need timed invoke with a too-short timeout value\n");
             err = TestSendCommandThatDoesNotNeedTimedInvokeWithATooShortTimeoutValue_6();
             break;
+        case 7:
+            ChipLogProgress(chipTool, " ***** Test Step 7 : Read attribute that needs timed write initial state\n");
+            err = TestReadAttributeThatNeedsTimedWriteInitialState_7();
+            break;
+        case 8:
+            ChipLogProgress(chipTool, " ***** Test Step 8 : Write attribute that needs timed write without a timeout value\n");
+            err = TestWriteAttributeThatNeedsTimedWriteWithoutATimeoutValue_8();
+            break;
+        case 9:
+            ChipLogProgress(chipTool, " ***** Test Step 9 : Read attribute that needs timed write state unchanged 1\n");
+            err = TestReadAttributeThatNeedsTimedWriteStateUnchanged1_9();
+            break;
+        case 10:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 10 : Write attribute that needs timed write with a too-short timeout value\n");
+            err = TestWriteAttributeThatNeedsTimedWriteWithATooShortTimeoutValue_10();
+            break;
+        case 11:
+            ChipLogProgress(chipTool, " ***** Test Step 11 : Read attribute that needs timed write state unchanged 2\n");
+            err = TestReadAttributeThatNeedsTimedWriteStateUnchanged2_11();
+            break;
+        case 12:
+            ChipLogProgress(chipTool, " ***** Test Step 12 : Write attribute that needs timed write with a long timeout value\n");
+            err = TestWriteAttributeThatNeedsTimedWriteWithALongTimeoutValue_12();
+            break;
+        case 13:
+            ChipLogProgress(chipTool, " ***** Test Step 13 : Read attribute that needs timed write state changed\n");
+            err = TestReadAttributeThatNeedsTimedWriteStateChanged_13();
+            break;
+        case 14:
+            ChipLogProgress(chipTool, " ***** Test Step 14 : Write attribute that needs timed write reset to default\n");
+            err = TestWriteAttributeThatNeedsTimedWriteResetToDefault_14();
+            break;
+        case 15:
+            ChipLogProgress(chipTool, " ***** Test Step 15 : Read attribute that does not need timed write initial value\n");
+            err = TestReadAttributeThatDoesNotNeedTimedWriteInitialValue_15();
+            break;
+        case 16:
+            ChipLogProgress(
+                chipTool, " ***** Test Step 16 : Write attribute that does not need timed write with a too-short timeout value\n");
+            err = TestWriteAttributeThatDoesNotNeedTimedWriteWithATooShortTimeoutValue_16();
+            break;
+        case 17:
+            ChipLogProgress(chipTool, " ***** Test Step 17 : Read attribute that does not need timed write unchanged value\n");
+            err = TestReadAttributeThatDoesNotNeedTimedWriteUnchangedValue_17();
+            break;
+        case 18:
+            ChipLogProgress(chipTool,
+                            " ***** Test Step 18 : Write attribute that does not need timed write with a long timeout value\n");
+            err = TestWriteAttributeThatDoesNotNeedTimedWriteWithALongTimeoutValue_18();
+            break;
+        case 19:
+            ChipLogProgress(chipTool, " ***** Test Step 19 : Read attribute that does not need timed write changed value\n");
+            err = TestReadAttributeThatDoesNotNeedTimedWriteChangedValue_19();
+            break;
+        case 20:
+            ChipLogProgress(chipTool, " ***** Test Step 20 : Write attribute that does not need timed write reset to default\n");
+            err = TestWriteAttributeThatDoesNotNeedTimedWriteResetToDefault_20();
+            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -42926,7 +43309,126 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 7;
+    const uint16_t mTestCount = 21;
+
+    static void OnFailureCallback_7(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_7(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_7(void * context, bool timedWriteBoolean)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_7(timedWriteBoolean);
+    }
+
+    static void OnFailureCallback_8(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_8(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_8(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_8(); }
+
+    static void OnFailureCallback_9(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_9(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_9(void * context, bool timedWriteBoolean)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_9(timedWriteBoolean);
+    }
+
+    static void OnFailureCallback_10(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_10(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_10(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_10(); }
+
+    static void OnFailureCallback_11(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_11(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_11(void * context, bool timedWriteBoolean)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_11(timedWriteBoolean);
+    }
+
+    static void OnFailureCallback_12(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_12(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_12(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_12(); }
+
+    static void OnFailureCallback_13(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_13(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_13(void * context, bool timedWriteBoolean)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_13(timedWriteBoolean);
+    }
+
+    static void OnFailureCallback_14(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_14(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_14(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_14(); }
+
+    static void OnFailureCallback_15(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_15(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_15(void * context, bool boolean)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_15(boolean);
+    }
+
+    static void OnFailureCallback_16(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_16(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_16(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_16(); }
+
+    static void OnFailureCallback_17(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_17(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_17(void * context, bool boolean)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_17(boolean);
+    }
+
+    static void OnFailureCallback_18(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_18(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_18(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_18(); }
+
+    static void OnFailureCallback_19(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_19(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_19(void * context, bool boolean)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_19(boolean);
+    }
+
+    static void OnFailureCallback_20(void * context, EmberAfStatus status)
+    {
+        (static_cast<TestClusterComplexTypes *>(context))->OnFailureResponse_20(chip::to_underlying(status));
+    }
+
+    static void OnSuccessCallback_20(void * context) { (static_cast<TestClusterComplexTypes *>(context))->OnSuccessResponse_20(); }
 
     //
     // Tests methods
@@ -43122,6 +43624,293 @@ private:
     }
 
     void OnSuccessResponse_6() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadAttributeThatNeedsTimedWriteInitialState_7()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
+            this, OnSuccessCallback_7, OnFailureCallback_7);
+    }
+
+    void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_7(bool timedWriteBoolean)
+    {
+        VerifyOrReturn(CheckValue("timedWriteBoolean", timedWriteBoolean, false));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeThatNeedsTimedWriteWithoutATimeoutValue_8()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        bool timedWriteBooleanArgument;
+        timedWriteBooleanArgument = true;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
+            timedWriteBooleanArgument, this, OnSuccessCallback_8, OnFailureCallback_8, chip::NullOptional));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_8(uint8_t status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_NEEDS_TIMED_INTERACTION));
+        NextTest();
+    }
+
+    void OnSuccessResponse_8() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadAttributeThatNeedsTimedWriteStateUnchanged1_9()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
+            this, OnSuccessCallback_9, OnFailureCallback_9);
+    }
+
+    void OnFailureResponse_9(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_9(bool timedWriteBoolean)
+    {
+        VerifyOrReturn(CheckValue("timedWriteBoolean", timedWriteBoolean, false));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeThatNeedsTimedWriteWithATooShortTimeoutValue_10()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        bool timedWriteBooleanArgument;
+        timedWriteBooleanArgument = true;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
+            timedWriteBooleanArgument, this, OnSuccessCallback_10, OnFailureCallback_10, 1));
+        {
+            using namespace chip::System::Clock::Literals;
+            // Busy-wait for 100 milliseconds.
+            auto & clock = chip::System::SystemClock();
+            auto start   = clock.GetMonotonicTimestamp();
+            while (clock.GetMonotonicTimestamp() - start < 100_ms)
+                ;
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_10(uint8_t status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS));
+        NextTest();
+    }
+
+    void OnSuccessResponse_10() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadAttributeThatNeedsTimedWriteStateUnchanged2_11()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
+            this, OnSuccessCallback_11, OnFailureCallback_11);
+    }
+
+    void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_11(bool timedWriteBoolean)
+    {
+        VerifyOrReturn(CheckValue("timedWriteBoolean", timedWriteBoolean, false));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeThatNeedsTimedWriteWithALongTimeoutValue_12()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        bool timedWriteBooleanArgument;
+        timedWriteBooleanArgument = true;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
+            timedWriteBooleanArgument, this, OnSuccessCallback_12, OnFailureCallback_12, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_12() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeThatNeedsTimedWriteStateChanged_13()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
+            this, OnSuccessCallback_13, OnFailureCallback_13);
+    }
+
+    void OnFailureResponse_13(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_13(bool timedWriteBoolean)
+    {
+        VerifyOrReturn(CheckValue("timedWriteBoolean", timedWriteBoolean, true));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeThatNeedsTimedWriteResetToDefault_14()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        bool timedWriteBooleanArgument;
+        timedWriteBooleanArgument = false;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
+            timedWriteBooleanArgument, this, OnSuccessCallback_14, OnFailureCallback_14, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_14(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_14() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeThatDoesNotNeedTimedWriteInitialValue_15()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(this, OnSuccessCallback_15,
+                                                                                                      OnFailureCallback_15);
+    }
+
+    void OnFailureResponse_15(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_15(bool boolean)
+    {
+        VerifyOrReturn(CheckValue("boolean", boolean, false));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeThatDoesNotNeedTimedWriteWithATooShortTimeoutValue_16()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        bool booleanArgument;
+        booleanArgument = true;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
+            booleanArgument, this, OnSuccessCallback_16, OnFailureCallback_16, 1));
+        {
+            using namespace chip::System::Clock::Literals;
+            // Busy-wait for 100 milliseconds.
+            auto & clock = chip::System::SystemClock();
+            auto start   = clock.GetMonotonicTimestamp();
+            while (clock.GetMonotonicTimestamp() - start < 100_ms)
+                ;
+        }
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_16(uint8_t status)
+    {
+        VerifyOrReturn(CheckValue("status", status, EMBER_ZCL_STATUS_UNSUPPORTED_ACCESS));
+        NextTest();
+    }
+
+    void OnSuccessResponse_16() { ThrowSuccessResponse(); }
+
+    CHIP_ERROR TestReadAttributeThatDoesNotNeedTimedWriteUnchangedValue_17()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(this, OnSuccessCallback_17,
+                                                                                                      OnFailureCallback_17);
+    }
+
+    void OnFailureResponse_17(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_17(bool boolean)
+    {
+        VerifyOrReturn(CheckValue("boolean", boolean, false));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeThatDoesNotNeedTimedWriteWithALongTimeoutValue_18()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        bool booleanArgument;
+        booleanArgument = true;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
+            booleanArgument, this, OnSuccessCallback_18, OnFailureCallback_18, 10000));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_18(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_18() { NextTest(); }
+
+    CHIP_ERROR TestReadAttributeThatDoesNotNeedTimedWriteChangedValue_19()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(this, OnSuccessCallback_19,
+                                                                                                      OnFailureCallback_19);
+    }
+
+    void OnFailureResponse_19(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_19(bool boolean)
+    {
+        VerifyOrReturn(CheckValue("boolean", boolean, true));
+
+        NextTest();
+    }
+
+    CHIP_ERROR TestWriteAttributeThatDoesNotNeedTimedWriteResetToDefault_20()
+    {
+        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
+        chip::Controller::TestClusterClusterTest cluster;
+        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
+
+        bool booleanArgument;
+        booleanArgument = false;
+
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
+            booleanArgument, this, OnSuccessCallback_20, OnFailureCallback_20));
+        return CHIP_NO_ERROR;
+    }
+
+    void OnFailureResponse_20(uint8_t status) { ThrowFailureResponse(); }
+
+    void OnSuccessResponse_20() { NextTest(); }
 };
 
 class TestConstraints : public TestCommand
@@ -43332,8 +44121,9 @@ private:
         uint32_t int32uArgument;
         int32uArgument = 5UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            int32uArgument, this, OnSuccessCallback_1, OnFailureCallback_1);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
+            int32uArgument, this, OnSuccessCallback_1, OnFailureCallback_1));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -43406,8 +44196,9 @@ private:
         uint32_t int32uArgument;
         int32uArgument = 0UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            int32uArgument, this, OnSuccessCallback_5, OnFailureCallback_5);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
+            int32uArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -43423,8 +44214,9 @@ private:
         chip::CharSpan charStringArgument;
         charStringArgument = chip::Span<const char>("** Test **garbage: not in length on purpose", 10);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            charStringArgument, this, OnSuccessCallback_6, OnFailureCallback_6);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_6, OnFailureCallback_6));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_6(uint8_t status) { ThrowFailureResponse(); }
@@ -43516,8 +44308,9 @@ private:
         chip::CharSpan charStringArgument;
         charStringArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
-            charStringArgument, this, OnSuccessCallback_11, OnFailureCallback_11);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(
+            charStringArgument, this, OnSuccessCallback_11, OnFailureCallback_11));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_11(uint8_t status) { ThrowFailureResponse(); }
@@ -45032,8 +45825,9 @@ private:
         bool booleanArgument;
         booleanArgument = 1;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-            booleanArgument, this, OnSuccessCallback_5, OnFailureCallback_5);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
+            booleanArgument, this, OnSuccessCallback_5, OnFailureCallback_5));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_5(uint8_t status) { ThrowFailureResponse(); }
@@ -45068,8 +45862,9 @@ private:
         bool booleanArgument;
         booleanArgument = readAttributeBooleanDefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
-            booleanArgument, this, OnSuccessCallback_7, OnFailureCallback_7);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(
+            booleanArgument, this, OnSuccessCallback_7, OnFailureCallback_7));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_7(uint8_t status) { ThrowFailureResponse(); }
@@ -45124,8 +45919,9 @@ private:
         uint8_t bitmap8Argument;
         bitmap8Argument = 1;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
-            bitmap8Argument, this, OnSuccessCallback_10, OnFailureCallback_10);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
+            bitmap8Argument, this, OnSuccessCallback_10, OnFailureCallback_10));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_10(uint8_t status) { ThrowFailureResponse(); }
@@ -45160,8 +45956,9 @@ private:
         uint8_t bitmap8Argument;
         bitmap8Argument = readAttributeBitmap8DefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
-            bitmap8Argument, this, OnSuccessCallback_12, OnFailureCallback_12);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(
+            bitmap8Argument, this, OnSuccessCallback_12, OnFailureCallback_12));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_12(uint8_t status) { ThrowFailureResponse(); }
@@ -45216,8 +46013,9 @@ private:
         uint16_t bitmap16Argument;
         bitmap16Argument = 1U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
-            bitmap16Argument, this, OnSuccessCallback_15, OnFailureCallback_15);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
+            bitmap16Argument, this, OnSuccessCallback_15, OnFailureCallback_15));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_15(uint8_t status) { ThrowFailureResponse(); }
@@ -45252,8 +46050,9 @@ private:
         uint16_t bitmap16Argument;
         bitmap16Argument = readAttributeBitmap16DefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
-            bitmap16Argument, this, OnSuccessCallback_17, OnFailureCallback_17);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(
+            bitmap16Argument, this, OnSuccessCallback_17, OnFailureCallback_17));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_17(uint8_t status) { ThrowFailureResponse(); }
@@ -45308,8 +46107,9 @@ private:
         uint32_t bitmap32Argument;
         bitmap32Argument = 1UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
-            bitmap32Argument, this, OnSuccessCallback_20, OnFailureCallback_20);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
+            bitmap32Argument, this, OnSuccessCallback_20, OnFailureCallback_20));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_20(uint8_t status) { ThrowFailureResponse(); }
@@ -45344,8 +46144,9 @@ private:
         uint32_t bitmap32Argument;
         bitmap32Argument = readAttributeBitmap32DefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
-            bitmap32Argument, this, OnSuccessCallback_22, OnFailureCallback_22);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(
+            bitmap32Argument, this, OnSuccessCallback_22, OnFailureCallback_22));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_22(uint8_t status) { ThrowFailureResponse(); }
@@ -45400,8 +46201,9 @@ private:
         uint64_t bitmap64Argument;
         bitmap64Argument = 1ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
-            bitmap64Argument, this, OnSuccessCallback_25, OnFailureCallback_25);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
+            bitmap64Argument, this, OnSuccessCallback_25, OnFailureCallback_25));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_25(uint8_t status) { ThrowFailureResponse(); }
@@ -45436,8 +46238,9 @@ private:
         uint64_t bitmap64Argument;
         bitmap64Argument = readAttributeBitmap64DefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
-            bitmap64Argument, this, OnSuccessCallback_27, OnFailureCallback_27);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(
+            bitmap64Argument, this, OnSuccessCallback_27, OnFailureCallback_27));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_27(uint8_t status) { ThrowFailureResponse(); }
@@ -45492,8 +46295,9 @@ private:
         uint8_t int8uArgument;
         int8uArgument = 1;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
-            int8uArgument, this, OnSuccessCallback_30, OnFailureCallback_30);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
+            int8uArgument, this, OnSuccessCallback_30, OnFailureCallback_30));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_30(uint8_t status) { ThrowFailureResponse(); }
@@ -45528,8 +46332,9 @@ private:
         uint8_t int8uArgument;
         int8uArgument = readAttributeInt8uDefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
-            int8uArgument, this, OnSuccessCallback_32, OnFailureCallback_32);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(
+            int8uArgument, this, OnSuccessCallback_32, OnFailureCallback_32));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_32(uint8_t status) { ThrowFailureResponse(); }
@@ -45584,8 +46389,9 @@ private:
         uint16_t int16uArgument;
         int16uArgument = 1U;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
-            int16uArgument, this, OnSuccessCallback_35, OnFailureCallback_35);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
+            int16uArgument, this, OnSuccessCallback_35, OnFailureCallback_35));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_35(uint8_t status) { ThrowFailureResponse(); }
@@ -45620,8 +46426,9 @@ private:
         uint16_t int16uArgument;
         int16uArgument = readAttributeInt16uDefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
-            int16uArgument, this, OnSuccessCallback_37, OnFailureCallback_37);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(
+            int16uArgument, this, OnSuccessCallback_37, OnFailureCallback_37));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_37(uint8_t status) { ThrowFailureResponse(); }
@@ -45676,8 +46483,9 @@ private:
         uint32_t int32uArgument;
         int32uArgument = 1UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            int32uArgument, this, OnSuccessCallback_40, OnFailureCallback_40);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
+            int32uArgument, this, OnSuccessCallback_40, OnFailureCallback_40));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_40(uint8_t status) { ThrowFailureResponse(); }
@@ -45712,8 +46520,9 @@ private:
         uint32_t int32uArgument;
         int32uArgument = readAttributeInt32uDefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
-            int32uArgument, this, OnSuccessCallback_42, OnFailureCallback_42);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(
+            int32uArgument, this, OnSuccessCallback_42, OnFailureCallback_42));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_42(uint8_t status) { ThrowFailureResponse(); }
@@ -45768,8 +46577,9 @@ private:
         uint64_t int64uArgument;
         int64uArgument = 1ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
-            int64uArgument, this, OnSuccessCallback_45, OnFailureCallback_45);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
+            int64uArgument, this, OnSuccessCallback_45, OnFailureCallback_45));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_45(uint8_t status) { ThrowFailureResponse(); }
@@ -45804,8 +46614,9 @@ private:
         uint64_t int64uArgument;
         int64uArgument = readAttributeInt64uDefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
-            int64uArgument, this, OnSuccessCallback_47, OnFailureCallback_47);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(
+            int64uArgument, this, OnSuccessCallback_47, OnFailureCallback_47));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_47(uint8_t status) { ThrowFailureResponse(); }
@@ -45860,8 +46671,9 @@ private:
         int8_t int8sArgument;
         int8sArgument = 1;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
-            int8sArgument, this, OnSuccessCallback_50, OnFailureCallback_50);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
+            int8sArgument, this, OnSuccessCallback_50, OnFailureCallback_50));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_50(uint8_t status) { ThrowFailureResponse(); }
@@ -45896,8 +46708,9 @@ private:
         int8_t int8sArgument;
         int8sArgument = readAttributeInt8sDefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
-            int8sArgument, this, OnSuccessCallback_52, OnFailureCallback_52);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(
+            int8sArgument, this, OnSuccessCallback_52, OnFailureCallback_52));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_52(uint8_t status) { ThrowFailureResponse(); }
@@ -45952,8 +46765,9 @@ private:
         int16_t int16sArgument;
         int16sArgument = 1;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
-            int16sArgument, this, OnSuccessCallback_55, OnFailureCallback_55);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
+            int16sArgument, this, OnSuccessCallback_55, OnFailureCallback_55));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_55(uint8_t status) { ThrowFailureResponse(); }
@@ -45988,8 +46802,9 @@ private:
         int16_t int16sArgument;
         int16sArgument = readAttributeInt16sDefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
-            int16sArgument, this, OnSuccessCallback_57, OnFailureCallback_57);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(
+            int16sArgument, this, OnSuccessCallback_57, OnFailureCallback_57));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_57(uint8_t status) { ThrowFailureResponse(); }
@@ -46044,8 +46859,9 @@ private:
         int32_t int32sArgument;
         int32sArgument = 1L;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
-            int32sArgument, this, OnSuccessCallback_60, OnFailureCallback_60);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
+            int32sArgument, this, OnSuccessCallback_60, OnFailureCallback_60));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_60(uint8_t status) { ThrowFailureResponse(); }
@@ -46080,8 +46896,9 @@ private:
         int32_t int32sArgument;
         int32sArgument = readAttributeInt32sDefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
-            int32sArgument, this, OnSuccessCallback_62, OnFailureCallback_62);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(
+            int32sArgument, this, OnSuccessCallback_62, OnFailureCallback_62));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_62(uint8_t status) { ThrowFailureResponse(); }
@@ -46136,8 +46953,9 @@ private:
         int64_t int64sArgument;
         int64sArgument = 1LL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
-            int64sArgument, this, OnSuccessCallback_65, OnFailureCallback_65);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
+            int64sArgument, this, OnSuccessCallback_65, OnFailureCallback_65));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_65(uint8_t status) { ThrowFailureResponse(); }
@@ -46172,8 +46990,9 @@ private:
         int64_t int64sArgument;
         int64sArgument = readAttributeInt64sDefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
-            int64sArgument, this, OnSuccessCallback_67, OnFailureCallback_67);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(
+            int64sArgument, this, OnSuccessCallback_67, OnFailureCallback_67));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_67(uint8_t status) { ThrowFailureResponse(); }
@@ -46228,8 +47047,9 @@ private:
         uint8_t enum8Argument;
         enum8Argument = static_cast<uint8_t>(1);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
-            enum8Argument, this, OnSuccessCallback_70, OnFailureCallback_70);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
+            enum8Argument, this, OnSuccessCallback_70, OnFailureCallback_70));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_70(uint8_t status) { ThrowFailureResponse(); }
@@ -46264,8 +47084,9 @@ private:
         uint8_t enum8Argument;
         enum8Argument = static_cast<uint8_t>(readAttributeEnum8DefaultValue);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
-            enum8Argument, this, OnSuccessCallback_72, OnFailureCallback_72);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(
+            enum8Argument, this, OnSuccessCallback_72, OnFailureCallback_72));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_72(uint8_t status) { ThrowFailureResponse(); }
@@ -46320,8 +47141,9 @@ private:
         uint16_t enum16Argument;
         enum16Argument = static_cast<uint16_t>(1);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
-            enum16Argument, this, OnSuccessCallback_75, OnFailureCallback_75);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
+            enum16Argument, this, OnSuccessCallback_75, OnFailureCallback_75));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_75(uint8_t status) { ThrowFailureResponse(); }
@@ -46356,8 +47178,9 @@ private:
         uint16_t enum16Argument;
         enum16Argument = static_cast<uint16_t>(readAttributeEnum16DefaultValue);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
-            enum16Argument, this, OnSuccessCallback_77, OnFailureCallback_77);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(
+            enum16Argument, this, OnSuccessCallback_77, OnFailureCallback_77));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_77(uint8_t status) { ThrowFailureResponse(); }
@@ -46412,8 +47235,9 @@ private:
         uint64_t epochUsArgument;
         epochUsArgument = 1ULL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            epochUsArgument, this, OnSuccessCallback_80, OnFailureCallback_80);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
+            epochUsArgument, this, OnSuccessCallback_80, OnFailureCallback_80));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_80(uint8_t status) { ThrowFailureResponse(); }
@@ -46448,8 +47272,9 @@ private:
         uint64_t epochUsArgument;
         epochUsArgument = readAttributeEpochUSDefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
-            epochUsArgument, this, OnSuccessCallback_82, OnFailureCallback_82);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(
+            epochUsArgument, this, OnSuccessCallback_82, OnFailureCallback_82));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_82(uint8_t status) { ThrowFailureResponse(); }
@@ -46504,8 +47329,9 @@ private:
         uint32_t epochSArgument;
         epochSArgument = 1UL;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            epochSArgument, this, OnSuccessCallback_85, OnFailureCallback_85);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
+            epochSArgument, this, OnSuccessCallback_85, OnFailureCallback_85));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_85(uint8_t status) { ThrowFailureResponse(); }
@@ -46540,8 +47366,9 @@ private:
         uint32_t epochSArgument;
         epochSArgument = readAttributeEpochSDefaultValue;
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
-            epochSArgument, this, OnSuccessCallback_87, OnFailureCallback_87);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(
+            epochSArgument, this, OnSuccessCallback_87, OnFailureCallback_87));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_87(uint8_t status) { ThrowFailureResponse(); }
@@ -46596,8 +47423,9 @@ private:
         chip::VendorId vendorIdArgument;
         vendorIdArgument = static_cast<chip::VendorId>(1);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-            vendorIdArgument, this, OnSuccessCallback_90, OnFailureCallback_90);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
+            vendorIdArgument, this, OnSuccessCallback_90, OnFailureCallback_90));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_90(uint8_t status) { ThrowFailureResponse(); }
@@ -46632,8 +47460,9 @@ private:
         chip::VendorId vendorIdArgument;
         vendorIdArgument = static_cast<chip::VendorId>(readAttributeVendorIdDefaultValue);
 
-        return cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
-            vendorIdArgument, this, OnSuccessCallback_92, OnFailureCallback_92);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(
+            vendorIdArgument, this, OnSuccessCallback_92, OnFailureCallback_92));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_92(uint8_t status) { ThrowFailureResponse(); }
@@ -47039,8 +47868,9 @@ private:
         chip::CharSpan locationArgument;
         locationArgument = chip::Span<const char>("usgarbage: not in length on purpose", 2);
 
-        return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_2, OnFailureCallback_2);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            locationArgument, this, OnSuccessCallback_2, OnFailureCallback_2));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
@@ -47075,8 +47905,9 @@ private:
         chip::CharSpan locationArgument;
         locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_4, OnFailureCallback_4);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            locationArgument, this, OnSuccessCallback_4, OnFailureCallback_4));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
@@ -48790,8 +49621,9 @@ private:
         chip::CharSpan locationArgument;
         locationArgument = chip::Span<const char>("usgarbage: not in length on purpose", 2);
 
-        return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_1, OnFailureCallback_1, OnDoneCallback_1);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            locationArgument, this, OnSuccessCallback_1, OnFailureCallback_1, OnDoneCallback_1));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
@@ -48828,8 +49660,9 @@ private:
         chip::CharSpan locationArgument;
         locationArgument = chip::Span<const char>("garbage: not in length on purpose", 0);
 
-        return cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
-            locationArgument, this, OnSuccessCallback_3, OnFailureCallback_3, OnDoneCallback_3);
+        ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(
+            locationArgument, this, OnSuccessCallback_3, OnFailureCallback_3, OnDoneCallback_3));
+        return CHIP_NO_ERROR;
     }
 
     void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }

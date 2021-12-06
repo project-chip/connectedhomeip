@@ -123,6 +123,8 @@ static_library("app") {
     "StatusResponse.h",
     "TimedHandler.cpp",
     "TimedHandler.h",
+    "TimedRequest.cpp",
+    "TimedRequest.h",
     "WriteClient.cpp",
     "WriteHandler.cpp",
     "decoder.cpp",
