@@ -44,9 +44,9 @@ CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventOptions aEv
     EventLogger<T> eventData(aEventData);
     ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
     // log the actual event
-    aEventNumber = 0;
+    aEventNumber              = 0;
     EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
-    aEventOptions.mPath = path;
+    aEventOptions.mPath       = path;
     return logMgmt.LogEvent(&eventData, aEventOptions, aEventNumber);
 }
 
