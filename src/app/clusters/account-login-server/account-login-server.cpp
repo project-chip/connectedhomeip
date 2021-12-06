@@ -36,11 +36,10 @@ std::string accountLoginClusterGetSetupPin(std::string requestTempAccountIdentif
 
 void sendResponse(app::CommandHandler * command, const char * responseSetupPin)
 {
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, AccountLogin::Id,
-                                         Commands::GetSetupPINResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
-    SuccessOrExit(err = command->PrepareCommand(cmdParams));
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), AccountLogin::Id, Commands::GetSetupPINResponse::Id };
+    TLV::TLVWriter * writer       = nullptr;
+    SuccessOrExit(err = command->PrepareCommand(path));
     VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     SuccessOrExit(err = writer->PutString(TLV::ContextTag(0), responseSetupPin));
     SuccessOrExit(err = command->FinishCommand());

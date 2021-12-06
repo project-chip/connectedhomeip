@@ -24,16 +24,16 @@ namespace app {
 CHIP_ERROR AttributeReportBuilder::PrepareAttribute(AttributeReportIBs::Builder & aAttributeReportIBsBuilder,
                                                     const ConcreteDataAttributePath & aPath, DataVersion aDataVersion)
 {
-    mAttributeReportIBBuilder = aAttributeReportIBsBuilder.CreateAttributeReport();
+    AttributeReportIB::Builder & attributeReportIBBuilder = aAttributeReportIBsBuilder.CreateAttributeReport();
     ReturnErrorOnFailure(aAttributeReportIBsBuilder.GetError());
 
-    mAttributeDataIBBuilder = mAttributeReportIBBuilder.CreateAttributeData();
-    ReturnErrorOnFailure(mAttributeReportIBBuilder.GetError());
+    AttributeDataIB::Builder & attributeDataIBBuilder = attributeReportIBBuilder.CreateAttributeData();
+    ReturnErrorOnFailure(attributeReportIBBuilder.GetError());
 
-    mAttributeDataIBBuilder.DataVersion(aDataVersion);
+    attributeDataIBBuilder.DataVersion(aDataVersion);
 
-    auto attributePathIBBuilder = mAttributeDataIBBuilder.CreatePath();
-    ReturnErrorOnFailure(mAttributeDataIBBuilder.GetError());
+    AttributePathIB::Builder & attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
+    ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     attributePathIBBuilder.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId);
 
@@ -46,13 +46,13 @@ CHIP_ERROR AttributeReportBuilder::PrepareAttribute(AttributeReportIBs::Builder 
 
     ReturnErrorOnFailure(attributePathIBBuilder.EndOfAttributePathIB().GetError());
 
-    return mAttributeDataIBBuilder.GetError();
+    return attributeDataIBBuilder.GetError();
 }
 
-CHIP_ERROR AttributeReportBuilder::FinishAttribute()
+CHIP_ERROR AttributeReportBuilder::FinishAttribute(AttributeReportIBs::Builder & aAttributeReportIBsBuilder)
 {
-    ReturnErrorOnFailure(mAttributeDataIBBuilder.EndOfAttributeDataIB().GetError());
-    return mAttributeReportIBBuilder.EndOfAttributeReportIB().GetError();
+    ReturnErrorOnFailure(aAttributeReportIBsBuilder.GetAttributeReport().GetAttributeData().EndOfAttributeDataIB().GetError());
+    return aAttributeReportIBsBuilder.GetAttributeReport().EndOfAttributeReportIB().GetError();
 }
 
 CHIP_ERROR AttributeValueEncoder::EncodeEmptyList()
@@ -70,9 +70,9 @@ CHIP_ERROR AttributeValueEncoder::EncodeEmptyList()
             AttributeReportBuilder builder;
 
             ReturnErrorOnFailure(builder.PrepareAttribute(mAttributeReportIBsBuilder, mPath, mDataVersion));
-            ReturnErrorOnFailure(builder.EncodeValue(DataModel::List<uint8_t>()));
+            ReturnErrorOnFailure(builder.EncodeValue(mAttributeReportIBsBuilder, DataModel::List<uint8_t>()));
 
-            ReturnErrorOnFailure(builder.FinishAttribute());
+            ReturnErrorOnFailure(builder.FinishAttribute(mAttributeReportIBsBuilder));
             mEncodeState.mCurrentEncodingListIndex = 0;
         }
         mCurrentEncodingListIndex = 0;

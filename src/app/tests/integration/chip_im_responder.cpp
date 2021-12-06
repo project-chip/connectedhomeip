@@ -67,21 +67,17 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
     }
 
-    chip::app::CommandPathParams commandPathParams = { kTestEndpointId, // Endpoint
-                                                       kTestGroupId,    // GroupId
-                                                       kTestClusterId,  // ClusterId
-                                                       kTestCommandId,  // CommandId
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+    chip::app::ConcreteCommandPath path = {
+        kTestEndpointId, // Endpoint
+        kTestClusterId,  // ClusterId
+        kTestCommandId,  // CommandId
+    };
 
     // Add command data here
     if (statusCodeFlipper)
     {
-        chip::app::ConcreteCommandPath commandPath(kTestEndpointId, // Endpoint
-                                                   kTestClusterId,  // ClusterId
-                                                   kTestCommandId   // CommandId
-        );
         printf("responder constructing status code in command");
-        apCommandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+        apCommandObj->AddStatus(path, Protocols::InteractionModel::Status::Success);
     }
     else
     {
@@ -89,7 +85,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
 
         chip::TLV::TLVWriter * writer;
 
-        ReturnOnFailure(apCommandObj->PrepareCommand(commandPathParams));
+        ReturnOnFailure(apCommandObj->PrepareCommand(path));
 
         writer = apCommandObj->GetCommandDataIBTLVWriter();
         ReturnOnFailure(writer->Put(chip::TLV::ContextTag(kTestFieldId1), kTestFieldValue1));

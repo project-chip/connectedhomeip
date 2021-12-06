@@ -231,14 +231,18 @@ CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeRepor
     {
         aAttributeReport.Rollback(*aReportCheckpoint);
     }
-    AttributeStatusIB::Builder attributeStatusIBBuilder = aAttributeReport.CreateAttributeStatus();
-    AttributePathIB::Builder attributePathIBBuilder     = attributeStatusIBBuilder.CreatePath();
+    AttributeStatusIB::Builder & attributeStatusIBBuilder = aAttributeReport.CreateAttributeStatus();
+    ReturnErrorOnFailure(aAttributeReport.GetError());
+    AttributePathIB::Builder & attributePathIBBuilder = attributeStatusIBBuilder.CreatePath();
+    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
+
     attributePathIBBuilder.Endpoint(aPath.mEndpointId)
         .Cluster(aPath.mClusterId)
         .Attribute(aPath.mAttributeId)
         .EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePathIBBuilder.GetError());
-    StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
+    StatusIB::Builder & statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
+    ReturnErrorOnFailure(attributeStatusIBBuilder.GetError());
     statusIBBuilder.EncodeStatusIB(StatusIB(aStatus));
     ReturnErrorOnFailure(statusIBBuilder.GetError());
 
@@ -306,13 +310,14 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     attributeReport.Checkpoint(backup);
 
     // We have verified that the attribute exists.
-    AttributeDataIB::Builder attributeDataIBBuilder = attributeReport.CreateAttributeData();
+    AttributeDataIB::Builder & attributeDataIBBuilder = attributeReport.CreateAttributeData();
+
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     attributeDataIBBuilder.DataVersion(kTemporaryDataVersion);
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
-    AttributePathIB::Builder attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
+    AttributePathIB::Builder & attributePathIBBuilder = attributeDataIBBuilder.CreatePath();
     ReturnErrorOnFailure(attributeDataIBBuilder.GetError());
 
     attributePathIBBuilder.Endpoint(aPath.mEndpointId)

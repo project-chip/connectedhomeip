@@ -224,16 +224,18 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
 
     if (!dataExists)
     {
-        AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
-        AttributeDataIB::Builder attributeData;
-        AttributePathIB::Builder attributePath;
-        AttributeStatusIB::Builder attributeStatus;
-        attributeStatus = attributeReport.CreateAttributeStatus();
-        attributePath   = attributeStatus.CreatePath();
+        AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+        ReturnErrorOnFailure(aAttributeReports.GetError());
+        AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
+        ReturnErrorOnFailure(attributeReport.GetError());
+        AttributePathIB::Builder & attributePath = attributeStatus.CreatePath();
+        ReturnErrorOnFailure(attributeStatus.GetError());
         attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
         ReturnErrorOnFailure(attributePath.GetError());
-        StatusIB::Builder errorStatus = attributeStatus.CreateErrorStatus();
+        StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
+        ReturnErrorOnFailure(attributeStatus.GetError());
         errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::UnsupportedAttribute));
+        ReturnErrorOnFailure(errorStatus.GetError());
         attributeStatus.EndOfAttributeStatusIB();
         ReturnErrorOnFailure(attributeStatus.GetError());
         return attributeReport.EndOfAttributeReportIB().GetError();
@@ -261,13 +263,13 @@ CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const Co
         return err;
     }
 
-    AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
-    AttributeDataIB::Builder attributeData;
-    AttributePathIB::Builder attributePath;
-
-    attributeData = attributeReport.CreateAttributeData();
+    AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+    ReturnErrorOnFailure(aAttributeReports.GetError());
+    AttributeDataIB::Builder & attributeData = attributeReport.CreateAttributeData();
+    ReturnErrorOnFailure(attributeReport.GetError());
     attributeData.DataVersion(0);
-    attributePath = attributeData.CreatePath();
+    AttributePathIB::Builder & attributePath = attributeData.CreatePath();
+    ReturnErrorOnFailure(attributeData.GetError());
     attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePath.GetError());
 

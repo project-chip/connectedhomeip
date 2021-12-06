@@ -101,7 +101,6 @@ protected:
     void Close();
 
     void MoveToState(const CommandState aTargetState);
-    CHIP_ERROR ConstructCommandPath(const CommandPathParams & aCommandPathParams, CommandPathIB::Builder & aCommandPath);
     const char * GetStateStr() const;
 
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
