@@ -236,8 +236,9 @@ CHIP_ERROR SendFailureStatus(const ConcreteAttributePath & aPath, AttributeRepor
     StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
     statusIBBuilder.EncodeStatusIB(StatusIB(aStatus));
     ReturnErrorOnFailure(statusIBBuilder.GetError());
-    attributeStatusIBBuilder.EndOfAttributeStatusIB();
-    return attributeStatusIBBuilder.GetError();
+
+    ReturnErrorOnFailure(attributeStatusIBBuilder.EndOfAttributeStatusIB().GetError());
+    return aAttributeReport.EndOfAttributeReportIB().GetError();
 }
 
 } // anonymous namespace
@@ -259,9 +260,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         ReturnErrorOnFailure(aAttributeReports.GetError());
 
         // This path is not actually supported.
-        ReturnErrorOnFailure(
-            SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr));
-        return attributeReport.EndOfAttributeReportIB().GetError();
+        return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr);
     }
 
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
@@ -537,8 +536,7 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
 
             // Just encode an empty array.
             TLV::TLVType containerType;
-            ReturnErrorOnFailure(writer->StartContainer(TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)),
-                                                        TLV::kTLVType_Array, containerType));
+            ReturnErrorOnFailure(writer->StartContainer(tag, TLV::kTLVType_Array, containerType));
             ReturnErrorOnFailure(writer->EndContainer(containerType));
             break;
         }

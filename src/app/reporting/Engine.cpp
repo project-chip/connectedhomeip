@@ -342,8 +342,9 @@ exit:
         aReportDataBuilder.Rollback(backup);
     }
 
-    // hasMoreChunks + no data encoded is a flag that we have encodered some trouble when processing the attribute.
-    // BuildAndSendSingleReportData will abort the read transaction if encoded no attribute and no events but hasMoreChunks is set.
+    // hasMoreChunks + no data encoded is a flag that we have encountered some trouble when processing the attribute.
+    // BuildAndSendSingleReportData will abort the read transaction if we encoded no attribute and no events but hasMoreChunks is
+    // set.
     if (apHasMoreChunks != nullptr)
     {
         *apHasMoreChunks = hasMoreChunks;
