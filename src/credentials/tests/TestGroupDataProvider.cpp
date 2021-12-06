@@ -293,9 +293,34 @@ void TestGroupMappingIterator(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == groups->AddGroupMapping(kFabric2, endpoint3group2));
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == groups->AddGroupMapping(kFabric2, endpoint3group1));
 
-    // Fabric 1
-
     GroupMapping mapping;
+
+    // Fabric1, all endpoints
+
+    std::set<std::pair<EndpointId, GroupId>> expected_f1_all = {
+        { kEndpoint1, kGroup1 }, { kEndpoint1, kGroup2 }, { kEndpoint1, kGroup3 }, { kEndpoint2, kGroup1 }, { kEndpoint2, kGroup2 },
+        { kEndpoint2, kGroup3 }, { kEndpoint3, kGroup1 }, { kEndpoint3, kGroup2 }, { kEndpoint3, kGroup3 },
+    };
+
+    auto it = groups->IterateGroupMappings(kFabric1);
+    NL_TEST_ASSERT(apSuite, it);
+    if (it)
+    {
+        size_t count = 0;
+        NL_TEST_ASSERT(apSuite, it->Count() == expected_f1_all.size());
+        while (it->Next(mapping))
+        {
+            std::pair<EndpointId, GroupId> pair(mapping.endpoint, mapping.group);
+            NL_TEST_ASSERT(apSuite, expected_f1_all.count(pair) > 0);
+            count++;
+        }
+
+        NL_TEST_ASSERT(apSuite, count == expected_f1_all.size());
+        NL_TEST_ASSERT(apSuite, it->Count() == expected_f1_all.size());
+        it->Release();
+    }
+
+    // Fabric 1, by endpoint
 
     constexpr size_t endpoints_count                = 3;
     constexpr EndpointId endpoints[endpoints_count] = { kEndpoint1, kEndpoint2, kEndpoint3 };
@@ -308,7 +333,7 @@ void TestGroupMappingIterator(nlTestSuite * apSuite, void * apContext)
 
     for (size_t i = 0; i < endpoints_count; i++)
     {
-        auto it = groups->IterateGroupMappings(kFabric1, endpoints[i]);
+        it = groups->IterateGroupMappings(kFabric1, endpoints[i]);
         NL_TEST_ASSERT(apSuite, it);
         if (it)
         {
@@ -327,7 +352,33 @@ void TestGroupMappingIterator(nlTestSuite * apSuite, void * apContext)
         }
     }
 
-    // // Fabric 2
+    // Fabric2, all endpoints
+
+    std::set<std::pair<EndpointId, GroupId>> expected_f2_all = { { kEndpoint1, kGroup1 }, { kEndpoint2, kGroup2 },
+                                                                 { kEndpoint2, kGroup1 }, { kEndpoint3, kGroup3 },
+                                                                 { kEndpoint3, kGroup2 }, { kEndpoint3, kGroup1 } };
+
+    it = groups->IterateGroupMappings(kFabric2);
+    NL_TEST_ASSERT(apSuite, it);
+    if (it)
+    {
+        size_t count = 0;
+        NL_TEST_ASSERT(apSuite, it->Count() == expected_f2_all.size());
+
+        while (it->Next(mapping))
+        {
+            std::pair<EndpointId, GroupId> pair(mapping.endpoint, mapping.group);
+            NL_TEST_ASSERT(apSuite, expected_f2_all.count(pair) > 0);
+            count++;
+        }
+
+        NL_TEST_ASSERT(apSuite, count == expected_f2_all.size());
+        NL_TEST_ASSERT(apSuite, it->Count() == expected_f2_all.size());
+        it->Release();
+        it = nullptr;
+    }
+
+    // Fabric 2, by endpoint
 
     std::set<GroupId> expected_f2[3]                     = { { kGroup1, kUndefinedGroupId, kUndefinedGroupId },
                                          { kGroup2, kGroup1, kUndefinedGroupId },
@@ -336,7 +387,7 @@ void TestGroupMappingIterator(nlTestSuite * apSuite, void * apContext)
 
     for (size_t i = 0; i < endpoints_count; i++)
     {
-        auto it = groups->IterateGroupMappings(kFabric2, endpoints[i]);
+        it = groups->IterateGroupMappings(kFabric2, endpoints[i]);
         NL_TEST_ASSERT(apSuite, it);
         if (it)
         {
@@ -355,6 +406,7 @@ void TestGroupMappingIterator(nlTestSuite * apSuite, void * apContext)
             }
             NL_TEST_ASSERT(apSuite, j == expected_count);
             it->Release();
+            it = nullptr;
         }
     }
 }
@@ -494,20 +546,21 @@ void TestGroupStateIterator(nlTestSuite * apSuite, void * apContext)
                                                   fabric2group1set2, fabric2group1set3, fabric1group1set2 };
     GroupState state(0, 0, 0);
 
-    auto it_all = groups->IterateGroupStates();
-    NL_TEST_ASSERT(apSuite, it_all);
-    if (it_all)
+    auto it = groups->IterateGroupStates();
+    NL_TEST_ASSERT(apSuite, it);
+    if (it)
     {
         size_t i = 0;
-        NL_TEST_ASSERT(apSuite, expected_count == it_all->Count());
+        NL_TEST_ASSERT(apSuite, expected_count == it->Count());
 
-        while (it_all->Next(state) && i < expected_count)
+        while (it->Next(state) && i < expected_count)
         {
             NL_TEST_ASSERT(apSuite, state == expected[i]);
             i++;
         }
         NL_TEST_ASSERT(apSuite, i == expected_count);
-        it_all->Release();
+        it->Release();
+        it = nullptr;
     }
 
     // Iterate Fabric 1 only
@@ -515,20 +568,21 @@ void TestGroupStateIterator(nlTestSuite * apSuite, void * apContext)
     constexpr size_t expected_count_f1              = 3;
     const GroupState expected_f1[expected_count_f1] = { fabric1group1set3, fabric1group1set1, fabric1group1set2 };
 
-    auto it_f1 = groups->IterateGroupStates(kFabric1);
-    NL_TEST_ASSERT(apSuite, it_f1);
-    if (it_f1)
+    it = groups->IterateGroupStates(kFabric1);
+    NL_TEST_ASSERT(apSuite, it);
+    if (it)
     {
         size_t i = 0;
-        NL_TEST_ASSERT(apSuite, expected_count_f1 == it_f1->Count());
+        NL_TEST_ASSERT(apSuite, expected_count_f1 == it->Count());
 
-        while (it_f1->Next(state) && i < expected_count_f1)
+        while (it->Next(state) && i < expected_count_f1)
         {
             NL_TEST_ASSERT(apSuite, state == expected_f1[i]);
             i++;
         }
         NL_TEST_ASSERT(apSuite, i == expected_count_f1);
-        it_f1->Release();
+        it->Release();
+        it = nullptr;
     }
 
     // Iterate Fabric 2 only
@@ -536,20 +590,21 @@ void TestGroupStateIterator(nlTestSuite * apSuite, void * apContext)
     constexpr size_t expected_count_f2              = 3;
     const GroupState expected_f2[expected_count_f2] = { fabric2group1set1, fabric2group1set2, fabric2group1set3 };
 
-    auto it_f2 = groups->IterateGroupStates(kFabric2);
-    NL_TEST_ASSERT(apSuite, it_f2);
-    if (it_f2)
+    it = groups->IterateGroupStates(kFabric2);
+    NL_TEST_ASSERT(apSuite, it);
+    if (it)
     {
         size_t i = 0;
-        NL_TEST_ASSERT(apSuite, expected_count_f2 == it_f2->Count());
+        NL_TEST_ASSERT(apSuite, expected_count_f2 == it->Count());
 
-        while (it_f2->Next(state) && i < expected_count_f2)
+        while (it->Next(state) && i < expected_count_f2)
         {
             NL_TEST_ASSERT(apSuite, state == expected_f2[i]);
             i++;
         }
         NL_TEST_ASSERT(apSuite, i == expected_count_f2);
-        it_f2->Release();
+        it->Release();
+        it = nullptr;
     }
 }
 
@@ -704,42 +759,44 @@ void TestKeySetIterator(nlTestSuite * apSuite, void * apContext)
         { kKeySetId1, keyset1 }, { kKeySetId0, keyset0 }, { kKeySetId2, keyset2 }, { kKeySetId3, keyset3 }
     };
 
-    auto it_f1 = groups->IterateKeySets(kFabric1);
-    NL_TEST_ASSERT(apSuite, it_f1);
-    if (it_f1)
+    auto it = groups->IterateKeySets(kFabric1);
+    NL_TEST_ASSERT(apSuite, it);
+    if (it)
     {
         size_t i = 0;
-        NL_TEST_ASSERT(apSuite, expected_f1.size() == it_f1->Count());
+        NL_TEST_ASSERT(apSuite, expected_f1.size() == it->Count());
 
-        while (it_f1->Next(keysets) && i < expected_f1.size())
+        while (it->Next(keysets) && i < expected_f1.size())
         {
             NL_TEST_ASSERT(apSuite, expected_f1.count(keysets.keyset_id) > 0);
             NL_TEST_ASSERT(apSuite, keysets == expected_f1[keysets.keyset_id]);
             i++;
         }
         NL_TEST_ASSERT(apSuite, i == expected_f1.size());
-        it_f1->Release();
+        it->Release();
+        it = nullptr;
     }
 
     // Iterate Fabric 2
 
     std::map<uint16_t, const KeySet> expected_f2{ { kKeySetId3, keyset2 }, { kKeySetId1, keyset3 }, { kKeySetId2, keyset1 } };
 
-    auto it_f2 = groups->IterateKeySets(kFabric2);
-    NL_TEST_ASSERT(apSuite, it_f2);
-    if (it_f2)
+    it = groups->IterateKeySets(kFabric2);
+    NL_TEST_ASSERT(apSuite, it);
+    if (it)
     {
         size_t i = 0;
-        NL_TEST_ASSERT(apSuite, expected_f2.size() == it_f2->Count());
+        NL_TEST_ASSERT(apSuite, expected_f2.size() == it->Count());
 
-        while (it_f2->Next(keysets) && i < expected_f2.size())
+        while (it->Next(keysets) && i < expected_f2.size())
         {
             NL_TEST_ASSERT(apSuite, expected_f2.count(keysets.keyset_id) > 0);
             NL_TEST_ASSERT(apSuite, keysets == expected_f2[keysets.keyset_id]);
             i++;
         }
         NL_TEST_ASSERT(apSuite, i == expected_f2.size());
-        it_f2->Release();
+        it->Release();
+        it = nullptr;
     }
 }
 
@@ -919,38 +976,41 @@ void TestEndpointIterator(nlTestSuite * apSuite, void * apContext)
 
     // Endpoint 1
 
+    GroupDataProvider::GroupMapping mapping;
     auto * it = groups->IterateGroupMappings(kFabric1, kEndpoint1);
     NL_TEST_ASSERT(apSuite, it);
-
-    GroupDataProvider::GroupMapping mapping;
-    size_t count1 = it->Count();
-    size_t count2 = 0;
-    NL_TEST_ASSERT(apSuite, 2 == count1);
-    while (it->Next(mapping))
+    if (it)
     {
-        count2++;
-        NL_TEST_ASSERT(apSuite, kGroup1 == mapping.group || kGroup2 == mapping.group);
+        size_t count1 = it->Count();
+        size_t count2 = 0;
+        NL_TEST_ASSERT(apSuite, 2 == count1);
+        while (it->Next(mapping))
+        {
+            count2++;
+            NL_TEST_ASSERT(apSuite, kGroup1 == mapping.group || kGroup2 == mapping.group);
+        }
+        NL_TEST_ASSERT(apSuite, count2 == count1);
+        it->Release();
     }
-    NL_TEST_ASSERT(apSuite, count2 == count1);
-    it->Release();
-    it = nullptr;
 
     // Endpoint 3
 
     it = groups->IterateGroupMappings(kFabric1, kEndpoint3);
     NL_TEST_ASSERT(apSuite, it);
-
-    count1 = it->Count();
-    count2 = 0;
-    NL_TEST_ASSERT(apSuite, 3 == count1);
-    while (it->Next(mapping))
+    if (it)
     {
-        count2++;
-        NL_TEST_ASSERT(apSuite, kGroup1 == mapping.group || kGroup2 == mapping.group || kGroup3 == mapping.group);
+        size_t count1 = it->Count();
+        size_t count2 = 0;
+        NL_TEST_ASSERT(apSuite, 3 == count1);
+        while (it->Next(mapping))
+        {
+            count2++;
+            NL_TEST_ASSERT(apSuite, kGroup1 == mapping.group || kGroup2 == mapping.group || kGroup3 == mapping.group);
+        }
+        NL_TEST_ASSERT(apSuite, count2 == count1);
+        it->Release();
+        it = nullptr;
     }
-    NL_TEST_ASSERT(apSuite, count2 == count1);
-    it->Release();
-    it = nullptr;
 }
 
 void TestStates(nlTestSuite * apSuite, void * apContext)
@@ -985,21 +1045,24 @@ void TestStates(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_INVALID_ARGUMENT == err);
 
     auto * it = groups->IterateGroupStates(kFabric1);
-    NL_TEST_ASSERT(apSuite, it != nullptr);
-    NL_TEST_ASSERT(apSuite, 2 == it->Count());
-    it->Release();
-    it = nullptr;
+    if (it)
+    {
+        NL_TEST_ASSERT(apSuite, it != nullptr);
+        NL_TEST_ASSERT(apSuite, 2 == it->Count());
+        it->Release();
+        it = nullptr;
+    }
 
     err = groups->GetGroupState(0, state0b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, state0a.group == state0b.group);
-    NL_TEST_ASSERT(apSuite, state0a.keyset_index == state0b.keyset_index);
+    NL_TEST_ASSERT(apSuite, state0a.keyset_id == state0b.keyset_id);
     NL_TEST_ASSERT(apSuite, kFabric1 == state0b.fabric_index);
 
     err = groups->GetGroupState(1, state1b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, state1a.group == state1b.group);
-    NL_TEST_ASSERT(apSuite, state1a.keyset_index == state1b.keyset_index);
+    NL_TEST_ASSERT(apSuite, state1a.keyset_id == state1b.keyset_id);
     NL_TEST_ASSERT(apSuite, kFabric1 == state1b.fabric_index);
 
     err = groups->GetGroupState(2, state3b);
@@ -1010,16 +1073,16 @@ void TestStates(nlTestSuite * apSuite, void * apContext)
 
     // Entry 1 should remain, now at slot 0
     state1b.group        = 10;
-    state1b.keyset_index = 12;
+    state1b.keyset_id    = 12;
     state1b.fabric_index = 14;
     err                  = groups->GetGroupState(0, state1b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, state1a.group == state1b.group);
-    NL_TEST_ASSERT(apSuite, state1a.keyset_index == state1b.keyset_index);
+    NL_TEST_ASSERT(apSuite, state1a.keyset_id == state1b.keyset_id);
     NL_TEST_ASSERT(apSuite, kFabric1 == state1b.fabric_index);
 
     state1b.group        = 10;
-    state1b.keyset_index = 12;
+    state1b.keyset_id    = 12;
     state1b.fabric_index = 14;
     err                  = groups->GetGroupState(1, state1b);
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == err);
@@ -1041,7 +1104,7 @@ void TestStates(nlTestSuite * apSuite, void * apContext)
     err = groups->GetGroupState(0, state4b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, state4a.group == state4b.group);
-    NL_TEST_ASSERT(apSuite, state4a.keyset_index == state4b.keyset_index);
+    NL_TEST_ASSERT(apSuite, state4a.keyset_id == state4b.keyset_id);
     NL_TEST_ASSERT(apSuite, state4a.fabric_index == state4b.fabric_index);
 
     // Incorrect fabric
@@ -1090,7 +1153,7 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
         GroupDataProvider::GroupState state;
         while (it->Next(state))
         {
-            NL_TEST_ASSERT(apSuite, (state.group > 0 && state.group < 4) && (state.keyset_index == 1));
+            NL_TEST_ASSERT(apSuite, (state.group > 0 && state.group < 4) && (state.keyset_id == 1));
             NL_TEST_ASSERT(apSuite, (state.fabric_index == kFabric1));
             count2++;
         }
@@ -1099,17 +1162,17 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
         it = nullptr;
     }
 
+    // Fabric Index 2 has 1 entry
+    auto * it = groups->IterateGroupStates(kFabric2);
+    NL_TEST_ASSERT(apSuite, it != nullptr);
+    if (it)
     {
-        // Fabric Index 2 has 1 entry
-        auto * it = groups->IterateGroupStates(kFabric2);
-        NL_TEST_ASSERT(apSuite, it != nullptr);
-
         size_t count1 = it->Count();
         NL_TEST_ASSERT(apSuite, 1 == count1);
         GroupDataProvider::GroupState state;
         NL_TEST_ASSERT(apSuite, it->Next(state));
 
-        NL_TEST_ASSERT(apSuite, (state.group > 0 && state.group < 4) && (state.keyset_index == 2));
+        NL_TEST_ASSERT(apSuite, (state.group > 0 && state.group < 4) && (state.keyset_id == 2));
         NL_TEST_ASSERT(apSuite, (state.fabric_index == kFabric2));
 
         NL_TEST_ASSERT(apSuite, !it->Next(state));
@@ -1118,11 +1181,11 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
         it = nullptr;
     }
 
+    // Fabric Index 1 has 3 entries + Fabric Index 2 has 1 entry
+    it = groups->IterateGroupStates();
+    NL_TEST_ASSERT(apSuite, it != nullptr);
+    if (it)
     {
-        // Fabric Index 1 has 3 entries + Fabric Index 2 has 1 entry
-        auto * it = groups->IterateGroupStates();
-        NL_TEST_ASSERT(apSuite, it != nullptr);
-
         size_t count1 = it->Count();
         size_t count2 = 0;
         NL_TEST_ASSERT(apSuite, 4 == count1);
@@ -1130,7 +1193,7 @@ void TestStateIterator(nlTestSuite * apSuite, void * apContext)
         while (it->Next(state))
         {
             NL_TEST_ASSERT(apSuite, (state.fabric_index == kFabric1 || state.fabric_index == kFabric2));
-            NL_TEST_ASSERT(apSuite, (state.group > 0 && state.group < 4) && (state.keyset_index == 1 || state.keyset_index == 2));
+            NL_TEST_ASSERT(apSuite, (state.group > 0 && state.group < 4) && (state.keyset_id == 1 || state.keyset_id == 2));
             count2++;
         }
         NL_TEST_ASSERT(apSuite, count2 == count1);
@@ -1173,7 +1236,12 @@ void TestKeys(nlTestSuite * apSuite, void * apContext)
 
     auto * it = groups->IterateKeySets(kFabric1);
     NL_TEST_ASSERT(apSuite, it != nullptr);
-    NL_TEST_ASSERT(apSuite, it->Count() == 2);
+    if (it)
+    {
+        NL_TEST_ASSERT(apSuite, it->Count() == 2);
+        it->Release();
+        it = nullptr;
+    }
 
     err = groups->GetKeySet(kFabric1, kKeySetId0, keys0b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
@@ -1233,24 +1301,26 @@ void TestKeysIterator(nlTestSuite * apSuite, void * apContext)
 
     auto * it = groups->IterateKeySets(kFabric1);
     NL_TEST_ASSERT(apSuite, it);
-
-    size_t count1 = it->Count();
-    size_t count2 = 0;
-    NL_TEST_ASSERT(apSuite, 3 == count1);
-    GroupDataProvider::KeySet keys;
-
-    uint16_t last_keyset_id = UINT16_MAX;
-
-    while (it->Next(keys))
+    if (it)
     {
-        NL_TEST_ASSERT(apSuite, keys.keyset_id == kKeySetId0 || keys.keyset_id == kKeySetId1 || keys.keyset_id == kKeySetId2);
-        NL_TEST_ASSERT(apSuite, keys.keyset_id != last_keyset_id);
-        last_keyset_id = keys.keyset_id;
-        count2++;
+        size_t count1 = it->Count();
+        size_t count2 = 0;
+        NL_TEST_ASSERT(apSuite, 3 == count1);
+        GroupDataProvider::KeySet keys;
+
+        uint16_t last_keyset_id = UINT16_MAX;
+
+        while (it->Next(keys))
+        {
+            NL_TEST_ASSERT(apSuite, keys.keyset_id == kKeySetId0 || keys.keyset_id == kKeySetId1 || keys.keyset_id == kKeySetId2);
+            NL_TEST_ASSERT(apSuite, keys.keyset_id != last_keyset_id);
+            last_keyset_id = keys.keyset_id;
+            count2++;
+        }
+        NL_TEST_ASSERT(apSuite, count2 == count1);
+        it->Release();
+        it = nullptr;
     }
-    NL_TEST_ASSERT(apSuite, count2 == count1);
-    it->Release();
-    it = nullptr;
 }
 
 void TestPerFabricData(nlTestSuite * apSuite, void * apContext)
@@ -1330,19 +1400,19 @@ void TestPerFabricData(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, state0a.fabric_index == state0b.fabric_index);
     NL_TEST_ASSERT(apSuite, state0a.group == state0b.group);
-    NL_TEST_ASSERT(apSuite, state0a.keyset_index == state0b.keyset_index);
+    NL_TEST_ASSERT(apSuite, state0a.keyset_id == state0b.keyset_id);
 
     err = groups->GetGroupState(1, state1b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, state1a.fabric_index == state1b.fabric_index);
     NL_TEST_ASSERT(apSuite, state1a.group == state1b.group);
-    NL_TEST_ASSERT(apSuite, state1a.keyset_index == state1b.keyset_index);
+    NL_TEST_ASSERT(apSuite, state1a.keyset_id == state1b.keyset_id);
 
     err = groups->GetGroupState(2, state2b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, state2a.fabric_index == state2b.fabric_index);
     NL_TEST_ASSERT(apSuite, state2a.group == state2b.group);
-    NL_TEST_ASSERT(apSuite, state2a.keyset_index == state2b.keyset_index);
+    NL_TEST_ASSERT(apSuite, state2a.keyset_id == state2b.keyset_id);
 
     err = groups->GetGroupState(4, state4b);
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == err);
@@ -1452,13 +1522,13 @@ void TestPerFabricData(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, state1a.fabric_index == state0b.fabric_index);
     NL_TEST_ASSERT(apSuite, state1a.group == state0b.group);
-    NL_TEST_ASSERT(apSuite, state1a.keyset_index == state0b.keyset_index);
+    NL_TEST_ASSERT(apSuite, state1a.keyset_id == state0b.keyset_id);
 
     err = groups->GetGroupState(1, state1b);
     NL_TEST_ASSERT(apSuite, CHIP_NO_ERROR == err);
     NL_TEST_ASSERT(apSuite, state2a.fabric_index == state1b.fabric_index);
     NL_TEST_ASSERT(apSuite, state2a.group == state1b.group);
-    NL_TEST_ASSERT(apSuite, state2a.keyset_index == state1b.keyset_index);
+    NL_TEST_ASSERT(apSuite, state2a.keyset_id == state1b.keyset_id);
 
     err = groups->GetGroupState(2, state2b);
     NL_TEST_ASSERT(apSuite, CHIP_ERROR_KEY_NOT_FOUND == err);

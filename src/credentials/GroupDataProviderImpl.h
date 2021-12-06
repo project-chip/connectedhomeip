@@ -43,6 +43,7 @@ public:
     CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping) override;
     CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping) override;
     CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint) override;
+    GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric_index) override;
     GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint) override;
 
     //
@@ -71,6 +72,25 @@ public:
     CHIP_ERROR Decrypt(PacketHeader packetHeader, PayloadHeader & payloadHeader, System::PacketBufferHandle & msg) override;
 
 private:
+    class AllGroupMappingsIteratorImpl : public GroupMappingIterator
+    {
+    public:
+        AllGroupMappingsIteratorImpl(GroupDataProviderImpl & provider, chip::FabricIndex fabric);
+        size_t Count() override;
+        bool Next(GroupMapping & item) override;
+        void Release() override;
+
+    private:
+        GroupDataProviderImpl & mProvider;
+        chip::FabricIndex mFabric       = kUndefinedFabricIndex;
+        chip::EndpointId mEndpoint      = kInvalidEndpointId;
+        size_t mEndpointIndex           = 0;
+        size_t mEndpointCount           = 0;
+        chip::GroupId mGroup            = kUndefinedGroupId;
+        chip::EndpointId mFirstEndpoint = kInvalidEndpointId;
+        bool mFirstGroup                = true;
+    };
+
     class GroupMappingIteratorImpl : public GroupMappingIterator
     {
     public:
@@ -81,8 +101,9 @@ private:
 
     private:
         GroupDataProviderImpl & mProvider;
-        chip::FabricIndex mFabric  = 0;
-        chip::EndpointId mEndpoint = 0;
+        chip::FabricIndex mFabric  = kUndefinedFabricIndex;
+        chip::EndpointId mEndpoint = kInvalidEndpointId;
+        chip::GroupId mFirstGroup  = kUndefinedGroupId;
         chip::GroupId mGroup       = kUndefinedGroupId;
     };
 
@@ -111,7 +132,7 @@ private:
 
     private:
         GroupDataProviderImpl & mProvider;
-        chip::FabricIndex mFabric = 0;
+        chip::FabricIndex mFabric = kUndefinedFabricIndex;
         uint16_t mIndex           = 0;
         size_t mCount             = 0;
         size_t mTotalCount        = 0;
@@ -127,7 +148,7 @@ private:
 
     private:
         GroupDataProviderImpl & mProvider;
-        chip::FabricIndex mFabric = 0;
+        chip::FabricIndex mFabric = kUndefinedFabricIndex;
         uint16_t mNextId          = 0;
         size_t mCount             = 0;
         size_t mIndex             = 0;
@@ -135,7 +156,8 @@ private:
 
     chip::PersistentStorageDelegate & mStorage;
     bool mInitialized = false;
-    BitMapObjectPool<GroupMappingIteratorImpl, kIteratorsMax> mEndpointIterators;
+    BitMapObjectPool<AllGroupMappingsIteratorImpl, kIteratorsMax> mAllGroupsIterators;
+    BitMapObjectPool<GroupMappingIteratorImpl, kIteratorsMax> mEndpointGroupsIterators;
     BitMapObjectPool<AllStatesIterator, kIteratorsMax> mAllStatesIterators;
     BitMapObjectPool<FabricStatesIterator, kIteratorsMax> mFabricStatesIterators;
     BitMapObjectPool<KeySetIteratorImpl, kIteratorsMax, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode> mKeySetIterators;
