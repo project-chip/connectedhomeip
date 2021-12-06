@@ -58,5 +58,21 @@ struct Identify
     EmberAfIdentifyEffectIdentifier mCurrentEffectIdentifier;
     EmberAfIdentifyEffectIdentifier mTargetEffectIdentifier;
     uint8_t mEffectVariant;
-    bool mActive = false;
+    bool mActive             = false;
+    Identify * next_identify = nullptr;
+
+    bool hasNext()
+    {
+        bool hasNext = false;
+        if (this->next_identify != nullptr)
+        {
+            hasNext = true;
+        }
+
+        return hasNext;
+    }
+
+    Identify * next() { return this->next_identify; }
+
+    void setNext(Identify * inst) { this->next_identify = inst; }
 };
