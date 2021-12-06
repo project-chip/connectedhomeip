@@ -126,7 +126,7 @@ static void CheckLogState(nlTestSuite * apSuite, chip::app::EventManagement & aL
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(apSuite, elementCount == expectedNumEvents);
-    printf("Num Events: %zu\n", elementCount);
+    printf("elementCount vs expectedNumEvents : %zu vs %zu \n", elementCount, expectedNumEvents);
 }
 
 static void CheckLogReadOut(nlTestSuite * apSuite, chip::app::EventManagement & alogMgmt, chip::app::PriorityLevel priority,
@@ -171,16 +171,14 @@ static void CheckLogEventWithEvictToNextBuffer(nlTestSuite * apSuite, void * apC
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2, eid3, eid4, eid5, eid6;
-    chip::app::EventSchema schema1 = { kTestDeviceNodeId1, kTestEndpointId1, kLivenessClusterId, kLivenessChangeEvent,
-                                       chip::app::PriorityLevel::Info };
-    chip::app::EventSchema schema2 = { kTestDeviceNodeId1, kTestEndpointId2, kLivenessClusterId, kLivenessChangeEvent,
-                                       chip::app::PriorityLevel::Info };
     chip::app::EventOptions options1;
     chip::app::EventOptions options2;
     TestEventGenerator testEventGenerator;
 
-    options1.mpEventSchema               = &schema1;
-    options2.mpEventSchema               = &schema2;
+    options1.mPath                       = { kTestEndpointId1, kLivenessClusterId, kLivenessChangeEvent };
+    options1.mPriority                   = chip::app::PriorityLevel::Info;
+    options2.mPath                       = { kTestEndpointId2, kLivenessClusterId, kLivenessChangeEvent };
+    options2.mPriority                   = chip::app::PriorityLevel::Info;
     chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
     testEventGenerator.SetStatus(0);
     err = logMgmt.LogEvent(&testEventGenerator, options1, eid1);
@@ -240,41 +238,42 @@ static void CheckLogEventWithDiscardLowEvent(nlTestSuite * apSuite, void * apCon
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2, eid3, eid4, eid5, eid6;
-    chip::app::EventSchema schema = { kTestDeviceNodeId1, kTestEndpointId1, kLivenessClusterId, kLivenessChangeEvent,
-                                      chip::app::PriorityLevel::Debug };
     chip::app::EventOptions options;
+    options.mPath     = { kTestEndpointId1, kLivenessClusterId, kLivenessChangeEvent };
+    options.mPriority = chip::app::PriorityLevel::Debug;
     TestEventGenerator testEventGenerator;
-
-    options.mpEventSchema = &schema;
 
     chip::app::EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
     testEventGenerator.SetStatus(0);
     err = logMgmt.LogEvent(&testEventGenerator, options, eid1);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Debug);
+    CheckLogState(apSuite, logMgmt, 4, chip::app::PriorityLevel::Debug);
     testEventGenerator.SetStatus(1);
     err = logMgmt.LogEvent(&testEventGenerator, options, eid2);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Debug);
+    CheckLogState(apSuite, logMgmt, 4, chip::app::PriorityLevel::Debug);
     testEventGenerator.SetStatus(0);
     err = logMgmt.LogEvent(&testEventGenerator, options, eid3);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Debug);
+    CheckLogState(apSuite, logMgmt, 4, chip::app::PriorityLevel::Debug);
+    CheckLogState(apSuite, logMgmt, 8, chip::app::PriorityLevel::Info);
     // Start to drop off debug event since debug event can only be saved in debug buffer
     testEventGenerator.SetStatus(1);
     err = logMgmt.LogEvent(&testEventGenerator, options, eid4);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Debug);
+    CheckLogState(apSuite, logMgmt, 4, chip::app::PriorityLevel::Debug);
+    CheckLogState(apSuite, logMgmt, 8, chip::app::PriorityLevel::Info);
 
     testEventGenerator.SetStatus(0);
     err = logMgmt.LogEvent(&testEventGenerator, options, eid5);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Debug);
+    CheckLogState(apSuite, logMgmt, 4, chip::app::PriorityLevel::Debug);
+    CheckLogState(apSuite, logMgmt, 8, chip::app::PriorityLevel::Info);
 
     testEventGenerator.SetStatus(1);
     err = logMgmt.LogEvent(&testEventGenerator, options, eid6);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    CheckLogState(apSuite, logMgmt, 3, chip::app::PriorityLevel::Debug);
+    CheckLogState(apSuite, logMgmt, 4, chip::app::PriorityLevel::Debug);
 }
 /**
  *   Test Suite. It lists all the test functions.
