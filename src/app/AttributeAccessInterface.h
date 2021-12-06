@@ -74,7 +74,7 @@ public:
      * EncodeValue encodes the value field of the report, it should be called exactly once.
      */
     template <typename... Ts>
-    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, Ts... aArgs)
+    CHIP_ERROR EncodeValue(AttributeReportIBs::Builder & aAttributeReportIBs, Ts &&... aArgs)
     {
         return DataModel::Encode(*(aAttributeReportIBs.GetAttributeReport().GetAttributeData().GetWriter()),
                                  TLV::ContextTag(to_underlying(AttributeDataIB::Tag::kData)), std::forward<Ts>(aArgs)...);
@@ -98,7 +98,7 @@ public:
         ListEncodeHelper(AttributeValueEncoder & encoder) : mAttributeValueEncoder(encoder) {}
 
         template <typename... Ts>
-        CHIP_ERROR Encode(Ts... aArgs) const
+        CHIP_ERROR Encode(Ts &&... aArgs) const
         {
             return mAttributeValueEncoder.EncodeListItem(std::forward<Ts>(aArgs)...);
         }
@@ -152,7 +152,7 @@ public:
      * operation.
      */
     template <typename... Ts>
-    CHIP_ERROR Encode(Ts... aArgs)
+    CHIP_ERROR Encode(Ts &&... aArgs)
     {
         mTriedEncode = true;
         return EncodeAttributeReportIB(std::forward<Ts>(aArgs)...);
@@ -209,7 +209,7 @@ private:
     friend class ListEncodeHelper;
 
     template <typename... Ts>
-    CHIP_ERROR EncodeListItem(Ts... aArgs)
+    CHIP_ERROR EncodeListItem(Ts &&... aArgs)
     {
         // EncodeListItem must be called after EncodeEmptyList(), thus mCurrentEncodingListIndex and
         // mEncodeState.mCurrentEncodingListIndex are not invalid values.
@@ -242,7 +242,7 @@ private:
      * Actual logic for encoding a single AttributeReportIB in AttributeReportIBs.
      */
     template <typename... Ts>
-    CHIP_ERROR EncodeAttributeReportIB(Ts... aArgs)
+    CHIP_ERROR EncodeAttributeReportIB(Ts &&... aArgs)
     {
         mTriedEncode = true;
         AttributeReportBuilder builder;

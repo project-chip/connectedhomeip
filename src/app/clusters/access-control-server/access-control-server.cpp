@@ -350,7 +350,7 @@ CHIP_ERROR AccessControlAttribute::ReadAcl(AttributeValueEncoder & aEncoder)
 
     GetAccessControl().Entries(iterator);
 
-    CHIP_ERROR err = aEncoder.EncodeList([&](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    CHIP_ERROR err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
         while (iterator.Next(codec.entry) == CHIP_NO_ERROR)
         {
             encoder.Encode(codec);
