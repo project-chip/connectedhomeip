@@ -16,28 +16,30 @@
  *    limitations under the License.
  */
 
-#include <OTAImageProcessorImpl.h>
+#include "MbedOTAImageProcessor.h"
 #include <lib/support/logging/CHIPLogging.h>
 
-CHIP_ERROR OTAImageProcessorImpl::PrepareDownload()
+using namespace ::chip;
+
+CHIP_ERROR MbedOTAImageProcessor::PrepareDownload()
 {
     ChipLogProgress(SoftwareUpdate, "Prepare download");
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAImageProcessorImpl::ProcessBlock(chip::ByteSpan & data)
+CHIP_ERROR MbedOTAImageProcessor::ProcessBlock(ByteSpan & data)
 {
     ChipLogProgress(SoftwareUpdate, "Process block");
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAImageProcessorImpl::Finalize()
+CHIP_ERROR MbedOTAImageProcessor::Finalize()
 {
     ChipLogProgress(SoftwareUpdate, "Finalize");
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR OTAImageProcessorImpl::Abort()
+CHIP_ERROR MbedOTAImageProcessor::Abort()
 {
     ChipLogProgress(SoftwareUpdate, "Abort");
     return CHIP_NO_ERROR;

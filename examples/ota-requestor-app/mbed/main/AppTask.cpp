@@ -45,8 +45,10 @@
 #include "events/EventQueue.h"
 #include "platform/Callback.h"
 
-#include <OTADownloaderImpl.h>
-#include <OTAImageProcessorImpl.h>
+#include <MbedOTADownloader.h>
+#include <MbedOTAImageProcessor.h>
+#include <MbedOTARequestor.h>
+#include <MbedOTARequestorDriver.h>
 
 static bool sIsWiFiStationProvisioned = false;
 static bool sIsWiFiStationEnabled     = false;
@@ -61,9 +63,6 @@ using namespace ::chip::Credentials;
 using namespace ::chip::DeviceLayer;
 
 static LEDWidget sStatusLED(MBED_CONF_APP_SYSTEM_STATE_LED);
-
-static OTARequestorDriverImpl sRequestorDriver;
-static OTAImageProcessorImpl sImageProcessor;
 
 AppTask AppTask::sAppTask;
 
@@ -91,11 +90,27 @@ int AppTask::Init()
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
     }
 
-    OTARequestorImpl::GetInstance().Init(OnConnectProviderCallback, OnProviderResponseCallback);
-    OTARequestorImpl::GetInstance().SetOtaRequestorDriver(&sRequestorDriver);
+    // Initialize and interconnect the Requestor and Image Processor objects -- START
+    // Initialize the instance of the main Requestor Class
+    MbedOTARequestor * requestorCore = new MbedOTARequestor(OnAnnounceProviderCallback, OnProviderResponseCallback);
+    SetRequestorInstance(requestorCore);
 
-    OTADownloaderImpl::GetInstance().Init(OnDownloadCompletedCallback);
-    OTADownloaderImpl::GetInstance().SetImageProcessorDelegate(&sImageProcessor);
+    // Initialize an instance of the Requestor Driver
+    MbedOTARequestorDriver * requestorUser = new MbedOTARequestorDriver;
+
+    // Connect the Requestor and Requestor Driver objects
+    requestorCore->SetOtaRequestorDriver(requestorUser);
+
+    // Initialize  the Downloader object
+    MbedOTADownloader * downloaderCore = new MbedOTADownloader(OnDownloadCompletedCallback);
+    SetDownloaderInstance(downloaderCore);
+
+    // Initialize the Image Processor object
+    MbedOTAImageProcessor * downloaderUser = new MbedOTAImageProcessor;
+
+    // Connect the Downloader and Image Processor objects
+    downloaderCore->SetImageProcessorDelegate(downloaderUser);
+    // Initialize and interconnect the Requestor and Image Processor objects -- END
 
     chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
 
@@ -175,17 +190,18 @@ void AppTask::OnOtaEventHandler(AppEvent * aEvent)
 {
     switch (aEvent->Type)
     {
-    case AppEvent::kEventType_ota_provider_connect:
-        ChipLogProgress(NotSpecified, "OTA provider connect event");
-
-        OTARequestorImpl::GetInstance().ConnectProvider(aEvent->OTAProviderConnectEvent.nodeId,
-                                                        aEvent->OTAProviderConnectEvent.fabricIndex,
-                                                        aEvent->OTAProviderConnectEvent.ipAddress);
+    case AppEvent::kEventType_ota_provider_announce: {
+        ChipLogProgress(NotSpecified, "OTA provider announce event");
+        MbedOTARequestor * requestor = static_cast<MbedOTARequestor *>(GetRequestorInstance());
+        requestor->ConnectProvider();
         break;
+    }
+
     case AppEvent::kEventType_ota_provider_response: {
         ChipLogProgress(NotSpecified, "OTA provider response event");
-        OTADownloaderImpl::GetInstance().SetDownloadImageInfo(aEvent->OTAProviderResponseEvent.imageDatails->updateFileName);
-        OTADownloaderImpl::GetInstance().BeginDownload();
+        MbedOTADownloader * downloader = static_cast<MbedOTADownloader *>(GetDownloaderInstance());
+        downloader->SetDownloadImageInfo(aEvent->OTAProviderResponseEvent.imageDatails->updateFileName);
+        downloader->BeginPrepareDownload();
         break;
     }
     case AppEvent::kEventType_ota_download_completed:
@@ -200,18 +216,15 @@ void AppTask::OnOtaEventHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::OnConnectProviderCallback(NodeId nodeId, FabricIndex fabricIndex, chip::Optional<chip::ByteSpan> ipAddress)
+void AppTask::OnAnnounceProviderCallback()
 {
-    AppEvent ota_connect_provider_event;
-    ota_connect_provider_event.Type                                = AppEvent::kEventType_ota_provider_connect;
-    ota_connect_provider_event.OTAProviderConnectEvent.nodeId      = nodeId;
-    ota_connect_provider_event.OTAProviderConnectEvent.fabricIndex = fabricIndex;
-    ota_connect_provider_event.OTAProviderConnectEvent.ipAddress   = reinterpret_cast<const char *>(ipAddress.Value().data());
-    ota_connect_provider_event.Handler                             = OnOtaEventHandler;
-    sAppTask.PostEvent(&ota_connect_provider_event);
+    AppEvent ota_announce_provider_event;
+    ota_announce_provider_event.Type    = AppEvent::kEventType_ota_provider_announce;
+    ota_announce_provider_event.Handler = OnOtaEventHandler;
+    sAppTask.PostEvent(&ota_announce_provider_event);
 }
 
-void AppTask::OnProviderResponseCallback(OTARequestorImpl::OTAUpdateDetails * updateDetails)
+void AppTask::OnProviderResponseCallback(MbedOTARequestor::OTAUpdateDetails * updateDetails)
 {
     AppEvent ota_provider_response_event;
     ota_provider_response_event.Type                                  = AppEvent::kEventType_ota_provider_response;
@@ -220,7 +233,7 @@ void AppTask::OnProviderResponseCallback(OTARequestorImpl::OTAUpdateDetails * up
     sAppTask.PostEvent(&ota_provider_response_event);
 }
 
-void AppTask::OnDownloadCompletedCallback(OTADownloaderImpl::ImageInfo * imageInfo)
+void AppTask::OnDownloadCompletedCallback(MbedOTADownloader::ImageInfo * imageInfo)
 {
     AppEvent ota_download_completed_event;
     ota_download_completed_event.Type                                = AppEvent::kEventType_ota_download_completed;

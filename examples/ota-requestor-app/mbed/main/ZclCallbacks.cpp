@@ -21,7 +21,6 @@
 #include <app/ConcreteAttributePath.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-#include "OTARequestorImpl.h"
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/CommandHandler.h>
 #include <app/util/af.h>
@@ -35,22 +34,4 @@ void MatterPostAttributeChangeCallback(const chip::app::ConcreteAttributePath & 
     ClusterId clusterId     = attributePath.mClusterId;
     AttributeId attributeId = attributePath.mAttributeId;
     ChipLogProgress(Zcl, "Cluster callback: " ChipLogFormatMEI, ChipLogValueMEI(clusterId));
-}
-
-// OTA Software Update Requestor Cluster AnnounceOtaProvider Command callback (from client)
-bool emberAfOtaSoftwareUpdateRequestorClusterAnnounceOtaProviderCallback(
-    chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
-    const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
-{
-
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
-
-    auto ret = OTARequestorImpl::GetInstance().HandleAnnounceOTAProvider(commandObj, commandPath, commandData);
-    if (ret)
-    {
-        status = EMBER_ZCL_STATUS_FAILURE;
-    }
-
-    emberAfSendImmediateDefaultResponse(status);
-    return true;
 }

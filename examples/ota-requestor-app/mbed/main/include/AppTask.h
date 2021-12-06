@@ -20,8 +20,8 @@
 #pragma once
 
 #include "AppEvent.h"
-#include <OTADownloaderImpl.h>
-#include <OTARequestorImpl.h>
+#include <MbedOTADownloader.h>
+#include <MbedOTARequestor.h>
 
 class AppTask
 {
@@ -38,12 +38,11 @@ private:
 
     static void OnOtaEventHandler(AppEvent * aEvent);
 
-    static void OnConnectProviderCallback(chip::NodeId nodeId, chip::FabricIndex fabricIndex,
-                                          chip::Optional<chip::ByteSpan> ipAddress);
+    static void OnAnnounceProviderCallback();
 
-    static void OnProviderResponseCallback(OTARequestorImpl::OTAUpdateDetails * updateDetails);
+    static void OnProviderResponseCallback(MbedOTARequestor::OTAUpdateDetails * updateDetails);
 
-    static void OnDownloadCompletedCallback(OTADownloaderImpl::ImageInfo * imageInfo);
+    static void OnDownloadCompletedCallback(chip::MbedOTADownloader::ImageInfo * imageInfo);
 
     static AppTask sAppTask;
 };

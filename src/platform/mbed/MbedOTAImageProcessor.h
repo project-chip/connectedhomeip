@@ -23,17 +23,20 @@
 
 #pragma once
 
+#include <app/clusters/ota-requestor/OTAImageProcessor.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/logging/CHIPLogging.h>
 
-class OTAImageProcessorImpl
+namespace chip {
+
+class MbedOTAImageProcessor : public OTAImageProcessorInterface
 {
 public:
     // Open file, find block of space in persistent memory, or allocate a buffer, etc.
     CHIP_ERROR PrepareDownload();
 
     // Must not be a blocking call to support cases that require IO to elements such as // external peripherals/radios
-    CHIP_ERROR ProcessBlock(chip::ByteSpan & data);
+    CHIP_ERROR ProcessBlock(ByteSpan & data);
 
     // Close file, close persistent storage, etc
     CHIP_ERROR Finalize();
@@ -42,3 +45,5 @@ public:
     // releasing buffers, etc.
     CHIP_ERROR Abort();
 };
+
+} // namespace chip

@@ -16,28 +16,21 @@
  *    limitations under the License.
  */
 
-#include <OTADownloaderImpl.h>
-#include <app/OperationalDeviceProxy.h>
+#include "MbedOTADownloader.h"
 #include <app/server/Server.h>
 #include <platform/CHIPDeviceLayer.h>
 
 using namespace ::chip;
-using namespace chip::bdx;
+using namespace ::chip::bdx;
 
-OTADownloaderImpl OTADownloaderImpl::sInstance;
+static OTADownloader * sInstance;
 
-OTADownloaderImpl::OTADownloaderImpl() {}
-
-void OTADownloaderImpl::BeginDownload()
+CHIP_ERROR MbedOTADownloader::BeginPrepareDownload()
 {
     ChipLogProgress(SoftwareUpdate, "Begin download");
 
     OperationalDeviceProxy * deviceProxy = Server::GetInstance().GetOperationalDeviceProxy();
-    if (deviceProxy == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "Provider connection not established");
-        return;
-    }
+    VerifyOrReturnError(deviceProxy != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     Messaging::ExchangeManager * exchangeMgr = deviceProxy->GetExchangeManager();
     Optional<SessionHandle> session          = deviceProxy->GetSecureSession();
@@ -48,11 +41,7 @@ void OTADownloaderImpl::BeginDownload()
         exchangeCtx = exchangeMgr->NewContext(session.Value(), this);
     }
 
-    if (exchangeCtx == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "Failed to allocate exchange");
-        return;
-    }
+    VerifyOrReturnError(exchangeCtx != nullptr, CHIP_ERROR_INTERNAL);
 
     mExchangeCtx = exchangeCtx;
 
@@ -62,26 +51,20 @@ void OTADownloaderImpl::BeginDownload()
     initOptions.FileDesLength    = mImageInfo.imageName.size();
     initOptions.FileDesignator   = reinterpret_cast<const uint8_t *>(mImageInfo.imageName.data());
 
-    CHIP_ERROR error =
-        InitiateTransfer(&DeviceLayer::SystemLayer(), TransferRole::kReceiver, initOptions, System::Clock::Seconds16(20));
+    ReturnErrorOnFailure(
+        InitiateTransfer(&DeviceLayer::SystemLayer(), TransferRole::kReceiver, initOptions, System::Clock::Seconds16(20)));
 
-    if (error != CHIP_NO_ERROR)
-    {
-        ChipLogError(SoftwareUpdate, "Failed to initiate BDX transfer: %" CHIP_ERROR_FORMAT, error.Format());
-    }
+    return CHIP_NO_ERROR;
 }
 
-void OTADownloaderImpl::OnPreparedForDownload()
+CHIP_ERROR MbedOTADownloader::OnPreparedForDownload(CHIP_ERROR status)
 {
     ChipLogProgress(SoftwareUpdate, "On Prepared For Download");
+
+    return CHIP_NO_ERROR;
 }
 
-void OTADownloaderImpl::OnBlockProcessed(BlockActionType action)
-{
-    ChipLogProgress(SoftwareUpdate, "On Block Processed");
-}
-
-void OTADownloaderImpl::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
+void MbedOTADownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
 {
     using OutputEventType  = TransferSession::OutputEventType;
     using SendMessageFlags = Messaging::SendMessageFlags;
@@ -102,11 +85,11 @@ void OTADownloaderImpl::HandleTransferSessionOutput(TransferSession::OutputEvent
             mTransfer.Reset();
             mIsTransferComplete = false;
 
-            error = mImageProcessorDelegate->Finalize();
+            error = mImageProcessor->Finalize();
             if (error != CHIP_NO_ERROR)
             {
                 ChipLogError(BDX, "Image processing finalize failed: %" CHIP_ERROR_FORMAT, error.Format());
-                mImageProcessorDelegate->Abort();
+                mImageProcessor->Abort();
                 return;
             }
 
@@ -129,12 +112,12 @@ void OTADownloaderImpl::HandleTransferSessionOutput(TransferSession::OutputEvent
     }
     case TransferSession::OutputEventType::kAcceptReceived:
         ChipLogProgress(BDX, "Starting image file transfer size %lldB", static_cast<uint64_t>(event.transferAcceptData.Length));
-        error = mImageProcessorDelegate->PrepareDownload();
+        error = mImageProcessor->PrepareDownload();
         if (error != CHIP_NO_ERROR)
         {
             ChipLogError(BDX, "Image processing prepare failed: %" CHIP_ERROR_FORMAT, error.Format());
             mTransfer.Reset();
-            mImageProcessorDelegate->Abort();
+            mImageProcessor->Abort();
             return;
         }
 
@@ -149,13 +132,13 @@ void OTADownloaderImpl::HandleTransferSessionOutput(TransferSession::OutputEvent
                         static_cast<unsigned>(mTransfer.GetNumBytesProcessed()) / 1024u);
 
         ByteSpan data(event.blockdata.Data, event.blockdata.Length);
-        mImageProcessorDelegate->ProcessBlock(data);
+        mImageProcessor->ProcessBlock(data);
         if (error != CHIP_NO_ERROR)
         {
             ChipLogError(BDX, "Image processing process block failed: %" CHIP_ERROR_FORMAT, error.Format());
             mTransfer.Reset();
             ;
-            mImageProcessorDelegate->Abort();
+            mImageProcessor->Abort();
             return;
         }
 
@@ -182,18 +165,18 @@ void OTADownloaderImpl::HandleTransferSessionOutput(TransferSession::OutputEvent
         if (event.statusData.statusCode != bdx::StatusCode::kNone)
         {
             mTransfer.Reset();
-            mImageProcessorDelegate->Abort();
+            mImageProcessor->Abort();
         }
         break;
     case TransferSession::OutputEventType::kInternalError:
         ChipLogError(BDX, "Transfer stopped due to internal error");
         mTransfer.Reset();
-        mImageProcessorDelegate->Abort();
+        mImageProcessor->Abort();
         break;
     case TransferSession::OutputEventType::kTransferTimeout:
         ChipLogError(BDX, "Transfer timed out");
         mTransfer.Reset();
-        mImageProcessorDelegate->Abort();
+        mImageProcessor->Abort();
         break;
     case TransferSession::OutputEventType::kInitReceived:
     case TransferSession::OutputEventType::kAckReceived:
@@ -202,4 +185,14 @@ void OTADownloaderImpl::HandleTransferSessionOutput(TransferSession::OutputEvent
     default:
         ChipLogError(BDX, "Unexpected BDX event type: %" PRIu16, to_underlying(event.EventType));
     }
+}
+
+void SetDownloaderInstance(OTADownloader * instance)
+{
+    sInstance = instance;
+}
+
+OTADownloader * GetDownloaderInstance()
+{
+    return sInstance;
 }

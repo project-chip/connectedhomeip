@@ -27,9 +27,9 @@
 #include <lib/support/Span.h>
 
 #include "events/EventQueue.h"
-#include <OTARequestorDriverImpl.h>
+#include <app/clusters/ota-requestor/OTARequestor.h>
 
-class OTARequestorImpl
+class MbedOTARequestor : public OTARequestorInterface
 {
     static constexpr uint8_t kVersionBufLen = 32;
     char mUpdateVersion[kVersionBufLen];
@@ -50,21 +50,14 @@ public:
     };
 
 private:
-    typedef void (*ConnectToProviderCallback)(chip::NodeId, chip::FabricIndex, chip::Optional<chip::ByteSpan>);
+    typedef void (*AnnounceProviderCallback)();
     typedef void (*ProviderResponseCallback)(OTAUpdateDetails * updateDetails);
 
 public:
-    static OTARequestorImpl & GetInstance() { return sInstance; }
-
-    void Init(ConnectToProviderCallback connectProviderCallback = nullptr,
-              ProviderResponseCallback providerResponseCallback = nullptr)
-    {
-        mConnectProviderCallback  = connectProviderCallback;
-        mProviderResponseCallback = providerResponseCallback;
-    }
+    MbedOTARequestor(AnnounceProviderCallback announceProviderCallback, ProviderResponseCallback providerResponseCallback);
 
     // Handler for the AnnounceOTAProvider command
-    bool HandleAnnounceOTAProvider(
+    EmberAfStatus HandleAnnounceOTAProvider(
         chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
         const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData);
 
@@ -72,50 +65,39 @@ public:
     bool HandleQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI,
                                   uint32_t softwareVersion, chip::CharSpan softwareVersionString, chip::ByteSpan updateToken,
                                   bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
-
-    // Handler for the ApplyUpdateResponse command
-    bool HandleApplyUpdateResponse(
-        chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
-    {
-        return false;
-    }
-
     // Application directs the Requestor to start the Image Query process
     // and download the new image if available
     void TriggerImmediateQuery() {}
+
+    // A setter for the delegate class pointer
+    void SetOtaRequestorDriver(OTARequestorDriver * driver);
 
     // Application directs the Requestor to abort any processing related to
     // the image update
     void AbortImageUpdate() {}
 
-    // A setter for the delegate class pointer
-    void SetOtaRequestorDriver(OTARequestorDriverImpl * driver);
+    void ConnectProvider();
 
-    void ConnectProvider(chip::NodeId peerNodeId, chip::FabricIndex peerFabricIndex, const char * ipAddress);
+    // Temporary until IP address resolution is implemented in the Exchange Layer
+    void SetIpAddress(chip::Inet::IPAddress IpAddress) { mProviderIpAddress = IpAddress; }
 
 private:
-    OTARequestorImpl();
-
-    static OTARequestorImpl sInstance;
-
-    chip::OperationalDeviceProxy * mOperationalDeviceProxy;
+    OTAUpdateDetails mUpdateDetails;
 
     chip::NodeId mProviderNodeId;
     chip::FabricIndex mProviderFabricIndex;
     EmberAfOTAAnnouncementReason mAnnouncementReason;
-    chip::Optional<chip::ByteSpan> mProviderIpAddress;
+    chip::Inet::IPAddress mProviderIpAddress;
 
-    OTAUpdateDetails mUpdateDetails;
-
-    ConnectToProviderCallback mConnectProviderCallback;
+    AnnounceProviderCallback mAnnounceProviderCallback;
     ProviderResponseCallback mProviderResponseCallback;
 
-    OTARequestorDriverImpl * mOtaRequestorDriver;
+    OTARequestorDriver * mOtaRequestorDriver;
 
     chip::CharSpan GetFileNameFromURI(chip::CharSpan imageURI);
 };
 
-inline void OTARequestorImpl::SetOtaRequestorDriver(OTARequestorDriverImpl * driver)
+inline void MbedOTARequestor::SetOtaRequestorDriver(OTARequestorDriver * driver)
 {
     mOtaRequestorDriver = driver;
 }

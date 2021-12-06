@@ -16,21 +16,19 @@
  *    limitations under the License.
  */
 
-#include <OTARequestorImpl.h>
+#include "MbedOTARequestor.h"
 
 #include <app/util/util.h>
 #include <platform/CHIPDeviceLayer.h>
 
-#include <app/OperationalDeviceProxy.h>
 #include <app/server/Server.h>
 #include <app/util/util.h>
-#include <controller/CHIPDeviceControllerFactory.h>
-#include <controller/CommissioneeDeviceProxy.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
-#include <credentials/DeviceAttestationCredsProvider.h>
-#include <credentials/examples/DeviceAttestationCredsExample.h>
+#include <inet/IPAddress.h>
 #include <lib/support/CHIPArgParser.hpp>
+#include <netinet/in.h>
 #include <platform/CHIPDeviceLayer.h>
+
+#include <zap-generated/CHIPClientCallbacks.h>
 #include <zap-generated/CHIPClusters.h>
 
 using chip::DeviceProxy;
@@ -46,17 +44,18 @@ using chip::Callback::Callback;
 using chip::Inet::IPAddress;
 using chip::System::Layer;
 using chip::Transport::PeerAddress;
-using namespace chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
-using namespace chip::DeviceLayer;
+using namespace ::chip::app::Clusters::OtaSoftwareUpdateProvider::Commands;
+using namespace ::chip::DeviceLayer;
+using namespace ::chip::Inet;
 
-OTARequestorImpl OTARequestorImpl::sInstance;
+static OTARequestorInterface * sInstance;
 
 constexpr const char gRequestorLocation[]                  = { 'U', 'S' };
 constexpr EmberAfOTADownloadProtocol gRequestorProtocols[] = { EMBER_ZCL_OTA_DOWNLOAD_PROTOCOL_BDX_SYNCHRONOUS };
 constexpr chip::EndpointId gOtaProviderEndpoint            = 0;
 constexpr bool gRequestorCanConsent                        = false;
 
-static void OnProviderConnected(void * context, chip::DeviceProxy * deviceProxy);
+static void OnProviderConnected(void * context, chip::OperationalDeviceProxy * deviceProxy);
 static void OnProviderConnectionFailure(void * context, chip::NodeId deviceId, CHIP_ERROR error);
 
 static void
@@ -67,20 +66,21 @@ static void OnQueryImageFailure(void * context, EmberAfStatus status);
 static Callback<OnDeviceConnected> mOnConnectedCallback(OnProviderConnected, nullptr);
 static Callback<OnDeviceConnectionFailure> mOnConnectionFailureCallback(OnProviderConnectionFailure, nullptr);
 
-OTARequestorImpl::OTARequestorImpl()
+MbedOTARequestor::MbedOTARequestor(AnnounceProviderCallback announceProviderCallback = nullptr,
+                                   ProviderResponseCallback providerResponseCallback = nullptr)
 {
-    mOperationalDeviceProxy   = nullptr;
-    mProviderNodeId           = chip::kUndefinedNodeId;
-    mProviderFabricIndex      = chip::kUndefinedFabricIndex;
-    mConnectProviderCallback  = nullptr;
-    mProviderResponseCallback = nullptr;
+    mProviderNodeId      = chip::kUndefinedNodeId;
+    mProviderFabricIndex = chip::kUndefinedFabricIndex;
+
+    mAnnounceProviderCallback = announceProviderCallback;
+    mProviderResponseCallback = providerResponseCallback;
 
     mUpdateDetails.updateVersionString = chip::MutableCharSpan(mUpdateVersion, kVersionBufLen);
     mUpdateDetails.updateFileName      = chip::MutableCharSpan(mUpdateFileName, kFileNameBufLen);
     mUpdateDetails.updateToken         = chip::MutableByteSpan(mUpdateToken, kTokenBufLen);
 }
 
-chip::CharSpan OTARequestorImpl::GetFileNameFromURI(chip::CharSpan imageURI)
+chip::CharSpan MbedOTARequestor::GetFileNameFromURI(chip::CharSpan imageURI)
 {
     constexpr char delimiter = '/';
 
@@ -95,39 +95,87 @@ chip::CharSpan OTARequestorImpl::GetFileNameFromURI(chip::CharSpan imageURI)
     return imageURI;
 }
 
-bool OTARequestorImpl::HandleAnnounceOTAProvider(
+EmberAfStatus MbedOTARequestor::HandleAnnounceOTAProvider(
     chip::app::CommandHandler * commandObj, const chip::app::ConcreteCommandPath & commandPath,
     const chip::app::Clusters::OtaSoftwareUpdateRequestor::Commands::AnnounceOtaProvider::DecodableType & commandData)
 {
     if (commandObj == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Cannot access get FabricIndex");
-        return true;
+        return EMBER_ZCL_STATUS_FAILURE;
     }
 
     mProviderNodeId      = commandData.providerLocation;
     mProviderFabricIndex = commandObj->GetAccessingFabricIndex();
     mAnnouncementReason  = commandData.announcementReason;
-    mProviderIpAddress   = commandData.metadataForNode;
+    IPAddress ipAddr;
+    IPAddress::FromString(reinterpret_cast<const char *>(commandData.metadataForNode.Value().data()),
+                          commandData.metadataForNode.Value().size(), ipAddr);
+    SetIpAddress(ipAddr);
 
+    char strIpAddr[INET6_ADDRSTRLEN];
+    ipAddr.ToString(strIpAddr);
     ChipLogProgress(SoftwareUpdate, "OTA Requestor received AnnounceOTAProvider");
     ChipLogProgress(SoftwareUpdate, "  FabricIndex: %" PRIu8, mProviderFabricIndex);
     ChipLogProgress(SoftwareUpdate, "  ProviderNodeID: %" PRIu64 " (0x%" PRIX64 ")", mProviderNodeId, mProviderNodeId);
     ChipLogProgress(SoftwareUpdate, "  VendorID: %" PRIu16 " (0x%" PRIX16 ")", commandData.vendorId, commandData.vendorId);
-    ChipLogProgress(SoftwareUpdate, "  ProviderIP: %.*s", static_cast<int>(mProviderIpAddress.Value().size()),
-                    reinterpret_cast<const char *>(mProviderIpAddress.Value().data()));
+    ChipLogProgress(SoftwareUpdate, "  ProviderIP: %s", strIpAddr);
     ChipLogProgress(SoftwareUpdate, "  AnnouncementReason: %" PRIu8, mAnnouncementReason);
 
-    if (mConnectProviderCallback)
+    if (mAnnounceProviderCallback)
     {
-        mConnectProviderCallback(mProviderNodeId, mProviderFabricIndex, mProviderIpAddress);
+        mAnnounceProviderCallback();
     }
 
+    return EMBER_ZCL_STATUS_SUCCESS;
+}
+
+bool MbedOTARequestor::HandleQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI,
+                                                uint32_t softwareVersion, chip::CharSpan softwareVersionString,
+                                                chip::ByteSpan updateToken, bool userConsentNeeded,
+                                                chip::ByteSpan metadataForRequestor)
+{
+    switch (status)
+    {
+    case EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE:
+        ChipLogProgress(SoftwareUpdate, "Update available");
+        break;
+    case EMBER_ZCL_OTA_QUERY_STATUS_BUSY:
+        ChipLogProgress(SoftwareUpdate, "OTA provider busy");
+        return false;
+    case EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE:
+        ChipLogProgress(SoftwareUpdate, "Update not available");
+        return false;
+    }
+
+    ChipLogProgress(SoftwareUpdate, "  Image URI: %.*s", static_cast<int>(imageURI.size()), imageURI.data());
+    ChipLogProgress(SoftwareUpdate, "  Version: %lu name: %.*s", softwareVersion, static_cast<int>(softwareVersionString.size()),
+                    softwareVersionString.data());
+
+    mUpdateDetails.updateVersion = softwareVersion;
+    memcpy((void *) mUpdateDetails.updateVersionString.begin(), softwareVersionString.data(), softwareVersionString.size());
+    mUpdateDetails.updateVersionString.reduce_size(softwareVersionString.size());
+    auto fileName = GetFileNameFromURI(imageURI);
+    memcpy((void *) mUpdateDetails.updateFileName.begin(), fileName.data(), fileName.size());
+    mUpdateDetails.updateFileName.reduce_size(fileName.size());
+    memcpy((void *) mUpdateDetails.updateToken.begin(), updateToken.data(), updateToken.size());
+    mUpdateDetails.updateToken.reduce_size(updateToken.size());
+
+    ChipLogProgress(SoftwareUpdate, "  Image name: %.*s", static_cast<int>(mUpdateDetails.updateFileName.size()),
+                    mUpdateDetails.updateFileName.data());
+
+    if (mProviderResponseCallback)
+    {
+        mProviderResponseCallback(&mUpdateDetails);
+    }
     return false;
 }
 
-void OTARequestorImpl::ConnectProvider(NodeId peerNodeId, FabricIndex peerFabricIndex, const char * ipAddress)
+void MbedOTARequestor::ConnectProvider()
 {
+    chip::NodeId peerNodeId           = mProviderNodeId;
+    chip::FabricIndex peerFabricIndex = mProviderFabricIndex;
+
     Server * server           = &(Server::GetInstance());
     chip::FabricInfo * fabric = server->GetFabricTable().FindFabricWithIndex(peerFabricIndex);
     if (fabric == nullptr)
@@ -144,30 +192,29 @@ void OTARequestorImpl::ConnectProvider(NodeId peerNodeId, FabricIndex peerFabric
         .imDelegate     = chip::Platform::New<chip::Controller::DeviceControllerInteractionModelDelegate>(),
     };
 
-    mOperationalDeviceProxy = chip::Platform::New<chip::OperationalDeviceProxy>(initParams, fabric->GetPeerIdForNode(peerNodeId));
-    if (mOperationalDeviceProxy == nullptr)
+    chip::OperationalDeviceProxy * operationalDeviceProxy =
+        chip::Platform::New<chip::OperationalDeviceProxy>(initParams, fabric->GetPeerIdForNode(peerNodeId));
+    if (operationalDeviceProxy == nullptr)
     {
         ChipLogError(SoftwareUpdate, "Failed in creating an instance of OperationalDeviceProxy");
         return;
     }
 
-    server->SetOperationalDeviceProxy(mOperationalDeviceProxy);
+    server->SetOperationalDeviceProxy(operationalDeviceProxy);
 
     // Explicitly calling UpdateDeviceData() should not be needed once OperationalDeviceProxy can resolve IP address from node
     // ID and fabric index
-    IPAddress ipAddr;
-    IPAddress::FromString(ipAddress, ipAddr);
-    PeerAddress addr = PeerAddress::UDP(ipAddr, CHIP_PORT);
-    mOperationalDeviceProxy->UpdateDeviceData(addr, mOperationalDeviceProxy->GetMRPConfig());
+    PeerAddress addr = PeerAddress::UDP(mProviderIpAddress, CHIP_PORT);
+    operationalDeviceProxy->UpdateDeviceData(addr, operationalDeviceProxy->GetMRPConfig());
 
-    CHIP_ERROR err = mOperationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
+    CHIP_ERROR err = operationalDeviceProxy->Connect(&mOnConnectedCallback, &mOnConnectionFailureCallback);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Cannot establish connection to peer device: %" CHIP_ERROR_FORMAT, err.Format());
     }
 }
 
-void OnProviderConnected(void * context, chip::DeviceProxy * deviceProxy)
+void OnProviderConnected(void * context, chip::OperationalDeviceProxy * deviceProxy)
 {
     ChipLogProgress(SoftwareUpdate, "OnProviderConnected");
     chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
@@ -214,10 +261,12 @@ void OnQueryImageResponse(void * context, const QueryImageResponse::DecodableTyp
 {
     ChipLogProgress(SoftwareUpdate, "OnQueryImageResponse");
 
-    OTARequestorImpl::GetInstance().HandleQueryImageResponse(
-        context, response.status, response.delayedActionTime.ValueOr(0), response.imageURI.ValueOr({}),
-        response.softwareVersion.ValueOr(0), response.softwareVersionString.ValueOr({}), response.updateToken.ValueOr({}),
-        response.userConsentNeeded.ValueOr(false), response.metadataForRequestor.ValueOr({}));
+    MbedOTARequestor * requestor = static_cast<MbedOTARequestor *>(GetRequestorInstance());
+
+    requestor->HandleQueryImageResponse(context, response.status, response.delayedActionTime.ValueOr(0),
+                                        response.imageURI.ValueOr({}), response.softwareVersion.ValueOr(0),
+                                        response.softwareVersionString.ValueOr({}), response.updateToken.ValueOr({}),
+                                        response.userConsentNeeded.ValueOr(false), response.metadataForRequestor.ValueOr({}));
 }
 
 void OnQueryImageFailure(void * context, EmberAfStatus status)
@@ -225,43 +274,12 @@ void OnQueryImageFailure(void * context, EmberAfStatus status)
     ChipLogError(SoftwareUpdate, "QueryImage failure %" PRIu8, status);
 }
 
-bool OTARequestorImpl::HandleQueryImageResponse(void * context, uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI,
-                                                uint32_t softwareVersion, chip::CharSpan softwareVersionString,
-                                                chip::ByteSpan updateToken, bool userConsentNeeded,
-                                                chip::ByteSpan metadataForRequestor)
+OTARequestorInterface * GetRequestorInstance()
 {
-    switch (status)
-    {
-    case EMBER_ZCL_OTA_QUERY_STATUS_UPDATE_AVAILABLE:
-        ChipLogProgress(SoftwareUpdate, "Update available");
-        break;
-    case EMBER_ZCL_OTA_QUERY_STATUS_BUSY:
-        ChipLogProgress(SoftwareUpdate, "OTA provider busy");
-        return false;
-    case EMBER_ZCL_OTA_QUERY_STATUS_NOT_AVAILABLE:
-        ChipLogProgress(SoftwareUpdate, "Update not available");
-        return false;
-    }
+    return sInstance;
+}
 
-    ChipLogProgress(SoftwareUpdate, "  Image URI: %.*s", static_cast<int>(imageURI.size()), imageURI.data());
-    ChipLogProgress(SoftwareUpdate, "  Version: %d name: %.*s", softwareVersion, static_cast<int>(softwareVersionString.size()),
-                    softwareVersionString.data());
-
-    mUpdateDetails.updateVersion = softwareVersion;
-    memcpy((void *) mUpdateDetails.updateVersionString.begin(), softwareVersionString.data(), softwareVersionString.size());
-    mUpdateDetails.updateVersionString.reduce_size(softwareVersionString.size());
-    auto fileName = GetFileNameFromURI(imageURI);
-    memcpy((void *) mUpdateDetails.updateFileName.begin(), fileName.data(), fileName.size());
-    mUpdateDetails.updateFileName.reduce_size(fileName.size());
-    memcpy((void *) mUpdateDetails.updateToken.begin(), updateToken.data(), updateToken.size());
-    mUpdateDetails.updateToken.reduce_size(updateToken.size());
-
-    ChipLogProgress(SoftwareUpdate, "  Image name: %.*s", static_cast<int>(mUpdateDetails.updateFileName.size()),
-                    mUpdateDetails.updateFileName.data());
-
-    if (mProviderResponseCallback)
-    {
-        mProviderResponseCallback(&mUpdateDetails);
-    }
-    return false;
+void SetRequestorInstance(OTARequestorInterface * instance)
+{
+    sInstance = instance;
 }
