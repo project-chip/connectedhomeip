@@ -924,7 +924,7 @@
 // Array of device ids
 #define FIXED_DEVICE_IDS                                                                                                           \
     {                                                                                                                              \
-        0, 0                                                                                                                       \
+        14, 257                                                                                                                    \
     }
 
 // Array of device versions
