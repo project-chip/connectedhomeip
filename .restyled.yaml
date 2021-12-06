@@ -68,6 +68,7 @@ exclude:
     - "src/android/CHIPTool/gradlew" # gradle wrapper generated file
     - "third_party/android_deps/gradlew" # gradle wrapper generated file
     - "src/controller/python/chip/clusters/Objects.py" # generated file, no point to restyle
+    - "src/controller/python/chip/clusters/CHIPClusters.py" # generated file, no point to restyle
 
 
 changed_paths:
