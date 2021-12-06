@@ -18,11 +18,13 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include <app/AttributeAccessInterface.h>
 #include <lib/support/ThreadOperationalDataset.h>
 #include <platform/Linux/GlibTypeDeleter.h>
 #include <platform/Linux/dbus/openthread/introspect.h>
+#include <platform/NetworkCommissioning.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 
@@ -50,6 +52,9 @@ public:
 
     CHIP_ERROR _SetThreadProvision(ByteSpan netInfo);
 
+    void _OnNetworkScanFinished(GAsyncResult * res);
+    static void _OnNetworkScanFinished(GObject * source_object, GAsyncResult * res, gpointer user_data);
+
     void _ErasePersistentInfo();
 
     bool _IsThreadProvisioned();
@@ -58,7 +63,10 @@ public:
 
     bool _IsThreadAttached();
 
+    CHIP_ERROR AttachToThreadNetwork(ByteSpan netInfo, ThreadNetworkCommissioningDelegate::Callback * callback);
+
     CHIP_ERROR _SetThreadEnabled(bool val);
+    static void _OnThreadAttachFinished(GObject * source_object, GAsyncResult * res, gpointer user_data);
 
     ConnectivityManager::ThreadDeviceType _GetThreadDeviceType();
 
@@ -90,6 +98,8 @@ public:
 
     CHIP_ERROR _WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
+    CHIP_ERROR StartThreadScan(ThreadNetworkCommissioningDelegate::Callback * callback);
+
     ~ThreadStackManagerImpl() = default;
 
     static ThreadStackManagerImpl sInstance;
@@ -106,6 +116,19 @@ private:
 
     static constexpr char kPropertyDeviceRole[] = "DeviceRole";
 
+    struct ThreadNetworkScanned
+    {
+        uint16_t panId;
+        uint64_t extendedPanId;
+        uint8_t networkName[16];
+        uint8_t networkNameLen;
+        uint16_t channel;
+        uint8_t version;
+        uint64_t extendedAddress;
+        int8_t rssi;
+        uint8_t lqi;
+    };
+
     std::unique_ptr<OpenthreadIoOpenthreadBorderRouter, GObjectDeleter> mProxy;
 
     static void OnDbusPropertiesChanged(OpenthreadIoOpenthreadBorderRouter * proxy, GVariant * changed_properties,
@@ -113,6 +136,9 @@ private:
     void ThreadDevcieRoleChangedHandler(const gchar * role);
 
     Thread::OperationalDataset mDataset = {};
+
+    ThreadNetworkCommissioningDelegate::Callback * mpNetworkCommissioningCallback;
+    std::vector<ThreadNetworkScanned> mNetworkScanned;
 
     bool mAttached;
 };

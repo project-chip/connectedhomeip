@@ -27,6 +27,9 @@
 
 #include <cstdlib>
 #include <new>
+#include <string>
+#include <utility>
+#include <vector>
 
 #include <ifaddrs.h>
 #include <stdio.h>
@@ -69,12 +72,16 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 char ConnectivityManagerImpl::sWiFiIfName[];
 #endif
 
+std::vector<ConnectivityManagerImpl::WiFiNetworkScanned> ConnectivityManagerImpl::mScannedNetwork;
+WiFiNetworkCommissioningDelegate::Callback * ConnectivityManagerImpl::mpNetworkCommissioningCallback;
+
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     mWiFiStationMode              = kWiFiStationMode_Disabled;
     mWiFiStationReconnectInterval = System::Clock::Milliseconds32(CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL);
 #endif
+    mpNetworkCommissioningCallback = nullptr;
 
     if (ConnectivityUtils::GetEthInterfaceName(mEthIfName, IFNAMSIZ) == CHIP_NO_ERROR)
     {
@@ -427,6 +434,7 @@ void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object,
         ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to wpa_supplicant interface proxy");
 
         g_signal_connect(mWpaSupplicant.iface, "properties-changed", G_CALLBACK(_OnWpaPropertiesChanged), NULL);
+        g_signal_connect(mWpaSupplicant.iface, "scan-done", G_CALLBACK(_OnWpaInterfaceScanDone), NULL);
     }
     else
     {
@@ -1108,6 +1116,235 @@ CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
     wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
 
     return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::StartWiFiScan(ByteSpan ssid, WiFiNetworkCommissioningDelegate::Callback * callback)
+{
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+    VerifyOrReturnError(mWpaSupplicant.iface != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    CHIP_ERROR ret  = CHIP_NO_ERROR;
+    GError * err    = nullptr;
+    GVariant * args = nullptr;
+    GVariantBuilder builder;
+    gboolean result;
+
+    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+    g_variant_builder_add(&builder, "{sv}", "Type", g_variant_new_string("active"));
+    args = g_variant_builder_end(&builder);
+
+    result = wpa_fi_w1_wpa_supplicant1_interface_call_scan_sync(mWpaSupplicant.iface, args, nullptr, &err);
+
+    if (result)
+    {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: initialized network scan.");
+        mpNetworkCommissioningCallback = callback;
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to start network scan: %s", err ? err->message : "unknown error");
+        ret = CHIP_ERROR_INTERNAL;
+    }
+
+    if (err != nullptr)
+    {
+        g_error_free(err);
+    }
+    return ret;
+}
+
+bool ConnectivityManagerImpl::_GetBssInfo(const gchar * bssPath, ConnectivityManagerImpl::WiFiNetworkScanned & result)
+{
+    std::unique_ptr<GError, GErrorDeleter> err;
+    std::unique_ptr<WpaFiW1Wpa_supplicant1BSS, GObjectDeleter> bss(
+        wpa_fi_w1_wpa_supplicant1_bss_proxy_new_for_bus_sync(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
+                                                             bssPath, nullptr, &MakeUniquePointerReceiver(err).Get()));
+
+    if (bss == nullptr)
+    {
+        return false;
+    }
+
+    WpaFiW1Wpa_supplicant1BSSProxy * bssProxy = WPA_FI_W1_WPA_SUPPLICANT1_BSS_PROXY(bss.get());
+
+    std::unique_ptr<GVariant, GVariantDeleter> ssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "SSID"));
+    std::unique_ptr<GVariant, GVariantDeleter> bssid(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(bssProxy), "BSSID"));
+
+    const guchar * ssidStr       = nullptr;
+    const guchar * bssidBuf      = nullptr;
+    char bssidStr[2 * 6 + 5 + 1] = { 0 };
+    gsize ssidLen                = 0;
+    gsize bssidLen               = 0;
+    gint16 signal                = wpa_fi_w1_wpa_supplicant1_bss_get_signal(bss.get());
+
+    ssidStr  = reinterpret_cast<const guchar *>(g_variant_get_fixed_array(ssid.get(), &ssidLen, sizeof(guchar)));
+    bssidBuf = reinterpret_cast<const guchar *>(g_variant_get_fixed_array(bssid.get(), &bssidLen, sizeof(guchar)));
+
+    if (bssidLen == 6)
+    {
+        snprintf(bssidStr, sizeof(bssidStr), "%02x:%02x:%02x:%02x:%02x:%02x", bssidBuf[0], bssidBuf[1], bssidBuf[2], bssidBuf[3],
+                 bssidBuf[4], bssidBuf[5]);
+    }
+    else
+    {
+        bssidLen = 0;
+        ChipLogError(DeviceLayer, "Got a network with bssid not equals to 6");
+    }
+    ChipLogDetail(DeviceLayer, "Network Found: %.*s (%s) Signal:%" PRId16, int(ssidLen), ssidStr, bssidStr, signal);
+
+    // A flag for enterprise encryption option to avoid returning open for these networks by mistake
+    // TODO: The following code will mistakenly recognize WEP encryption as OPEN network, this should be fixed by reading
+    // IEs (infomation elements) field instead of reading cooked data.
+
+    static constexpr uint8_t kEAP = (1 << 7);
+
+    auto IsNetworkWPAPSK = [](GVariant * wpa) -> uint8_t {
+        if (wpa == nullptr)
+        {
+            return 0;
+        }
+
+        GVariant * keyMgmt = g_variant_lookup_value(wpa, "KeyMgmt", nullptr);
+        if (keyMgmt == nullptr)
+        {
+            return 0;
+        }
+        const gchar ** keyMgmts        = g_variant_get_strv(keyMgmt, nullptr);
+        const gchar ** keyMgmtsForFree = keyMgmts;
+        uint8_t res                    = 0;
+        for (const gchar * keyMgmtVal = (keyMgmts != nullptr ? *keyMgmts : nullptr); keyMgmtVal != nullptr;
+             keyMgmtVal               = *(++keyMgmts))
+        {
+            if (g_strcasecmp(keyMgmtVal, "wpa-psk") == 0 || g_strcasecmp(keyMgmtVal, "wpa-none") == 0)
+            {
+                res |= (1 << 2); // SecurityType::WPA_PERSONAL
+            }
+            else if (g_strcasecmp(keyMgmtVal, "wpa-eap"))
+            {
+                res |= (kEAP);
+            }
+        }
+        g_variant_unref(keyMgmt);
+        g_free(keyMgmtsForFree);
+        return res;
+    };
+    auto IsNetworkWPA2PSK = [](GVariant * rsn) -> uint8_t {
+        if (rsn == nullptr)
+        {
+            return 0;
+        }
+        GVariant * keyMgmt = g_variant_lookup_value(rsn, "KeyMgmt", nullptr);
+        if (keyMgmt == nullptr)
+        {
+            return 0;
+        }
+        const gchar ** keyMgmts        = g_variant_get_strv(keyMgmt, nullptr);
+        const gchar ** keyMgmtsForFree = keyMgmts;
+        uint8_t res                    = 0;
+        for (const gchar * keyMgmtVal = (keyMgmts != nullptr ? *keyMgmts : nullptr); keyMgmtVal != nullptr;
+             keyMgmtVal               = *(++keyMgmts))
+        {
+            if (g_strcasecmp(keyMgmtVal, "wpa-psk") == 0 || g_strcasecmp(keyMgmtVal, "wpa-psk-sha256") == 0 ||
+                g_strcasecmp(keyMgmtVal, "wpa-ft-psk") == 0)
+            {
+                res |= (1 << 3); // SecurityType::WPA2_PERSONAL
+            }
+            else if (g_strcasecmp(keyMgmtVal, "wpa-eap") == 0 || g_strcasecmp(keyMgmtVal, "wpa-eap-sha256") == 0 ||
+                     g_strcasecmp(keyMgmtVal, "wpa-ft-eap") == 0)
+            {
+                res |= kEAP;
+            }
+            else if (g_strcasecmp(keyMgmtVal, "sae") == 0)
+            {
+                // wpa_supplicant will include "sae" in KeyMgmt field for WPA3 WiFi, this is not included in the wpa_supplicant
+                // document.
+                res |= (1 << 4); // SecurityType::WPA3_PERSONAL
+            }
+        }
+        g_variant_unref(keyMgmt);
+        g_free(keyMgmtsForFree);
+        return res;
+    };
+    auto GetNetworkSecurityType = [IsNetworkWPAPSK, IsNetworkWPA2PSK](WpaFiW1Wpa_supplicant1BSSProxy * proxy) -> uint8_t {
+        std::unique_ptr<GVariant, GVariantDeleter> wpa(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "WPA"));
+        std::unique_ptr<GVariant, GVariantDeleter> rsn(g_dbus_proxy_get_cached_property(G_DBUS_PROXY(proxy), "RSN"));
+
+        uint8_t res = IsNetworkWPAPSK(wpa.get()) | IsNetworkWPA2PSK(rsn.get());
+        if (res == 0)
+        {
+            res = 1; // Open
+        }
+        return res & (0x7F);
+    };
+
+    memcpy(result.ssid, ssidStr, ssidLen);
+    memcpy(result.bssid, bssidBuf, bssidLen);
+    if (signal < INT8_MIN)
+    {
+        result.rssi = INT8_MIN;
+    }
+    else if (signal > INT8_MAX)
+    {
+        result.rssi = INT8_MAX;
+    }
+    else
+    {
+        result.rssi = static_cast<uint8_t>(signal);
+    }
+
+    // TODO: Fill band and channel
+    result.frequencyBand = 0;
+    result.channel       = 0;
+    result.security      = GetNetworkSecurityType(bssProxy);
+
+    return true;
+}
+
+void ConnectivityManagerImpl::_OnWpaInterfaceScanDone(GObject * source_object, GAsyncResult * res, gpointer user_data)
+{
+    ChipLogProgress(DeviceLayer, "wpa_supplicant: network scan done");
+    gchar ** bsss    = wpa_fi_w1_wpa_supplicant1_interface_dup_bsss(mWpaSupplicant.iface);
+    gchar ** oldBsss = bsss;
+    if (bsss == nullptr)
+    {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: no network found");
+        return;
+    }
+
+    mScannedNetwork.clear();
+
+    for (const gchar * bssPath = (bsss != nullptr ? *bsss : nullptr); bssPath != nullptr; bssPath = *(++bsss))
+    {
+        WiFiNetworkScanned network;
+        if (_GetBssInfo(bssPath, network))
+        {
+            mScannedNetwork.push_back(network);
+        }
+    }
+
+    DeviceLayer::SystemLayer().ScheduleLambda([]() {
+        std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+        std::vector<app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type> scanResults;
+
+        for (auto & network : mScannedNetwork)
+        {
+            app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type scanResult;
+            scanResult.security = network.security;
+            scanResult.ssid     = ByteSpan(network.ssid, network.ssidLen);
+            scanResult.bssid    = ByteSpan(network.bssid, 6);
+            scanResult.channel  = network.channel;
+            scanResult.wiFiBand = network.frequencyBand;
+            scanResult.rssi     = network.rssi;
+            scanResults.push_back(scanResult);
+        }
+
+        mpNetworkCommissioningCallback->OnScanFinished(
+            CHIP_NO_ERROR, CharSpan(),
+            Span<app::Clusters::NetworkCommissioning::Structs::WiFiInterfaceScanResult::Type>(scanResults.data(),
+                                                                                              scanResults.size()));
+    });
+
+    g_strfreev(oldBsss);
 }
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA

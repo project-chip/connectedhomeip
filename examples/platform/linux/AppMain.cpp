@@ -22,10 +22,12 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <lib/core/CHIPError.h>
 #include <lib/core/NodeId.h>
+#include <platform/Linux/NetworkCommissioningDelegate.h>
 
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/DeviceAttestationVerifier.h>
@@ -86,6 +88,20 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
         ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
     }
 }
+} // namespace
+
+// Network commissioning
+namespace {
+DeviceLayer::LinuxNetworkCommissioningDelegate sNetworkCommissioningDelegate;
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+app::Clusters::NetworkCommissioning::SingleNetworkInstance sThreadNetworkCommissioningInstance(
+    0 /* Endpoint Id */, static_cast<DeviceLayer::ThreadNetworkCommissioningDelegate *>(&sNetworkCommissioningDelegate));
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+app::Clusters::NetworkCommissioning::SingleNetworkInstance
+    sWiFiNetworkCommissioningInstance(1 /* Endpoint Id */,
+                                      static_cast<DeviceLayer::WiFiNetworkCommissioningDelegate *>(&sNetworkCommissioningDelegate));
+#endif
 } // namespace
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
@@ -426,6 +442,13 @@ void ChipLinuxAppMainLoop()
     chip::Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
+    chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(&sThreadNetworkCommissioningInstance);
+#endif
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    chip::app::InteractionModelEngine::GetInstance()->RegisterCommandHandler(&sWiFiNetworkCommissioningInstance);
+#endif
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

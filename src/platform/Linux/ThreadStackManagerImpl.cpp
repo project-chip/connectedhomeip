@@ -276,20 +276,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
     VerifyOrReturnError(mProxy, CHIP_ERROR_INCORRECT_STATE);
     if (val)
     {
-        std::unique_ptr<GError, GErrorDeleter> err;
-        gboolean result =
-            openthread_io_openthread_border_router_call_attach_sync(mProxy.get(), nullptr, &MakeUniquePointerReceiver(err).Get());
-        if (err)
-        {
-            ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Attach", err->message);
-            return CHIP_ERROR_INTERNAL;
-        }
-
-        if (!result)
-        {
-            ChipLogError(DeviceLayer, "openthread: _SetThreadEnabled calling %s failed: %s", "Attach", "return false");
-            return CHIP_ERROR_INTERNAL;
-        }
+        openthread_io_openthread_border_router_call_attach(mProxy.get(), nullptr, _OnThreadAttachFinished, this);
     }
     else
     {
@@ -309,6 +296,43 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
         }
     }
     return CHIP_NO_ERROR;
+}
+
+void ThreadStackManagerImpl::_OnThreadAttachFinished(GObject * source_object, GAsyncResult * res, gpointer user_data)
+{
+    ThreadStackManagerImpl * this_ = reinterpret_cast<ThreadStackManagerImpl *>(user_data);
+    std::unique_ptr<GVariant, GVariantDeleter> attachRes;
+    std::unique_ptr<GError, GErrorDeleter> err;
+    {
+        gboolean result = openthread_io_openthread_border_router_call_attach_finish(this_->mProxy.get(), res,
+                                                                                    &MakeUniquePointerReceiver(err).Get());
+        if (!result)
+        {
+            ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
+                         err == nullptr ? "unknown error" : err->message);
+            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
+                if (this_->mpNetworkCommissioningCallback != nullptr)
+                {
+                    // TODO: Replace this with actual thread attach result.
+                    this_->mpNetworkCommissioningCallback->OnConnectThreadResult(
+                        app::Clusters::NetworkCommissioning::NetworkCommissioningStatus::kUnknownError, CharSpan(), 0);
+                    this_->mpNetworkCommissioningCallback = nullptr;
+                }
+            });
+        }
+        else
+        {
+            DeviceLayer::SystemLayer().ScheduleLambda([this_]() {
+                if (this_->mpNetworkCommissioningCallback != nullptr)
+                {
+                    // TODO: Replace this with actual thread attach result.
+                    this_->mpNetworkCommissioningCallback->OnConnectThreadResult(
+                        app::Clusters::NetworkCommissioning::NetworkCommissioningStatus::kSuccess, CharSpan(), 0);
+                    this_->mpNetworkCommissioningCallback = nullptr;
+                }
+            });
+        }
+    }
 }
 
 ConnectivityManager::ThreadDeviceType ThreadStackManagerImpl::_GetThreadDeviceType()
@@ -472,6 +496,114 @@ CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
+CHIP_ERROR ThreadStackManagerImpl::StartThreadScan(ThreadNetworkCommissioningDelegate::Callback * callback)
+{
+    mpNetworkCommissioningCallback = callback;
+    openthread_io_openthread_border_router_call_scan(mProxy.get(), nullptr, _OnNetworkScanFinished, this);
+    return CHIP_NO_ERROR;
+}
+
+void ThreadStackManagerImpl::_OnNetworkScanFinished(GObject * source_object, GAsyncResult * res, gpointer user_data)
+{
+    ThreadStackManagerImpl * this_ = reinterpret_cast<ThreadStackManagerImpl *>(user_data);
+    this_->_OnNetworkScanFinished(res);
+}
+
+void ThreadStackManagerImpl::_OnNetworkScanFinished(GAsyncResult * res)
+{
+    std::unique_ptr<GVariant, GVariantDeleter> scan_result;
+    std::unique_ptr<GError, GErrorDeleter> err;
+    {
+        gboolean result = openthread_io_openthread_border_router_call_scan_finish(
+            mProxy.get(), &MakeUniquePointerReceiver(scan_result).Get(), res, &MakeUniquePointerReceiver(err).Get());
+        if (!result)
+        {
+            ChipLogError(DeviceLayer, "Failed to perform finish Thread network scan: %s",
+                         err == nullptr ? "unknown error" : err->message);
+            DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+                if (mpNetworkCommissioningCallback != nullptr)
+                {
+                    mpNetworkCommissioningCallback->OnScanFinished(
+                        CHIP_ERROR_INTERNAL, CharSpan(),
+                        Span<app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type>());
+                }
+            });
+        }
+    }
+
+    if (g_variant_n_children(scan_result.get()) > 0)
+    {
+        std::unique_ptr<GVariantIter, GVariantIterDeleter> iter;
+        g_variant_get(scan_result.get(), "a(tstayqqyyyybb)", &MakeUniquePointerReceiver(iter).Get());
+        if (!iter)
+            return;
+
+        guint64 ext_address;
+        const gchar * network_name;
+        guint64 ext_panid;
+        const gchar * steering_data;
+        guint16 panid;
+        guint16 joiner_udp_port;
+        guint8 channel;
+        guint8 rssi;
+        guint8 lqi;
+        guint8 version;
+        gboolean is_native;
+        gboolean is_joinable;
+
+        while (g_variant_iter_loop(iter.get(), "(tstayqqyyyybb)", &ext_address, &network_name, &ext_panid, &steering_data, &panid,
+                                   &joiner_udp_port, &channel, &rssi, &lqi, &version, &is_native, &is_joinable))
+        {
+            ChipLogProgress(DeviceLayer,
+                            "Thread Network: %s (%016" PRIx64 ") ExtPanId(%016" PRIx64 ") RSSI %" PRIu16 " LQI %" PRIu8
+                            " Version %" PRIu8,
+                            network_name, ext_address, ext_panid, rssi, lqi, version);
+            ThreadNetworkScanned networkScanned;
+            networkScanned.panId         = panid;
+            networkScanned.extendedPanId = ext_panid;
+            size_t networkNameLen        = strlen(network_name);
+            if (networkNameLen > 16)
+            {
+                ChipLogProgress(DeviceLayer, "Network name is too long, ignore it.");
+                continue;
+            }
+            networkScanned.networkNameLen = static_cast<uint8_t>(networkNameLen);
+            memcpy(networkScanned.networkName, network_name, networkNameLen);
+            networkScanned.channel         = channel;
+            networkScanned.version         = version;
+            networkScanned.extendedAddress = 0;
+            networkScanned.rssi            = rssi;
+            networkScanned.lqi             = lqi;
+            mNetworkScanned.push_back(networkScanned);
+        }
+    }
+
+    DeviceLayer::SystemLayer().ScheduleLambda([this]() {
+        if (mpNetworkCommissioningCallback != nullptr)
+        {
+            std::vector<app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type> results;
+            for (const auto & r : mNetworkScanned)
+            {
+                app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type v;
+
+                v.panId           = r.panId;
+                v.extendedPanId   = r.extendedPanId;
+                v.networkName     = CharSpan(reinterpret_cast<const char *>(r.networkName), r.networkNameLen);
+                v.channel         = r.channel;
+                v.version         = r.version;
+                v.extendedAddress = r.extendedAddress;
+                v.rssi            = r.rssi;
+                v.lqi             = r.lqi;
+                results.push_back(v);
+            }
+            mpNetworkCommissioningCallback->OnScanFinished(
+                CHIP_NO_ERROR, CharSpan(),
+                Span<app::Clusters::NetworkCommissioning::Structs::ThreadInterfaceScanResult::Type>(results.data(),
+                                                                                                    results.size()));
+        }
+    });
+}
+
 void ThreadStackManagerImpl::_ResetThreadNetworkDiagnosticsCounts() {}
 
 CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId,
@@ -496,6 +628,16 @@ CHIP_ERROR ThreadStackManagerImpl::_WriteThreadNetworkDiagnosticAttributeToTlv(A
     }
 
     return err;
+}
+
+CHIP_ERROR
+ThreadStackManagerImpl::AttachToThreadNetwork(ByteSpan netInfo, ThreadNetworkCommissioningDelegate::Callback * callback)
+{
+    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(false));
+    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadProvision(netInfo));
+    ReturnErrorOnFailure(DeviceLayer::ThreadStackMgr().SetThreadEnabled(true));
+    mpNetworkCommissioningCallback = callback;
+    return CHIP_NO_ERROR;
 }
 
 ThreadStackManager & ThreadStackMgr()
