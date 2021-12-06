@@ -217,7 +217,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetSoftwareVersionString(char * buf, size_t
 {
     CHIP_ERROR err;
     size_t u32SoftwareVerSize = 0; // without counting null-terminator
-    err                       = ReadConfigValueStr(AndroidConfig::kConfigKey_SoftwareVersionString, buf, bufSize, u32SoftwareVerSize);
+    err = ReadConfigValueStr(AndroidConfig::kConfigKey_SoftwareVersionString, buf, bufSize, u32SoftwareVerSize);
 
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -232,7 +232,7 @@ CHIP_ERROR ConfigurationManagerImpl::GetHardwareVersionString(char * buf, size_t
 {
     CHIP_ERROR err;
     size_t hardwareVersionLen = 0; // without counting null-terminator
-    err                       = ReadConfigValueStr(AndroidConfig::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionLen);
+    err = ReadConfigValueStr(AndroidConfig::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionLen);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
