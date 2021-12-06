@@ -65,16 +65,6 @@ CHIP_ERROR ContentLauncherManager::proxyGetAcceptsHeader(chip::app::AttributeVal
     });
 }
 
-CHIP_ERROR ContentLauncherManager::proxyGetSupportedStreamingTypes(chip::app::AttributeValueEncoder & aEncoder)
-{
-    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
-        // TODO: Insert code here
-        ReturnErrorOnFailure(encoder.Encode(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_DASH));
-        ReturnErrorOnFailure(encoder.Encode(EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_HLS));
-        return CHIP_NO_ERROR;
-    });
-}
-
 ContentLaunchResponse ContentLauncherManager::proxyLaunchContentRequest(list<ContentLaunchParamater> parameterList, bool autoplay,
                                                                         string data)
 {
