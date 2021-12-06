@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
@@ -315,6 +316,8 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
 
 /**
  *  Fetch attribute value and version info and write to the AttributeReport provided.
+ *  The ReadSingleClusterData will do everything required for encoding an attribute, i.e. it will try to put one or more
+ * AttributeReportIB to the AttributeReportIBs::Builder.
  *  When the endpoint / cluster / attribute / event data specified by aClusterInfo does not exist, corresponding interaction model
  * error code will be put into the writer, and CHIP_NO_ERROR will be returned.
  *  If the data exists on the server, the data (with tag kData) and the data version (with tag kDataVersion) will be put
@@ -330,7 +333,8 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
  *  @retval  CHIP_NO_ERROR on success
  */
 CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIB::Builder & aAttributeReport);
+                                 AttributeReportIBs::Builder & aAttributeReports,
+                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 
 /**
  * TODO: Document.

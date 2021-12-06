@@ -136,7 +136,8 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath)
 }
 
 CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIB::Builder & aAttributeReport)
+                                 AttributeReportIBs::Builder & aAttributeReports,
+                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }

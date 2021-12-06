@@ -915,6 +915,8 @@ typedef void (*CHIPTestClusterClusterRangeRestrictedInt16uAttributeCallbackType)
     void *, chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterRangeRestrictedInt16sAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterListLongOctetStringAttributeCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Attributes::ListLongOctetString::TypeInfo::DecodableType &);
 typedef void (*CHIPTestClusterClusterTimedWriteBooleanAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterUnsupportedAttributeCallbackType)(

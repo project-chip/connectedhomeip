@@ -4053,6 +4053,11 @@ class ChipClusters:
                 "reportable": True,
                 "writable": True,
             },
+            0x0000002A: {
+                "attributeName": "ListLongOctetString",
+                "attributeId": 0x0000002A,
+                "type": "bytes",
+            },
             0x00000030: {
                 "attributeName": "TimedWriteBoolean",
                 "attributeId": 0x00000030,

@@ -45,7 +45,7 @@ exit:
 
 CHIP_ERROR TvChannelManager::proxyGetTvChannelList(chip::app::AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         // TODO: Insert code here
         int maximumVectorSize    = 2;
         char affiliateCallSign[] = "exampleASign";

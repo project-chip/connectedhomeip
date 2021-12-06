@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <app/AttributeAccessInterface.h>
 #include <app/ConcreteAttributePath.h>
 #include <app/MessageDef/AttributeReportIB.h>
 #include <lib/core/CHIPError.h>
@@ -31,6 +32,7 @@
 namespace chip {
 namespace Test {
 CHIP_ERROR ReadSingleMockClusterData(FabricIndex aAccessingFabricIndex, const app::ConcreteAttributePath & aPath,
-                                     app::AttributeReportIB::Builder & aAttributeReport);
+                                     app::AttributeReportIBs::Builder & aAttributeReports,
+                                     app::AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 } // namespace Test
 } // namespace chip
