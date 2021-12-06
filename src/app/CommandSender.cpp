@@ -27,7 +27,7 @@
 #include "CommandHandler.h"
 #include "InteractionModelEngine.h"
 #include "StatusResponse.h"
-#include <app/MessageDef/TimedRequestMessage.h>
+#include <app/TimedRequest.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 
@@ -77,7 +77,9 @@ CHIP_ERROR CommandSender::SendCommandRequest(SessionHandle session, System::Cloc
 
     if (mTimedInvokeTimeoutMs.HasValue())
     {
-        return SendTimedRequest(mTimedInvokeTimeoutMs.Value());
+        ReturnErrorOnFailure(TimedRequest::Send(mpExchangeCtx, mTimedInvokeTimeoutMs.Value()));
+        MoveToState(CommandState::AwaitingTimedStatus);
+        return CHIP_NO_ERROR;
     }
 
     return SendInvokeRequest();
@@ -144,7 +146,7 @@ exit:
     {
         Close();
     }
-    // Else we got a response to a Timed Request and just send the invoke.
+    // Else we got a response to a Timed Request and just sent the invoke.
 
     return err;
 }
@@ -298,23 +300,23 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
 
 CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct)
 {
-    CommandDataIB::Builder commandData;
     ReturnLogErrorOnFailure(AllocateBuffer());
 
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
     VerifyOrReturnError(mState == CommandState::Idle, CHIP_ERROR_INCORRECT_STATE);
-
-    commandData = mInvokeRequestBuilder.GetInvokeRequests().CreateCommandData();
-    ReturnLogErrorOnFailure(commandData.GetError());
-
-    ReturnLogErrorOnFailure(ConstructCommandPath(aCommandPathParams, commandData.CreatePath()));
+    InvokeRequests::Builder & invokeRequests = mInvokeRequestBuilder.GetInvokeRequests();
+    CommandDataIB::Builder & invokeRequest   = invokeRequests.CreateCommandData();
+    ReturnErrorOnFailure(invokeRequests.GetError());
+    CommandPathIB::Builder & path = invokeRequest.CreatePath();
+    ReturnErrorOnFailure(invokeRequest.GetError());
+    ReturnErrorOnFailure(path.Encode(aCommandPathParams));
 
     if (aStartDataStruct)
     {
-        ReturnLogErrorOnFailure(commandData.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)),
-                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
+        ReturnLogErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)),
+                                                                          TLV::kTLVType_Structure, mDataElementContainerType));
     }
 
     MoveToState(CommandState::AddingCommand);
@@ -355,44 +357,10 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
     }
 }
 
-CHIP_ERROR CommandSender::SendTimedRequest(uint16_t aTimeoutMs)
-{
-    using namespace Protocols::InteractionModel;
-    using namespace Messaging;
-
-    // The payload is an anonymous struct (2 bytes) containing a single
-    // 16-bit integer with a context tag (1 control byte, 1 byte tag, at
-    // most 2 bytes for the integer).  Use MessagePacketBuffer::New to
-    // account for other message-global overheads (MIC, etc).
-    System::PacketBufferHandle payload = MessagePacketBuffer::New(6);
-    VerifyOrReturnError(!payload.IsNull(), CHIP_ERROR_NO_MEMORY);
-
-    System::PacketBufferTLVWriter writer;
-    writer.Init(std::move(payload));
-
-    TimedRequestMessage::Builder builder;
-    ReturnErrorOnFailure(builder.Init(&writer));
-
-    builder.TimeoutMs(aTimeoutMs);
-    ReturnErrorOnFailure(builder.GetError());
-
-    ReturnErrorOnFailure(writer.Finalize(&payload));
-
-    ReturnErrorOnFailure(mpExchangeCtx->SendMessage(MsgType::TimedRequest, std::move(payload), SendMessageFlags::kExpectResponse));
-    MoveToState(CommandState::AwaitingTimedStatus);
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR CommandSender::HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
                                             StatusIB & aStatusIB)
 {
-    using namespace Protocols::InteractionModel;
-
-    VerifyOrReturnError(aPayloadHeader.HasMessageType(MsgType::StatusResponse), CHIP_ERROR_INVALID_MESSAGE_TYPE);
-
-    ReturnErrorOnFailure(StatusResponse::ProcessStatusResponse(std::move(aPayload), aStatusIB));
-
-    VerifyOrReturnError(aStatusIB.mStatus == Status::Success, CHIP_ERROR_IM_STATUS_CODE_RECEIVED);
+    ReturnErrorOnFailure(TimedRequest::HandleResponse(aPayloadHeader, std::move(aPayload), aStatusIB));
 
     return SendInvokeRequest();
 }

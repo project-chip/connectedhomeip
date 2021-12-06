@@ -62,36 +62,19 @@ EventNumber Engine::CountEvents(ReadHandler * apReadHandler, EventNumber * apIni
 
 CHIP_ERROR
 Engine::RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
-                            const ConcreteReadAttributePath & aPath)
+                            const ConcreteReadAttributePath & aPath, AttributeValueEncoder::AttributeEncodeState * aEncoderState)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    AttributeReportIB::Builder attributeReport = aAttributeReportIBs.CreateAttributeReport();
-    err                                        = attributeReport.GetError();
-    SuccessOrExit(attributeReport.GetError());
-
     ChipLogDetail(DataManagement, "<RE:Run> Cluster %" PRIx32 ", Attribute %" PRIx32 " is dirty", aPath.mClusterId,
                   aPath.mAttributeId);
-
     MatterPreAttributeReadCallback(aPath);
-    err = ReadSingleClusterData(aAccessingFabricIndex, aPath, attributeReport);
+    ReturnErrorOnFailure(ReadSingleClusterData(aAccessingFabricIndex, aPath, aAttributeReportIBs, aEncoderState));
     MatterPostAttributeReadCallback(aPath);
-    SuccessOrExit(err);
-    attributeReport.EndOfAttributeReportIB();
-    err = attributeReport.GetError();
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DataManagement, "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
-                     ChipLogValueMEI(aPath.mClusterId), err.Format());
-    }
-
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & aReportDataBuilder,
-                                                           ReadHandler * apReadHandler, bool * apHasMoreChunks)
+                                                           ReadHandler * apReadHandler, bool * apHasMoreChunks,
+                                                           bool * apHasEncodedData)
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
     bool attributeDataWritten = false;
@@ -100,9 +83,13 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
     const uint32_t kReservedSizeEndOfReportIBs = 1;
 
     aReportDataBuilder.Checkpoint(backup);
-    auto attributeReportIBs = aReportDataBuilder.CreateAttributeReportIBs();
+
+    AttributeReportIBs::Builder & attributeReportIBs = aReportDataBuilder.CreateAttributeReportIBs();
+    size_t emptyReportDataLength                     = 0;
+
     SuccessOrExit(err = aReportDataBuilder.GetError());
 
+    emptyReportDataLength = attributeReportIBs.GetWriter()->GetLengthWritten();
     //
     // Reserve enough space for closing out the Report IB list
     //
@@ -141,21 +128,48 @@ CHIP_ERROR Engine::BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Bu
             TLV::TLVWriter attributeBackup;
             attributeReportIBs.Checkpoint(attributeBackup);
             ConcreteReadAttributePath pathForRetrieval(readPath);
-            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, pathForRetrieval);
+            // Load the saved state from previous encoding session for chunking of one single attribute (list chunking).
+            AttributeValueEncoder::AttributeEncodeState encodeState = apReadHandler->GetAttributeEncodeState();
+            err = RetrieveClusterData(apReadHandler->GetAccessingFabricIndex(), attributeReportIBs, pathForRetrieval, &encodeState);
             if (err != CHIP_NO_ERROR)
             {
-                // We met a error during writing reports, one common case is we are running out of buffer, rollback the
-                // attributeReportIB to avoid any partial data.
-                attributeReportIBs.Rollback(attributeBackup);
+                ChipLogError(DataManagement,
+                             "Error retrieving data from clusterId: " ChipLogFormatMEI ", err = %" CHIP_ERROR_FORMAT,
+                             ChipLogValueMEI(pathForRetrieval.mClusterId), err.Format());
+
+                if (encodeState.AllowPartialData())
+                {
+                    // Encoding is aborted but partial data is allowed, then we don't rollback and save the state for next chunk.
+                    apReadHandler->SetAttributeEncodeState(encodeState);
+                }
+                else
+                {
+                    // We met a error during writing reports, one common case is we are running out of buffer, rollback the
+                    // attributeReportIB to avoid any partial data.
+                    attributeReportIBs.Rollback(attributeBackup);
+                    apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
+                }
             }
             SuccessOrExit(err);
-            attributeDataWritten = true;
+            // Successfully encoded the attribute, clear the internal state.
+            apReadHandler->SetAttributeEncodeState(AttributeValueEncoder::AttributeEncodeState());
         }
         // We just visited all paths interested by this read handler and did not abort in the middle of iteration, there are no more
         // chunks for this report.
         hasMoreChunks = false;
     }
 exit:
+    if (attributeReportIBs.GetWriter()->GetLengthWritten() != emptyReportDataLength)
+    {
+        // We may encounter BUFFER_TOO_SMALL with nothing actually written for the case of list chunking, so we check if we have
+        // actually
+        attributeDataWritten = true;
+    }
+
+    if (apHasEncodedData != nullptr)
+    {
+        *apHasEncodedData = attributeDataWritten;
+    }
     //
     // Running out of space is an error that we're expected to handle - the incompletely written DataIB has already been rolled back
     // earlier to ensure only whole and complete DataIBs are present in the stream.
@@ -201,7 +215,11 @@ exit:
     {
         aReportDataBuilder.Rollback(backup);
     }
-    else if (apHasMoreChunks != nullptr)
+
+    // hasMoreChunks + no data encoded is a flag that we have encountered some trouble when processing the attribute.
+    // BuildAndSendSingleReportData will abort the read transaction if we encoded no attribute and no events but hasMoreChunks is
+    // set.
+    if (apHasMoreChunks != nullptr)
     {
         *apHasMoreChunks = hasMoreChunks;
     }
@@ -210,7 +228,7 @@ exit:
 }
 
 CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder & aReportDataBuilder, ReadHandler * apReadHandler,
-                                                     bool * apHasMoreChunks)
+                                                     bool * apHasMoreChunks, bool * apHasEncodedData)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     size_t eventCount = 0;
@@ -220,19 +238,15 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
     ClusterInfo * clusterInfoList  = apReadHandler->GetEventClusterInfolist();
     EventNumber * eventNumberList  = apReadHandler->GetVendedEventNumberList();
     EventManagement & eventManager = EventManagement::GetInstance();
-    EventReportIBs::Builder EventReportIBs;
-    bool hasMoreChunks = false;
+    bool hasMoreChunks             = false;
 
     aReportDataBuilder.Checkpoint(backup);
 
     VerifyOrExit(clusterInfoList != nullptr, );
-    VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
     // If the eventManager is not valid or has not been initialized,
     // skip the rest of processing
     VerifyOrExit(eventManager.IsValid(), ChipLogError(DataManagement, "EventManagement has not yet initialized"));
-
-    EventReportIBs = aReportDataBuilder.CreateEventReports();
-    SuccessOrExit(err = EventReportIBs.GetError());
 
     memcpy(initialEvents, eventNumberList, sizeof(initialEvents));
 
@@ -253,65 +267,77 @@ CHIP_ERROR Engine::BuildSingleReportDataEventReports(ReportDataMessage::Builder 
         ExitNow(); // Read clean, move along
     }
 
-    while (apReadHandler->GetCurrentPriority() != PriorityLevel::Invalid)
     {
-        uint8_t priorityIndex = static_cast<uint8_t>(apReadHandler->GetCurrentPriority());
-        err = eventManager.FetchEventsSince(*(EventReportIBs.GetWriter()), clusterInfoList, apReadHandler->GetCurrentPriority(),
-                                            eventNumberList[priorityIndex], eventCount);
+        EventReportIBs::Builder & eventReportIBs = aReportDataBuilder.CreateEventReports();
+        SuccessOrExit(err = aReportDataBuilder.GetError());
+        while (apReadHandler->GetCurrentPriority() != PriorityLevel::Invalid)
+        {
+            uint8_t priorityIndex = static_cast<uint8_t>(apReadHandler->GetCurrentPriority());
+            err = eventManager.FetchEventsSince(*(eventReportIBs.GetWriter()), clusterInfoList, apReadHandler->GetCurrentPriority(),
+                                                eventNumberList[priorityIndex], eventCount);
 
-        if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
-        {
-            // We have successfully reached the end of the log for
-            // the current priority. Advance to the next
-            // priority level.
-            err = CHIP_NO_ERROR;
-            apReadHandler->MoveToNextScheduledDirtyPriority();
-            hasMoreChunks = false;
-        }
-        else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
-        {
-            // when first cluster event is too big to fit in the packet, ignore that cluster event.
-            if (eventCount == 0)
+            if ((err == CHIP_END_OF_TLV) || (err == CHIP_ERROR_TLV_UNDERRUN) || (err == CHIP_NO_ERROR))
             {
-                eventNumberList[priorityIndex]++;
-                ChipLogDetail(DataManagement, "<RE:Run> first cluster event is too big so that it fails to fit in the packet!");
+                // We have successfully reached the end of the log for
+                // the current priority. Advance to the next
+                // priority level.
                 err = CHIP_NO_ERROR;
+                apReadHandler->MoveToNextScheduledDirtyPriority();
+                hasMoreChunks = false;
+            }
+            else if ((err == CHIP_ERROR_BUFFER_TOO_SMALL) || (err == CHIP_ERROR_NO_MEMORY))
+            {
+                // when first cluster event is too big to fit in the packet, ignore that cluster event.
+                if (eventCount == 0)
+                {
+                    eventNumberList[priorityIndex]++;
+                    ChipLogDetail(DataManagement, "<RE:Run> first cluster event is too big so that it fails to fit in the packet!");
+                    err = CHIP_NO_ERROR;
+                }
+                else
+                {
+                    // `FetchEventsSince` has filled the available space
+                    // within the allowed buffer before it fit all the
+                    // available events.  This is an expected condition,
+                    // so we do not propagate the error to higher levels;
+                    // instead, we terminate the event processing for now
+                    // (we will get another chance immediately afterwards,
+                    // with a ew buffer) and do not advance the processing
+                    // to the next priority level.
+                    err = CHIP_NO_ERROR;
+                    break;
+                }
+                hasMoreChunks = true;
             }
             else
             {
-                // `FetchEventsSince` has filled the available space
-                // within the allowed buffer before it fit all the
-                // available events.  This is an expected condition,
-                // so we do not propagate the error to higher levels;
-                // instead, we terminate the event processing for now
-                // (we will get another chance immediately afterwards,
-                // with a ew buffer) and do not advance the processing
-                // to the next priority level.
-                err = CHIP_NO_ERROR;
-                break;
+                // All other errors are propagated to higher level.
+                // Exiting here and returning an error will lead to
+                // abandoning subscription.
+                ExitNow();
             }
-            hasMoreChunks = true;
         }
-        else
-        {
-            // All other errors are propagated to higher level.
-            // Exiting here and returning an error will lead to
-            // abandoning subscription.
-            ExitNow();
-        }
+
+        eventReportIBs.EndOfEventReports();
+        SuccessOrExit(err = eventReportIBs.GetError());
     }
-
-    EventReportIBs.EndOfEventReports();
-    SuccessOrExit(err = EventReportIBs.GetError());
-
     ChipLogDetail(DataManagement, "Fetched %zu events", eventCount);
 
 exit:
+    if (apHasEncodedData != nullptr)
+    {
+        *apHasEncodedData = !(eventCount == 0 || eventClean);
+    }
+
     if (err == CHIP_NO_ERROR && (eventCount == 0 || eventClean))
     {
         aReportDataBuilder.Rollback(backup);
     }
-    else if (apHasMoreChunks != nullptr)
+
+    // hasMoreChunks + no data encoded is a flag that we have encountered some trouble when processing the attribute.
+    // BuildAndSendSingleReportData will abort the read transaction if we encoded no attribute and no events but hasMoreChunks is
+    // set.
+    if (apHasMoreChunks != nullptr)
     {
         *apHasMoreChunks = hasMoreChunks;
     }
@@ -325,7 +351,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     ReportDataMessage::Builder reportDataBuilder;
     chip::System::PacketBufferHandle bufHandle = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     uint16_t reservedSize                      = 0;
-    bool hasMoreChunks                         = false;
+    bool hasMoreChunks;
 
     // Reserved size for the MoreChunks boolean flag, which takes up 1 byte for the control tag and 1 byte for the context tag.
     const uint32_t kReservedSizeForMoreChunksFlag = 1 + 1;
@@ -333,6 +359,7 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
     // Reserved size for the end of report message, which is an end-of-container (i.e 1 byte for the control tag).
     const uint32_t kReservedSizeForEndOfReportMessage = 1;
 
+    VerifyOrExit(apReadHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(!bufHandle.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     if (bufHandle->AvailableDataLength() > kMaxSecureSduLengthBytes)
@@ -364,18 +391,34 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
 
     SuccessOrExit(err = reportDataWriter.ReserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfReportMessage));
 
-    err = BuildSingleReportDataAttributeReportIBs(reportDataBuilder, apReadHandler, &hasMoreChunks);
-    SuccessOrExit(err);
+    {
+        bool hasMoreChunksForAttributes = false;
+        bool hasMoreChunksForEvents     = false;
+        bool hasEncodedAttributes       = false;
+        bool hasEncodedEvents           = false;
 
-    err = BuildSingleReportDataEventReports(reportDataBuilder, apReadHandler, &hasMoreChunks);
-    SuccessOrExit(err);
+        err = BuildSingleReportDataAttributeReportIBs(reportDataBuilder, apReadHandler, &hasMoreChunksForAttributes,
+                                                      &hasEncodedAttributes);
+        SuccessOrExit(err);
+
+        err = BuildSingleReportDataEventReports(reportDataBuilder, apReadHandler, &hasMoreChunksForEvents, &hasEncodedEvents);
+        SuccessOrExit(err);
+
+        hasMoreChunks = hasMoreChunksForAttributes || hasMoreChunksForEvents;
+
+        if (!hasEncodedAttributes && !hasEncodedEvents && hasMoreChunks)
+        {
+            ChipLogError(DataManagement,
+                         "No data actually encoded but hasMoreChunks flag is set, abort report! (attribute too big?)");
+            ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
+        }
+    }
 
     SuccessOrExit(reportDataBuilder.GetError());
-
     SuccessOrExit(err = reportDataWriter.UnreserveBuffer(kReservedSizeForMoreChunksFlag + kReservedSizeForEndOfReportMessage));
     if (hasMoreChunks)
     {
-        reportDataBuilder.MoreChunkedMessages(hasMoreChunks);
+        reportDataBuilder.MoreChunkedMessages(true);
     }
     else if (apReadHandler->IsReadType())
     {
@@ -405,7 +448,10 @@ CHIP_ERROR Engine::BuildAndSendSingleReportData(ReadHandler * apReadHandler)
         err = report.Init(reader);
         SuccessOrExit(err);
 
-        err = report.CheckSchemaValidity();
+        if ((err = report.CheckSchemaValidity()) != CHIP_NO_ERROR)
+        {
+            ChipLogError(DataManagement, "<RE> Schema check failed: %s", chip::ErrorStr(err));
+        }
         SuccessOrExit(err);
     }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK

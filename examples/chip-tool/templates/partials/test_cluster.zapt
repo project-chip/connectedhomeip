@@ -180,6 +180,29 @@ class {{filename}}: public TestCommand
         {{else}}
         const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : {{endpoint}};
         {{/if}}
+
+        {{~#*inline "maybeTimedInteractionTimeout"}}
+          {{#if timedInteractionTimeoutMs}}
+          , {{timedInteractionTimeoutMs}}
+          {{else if commandObject.mustUseTimedInvoke}}
+          , chip::NullOptional
+          {{else if attributeObject.mustUseTimedWrite}}
+          , chip::NullOptional
+          {{/if}}
+        {{/inline~}}
+
+        {{~#*inline "maybeWait"}}
+          {{#if busyWaitMs}}
+          {
+            using namespace chip::System::Clock::Literals;
+            // Busy-wait for {{busyWaitMs}} milliseconds.
+            auto & clock = chip::System::SystemClock();
+            auto start = clock.GetMonotonicTimestamp();
+            while (clock.GetMonotonicTimestamp() - start < {{busyWaitMs}}_ms);
+          }
+          {{/if}}
+        {{/inline~}}
+
         {{#if isCommand}}
         using RequestType = chip::app::Clusters::{{asUpperCamelCase cluster}}::Commands::{{asUpperCamelCase command}}::Type;
 
@@ -199,21 +222,9 @@ class {{filename}}: public TestCommand
         ReturnErrorOnFailure(chip::Controller::{{#if isGroupCommand}}InvokeGroupCommand{{else}}InvokeCommand{{/if}}({{>device}}, this, success, failure,
           {{#if isGroupCommand}}groupId{{else}}endpoint{{/if}},
           request
-          {{#if timedInteractionTimeoutMs}}
-          , {{timedInteractionTimeoutMs}}
-          {{else if commandObject.mustUseTimedInvoke}}
-          , chip::NullOptional
-          {{/if}}
+          {{> maybeTimedInteractionTimeout }}
           ));
-        {{#if busyWaitMs}}
-          {
-            using namespace chip::System::Clock::Literals;
-            // Busy-wait for {{busyWaitMs}} milliseconds.
-            auto & clock = chip::System::SystemClock();
-            auto start = clock.GetMonotonicTimestamp();
-            while (clock.GetMonotonicTimestamp() - start < {{busyWaitMs}}_ms);
-          }
-        {{/if}}
+        {{> maybeWait }}
         {{#unless async}}return CHIP_NO_ERROR;{{/unless}}
         {{else}}
         chip::Controller::{{asUpperCamelCase cluster}}ClusterTest cluster;
@@ -232,7 +243,12 @@ class {{filename}}: public TestCommand
           {{#*inline "failureResponse"}}OnFailureCallback_{{index}}{{/inline}}
           {{#*inline "successResponse"}}OnSuccessCallback_{{index}}{{/inline}}
           {{#*inline "doneResponse"}}OnDoneCallback_{{index}}{{/inline}}
-          {{#if async}}ReturnErrorOnFailure({{else}}return {{/if}}cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>successResponse}}, {{>failureResponse}}{{#if isGroupCommand}}, {{>doneResponse}}{{/if}}){{#if async}}){{/if}};
+          ReturnErrorOnFailure(cluster.WriteAttribute<chip::app::Clusters::{{asUpperCamelCase cluster}}::Attributes::{{asUpperCamelCase attribute}}::TypeInfo>({{#chip_tests_item_parameters}}{{asLowerCamelCase name}}Argument, {{/chip_tests_item_parameters}}this, {{>successResponse}}, {{>failureResponse}}
+            {{~> maybeTimedInteractionTimeout ~}}
+            {{~#if isGroupCommand}}, {{>doneResponse}}{{/if~}}
+            ));
+          {{> maybeWait }}
+          {{#unless async}}return CHIP_NO_ERROR;{{/unless}}
         {{else if isReadAttribute}}
           {{#*inline "failureResponse"}}OnFailureCallback_{{index}}{{/inline}}
           {{#*inline "successResponse"}}OnSuccessCallback_{{index}}{{/inline}}

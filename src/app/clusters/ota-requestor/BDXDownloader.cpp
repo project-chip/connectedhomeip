@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,101 +19,200 @@
 #include "BDXDownloader.h"
 
 #include <lib/core/CHIPError.h>
-#include <messaging/ExchangeContext.h>
-#include <messaging/Flags.h>
-#include <protocols/bdx/BdxTransferSession.h>
+#include <lib/support/CodeUtils.h>
+#include <protocols/bdx/BdxMessages.h>
+#include <system/SystemClock.h> /* TODO:(#12520) remove */
+#include <system/SystemPacketBuffer.h>
+#include <transport/raw/MessageHeader.h>
 
-#include <fstream>
+using chip::OTADownloader;
+using chip::bdx::TransferSession;
 
-using namespace chip::bdx;
+namespace chip {
 
-uint32_t numBlocksRead   = 0;
-const char outFilePath[] = "test-ota-out.txt";
-
-void BdxDownloader::SetInitialExchange(chip::Messaging::ExchangeContext * ec)
+void BDXDownloader::OnMessageReceived(const chip::PayloadHeader & payloadHeader, chip::System::PacketBufferHandle msg)
 {
-    mExchangeCtx = ec;
+    VerifyOrReturn(mState == State::kInProgress, ChipLogError(BDX, "Can't accept messages, no transfer in progress"));
+    CHIP_ERROR err =
+        mBdxTransfer.HandleMessageReceived(payloadHeader, std::move(msg), /* TODO:(#12520) */ chip::System::Clock::Seconds16(0));
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(BDX, "unable to handle message: %" CHIP_ERROR_FORMAT, err.Format());
+    }
+
+    // HandleMessageReceived() will only decode/parse the message. Need to Poll() in order to do the message handling work in
+    // HandleBdxEvent().
+    PollTransferSession();
 }
 
-void BdxDownloader::HandleTransferSessionOutput(TransferSession::OutputEvent & event)
+CHIP_ERROR BDXDownloader::SetBDXParams(const chip::bdx::TransferSession::TransferInitData & bdxInitData)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
 
-    if (event.EventType != TransferSession::OutputEventType::kNone)
+    // Must call StartTransfer() here to store the the pointer data contained in bdxInitData in the TransferSession object.
+    // Otherwise it could be freed before we can use it.
+    ReturnErrorOnFailure(mBdxTransfer.StartTransfer(chip::bdx::TransferRole::kReceiver, bdxInitData,
+                                                    /* TODO:(#12520) */ chip::System::Clock::Seconds16(30)));
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BDXDownloader::BeginPrepareDownload()
+{
+    VerifyOrReturnError(mState == State::kIdle, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mImageProcessor != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mImageProcessor->PrepareDownload());
+
+    mState = State::kPreparing;
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BDXDownloader::OnPreparedForDownload(CHIP_ERROR status)
+{
+    VerifyOrReturnError(mState == State::kPreparing, CHIP_ERROR_INCORRECT_STATE);
+
+    if (status == CHIP_NO_ERROR)
     {
-        ChipLogDetail(BDX, "OutputEvent type: %s", event.ToString(event.EventType));
+        mState = State::kInProgress;
+
+        // Must call here because StartTransfer() should have prepared a ReceiveInit message, and now we should send it.
+        PollTransferSession();
+    }
+    else
+    {
+        ChipLogError(BDX, "failed to prepare download: %" CHIP_ERROR_FORMAT, status.Format());
+        mBdxTransfer.Reset();
+        mState = State::kIdle;
     }
 
-    switch (event.EventType)
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR BDXDownloader::FetchNextData()
+{
+    VerifyOrReturnError(mState == State::kInProgress, CHIP_ERROR_INCORRECT_STATE);
+    ReturnErrorOnFailure(mBdxTransfer.PrepareBlockQuery());
+    PollTransferSession();
+
+    return CHIP_NO_ERROR;
+}
+
+void BDXDownloader::OnDownloadTimeout()
+{
+    if (mState == State::kInProgress)
+    {
+        ChipLogDetail(BDX, "aborting due to timeout");
+        mBdxTransfer.Reset();
+        if (mImageProcessor != nullptr)
+        {
+            mImageProcessor->Abort();
+        }
+        mState = State::kIdle;
+    }
+    else
+    {
+        ChipLogError(BDX, "no download in progress");
+    }
+}
+
+void BDXDownloader::EndDownload(CHIP_ERROR reason)
+{
+    if (mState == State::kInProgress)
+    {
+        // There's no method for a BDX receiving driver to cleanly end a transfer
+        mBdxTransfer.AbortTransfer(chip::bdx::StatusCode::kUnknown);
+        if (mImageProcessor != nullptr)
+        {
+            mImageProcessor->Abort();
+        }
+        mState = State::kIdle;
+
+        // Because AbortTransfer() will generate a StatusReport to send.
+        PollTransferSession();
+    }
+    else
+    {
+        ChipLogError(BDX, "no download in progress");
+    }
+}
+
+void BDXDownloader::PollTransferSession()
+{
+    TransferSession::OutputEvent outEvent;
+
+    // WARNING: Is this dangerous? What happens if the loop encounters two messages that need to be sent? Does the ExchangeContext
+    // allow that?
+    do
+    {
+        mBdxTransfer.PollOutput(outEvent, /* TODO:(#12520) */ chip::System::Clock::Seconds16(0));
+        CHIP_ERROR err = HandleBdxEvent(outEvent);
+        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "HandleBDXEvent: %" CHIP_ERROR_FORMAT, err.Format()));
+    } while (outEvent.EventType != TransferSession::OutputEventType::kNone);
+}
+
+CHIP_ERROR BDXDownloader::HandleBdxEvent(const chip::bdx::TransferSession::OutputEvent & outEvent)
+{
+    VerifyOrReturnError(mImageProcessor != nullptr, CHIP_ERROR_INCORRECT_STATE);
+
+    switch (outEvent.EventType)
     {
     case TransferSession::OutputEventType::kNone:
-        if (mIsTransferComplete)
-        {
-            ChipLogDetail(BDX, "Transfer complete! Contents written/appended to %s", outFilePath);
-            mTransfer.Reset();
-            mIsTransferComplete = false;
-        }
+        break;
+    case TransferSession::OutputEventType::kAcceptReceived:
+        ReturnErrorOnFailure(mBdxTransfer.PrepareBlockQuery());
+        // TODO: need to check ReceiveAccept parameters
         break;
     case TransferSession::OutputEventType::kMsgToSend: {
-        chip::Messaging::SendFlags sendFlags;
-        VerifyOrReturn(mExchangeCtx != nullptr, ChipLogError(BDX, "mExchangeContext is null, cannot proceed"));
-        if (event.msgTypeData.MessageType == static_cast<uint8_t>(MessageType::ReceiveInit))
+        VerifyOrReturnError(mMsgDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+        ReturnErrorOnFailure(mMsgDelegate->SendMessage(outEvent));
+        if (outEvent.msgTypeData.HasMessageType(chip::bdx::MessageType::BlockAckEOF))
         {
-            sendFlags.Set(chip::Messaging::SendMessageFlags::kFromInitiator);
+            // BDX transfer is not complete until BlockAckEOF has been sent
+            mState = State::kComplete;
+
+            // TODO: how/when to reset the BDXDownloader to be ready to handle another download
         }
-        if (event.msgTypeData.MessageType != static_cast<uint8_t>(MessageType::BlockAckEOF))
-        {
-            sendFlags.Set(chip::Messaging::SendMessageFlags::kExpectResponse);
-        }
-        err = mExchangeCtx->SendMessage(event.msgTypeData.ProtocolId, event.msgTypeData.MessageType, std::move(event.MsgData),
-                                        sendFlags);
-        VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "SendMessage failed: %" CHIP_ERROR_FORMAT, err.Format()));
         break;
     }
-    case TransferSession::OutputEventType::kAcceptReceived:
-        VerifyOrReturn(CHIP_NO_ERROR == mTransfer.PrepareBlockQuery(), ChipLogError(BDX, "PrepareBlockQuery failed"));
-        break;
     case TransferSession::OutputEventType::kBlockReceived: {
-        ChipLogDetail(BDX, "Got block length %zu", event.blockdata.Length);
+        chip::ByteSpan blockData(outEvent.blockdata.Data, outEvent.blockdata.Length);
+        ReturnErrorOnFailure(mImageProcessor->ProcessBlock(blockData));
 
-        // TODO: something more elegant than appending to a local file
-        // TODO: while convenient, we should not do a synchronous block write in our example application - this is bad practice
-        std::ofstream otaFile(outFilePath, std::ifstream::out | std::ifstream::ate | std::ifstream::app);
-        otaFile.write(reinterpret_cast<const char *>(event.blockdata.Data), static_cast<std::streamsize>(event.blockdata.Length));
+        // TODO: this will cause problems if Finalize() is not guaranteed to do its work after ProcessBlock().
+        if (outEvent.blockdata.IsEof)
+        {
+            mBdxTransfer.PrepareBlockAck();
+            ReturnErrorOnFailure(mImageProcessor->Finalize());
+        }
 
-        if (event.blockdata.IsEof)
-        {
-            err = mTransfer.PrepareBlockAck();
-            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "PrepareBlockAck failed: %" CHIP_ERROR_FORMAT, err.Format()));
-            mIsTransferComplete = true;
-        }
-        else
-        {
-            err = mTransfer.PrepareBlockQuery();
-            VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(BDX, "PrepareBlockQuery failed: %" CHIP_ERROR_FORMAT, err.Format()));
-        }
         break;
     }
     case TransferSession::OutputEventType::kStatusReceived:
-        ChipLogError(BDX, "Got StatusReport %x", static_cast<uint16_t>(event.statusData.statusCode));
-        mTransfer.Reset();
-        mExchangeCtx->Close();
+        ChipLogError(BDX, "BDX StatusReport %x", static_cast<uint16_t>(outEvent.statusData.statusCode));
+        mBdxTransfer.Reset();
+        ReturnErrorOnFailure(mImageProcessor->Abort());
         break;
     case TransferSession::OutputEventType::kInternalError:
-        ChipLogError(BDX, "InternalError");
-        mTransfer.Reset();
-        mExchangeCtx->Close();
+        ChipLogError(BDX, "TransferSession error");
+        mBdxTransfer.Reset();
+        ReturnErrorOnFailure(mImageProcessor->Abort());
         break;
     case TransferSession::OutputEventType::kTransferTimeout:
         ChipLogError(BDX, "Transfer timed out");
-        mTransfer.Reset();
-        mExchangeCtx->Close();
+        mBdxTransfer.Reset();
+        ReturnErrorOnFailure(mImageProcessor->Abort());
         break;
     case TransferSession::OutputEventType::kInitReceived:
     case TransferSession::OutputEventType::kAckReceived:
     case TransferSession::OutputEventType::kQueryReceived:
     case TransferSession::OutputEventType::kAckEOFReceived:
     default:
-        ChipLogError(BDX, "Unexpected BDX event type: %" PRIu16, static_cast<uint16_t>(event.EventType));
+        ChipLogError(BDX, "Unexpected BDX event: %u", static_cast<uint16_t>(outEvent.EventType));
+        break;
     }
+
+    return CHIP_NO_ERROR;
 }
+
+} // namespace chip

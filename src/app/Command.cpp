@@ -37,17 +37,6 @@ CHIP_ERROR Command::Finalize(System::PacketBufferHandle & commandPacket)
     return mCommandMessageWriter.Finalize(&commandPacket);
 }
 
-CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathParams, CommandPathIB::Builder & aCommandPath)
-{
-    if (aCommandPathParams.mFlags.Has(CommandPathFlags::kEndpointIdValid))
-    {
-        aCommandPath.EndpointId(aCommandPathParams.mEndpointId);
-    }
-
-    aCommandPath.ClusterId(aCommandPathParams.mClusterId).CommandId(aCommandPathParams.mCommandId).EndOfCommandPathIB();
-    return aCommandPath.GetError();
-}
-
 void Command::Abort()
 {
     //

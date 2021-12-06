@@ -512,7 +512,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         break;
     }
-    case 0xF004: // Group Key Management Cluster
+    case 0x003F: // Group Key Management Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
@@ -1023,6 +1023,33 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                            sizeof(entry->NullableOptionalList)); // SimpleEnum
             break;
         }
+        case 0x002A: // list_long_octet_string
+        {
+            entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, static_cast<uint16_t>(index - 1));
+            if (entryOffset == 0)
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+
+            ByteSpan * listLongOctetStringSpan         = reinterpret_cast<ByteSpan *>(write ? src : dest); // LONG_OCTET_STRING
+            uint16_t listLongOctetStringRemainingSpace = static_cast<uint16_t>(am->size - entryOffset);
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, listLongOctetStringRemainingSpace, listLongOctetStringSpan)
+                       : ReadByteSpan(src + entryOffset, listLongOctetStringRemainingSpace, listLongOctetStringSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+
+            if (!CanCastTo<uint16_t>(listLongOctetStringSpan->size()))
+            {
+                ChipLogError(Zcl, "Span size %zu is too large", listLongOctetStringSpan->size());
+                return 0;
+            }
+            entryLength = static_cast<uint16_t>(listLongOctetStringSpan->size());
+            break;
+        }
         }
         break;
     }
@@ -1317,7 +1344,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
             break;
         }
         break;
-    case 0xF004: // Group Key Management Cluster
+    case 0x003F: // Group Key Management Cluster
         switch (attributeId)
         {
         case 0x0000: // groups
@@ -1424,6 +1451,10 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x0023: // list_nullables_and_optionals_struct
             // Struct _NullablesAndOptionalsStruct
             entryLength = 75;
+            break;
+        case 0x002A: // list_long_octet_string
+            // chip::ByteSpan
+            return GetByteSpanOffsetFromIndex(buffer, 1002, entryCount);
             break;
         }
         break;

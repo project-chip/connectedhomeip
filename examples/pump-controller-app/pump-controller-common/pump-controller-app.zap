@@ -31,8 +31,8 @@
   ],
   "endpointTypes": [
     {
-      "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "Pump Controller",
+      "name": "MA-pumpcontroller",
+      "deviceTypeName": "MA-pumpcontroller",
       "deviceTypeCode": 772,
       "deviceTypeProfileId": 2457,
       "clusters": [
@@ -4144,8 +4144,8 @@
       ]
     },
     {
-      "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "Pump Controller",
+      "name": "MA-pumpcontroller",
+      "deviceTypeName": "MA-pumpcontroller",
       "deviceTypeCode": 772,
       "deviceTypeProfileId": 2457,
       "clusters": [
@@ -5754,23 +5754,22 @@
   ],
   "endpoints": [
     {
-      "endpointTypeName": "Anonymous Endpoint Type",
+      "endpointTypeName": "MA-pumpcontroller",
       "endpointTypeIndex": 0,
       "profileId": 2457,
       "endpointId": 0,
       "networkId": 0,
       "endpointVersion": 1,
-      "deviceIdentifier": null
+      "deviceIdentifier": 772
     },
     {
-      "endpointTypeName": "Anonymous Endpoint Type",
+      "endpointTypeName": "MA-pumpcontroller",
       "endpointTypeIndex": 1,
       "profileId": 2457,
       "endpointId": 1,
       "networkId": 0,
       "endpointVersion": 1,
-      "deviceIdentifier": null
+      "deviceIdentifier": 772
     }
-  ],
-  "log": []
+  ]
 }

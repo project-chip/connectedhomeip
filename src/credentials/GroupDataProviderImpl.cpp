@@ -343,7 +343,7 @@ struct StateData : public GroupDataProvider::GroupState, PersistentData<kPersist
     {
         fabric_index = 0;
         group        = kUndefinedGroupId;
-        keyset_index = 0;
+        keyset_id    = 0;
         next         = 0;
     }
 
@@ -354,7 +354,7 @@ struct StateData : public GroupDataProvider::GroupState, PersistentData<kPersist
 
         ReturnErrorOnFailure(writer.Put(kTagFabric, static_cast<uint8_t>(fabric_index)));
         ReturnErrorOnFailure(writer.Put(kTagGroup, static_cast<uint16_t>(group)));
-        ReturnErrorOnFailure(writer.Put(kTagKeySet, static_cast<uint16_t>(keyset_index)));
+        ReturnErrorOnFailure(writer.Put(kTagKeySet, static_cast<uint16_t>(keyset_id)));
         ReturnErrorOnFailure(writer.Put(kTagNext, static_cast<uint16_t>(next)));
 
         return writer.EndContainer(container);
@@ -373,9 +373,9 @@ struct StateData : public GroupDataProvider::GroupState, PersistentData<kPersist
         // group
         ReturnErrorOnFailure(reader.Next(kTagGroup));
         ReturnErrorOnFailure(reader.Get(group));
-        // keyset_index
+        // keyset_id
         ReturnErrorOnFailure(reader.Next(kTagKeySet));
-        ReturnErrorOnFailure(reader.Get(keyset_index));
+        ReturnErrorOnFailure(reader.Get(keyset_id));
         // next
         ReturnErrorOnFailure(reader.Next(kTagNext));
         ReturnErrorOnFailure(reader.Get(next));
@@ -799,11 +799,97 @@ CHIP_ERROR GroupDataProviderImpl::RemoveAllGroupMappings(chip::FabricIndex fabri
     }
 }
 
+GroupDataProvider::GroupMappingIterator * GroupDataProviderImpl::IterateGroupMappings(chip::FabricIndex fabric_index)
+{
+    VerifyOrReturnError(mInitialized, nullptr);
+    return mAllGroupsIterators.CreateObject(*this, fabric_index);
+}
+
+GroupDataProviderImpl::AllGroupMappingsIteratorImpl::AllGroupMappingsIteratorImpl(GroupDataProviderImpl & provider,
+                                                                                  chip::FabricIndex fabric_index) :
+    mProvider(provider),
+    mFabric(fabric_index)
+{
+    FabricData fabric(fabric_index);
+    ReturnOnFailure(fabric.Load(provider.mStorage));
+
+    // Existing fabric
+    mFirstEndpoint = fabric.first_endpoint;
+    mFirstGroup    = true;
+    mEndpointCount = fabric.endpoint_count;
+    mEndpoint      = fabric.first_endpoint;
+    mEndpointIndex = 0;
+}
+
+size_t GroupDataProviderImpl::AllGroupMappingsIteratorImpl::Count()
+{
+    size_t count          = 0;
+    size_t endpoint_index = 0;
+    EndpointData endpoint_data(mFabric, mFirstEndpoint);
+
+    // Loop through the fabric's endpoints
+    while ((endpoint_index < mEndpointCount) && (CHIP_NO_ERROR == endpoint_data.Load(mProvider.mStorage)))
+    {
+        GroupData group_data(mFabric, endpoint_data.endpoint_id, endpoint_data.first_group);
+        // Loop through the endpoint's groups
+        while ((kUndefinedGroupId != group_data.group) && (CHIP_NO_ERROR == group_data.Load(mProvider.mStorage)))
+        {
+            group_data.group = group_data.next;
+            count++;
+        }
+        endpoint_data.endpoint_id = endpoint_data.next;
+        endpoint_index++;
+    }
+
+    return count;
+}
+
+bool GroupDataProviderImpl::AllGroupMappingsIteratorImpl::Next(GroupMapping & item)
+{
+    while (mEndpointIndex < mEndpointCount)
+    {
+        EndpointData endpoint_data(mFabric, mEndpoint);
+        if (CHIP_NO_ERROR != endpoint_data.Load(mProvider.mStorage))
+        {
+            mEndpointIndex = mEndpointCount;
+            return false;
+        }
+
+        if (mFirstGroup)
+        {
+            mGroup      = endpoint_data.first_group;
+            mFirstGroup = false;
+        }
+
+        GroupData group_data(mFabric, mEndpoint, mGroup);
+        if ((kUndefinedGroupId != mGroup) && CHIP_NO_ERROR == group_data.Load(mProvider.mStorage))
+        {
+            item.endpoint = mEndpoint;
+            item.group    = mGroup;
+            size_t size   = strnlen(group_data.name, GroupData::kGroupNameMax);
+            strncpy(item.name, group_data.name, size);
+            item.name[size] = 0;
+            mGroup          = group_data.next;
+            return true;
+        }
+
+        mEndpoint = endpoint_data.next;
+        mEndpointIndex++;
+        mFirstGroup = true;
+    }
+    return false;
+}
+
+void GroupDataProviderImpl::AllGroupMappingsIteratorImpl::Release()
+{
+    mProvider.mAllGroupsIterators.ReleaseObject(this);
+}
+
 GroupDataProvider::GroupMappingIterator * GroupDataProviderImpl::IterateGroupMappings(chip::FabricIndex fabric_index,
                                                                                       EndpointId endpoint_id)
 {
     VerifyOrReturnError(mInitialized, nullptr);
-    return mEndpointIterators.CreateObject(*this, fabric_index, endpoint_id);
+    return mEndpointGroupsIterators.CreateObject(*this, fabric_index, endpoint_id);
 }
 
 GroupDataProviderImpl::GroupMappingIteratorImpl::GroupMappingIteratorImpl(GroupDataProviderImpl & provider,
@@ -827,18 +913,20 @@ GroupDataProviderImpl::GroupMappingIteratorImpl::GroupMappingIteratorImpl(GroupD
         if (endpoint.endpoint_id == endpoint_id)
         {
             // Target endpoint found
-            mGroup = endpoint.first_group;
+            mFirstGroup = endpoint.first_group;
             break;
         }
         endpoint.endpoint_id = endpoint.next;
     } while (++count < fabric.endpoint_count);
+
+    mGroup = mFirstGroup;
 }
 
 size_t GroupDataProviderImpl::GroupMappingIteratorImpl::Count()
 {
     size_t count = 0;
 
-    GroupData group(mFabric, mEndpoint, mGroup);
+    GroupData group(mFabric, mEndpoint, mFirstGroup);
     chip::GroupId prev_gid = kUndefinedGroupId;
 
     while ((kUndefinedGroupId != group.group) && (prev_gid != group.group))
@@ -873,7 +961,7 @@ bool GroupDataProviderImpl::GroupMappingIteratorImpl::Next(GroupMapping & item)
 
 void GroupDataProviderImpl::GroupMappingIteratorImpl::Release()
 {
-    mProvider.mEndpointIterators.ReleaseObject(this);
+    mProvider.mEndpointGroupsIterators.ReleaseObject(this);
 }
 
 //
@@ -893,8 +981,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupState(size_t state_index, const GroupS
         VerifyOrReturnError(0 == state_index, CHIP_ERROR_INVALID_ARGUMENT);
         states.first = 0;
         states.count = 1;
-        ReturnLogErrorOnFailure(
-            StateData(states.first, in_state.fabric_index, in_state.group, in_state.keyset_index).Save(mStorage));
+        ReturnLogErrorOnFailure(StateData(states.first, in_state.fabric_index, in_state.group, in_state.keyset_id).Save(mStorage));
         return states.Save(mStorage);
     }
 
@@ -936,7 +1023,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupState(size_t state_index, const GroupS
         VerifyOrReturnError(state.fabric_index == in_state.fabric_index, CHIP_ERROR_ACCESS_DENIED);
         GroupState old_state = state;
         state.group          = in_state.group;
-        state.keyset_index   = in_state.keyset_index;
+        state.keyset_id      = in_state.keyset_id;
         ReturnErrorOnFailure(state.Save(mStorage));
         if (nullptr != mListener)
         {
@@ -946,7 +1033,7 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupState(size_t state_index, const GroupS
     }
 
     // New state
-    ReturnErrorOnFailure(StateData(new_id, in_state.fabric_index, in_state.group, in_state.keyset_index).Save(mStorage));
+    ReturnErrorOnFailure(StateData(new_id, in_state.fabric_index, in_state.group, in_state.keyset_id).Save(mStorage));
 
     if (previous)
     {
@@ -962,8 +1049,6 @@ CHIP_ERROR GroupDataProviderImpl::SetGroupState(size_t state_index, const GroupS
     // Update main list
     states.count = static_cast<uint16_t>(index + 1);
     return states.Save(mStorage);
-
-    return CHIP_ERROR_INTERNAL;
 }
 
 CHIP_ERROR GroupDataProviderImpl::GetGroupState(size_t state_index, GroupState & out_state)
@@ -990,7 +1075,7 @@ CHIP_ERROR GroupDataProviderImpl::GetGroupState(size_t state_index, GroupState &
             // Target index found
             out_state.fabric_index = state.fabric_index;
             out_state.group        = state.group;
-            out_state.keyset_index = state.keyset_index;
+            out_state.keyset_id    = state.keyset_id;
             return CHIP_NO_ERROR;
         }
         state.id = state.next;
@@ -1097,7 +1182,7 @@ bool GroupDataProviderImpl::AllStatesIterator::Next(GroupState & item)
     mIndex            = state.next;
     item.fabric_index = state.fabric_index;
     item.group        = state.group;
-    item.keyset_index = state.keyset_index;
+    item.keyset_id    = state.keyset_id;
     return true;
 }
 
@@ -1156,7 +1241,7 @@ bool GroupDataProviderImpl::FabricStatesIterator::Next(GroupState & item)
         {
             item.fabric_index = state.fabric_index;
             item.group        = state.group;
-            item.keyset_index = state.keyset_index;
+            item.keyset_id    = state.keyset_id;
             mIndex            = state.id;
             return true;
         }

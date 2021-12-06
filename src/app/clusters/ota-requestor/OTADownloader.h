@@ -23,9 +23,11 @@
  * must include this file
  */
 
+#pragma once
+
 #include "OTAImageProcessor.h"
 
-#pragma once
+#include <lib/core/CHIPError.h>
 
 namespace chip {
 
@@ -34,40 +36,47 @@ namespace chip {
 class OTADownloader
 {
 public:
-    // API declarations start
-
-    // Application calls this method to direct OTADownloader to begin the download
-    void virtual BeginDownload(){};
-
-    // Platform calls this method upon the completion of PrepareDownload() processing
-    void virtual OnPreparedForDownload(CHIP_ERROR status){};
-
-    // Action parameter type for the OnBlockProcessed()
-    enum BlockActionType
+    enum class State : uint8_t
     {
-        kGetNext,
-        kEnd
+        kIdle,
+        kPreparing,
+        kInProgress,
+        kComplete,
     };
 
-    // Platform calls this method upon the completion of ProcessBlock() processing
-    void virtual OnBlockProcessed(CHIP_ERROR status, BlockActionType action){};
+    OTADownloader() : mImageProcessor(nullptr), mState(State::kIdle) {}
+
+    // Application calls this method to direct OTADownloader to begin the download.
+    // OTADownloader should handle calling into OTAImageProcessorDriver::PrepareDownload().
+    CHIP_ERROR virtual BeginPrepareDownload() = 0;
+
+    // Platform calls this method when it is ready to begin processing downloaded image data.
+    // Upon this call, the OTADownloader may begin downloading data.
+    CHIP_ERROR virtual OnPreparedForDownload(CHIP_ERROR status) = 0;
+
+    // Should be called when it has been determined that the download has timed out.
+    void virtual OnDownloadTimeout() = 0;
+
+    // Not all download protocols will be able to close gracefully from the receiver side.
+    // The reason parameter should be used to indicate if this is a graceful end or a forceful abort.
+    void virtual EndDownload(CHIP_ERROR reason = CHIP_NO_ERROR) = 0;
+
+    // Fetch the next set of data. May be a no-op for asynchronous protocols.
+    CHIP_ERROR virtual FetchNextData() { return CHIP_ERROR_NOT_IMPLEMENTED; }
+
+    // Skip ahead some number of bytes in the download of the image file. May not be supported by some transport protocols.
+    CHIP_ERROR virtual SkipData(uint32_t numBytes) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
     // A setter for the delegate class pointer
-    void SetImageProcessorDelegate(OTAImageProcessorInterface * delegate) { mImageProcessorDelegate = delegate; }
+    void SetImageProcessorDelegate(OTAImageProcessorInterface * delegate) { mImageProcessor = delegate; }
 
-    // API declarations end
+    State GetState() const { return mState; }
 
-    // Destructor
     virtual ~OTADownloader() = default;
 
-private:
-    OTAImageProcessorInterface * mImageProcessorDelegate;
+protected:
+    OTAImageProcessorInterface * mImageProcessor;
+    State mState;
 };
-
-// Set the object implementing OTADownloader
-void SetDownloaderInstance(OTADownloader * instance);
-
-// Get the object implementing OTADownloaderInterface
-OTADownloader * GetDownloaderInstance();
 
 } // namespace chip

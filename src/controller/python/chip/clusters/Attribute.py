@@ -324,8 +324,7 @@ class AsyncReadTransaction:
             if (imStatus != chip.interaction_model.Status.Success):
                 logging.error(
                     f"For path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Attribute = {path.AttributeId}, got IM Error: {str(imStatus)}")
-                attributeValue = ValueDecodeFailure(
-                    None, chip.interaction_model.InteractionModelError(imStatus))
+                attributeValue = None
             else:
                 attributeType = _AttributeIndex.get(str(AttributePath(
                     ClusterId=path.ClusterId, AttributeId=path.AttributeId)), None)

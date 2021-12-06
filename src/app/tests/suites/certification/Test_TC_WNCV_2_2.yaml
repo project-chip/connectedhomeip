@@ -28,6 +28,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "ConfigStatus"
+      PICS: A_CONFIGSTATUS
       response:
           value: 4
 
@@ -35,5 +36,6 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "ConfigStatus"
+      PICS: A_CONFIGSTATUS
       response:
           value: 8

@@ -23,6 +23,7 @@
 #include <app/InteractionModelDelegate.h>
 #include <app/MessageDef/AttributeDataIBs.h>
 #include <app/MessageDef/AttributeStatusIB.h>
+#include <app/MessageDef/StatusIB.h>
 #include <app/MessageDef/WriteRequestMessage.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
@@ -85,9 +86,10 @@ public:
          * receives an OnDone call before it shuts down the object.
          *
          * @param[in] apWriteClient The write client object that initiated the attribute write transaction.
+         * @param[in] aStatus       A status response if we got one; might be Status::Failure if we did not.
          * @param[in] aError        A system error code that conveys the overall error code.
          */
-        virtual void OnError(const WriteClient * apWriteClient, CHIP_ERROR aError) {}
+        virtual void OnError(const WriteClient * apWriteClient, const StatusIB & aStatus, CHIP_ERROR aError) {}
 
         /**
          * OnDone will be called when WriteClient has finished all work and is reserved for future WriteClient ownership change.
@@ -125,10 +127,12 @@ private:
 
     enum class State
     {
-        Uninitialized = 0, // The client has not been initialized
-        Initialized,       // The client has been initialized
-        AddAttribute,      // The client has added attribute and ready for a SendWriteRequest
-        AwaitingResponse,  // The client has sent out the write request message
+        Uninitialized = 0,   // The client has not been initialized
+        Initialized,         // The client has been initialized
+        AddAttribute,        // The client has added attribute and ready for a SendWriteRequest
+        AwaitingTimedStatus, // Sent a Tiemd Request, waiting for response.
+        AwaitingResponse,    // The client has sent out the write request message
+        ResponseReceived,    // We have gotten a response after sending write request
     };
 
     /**
@@ -155,10 +159,12 @@ private:
      *
      *  @param[in]    apExchangeMgr    A pointer to the ExchangeManager object.
      *  @param[in]    apDelegate       InteractionModelDelegate set by application.
+     *  @param[in]    aTimedWriteTimeoutMs If provided, do a timed write using this timeout.
      *  @retval #CHIP_ERROR_INCORRECT_STATE incorrect state if it is already initialized
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, Callback * apDelegate);
+    CHIP_ERROR Init(Messaging::ExchangeManager * apExchangeMgr, Callback * apDelegate,
+                    const Optional<uint16_t> & aTimedWriteTimeoutMs);
 
     virtual ~WriteClient() = default;
 
@@ -184,13 +190,32 @@ private:
      */
     void ShutdownInternal();
 
+    // Handle a message received when we are expecting a status response to a
+    // Timed Request.  The caller is assumed to have already checked that our
+    // exchange context member is the one the message came in on.
+    //
+    // aStatusIB will be populated with the returned status if we can parse it
+    // successfully.
+    CHIP_ERROR HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
+                                 StatusIB & aStatusIB);
+
+    // Send our queued-up Write Request message.  Assumes the exchange is ready
+    // and mPendingWriteData is populated.
+    CHIP_ERROR SendWriteRequest();
+
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     Callback * mpCallback                      = nullptr;
     State mState                               = State::Uninitialized;
     System::PacketBufferTLVWriter mMessageWriter;
     WriteRequestMessage::Builder mWriteRequestBuilder;
-    uint8_t mAttributeStatusIndex = 0;
+    // TODO Maybe we should change PacketBufferTLVWriter so we can finalize it
+    // but have it hold on to the buffer, and get the buffer from it later.
+    // Then we could avoid this extra pointer-sized member.
+    System::PacketBufferHandle mPendingWriteData;
+    // If mTimedWriteTimeoutMs has a value, we are expected to do a timed
+    // write.
+    Optional<uint16_t> mTimedWriteTimeoutMs;
 };
 
 class WriteClientHandle

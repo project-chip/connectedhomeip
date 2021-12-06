@@ -26,6 +26,7 @@ tests:
     - label: "Write 1 to the OperationMode attribute to DUT: OperationMode"
       command: "writeAttribute"
       attribute: "OperationMode"
+      PICS: A_OPERATIONMODE
       arguments:
           value: 1
 
@@ -33,12 +34,14 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
+      PICS: A_EFFECTIVEOPERATIONMODE
       response:
           value: 1
 
     - label: "Write 2 to the OperationMode attribute to DUT: OperationMode"
       command: "writeAttribute"
       attribute: "OperationMode"
+      PICS: A_OPERATIONMODE
       arguments:
           value: 2
 
@@ -46,12 +49,14 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
+      PICS: A_EFFECTIVEOPERATIONMODE
       response:
           value: 2
 
     - label: "Write 3 to the OperationMode attribute to DUT: OperationMode"
       command: "writeAttribute"
       attribute: "OperationMode"
+      PICS: A_OPERATIONMODE
       arguments:
           value: 3
 
@@ -59,5 +64,6 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
+      PICS: A_EFFECTIVEOPERATIONMODE
       response:
           value: 3

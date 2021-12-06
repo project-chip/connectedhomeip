@@ -228,7 +228,8 @@ private:
 
 // The PoolImpl impl is used as a base class because its destructor must be called after ServerBase's destructor.
 template <size_t kCount>
-class Server : private chip::PoolImpl<ServerBase::EndpointInfo, kCount, ServerBase::EndpointInfoPoolType::Interface>,
+class Server : private chip::PoolImpl<ServerBase::EndpointInfo, kCount, chip::OnObjectPoolDestruction::Die,
+                                      ServerBase::EndpointInfoPoolType::Interface>,
                public ServerBase
 {
 public:

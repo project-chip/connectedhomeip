@@ -105,7 +105,7 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder
 
     if (DeviceLayer::GetDiagnosticDataProvider().GetThreadMetrics(&threadMetrics) == CHIP_NO_ERROR)
     {
-        err = aEncoder.EncodeList([&threadMetrics](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        err = aEncoder.EncodeList([&threadMetrics](const auto & encoder) -> CHIP_ERROR {
             for (DeviceLayer::ThreadMetrics * thread = threadMetrics; thread != nullptr; thread = thread->Next)
             {
                 ReturnErrorOnFailure(encoder.Encode(*thread));
@@ -131,7 +131,7 @@ class SoftwareDiagnosticsDelegate : public DeviceLayer::SoftwareDiagnosticsDeleg
     {
         ChipLogProgress(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 
-        ForAllEndpointsWithServerCluster(GeneralDiagnostics::Id, [](EndpointId endpoint, intptr_t) -> Loop {
+        ForAllEndpointsWithServerCluster(SoftwareDiagnostics::Id, [](EndpointId endpoint, intptr_t) -> Loop {
             // TODO: Log SoftwareFault event and walk them all.
             return Loop::Break;
         });

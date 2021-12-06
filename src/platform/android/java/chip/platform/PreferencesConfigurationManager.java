@@ -38,6 +38,48 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
   public long readConfigValueLong(String namespace, String name)
       throws AndroidChipPlatformException {
     String key = getKey(namespace, name);
+
+    switch (key) {
+        /**
+         * The unique id assigned by the device vendor to identify the product or device type. This
+         * number is scoped to the device vendor id. return a different value than
+         * src/include/platform/CHIPDeviceConfig.h for debug
+         */
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_ProductId:
+        return 65278;
+
+        /**
+         * The default hardware version number assigned to the device or product by the device
+         * vendor.
+         *
+         * <p>Hardware versions are specific to a particular device vendor and product id, and
+         * typically correspond to a revision of the physical device, a change to its packaging,
+         * and/or a change to its marketing presentation. This value is generally *not* incremented
+         * for device software revisions.
+         *
+         * <p>This is a default value which is used when a hardware version has not been stored in
+         * device persistent storage (e.g. by a factory provisioning process).
+         *
+         * <p>return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+         */
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_HardwareVersion:
+        return 1;
+
+        /**
+         * A monothonic number identifying the software version running on the device.
+         *
+         * <p>return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+         */
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_SoftwareVersion:
+        return 1;
+
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_SetupPinCode:
+        return 20202021;
+
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_SetupDiscriminator:
+        return 0xF00;
+    }
+
     if (preferences.contains(key)) {
       long value = preferences.getLong(key, Long.MAX_VALUE);
       return value;
@@ -51,6 +93,51 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
   public String readConfigValueStr(String namespace, String name)
       throws AndroidChipPlatformException {
     String key = getKey(namespace, name);
+
+    switch (key) {
+        /**
+         * Human readable name of the device model. return a different value than
+         * src/include/platform/CHIPDeviceConfig.h for debug
+         */
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_ProductName:
+        return "TEST_ANDROID_PRODUCT";
+
+        /**
+         * Human readable string identifying version of the product assigned by the device vendor.
+         *
+         * <p>return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+         */
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_HardwareVersionString:
+        return "TEST_ANDROID_VERSION";
+
+        /**
+         * A string identifying the software version running on the device.
+         *
+         * <p>return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+         */
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_SoftwareVersionString:
+        return "prerelease(android)";
+
+        /**
+         * The ManufacturingDate attribute SHALL specify the date that the Node was manufactured.
+         * The first 8 characters SHALL specify the date of manufacture of the Node in international
+         * date notation according to ISO 8601, i.e., YYYYMMDD, e.g., 20060814. The final 8
+         * characters MAY include country, factory, line, shift or other related information at the
+         * option of the vendor. The format of this information is vendor defined.
+         */
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_ManufacturingDate:
+        return "2021-12-06";
+
+        /**
+         * Enables the use of a hard-coded default serial number if none * is found in Chip NV
+         * storage.
+         *
+         * <p>return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+         */
+      case kConfigNamespace_ChipFactory + ":" + kConfigKey_SerialNum:
+        return "TEST_ANDROID_SN";
+    }
+
     if (preferences.contains(key)) {
       String value = preferences.getString(key, null);
       return value;
