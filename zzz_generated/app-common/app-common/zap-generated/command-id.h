@@ -422,6 +422,10 @@
 // Commands for cluster: Application Launcher
 #define ZCL_LAUNCH_APP_COMMAND_ID (0x00)
 #define ZCL_LAUNCH_APP_RESPONSE_COMMAND_ID (0x00)
+#define ZCL_STOP_APP_COMMAND_ID (0x01)
+#define ZCL_STOP_APP_RESPONSE_COMMAND_ID (0x01)
+#define ZCL_HIDE_APP_COMMAND_ID (0x02)
+#define ZCL_HIDE_APP_RESPONSE_COMMAND_ID (0x02)
 
 // Commands for cluster: Application Basic
 #define ZCL_CHANGE_STATUS_COMMAND_ID (0x00)
@@ -430,6 +434,7 @@
 #define ZCL_GET_SETUP_PIN_COMMAND_ID (0x00)
 #define ZCL_GET_SETUP_PIN_RESPONSE_COMMAND_ID (0x00)
 #define ZCL_LOGIN_COMMAND_ID (0x01)
+#define ZCL_LOGOUT_COMMAND_ID (0x02)
 
 // Commands for cluster: Test Cluster
 #define ZCL_TEST_COMMAND_ID (0x00)
