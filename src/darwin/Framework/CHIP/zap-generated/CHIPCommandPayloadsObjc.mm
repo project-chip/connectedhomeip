@@ -2324,7 +2324,7 @@ NS_ASSUME_NONNULL_BEGIN
 
         _userType = @(0);
 
-        _credentialRule = nil;
+        _credentialRule = @(0);
     }
     return self;
 }
@@ -2438,9 +2438,9 @@ NS_ASSUME_NONNULL_BEGIN
 
         _credentialData = [NSData data];
 
-        _userIndex = nil;
+        _userIndex = @(0);
 
-        _userStatus = nil;
+        _userStatus = @(0);
     }
     return self;
 }

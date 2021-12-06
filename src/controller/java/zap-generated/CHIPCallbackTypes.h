@@ -285,20 +285,12 @@ typedef void (*CHIPDescriptorClusterClusterRevisionAttributeCallbackType)(
 typedef void (*CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
     void *, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &);
 
-typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetLogRecordResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetPINCodeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetRFIDCodeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetUserTypeResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
-typedef void (*CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType)(
-    void *, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetCredentialStatusResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetUserResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterSetCredentialResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType &);
 
 typedef void (*CHIPDoorLockClusterLockStateAttributeCallbackType)(
     void *, chip::app::Clusters::DoorLock::Attributes::LockState::TypeInfo::DecodableArgType);

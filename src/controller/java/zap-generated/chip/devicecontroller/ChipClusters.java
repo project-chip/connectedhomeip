@@ -3886,324 +3886,148 @@ public class ChipClusters {
     @Override
     public native long initWithDevice(long devicePtr, int endpointId);
 
-    public void clearAllPINCodes(DefaultClusterCallback callback) {
-      clearAllPINCodes(chipClusterPtr, callback);
+    public void clearCredential(
+        DefaultClusterCallback callback, Integer credentialType, Integer credentialIndex) {
+      clearCredential(chipClusterPtr, callback, credentialType, credentialIndex);
     }
 
-    public void clearAllRFIDCodes(DefaultClusterCallback callback) {
-      clearAllRFIDCodes(chipClusterPtr, callback);
+    public void clearUser(DefaultClusterCallback callback, Integer userIndex) {
+      clearUser(chipClusterPtr, callback, userIndex);
     }
 
-    public void clearHolidaySchedule(DefaultClusterCallback callback, Integer holidayIndex) {
-      clearHolidaySchedule(chipClusterPtr, callback, holidayIndex);
+    public void getCredentialStatus(
+        GetCredentialStatusResponseCallback callback,
+        Integer credentialType,
+        Integer credentialIndex) {
+      getCredentialStatus(chipClusterPtr, callback, credentialType, credentialIndex);
     }
 
-    public void clearPINCode(DefaultClusterCallback callback, Integer pinSlotIndex) {
-      clearPINCode(chipClusterPtr, callback, pinSlotIndex);
-    }
-
-    public void clearRFIDCode(DefaultClusterCallback callback, Integer rfidSlotIndex) {
-      clearRFIDCode(chipClusterPtr, callback, rfidSlotIndex);
-    }
-
-    public void clearWeekDaySchedule(
-        DefaultClusterCallback callback, Integer weekDayIndex, Integer userIndex) {
-      clearWeekDaySchedule(chipClusterPtr, callback, weekDayIndex, userIndex);
-    }
-
-    public void clearYearDaySchedule(
-        DefaultClusterCallback callback, Integer yearDayIndex, Integer userIndex) {
-      clearYearDaySchedule(chipClusterPtr, callback, yearDayIndex, userIndex);
-    }
-
-    public void getHolidaySchedule(
-        GetHolidayScheduleResponseCallback callback, Integer holidayIndex) {
-      getHolidaySchedule(chipClusterPtr, callback, holidayIndex);
-    }
-
-    public void getLogRecord(GetLogRecordResponseCallback callback, Integer logIndex) {
-      getLogRecord(chipClusterPtr, callback, logIndex);
-    }
-
-    public void getPINCode(GetPINCodeResponseCallback callback, Integer userId) {
-      getPINCode(chipClusterPtr, callback, userId);
-    }
-
-    public void getRFIDCode(GetRFIDCodeResponseCallback callback, Integer userId) {
-      getRFIDCode(chipClusterPtr, callback, userId);
-    }
-
-    public void getUserType(GetUserTypeResponseCallback callback, Integer userId) {
-      getUserType(chipClusterPtr, callback, userId);
-    }
-
-    public void getWeekDaySchedule(
-        GetWeekDayScheduleResponseCallback callback, Integer weekDayIndex, Integer userIndex) {
-      getWeekDaySchedule(chipClusterPtr, callback, weekDayIndex, userIndex);
-    }
-
-    public void getYearDaySchedule(
-        GetYearDayScheduleResponseCallback callback, Integer yearDayIndex, Integer userIndex) {
-      getYearDaySchedule(chipClusterPtr, callback, yearDayIndex, userIndex);
+    public void getUser(GetUserResponseCallback callback, Integer userIndex) {
+      getUser(chipClusterPtr, callback, userIndex);
     }
 
     public void lockDoor(DefaultClusterCallback callback, Optional<byte[]> pinCode) {
       lockDoor(chipClusterPtr, callback, pinCode);
     }
 
-    public void setHolidaySchedule(
-        DefaultClusterCallback callback,
-        Integer holidayIndex,
-        Long localStartTime,
-        Long localEndTime,
-        Integer operatingMode) {
-      setHolidaySchedule(
-          chipClusterPtr, callback, holidayIndex, localStartTime, localEndTime, operatingMode);
-    }
-
-    public void setPINCode(
-        DefaultClusterCallback callback,
-        Integer userId,
-        Integer userStatus,
-        Integer userType,
-        byte[] pin) {
-      setPINCode(chipClusterPtr, callback, userId, userStatus, userType, pin);
-    }
-
-    public void setRFIDCode(
-        DefaultClusterCallback callback,
-        Integer userId,
-        Integer userStatus,
-        Integer userType,
-        byte[] rfidCode) {
-      setRFIDCode(chipClusterPtr, callback, userId, userStatus, userType, rfidCode);
-    }
-
-    public void setUserType(DefaultClusterCallback callback, Integer userId, Integer userType) {
-      setUserType(chipClusterPtr, callback, userId, userType);
-    }
-
-    public void setWeekDaySchedule(
-        DefaultClusterCallback callback,
-        Integer weekDayIndex,
+    public void setCredential(
+        SetCredentialResponseCallback callback,
+        Integer operationType,
+        Integer credentialType,
+        Integer credentialIndex,
+        byte[] credentialData,
         Integer userIndex,
-        Integer daysMask,
-        Integer startHour,
-        Integer startMinute,
-        Integer endHour,
-        Integer endMinute) {
-      setWeekDaySchedule(
+        Integer userStatus) {
+      setCredential(
           chipClusterPtr,
           callback,
-          weekDayIndex,
+          operationType,
+          credentialType,
+          credentialIndex,
+          credentialData,
           userIndex,
-          daysMask,
-          startHour,
-          startMinute,
-          endHour,
-          endMinute);
+          userStatus);
     }
 
-    public void setYearDaySchedule(
+    public void setUser(
         DefaultClusterCallback callback,
-        Integer yearDayIndex,
+        Integer operationType,
         Integer userIndex,
-        Long localStartTime,
-        Long localEndTime) {
-      setYearDaySchedule(
-          chipClusterPtr, callback, yearDayIndex, userIndex, localStartTime, localEndTime);
+        @Nullable String userName,
+        @Nullable Long userUniqueId,
+        Integer userStatus,
+        Integer userType,
+        Integer credentialRule) {
+      setUser(
+          chipClusterPtr,
+          callback,
+          operationType,
+          userIndex,
+          userName,
+          userUniqueId,
+          userStatus,
+          userType,
+          credentialRule);
     }
 
     public void unlockDoor(DefaultClusterCallback callback, Optional<byte[]> pinCode) {
       unlockDoor(chipClusterPtr, callback, pinCode);
     }
 
-    public void unlockWithTimeout(
-        DefaultClusterCallback callback, Integer timeout, Optional<byte[]> pinCode) {
-      unlockWithTimeout(chipClusterPtr, callback, timeout, pinCode);
-    }
-
-    private native void clearAllPINCodes(long chipClusterPtr, DefaultClusterCallback Callback);
-
-    private native void clearAllRFIDCodes(long chipClusterPtr, DefaultClusterCallback Callback);
-
-    private native void clearHolidaySchedule(
-        long chipClusterPtr, DefaultClusterCallback Callback, Integer holidayIndex);
-
-    private native void clearPINCode(
-        long chipClusterPtr, DefaultClusterCallback Callback, Integer pinSlotIndex);
-
-    private native void clearRFIDCode(
-        long chipClusterPtr, DefaultClusterCallback Callback, Integer rfidSlotIndex);
-
-    private native void clearWeekDaySchedule(
+    private native void clearCredential(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Integer weekDayIndex,
-        Integer userIndex);
+        Integer credentialType,
+        Integer credentialIndex);
 
-    private native void clearYearDaySchedule(
+    private native void clearUser(
+        long chipClusterPtr, DefaultClusterCallback Callback, Integer userIndex);
+
+    private native void getCredentialStatus(
         long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        Integer yearDayIndex,
-        Integer userIndex);
+        GetCredentialStatusResponseCallback Callback,
+        Integer credentialType,
+        Integer credentialIndex);
 
-    private native void getHolidaySchedule(
-        long chipClusterPtr, GetHolidayScheduleResponseCallback Callback, Integer holidayIndex);
-
-    private native void getLogRecord(
-        long chipClusterPtr, GetLogRecordResponseCallback Callback, Integer logIndex);
-
-    private native void getPINCode(
-        long chipClusterPtr, GetPINCodeResponseCallback Callback, Integer userId);
-
-    private native void getRFIDCode(
-        long chipClusterPtr, GetRFIDCodeResponseCallback Callback, Integer userId);
-
-    private native void getUserType(
-        long chipClusterPtr, GetUserTypeResponseCallback Callback, Integer userId);
-
-    private native void getWeekDaySchedule(
-        long chipClusterPtr,
-        GetWeekDayScheduleResponseCallback Callback,
-        Integer weekDayIndex,
-        Integer userIndex);
-
-    private native void getYearDaySchedule(
-        long chipClusterPtr,
-        GetYearDayScheduleResponseCallback Callback,
-        Integer yearDayIndex,
-        Integer userIndex);
+    private native void getUser(
+        long chipClusterPtr, GetUserResponseCallback Callback, Integer userIndex);
 
     private native void lockDoor(
         long chipClusterPtr, DefaultClusterCallback Callback, Optional<byte[]> pinCode);
 
-    private native void setHolidaySchedule(
+    private native void setCredential(
         long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        Integer holidayIndex,
-        Long localStartTime,
-        Long localEndTime,
-        Integer operatingMode);
+        SetCredentialResponseCallback Callback,
+        Integer operationType,
+        Integer credentialType,
+        Integer credentialIndex,
+        byte[] credentialData,
+        Integer userIndex,
+        Integer userStatus);
 
-    private native void setPINCode(
+    private native void setUser(
         long chipClusterPtr,
         DefaultClusterCallback Callback,
-        Integer userId,
+        Integer operationType,
+        Integer userIndex,
+        @Nullable String userName,
+        @Nullable Long userUniqueId,
         Integer userStatus,
         Integer userType,
-        byte[] pin);
-
-    private native void setRFIDCode(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        Integer userId,
-        Integer userStatus,
-        Integer userType,
-        byte[] rfidCode);
-
-    private native void setUserType(
-        long chipClusterPtr, DefaultClusterCallback Callback, Integer userId, Integer userType);
-
-    private native void setWeekDaySchedule(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        Integer weekDayIndex,
-        Integer userIndex,
-        Integer daysMask,
-        Integer startHour,
-        Integer startMinute,
-        Integer endHour,
-        Integer endMinute);
-
-    private native void setYearDaySchedule(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        Integer yearDayIndex,
-        Integer userIndex,
-        Long localStartTime,
-        Long localEndTime);
+        Integer credentialRule);
 
     private native void unlockDoor(
         long chipClusterPtr, DefaultClusterCallback Callback, Optional<byte[]> pinCode);
 
-    private native void unlockWithTimeout(
-        long chipClusterPtr,
-        DefaultClusterCallback Callback,
-        Integer timeout,
-        Optional<byte[]> pinCode);
-
-    public interface GetHolidayScheduleResponseCallback {
+    public interface GetCredentialStatusResponseCallback {
       void onSuccess(
-          Integer holidayIndex,
-          Integer status,
-          Long localStartTime,
-          Long localEndTime,
-          Integer operatingMode);
+          Boolean credentialExists,
+          @Nullable Integer userIndex,
+          @Nullable Integer nextCredentialIndex);
 
       void onError(Exception error);
     }
 
-    public interface GetLogRecordResponseCallback {
+    public interface GetUserResponseCallback {
       void onSuccess(
-          Integer logEntryId,
-          Long timestamp,
-          Integer eventType,
-          Integer source,
-          Integer eventIdOrAlarmCode,
-          Integer userId,
-          byte[] pin);
-
-      void onError(Exception error);
-    }
-
-    public interface GetPINCodeResponseCallback {
-      void onSuccess(
-          Integer userId,
+          Integer userIndex,
+          @Nullable String userName,
+          @Nullable Long userUniqueId,
           @Nullable Integer userStatus,
           @Nullable Integer userType,
-          @Nullable byte[] pin);
+          @Nullable Integer credentialRule,
+          // credentials: /* TYPE WARNING: array array defaults to */ uint8_t *
+          // Conversion from this type to Java is not properly implemented yet
+          @Nullable Integer creatorFabricIndex,
+          @Nullable Integer lastModifiedFabricIndex,
+          Integer nextUserIndex);
 
       void onError(Exception error);
     }
 
-    public interface GetRFIDCodeResponseCallback {
+    public interface SetCredentialResponseCallback {
       void onSuccess(
-          Integer userId,
-          @Nullable Integer userStatus,
-          @Nullable Integer userType,
-          @Nullable byte[] rfidCode);
-
-      void onError(Exception error);
-    }
-
-    public interface GetUserTypeResponseCallback {
-      void onSuccess(Integer userId, Integer userType);
-
-      void onError(Exception error);
-    }
-
-    public interface GetWeekDayScheduleResponseCallback {
-      void onSuccess(
-          Integer weekDayIndex,
-          Integer userIndex,
-          Integer status,
-          Integer daysMask,
-          Integer startHour,
-          Integer startMinute,
-          Integer endHour,
-          Integer endMinute);
-
-      void onError(Exception error);
-    }
-
-    public interface GetYearDayScheduleResponseCallback {
-      void onSuccess(
-          Integer yearDayIndex,
-          Integer userIndex,
-          Integer status,
-          Long localStartTime,
-          Long localEndTime);
+          Integer status, @Nullable Integer userIndex, @Nullable Integer nextCredentialIndex);
 
       void onError(Exception error);
     }
