@@ -22,6 +22,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <app/clusters/network-commissioning/network-commissioning.h>
 #include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <lib/core/CHIPError.h>
@@ -54,6 +55,7 @@
 #include <CommonRpc.h>
 #endif
 
+#include "AppMain.h"
 #include "Options.h"
 
 using namespace chip;
@@ -426,6 +428,8 @@ void ChipLinuxAppMainLoop()
     chip::Shell::RegisterControllerCommands();
 #endif // defined(ENABLE_CHIP_SHELL)
 #endif // CHIP_DEVICE_CONFIG_ENABLE_BOTH_COMMISSIONER_AND_COMMISSIONEE
+
+    ApplicationInit();
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

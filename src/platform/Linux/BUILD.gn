@@ -61,6 +61,9 @@ static_library("Linux") {
     "KeyValueStoreManagerImpl.cpp",
     "KeyValueStoreManagerImpl.h",
     "Logging.cpp",
+    "NetworkCommissioningDriver.h",
+    "NetworkCommissioningThreadDriver.cpp",
+    "NetworkCommissioningWiFiDriver.cpp",
     "PlatformManagerImpl.cpp",
     "PlatformManagerImpl.h",
     "PosixConfig.cpp",
@@ -81,6 +84,7 @@ static_library("Linux") {
   deps = [ "${chip_root}/src/setup_payload" ]
 
   public_deps = [
+    "${chip_root}/src/app/common:cluster-objects",
     "${chip_root}/src/platform:platform_base",
     "${chip_root}/third_party/inipp",
   ]
