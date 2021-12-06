@@ -51,8 +51,10 @@ int streamer_esp32_init(streamer_t * streamer)
     setvbuf(stdin, NULL, _IONBF, 0);
     esp_vfs_dev_uart_port_set_rx_line_endings(CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CR);
     esp_vfs_dev_uart_port_set_tx_line_endings(CONFIG_ESP_CONSOLE_UART_NUM, ESP_LINE_ENDINGS_CRLF);
-
-    ESP_ERROR_CHECK(uart_driver_install(CONFIG_ESP_CONSOLE_UART_NUM, 256, 0, 0, NULL, 0));
+    if (!uart_is_driver_installed(CONFIG_ESP_CONSOLE_UART_NUM))
+    {
+        ESP_ERROR_CHECK(uart_driver_install(CONFIG_ESP_CONSOLE_UART_NUM, 256, 0, 0, NULL, 0));
+    }
     uart_config_t uart_config = {
         .baud_rate           = 115200,
         .data_bits           = UART_DATA_8_BITS,
@@ -78,7 +80,7 @@ int streamer_esp32_init(streamer_t * streamer)
         linenoiseSetDumbMode(1);
     }
 
-    esp_console_cmd_t command = { .command = "chip", .help = "CHIP utilities", .func = chip_command_handler };
+    esp_console_cmd_t command = { .command = "matter", .help = "Matter utilities", .func = chip_command_handler };
     ESP_ERROR_CHECK(esp_console_cmd_register(&command));
     return 0;
 }
