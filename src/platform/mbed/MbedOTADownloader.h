@@ -23,23 +23,26 @@
  * must include this file
  */
 
-#include <OTAImageProcessorImpl.h>
+#pragma once
+
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/clusters/ota-requestor/OTADownloader.h>
+#include <app/clusters/ota-requestor/OTAImageProcessor.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeDelegate.h>
 #include <protocols/bdx/BdxTransferSession.h>
 #include <protocols/bdx/TransferFacilitator.h>
 
-#pragma once
+namespace chip {
 
 // A class that abstracts the image download functionality from the particular
 // protocol used for that (BDX or possibly HTTPS)
-class OTADownloaderImpl : public chip::bdx::Initiator
+class MbedOTADownloader : public bdx::Initiator, public OTADownloader
 {
 public:
     struct ImageInfo
     {
-        chip::MutableCharSpan imageName;
+        MutableCharSpan imageName;
         size_t imageSize;
     };
 
@@ -47,43 +50,29 @@ private:
     typedef void (*DownloadCompletedCallback)(ImageInfo *);
 
 public:
-    static OTADownloaderImpl & GetInstance() { return sInstance; }
-
-    void Init(DownloadCompletedCallback downloadCompletedCallback = nullptr)
+    MbedOTADownloader(DownloadCompletedCallback downloadCompletedCallback = nullptr)
     {
         mDownloadCompletedCallback = downloadCompletedCallback;
     }
 
     // Application calls this method to direct OTADownloader to begin the download
-    void BeginDownload();
+    CHIP_ERROR BeginPrepareDownload();
 
     // Platform calls this method upon the completion of PrepareDownload() processing
-    void OnPreparedForDownload();
+    CHIP_ERROR OnPreparedForDownload(CHIP_ERROR status);
 
-    // Action parameter type for the OnBlockProcessed()
-    enum BlockActionType
-    {
-        kGetNext,
-        kEnd
-    };
+    // Should be called when it has been determined that the download has timed out.
+    void OnDownloadTimeout() {}
 
-    // Platform calls this method upon the completion of ProcessBlock() processing
-    void OnBlockProcessed(BlockActionType action);
+    // Not all download protocols will be able to close gracefully from the receiver side.
+    // The reason parameter should be used to indicate if this is a graceful end or a forceful abort.
+    void EndDownload(CHIP_ERROR reason = CHIP_NO_ERROR) {}
 
-    // A setter for the delegate class pointer
-    void SetImageProcessorDelegate(OTAImageProcessorImpl * delegate);
-
-    void SetDownloadImageInfo(chip::MutableCharSpan & imageName);
+    void SetDownloadImageInfo(MutableCharSpan & imageName);
 
 private:
-    OTADownloaderImpl();
-
-    static OTADownloaderImpl sInstance;
-
-    OTAImageProcessorImpl * mImageProcessorDelegate;
-
     // inherited from bdx::Endpoint
-    void HandleTransferSessionOutput(chip::bdx::TransferSession::OutputEvent & event);
+    void HandleTransferSessionOutput(bdx::TransferSession::OutputEvent & event);
 
     bool mIsTransferComplete = false;
 
@@ -94,12 +83,13 @@ private:
     DownloadCompletedCallback mDownloadCompletedCallback;
 };
 
-inline void OTADownloaderImpl::SetImageProcessorDelegate(OTAImageProcessorImpl * delegate)
-{
-    mImageProcessorDelegate = delegate;
-}
-
-inline void OTADownloaderImpl::SetDownloadImageInfo(chip::MutableCharSpan & imageName)
+inline void MbedOTADownloader::SetDownloadImageInfo(MutableCharSpan & imageName)
 {
     mImageInfo.imageName = imageName;
 }
+
+} // namespace chip
+
+void SetDownloaderInstance(chip::OTADownloader * instance);
+
+chip::OTADownloader * GetDownloaderInstance();

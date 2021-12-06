@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
-#include <OTARequestorDriverImpl.h>
+#include <MbedOTARequestorDriver.h>
 
-bool CheckImageDownloadAllowed()
+bool MbedOTARequestorDriver::CheckImageDownloadAllowed()
 {
     return true;
 }
 
-void ImageDownloadComplete() {}
+void MbedOTARequestorDriver::ImageDownloadComplete() {}
