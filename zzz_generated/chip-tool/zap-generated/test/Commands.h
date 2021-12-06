@@ -32192,18 +32192,6 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Read attribute Application Launcher list\n");
             err = TestReadAttributeApplicationLauncherList_1();
             break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Launch App Command\n");
-            err = TestLaunchAppCommand_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read attribute catalog vendor id\n");
-            err = TestReadAttributeCatalogVendorId_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read attribute application id\n");
-            err = TestReadAttributeApplicationId_4();
-            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -32215,7 +32203,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 2;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -32227,6 +32215,7 @@ private:
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_1(applicationLauncherList);
     }
 
+<<<<<<< HEAD
     static void OnFailureCallback_3(void * context, EmberAfStatus status)
     {
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_3(status);
@@ -32247,6 +32236,8 @@ private:
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_4(applicationId);
     }
 
+=======
+>>>>>>> c350a1134 (Run zap tool successfully)
     //
     // Tests methods
     //
@@ -32282,6 +32273,7 @@ private:
 
         NextTest();
     }
+<<<<<<< HEAD
 
     CHIP_ERROR TestLaunchAppCommand_2()
     {
@@ -32352,6 +32344,8 @@ private:
 
         NextTest();
     }
+=======
+>>>>>>> c350a1134 (Run zap tool successfully)
 };
 
 class TV_KeypadInputCluster : public TestCommand
@@ -32693,10 +32687,6 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Read attribute product id\n");
             err = TestReadAttributeProductId_3();
             break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read attribute catalog vendor id\n");
-            err = TestReadAttributeCatalogVendorId_4();
-            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -32708,7 +32698,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 4;
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
@@ -32730,6 +32720,7 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_3(productId);
     }
 
+<<<<<<< HEAD
     static void OnFailureCallback_4(void * context, EmberAfStatus status)
     {
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_4(status);
@@ -32740,6 +32731,8 @@ private:
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_4(catalogVendorId);
     }
 
+=======
+>>>>>>> c350a1134 (Run zap tool successfully)
     //
     // Tests methods
     //
@@ -32813,6 +32806,7 @@ private:
 
         NextTest();
     }
+<<<<<<< HEAD
 
     CHIP_ERROR TestReadAttributeCatalogVendorId_4()
     {
@@ -32833,6 +32827,8 @@ private:
 
         NextTest();
     }
+=======
+>>>>>>> c350a1134 (Run zap tool successfully)
 };
 
 class TV_MediaPlaybackCluster : public TestCommand
@@ -33315,9 +33311,9 @@ private:
     static void OnSuccessCallback_1(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> &
-            tvChannelList)
+            channelList)
     {
-        (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_1(tvChannelList);
+        (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_1(channelList);
     }
 
     //
@@ -33336,35 +33332,38 @@ private:
         chip::Controller::TvChannelClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
+<<<<<<< HEAD
         ReturnErrorOnFailure(cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo>(
             this, OnSuccessCallback_1, OnFailureCallback_1));
         return CHIP_NO_ERROR;
+=======
+        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo>(this, OnSuccessCallback_1,
+                                                                                                        OnFailureCallback_1);
+>>>>>>> c350a1134 (Run zap tool successfully)
     }
 
     void OnFailureResponse_1(EmberAfStatus status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_1(
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> &
-            tvChannelList)
+            channelList)
     {
-        auto iter = tvChannelList.begin();
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(tvChannelList)>("tvChannelList", iter, 0));
-        VerifyOrReturn(CheckValue("tvChannelList[0].majorNumber", iter.GetValue().majorNumber, 1U));
-        VerifyOrReturn(CheckValue("tvChannelList[0].minorNumber", iter.GetValue().minorNumber, 2U));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[0].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
-        VerifyOrReturn(
-            CheckValueAsString("tvChannelList[0].callSign", iter.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[0].affiliateCallSign", iter.GetValue().affiliateCallSign,
+        auto iter = channelList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter, 0));
+        VerifyOrReturn(CheckValue("channelList[0].majorNumber", iter.GetValue().majorNumber, 1U));
+        VerifyOrReturn(CheckValue("channelList[0].minorNumber", iter.GetValue().minorNumber, 2U));
+        VerifyOrReturn(CheckValueAsString("channelList[0].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
+        VerifyOrReturn(CheckValueAsString("channelList[0].callSign", iter.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
+        VerifyOrReturn(CheckValueAsString("channelList[0].affiliateCallSign", iter.GetValue().affiliateCallSign,
                                           chip::CharSpan("exampleASign", 12)));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(tvChannelList)>("tvChannelList", iter, 1));
-        VerifyOrReturn(CheckValue("tvChannelList[1].majorNumber", iter.GetValue().majorNumber, 2U));
-        VerifyOrReturn(CheckValue("tvChannelList[1].minorNumber", iter.GetValue().minorNumber, 3U));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[1].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
-        VerifyOrReturn(
-            CheckValueAsString("tvChannelList[1].callSign", iter.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[1].affiliateCallSign", iter.GetValue().affiliateCallSign,
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter, 1));
+        VerifyOrReturn(CheckValue("channelList[1].majorNumber", iter.GetValue().majorNumber, 2U));
+        VerifyOrReturn(CheckValue("channelList[1].minorNumber", iter.GetValue().minorNumber, 3U));
+        VerifyOrReturn(CheckValueAsString("channelList[1].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
+        VerifyOrReturn(CheckValueAsString("channelList[1].callSign", iter.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
+        VerifyOrReturn(CheckValueAsString("channelList[1].affiliateCallSign", iter.GetValue().affiliateCallSign,
                                           chip::CharSpan("exampleASign", 12)));
-        VerifyOrReturn(CheckNoMoreListItems<decltype(tvChannelList)>("tvChannelList", iter, 2));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(channelList)>("channelList", iter, 2));
 
         NextTest();
     }
