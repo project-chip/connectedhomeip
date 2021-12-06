@@ -25,7 +25,7 @@ tests:
 
     - label: "Read attribute TV Channel list"
       command: "readAttribute"
-      attribute: "TV Channel list"
+      attribute: "Channel list"
       response:
           value:
               [

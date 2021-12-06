@@ -620,6 +620,21 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPContentLauncherClusterContentLaunchDimension
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _width = @(0);
+
+        _height = @(0);
+
+        _metric = @(0);
+    }
+    return self;
+}
+@end
+
 @implementation CHIPContentLauncherClusterContentLaunchAdditionalInfo
 - (instancetype)init
 {
@@ -648,42 +663,6 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
-@implementation CHIPContentLauncherClusterContentLaunchBrandingInformation
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _providerName = @"";
-
-        _background = @(0);
-
-        _logo = @(0);
-
-        _progressBar = @(0);
-
-        _splash = @(0);
-
-        _waterMark = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPContentLauncherClusterContentLaunchDimension
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _width = @"";
-
-        _height = @"";
-
-        _metric = @(0);
-    }
-    return self;
-}
-@end
-
 @implementation CHIPContentLauncherClusterContentLaunchStyleInformation
 - (instancetype)init
 {
@@ -693,7 +672,28 @@ NS_ASSUME_NONNULL_BEGIN
 
         _color = @"";
 
-        _size = @(0);
+        _size = [CHIPContentLauncherClusterContentLaunchDimension new];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPContentLauncherClusterContentLaunchBrandingInformation
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _providerName = @"";
+
+        _background = [CHIPContentLauncherClusterContentLaunchStyleInformation new];
+
+        _logo = [CHIPContentLauncherClusterContentLaunchStyleInformation new];
+
+        _progressBar = [CHIPContentLauncherClusterContentLaunchStyleInformation new];
+
+        _splash = [CHIPContentLauncherClusterContentLaunchStyleInformation new];
+
+        _waterMark = [CHIPContentLauncherClusterContentLaunchStyleInformation new];
     }
     return self;
 }
@@ -715,6 +715,32 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @implementation CHIPApplicationLauncherClusterApplicationLauncherApp
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _catalogVendorId = @(0);
+
+        _applicationId = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationLauncherClusterApplicationLauncherEndpoint
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _application = [CHIPApplicationLauncherClusterApplicationLauncherApp new];
+
+        _endpoint = @"";
+    }
+    return self;
+}
+@end
+
+@implementation CHIPApplicationBasicClusterApplicationBasicApp
 - (instancetype)init
 {
     if (self = [super init]) {
