@@ -43,25 +43,71 @@ using namespace chip::app::Clusters::DoorLock;
 EmberEventControl emberAfPluginDoorLockServerLockoutEventControl;
 EmberEventControl emberAfPluginDoorLockServerRelockEventControl;
 
-void DoorLockServer::InitServer()
+DoorLockServer DoorLockServer::instance;
+
+/**********************************************************
+ * DoorLockServer Implementation
+ *********************************************************/
+
+DoorLockServer & DoorLockServer::Instance()
 {
+    return instance;
 }
 
-bool DoorLockServer::SetLockState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState newLockState)
+/**
+ * @brief Initializes given endpoint for a server.
+ *
+ * @param endpointId
+ */
+void DoorLockServer::InitServer(chip::EndpointId endpointId)
 {
-    return true;
+    emberAfDoorLockClusterPrintln("Door Lock cluster initialized at %d", endpointId);
 }
 
-bool DoorLockServer::SetActuatorState(chip::EndpointId endpointId, bool actuatorState)
+bool DoorLockServer::SetLockState(chip::EndpointId endpointId, DlLockState newLockState)
 {
-    return true;
+    auto lockState = static_cast<uint8_t>(newLockState);
+
+    emberAfDoorLockClusterPrintln("Setting Lock State to '%hhu'", lockState);
+
+    bool status = Attributes::LockState::Set(endpointId, lockState);
+    if (!status)
+    {
+        ChipLogError(Zcl, "Unable to set the Lock State to %hhu: internal error", lockState);
+    }
+
+    return status;
 }
 
-bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, chip::app::Clusters::DoorLock::DlLockState doorState)
+bool DoorLockServer::SetActuatorState(chip::EndpointId endpointId, bool newActuatorState)
 {
-    return true;
+    auto actuatorState = static_cast<uint8_t>(newActuatorState);
+
+    emberAfDoorLockClusterPrintln("Setting Actuator State to '%hhu'", actuatorState);
+
+    bool status = Attributes::LockState::Set(endpointId, actuatorState);
+    if (!status)
+    {
+        ChipLogError(Zcl, "Unable to set the Actuator State to %hhu: internal error", actuatorState);
+    }
+
+    return false;
 }
 
+bool DoorLockServer::SetDoorState(chip::EndpointId endpointId, DlLockState newDoorState)
+{
+    auto doorState = static_cast<uint8_t>(newDoorState);
+
+    emberAfDoorLockClusterPrintln("Setting Door State to '%hhu'", doorState);
+    bool status = Attributes::DoorState::Set(endpointId, doorState);
+
+    if (!status)
+    {
+        ChipLogError(Zcl, "Unable to set the Door State to %hhu: internal error", doorState);
+    }
+
+    return false;
+}
 
 bool DoorLockServer::SetLanguage(chip::EndpointId endpointId, const char * newLanguage)
 {
@@ -180,135 +226,12 @@ bool emberAfDoorLockClusterClearCredentialCallback(
     return true;
 }
 
-// =======================================================
-
-bool emberAfDoorLockClusterGetLogRecordCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                const Commands::GetLogRecord::DecodableType & commandData)
+chip::Protocols::InteractionModel::Status
+MatterDoorLockClusterServerPreAttributeChangedCallback(const chip::app::ConcreteAttributePath & attributePath,
+                                                       EmberAfAttributeType attributeType, uint16_t size, uint8_t * value)
 {
-    return true;
-}
-
-bool emberAfDoorLockClusterSetWeekDayScheduleCallback(app::CommandHandler * commandObj,
-                                                      const app::ConcreteCommandPath & commandPath,
-                                                      const Commands::SetWeekDaySchedule::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterGetWeekDayScheduleCallback(app::CommandHandler * commandObj,
-                                                      const app::ConcreteCommandPath & commandPath,
-                                                      const Commands::GetWeekDaySchedule::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterClearWeekDayScheduleCallback(app::CommandHandler * commandObj,
-                                                        const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::ClearWeekDaySchedule::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterSetYearDayScheduleCallback(app::CommandHandler * commandObj,
-                                                      const app::ConcreteCommandPath & commandPath,
-                                                      const Commands::SetYearDaySchedule::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterGetYearDayScheduleCallback(app::CommandHandler * commandObj,
-                                                      const app::ConcreteCommandPath & commandPath,
-                                                      const Commands::GetYearDaySchedule::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterClearYearDayScheduleCallback(app::CommandHandler * commandObj,
-                                                        const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::ClearYearDaySchedule::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterSetHolidayScheduleCallback(app::CommandHandler * commandObj,
-                                                      const app::ConcreteCommandPath & commandPath,
-                                                      const Commands::SetHolidaySchedule::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterGetHolidayScheduleCallback(app::CommandHandler * commandObj,
-                                                      const app::ConcreteCommandPath & commandPath,
-                                                      const Commands::GetHolidaySchedule::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterClearHolidayScheduleCallback(app::CommandHandler * commandObj,
-                                                        const app::ConcreteCommandPath & commandPath,
-                                                        const Commands::ClearHolidaySchedule::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterGetUserTypeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                               const Commands::GetUserType::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterSetUserTypeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                               const Commands::SetUserType::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterSetPINCodeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                              const Commands::SetPINCode::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterGetPINCodeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                              const Commands::GetPINCode::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterClearPINCodeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                const Commands::ClearPINCode::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterClearAllPINCodesCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                    const Commands::ClearAllPINCodes::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterSetRFIDCodeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                               const Commands::SetRFIDCode::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterGetRFIDCodeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                               const Commands::GetRFIDCode::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterClearRFIDCodeCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                 const Commands::ClearRFIDCode::DecodableType & commandData)
-{
-    return true;
-}
-
-bool emberAfDoorLockClusterClearAllRFIDCodesCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                     const Commands::ClearAllRFIDCodes::DecodableType & commandData)
-{
-    return true;
+    // TODO: Implement attribute changes
+    return chip::Protocols::InteractionModel::Status::Success;
 }
 
 void emberAfPluginDoorLockServerLockoutEventHandler(void)
@@ -319,14 +242,9 @@ void emberAfPluginDoorLockServerRelockEventHandler(void)
 {
 }
 
-bool emberAfDoorLockClusterUnlockWithTimeoutCallback(app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
-                                                     const Commands::UnlockWithTimeout::DecodableType & commandData)
-{
-    return true;
-}
-
 void MatterDoorLockPluginServerInitCallback()
 {
+    emberAfDoorLockClusterPrintln("Door Lock server initialized");
 }
 
 void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
