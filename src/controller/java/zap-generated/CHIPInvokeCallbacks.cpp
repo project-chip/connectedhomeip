@@ -205,14 +205,10 @@ void CHIPContentLauncherClusterLaunchContentResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;Ljava/lang/Integer;)V",
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;)V",
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject data;
-
-    chip::UtfString dataUtfString(env, dataResponse.data);
-    data = dataUtfString.jniValue();
     jobject contentLaunchStatus;
 
     std::string contentLaunchStatusClassName     = "java/lang/Integer";
@@ -220,8 +216,12 @@ void CHIPContentLauncherClusterLaunchContentResponseCallback::CallbackFn(
     chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(
         contentLaunchStatusClassName.c_str(), contentLaunchStatusCtorSignature.c_str(), dataResponse.contentLaunchStatus,
         contentLaunchStatus);
+    jobject data;
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, data, contentLaunchStatus);
+    chip::UtfString dataUtfString(env, dataResponse.data);
+    data = dataUtfString.jniValue();
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, contentLaunchStatus, data);
 }
 CHIPContentLauncherClusterLaunchURLResponseCallback::CHIPContentLauncherClusterLaunchURLResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPContentLauncherClusterLaunchURLResponseCallbackType>(CallbackFn, this)
@@ -272,14 +272,10 @@ void CHIPContentLauncherClusterLaunchURLResponseCallback::CallbackFn(
     // Java callback is allowed to be null, exit early if this is the case.
     VerifyOrReturn(javaCallbackRef != nullptr);
 
-    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/String;Ljava/lang/Integer;)V",
+    err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;Ljava/lang/String;)V",
                                                   &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject data;
-
-    chip::UtfString dataUtfString(env, dataResponse.data);
-    data = dataUtfString.jniValue();
     jobject contentLaunchStatus;
 
     std::string contentLaunchStatusClassName     = "java/lang/Integer";
@@ -287,8 +283,12 @@ void CHIPContentLauncherClusterLaunchURLResponseCallback::CallbackFn(
     chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::ContentLauncher::ContentLaunchStatus>(
         contentLaunchStatusClassName.c_str(), contentLaunchStatusCtorSignature.c_str(), dataResponse.contentLaunchStatus,
         contentLaunchStatus);
+    jobject data;
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, data, contentLaunchStatus);
+    chip::UtfString dataUtfString(env, dataResponse.data);
+    data = dataUtfString.jniValue();
+
+    env->CallVoidMethod(javaCallbackRef, javaMethod, contentLaunchStatus, data);
 }
 CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback::CHIPDiagnosticLogsClusterRetrieveLogsResponseCallback(jobject javaCallback) :
     Callback::Callback<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType>(CallbackFn, this)
@@ -3799,17 +3799,17 @@ void CHIPTvChannelClusterChangeChannelResponseCallback::CallbackFn(
     err = JniReferences::GetInstance().FindMethod(env, javaCallbackRef, "onSuccess", "(Ljava/lang/Integer;)V", &javaMethod);
     VerifyOrReturn(err == CHIP_NO_ERROR, ChipLogError(Zcl, "Error invoking Java callback: %s", ErrorStr(err)));
 
-    jobject ChannelMatch;
+    jobject channelMatch;
 
-    ChannelMatch = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
-    jobject ErrorType;
+    channelMatch = nullptr; /* Array - Conversion from this type to Java is not properly implemented yet */
+    jobject errorType;
 
-    std::string ErrorTypeClassName     = "java/lang/Integer";
-    std::string ErrorTypeCtorSignature = "(I)V";
+    std::string errorTypeClassName     = "java/lang/Integer";
+    std::string errorTypeCtorSignature = "(I)V";
     chip::JniReferences::GetInstance().CreateBoxedObject<chip::app::Clusters::TvChannel::TvChannelErrorType>(
-        ErrorTypeClassName.c_str(), ErrorTypeCtorSignature.c_str(), dataResponse.errorType, ErrorType);
+        errorTypeClassName.c_str(), errorTypeCtorSignature.c_str(), dataResponse.errorType, errorType);
 
-    env->CallVoidMethod(javaCallbackRef, javaMethod, ChannelMatch, ErrorType);
+    env->CallVoidMethod(javaCallbackRef, javaMethod, channelMatch, errorType);
 }
 CHIPTargetNavigatorClusterNavigateTargetResponseCallback::CHIPTargetNavigatorClusterNavigateTargetResponseCallback(
     jobject javaCallback) :

@@ -1680,24 +1680,26 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPContentLauncherClusterLaunchContentParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull autoPlay;
 @property (strong, nonatomic) NSString * _Nonnull data;
+@property (strong, nonatomic) NSArray * _Nonnull search;
 - (instancetype)init;
 @end
 
 @interface CHIPContentLauncherClusterLaunchContentResponseParams : NSObject
-@property (strong, nonatomic) NSString * _Nonnull data;
 @property (strong, nonatomic) NSNumber * _Nonnull contentLaunchStatus;
+@property (strong, nonatomic) NSString * _Nonnull data;
 - (instancetype)init;
 @end
 
 @interface CHIPContentLauncherClusterLaunchURLParams : NSObject
 @property (strong, nonatomic) NSString * _Nonnull contentURL;
 @property (strong, nonatomic) NSString * _Nonnull displayString;
+@property (strong, nonatomic) NSArray * _Nonnull brandingInformation;
 - (instancetype)init;
 @end
 
 @interface CHIPContentLauncherClusterLaunchURLResponseParams : NSObject
-@property (strong, nonatomic) NSString * _Nonnull data;
 @property (strong, nonatomic) NSNumber * _Nonnull contentLaunchStatus;
+@property (strong, nonatomic) NSString * _Nonnull data;
 - (instancetype)init;
 @end
 
@@ -1714,14 +1716,35 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPApplicationLauncherClusterLaunchAppParams : NSObject
 @property (strong, nonatomic) NSString * _Nonnull data;
-@property (strong, nonatomic) NSNumber * _Nonnull catalogVendorId;
-@property (strong, nonatomic) NSString * _Nonnull applicationId;
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApp * _Nonnull application;
 - (instancetype)init;
 @end
 
 @interface CHIPApplicationLauncherClusterLaunchAppResponseParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nonnull status;
 @property (strong, nonatomic) NSString * _Nonnull data;
+- (instancetype)init;
+@end
+
+@interface CHIPApplicationLauncherClusterStopAppParams : NSObject
+@property (strong, nonatomic) NSString * _Nonnull data;
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApp * _Nonnull application;
+- (instancetype)init;
+@end
+
+@interface CHIPApplicationLauncherClusterStopAppResponseParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull status;
+- (instancetype)init;
+@end
+
+@interface CHIPApplicationLauncherClusterHideAppParams : NSObject
+@property (strong, nonatomic) NSString * _Nonnull data;
+@property (strong, nonatomic) CHIPApplicationLauncherClusterApplicationLauncherApp * _Nonnull application;
+- (instancetype)init;
+@end
+
+@interface CHIPApplicationLauncherClusterHideAppResponseParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull status;
 - (instancetype)init;
 @end
 
