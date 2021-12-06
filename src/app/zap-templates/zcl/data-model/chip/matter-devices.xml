@@ -2163,34 +2163,15 @@ limitations under the License.
             <include cluster="Door Lock" client="true" server="true" clientLocked="true" serverLocked="true">
                 <requireCommand>LockDoor</requireCommand>
                 <requireCommand>UnlockDoor</requireCommand>
-                <requireCommand>UnlockWithTimeout</requireCommand>
-                <requireCommand>GetLogRecord</requireCommand>
-                <requireCommand>GetLogRecordResponse</requireCommand>
-                <requireCommand>SetPINCode</requireCommand>
-                <requireCommand>GetPINCode</requireCommand>
-                <requireCommand>GetPINCodeResponse</requireCommand>
-                <requireCommand>ClearPINCode</requireCommand>
-                <requireCommand>ClearAllPINCodes</requireCommand>
-                <requireCommand>SetWeekDaySchedule</requireCommand>
-                <requireCommand>GetWeekDaySchedule</requireCommand>
-                <requireCommand>GetWeekDayScheduleResponse</requireCommand>
-                <requireCommand>ClearWeekDaySchedule</requireCommand>
-                <requireCommand>SetYearDaySchedule</requireCommand>
-                <requireCommand>GetYearDaySchedule</requireCommand>
-                <requireCommand>GetYearDayScheduleResponse</requireCommand>
-                <requireCommand>ClearYearDaySchedule</requireCommand>
-                <requireCommand>SetHolidaySchedule</requireCommand>
-                <requireCommand>GetHolidaySchedule</requireCommand>
-                <requireCommand>GetHolidayScheduleResponse</requireCommand>
-                <requireCommand>ClearHolidaySchedule</requireCommand>
-                <requireCommand>SetUserType</requireCommand>
-                <requireCommand>GetUserType</requireCommand>
-                <requireCommand>GetUserTypeResponse</requireCommand>
-                <requireCommand>SetRFIDCode</requireCommand>
-                <requireCommand>GetRFIDCode</requireCommand>
-                <requireCommand>GetRFIDCodeResponse</requireCommand>
-                <requireCommand>ClearRFIDCode</requireCommand>
-                <requireCommand>ClearAllRFIDCodes</requireCommand>
+                <requireCommand>SetUser</requireCommand>
+                <requireCommand>GetUser</requireCommand>
+                <requireCommand>GetUserResponse</requireCommand>
+                <requireCommand>ClearUser</requireCommand>
+                <requireCommand>SetCredential</requireCommand>
+                <requireCommand>SetCredentialResponse</requireCommand>
+                <requireCommand>SetCredentialStatus</requireCommand>
+                <requireCommand>SetCredentialStatusResponse</requireCommand>
+                <requireCommand>ClearCredential</requireCommand>
             </include>
             <include cluster="Groups" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>

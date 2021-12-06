@@ -9882,7 +9882,7 @@
               "code": 3,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9890,7 +9890,7 @@
               "code": 4,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9898,7 +9898,7 @@
               "code": 5,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9906,7 +9906,7 @@
               "code": 6,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9914,7 +9914,7 @@
               "code": 7,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9922,7 +9922,7 @@
               "code": 8,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9930,7 +9930,7 @@
               "code": 11,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9938,7 +9938,7 @@
               "code": 12,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9946,7 +9946,7 @@
               "code": 13,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9954,7 +9954,7 @@
               "code": 14,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9962,7 +9962,7 @@
               "code": 15,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9970,7 +9970,7 @@
               "code": 16,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9978,7 +9978,7 @@
               "code": 17,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9986,7 +9986,7 @@
               "code": 18,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -9994,7 +9994,7 @@
               "code": 19,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -10002,7 +10002,7 @@
               "code": 20,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -10010,7 +10010,7 @@
               "code": 21,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -10018,7 +10018,7 @@
               "code": 22,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -10026,7 +10026,7 @@
               "code": 23,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -10034,7 +10034,7 @@
               "code": 24,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -10042,8 +10042,56 @@
               "code": 25,
               "mfgCode": null,
               "source": "client",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
+            },
+            {
+              "name": "SetUser",
+              "code": 26,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "GetUser",
+              "code": 27,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "ClearUser",
+              "code": 29,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "SetCredential",
+              "code": 34,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "GetCredentialStatus",
+              "code": 36,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "ClearCredential",
+              "code": 38,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
@@ -10078,7 +10126,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "GetPINCodeResponse",
@@ -10086,7 +10134,7 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "GetWeekDayScheduleResponse",
@@ -10094,11 +10142,35 @@
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "GetYearDayScheduleResponse",
               "code": 15,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 0
+            },
+            {
+              "name": "GetUserResponse",
+              "code": 28,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "SetCredentialResponse",
+              "code": 35,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "GetCredentialStatusResponse",
+              "code": 37,
               "mfgCode": null,
               "source": "server",
               "incoming": 0,
@@ -10156,7 +10228,7 @@
               "code": 3,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -10182,6 +10254,81 @@
               "reportableChange": 0
             },
             {
+              "name": "NumberOfTotalUsersSupported",
+              "code": 17,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "NumberOfPINUsersSupported",
+              "code": 18,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "MaxPINCodeLength",
+              "code": 23,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "MinPINCodeLength",
+              "code": 24,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "CredentialRulesSupport",
+              "code": 27,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "EnableLogging",
               "code": 32,
               "mfgCode": null,
@@ -10201,7 +10348,7 @@
               "code": 33,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -10246,7 +10393,7 @@
               "code": 36,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -10321,7 +10468,7 @@
               "code": 41,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -10351,7 +10498,7 @@
               "code": 43,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -10366,7 +10513,7 @@
               "code": 48,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,
@@ -10381,7 +10528,7 @@
               "code": 49,
               "mfgCode": null,
               "side": "server",
-              "included": 0,
+              "included": 1,
               "storageOption": "RAM",
               "singleton": 0,
               "bounded": 0,

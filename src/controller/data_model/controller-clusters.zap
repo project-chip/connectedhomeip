@@ -6027,7 +6027,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "GetLogRecord",
@@ -6035,7 +6035,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "SetPINCode",
@@ -6043,7 +6043,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "GetPINCode",
@@ -6051,7 +6051,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "ClearPINCode",
@@ -6059,7 +6059,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "ClearAllPINCodes",
@@ -6067,7 +6067,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "SetWeekDaySchedule",
@@ -6075,7 +6075,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "GetWeekDaySchedule",
@@ -6083,7 +6083,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "ClearWeekDaySchedule",
@@ -6091,7 +6091,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "SetYearDaySchedule",
@@ -6099,7 +6099,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "GetYearDaySchedule",
@@ -6107,7 +6107,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "ClearYearDaySchedule",
@@ -6115,7 +6115,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "SetHolidaySchedule",
@@ -6123,7 +6123,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "GetHolidaySchedule",
@@ -6131,7 +6131,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "ClearHolidaySchedule",
@@ -6139,7 +6139,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "SetUserType",
@@ -6147,7 +6147,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "GetUserType",
@@ -6155,7 +6155,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "SetRFIDCode",
@@ -6163,7 +6163,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "GetRFIDCode",
@@ -6171,7 +6171,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "ClearRFIDCode",
@@ -6179,7 +6179,7 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
-              "outgoing": 1
+              "outgoing": 0
             },
             {
               "name": "ClearAllRFIDCodes",
@@ -6187,6 +6187,54 @@
               "mfgCode": null,
               "source": "client",
               "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "SetUser",
+              "code": 26,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "GetUser",
+              "code": 27,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "ClearUser",
+              "code": 29,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "SetCredential",
+              "code": 34,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "GetCredentialStatus",
+              "code": 36,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "ClearCredential",
+              "code": 38,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 0,
               "outgoing": 1
             }
           ],
@@ -6221,7 +6269,7 @@
               "code": 4,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -6229,7 +6277,7 @@
               "code": 6,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -6245,7 +6293,7 @@
               "code": 12,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -6253,7 +6301,7 @@
               "code": 15,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -6261,7 +6309,7 @@
               "code": 18,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -6269,7 +6317,7 @@
               "code": 21,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
             },
             {
@@ -6277,8 +6325,32 @@
               "code": 23,
               "mfgCode": null,
               "source": "server",
-              "incoming": 1,
+              "incoming": 0,
               "outgoing": 1
+            },
+            {
+              "name": "GetUserResponse",
+              "code": 28,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "SetCredentialResponse",
+              "code": 35,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
+              "name": "GetCredentialStatusResponse",
+              "code": 37,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 1,
+              "outgoing": 0
             }
           ],
           "attributes": [
