@@ -6920,6 +6920,89 @@ struct TypeInfo
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace StateChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+    kNewState = 2,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    ActionStatusEnum newState;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    ActionStatusEnum newState;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace StateChanged
+namespace ActionFailed {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+    kNewState = 2,
+    kError    = 3,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    ActionStatusEnum newState;
+    ActionErrorEnum error;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    ActionStatusEnum newState;
+    ActionErrorEnum error;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ActionFailed
+} // namespace Events
 } // namespace BridgedActions
 namespace Basic {
 

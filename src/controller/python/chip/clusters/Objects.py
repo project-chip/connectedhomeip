@@ -5121,6 +5121,45 @@ class BridgedActions(Cluster):
             value: 'uint' = 0
 
 
+    class Events:
+        @dataclass
+        class StateChanged(ClusterEventDescriptor):
+            cluster_id: typing.ClassVar[int] = 0x0025
+            event_id: typing.ClassVar[int] = 0x00000000
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="actionID", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="invokeID", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="newState", Tag=2, Type=BridgedActions.Enums.ActionStatusEnum),
+                    ])
+
+            actionID: 'uint' = 0
+            invokeID: 'uint' = 0
+            newState: 'BridgedActions.Enums.ActionStatusEnum' = 0
+
+        @dataclass
+        class ActionFailed(ClusterEventDescriptor):
+            cluster_id: typing.ClassVar[int] = 0x0025
+            event_id: typing.ClassVar[int] = 0x00000001
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields = [
+                            ClusterObjectFieldDescriptor(Label="actionID", Tag=0, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="invokeID", Tag=1, Type=uint),
+                            ClusterObjectFieldDescriptor(Label="newState", Tag=2, Type=BridgedActions.Enums.ActionStatusEnum),
+                            ClusterObjectFieldDescriptor(Label="error", Tag=3, Type=BridgedActions.Enums.ActionErrorEnum),
+                    ])
+
+            actionID: 'uint' = 0
+            invokeID: 'uint' = 0
+            newState: 'BridgedActions.Enums.ActionStatusEnum' = 0
+            error: 'BridgedActions.Enums.ActionErrorEnum' = 0
+
 
 @dataclass
 class Basic(Cluster):
