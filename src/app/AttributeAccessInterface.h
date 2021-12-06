@@ -43,7 +43,7 @@ namespace chip {
 namespace app {
 
 /**
- * The AttributeReportEncoder is a helper class for filling a single report in AttributeReportIBs.
+ * The AttributeReportBuilder is a helper class for filling a single report in AttributeReportIBs.
  *
  * Possible usage of AttributeReportBuilder might be:
  *
@@ -128,6 +128,8 @@ public:
          * state of the buffer is valid to send (i.e. contains no trailing garbage), and return an error
          * if the list doesn't entirely fit.  In this situation, mAllowPartialData is set to communicate to the
          * report engine that it should not roll back the list items.
+         *
+         * TODO: There might be a better name for this variable.
          */
         bool mAllowPartialData = false;
         /**
@@ -161,16 +163,19 @@ public:
     }
 
     /**
-     * aCallback is expected to take a const auto & argument and
-     * Encode() on it as many times as needed to encode all the list elements
-     * one by one.  If any of those Encode() calls returns failure, aCallback
-     * must stop encoding and return failure.  When all items are encoded
-     * aCallback is expected to return success.
+     * aCallback is expected to take a const auto & argument and Encode() on it as many times as needed to encode all the list
+     * elements one by one.  If any of those Encode() calls returns failure, aCallback must stop encoding and return failure.  When
+     * all items are encoded aCallback is expected to return success.
      *
-     * aCallback may not be called.  Consumers must not assume it will be
-     * called.
+     * aCallback may not be called.  Consumers must not assume it will be called.
+     *
+     * When EncodeList returns an error, the consumers must abort the encoding, and return the exact error to the caller.
+     *
+     * TODO: Can we hold a error state in the AttributeValueEncoder itself so functions in ember-compatibility-functions don't have
+     * to rely on the above assumption?
      *
      * Consumers are allowed to make either one call to EncodeList or one call to Encode to handle a read.
+     *
      */
     template <typename ListGenerator>
     CHIP_ERROR EncodeList(ListGenerator aCallback)

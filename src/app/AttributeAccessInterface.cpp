@@ -69,9 +69,7 @@ CHIP_ERROR AttributeValueEncoder::EncodeEmptyList()
             // Put an empty array before encoding the first array element for list chunking.
             AttributeReportBuilder builder;
 
-            ReturnErrorOnFailure(builder.PrepareAttribute(
-                mAttributeReportIBsBuilder, ConcreteDataAttributePath(mPath.mEndpointId, mPath.mClusterId, mPath.mAttributeId),
-                mDataVersion));
+            ReturnErrorOnFailure(builder.PrepareAttribute(mAttributeReportIBsBuilder, mPath, mDataVersion));
             ReturnErrorOnFailure(builder.EncodeValue(DataModel::List<uint8_t>()));
 
             ReturnErrorOnFailure(builder.FinishAttribute());
@@ -80,8 +78,8 @@ CHIP_ERROR AttributeValueEncoder::EncodeEmptyList()
         mCurrentEncodingListIndex = 0;
     }
 
-    // After encoded the empty list, the remaining items are atomicly encoded into the buffer. Tell report engine that do not revert
-    // partial data.
+    // After encoding the empty list, the remaining items are atomicaly encoded into the buffer. Tell report engine that to not
+    // revert partial data.
     mEncodeState.mAllowPartialData = true;
 
     return CHIP_NO_ERROR;
