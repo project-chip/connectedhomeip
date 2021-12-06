@@ -15,13 +15,13 @@ an open thread border router.
 -   patch file: rio_patch_updated.patch
 -   savannah link: https://savannah.nongnu.org/patch/?10114
 
-Troubleshooting: The patch uses the ip6_addr_net_eq function, which is a recent
-API change on upstream LwIP. The previous version of this function is
-ip6_addr_netcmp, so this function call may need to be replaced on older forks.
+Troubleshooting: The patch uses the `ip6_addr_net_eq` function, which is a
+recent API change on upstream LwIP. The previous version of this function is
+`ip6_addr_netcmp`, so this function call may need to be replaced on older forks.
 
 ## Important upstream patches
 
-### Malformed neighbour solicitation packet fix
+### Malformed neighbor solicitation packet fix
 
 -   issue raised here
     https://github.com/project-chip/connectedhomeip/issues/9791
