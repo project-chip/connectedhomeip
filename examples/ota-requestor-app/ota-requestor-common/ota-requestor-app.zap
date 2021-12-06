@@ -31,9 +31,9 @@
   ],
   "endpointTypes": [
     {
-      "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "MA-all-clusters-app",
-      "deviceTypeCode": 0,
+      "name": "MA-rootdevice",
+      "deviceTypeName": "MA-rootdevice",
+      "deviceTypeCode": 22,
       "deviceTypeProfileId": 259,
       "clusters": [
         {
@@ -1054,7 +1054,7 @@
               "outgoing": 0
             },
             {
-              "name": "ApplyUpdateRequestResponse",
+              "name": "ApplyUpdateResponse",
               "code": 4,
               "mfgCode": null,
               "source": "server",
@@ -3703,14 +3703,13 @@
   ],
   "endpoints": [
     {
-      "endpointTypeName": "Anonymous Endpoint Type",
+      "endpointTypeName": "MA-rootdevice",
       "endpointTypeIndex": 0,
       "profileId": 259,
       "endpointId": 0,
       "networkId": 0,
       "endpointVersion": 1,
-      "deviceIdentifier": 0
+      "deviceIdentifier": 22
     }
-  ],
-  "log": []
+  ]
 }
