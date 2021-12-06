@@ -26,6 +26,7 @@ tests:
     - label: "Writes a value of 0 to TemperatureDisplayMode attribute of DUT"
       command: "writeAttribute"
       attribute: "temperature display mode"
+      PICS: A_TEMPERATURE_DISPLAY_MODE
       arguments:
           value: 0
 
@@ -36,6 +37,7 @@ tests:
     - label: "Writes a value of 1 to TemperatureDisplayMode attribute of DUT"
       command: "writeAttribute"
       attribute: "temperature display mode"
+      PICS: A_TEMPERATURE_DISPLAY_MODE
       arguments:
           value: 1
 
@@ -50,6 +52,7 @@ tests:
       disabled: true
       command: "writeAttribute"
       attribute: "temperature display mode"
+      PICS: A_TEMPERATURE_DISPLAY_MODE
       arguments:
           value: 2
       response:
@@ -58,6 +61,7 @@ tests:
     - label: "Writes a value of 0 to KeypadLockout attribute of DUT"
       command: "writeAttribute"
       attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 0
 
@@ -68,6 +72,7 @@ tests:
     - label: "Writes a value of 1 to KeypadLockout attribute of DUT"
       command: "writeAttribute"
       attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 1
 
@@ -78,6 +83,7 @@ tests:
     - label: "Writes a value of 2 to KeypadLockout attribute of DUT"
       command: "writeAttribute"
       attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 2
 
@@ -88,6 +94,7 @@ tests:
     - label: "Writes a value of 3 to KeypadLockout attribute of DUT"
       command: "writeAttribute"
       attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 3
 
@@ -98,6 +105,7 @@ tests:
     - label: "Writes a value of 4 to KeypadLockout attribute of DUT"
       command: "writeAttribute"
       attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 4
 
@@ -108,6 +116,7 @@ tests:
     - label: "Writes a value of 5 to KeypadLockout attribute of DUT"
       command: "writeAttribute"
       attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 5
 
@@ -121,6 +130,7 @@ tests:
       disabled: true
       command: "writeAttribute"
       attribute: "keypad lockout"
+      PICS: A_KEYPAD_LOCKOUT
       arguments:
           value: 6
       response:
@@ -130,6 +140,7 @@ tests:
           "Writes a value of 0 to ScheduleProgrammingVisibility attribute of DUT"
       command: "writeAttribute"
       attribute: "schedule programming visibility"
+      PICS: A_SCHEDULE_PROGRAMMING_VISIBILITY
       arguments:
           value: 0
 
@@ -143,6 +154,7 @@ tests:
           "Writes a value of 1 to ScheduleProgrammingVisibility attribute of DUT"
       command: "writeAttribute"
       attribute: "schedule programming visibility"
+      PICS: A_SCHEDULE_PROGRAMMING_VISIBILITY
       arguments:
           value: 1
 
@@ -159,6 +171,7 @@ tests:
       disabled: true
       command: "writeAttribute"
       attribute: "schedule programming visibility"
+      PICS: A_SCHEDULE_PROGRAMMING_VISIBILITY
       arguments:
           value: 2
       response:

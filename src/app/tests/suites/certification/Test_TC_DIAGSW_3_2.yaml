@@ -27,11 +27,13 @@ tests:
     - label: "Sends ResetWatermarks to DUT"
       disabled: true
       command: "ResetWatermarks"
+      PICS: CR_RESETWATERMARKS
 
     - label: "Reads a list of ThreadMetrics struct attribute from DUT."
       disabled: true
       command: "readAttribute"
       attribute: "ThreadMetrics"
+      PICS: A_THREADMETRICS
       response:
           value: 0
 
@@ -39,6 +41,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "CurrentHeapUsed"
+      PICS: A_CURRENTHEAPUSED
       response:
           value: 0
 
@@ -46,5 +49,6 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "CurrentHeapHighWatermark"
+      PICS: A_CURRENTHEAPHIGHWATERMARK
       response:
           value: 0
