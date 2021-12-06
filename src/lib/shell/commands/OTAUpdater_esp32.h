@@ -101,7 +101,7 @@ inline esp_err_t OTAUpdater::Abort(void)
         return ESP_ERR_INVALID_STATE;
     }
 
-    ESP_LOGI(TAG, "Abort");
+    ESP_LOGI(TAG, "OTA Abort");
     otaUpdateInProgress = false;
     otaUpdateImageLen   = 0;
     return esp_ota_abort(otaUpdateHandle);
