@@ -99,102 +99,44 @@ private:
     jobject javaCallbackRef;
 };
 
-class CHIPDoorLockClusterGetHolidayScheduleResponseCallback
-    : public Callback::Callback<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>
+class CHIPDoorLockClusterGetCredentialStatusResponseCallback
+    : public Callback::Callback<CHIPDoorLockClusterGetCredentialStatusResponseCallbackType>
 {
 public:
-    CHIPDoorLockClusterGetHolidayScheduleResponseCallback(jobject javaCallback);
+    CHIPDoorLockClusterGetCredentialStatusResponseCallback(jobject javaCallback);
 
-    ~CHIPDoorLockClusterGetHolidayScheduleResponseCallback();
+    ~CHIPDoorLockClusterGetCredentialStatusResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data);
+                           const chip::app::Clusters::DoorLock::Commands::GetCredentialStatusResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPDoorLockClusterGetLogRecordResponseCallback
-    : public Callback::Callback<CHIPDoorLockClusterGetLogRecordResponseCallbackType>
+class CHIPDoorLockClusterGetUserResponseCallback : public Callback::Callback<CHIPDoorLockClusterGetUserResponseCallbackType>
 {
 public:
-    CHIPDoorLockClusterGetLogRecordResponseCallback(jobject javaCallback);
+    CHIPDoorLockClusterGetUserResponseCallback(jobject javaCallback);
 
-    ~CHIPDoorLockClusterGetLogRecordResponseCallback();
+    ~CHIPDoorLockClusterGetUserResponseCallback();
 
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType & data);
+    static void CallbackFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetUserResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;
 };
 
-class CHIPDoorLockClusterGetPINCodeResponseCallback : public Callback::Callback<CHIPDoorLockClusterGetPINCodeResponseCallbackType>
+class CHIPDoorLockClusterSetCredentialResponseCallback
+    : public Callback::Callback<CHIPDoorLockClusterSetCredentialResponseCallbackType>
 {
 public:
-    CHIPDoorLockClusterGetPINCodeResponseCallback(jobject javaCallback);
+    CHIPDoorLockClusterSetCredentialResponseCallback(jobject javaCallback);
 
-    ~CHIPDoorLockClusterGetPINCodeResponseCallback();
-
-    static void CallbackFn(void * context, const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPDoorLockClusterGetRFIDCodeResponseCallback : public Callback::Callback<CHIPDoorLockClusterGetRFIDCodeResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetRFIDCodeResponseCallback(jobject javaCallback);
-
-    ~CHIPDoorLockClusterGetRFIDCodeResponseCallback();
+    ~CHIPDoorLockClusterSetCredentialResponseCallback();
 
     static void CallbackFn(void * context,
-                           const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPDoorLockClusterGetUserTypeResponseCallback : public Callback::Callback<CHIPDoorLockClusterGetUserTypeResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetUserTypeResponseCallback(jobject javaCallback);
-
-    ~CHIPDoorLockClusterGetUserTypeResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPDoorLockClusterGetWeekDayScheduleResponseCallback
-    : public Callback::Callback<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetWeekDayScheduleResponseCallback(jobject javaCallback);
-
-    ~CHIPDoorLockClusterGetWeekDayScheduleResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data);
-
-private:
-    jobject javaCallbackRef;
-};
-
-class CHIPDoorLockClusterGetYearDayScheduleResponseCallback
-    : public Callback::Callback<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>
-{
-public:
-    CHIPDoorLockClusterGetYearDayScheduleResponseCallback(jobject javaCallback);
-
-    ~CHIPDoorLockClusterGetYearDayScheduleResponseCallback();
-
-    static void CallbackFn(void * context,
-                           const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data);
+                           const chip::app::Clusters::DoorLock::Commands::SetCredentialResponse::DecodableType & data);
 
 private:
     jobject javaCallbackRef;

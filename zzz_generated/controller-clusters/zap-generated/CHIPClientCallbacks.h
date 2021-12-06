@@ -43,22 +43,16 @@ typedef void (*ContentLauncherClusterLaunchContentResponseCallback)(void * conte
 typedef void (*ContentLauncherClusterLaunchURLResponseCallback)(void * context, chip::CharSpan data, uint8_t contentLaunchStatus);
 typedef void (*DiagnosticLogsClusterRetrieveLogsResponseCallback)(void * context, uint8_t status, chip::ByteSpan content,
                                                                   uint32_t timeStamp, uint32_t timeSinceBoot);
-typedef void (*DoorLockClusterGetHolidayScheduleResponseCallback)(void * context, uint8_t holidayIndex, uint8_t status,
-                                                                  uint32_t localStartTime, uint32_t localEndTime,
-                                                                  uint8_t operatingMode);
-typedef void (*DoorLockClusterGetLogRecordResponseCallback)(void * context, uint16_t logEntryId, uint32_t timestamp,
-                                                            uint8_t eventType, uint8_t source, uint8_t eventIdOrAlarmCode,
-                                                            uint16_t userId, chip::ByteSpan pin);
-typedef void (*DoorLockClusterGetPINCodeResponseCallback)(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType,
-                                                          chip::ByteSpan pin);
-typedef void (*DoorLockClusterGetRFIDCodeResponseCallback)(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType,
-                                                           chip::ByteSpan rfidCode);
-typedef void (*DoorLockClusterGetUserTypeResponseCallback)(void * context, uint16_t userId, uint8_t userType);
-typedef void (*DoorLockClusterGetWeekDayScheduleResponseCallback)(void * context, uint8_t weekDayIndex, uint16_t userIndex,
-                                                                  uint8_t status, uint8_t daysMask, uint8_t startHour,
-                                                                  uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
-typedef void (*DoorLockClusterGetYearDayScheduleResponseCallback)(void * context, uint8_t yearDayIndex, uint16_t userIndex,
-                                                                  uint8_t status, uint32_t localStartTime, uint32_t localEndTime);
+typedef void (*DoorLockClusterGetCredentialStatusResponseCallback)(void * context, bool credentialExists, uint16_t userIndex,
+                                                                   uint16_t nextCredentialIndex);
+typedef void (*DoorLockClusterGetUserResponseCallback)(void * context, uint16_t userIndex, chip::CharSpan userName,
+                                                       uint32_t userUniqueId, uint8_t userStatus, uint8_t userType,
+                                                       uint8_t credentialRule,
+                                                       /* TYPE WARNING: array array defaults to */ uint8_t * credentials,
+                                                       chip::FabricIndex creatorFabricIndex,
+                                                       chip::FabricIndex lastModifiedFabricIndex, uint16_t nextUserIndex);
+typedef void (*DoorLockClusterSetCredentialResponseCallback)(void * context, uint8_t status, uint16_t userIndex,
+                                                             uint16_t nextCredentialIndex);
 typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallback)(void * context, uint8_t errorCode, chip::CharSpan debugText);
 typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)(void * context, uint8_t errorCode,
                                                                                  chip::CharSpan debugText);

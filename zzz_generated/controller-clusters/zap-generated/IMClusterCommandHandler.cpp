@@ -549,381 +549,12 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
     {
         switch (aCommandPath.mCommandId)
         {
-        case Commands::GetHolidayScheduleResponse::Id: {
-            expectArgumentCount = 5;
-            uint8_t holidayIndex;
-            uint8_t status;
-            uint32_t localStartTime;
-            uint32_t localEndTime;
-            uint8_t operatingMode;
-            bool argExists[5];
-
-            memset(argExists, 0, sizeof argExists);
-
-            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
-            {
-                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
-                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
-                if (!TLV::IsContextTag(aDataTlv.GetTag()))
-                {
-                    continue;
-                }
-                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 5)
-                {
-                    if (argExists[currentDecodeTagId])
-                    {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
-                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-                        break;
-                    }
-                    else
-                    {
-                        argExists[currentDecodeTagId] = true;
-                        validArgumentCount++;
-                    }
-                }
-                switch (currentDecodeTagId)
-                {
-                case 0:
-                    TLVUnpackError = aDataTlv.Get(holidayIndex);
-                    break;
-                case 1:
-                    TLVUnpackError = aDataTlv.Get(status);
-                    break;
-                case 2:
-                    TLVUnpackError = aDataTlv.Get(localStartTime);
-                    break;
-                case 3:
-                    TLVUnpackError = aDataTlv.Get(localEndTime);
-                    break;
-                case 4:
-                    TLVUnpackError = aDataTlv.Get(operatingMode);
-                    break;
-                default:
-                    // Unsupported tag, ignore it.
-                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
-                    break;
-                }
-                if (CHIP_NO_ERROR != TLVUnpackError)
-                {
-                    break;
-                }
-            }
-
-            if (CHIP_END_OF_TLV == TLVError)
-            {
-                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
-                TLVError = CHIP_NO_ERROR;
-            }
-
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
-            {
-                wasHandled = emberAfDoorLockClusterGetHolidayScheduleResponseCallback(
-                    aCommandPath.mEndpointId, apCommandObj, holidayIndex, status, localStartTime, localEndTime, operatingMode);
-            }
-            break;
-        }
-        case Commands::GetLogRecordResponse::Id: {
-            expectArgumentCount = 7;
-            uint16_t logEntryId;
-            uint32_t timestamp;
-            uint8_t eventType;
-            uint8_t source;
-            uint8_t eventIdOrAlarmCode;
-            uint16_t userId;
-            chip::ByteSpan pin;
-            bool argExists[7];
-
-            memset(argExists, 0, sizeof argExists);
-
-            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
-            {
-                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
-                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
-                if (!TLV::IsContextTag(aDataTlv.GetTag()))
-                {
-                    continue;
-                }
-                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 7)
-                {
-                    if (argExists[currentDecodeTagId])
-                    {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
-                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-                        break;
-                    }
-                    else
-                    {
-                        argExists[currentDecodeTagId] = true;
-                        validArgumentCount++;
-                    }
-                }
-                switch (currentDecodeTagId)
-                {
-                case 0:
-                    TLVUnpackError = aDataTlv.Get(logEntryId);
-                    break;
-                case 1:
-                    TLVUnpackError = aDataTlv.Get(timestamp);
-                    break;
-                case 2:
-                    TLVUnpackError = aDataTlv.Get(eventType);
-                    break;
-                case 3:
-                    TLVUnpackError = aDataTlv.Get(source);
-                    break;
-                case 4:
-                    TLVUnpackError = aDataTlv.Get(eventIdOrAlarmCode);
-                    break;
-                case 5:
-                    TLVUnpackError = aDataTlv.Get(userId);
-                    break;
-                case 6:
-                    TLVUnpackError = aDataTlv.Get(pin);
-                    break;
-                default:
-                    // Unsupported tag, ignore it.
-                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
-                    break;
-                }
-                if (CHIP_NO_ERROR != TLVUnpackError)
-                {
-                    break;
-                }
-            }
-
-            if (CHIP_END_OF_TLV == TLVError)
-            {
-                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
-                TLVError = CHIP_NO_ERROR;
-            }
-
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 7 == validArgumentCount)
-            {
-                wasHandled = emberAfDoorLockClusterGetLogRecordResponseCallback(aCommandPath.mEndpointId, apCommandObj, logEntryId,
-                                                                                timestamp, eventType, source, eventIdOrAlarmCode,
-                                                                                userId, pin);
-            }
-            break;
-        }
-        case Commands::GetPINCodeResponse::Id: {
-            expectArgumentCount = 4;
-            uint16_t userId;
-            uint8_t userStatus;
-            uint8_t userType;
-            chip::ByteSpan pin;
-            bool argExists[4];
-
-            memset(argExists, 0, sizeof argExists);
-
-            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
-            {
-                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
-                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
-                if (!TLV::IsContextTag(aDataTlv.GetTag()))
-                {
-                    continue;
-                }
-                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 4)
-                {
-                    if (argExists[currentDecodeTagId])
-                    {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
-                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-                        break;
-                    }
-                    else
-                    {
-                        argExists[currentDecodeTagId] = true;
-                        validArgumentCount++;
-                    }
-                }
-                switch (currentDecodeTagId)
-                {
-                case 0:
-                    TLVUnpackError = aDataTlv.Get(userId);
-                    break;
-                case 1:
-                    TLVUnpackError = aDataTlv.Get(userStatus);
-                    break;
-                case 2:
-                    TLVUnpackError = aDataTlv.Get(userType);
-                    break;
-                case 3:
-                    TLVUnpackError = aDataTlv.Get(pin);
-                    break;
-                default:
-                    // Unsupported tag, ignore it.
-                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
-                    break;
-                }
-                if (CHIP_NO_ERROR != TLVUnpackError)
-                {
-                    break;
-                }
-            }
-
-            if (CHIP_END_OF_TLV == TLVError)
-            {
-                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
-                TLVError = CHIP_NO_ERROR;
-            }
-
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
-            {
-                wasHandled = emberAfDoorLockClusterGetPINCodeResponseCallback(aCommandPath.mEndpointId, apCommandObj, userId,
-                                                                              userStatus, userType, pin);
-            }
-            break;
-        }
-        case Commands::GetRFIDCodeResponse::Id: {
-            expectArgumentCount = 4;
-            uint16_t userId;
-            uint8_t userStatus;
-            uint8_t userType;
-            chip::ByteSpan rfidCode;
-            bool argExists[4];
-
-            memset(argExists, 0, sizeof argExists);
-
-            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
-            {
-                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
-                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
-                if (!TLV::IsContextTag(aDataTlv.GetTag()))
-                {
-                    continue;
-                }
-                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 4)
-                {
-                    if (argExists[currentDecodeTagId])
-                    {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
-                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-                        break;
-                    }
-                    else
-                    {
-                        argExists[currentDecodeTagId] = true;
-                        validArgumentCount++;
-                    }
-                }
-                switch (currentDecodeTagId)
-                {
-                case 0:
-                    TLVUnpackError = aDataTlv.Get(userId);
-                    break;
-                case 1:
-                    TLVUnpackError = aDataTlv.Get(userStatus);
-                    break;
-                case 2:
-                    TLVUnpackError = aDataTlv.Get(userType);
-                    break;
-                case 3:
-                    TLVUnpackError = aDataTlv.Get(rfidCode);
-                    break;
-                default:
-                    // Unsupported tag, ignore it.
-                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
-                    break;
-                }
-                if (CHIP_NO_ERROR != TLVUnpackError)
-                {
-                    break;
-                }
-            }
-
-            if (CHIP_END_OF_TLV == TLVError)
-            {
-                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
-                TLVError = CHIP_NO_ERROR;
-            }
-
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 4 == validArgumentCount)
-            {
-                wasHandled = emberAfDoorLockClusterGetRFIDCodeResponseCallback(aCommandPath.mEndpointId, apCommandObj, userId,
-                                                                               userStatus, userType, rfidCode);
-            }
-            break;
-        }
-        case Commands::GetUserTypeResponse::Id: {
-            expectArgumentCount = 2;
-            uint16_t userId;
-            uint8_t userType;
-            bool argExists[2];
-
-            memset(argExists, 0, sizeof argExists);
-
-            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
-            {
-                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
-                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
-                if (!TLV::IsContextTag(aDataTlv.GetTag()))
-                {
-                    continue;
-                }
-                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 2)
-                {
-                    if (argExists[currentDecodeTagId])
-                    {
-                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
-                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-                        break;
-                    }
-                    else
-                    {
-                        argExists[currentDecodeTagId] = true;
-                        validArgumentCount++;
-                    }
-                }
-                switch (currentDecodeTagId)
-                {
-                case 0:
-                    TLVUnpackError = aDataTlv.Get(userId);
-                    break;
-                case 1:
-                    TLVUnpackError = aDataTlv.Get(userType);
-                    break;
-                default:
-                    // Unsupported tag, ignore it.
-                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
-                    break;
-                }
-                if (CHIP_NO_ERROR != TLVUnpackError)
-                {
-                    break;
-                }
-            }
-
-            if (CHIP_END_OF_TLV == TLVError)
-            {
-                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
-                TLVError = CHIP_NO_ERROR;
-            }
-
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
-            {
-                wasHandled =
-                    emberAfDoorLockClusterGetUserTypeResponseCallback(aCommandPath.mEndpointId, apCommandObj, userId, userType);
-            }
-            break;
-        }
-        case Commands::GetWeekDayScheduleResponse::Id: {
-            expectArgumentCount = 8;
-            uint8_t weekDayIndex;
+        case Commands::GetCredentialStatusResponse::Id: {
+            expectArgumentCount = 3;
+            bool credentialExists;
             uint16_t userIndex;
-            uint8_t status;
-            uint8_t daysMask;
-            uint8_t startHour;
-            uint8_t startMinute;
-            uint8_t endHour;
-            uint8_t endMinute;
-            bool argExists[8];
+            uint16_t nextCredentialIndex;
+            bool argExists[3];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -936,7 +567,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 8)
+                if (currentDecodeTagId < 3)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -953,28 +584,109 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(weekDayIndex);
+                    TLVUnpackError = aDataTlv.Get(credentialExists);
                     break;
                 case 1:
                     TLVUnpackError = aDataTlv.Get(userIndex);
                     break;
                 case 2:
-                    TLVUnpackError = aDataTlv.Get(status);
+                    TLVUnpackError = aDataTlv.Get(nextCredentialIndex);
+                    break;
+                default:
+                    // Unsupported tag, ignore it.
+                    ChipLogProgress(Zcl, "Unknown TLV tag during processing.");
+                    break;
+                }
+                if (CHIP_NO_ERROR != TLVUnpackError)
+                {
+                    break;
+                }
+            }
+
+            if (CHIP_END_OF_TLV == TLVError)
+            {
+                // CHIP_END_OF_TLV means we have iterated all items in the structure, which is not a real error.
+                TLVError = CHIP_NO_ERROR;
+            }
+
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
+            {
+                wasHandled = emberAfDoorLockClusterGetCredentialStatusResponseCallback(
+                    aCommandPath.mEndpointId, apCommandObj, credentialExists, userIndex, nextCredentialIndex);
+            }
+            break;
+        }
+        case Commands::GetUserResponse::Id: {
+            expectArgumentCount = 10;
+            uint16_t userIndex;
+            chip::CharSpan userName;
+            uint32_t userUniqueId;
+            uint8_t userStatus;
+            uint8_t userType;
+            uint8_t credentialRule;
+            /* TYPE WARNING: array array defaults to */ uint8_t * credentials;
+            chip::FabricIndex creatorFabricIndex;
+            chip::FabricIndex lastModifiedFabricIndex;
+            uint16_t nextUserIndex;
+            bool argExists[10];
+
+            memset(argExists, 0, sizeof argExists);
+
+            while ((TLVError = aDataTlv.Next()) == CHIP_NO_ERROR)
+            {
+                // Since call to aDataTlv.Next() is CHIP_NO_ERROR, the read head always points to an element.
+                // Skip this element if it is not a ContextTag, not consider it as an error if other values are valid.
+                if (!TLV::IsContextTag(aDataTlv.GetTag()))
+                {
+                    continue;
+                }
+                currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
+                if (currentDecodeTagId < 10)
+                {
+                    if (argExists[currentDecodeTagId])
+                    {
+                        ChipLogProgress(Zcl, "Duplicate TLV tag %" PRIx32, TLV::TagNumFromTag(aDataTlv.GetTag()));
+                        TLVUnpackError = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+                        break;
+                    }
+                    else
+                    {
+                        argExists[currentDecodeTagId] = true;
+                        validArgumentCount++;
+                    }
+                }
+                switch (currentDecodeTagId)
+                {
+                case 0:
+                    TLVUnpackError = aDataTlv.Get(userIndex);
+                    break;
+                case 1:
+                    TLVUnpackError = aDataTlv.Get(userName);
+                    break;
+                case 2:
+                    TLVUnpackError = aDataTlv.Get(userUniqueId);
                     break;
                 case 3:
-                    TLVUnpackError = aDataTlv.Get(daysMask);
+                    TLVUnpackError = aDataTlv.Get(userStatus);
                     break;
                 case 4:
-                    TLVUnpackError = aDataTlv.Get(startHour);
+                    TLVUnpackError = aDataTlv.Get(userType);
                     break;
                 case 5:
-                    TLVUnpackError = aDataTlv.Get(startMinute);
+                    TLVUnpackError = aDataTlv.Get(credentialRule);
                     break;
                 case 6:
-                    TLVUnpackError = aDataTlv.Get(endHour);
+                    // Just for compatibility, we will add array type support in IM later.
+                    TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>(credentials));
                     break;
                 case 7:
-                    TLVUnpackError = aDataTlv.Get(endMinute);
+                    TLVUnpackError = aDataTlv.Get(creatorFabricIndex);
+                    break;
+                case 8:
+                    TLVUnpackError = aDataTlv.Get(lastModifiedFabricIndex);
+                    break;
+                case 9:
+                    TLVUnpackError = aDataTlv.Get(nextUserIndex);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -993,22 +705,20 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 8 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 10 == validArgumentCount)
             {
-                wasHandled = emberAfDoorLockClusterGetWeekDayScheduleResponseCallback(aCommandPath.mEndpointId, apCommandObj,
-                                                                                      weekDayIndex, userIndex, status, daysMask,
-                                                                                      startHour, startMinute, endHour, endMinute);
+                wasHandled = emberAfDoorLockClusterGetUserResponseCallback(
+                    aCommandPath.mEndpointId, apCommandObj, userIndex, userName, userUniqueId, userStatus, userType, credentialRule,
+                    credentials, creatorFabricIndex, lastModifiedFabricIndex, nextUserIndex);
             }
             break;
         }
-        case Commands::GetYearDayScheduleResponse::Id: {
-            expectArgumentCount = 5;
-            uint8_t yearDayIndex;
-            uint16_t userIndex;
+        case Commands::SetCredentialResponse::Id: {
+            expectArgumentCount = 3;
             uint8_t status;
-            uint32_t localStartTime;
-            uint32_t localEndTime;
-            bool argExists[5];
+            uint16_t userIndex;
+            uint16_t nextCredentialIndex;
+            bool argExists[3];
 
             memset(argExists, 0, sizeof argExists);
 
@@ -1021,7 +731,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                     continue;
                 }
                 currentDecodeTagId = TLV::TagNumFromTag(aDataTlv.GetTag());
-                if (currentDecodeTagId < 5)
+                if (currentDecodeTagId < 3)
                 {
                     if (argExists[currentDecodeTagId])
                     {
@@ -1038,19 +748,13 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(yearDayIndex);
+                    TLVUnpackError = aDataTlv.Get(status);
                     break;
                 case 1:
                     TLVUnpackError = aDataTlv.Get(userIndex);
                     break;
                 case 2:
-                    TLVUnpackError = aDataTlv.Get(status);
-                    break;
-                case 3:
-                    TLVUnpackError = aDataTlv.Get(localStartTime);
-                    break;
-                case 4:
-                    TLVUnpackError = aDataTlv.Get(localEndTime);
+                    TLVUnpackError = aDataTlv.Get(nextCredentialIndex);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -1069,10 +773,10 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 TLVError = CHIP_NO_ERROR;
             }
 
-            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 5 == validArgumentCount)
+            if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 3 == validArgumentCount)
             {
-                wasHandled = emberAfDoorLockClusterGetYearDayScheduleResponseCallback(
-                    aCommandPath.mEndpointId, apCommandObj, yearDayIndex, userIndex, status, localStartTime, localEndTime);
+                wasHandled = emberAfDoorLockClusterSetCredentialResponseCallback(aCommandPath.mEndpointId, apCommandObj, status,
+                                                                                 userIndex, nextCredentialIndex);
             }
             break;
         }
