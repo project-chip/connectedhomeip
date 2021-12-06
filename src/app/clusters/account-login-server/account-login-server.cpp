@@ -32,6 +32,7 @@ using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AccountLogin;
 
 bool accountLoginClusterIsUserLoggedIn(std::string requestTempAccountIdentifier, std::string requestSetupPin);
+bool accountLoginClusterLogout();
 std::string accountLoginClusterGetSetupPin(std::string requestTempAccountIdentifier, EndpointId endpoint);
 
 void sendResponse(app::CommandHandler * command, const char * responseSetupPin)
@@ -74,6 +75,19 @@ bool emberAfAccountLoginClusterLoginCallback(app::CommandHandler * command, cons
     if (!isLoggedIn)
     {
         ChipLogError(Zcl, "User is not authorized.");
+    }
+    emberAfSendImmediateDefaultResponse(status);
+    return true;
+}
+
+bool emberAfAccountLoginClusterLogoutCallback(app::CommandHandler * command, const app::ConcreteCommandPath & commandPath,
+                                             const Commands::Login::DecodableType & commandData)
+{
+    bool isLoggedOut      = accountLoginClusterLogout();
+    EmberAfStatus status = isLoggedOut ? EMBER_ZCL_STATUS_SUCCESS : EMBER_ZCL_STATUS_NOT_AUTHORIZED;
+    if (!isLoggedOut)
+    {
+        ChipLogError(Zcl, "User is not logged out.");
     }
     emberAfSendImmediateDefaultResponse(status);
     return true;
