@@ -951,13 +951,13 @@
 // Array of profile ids
 #define FIXED_PROFILE_IDS                                                                                                          \
     {                                                                                                                              \
-        0x0104, 0x0104, 0x0104                                                                                                     \
+        0x0103, 0x0103, 0x0103                                                                                                     \
     }
 
 // Array of device ids
 #define FIXED_DEVICE_IDS                                                                                                           \
     {                                                                                                                              \
-        0, 0, 0                                                                                                                    \
+        514, 514, 514                                                                                                              \
     }
 
 // Array of device versions
@@ -976,22 +976,4 @@
 #define FIXED_NETWORKS                                                                                                             \
     {                                                                                                                              \
         0, 0, 0                                                                                                                    \
-    }
-
-// This is an array of EmberAfManufacturerCodeEntry structures for clusters.
-#define GENERATED_CLUSTER_MANUFACTURER_CODE_COUNT (0)
-#define GENERATED_CLUSTER_MANUFACTURER_CODES                                                                                       \
-    {                                                                                                                              \
-        {                                                                                                                          \
-            0x00, 0x00                                                                                                             \
-        }                                                                                                                          \
-    }
-
-// This is an array of EmberAfManufacturerCodeEntry structures for attributes.
-#define GENERATED_ATTRIBUTE_MANUFACTURER_CODE_COUNT (0)
-#define GENERATED_ATTRIBUTE_MANUFACTURER_CODES                                                                                     \
-    {                                                                                                                              \
-        {                                                                                                                          \
-            0x00, 0x00                                                                                                             \
-        }                                                                                                                          \
     }

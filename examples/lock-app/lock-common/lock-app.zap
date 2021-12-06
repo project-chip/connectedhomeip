@@ -31,10 +31,10 @@
   ],
   "endpointTypes": [
     {
-      "name": "Anonymous Endpoint Type",
-      "deviceTypeName": null,
-      "deviceTypeCode": null,
-      "deviceTypeProfileId": null,
+      "name": "MA-rootdevice",
+      "deviceTypeName": "MA-rootdevice",
+      "deviceTypeCode": 22,
+      "deviceTypeProfileId": 259,
       "clusters": [
         {
           "name": "Power Configuration",
@@ -3942,10 +3942,10 @@
       ]
     },
     {
-      "name": "Anonymous Endpoint Type",
-      "deviceTypeName": null,
-      "deviceTypeCode": null,
-      "deviceTypeProfileId": null,
+      "name": "MA-doorlock",
+      "deviceTypeName": "MA-doorlock",
+      "deviceTypeCode": 10,
+      "deviceTypeProfileId": 259,
       "clusters": [
         {
           "name": "Power Configuration",
@@ -5525,23 +5525,22 @@
   ],
   "endpoints": [
     {
-      "endpointTypeName": "Anonymous Endpoint Type",
+      "endpointTypeName": "MA-rootdevice",
       "endpointTypeIndex": 0,
-      "profileId": "0x109",
+      "profileId": 259,
       "endpointId": 0,
       "networkId": 0,
-      "endpointVersion": null,
-      "deviceIdentifier": null
+      "endpointVersion": 1,
+      "deviceIdentifier": 22
     },
     {
-      "endpointTypeName": "Anonymous Endpoint Type",
+      "endpointTypeName": "MA-doorlock",
       "endpointTypeIndex": 1,
-      "profileId": 261,
+      "profileId": 259,
       "endpointId": 1,
       "networkId": 0,
-      "endpointVersion": 0,
-      "deviceIdentifier": null
+      "endpointVersion": 1,
+      "deviceIdentifier": 10
     }
-  ],
-  "log": []
+  ]
 }

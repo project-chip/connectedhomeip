@@ -22,12 +22,6 @@
 
 namespace chip {
 
-// TODO: Dummy function to be removed once BDX downloader is implemented and can return a real instance
-OTADownloader * GetDownloaderInstance()
-{
-    return nullptr;
-}
-
 CHIP_ERROR LinuxOTAImageProcessor::PrepareDownload()
 {
     if (mParams.imageFile.empty())
@@ -83,17 +77,15 @@ CHIP_ERROR LinuxOTAImageProcessor::ProcessBlock(ByteSpan & block)
 
 void LinuxOTAImageProcessor::HandlePrepareDownload(intptr_t context)
 {
-    OTADownloader * downloader = GetDownloaderInstance();
-    if (downloader == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "No known OTA downloader");
-        return;
-    }
-
     auto * imageProcessor = reinterpret_cast<LinuxOTAImageProcessor *>(context);
     if (imageProcessor == nullptr)
     {
-        downloader->OnPreparedForDownload(CHIP_ERROR_INVALID_ARGUMENT);
+        ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
+        return;
+    }
+    else if (imageProcessor->mDownloader == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
 
@@ -101,11 +93,13 @@ void LinuxOTAImageProcessor::HandlePrepareDownload(intptr_t context)
                               std::ofstream::out | std::ofstream::ate | std::ofstream::app);
     if (!imageProcessor->mOfs.good())
     {
-        downloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
+        imageProcessor->mDownloader->OnPreparedForDownload(CHIP_ERROR_OPEN_FAILED);
         return;
     }
 
-    downloader->OnPreparedForDownload(CHIP_NO_ERROR);
+    // TODO: if file already exists and is not empty, erase previous contents
+
+    imageProcessor->mDownloader->OnPreparedForDownload(CHIP_NO_ERROR);
 }
 
 void LinuxOTAImageProcessor::HandleFinalize(intptr_t context)
@@ -118,6 +112,8 @@ void LinuxOTAImageProcessor::HandleFinalize(intptr_t context)
 
     imageProcessor->mOfs.close();
     imageProcessor->ReleaseBlock();
+
+    ChipLogProgress(SoftwareUpdate, "OTA image downloaded to %s", imageProcessor->mParams.imageFile.data());
 }
 
 void LinuxOTAImageProcessor::HandleAbort(intptr_t context)
@@ -135,17 +131,15 @@ void LinuxOTAImageProcessor::HandleAbort(intptr_t context)
 
 void LinuxOTAImageProcessor::HandleProcessBlock(intptr_t context)
 {
-    OTADownloader * downloader = GetDownloaderInstance();
-    if (downloader == nullptr)
-    {
-        ChipLogError(SoftwareUpdate, "No known OTA downloader");
-        return;
-    }
-
     auto * imageProcessor = reinterpret_cast<LinuxOTAImageProcessor *>(context);
     if (imageProcessor == nullptr)
     {
-        downloader->OnBlockProcessed(CHIP_ERROR_INVALID_ARGUMENT, OTADownloader::kEnd);
+        ChipLogError(SoftwareUpdate, "ImageProcessor context is null");
+        return;
+    }
+    else if (imageProcessor->mDownloader == nullptr)
+    {
+        ChipLogError(SoftwareUpdate, "mDownloader is null");
         return;
     }
 
@@ -154,12 +148,12 @@ void LinuxOTAImageProcessor::HandleProcessBlock(intptr_t context)
     if (!imageProcessor->mOfs.write(reinterpret_cast<const char *>(imageProcessor->mBlock.data()),
                                     static_cast<std::streamsize>(imageProcessor->mBlock.size())))
     {
-        downloader->OnBlockProcessed(CHIP_ERROR_WRITE_FAILED, OTADownloader::kEnd);
+        imageProcessor->mDownloader->EndDownload(CHIP_ERROR_WRITE_FAILED);
         return;
     }
 
     imageProcessor->mParams.downloadedBytes += imageProcessor->mBlock.size();
-    downloader->OnBlockProcessed(CHIP_NO_ERROR, OTADownloader::kGetNext);
+    imageProcessor->mDownloader->FetchNextData();
 }
 
 CHIP_ERROR LinuxOTAImageProcessor::SetBlock(ByteSpan & block)

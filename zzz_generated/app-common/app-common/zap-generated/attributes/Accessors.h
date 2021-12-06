@@ -744,6 +744,12 @@ namespace Attributes {
 } // namespace Attributes
 } // namespace Descriptor
 
+namespace AccessControl {
+namespace Attributes {
+
+} // namespace Attributes
+} // namespace AccessControl
+
 namespace PollControl {
 namespace Attributes {
 
@@ -1673,6 +1679,12 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::FabricIndex value);
 
 } // namespace Attributes
 } // namespace OperationalCredentials
+
+namespace GroupKeyManagement {
+namespace Attributes {
+
+} // namespace Attributes
+} // namespace GroupKeyManagement
 
 namespace FixedLabel {
 namespace Attributes {
@@ -5425,12 +5437,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 
 } // namespace Attributes
 } // namespace ElectricalMeasurement
-
-namespace GroupKeyManagement {
-namespace Attributes {
-
-} // namespace Attributes
-} // namespace GroupKeyManagement
 
 } // namespace Clusters
 } // namespace app

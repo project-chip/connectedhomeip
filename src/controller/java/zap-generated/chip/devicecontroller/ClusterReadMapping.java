@@ -29,6 +29,46 @@ public class ClusterReadMapping {
 
   public Map<String, Map<String, InteractionInfo>> getReadAttributeMap() {
     Map<String, Map<String, InteractionInfo>> readAttributeMap = new HashMap<>();
+    Map<String, InteractionInfo> readAccessControlInteractionInfo = new LinkedHashMap<>();
+    Map<String, CommandParameterInfo> readAccessControlAclCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAccessControlAclAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AccessControlCluster) cluster)
+                  .readAclAttribute(
+                      (ChipClusters.AccessControlCluster.AclAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedAclAttributeCallback(),
+            readAccessControlAclCommandParams);
+    readAccessControlInteractionInfo.put(
+        "readAclAttribute", readAccessControlAclAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAccessControlExtensionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAccessControlExtensionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AccessControlCluster) cluster)
+                  .readExtensionAttribute(
+                      (ChipClusters.AccessControlCluster.ExtensionAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedExtensionAttributeCallback(),
+            readAccessControlExtensionCommandParams);
+    readAccessControlInteractionInfo.put(
+        "readExtensionAttribute", readAccessControlExtensionAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readAccessControlClusterRevisionCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readAccessControlClusterRevisionAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.AccessControlCluster) cluster)
+                  .readClusterRevisionAttribute((ChipClusters.IntegerAttributeCallback) callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedIntegerAttributeCallback(),
+            readAccessControlClusterRevisionCommandParams);
+    readAccessControlInteractionInfo.put(
+        "readClusterRevisionAttribute", readAccessControlClusterRevisionAttributeInteractionInfo);
+    readAttributeMap.put("accessControl", readAccessControlInteractionInfo);
     Map<String, InteractionInfo> readAccountLoginInteractionInfo = new LinkedHashMap<>();
     Map<String, CommandParameterInfo> readAccountLoginClusterRevisionCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
@@ -4637,6 +4677,21 @@ public class ClusterReadMapping {
     readTestClusterInteractionInfo.put(
         "readRangeRestrictedInt16sAttribute",
         readTestClusterRangeRestrictedInt16sAttributeInteractionInfo);
+    Map<String, CommandParameterInfo> readTestClusterListLongOctetStringCommandParams =
+        new LinkedHashMap<String, CommandParameterInfo>();
+    InteractionInfo readTestClusterListLongOctetStringAttributeInteractionInfo =
+        new InteractionInfo(
+            (cluster, callback, commandArguments) -> {
+              ((ChipClusters.TestClusterCluster) cluster)
+                  .readListLongOctetStringAttribute(
+                      (ChipClusters.TestClusterCluster.ListLongOctetStringAttributeCallback)
+                          callback);
+            },
+            () -> new ClusterInfoMapping.DelegatedListLongOctetStringAttributeCallback(),
+            readTestClusterListLongOctetStringCommandParams);
+    readTestClusterInteractionInfo.put(
+        "readListLongOctetStringAttribute",
+        readTestClusterListLongOctetStringAttributeInteractionInfo);
     Map<String, CommandParameterInfo> readTestClusterTimedWriteBooleanCommandParams =
         new LinkedHashMap<String, CommandParameterInfo>();
     InteractionInfo readTestClusterTimedWriteBooleanAttributeInteractionInfo =

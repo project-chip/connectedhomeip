@@ -33,6 +33,17 @@ using namespace chip::Encoding::LittleEndian;
 namespace chip {
 namespace Controller {
 
+CHIP_ERROR AccessControlClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                   Callback::Cancelable * onFailureCallback, uint16_t value)
+{
+    app::WriteClientHandle handle;
+    ReturnErrorOnFailure(
+        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
+    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
+        chip::app::AttributePathParams(mEndpoint, mClusterId, AccessControl::Attributes::ClusterRevision::Id), value));
+    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
+}
+
 CHIP_ERROR AccountLoginClusterTest::WriteAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                   Callback::Cancelable * onFailureCallback, uint16_t value)
 {

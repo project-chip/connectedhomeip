@@ -24,6 +24,16 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ * Cluster Access Control
+ *
+ */
+@interface CHIPTestAccessControl : CHIPAccessControl
+
+- (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
+
+@end
+
+/**
  * Cluster Account Login
  *
  */
@@ -785,6 +795,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)writeAttributeListNullablesAndOptionalsStructWithValue:(NSArray * _Nonnull)value
                                              completionHandler:(StatusCompletion)completionHandler;
+- (void)writeAttributeListLongOctetStringWithValue:(NSArray * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 - (void)writeAttributeClusterRevisionWithValue:(NSNumber * _Nonnull)value completionHandler:(StatusCompletion)completionHandler;
 
 @end

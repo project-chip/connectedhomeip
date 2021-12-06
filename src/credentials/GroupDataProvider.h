@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/util/basic-types.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <lib/core/CHIPError.h>
@@ -94,29 +95,24 @@ public:
     {
         GroupState() = default;
         GroupState(chip::FabricIndex fabric, chip::GroupId group_id, uint16_t key_set) :
-            fabric_index(fabric), group(group_id), keyset_index(key_set)
+            fabric_index(fabric), group(group_id), keyset_id(key_set)
         {}
         // Fabric Index associated with the group state entry's fabric scoping
         chip::FabricIndex fabric_index = kUndefinedFabricIndex;
         // Identifies the group within the scope of the given fabric
         chip::GroupId group = kUndefinedGroupId;
         // References the set of group keys that generate operationa group keys for use with the given group
-        uint16_t keyset_index = 0;
+        uint16_t keyset_id = 0;
         bool operator==(const GroupState & other)
         {
-            return this->fabric_index == other.fabric_index && this->group == other.group &&
-                this->keyset_index == other.keyset_index;
+            return this->fabric_index == other.fabric_index && this->group == other.group && this->keyset_id == other.keyset_id;
         }
     };
 
     // A operational group key set, usable by many GroupState mappings
     struct KeySet
     {
-        enum class SecurityPolicy : uint8_t
-        {
-            kStandard   = 0,
-            kLowLatency = 1
-        };
+        using SecurityPolicy = chip::app::Clusters::GroupKeyManagement::GroupKeySecurityPolicy;
 
         KeySet() = default;
         KeySet(uint16_t id) : keyset_id(id) {}
@@ -225,6 +221,14 @@ public:
     virtual CHIP_ERROR AddGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping)    = 0;
     virtual CHIP_ERROR RemoveGroupMapping(chip::FabricIndex fabric_index, const GroupMapping & mapping) = 0;
     virtual CHIP_ERROR RemoveAllGroupMappings(chip::FabricIndex fabric_index, EndpointId endpoint)      = 0;
+    /**
+     *  Creates an iterator that may be used to obtain the groups associated with the given fabric.
+     *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,
+     *  the iterator's Release() method must be called after the iteration is finished.
+     *  @retval An instance of GroupMappingIterator on success
+     *  @retval nullptr if no iterator instances are available.
+     */
+    virtual GroupMappingIterator * IterateGroupMappings(chip::FabricIndex fabric_index) = 0;
     /**
      *  Creates an iterator that may be used to obtain the groups associated with the given fabric and endpoint.
      *  The number of concurrent instances of this iterator is limited. In order to release the allocated memory,

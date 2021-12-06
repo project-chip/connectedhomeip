@@ -23,6 +23,12 @@ typedef void (*CHIPDefaultSuccessCallbackType)(void *, const chip::app::DataMode
 typedef void (*CHIPDefaultWriteSuccessCallbackType)(void *);
 typedef void (*CHIPDefaultFailureCallbackType)(void *, EmberAfStatus);
 
+typedef void (*CHIPAccessControlClusterAclAttributeCallbackType)(
+    void *, const chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo::DecodableType &);
+typedef void (*CHIPAccessControlClusterExtensionAttributeCallbackType)(
+    void *, const chip::app::Clusters::AccessControl::Attributes::Extension::TypeInfo::DecodableType &);
+typedef void (*CHIPAccessControlClusterClusterRevisionAttributeCallbackType)(
+    void *, chip::app::Clusters::AccessControl::Attributes::ClusterRevision::TypeInfo::DecodableArgType);
 typedef void (*CHIPAccountLoginClusterGetSetupPINResponseCallbackType)(
     void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
 
@@ -909,6 +915,8 @@ typedef void (*CHIPTestClusterClusterRangeRestrictedInt16uAttributeCallbackType)
     void *, chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterRangeRestrictedInt16sAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo::DecodableArgType);
+typedef void (*CHIPTestClusterClusterListLongOctetStringAttributeCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Attributes::ListLongOctetString::TypeInfo::DecodableType &);
 typedef void (*CHIPTestClusterClusterTimedWriteBooleanAttributeCallbackType)(
     void *, chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo::DecodableArgType);
 typedef void (*CHIPTestClusterClusterUnsupportedAttributeCallbackType)(

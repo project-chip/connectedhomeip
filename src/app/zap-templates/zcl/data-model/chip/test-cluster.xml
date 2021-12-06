@@ -144,6 +144,7 @@ limitations under the License.
     <attribute side="server" code="0x0027" define="RANGE_RESTRICTED_INT8s" type="int8s" min="-40" max="50" writable="true" optional="false" default="-5">range_restricted_int8s</attribute>
     <attribute side="server" code="0x0028" define="RANGE_RESTRICTED_INT16U" type="int16u" min="100" max="1000" writable="true" optional="false" default="200">range_restricted_int16u</attribute>
     <attribute side="server" code="0x0029" define="RANGE_RESTRICTED_INT16s" type="int16s" min="-150" max="200" writable="true" optional="false" default="-5">range_restricted_int16s</attribute>
+    <attribute side="server" code="0x002A" define="LIST_LONG_OCTET_STRING" type="ARRAY" entryType="LONG_OCTET_STRING" length="1000" writable="false" optional="false">list_long_octet_string</attribute>
     <attribute side="server" code="0x0030" define="TIMED_WRITE_BOOLEAN"
                type="BOOLEAN" writable="true" mustUseTimedWrite="true">timed_write_boolean</attribute>
 

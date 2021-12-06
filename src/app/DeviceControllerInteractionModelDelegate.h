@@ -66,9 +66,9 @@ public:
         IMWriteResponseCallback(apWriteClient, attributeStatus.mStatus);
     }
 
-    void OnError(const app::WriteClient * apWriteClient, CHIP_ERROR aError) override
+    void OnError(const app::WriteClient * apWriteClient, const app::StatusIB & aStatus, CHIP_ERROR aError) override
     {
-        IMWriteResponseCallback(apWriteClient, Protocols::InteractionModel::Status::Failure);
+        IMWriteResponseCallback(apWriteClient, aStatus.mStatus);
     }
 
     void OnDone(app::WriteClient * apWriteClient) override {}

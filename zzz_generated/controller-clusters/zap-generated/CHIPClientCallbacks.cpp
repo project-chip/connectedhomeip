@@ -134,6 +134,48 @@ namespace {
 // Singleton instance of the callbacks manager
 app::CHIPDeviceCallbacksMgr & gCallbacks = app::CHIPDeviceCallbacksMgr::GetInstance();
 
+void AccessControlClusterAclListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<AccessControlAclListAttributeCallback> * cb =
+        Callback::Callback<AccessControlAclListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
+void AccessControlClusterExtensionListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                      Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<AccessControlExtensionListAttributeCallback> * cb =
+        Callback::Callback<AccessControlExtensionListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
 void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(TLV::TLVReader * tlvData,
                                                                           Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback)
@@ -795,6 +837,27 @@ void TestClusterClusterListNullablesAndOptionalsStructListAttributeFilter(TLV::T
 
     Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback> * cb =
         Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback>::FromCancelable(onSuccessCallback);
+    cb->mCall(cb->mContext, list);
+}
+
+void TestClusterClusterListLongOctetStringListAttributeFilter(TLV::TLVReader * tlvData, Callback::Cancelable * onSuccessCallback,
+                                                              Callback::Cancelable * onFailureCallback)
+{
+    chip::app::DataModel::DecodableList<chip::ByteSpan> list;
+    CHIP_ERROR err = Decode(*tlvData, list);
+    if (err != CHIP_NO_ERROR)
+    {
+        if (onFailureCallback != nullptr)
+        {
+            Callback::Callback<DefaultFailureCallback> * cb =
+                Callback::Callback<DefaultFailureCallback>::FromCancelable(onFailureCallback);
+            cb->mCall(cb->mContext, EMBER_ZCL_STATUS_INVALID_VALUE);
+        }
+        return;
+    }
+
+    Callback::Callback<TestClusterListLongOctetStringListAttributeCallback> * cb =
+        Callback::Callback<TestClusterListLongOctetStringListAttributeCallback>::FromCancelable(onSuccessCallback);
     cb->mCall(cb->mContext, list);
 }
 

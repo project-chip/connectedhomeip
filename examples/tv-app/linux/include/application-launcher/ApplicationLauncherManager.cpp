@@ -39,7 +39,7 @@ exit:
 CHIP_ERROR ApplicationLauncherManager::proxyGetApplicationList(chip::app::AttributeValueEncoder & aEncoder)
 {
     ChipLogProgress(Zcl, "ApplicationLauncherManager::proxyGetApplicationList");
-    return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         ReturnErrorOnFailure(encoder.Encode(123u));
         ReturnErrorOnFailure(encoder.Encode(456u));
         return CHIP_NO_ERROR;

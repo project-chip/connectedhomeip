@@ -669,6 +669,9 @@
             { 0xFFFD, ZAP_TYPE(INT16U), 0, ZAP_ATTRIBUTE_MASK(EXTERNAL_STORAGE),                                                   \
               ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                                                                  \
                                                                                                                                    \
+            /* Endpoint: 0, Cluster: Binding (server) */                                                                           \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                                  \
+                                                                                                                                   \
             /* Endpoint: 0, Cluster: Basic (server) */                                                                             \
             { 0x0000, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_SIMPLE_DEFAULT(1) }, /* InteractionModelVersion */   \
             { 0x0001, ZAP_TYPE(CHAR_STRING), 33, ZAP_ATTRIBUTE_MASK(SINGLETON), ZAP_EMPTY_DEFAULT() }, /* VendorName */            \
@@ -841,9 +844,6 @@
               ZAP_EMPTY_DEFAULT() },                                        /* CurrentFabricIndex */                               \
             { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                                  \
                                                                                                                                    \
-            /* Endpoint: 0, Cluster: Binding (server) */                                                                           \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, ZAP_SIMPLE_DEFAULT(0x0001) }, /* ClusterRevision */                                  \
-                                                                                                                                   \
             /* Endpoint: 0, Cluster: Group Key Management (server) */                                                              \
             { 0x0000, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(616) }, /* groups */                                        \
             { 0x0001, ZAP_TYPE(ARRAY), 254, 0, ZAP_LONG_DEFAULTS_INDEX(870) }, /* group keys */                                    \
@@ -949,50 +949,48 @@
             {                                                                                                                      \
                 0x001D, ZAP_ATTRIBUTE_INDEX(2), 5, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                               \
             }, /* Endpoint: 0, Cluster: Descriptor (server) */                                                                     \
+            { 0x001E, ZAP_ATTRIBUTE_INDEX(7), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 0, Cluster: Binding (server) */ \
             { 0x0028,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(7),                                                                                              \
+              ZAP_ATTRIBUTE_INDEX(8),                                                                                              \
               20,                                                                                                                  \
               687,                                                                                                                 \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
               chipFuncArrayBasicServer }, /* Endpoint: 0, Cluster: Basic (server) */                                               \
             {                                                                                                                      \
-                0x0029, ZAP_ATTRIBUTE_INDEX(27), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x0029, ZAP_ATTRIBUTE_INDEX(28), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 0, Cluster: OTA Software Update Provider (server) */                                                   \
             {                                                                                                                      \
-                0x0030, ZAP_ATTRIBUTE_INDEX(28), 6, 270, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
+                0x0030, ZAP_ATTRIBUTE_INDEX(29), 6, 270, ZAP_CLUSTER_MASK(SERVER), NULL                                            \
             }, /* Endpoint: 0, Cluster: General Commissioning (server) */                                                          \
             {                                                                                                                      \
-                0x0031, ZAP_ATTRIBUTE_INDEX(34), 2, 6, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x0031, ZAP_ATTRIBUTE_INDEX(35), 2, 6, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 0, Cluster: Network Commissioning (server) */                                                          \
             {                                                                                                                      \
-                0x0032, ZAP_ATTRIBUTE_INDEX(36), 0, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+                0x0032, ZAP_ATTRIBUTE_INDEX(37), 0, 0, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
             }, /* Endpoint: 0, Cluster: Diagnostic Logs (server) */                                                                \
             {                                                                                                                      \
-                0x0033, ZAP_ATTRIBUTE_INDEX(36), 9, 17, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0033, ZAP_ATTRIBUTE_INDEX(37), 9, 17, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: General Diagnostics (server) */                                                            \
             {                                                                                                                      \
-                0x0034, ZAP_ATTRIBUTE_INDEX(45), 6, 30, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x0034, ZAP_ATTRIBUTE_INDEX(46), 6, 30, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Software Diagnostics (server) */                                                           \
             {                                                                                                                      \
-                0x0035, ZAP_ATTRIBUTE_INDEX(51), 65, 247, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+                0x0035, ZAP_ATTRIBUTE_INDEX(52), 65, 247, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 0, Cluster: Thread Network Diagnostics (server) */                                                     \
             {                                                                                                                      \
-                0x0036, ZAP_ATTRIBUTE_INDEX(116), 15, 58, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+                0x0036, ZAP_ATTRIBUTE_INDEX(117), 15, 58, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 0, Cluster: WiFi Network Diagnostics (server) */                                                       \
             {                                                                                                                      \
-                0x0037, ZAP_ATTRIBUTE_INDEX(131), 11, 57, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+                0x0037, ZAP_ATTRIBUTE_INDEX(132), 11, 57, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 0, Cluster: Ethernet Network Diagnostics (server) */                                                   \
             {                                                                                                                      \
-                0x003C, ZAP_ATTRIBUTE_INDEX(142), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x003C, ZAP_ATTRIBUTE_INDEX(143), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: AdministratorCommissioning (server) */                                                     \
             {                                                                                                                      \
-                0x003E, ZAP_ATTRIBUTE_INDEX(143), 6, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
+                0x003E, ZAP_ATTRIBUTE_INDEX(144), 6, 4, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
             }, /* Endpoint: 0, Cluster: Operational Credentials (server) */                                                        \
             {                                                                                                                      \
-                0xF000, ZAP_ATTRIBUTE_INDEX(149), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                             \
-            }, /* Endpoint: 0, Cluster: Binding (server) */                                                                        \
-            {                                                                                                                      \
-                0xF004, ZAP_ATTRIBUTE_INDEX(150), 3, 510, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
+                0x003F, ZAP_ATTRIBUTE_INDEX(150), 3, 510, ZAP_CLUSTER_MASK(SERVER), NULL                                           \
             }, /* Endpoint: 0, Cluster: Group Key Management (server) */                                                           \
             {                                                                                                                      \
                 0x0003, ZAP_ATTRIBUTE_INDEX(153), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                             \
@@ -1056,13 +1054,13 @@
 // Array of profile ids
 #define FIXED_PROFILE_IDS                                                                                                          \
     {                                                                                                                              \
-        0x0103, 0x0104                                                                                                             \
+        0x0103, 0x0103                                                                                                             \
     }
 
 // Array of device ids
 #define FIXED_DEVICE_IDS                                                                                                           \
     {                                                                                                                              \
-        0, 0                                                                                                                       \
+        22, 769                                                                                                                    \
     }
 
 // Array of device versions
@@ -1081,22 +1079,4 @@
 #define FIXED_NETWORKS                                                                                                             \
     {                                                                                                                              \
         0, 0                                                                                                                       \
-    }
-
-// This is an array of EmberAfManufacturerCodeEntry structures for clusters.
-#define GENERATED_CLUSTER_MANUFACTURER_CODE_COUNT (0)
-#define GENERATED_CLUSTER_MANUFACTURER_CODES                                                                                       \
-    {                                                                                                                              \
-        {                                                                                                                          \
-            0x00, 0x00                                                                                                             \
-        }                                                                                                                          \
-    }
-
-// This is an array of EmberAfManufacturerCodeEntry structures for attributes.
-#define GENERATED_ATTRIBUTE_MANUFACTURER_CODE_COUNT (0)
-#define GENERATED_ATTRIBUTE_MANUFACTURER_CODES                                                                                     \
-    {                                                                                                                              \
-        {                                                                                                                          \
-            0x00, 0x00                                                                                                             \
-        }                                                                                                                          \
     }

@@ -31,10 +31,10 @@
   ],
   "endpointTypes": [
     {
-      "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "HA-windowcovering",
+      "name": "MA-windowcovering",
+      "deviceTypeName": "MA-windowcovering",
       "deviceTypeCode": 514,
-      "deviceTypeProfileId": 260,
+      "deviceTypeProfileId": 259,
       "clusters": [
         {
           "name": "Identify",
@@ -3703,10 +3703,10 @@
       ]
     },
     {
-      "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "HA-windowcovering",
+      "name": "MA-windowcovering",
+      "deviceTypeName": "MA-windowcovering",
       "deviceTypeCode": 514,
-      "deviceTypeProfileId": 260,
+      "deviceTypeProfileId": 259,
       "clusters": [
         {
           "name": "Identify",
@@ -6121,10 +6121,10 @@
       ]
     },
     {
-      "name": "Anonymous Endpoint Type",
-      "deviceTypeName": "HA-windowcovering",
+      "name": "MA-windowcovering",
+      "deviceTypeName": "MA-windowcovering",
       "deviceTypeCode": 514,
-      "deviceTypeProfileId": 260,
+      "deviceTypeProfileId": 259,
       "clusters": [
         {
           "name": "Identify",
@@ -7354,32 +7354,31 @@
   ],
   "endpoints": [
     {
-      "endpointTypeName": "Anonymous Endpoint Type",
+      "endpointTypeName": "MA-windowcovering",
       "endpointTypeIndex": 0,
-      "profileId": 260,
+      "profileId": 259,
       "endpointId": 0,
       "networkId": 0,
       "endpointVersion": 1,
       "deviceIdentifier": 514
     },
     {
-      "endpointTypeName": "Anonymous Endpoint Type",
+      "endpointTypeName": "MA-windowcovering",
       "endpointTypeIndex": 1,
-      "profileId": 260,
+      "profileId": 259,
       "endpointId": 1,
       "networkId": 0,
-      "endpointVersion": null,
-      "deviceIdentifier": null
+      "endpointVersion": 1,
+      "deviceIdentifier": 514
     },
     {
-      "endpointTypeName": "Anonymous Endpoint Type",
+      "endpointTypeName": "MA-windowcovering",
       "endpointTypeIndex": 2,
-      "profileId": 260,
+      "profileId": 259,
       "endpointId": 2,
       "networkId": 0,
       "endpointVersion": 1,
       "deviceIdentifier": 514
     }
-  ],
-  "log": []
+  ]
 }

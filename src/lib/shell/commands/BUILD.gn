@@ -58,6 +58,12 @@ source_set("commands") {
     if (chip_device_platform == "nrfconnect") {
       sources += [ "DFUManager_nrfconnect.h" ]
     }
+    if (chip_device_platform == "esp32") {
+      sources += [
+        "DFUManager_esp32.h",
+        "OTAUpdater_esp32.h",
+      ]
+    }
   }
 
   if (chip_device_platform != "none") {

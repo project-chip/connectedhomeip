@@ -19,6 +19,7 @@
 #include <memory>
 #include <type_traits>
 
+#include <app/BufferedReadCallback.h>
 #include <app/DeviceProxy.h>
 #include <app/ReadClient.h>
 #include <app/WriteClient.h>
@@ -76,7 +77,9 @@ OnReadDoneCallback gOnReadDoneCallback                               = nullptr;
 class ReadClientCallback : public ReadClient::Callback
 {
 public:
-    ReadClientCallback(PyObject * appContext) : mAppContext(appContext) {}
+    ReadClientCallback(PyObject * appContext) : mBufferedReadCallback(*this), mAppContext(appContext) {}
+
+    app::BufferedReadCallback * GetBufferedReadCallback() { return &mBufferedReadCallback; }
 
     void OnAttributeData(const ReadClient * apReadClient, const ConcreteDataAttributePath & aPath, TLV::TLVReader * apData,
                          const StatusIB & aStatus) override
@@ -86,9 +89,9 @@ public:
         // callback. If we do, that's a bug.
         //
         VerifyOrDie(!aPath.IsListItemOperation());
-
-        uint8_t buffer[CHIP_CONFIG_DEFAULT_UDP_MTU_SIZE];
-        uint32_t size = 0;
+        size_t bufferLen                  = (apData == nullptr ? 0 : apData->GetRemainingLength() + apData->GetLengthRead());
+        std::unique_ptr<uint8_t[]> buffer = std::unique_ptr<uint8_t[]>(apData == nullptr ? nullptr : new uint8_t[bufferLen]);
+        uint32_t size                     = 0;
         // When the apData is nullptr, means we did not receive a valid attribute data from server, status will be some error
         // status.
         if (apData != nullptr)
@@ -97,7 +100,7 @@ public:
             // a TLVWriter to get a TLV with a normalized TLV buffer (Wrapped with a anonymous tag, no extra "end of container" tag
             // at the end.)
             TLV::TLVWriter writer;
-            writer.Init(buffer);
+            writer.Init(buffer.get(), bufferLen);
             CHIP_ERROR err = writer.CopyElement(TLV::AnonymousTag, *apData);
             if (err != CHIP_NO_ERROR)
             {
@@ -110,7 +113,7 @@ public:
         }
 
         gOnReadAttributeDataCallback(mAppContext, aPath.mEndpointId, aPath.mClusterId, aPath.mAttributeId,
-                                     to_underlying(aStatus.mStatus), buffer, size);
+                                     to_underlying(aStatus.mStatus), buffer.get(), size);
     }
 
     void OnSubscriptionEstablished(const ReadClient * apReadClient) override
@@ -165,6 +168,7 @@ public:
     };
 
 private:
+    BufferedReadCallback mBufferedReadCallback;
     PyObject * mAppContext;
 };
 
@@ -189,7 +193,7 @@ public:
                                  to_underlying(aStatus.mStatus));
     }
 
-    void OnError(const WriteClient * apWriteClient, CHIP_ERROR aProtocolError) override
+    void OnError(const WriteClient * apWriteClient, const StatusIB &, CHIP_ERROR aProtocolError) override
     {
         gOnWriteErrorCallback(mAppContext, aProtocolError.AsInteger());
     }
@@ -310,7 +314,7 @@ chip::ChipError::StorageType pychip_ReadClient_ReadAttributes(void * appContext,
     {
         app::InteractionModelEngine::GetInstance()->NewReadClient(
             &readClient, isSubscription ? ReadClient::InteractionType::Subscribe : ReadClient::InteractionType::Read,
-            callback.get());
+            callback->GetBufferedReadCallback());
         ReadPrepareParams params(session.Value());
         params.mpAttributePathParamsList    = readPaths.get();
         params.mAttributePathParamsListSize = n;

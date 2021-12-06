@@ -29,15 +29,7 @@ if(NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../.. REALPATH)
 endif()
 
-set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs)
-
-if (CONFIG_ENABLE_CHIP_SHELL)
-    list(APPEND CHIP_REQURIE_COMPONENTS console)
-endif()
-
-if (CONFIG_OPENTHREAD_ENABLED)
-    list(APPEND CHIP_REQURIE_COMPONENTS openthread)
-endif()
+set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs app_update console openthread)
 
 if (NOT CMAKE_BUILD_EARLY_EXPANSION)
     if (CONFIG_COMPILER_OPTIMIZATION_DEFAULT OR CONFIG_COMPILER_OPTIMIZATION_NONE)
@@ -105,6 +97,10 @@ endif()
 
 if (CONFIG_OPENTHREAD_ENABLED)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
+endif()
+
+if (CONFIG_ENABLE_OTA_REQUESTOR)
+    chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")

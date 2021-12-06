@@ -63,7 +63,7 @@ CHIP_ERROR ModeSelectAttrAccess::Read(const ConcreteReadAttributePath & aPath, A
             return CHIP_NO_ERROR;
         }
         CHIP_ERROR err;
-        err = aEncoder.EncodeList([modeOptionsProvider](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        err = aEncoder.EncodeList([modeOptionsProvider](const auto & encoder) -> CHIP_ERROR {
             const auto * end = modeOptionsProvider.end();
             for (auto * it = modeOptionsProvider.begin(); it != end; ++it)
             {

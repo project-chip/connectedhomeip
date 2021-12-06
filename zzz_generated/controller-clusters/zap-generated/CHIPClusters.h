@@ -30,6 +30,18 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT AccessControlCluster : public ClusterBase
+{
+public:
+    AccessControlCluster() : ClusterBase(app::Clusters::AccessControl::Id) {}
+    ~AccessControlCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR ReadAttributeAcl(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeExtension(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
+
 class DLL_EXPORT AccountLoginCluster : public ClusterBase
 {
 public:
@@ -2483,6 +2495,7 @@ public:
                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                        uint16_t maxInterval);
     CHIP_ERROR ReportAttributeRangeRestrictedInt16s(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ReadAttributeListLongOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeTimedWriteBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeTimedWriteBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                bool value);

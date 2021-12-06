@@ -22,6 +22,8 @@
 #include "ListParser.h"
 
 #include <app/AppBuildConfig.h>
+#include <app/CommandPathParams.h>
+#include <app/ConcreteCommandPath.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -128,6 +130,9 @@ public:
      *  @return A reference to *this
      */
     CommandPathIB::Builder & EndOfCommandPathIB();
+
+    CHIP_ERROR Encode(const CommandPathParams & aCommandPathParams);
+    CHIP_ERROR Encode(const ConcreteCommandPath & aConcreteCommandPath);
 };
 } // namespace CommandPathIB
 } // namespace app

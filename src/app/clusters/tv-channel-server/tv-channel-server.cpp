@@ -54,11 +54,10 @@ bool tvChannelClusterSkipChannel(uint16_t count);
 
 void sendResponse(app::CommandHandler * command, ::TvChannelInfo channelInfo)
 {
-    CHIP_ERROR err                   = CHIP_NO_ERROR;
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, TvChannel::Id,
-                                         Commands::ChangeChannelResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
-    SuccessOrExit(err = command->PrepareCommand(cmdParams));
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), TvChannel::Id, Commands::ChangeChannelResponse::Id };
+    TLV::TLVWriter * writer       = nullptr;
+    SuccessOrExit(err = command->PrepareCommand(path));
     VerifyOrExit((writer = command->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     // TODO: Enable this once struct as param is supported
     // SuccessOrExit(err = writer->Put(TLV::ContextTag(0), channelInfo));

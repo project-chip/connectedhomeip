@@ -49,6 +49,15 @@ JNI_METHOD(void, BaseChipCluster, deleteCluster)(JNIEnv * env, jobject self, jlo
     }
 }
 
+JNI_METHOD(jlong, AccessControlCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
+{
+    chip::DeviceLayer::StackLock lock;
+    AccessControlCluster * cppCluster = new AccessControlCluster();
+
+    cppCluster->Associate(reinterpret_cast<DeviceProxy *>(devicePtr), endpointId);
+    return reinterpret_cast<jlong>(cppCluster);
+}
+
 JNI_METHOD(jlong, AccountLoginCluster, initWithDevice)(JNIEnv * env, jobject self, jlong devicePtr, jint endpointId)
 {
     chip::DeviceLayer::StackLock lock;
@@ -27336,7 +27345,7 @@ JNI_METHOD(void, TestClusterCluster, writeTimedWriteBooleanAttribute)
 
     auto successFn = chip::Callback::Callback<CHIPDefaultWriteSuccessCallbackType>::FromCancelable(onSuccess->Cancel());
     auto failureFn = chip::Callback::Callback<CHIPDefaultFailureCallbackType>::FromCancelable(onFailure->Cancel());
-    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall);
+    err            = cppCluster->WriteAttribute<TypeInfo>(cppValue, onSuccess->mContext, successFn->mCall, failureFn->mCall, 10000);
     VerifyOrReturn(
         err == CHIP_NO_ERROR,
         chip::AndroidClusterExceptions::GetInstance().ReturnIllegalStateException(env, callback, "Error writing attribute", err));

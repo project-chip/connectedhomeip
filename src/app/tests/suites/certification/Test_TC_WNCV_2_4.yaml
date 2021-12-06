@@ -27,12 +27,14 @@ tests:
     - label: "Reads Type attribute from DUT"
       command: "readAttribute"
       attribute: "Type"
+      PICS: A_TYPE
       response:
           value: 0
 
     - label: "Reads Type attribute constraints"
       command: "readAttribute"
       attribute: "Type"
+      PICS: A_TYPE
       response:
           constraints:
               type: enum8

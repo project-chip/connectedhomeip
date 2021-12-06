@@ -22,6 +22,7 @@
 #include <app-common/zap-generated/callbacks/PluginCallbacks.h>
 
 #define MATTER_PLUGINS_INIT                                                                                                        \
+    MatterAccessControlPluginServerInitCallback();                                                                                 \
     MatterAccountLoginPluginServerInitCallback();                                                                                  \
     MatterAdministratorCommissioningPluginServerInitCallback();                                                                    \
     MatterApplicationBasicPluginServerInitCallback();                                                                              \
@@ -57,6 +58,7 @@
     MatterMediaPlaybackPluginServerInitCallback();                                                                                 \
     MatterModeSelectPluginServerInitCallback();                                                                                    \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
     MatterOtaSoftwareUpdateProviderPluginServerInitCallback();                                                                     \
     MatterOtaSoftwareUpdateRequestorPluginServerInitCallback();                                                                    \
     MatterOccupancySensingPluginServerInitCallback();                                                                              \

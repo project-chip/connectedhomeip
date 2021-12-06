@@ -60,7 +60,7 @@ CHIP_ERROR PowerSourceConfigurationAttrAccess::Read(const ConcreteReadAttributeP
     switch (aPath.mAttributeId)
     {
     case Sources::Id:
-        err = aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+        err = aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
             uint16_t clusterCount = 0;
 
             for (uint16_t endpointIndex = 0; endpointIndex < emberAfEndpointCount(); endpointIndex++)

@@ -100,6 +100,53 @@ NS_ASSUME_NONNULL_BEGIN
 }
 @end
 
+@implementation CHIPAccessControlClusterTarget
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _cluster = nil;
+
+        _endpoint = nil;
+
+        _deviceType = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPAccessControlClusterAccessControlEntry
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+
+        _privilege = @(0);
+
+        _authMode = @(0);
+
+        _subjects = nil;
+
+        _targets = nil;
+    }
+    return self;
+}
+@end
+
+@implementation CHIPAccessControlClusterExtensionEntry
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _fabricIndex = @(0);
+
+        _data = [NSData data];
+    }
+    return self;
+}
+@end
+
 @implementation CHIPBridgedActionsClusterActionStruct
 - (instancetype)init
 {
@@ -375,6 +422,40 @@ NS_ASSUME_NONNULL_BEGIN
         _fabricIndex = @(0);
 
         _noc = [NSData data];
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterGroupKey
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _vendorId = @(0);
+
+        _groupKeyIndex = @(0);
+
+        _groupKeyRoot = [NSData data];
+
+        _groupKeyEpochStartTime = @(0);
+
+        _groupKeySecurityPolicy = @(0);
+    }
+    return self;
+}
+@end
+
+@implementation CHIPGroupKeyManagementClusterGroupState
+- (instancetype)init
+{
+    if (self = [super init]) {
+
+        _vendorId = @(0);
+
+        _vendorGroupId = @(0);
+
+        _groupKeySetIndex = @(0);
     }
     return self;
 }
@@ -761,40 +842,6 @@ NS_ASSUME_NONNULL_BEGIN
         _fabricIndex = @(0);
 
         _operationalCert = [NSData data];
-    }
-    return self;
-}
-@end
-
-@implementation CHIPGroupKeyManagementClusterGroupKey
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _vendorId = @(0);
-
-        _groupKeyIndex = @(0);
-
-        _groupKeyRoot = [NSData data];
-
-        _groupKeyEpochStartTime = @(0);
-
-        _groupKeySecurityPolicy = @(0);
-    }
-    return self;
-}
-@end
-
-@implementation CHIPGroupKeyManagementClusterGroupState
-- (instancetype)init
-{
-    if (self = [super init]) {
-
-        _vendorId = @(0);
-
-        _vendorGroupId = @(0);
-
-        _groupKeySetIndex = @(0);
     }
     return self;
 }

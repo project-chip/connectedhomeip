@@ -198,7 +198,7 @@ public:
                static_cast<double>(gWriteRespCount) * 100 / static_cast<double>(gWriteCount),
                static_cast<double>(transitTime.count()) / 1000);
     }
-    void OnError(const chip::app::WriteClient * apCommandSender, CHIP_ERROR aError) override
+    void OnError(const chip::app::WriteClient * apCommandSender, const chip::app::StatusIB &, CHIP_ERROR aError) override
     {
         printf("WriteClient::OnError happens with %" CHIP_ERROR_FORMAT, aError.Format());
     }
@@ -627,17 +627,23 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
 }
 
 CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIB::Builder & aAttributeReport)
+                                 AttributeReportIBs::Builder & aAttributeReports,
+                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
-    AttributeStatusIB::Builder attributeStatus = aAttributeReport.CreateAttributeStatus();
-    AttributePathIB::Builder attributePath     = attributeStatus.CreatePath();
+    AttributeReportIB::Builder & attributeReport = aAttributeReports.CreateAttributeReport();
+    ReturnErrorOnFailure(aAttributeReports.GetError());
+    AttributeStatusIB::Builder & attributeStatus = attributeReport.CreateAttributeStatus();
+    ReturnErrorOnFailure(attributeReport.GetError());
+    AttributePathIB::Builder & attributePath = attributeStatus.CreatePath();
+    ReturnErrorOnFailure(attributeStatus.GetError());
     attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
     ReturnErrorOnFailure(attributePath.GetError());
-    StatusIB::Builder errorStatus = attributeStatus.CreateErrorStatus();
+    StatusIB::Builder & errorStatus = attributeStatus.CreateErrorStatus();
     errorStatus.EncodeStatusIB(StatusIB(Protocols::InteractionModel::Status::UnsupportedAttribute));
+    ReturnErrorOnFailure(errorStatus.GetError());
     attributeStatus.EndOfAttributeStatusIB();
     ReturnErrorOnFailure(attributeStatus.GetError());
-    return CHIP_NO_ERROR;
+    return attributeReport.EndOfAttributeReportIB().GetError();
 }
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler *)

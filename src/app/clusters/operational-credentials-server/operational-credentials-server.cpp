@@ -89,7 +89,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadCommissionedFabrics(EndpointId 
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
         {
             if (!fabricInfo.IsInitialized())
@@ -114,7 +114,7 @@ CHIP_ERROR OperationalCredentialsAttrAccess::ReadFabricsList(EndpointId endpoint
 
 CHIP_ERROR OperationalCredentialsAttrAccess::ReadRootCertificates(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([](const TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         for (auto & fabricInfo : Server::GetInstance().GetFabricTable())
         {
             ByteSpan cert;
@@ -362,13 +362,12 @@ FabricInfo gFabricBeingCommissioned;
 CHIP_ERROR SendNOCResponse(app::CommandHandler * commandObj, EmberAfNodeOperationalCertStatus status, uint8_t index,
                            CharSpan debug_text)
 {
-    app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, OperationalCredentials::Id,
-                                         Commands::NOCResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
-    TLV::TLVWriter * writer          = nullptr;
+    app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), OperationalCredentials::Id, Commands::NOCResponse::Id };
+    TLV::TLVWriter * writer       = nullptr;
 
     VerifyOrReturnError(commandObj != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    ReturnErrorOnFailure(commandObj->PrepareCommand(cmdParams));
+    ReturnErrorOnFailure(commandObj->PrepareCommand(path));
     writer = commandObj->GetCommandDataIBTLVWriter();
     ReturnErrorOnFailure(writer->Put(TLV::ContextTag(0), status));
     if (status == EMBER_ZCL_NODE_OPERATIONAL_CERT_STATUS_SUCCESS)

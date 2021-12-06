@@ -29,6 +29,7 @@
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
 /**** Cluster endpoint counts ****/
+#define EMBER_AF_ACCESS_CONTROL_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ACCOUNT_LOGIN_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_ADMINISTRATOR_COMMISSIONING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 #define EMBER_AF_APPLICATION_BASIC_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
@@ -89,6 +90,10 @@
 #define EMBER_AF_WINDOW_COVERING_CLUSTER_CLIENT_ENDPOINT_COUNT (1)
 
 /**** Cluster Plugins ****/
+
+// Use this macro to check if the client side of the Access Control cluster is included
+#define ZCL_USING_ACCESS_CONTROL_CLUSTER_CLIENT
+#define EMBER_AF_PLUGIN_ACCESS_CONTROL_CLIENT
 
 // Use this macro to check if the client side of the Account Login cluster is included
 #define ZCL_USING_ACCOUNT_LOGIN_CLUSTER_CLIENT
