@@ -128,6 +128,14 @@ jobs:
                     out/ota_requestor_debug/chip-ota-requestor-app \
                     /tmp/bloat_reports/
 
+            - name: Build example Standalone Door Lock App
+              timeout-minutes: 5
+              run: |
+                  scripts/examples/gn_build_example.sh examples/lock-app/linux out/lock_app_debug
+                  .environment/pigweed-venv/bin/python3 scripts/tools/memory/gh_sizes.py \
+                    linux debug lock-app \
+                    out/lock_app_debug/chip-lock-app \
+                    /tmp/bloat_reports/
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}
