@@ -130,13 +130,6 @@ enum EmberAfContentLaunchStatus : uint8_t
     EMBER_ZCL_CONTENT_LAUNCH_STATUS_AUTH_FAILED       = 2,
 };
 
-// Enum for ContentLaunchStreamingType
-enum EmberAfContentLaunchStreamingType : uint8_t
-{
-    EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_DASH = 0,
-    EMBER_ZCL_CONTENT_LAUNCH_STREAMING_TYPE_HLS  = 1,
-};
-
 // Enum for DoorLockEventSource
 enum EmberAfDoorLockEventSource : uint8_t
 {

@@ -28072,6 +28072,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
 
 } // namespace CurrentMediaInput
 
+<<<<<<< HEAD
 namespace FeatureMap {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
@@ -28130,6 +28131,8 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 } // namespace ClusterRevision
 
+=======
+>>>>>>> f56a5fe21 (Run zap tool successfully)
 } // namespace Attributes
 } // namespace MediaInput
 
@@ -28258,6 +28261,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 } // namespace ClusterRevision
 
+<<<<<<< HEAD
 } // namespace Attributes
 } // namespace KeypadInput
 
@@ -28353,6 +28357,33 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
     uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteServerAttribute(endpoint, Clusters::AudioOutput::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+=======
+namespace PlaybackSpeed {
+
+EmberAfStatus Get(chip::EndpointId endpoint, float * value)
+{
+    NumericAttributeTraits<float>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<float>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<float>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<float>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, float value)
+{
+    if (!NumericAttributeTraits<float>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<float>::StorageType storageValue;
+    NumericAttributeTraits<float>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<float>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::MediaPlayback::Id, Id, writable, ZCL_SINGLE_ATTRIBUTE_TYPE);
+>>>>>>> f56a5fe21 (Run zap tool successfully)
 }
 
 } // namespace CurrentAudioOutput
@@ -28448,6 +28479,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
     return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
+<<<<<<< HEAD
 } // namespace CatalogVendorId
 
 namespace ApplicationId {
@@ -28457,35 +28489,23 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
     NumericAttributeTraits<uint8_t>::StorageType temp;
     uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, readable, sizeof(temp));
-    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
-    return status;
-}
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
-{
-    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
-    {
-        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
-    }
-    NumericAttributeTraits<uint8_t>::StorageType storageValue;
-    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
-    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
-    return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
-}
+=======
+} // namespace CurrentMediaInput
 
-} // namespace ApplicationId
+} // namespace Attributes
+} // namespace MediaInput
 
-namespace FeatureMap {
+namespace ContentLauncher {
+namespace Attributes {
+
+namespace SupportedStreamingProtocols {
 
 EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
 {
     NumericAttributeTraits<uint32_t>::StorageType temp;
     uint8_t * readable   = NumericAttributeTraits<uint32_t>::ToAttributeStoreRepresentation(temp);
-    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, readable, sizeof(temp));
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::ContentLauncher::Id, Id, readable, sizeof(temp));
+>>>>>>> f56a5fe21 (Run zap tool successfully)
     VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
     if (!NumericAttributeTraits<uint32_t>::CanRepresentValue(/* isNullable = */ false, temp))
     {
@@ -28500,6 +28520,60 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
     {
         return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
     }
+<<<<<<< HEAD
+    NumericAttributeTraits<uint8_t>::StorageType storageValue;
+    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace ApplicationId
+
+namespace FeatureMap {
+=======
+    NumericAttributeTraits<uint32_t>::StorageType storageValue;
+    NumericAttributeTraits<uint32_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint32_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ContentLauncher::Id, Id, writable, ZCL_BITMAP32_ATTRIBUTE_TYPE);
+}
+
+} // namespace SupportedStreamingProtocols
+
+} // namespace Attributes
+} // namespace ContentLauncher
+
+namespace AudioOutput {
+namespace Attributes {
+
+namespace CurrentAudioOutput {
+>>>>>>> f56a5fe21 (Run zap tool successfully)
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value)
+{
+<<<<<<< HEAD
+    NumericAttributeTraits<uint32_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint32_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::ApplicationLauncher::Id, Id, readable, sizeof(temp));
+=======
+    NumericAttributeTraits<uint8_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::AudioOutput::Id, Id, readable, sizeof(temp));
+>>>>>>> f56a5fe21 (Run zap tool successfully)
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<uint32_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<uint32_t>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value)
+{
+    if (!NumericAttributeTraits<uint32_t>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+<<<<<<< HEAD
     NumericAttributeTraits<uint32_t>::StorageType storageValue;
     NumericAttributeTraits<uint32_t>::WorkingToStorage(value, storageValue);
     uint8_t * writable = NumericAttributeTraits<uint32_t>::ToAttributeStoreRepresentation(storageValue);
@@ -28536,6 +28610,21 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 }
 
 } // namespace ClusterRevision
+=======
+    NumericAttributeTraits<uint8_t>::StorageType storageValue;
+    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::AudioOutput::Id, Id, writable, ZCL_INT8U_ATTRIBUTE_TYPE);
+}
+
+} // namespace CurrentAudioOutput
+
+} // namespace Attributes
+} // namespace AudioOutput
+
+namespace ApplicationLauncher {
+namespace Attributes {
+>>>>>>> f56a5fe21 (Run zap tool successfully)
 
 } // namespace Attributes
 } // namespace ApplicationLauncher
@@ -28807,6 +28896,7 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
 
 } // namespace ClusterRevision
 
+<<<<<<< HEAD
 } // namespace Attributes
 } // namespace ApplicationBasic
 
@@ -28867,9 +28957,66 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value)
     NumericAttributeTraits<uint16_t>::WorkingToStorage(value, storageValue);
     uint8_t * writable = NumericAttributeTraits<uint16_t>::ToAttributeStoreRepresentation(storageValue);
     return emberAfWriteServerAttribute(endpoint, Clusters::AccountLogin::Id, Id, writable, ZCL_INT16U_ATTRIBUTE_TYPE);
+=======
+namespace ApplicationStatus {
+
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value)
+{
+    NumericAttributeTraits<uint8_t>::StorageType temp;
+    uint8_t * readable   = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(temp);
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, readable, sizeof(temp));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, temp))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    *value = NumericAttributeTraits<uint8_t>::StorageToWorking(temp);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value)
+{
+    if (!NumericAttributeTraits<uint8_t>::CanRepresentValue(/* isNullable = */ false, value))
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+    NumericAttributeTraits<uint8_t>::StorageType storageValue;
+    NumericAttributeTraits<uint8_t>::WorkingToStorage(value, storageValue);
+    uint8_t * writable = NumericAttributeTraits<uint8_t>::ToAttributeStoreRepresentation(storageValue);
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, writable, ZCL_ENUM8_ATTRIBUTE_TYPE);
+>>>>>>> f56a5fe21 (Run zap tool successfully)
 }
 
 } // namespace ClusterRevision
+
+namespace ApplicationVersion {
+
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value)
+{
+    uint8_t zclString[32 + 1];
+    EmberAfStatus status = emberAfReadServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, sizeof(zclString));
+    VerifyOrReturnError(EMBER_ZCL_STATUS_SUCCESS == status, status);
+    size_t length = emberAfStringLength(zclString);
+    if (length == NumericAttributeTraits<uint8_t>::kNullValue)
+    {
+        return EMBER_ZCL_STATUS_CONSTRAINT_ERROR;
+    }
+
+    VerifyOrReturnError(value.size() == 32, EMBER_ZCL_STATUS_INVALID_DATA_TYPE);
+    memcpy(value.data(), &zclString[1], 32);
+    value.reduce_size(length);
+    return status;
+}
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value)
+{
+    static_assert(32 < NumericAttributeTraits<uint8_t>::kNullValue, "value.size() might be too big");
+    VerifyOrReturnError(value.size() <= 32, EMBER_ZCL_STATUS_CONSTRAINT_ERROR);
+    uint8_t zclString[32 + 1];
+    emberAfCopyInt8u(zclString, 0, static_cast<uint8_t>(value.size()));
+    memcpy(&zclString[1], value.data(), value.size());
+    return emberAfWriteServerAttribute(endpoint, Clusters::ApplicationBasic::Id, Id, zclString, ZCL_CHAR_STRING_ATTRIBUTE_TYPE);
+}
+
+} // namespace ApplicationVersion
 
 } // namespace Attributes
 } // namespace AccountLogin

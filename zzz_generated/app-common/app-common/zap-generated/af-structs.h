@@ -84,6 +84,14 @@ typedef struct _DoubleNestedStructList
     /* TYPE WARNING: array array defaults to */ uint8_t * a;
 } DoubleNestedStructList;
 
+// Struct for ContentLaunchDimension
+typedef struct _ContentLaunchDimension
+{
+    double width;
+    double height;
+    uint8_t metric;
+} ContentLaunchDimension;
+
 // Struct for ContentLaunchAdditionalInfo
 typedef struct _ContentLaunchAdditionalInfo
 {
@@ -94,10 +102,43 @@ typedef struct _ContentLaunchAdditionalInfo
 // Struct for ContentLaunchParamater
 typedef struct _ContentLaunchParamater
 {
-    uint8_t Type;
-    chip::CharSpan Value;
-    /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
+    uint8_t type;
+    chip::CharSpan value;
+    /* TYPE WARNING: array array defaults to */ uint8_t * externalIDList;
 } ContentLaunchParamater;
+
+// Struct for ContentLaunchStyleInformation
+typedef struct _ContentLaunchStyleInformation
+{
+    chip::CharSpan imageUrl;
+    chip::CharSpan color;
+    ContentLaunchDimension size;
+} ContentLaunchStyleInformation;
+
+// Struct for ContentLaunchBrandingInformation
+typedef struct _ContentLaunchBrandingInformation
+{
+    chip::CharSpan providerName;
+    ContentLaunchStyleInformation background;
+    ContentLaunchStyleInformation logo;
+    ContentLaunchStyleInformation progressBar;
+    ContentLaunchStyleInformation splash;
+    ContentLaunchStyleInformation waterMark;
+} ContentLaunchBrandingInformation;
+
+// Struct for ApplicationLauncherApp
+typedef struct _ApplicationLauncherApp
+{
+    uint16_t catalogVendorId;
+    chip::CharSpan applicationId;
+} ApplicationLauncherApp;
+
+// Struct for ApplicationLauncherEndpoint
+typedef struct _ApplicationLauncherEndpoint
+{
+    ApplicationLauncherApp application;
+    chip::CharSpan endpoint;
+} ApplicationLauncherEndpoint;
 
 // Struct for Target
 typedef struct _Target
@@ -128,12 +169,12 @@ typedef struct _ActionStruct
     uint8_t Status;
 } ActionStruct;
 
-// Struct for ApplicationLauncherApp
-typedef struct _ApplicationLauncherApp
+// Struct for ApplicationBasicApp
+typedef struct _ApplicationBasicApp
 {
     uint16_t catalogVendorId;
     chip::CharSpan applicationId;
-} ApplicationLauncherApp;
+} ApplicationBasicApp;
 
 // Struct for AudioOutputInfo
 typedef struct _AudioOutputInfo
@@ -162,33 +203,6 @@ typedef struct _BatFaultChangeType
     /* TYPE WARNING: array array defaults to */ uint8_t * current;
     /* TYPE WARNING: array array defaults to */ uint8_t * previous;
 } BatFaultChangeType;
-
-// Struct for ContentLaunchBrandingInformation
-typedef struct _ContentLaunchBrandingInformation
-{
-    chip::CharSpan providerName;
-    uint8_t background;
-    uint8_t logo;
-    uint8_t progressBar;
-    uint8_t splash;
-    uint8_t waterMark;
-} ContentLaunchBrandingInformation;
-
-// Struct for ContentLaunchDimension
-typedef struct _ContentLaunchDimension
-{
-    chip::CharSpan width;
-    chip::CharSpan height;
-    uint8_t metric;
-} ContentLaunchDimension;
-
-// Struct for ContentLaunchStyleInformation
-typedef struct _ContentLaunchStyleInformation
-{
-    chip::CharSpan imageUrl;
-    chip::CharSpan color;
-    uint8_t size;
-} ContentLaunchStyleInformation;
 
 // Struct for DeviceType
 typedef struct _DeviceType
