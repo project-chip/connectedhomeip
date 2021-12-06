@@ -30,8 +30,8 @@ limitations under the License.
           uint8[] steering_data
           uint16 panid
           uint16 joiner_udp_port
-          uint16 channel
-          uint16 rssi
+          uint8 channel
+          uint8 rssi
           uint8 lqi
           uint8 version
           bool is_native
@@ -40,7 +40,7 @@ limitations under the License.
       </literallayout>
     -->
     <method name="Scan">
-      <arg name="scan_result" type="a(tstayqqqqyybb)" direction="out"/> 
+      <arg name="scan_result" type="a(tstayqqyyyybb)" direction="out"/> 
     </method>
 
     <!-- Attach: Attach the current device to the Thread network using the current active network dataset. -->
