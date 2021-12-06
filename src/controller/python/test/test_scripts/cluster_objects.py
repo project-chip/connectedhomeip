@@ -98,6 +98,17 @@ class ClusterObjectTests:
             raise ValueError()
 
     @classmethod
+    async def SendCommandWithTestClusterEventTrigger(cls, devCtrl):
+        req = Clusters.TestCluster.Commands.TestEmitTestEventRequest(arg1=1)
+        res = await devCtrl.SendCommand(nodeid=NODE_ID, endpoint=LIGHTING_ENDPOINT_ID, payload=req)
+        if not isinstance(res, Clusters.TestCluster.Commands.TestEmitTestEventResponse):
+            logger.error(f"Unexpected response of type {type(res)} received.")
+            raise ValueError()
+        logger.info(f"Received response: {res}")
+        if res.returnValue != 5:
+            raise ValueError()
+
+    @classmethod
     async def SendWriteRequest(cls, devCtrl):
         res = await devCtrl.WriteAttribute(nodeid=NODE_ID,
                                            attributes=[
@@ -234,6 +245,7 @@ class ClusterObjectTests:
             await cls.RoundTripTest(devCtrl)
             await cls.RoundTripTestWithBadEndpoint(devCtrl)
             await cls.SendCommandWithResponse(devCtrl)
+            await cls.SendCommandWithTestClusterEventTrigger(devCtrl)
             await cls.SendWriteRequest(devCtrl)
             await cls.TestReadAttributeRequests(devCtrl)
             await cls.TestReadEventRequests(devCtrl)

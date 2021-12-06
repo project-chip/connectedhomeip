@@ -31215,11 +31215,6 @@ namespace TestEmitTestEventRequest {
 enum class Fields
 {
     kArg1 = 0,
-    kArg2 = 1,
-    kArg3 = 2,
-    kArg4 = 3,
-    kArg5 = 4,
-    kArg6 = 5,
 };
 
 struct Type
@@ -31230,11 +31225,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t arg1;
-    SimpleEnum arg2;
-    bool arg3;
-    Structs::SimpleStruct::Type arg4;
-    DataModel::List<const Structs::SimpleStruct::Type> arg5;
-    DataModel::List<const SimpleEnum> arg6;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -31250,11 +31240,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t arg1;
-    SimpleEnum arg2;
-    bool arg3;
-    Structs::SimpleStruct::DecodableType arg4;
-    DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg5;
-    DataModel::DecodableList<SimpleEnum> arg6;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace TestEmitTestEventRequest
@@ -32230,11 +32215,6 @@ static constexpr EventId kEventId             = 0x00000001;
 enum class Fields
 {
     kArg1 = 1,
-    kArg2 = 2,
-    kArg3 = 3,
-    kArg4 = 4,
-    kArg5 = 5,
-    kArg6 = 6,
 };
 
 struct Type
@@ -32245,11 +32225,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t arg1;
-    SimpleEnum arg2;
-    bool arg3;
-    Structs::SimpleStruct::Type arg4;
-    DataModel::List<const Structs::SimpleStruct::Type> arg5;
-    DataModel::List<const SimpleEnum> arg6;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -32262,11 +32237,6 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::TestCluster::Id; }
 
     uint8_t arg1;
-    SimpleEnum arg2;
-    bool arg3;
-    Structs::SimpleStruct::DecodableType arg4;
-    DataModel::DecodableList<Structs::SimpleStruct::DecodableType> arg5;
-    DataModel::DecodableList<SimpleEnum> arg6;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };

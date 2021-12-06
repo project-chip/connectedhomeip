@@ -376,11 +376,6 @@ limitations under the License.
         Command that takes identical arguments to the fields of the TestEvent and logs the TestEvent to the buffer.  Command returns an event ID as the response.
       </description>
       <arg name="arg1" type="INT8U"/>
-      <arg name="arg2" type="SimpleEnum"/>
-      <arg name="arg3" type="BOOLEAN"/>
-      <arg name="arg4" type="SimpleStruct"/>
-      <arg name="arg5" type="SimpleStruct" array="true"/>
-      <arg name="arg6" type="SimpleEnum" array="true"/>
     </command>
 
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
@@ -505,11 +500,6 @@ limitations under the License.
     <event code="0x0001" name="TestEvent" priority="info" side="server">
       <description>Example test event</description>
       <field id="1" name="arg1" type="INT8U"/>
-      <field id="2" name="arg2" type="SimpleEnum"/>
-      <field id="3" name="arg3" type="BOOLEAN"/>
-      <field id="4" name="arg4" type="SimpleStruct"/>
-      <field id="5" name="arg5" type="SimpleStruct" array="true"/>
-      <field id="6" name="arg6" type="SimpleEnum" array="true"/>
     </event>
   </cluster>
 </configurator>

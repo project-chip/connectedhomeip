@@ -4118,16 +4118,6 @@ NS_ASSUME_NONNULL_BEGIN
     if (self = [super init]) {
 
         _arg1 = @(0);
-
-        _arg2 = @(0);
-
-        _arg3 = @(0);
-
-        _arg4 = [CHIPTestClusterClusterSimpleStruct new];
-
-        _arg5 = [NSArray array];
-
-        _arg6 = [NSArray array];
     }
     return self;
 }

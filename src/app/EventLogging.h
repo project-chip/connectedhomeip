@@ -20,6 +20,7 @@
 
 #include <app/ConcreteEventPath.h>
 #include <app/EventLoggingDelegate.h>
+#include <app/EventManagement.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h> // So we can encode lists
 
@@ -27,7 +28,7 @@ namespace chip {
 namespace app {
 
 template <typename T>
-class EventLogger : EventLoggingDelegate
+class EventLogger : public EventLoggingDelegate
 {
 public:
     EventLogger(const T & aEventData) : mEventData(aEventData){};
@@ -44,7 +45,9 @@ CHIP_ERROR LogEvent(const T & aEventData, EndpointId aEndpoint, EventOptions aEv
     ConcreteEventPath path(aEndpoint, aEventData.GetClusterId(), aEventData.GetEventId());
     // log the actual event
     aEventNumber = 0;
-    return CHIP_NO_ERROR;
+    EventManagement & logMgmt = chip::app::EventManagement::GetInstance();
+    aEventOptions.mPath = path;
+    return logMgmt.LogEvent(&eventData, aEventOptions, aEventNumber);
 }
 
 } // namespace app
