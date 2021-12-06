@@ -66,8 +66,3 @@ tests:
       response:
           value: "appId"
 
-    - label: "Read attribute catalog vendor id"
-      command: "readAttribute"
-      attribute: "catalog vendor id"
-      response:
-          value: 1

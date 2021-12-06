@@ -28092,7 +28092,7 @@ public:
 } // namespace Commands
 
 namespace Attributes {
-namespace TvChannelList {
+namespace ChannelList {
 struct TypeInfo
 {
     using Type             = DataModel::List<const Structs::TvChannelInfo::Type>;
@@ -28100,34 +28100,34 @@ struct TypeInfo
     using DecodableArgType = const DataModel::DecodableList<Structs::TvChannelInfo::DecodableType> &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TvChannelList::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChannelList::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace TvChannelList
-namespace TvChannelLineup {
+} // namespace ChannelList
+namespace ChannelLineup {
 struct TypeInfo
 {
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
+    using Type             = Structs::TvChannelLineupInfo::Type;
+    using DecodableType    = Structs::TvChannelLineupInfo::DecodableType;
+    using DecodableArgType = const Structs::TvChannelLineupInfo::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::TvChannelLineup::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ChannelLineup::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace TvChannelLineup
-namespace CurrentTvChannel {
+} // namespace ChannelLineup
+namespace CurrentChannel {
 struct TypeInfo
 {
-    using Type             = chip::ByteSpan;
-    using DecodableType    = chip::ByteSpan;
-    using DecodableArgType = chip::ByteSpan;
+    using Type             = Structs::TvChannelInfo::Type;
+    using DecodableType    = Structs::TvChannelInfo::DecodableType;
+    using DecodableArgType = const Structs::TvChannelInfo::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::TvChannel::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentTvChannel::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::CurrentChannel::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CurrentTvChannel
+} // namespace CurrentChannel
 namespace AttributeList {
 struct TypeInfo
 {
@@ -29231,24 +29231,12 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace Duration
-namespace PositionUpdatedAt {
-struct TypeInfo
-{
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::PositionUpdatedAt::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace PositionUpdatedAt
 namespace Position {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = Structs::MediaPlaybackPosition::Type;
+    using DecodableType    = Structs::MediaPlaybackPosition::DecodableType;
+    using DecodableArgType = const Structs::MediaPlaybackPosition::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::Position::Id; }
@@ -29258,9 +29246,9 @@ struct TypeInfo
 namespace PlaybackSpeed {
 struct TypeInfo
 {
-    using Type             = uint64_t;
-    using DecodableType    = uint64_t;
-    using DecodableArgType = uint64_t;
+    using Type             = float;
+    using DecodableType    = float;
+    using DecodableArgType = float;
 
     static constexpr ClusterId GetClusterId() { return Clusters::MediaPlayback::Id; }
     static constexpr AttributeId GetAttributeId() { return Attributes::PlaybackSpeed::Id; }
@@ -29921,14 +29909,16 @@ enum class ContentLaunchParameterEnum : uint8_t
     kActor      = 0x00,
     kChannel    = 0x01,
     kCharacter  = 0x02,
-    kEvent      = 0x03,
-    kFranchise  = 0x04,
-    kGenre      = 0x05,
-    kLeague     = 0x06,
-    kPopularity = 0x07,
-    kSport      = 0x08,
-    kSportsTeam = 0x09,
-    kVideo      = 0x0A,
+    kDirector   = 0x03,
+    kEvent      = 0x04,
+    kFranchise  = 0x05,
+    kGenre      = 0x06,
+    kLeague     = 0x07,
+    kPopularity = 0x08,
+    kProvider   = 0x09,
+    kSport      = 0x0A,
+    kSportsTeam = 0x0B,
+    kType       = 0x0C,
 };
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
@@ -29943,20 +29933,30 @@ enum class ContentLaunchStatus : uint8_t
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using ContentLaunchStatus             = EmberAfContentLaunchStatus;
 #endif
-// Need to convert consumers to using the new enum classes, so we
-// don't just have casts all over.
-#ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-// Enum for ContentLaunchStreamingType
-enum class ContentLaunchStreamingType : uint8_t
-{
-    kDash = 0x00,
-    kHls  = 0x01,
-};
-#else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
-using ContentLaunchStreamingType      = EmberAfContentLaunchStreamingType;
-#endif
 
 namespace Structs {
+namespace ContentLaunchDimension {
+enum class Fields
+{
+    kWidth  = 1,
+    kHeight = 2,
+    kMetric = 3,
+};
+
+struct Type
+{
+public:
+    double width;
+    double height;
+    ContentLaunchMetricType metric;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace ContentLaunchDimension
 namespace ContentLaunchAdditionalInfo {
 enum class Fields
 {
@@ -30005,6 +30005,28 @@ public:
 };
 
 } // namespace ContentLaunchParamater
+namespace ContentLaunchStyleInformation {
+enum class Fields
+{
+    kImageUrl = 1,
+    kColor    = 2,
+    kSize     = 3,
+};
+
+struct Type
+{
+public:
+    chip::CharSpan imageUrl;
+    chip::CharSpan color;
+    Structs::ContentLaunchDimension::Type size;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace ContentLaunchStyleInformation
 namespace ContentLaunchBrandingInformation {
 enum class Fields
 {
@@ -30020,11 +30042,11 @@ struct Type
 {
 public:
     chip::CharSpan providerName;
-    uint8_t background;
-    uint8_t logo;
-    uint8_t progressBar;
-    uint8_t splash;
-    uint8_t waterMark;
+    Structs::ContentLaunchStyleInformation::Type background;
+    Structs::ContentLaunchStyleInformation::Type logo;
+    Structs::ContentLaunchStyleInformation::Type progressBar;
+    Structs::ContentLaunchStyleInformation::Type splash;
+    Structs::ContentLaunchStyleInformation::Type waterMark;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -30033,50 +30055,6 @@ public:
 using DecodableType = Type;
 
 } // namespace ContentLaunchBrandingInformation
-namespace ContentLaunchDimension {
-enum class Fields
-{
-    kWidth  = 1,
-    kHeight = 2,
-    kMetric = 3,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan width;
-    chip::CharSpan height;
-    ContentLaunchMetricType metric;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-
-using DecodableType = Type;
-
-} // namespace ContentLaunchDimension
-namespace ContentLaunchStyleInformation {
-enum class Fields
-{
-    kImageUrl = 1,
-    kColor    = 2,
-    kSize     = 3,
-};
-
-struct Type
-{
-public:
-    chip::CharSpan imageUrl;
-    chip::CharSpan color;
-    uint8_t size;
-
-    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
-    CHIP_ERROR Decode(TLV::TLVReader & reader);
-};
-
-using DecodableType = Type;
-
-} // namespace ContentLaunchStyleInformation
 } // namespace Structs
 
 namespace Commands {
@@ -30110,6 +30088,7 @@ enum class Fields
 {
     kAutoPlay = 0,
     kData     = 1,
+    kSearch   = 2,
 };
 
 struct Type
@@ -30121,6 +30100,7 @@ public:
 
     bool autoPlay;
     chip::CharSpan data;
+    DataModel::List<const Structs::ContentLaunchParamater::Type> search;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -30137,14 +30117,15 @@ public:
 
     bool autoPlay;
     chip::CharSpan data;
+    DataModel::DecodableList<Structs::ContentLaunchParamater::DecodableType> search;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchContent
 namespace LaunchContentResponse {
 enum class Fields
 {
-    kData                = 0,
-    kContentLaunchStatus = 1,
+    kContentLaunchStatus = 0,
+    kData                = 1,
 };
 
 struct Type
@@ -30154,8 +30135,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchContentResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    chip::CharSpan data;
     ContentLaunchStatus contentLaunchStatus;
+    chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -30170,16 +30151,17 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchContentResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    chip::CharSpan data;
     ContentLaunchStatus contentLaunchStatus;
+    chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchContentResponse
 namespace LaunchURL {
 enum class Fields
 {
-    kContentURL    = 0,
-    kDisplayString = 1,
+    kContentURL          = 0,
+    kDisplayString       = 1,
+    kBrandingInformation = 2,
 };
 
 struct Type
@@ -30191,6 +30173,7 @@ public:
 
     chip::CharSpan contentURL;
     chip::CharSpan displayString;
+    DataModel::List<const Structs::ContentLaunchBrandingInformation::Type> brandingInformation;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -30207,14 +30190,15 @@ public:
 
     chip::CharSpan contentURL;
     chip::CharSpan displayString;
+    DataModel::DecodableList<Structs::ContentLaunchBrandingInformation::DecodableType> brandingInformation;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchURL
 namespace LaunchURLResponse {
 enum class Fields
 {
-    kData                = 0,
-    kContentLaunchStatus = 1,
+    kContentLaunchStatus = 0,
+    kData                = 1,
 };
 
 struct Type
@@ -30224,8 +30208,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchURLResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    chip::CharSpan data;
     ContentLaunchStatus contentLaunchStatus;
+    chip::CharSpan data;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -30240,8 +30224,8 @@ public:
     static constexpr CommandId GetCommandId() { return Commands::LaunchURLResponse::Id; }
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
 
-    chip::CharSpan data;
     ContentLaunchStatus contentLaunchStatus;
+    chip::CharSpan data;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchURLResponse
@@ -30260,18 +30244,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace AcceptsHeaderList
-namespace SupportedStreamingTypes {
+namespace SupportedStreamingProtocols {
 struct TypeInfo
 {
-    using Type             = DataModel::List<const ContentLaunchStreamingType>;
-    using DecodableType    = DataModel::DecodableList<ContentLaunchStreamingType>;
-    using DecodableArgType = const DataModel::DecodableList<ContentLaunchStreamingType> &;
+    using Type             = uint32_t;
+    using DecodableType    = uint32_t;
+    using DecodableArgType = uint32_t;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ContentLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedStreamingTypes::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::SupportedStreamingProtocols::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace SupportedStreamingTypes
+} // namespace SupportedStreamingProtocols
 namespace AttributeList {
 struct TypeInfo
 {
@@ -30537,6 +30521,26 @@ public:
 using DecodableType = Type;
 
 } // namespace ApplicationLauncherApp
+namespace ApplicationLauncherEndpoint {
+enum class Fields
+{
+    kApplication = 1,
+    kEndpoint    = 2,
+};
+
+struct Type
+{
+public:
+    Structs::ApplicationLauncherApp::Type application;
+    chip::CharSpan endpoint;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace ApplicationLauncherEndpoint
 } // namespace Structs
 
 namespace Commands {
@@ -30552,15 +30556,34 @@ struct Type;
 struct DecodableType;
 } // namespace LaunchAppResponse
 
+namespace StopApp {
+struct Type;
+struct DecodableType;
+} // namespace StopApp
+
+namespace StopAppResponse {
+struct Type;
+struct DecodableType;
+} // namespace StopAppResponse
+
+namespace HideApp {
+struct Type;
+struct DecodableType;
+} // namespace HideApp
+
+namespace HideAppResponse {
+struct Type;
+struct DecodableType;
+} // namespace HideAppResponse
+
 } // namespace Commands
 
 namespace Commands {
 namespace LaunchApp {
 enum class Fields
 {
-    kData            = 0,
-    kCatalogVendorId = 1,
-    kApplicationId   = 2,
+    kData        = 0,
+    kApplication = 1,
 };
 
 struct Type
@@ -30571,8 +30594,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     chip::CharSpan data;
-    uint16_t catalogVendorId;
-    chip::CharSpan applicationId;
+    Structs::ApplicationLauncherApp::Type application;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 
@@ -30588,8 +30610,7 @@ public:
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
 
     chip::CharSpan data;
-    uint16_t catalogVendorId;
-    chip::CharSpan applicationId;
+    Structs::ApplicationLauncherApp::DecodableType application;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchApp
@@ -30628,6 +30649,140 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace LaunchAppResponse
+namespace StopApp {
+enum class Fields
+{
+    kData        = 0,
+    kApplication = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StopApp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+
+    chip::CharSpan data;
+    Structs::ApplicationLauncherApp::Type application;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ApplicationLauncher::Commands::StopAppResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StopApp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+
+    chip::CharSpan data;
+    Structs::ApplicationLauncherApp::DecodableType application;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StopApp
+namespace StopAppResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::StopAppResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+
+    ApplicationLauncherStatus status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::StopAppResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+
+    ApplicationLauncherStatus status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace StopAppResponse
+namespace HideApp {
+enum class Fields
+{
+    kData        = 0,
+    kApplication = 1,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::HideApp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+
+    chip::CharSpan data;
+    Structs::ApplicationLauncherApp::Type application;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = Clusters::ApplicationLauncher::Commands::HideAppResponse::DecodableType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::HideApp::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+
+    chip::CharSpan data;
+    Structs::ApplicationLauncherApp::DecodableType application;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace HideApp
+namespace HideAppResponse {
+enum class Fields
+{
+    kStatus = 0,
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::HideAppResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+
+    ApplicationLauncherStatus status;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::HideAppResponse::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
+
+    ApplicationLauncherStatus status;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace HideAppResponse
 } // namespace Commands
 
 namespace Attributes {
@@ -30643,30 +30798,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApplicationLauncherList
-namespace CatalogVendorId {
+namespace ApplicationLauncherApp {
 struct TypeInfo
 {
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
+    using Type             = Structs::ApplicationLauncherEndpoint::Type;
+    using DecodableType    = Structs::ApplicationLauncherEndpoint::DecodableType;
+    using DecodableArgType = const Structs::ApplicationLauncherEndpoint::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CatalogVendorId::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationLauncherApp::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace CatalogVendorId
-namespace ApplicationId {
-struct TypeInfo
-{
-    using Type             = uint8_t;
-    using DecodableType    = uint8_t;
-    using DecodableArgType = uint8_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationLauncher::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationId::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace ApplicationId
+} // namespace ApplicationLauncherApp
 namespace AttributeList {
 struct TypeInfo
 {
@@ -30714,6 +30857,29 @@ enum class ApplicationBasicStatus : uint8_t
     kActiveHidden          = 0x02,
     kActiveVisibleNotFocus = 0x03,
 };
+
+namespace Structs {
+namespace ApplicationBasicApp {
+enum class Fields
+{
+    kCatalogVendorId = 1,
+    kApplicationId   = 2,
+};
+
+struct Type
+{
+public:
+    uint16_t catalogVendorId;
+    chip::CharSpan applicationId;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+
+using DecodableType = Type;
+
+} // namespace ApplicationBasicApp
+} // namespace Structs
 
 namespace Commands {
 // Forward-declarations so we can reference these later.
@@ -30809,30 +30975,18 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ProductId
-namespace ApplicationId {
+namespace ApplicationApp {
 struct TypeInfo
 {
-    using Type             = chip::CharSpan;
-    using DecodableType    = chip::CharSpan;
-    using DecodableArgType = chip::CharSpan;
+    using Type             = Structs::ApplicationBasicApp::Type;
+    using DecodableType    = Structs::ApplicationBasicApp::DecodableType;
+    using DecodableArgType = const Structs::ApplicationBasicApp::DecodableType &;
 
     static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationId::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationApp::Id; }
     static constexpr bool MustUseTimedWrite() { return false; }
 };
-} // namespace ApplicationId
-namespace CatalogVendorId {
-struct TypeInfo
-{
-    using Type             = uint16_t;
-    using DecodableType    = uint16_t;
-    using DecodableArgType = uint16_t;
-
-    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
-    static constexpr AttributeId GetAttributeId() { return Attributes::CatalogVendorId::Id; }
-    static constexpr bool MustUseTimedWrite() { return false; }
-};
-} // namespace CatalogVendorId
+} // namespace ApplicationApp
 namespace ApplicationStatus {
 struct TypeInfo
 {
@@ -30845,6 +30999,30 @@ struct TypeInfo
     static constexpr bool MustUseTimedWrite() { return false; }
 };
 } // namespace ApplicationStatus
+namespace ApplicationVersion {
+struct TypeInfo
+{
+    using Type             = chip::CharSpan;
+    using DecodableType    = chip::CharSpan;
+    using DecodableArgType = chip::CharSpan;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::ApplicationVersion::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace ApplicationVersion
+namespace AllowedVendorList {
+struct TypeInfo
+{
+    using Type             = DataModel::List<const uint16_t>;
+    using DecodableType    = DataModel::DecodableList<uint16_t>;
+    using DecodableArgType = const DataModel::DecodableList<uint16_t> &;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::ApplicationBasic::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AllowedVendorList::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AllowedVendorList
 namespace AttributeList {
 struct TypeInfo
 {
@@ -30902,6 +31080,11 @@ namespace Login {
 struct Type;
 struct DecodableType;
 } // namespace Login
+
+namespace Logout {
+struct Type;
+struct DecodableType;
+} // namespace Logout
 
 } // namespace Commands
 
@@ -31005,6 +31188,34 @@ public:
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
 }; // namespace Login
+namespace Logout {
+enum class Fields
+{
+};
+
+struct Type
+{
+public:
+    // Use GetCommandId instead of commandId directly to avoid naming conflict with CommandIdentification in ExecutionOfACommand
+    static constexpr CommandId GetCommandId() { return Commands::Logout::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+
+    using ResponseType = DataModel::NullObjectType;
+
+    static constexpr bool MustUseTimedInvoke() { return false; }
+};
+
+struct DecodableType
+{
+public:
+    static constexpr CommandId GetCommandId() { return Commands::Logout::Id; }
+    static constexpr ClusterId GetClusterId() { return Clusters::AccountLogin::Id; }
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+}; // namespace Logout
 } // namespace Commands
 
 namespace Attributes {

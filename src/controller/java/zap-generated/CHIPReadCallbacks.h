@@ -457,6 +457,30 @@ private:
     bool keepAlive;
 };
 
+class CHIPApplicationBasicAllowedVendorListAttributeCallback
+    : public chip::Callback::Callback<CHIPApplicationBasicClusterAllowedVendorListAttributeCallbackType>
+{
+public:
+    CHIPApplicationBasicAllowedVendorListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPApplicationBasicAllowedVendorListAttributeCallback();
+
+    static void maybeDestroy(CHIPApplicationBasicAllowedVendorListAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPApplicationBasicAllowedVendorListAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPApplicationBasicAttributeListAttributeCallback
     : public chip::Callback::Callback<CHIPApplicationBasicClusterAttributeListAttributeCallbackType>
 {
@@ -843,32 +867,6 @@ public:
     }
 
     static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
-
-private:
-    jobject javaCallbackRef;
-    bool keepAlive;
-};
-
-class CHIPContentLauncherSupportedStreamingTypesAttributeCallback
-    : public chip::Callback::Callback<CHIPContentLauncherClusterSupportedStreamingTypesAttributeCallbackType>
-{
-public:
-    CHIPContentLauncherSupportedStreamingTypesAttributeCallback(jobject javaCallback, bool keepAlive = false);
-
-    ~CHIPContentLauncherSupportedStreamingTypesAttributeCallback();
-
-    static void maybeDestroy(CHIPContentLauncherSupportedStreamingTypesAttributeCallback * callback)
-    {
-        if (!callback->keepAlive)
-        {
-            callback->Cancel();
-            chip::Platform::Delete<CHIPContentLauncherSupportedStreamingTypesAttributeCallback>(callback);
-        }
-    }
-
-    static void
-    CallbackFn(void * context,
-               const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & list);
 
 private:
     jobject javaCallbackRef;
@@ -2483,20 +2481,20 @@ private:
     bool keepAlive;
 };
 
-class CHIPTvChannelTvChannelListAttributeCallback
-    : public chip::Callback::Callback<CHIPTvChannelClusterTvChannelListAttributeCallbackType>
+class CHIPTvChannelChannelListAttributeCallback
+    : public chip::Callback::Callback<CHIPTvChannelClusterChannelListAttributeCallbackType>
 {
 public:
-    CHIPTvChannelTvChannelListAttributeCallback(jobject javaCallback, bool keepAlive = false);
+    CHIPTvChannelChannelListAttributeCallback(jobject javaCallback, bool keepAlive = false);
 
-    ~CHIPTvChannelTvChannelListAttributeCallback();
+    ~CHIPTvChannelChannelListAttributeCallback();
 
-    static void maybeDestroy(CHIPTvChannelTvChannelListAttributeCallback * callback)
+    static void maybeDestroy(CHIPTvChannelChannelListAttributeCallback * callback)
     {
         if (!callback->keepAlive)
         {
             callback->Cancel();
-            chip::Platform::Delete<CHIPTvChannelTvChannelListAttributeCallback>(callback);
+            chip::Platform::Delete<CHIPTvChannelChannelListAttributeCallback>(callback);
         }
     }
 
