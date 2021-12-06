@@ -17,6 +17,19 @@ limitations under the License.
 -->
 <configurator>
     <deviceType>
+        <name>MA-orphan</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Orphan Clusters</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0xF001</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Proxy Configuration" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Proxy Discovery" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Proxy Valid" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Pulse Width Modulation" client="false" server="true" clientLocked="true" serverLocked="true"/>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-rootdevice</name>
         <domain>CHIP</domain>
         <typeName>Matter Root Node</typeName>
@@ -194,7 +207,7 @@ limitations under the License.
             <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Bridged Device Basic Information" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Bridged Device Basic" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Power Source Configuration" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
@@ -1273,6 +1286,7 @@ limitations under the License.
             </include>
             <include cluster="Switch" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Fixed Label" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="User Label" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
