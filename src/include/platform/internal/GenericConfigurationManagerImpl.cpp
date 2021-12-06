@@ -68,7 +68,7 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductId(uin
 {
     CHIP_ERROR err;
     uint32_t u32ProductId = 0;
-    err = ReadConfigValue(ConfigClass::kConfigKey_ProductId, u32ProductId);
+    err                   = ReadConfigValue(ConfigClass::kConfigKey_ProductId, u32ProductId);
 
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -87,7 +87,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductName(char * b
 {
     CHIP_ERROR err;
     size_t productNameSize = 0; // without counting null-terminator
-    err                 = ReadConfigValueStr(ConfigClass::kConfigKey_ProductName, buf, bufSize, productNameSize);
+    err                    = ReadConfigValueStr(ConfigClass::kConfigKey_ProductName, buf, bufSize, productNameSize);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_NAME), CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -102,7 +102,7 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersi
 {
     CHIP_ERROR err;
     uint32_t u32SoftwareVer = 0;
-    err = ReadConfigValue(ConfigClass::kConfigKey_SoftwareVersion, u32SoftwareVer);
+    err                     = ReadConfigValue(ConfigClass::kConfigKey_SoftwareVersion, u32SoftwareVer);
 
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
@@ -121,14 +121,14 @@ CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersionStrin
 {
     CHIP_ERROR err;
     size_t u32SoftwareVerSize = 0; // without counting null-terminator
-    err                 = ReadConfigValueStr(ConfigClass::kConfigKey_SoftwareVersionString, buf, bufSize, u32SoftwareVerSize);
+    err                       = ReadConfigValueStr(ConfigClass::kConfigKey_SoftwareVersionString, buf, bufSize, u32SoftwareVerSize);
 
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
         strcpy(buf, CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
     }
-    
+
     return CHIP_NO_ERROR;
 }
 
@@ -224,7 +224,7 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetHardwareVersi
 {
     CHIP_ERROR err;
     size_t hardwareVersionLen = 0; // without counting null-terminator
-    err                 = ReadConfigValueStr(ConfigClass::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionLen);
+    err                       = ReadConfigValueStr(ConfigClass::kConfigKey_HardwareVersionString, buf, bufSize, hardwareVersionLen);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
         ReturnErrorCodeIf(bufSize < sizeof(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_HARDWARE_VERSION_STRING), CHIP_ERROR_BUFFER_TOO_SMALL);
