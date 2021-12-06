@@ -436,6 +436,26 @@ void CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
 void CHIPApplicationBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -776,26 +796,6 @@ void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge::OnSuccessF
         auto & entry_0 = iter_0.GetValue();
         NSData * newElement_0;
         newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
-        [array_0 addObject:newElement_0];
-    }
-    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
-        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
-        return;
-    }
-    objCValue = array_0;
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge::OnSuccessFn(void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
-{
-    NSArray * _Nonnull objCValue;
-    auto * array_0 = [NSMutableArray new];
-    auto iter_0 = value.begin();
-    while (iter_0.Next()) {
-        auto & entry_0 = iter_0.GetValue();
-        NSNumber * newElement_0;
-        newElement_0 = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0)];
         [array_0 addObject:newElement_0];
     }
     if (iter_0.GetStatus() != CHIP_NO_ERROR) {
@@ -1949,7 +1949,7 @@ void CHIPSwitchAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
-void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
+void CHIPTvChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -2637,14 +2637,14 @@ void CHIPContentLauncherClusterLaunchContentResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPContentLauncherClusterLaunchContentResponseParams new];
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-        response.data = value;
-    }
-    {
         NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
         response.contentLaunchStatus = value;
+    }
+    {
+        NSString * value;
+        value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+        response.data = value;
     }
     DispatchSuccess(context, response);
 };
@@ -2654,14 +2654,14 @@ void CHIPContentLauncherClusterLaunchURLResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPContentLauncherClusterLaunchURLResponseParams new];
     {
-        NSString * value;
-        value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
-        response.data = value;
-    }
-    {
         NSNumber * value;
         value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
         response.contentLaunchStatus = value;
+    }
+    {
+        NSString * value;
+        value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+        response.data = value;
     }
     DispatchSuccess(context, response);
 };
@@ -5919,26 +5919,6 @@ void CHIPContentLauncherClusterContentLaunchStatusAttributeCallbackBridge::OnSuc
 
 void CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatus> & value)
-{
-    NSNumber * _Nullable objCValue;
-    if (value.IsNull()) {
-        objCValue = nil;
-    } else {
-        objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value.Value())];
-    }
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType value)
-{
-    NSNumber * _Nonnull objCValue;
-    objCValue = [NSNumber numberWithUnsignedChar:chip::to_underlying(value)];
-    DispatchSuccess(context, objCValue);
-};
-
-void CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
 {
     NSNumber * _Nullable objCValue;
     if (value.IsNull()) {

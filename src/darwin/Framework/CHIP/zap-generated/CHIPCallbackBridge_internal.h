@@ -502,10 +502,6 @@ typedef void (*ContentLauncherClusterContentLaunchStatusAttributeCallback)(
     void *, chip::app::Clusters::ContentLauncher::ContentLaunchStatus);
 typedef void (*NullableContentLauncherClusterContentLaunchStatusAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatus> &);
-typedef void (*ContentLauncherClusterContentLaunchStreamingTypeAttributeCallback)(
-    void *, chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType);
-typedef void (*NullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallback)(
-    void *, const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> &);
 typedef void (*AudioOutputClusterAudioOutputTypeAttributeCallback)(void *, chip::app::Clusters::AudioOutput::AudioOutputType);
 typedef void (*NullableAudioOutputClusterAudioOutputTypeAttributeCallback)(
     void *, const chip::app::DataModel::Nullable<chip::app::Clusters::AudioOutput::AudioOutputType> &);
@@ -904,6 +900,18 @@ public:
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
+class CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge
+    : public CHIPCallbackBridge<ApplicationBasicAllowedVendorListListAttributeCallback>
+{
+public:
+    CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                     CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<ApplicationBasicAllowedVendorListListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value);
+};
+
 class CHIPApplicationBasicAttributeListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ApplicationBasicAttributeListListAttributeCallback>
 {
@@ -1086,20 +1094,6 @@ public:
         CHIPCallbackBridge<ContentLauncherAcceptsHeaderListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
-};
-
-class CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherSupportedStreamingTypesListAttributeCallback>
-{
-public:
-    CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherSupportedStreamingTypesListAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
-
-    static void OnSuccessFn(
-        void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value);
 };
 
 class CHIPContentLauncherAttributeListListAttributeCallbackBridge
@@ -1728,12 +1722,12 @@ public:
     static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value);
 };
 
-class CHIPTvChannelTvChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelTvChannelListListAttributeCallback>
+class CHIPTvChannelChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelChannelListListAttributeCallback>
 {
 public:
-    CHIPTvChannelTvChannelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<TvChannelTvChannelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPTvChannelChannelListListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                        bool keepAlive = false) :
+        CHIPCallbackBridge<TvChannelChannelListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(
         void * context,
@@ -5261,34 +5255,6 @@ public:
     static void
     OnSuccessFn(void * context,
                 const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStatus> & value);
-};
-
-class CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>
-{
-public:
-    CHIPContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>(queue, handler, action, OnSuccessFn,
-                                                                                              keepAlive){};
-
-    static void OnSuccessFn(void * context, chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType value);
-};
-
-class CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge
-    : public CHIPCallbackBridge<NullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>
-{
-public:
-    CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallbackBridge(dispatch_queue_t queue,
-                                                                                        ResponseHandler handler,
-                                                                                        CHIPActionBlock action,
-                                                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<NullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallback>(queue, handler, action,
-                                                                                                      OnSuccessFn, keepAlive){};
-
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::Nullable<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value);
 };
 
 class CHIPAudioOutputClusterAudioOutputTypeAttributeCallbackBridge

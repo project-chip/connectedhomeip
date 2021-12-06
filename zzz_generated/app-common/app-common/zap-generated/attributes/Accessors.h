@@ -4085,16 +4085,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
 namespace TvChannel {
 namespace Attributes {
 
-namespace TvChannelLineup {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value); // octet_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
-} // namespace TvChannelLineup
-
-namespace CurrentTvChannel {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableByteSpan value); // octet_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::ByteSpan value);
-} // namespace CurrentTvChannel
-
 } // namespace Attributes
 } // namespace TvChannel
 
@@ -4127,19 +4117,9 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int64u
 EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
 } // namespace Duration
 
-namespace PositionUpdatedAt {
-EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int64u
-EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
-} // namespace PositionUpdatedAt
-
-namespace Position {
-EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int64u
-EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
-} // namespace Position
-
 namespace PlaybackSpeed {
-EmberAfStatus Get(chip::EndpointId endpoint, uint64_t * value); // int64u
-EmberAfStatus Set(chip::EndpointId endpoint, uint64_t value);
+EmberAfStatus Get(chip::EndpointId endpoint, float * value); // single
+EmberAfStatus Set(chip::EndpointId endpoint, float value);
 } // namespace PlaybackSpeed
 
 namespace SeekRangeEnd {
@@ -4169,6 +4149,11 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 namespace ContentLauncher {
 namespace Attributes {
 
+namespace SupportedStreamingProtocols {
+EmberAfStatus Get(chip::EndpointId endpoint, uint32_t * value); // bitmap32
+EmberAfStatus Set(chip::EndpointId endpoint, uint32_t value);
+} // namespace SupportedStreamingProtocols
+
 } // namespace Attributes
 } // namespace ContentLauncher
 
@@ -4185,16 +4170,6 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 
 namespace ApplicationLauncher {
 namespace Attributes {
-
-namespace CatalogVendorId {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace CatalogVendorId
-
-namespace ApplicationId {
-EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
-EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
-} // namespace ApplicationId
 
 } // namespace Attributes
 } // namespace ApplicationLauncher
@@ -4222,20 +4197,15 @@ EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
 EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
 } // namespace ProductId
 
-namespace ApplicationId {
-EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
-EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
-} // namespace ApplicationId
-
-namespace CatalogVendorId {
-EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
-EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
-} // namespace CatalogVendorId
-
 namespace ApplicationStatus {
 EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // enum8
 EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace ApplicationStatus
+
+namespace ApplicationVersion {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::MutableCharSpan value); // char_string
+EmberAfStatus Set(chip::EndpointId endpoint, chip::CharSpan value);
+} // namespace ApplicationVersion
 
 } // namespace Attributes
 } // namespace ApplicationBasic

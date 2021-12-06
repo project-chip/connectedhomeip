@@ -258,8 +258,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
         {
         case Commands::LaunchContentResponse::Id: {
             expectArgumentCount = 2;
-            chip::CharSpan data;
             uint8_t contentLaunchStatus;
+            chip::CharSpan data;
             bool argExists[2];
 
             memset(argExists, 0, sizeof argExists);
@@ -290,10 +290,10 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(data);
+                    TLVUnpackError = aDataTlv.Get(contentLaunchStatus);
                     break;
                 case 1:
-                    TLVUnpackError = aDataTlv.Get(contentLaunchStatus);
+                    TLVUnpackError = aDataTlv.Get(data);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -315,14 +315,14 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 wasHandled = emberAfContentLauncherClusterLaunchContentResponseCallback(aCommandPath.mEndpointId, apCommandObj,
-                                                                                        data, contentLaunchStatus);
+                                                                                        contentLaunchStatus, data);
             }
             break;
         }
         case Commands::LaunchURLResponse::Id: {
             expectArgumentCount = 2;
-            chip::CharSpan data;
             uint8_t contentLaunchStatus;
+            chip::CharSpan data;
             bool argExists[2];
 
             memset(argExists, 0, sizeof argExists);
@@ -353,10 +353,10 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 switch (currentDecodeTagId)
                 {
                 case 0:
-                    TLVUnpackError = aDataTlv.Get(data);
+                    TLVUnpackError = aDataTlv.Get(contentLaunchStatus);
                     break;
                 case 1:
-                    TLVUnpackError = aDataTlv.Get(contentLaunchStatus);
+                    TLVUnpackError = aDataTlv.Get(data);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -377,8 +377,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
 
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
-                wasHandled = emberAfContentLauncherClusterLaunchURLResponseCallback(aCommandPath.mEndpointId, apCommandObj, data,
-                                                                                    contentLaunchStatus);
+                wasHandled = emberAfContentLauncherClusterLaunchURLResponseCallback(aCommandPath.mEndpointId, apCommandObj,
+                                                                                    contentLaunchStatus, data);
             }
             break;
         }
@@ -3985,8 +3985,8 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
         {
         case Commands::ChangeChannelResponse::Id: {
             expectArgumentCount = 2;
-            /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch;
-            uint8_t ErrorType;
+            /* TYPE WARNING: array array defaults to */ uint8_t * channelMatch;
+            uint8_t errorType;
             bool argExists[2];
 
             memset(argExists, 0, sizeof argExists);
@@ -4018,10 +4018,10 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
                 {
                 case 0:
                     // Just for compatibility, we will add array type support in IM later.
-                    TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>(ChannelMatch));
+                    TLVUnpackError = aDataTlv.GetDataPtr(const_cast<const uint8_t *&>(channelMatch));
                     break;
                 case 1:
-                    TLVUnpackError = aDataTlv.Get(ErrorType);
+                    TLVUnpackError = aDataTlv.Get(errorType);
                     break;
                 default:
                     // Unsupported tag, ignore it.
@@ -4043,7 +4043,7 @@ void DispatchClientCommand(CommandSender * apCommandObj, const ConcreteCommandPa
             if (CHIP_NO_ERROR == TLVError && CHIP_NO_ERROR == TLVUnpackError && 2 == validArgumentCount)
             {
                 wasHandled = emberAfTvChannelClusterChangeChannelResponseCallback(aCommandPath.mEndpointId, apCommandObj,
-                                                                                  ChannelMatch, ErrorType);
+                                                                                  channelMatch, errorType);
             }
             break;
         }

@@ -37,12 +37,9 @@ public:
         delete onReportApplicationBasicVendorIdCallback;
         delete onReportApplicationBasicApplicationNameCallback;
         delete onReportApplicationBasicProductIdCallback;
-        delete onReportApplicationBasicApplicationIdCallback;
-        delete onReportApplicationBasicCatalogVendorIdCallback;
         delete onReportApplicationBasicApplicationStatusCallback;
+        delete onReportApplicationBasicApplicationVersionCallback;
         delete onReportApplicationBasicClusterRevisionCallback;
-        delete onReportApplicationLauncherCatalogVendorIdCallback;
-        delete onReportApplicationLauncherApplicationIdCallback;
         delete onReportApplicationLauncherClusterRevisionCallback;
         delete onReportAudioOutputCurrentAudioOutputCallback;
         delete onReportAudioOutputClusterRevisionCallback;
@@ -133,6 +130,7 @@ public:
         delete onReportColorControlCoupleColorTempToLevelMinMiredsCallback;
         delete onReportColorControlStartUpColorTemperatureMiredsCallback;
         delete onReportColorControlClusterRevisionCallback;
+        delete onReportContentLauncherSupportedStreamingProtocolsCallback;
         delete onReportContentLauncherClusterRevisionCallback;
         delete onReportDescriptorClusterRevisionCallback;
         delete onReportDoorLockLockStateCallback;
@@ -208,9 +206,6 @@ public:
         delete onReportMediaPlaybackPlaybackStateCallback;
         delete onReportMediaPlaybackStartTimeCallback;
         delete onReportMediaPlaybackDurationCallback;
-        delete onReportMediaPlaybackPositionUpdatedAtCallback;
-        delete onReportMediaPlaybackPositionCallback;
-        delete onReportMediaPlaybackPlaybackSpeedCallback;
         delete onReportMediaPlaybackSeekRangeEndCallback;
         delete onReportMediaPlaybackSeekRangeStartCallback;
         delete onReportMediaPlaybackClusterRevisionCallback;
@@ -303,8 +298,6 @@ public:
         delete onReportSwitchMultiPressMaxCallback;
         delete onReportSwitchFeatureMapCallback;
         delete onReportSwitchClusterRevisionCallback;
-        delete onReportTvChannelTvChannelLineupCallback;
-        delete onReportTvChannelCurrentTvChannelCallback;
         delete onReportTvChannelClusterRevisionCallback;
         delete onReportTargetNavigatorClusterRevisionCallback;
         delete onReportTemperatureMeasurementMeasuredValueCallback;
@@ -521,23 +514,14 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0x0003, onReportApplicationBasicProductIdCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0x0005,
-                                       onReportApplicationBasicApplicationIdCallback->Cancel(),
-                                       BasicAttributeFilter<CharStringAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0x0006,
-                                       onReportApplicationBasicCatalogVendorIdCallback->Cancel(),
-                                       BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0x0007,
                                        onReportApplicationBasicApplicationStatusCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0x0006,
+                                       onReportApplicationBasicApplicationVersionCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0xFFFD,
                                        onReportApplicationBasicClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050C, 0x0001,
-                                       onReportApplicationLauncherCatalogVendorIdCallback->Cancel(),
-                                       BasicAttributeFilter<Int8uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050C, 0x0002,
-                                       onReportApplicationLauncherApplicationIdCallback->Cancel(),
-                                       BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050C, 0xFFFD,
                                        onReportApplicationLauncherClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
@@ -751,6 +735,9 @@ public:
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0xFFFD, onReportColorControlClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050A, 0x0001,
+                                       onReportContentLauncherSupportedStreamingProtocolsCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050A, 0xFFFD,
                                        onReportContentLauncherClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
@@ -943,16 +930,9 @@ public:
                                        BasicAttributeFilter<Int64uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0002, onReportMediaPlaybackDurationCallback->Cancel(),
                                        BasicAttributeFilter<Int64uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0003,
-                                       onReportMediaPlaybackPositionUpdatedAtCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0005, onReportMediaPlaybackSeekRangeEndCallback->Cancel(),
                                        BasicAttributeFilter<Int64uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0004, onReportMediaPlaybackPositionCallback->Cancel(),
-                                       BasicAttributeFilter<Int64uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0005, onReportMediaPlaybackPlaybackSpeedCallback->Cancel(),
-                                       BasicAttributeFilter<Int64uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0006, onReportMediaPlaybackSeekRangeEndCallback->Cancel(),
-                                       BasicAttributeFilter<Int64uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0007, onReportMediaPlaybackSeekRangeStartCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0006, onReportMediaPlaybackSeekRangeStartCallback->Cancel(),
                                        BasicAttributeFilter<Int64uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0xFFFD, onReportMediaPlaybackClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
@@ -1193,10 +1173,6 @@ public:
                                        BasicAttributeFilter<Int32uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003B, 0xFFFD, onReportSwitchClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0504, 0x0001, onReportTvChannelTvChannelLineupCallback->Cancel(),
-                                       BasicAttributeFilter<OctetStringAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0504, 0x0002, onReportTvChannelCurrentTvChannelCallback->Cancel(),
-                                       BasicAttributeFilter<OctetStringAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0504, 0xFFFD, onReportTvChannelClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0505, 0xFFFD,
@@ -1737,30 +1713,18 @@ private:
         onReportApplicationBasicProductIdCallback =
             new chip::Callback::Callback<decltype(&ReadApplicationBasicProductId::OnAttributeResponse)>(
                 ReadApplicationBasicProductId::OnAttributeResponse, this);
-    chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationId::OnAttributeResponse)> *
-        onReportApplicationBasicApplicationIdCallback =
-            new chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationId::OnAttributeResponse)>(
-                ReadApplicationBasicApplicationId::OnAttributeResponse, this);
-    chip::Callback::Callback<decltype(&ReadApplicationBasicCatalogVendorId::OnAttributeResponse)> *
-        onReportApplicationBasicCatalogVendorIdCallback =
-            new chip::Callback::Callback<decltype(&ReadApplicationBasicCatalogVendorId::OnAttributeResponse)>(
-                ReadApplicationBasicCatalogVendorId::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationStatus::OnAttributeResponse)> *
         onReportApplicationBasicApplicationStatusCallback =
             new chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationStatus::OnAttributeResponse)>(
                 ReadApplicationBasicApplicationStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationVersion::OnAttributeResponse)> *
+        onReportApplicationBasicApplicationVersionCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationVersion::OnAttributeResponse)>(
+                ReadApplicationBasicApplicationVersion::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadApplicationBasicClusterRevision::OnAttributeResponse)> *
         onReportApplicationBasicClusterRevisionCallback =
             new chip::Callback::Callback<decltype(&ReadApplicationBasicClusterRevision::OnAttributeResponse)>(
                 ReadApplicationBasicClusterRevision::OnAttributeResponse, this);
-    chip::Callback::Callback<decltype(&ReadApplicationLauncherCatalogVendorId::OnAttributeResponse)> *
-        onReportApplicationLauncherCatalogVendorIdCallback =
-            new chip::Callback::Callback<decltype(&ReadApplicationLauncherCatalogVendorId::OnAttributeResponse)>(
-                ReadApplicationLauncherCatalogVendorId::OnAttributeResponse, this);
-    chip::Callback::Callback<decltype(&ReadApplicationLauncherApplicationId::OnAttributeResponse)> *
-        onReportApplicationLauncherApplicationIdCallback =
-            new chip::Callback::Callback<decltype(&ReadApplicationLauncherApplicationId::OnAttributeResponse)>(
-                ReadApplicationLauncherApplicationId::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadApplicationLauncherClusterRevision::OnAttributeResponse)> *
         onReportApplicationLauncherClusterRevisionCallback =
             new chip::Callback::Callback<decltype(&ReadApplicationLauncherClusterRevision::OnAttributeResponse)>(
@@ -2087,6 +2051,10 @@ private:
         onReportColorControlClusterRevisionCallback =
             new chip::Callback::Callback<decltype(&ReadColorControlClusterRevision::OnAttributeResponse)>(
                 ReadColorControlClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadContentLauncherSupportedStreamingProtocols::OnAttributeResponse)> *
+        onReportContentLauncherSupportedStreamingProtocolsCallback =
+            new chip::Callback::Callback<decltype(&ReadContentLauncherSupportedStreamingProtocols::OnAttributeResponse)>(
+                ReadContentLauncherSupportedStreamingProtocols::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadContentLauncherClusterRevision::OnAttributeResponse)> *
         onReportContentLauncherClusterRevisionCallback =
             new chip::Callback::Callback<decltype(&ReadContentLauncherClusterRevision::OnAttributeResponse)>(
@@ -2375,17 +2343,6 @@ private:
     chip::Callback::Callback<decltype(&ReadMediaPlaybackDuration::OnAttributeResponse)> * onReportMediaPlaybackDurationCallback =
         new chip::Callback::Callback<decltype(&ReadMediaPlaybackDuration::OnAttributeResponse)>(
             ReadMediaPlaybackDuration::OnAttributeResponse, this);
-    chip::Callback::Callback<decltype(&ReadMediaPlaybackPositionUpdatedAt::OnAttributeResponse)> *
-        onReportMediaPlaybackPositionUpdatedAtCallback =
-            new chip::Callback::Callback<decltype(&ReadMediaPlaybackPositionUpdatedAt::OnAttributeResponse)>(
-                ReadMediaPlaybackPositionUpdatedAt::OnAttributeResponse, this);
-    chip::Callback::Callback<decltype(&ReadMediaPlaybackPosition::OnAttributeResponse)> * onReportMediaPlaybackPositionCallback =
-        new chip::Callback::Callback<decltype(&ReadMediaPlaybackPosition::OnAttributeResponse)>(
-            ReadMediaPlaybackPosition::OnAttributeResponse, this);
-    chip::Callback::Callback<decltype(&ReadMediaPlaybackPlaybackSpeed::OnAttributeResponse)> *
-        onReportMediaPlaybackPlaybackSpeedCallback =
-            new chip::Callback::Callback<decltype(&ReadMediaPlaybackPlaybackSpeed::OnAttributeResponse)>(
-                ReadMediaPlaybackPlaybackSpeed::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadMediaPlaybackSeekRangeEnd::OnAttributeResponse)> *
         onReportMediaPlaybackSeekRangeEndCallback =
             new chip::Callback::Callback<decltype(&ReadMediaPlaybackSeekRangeEnd::OnAttributeResponse)>(
@@ -2728,14 +2685,6 @@ private:
     chip::Callback::Callback<decltype(&ReadSwitchClusterRevision::OnAttributeResponse)> * onReportSwitchClusterRevisionCallback =
         new chip::Callback::Callback<decltype(&ReadSwitchClusterRevision::OnAttributeResponse)>(
             ReadSwitchClusterRevision::OnAttributeResponse, this);
-    chip::Callback::Callback<decltype(&ReadTvChannelTvChannelLineup::OnAttributeResponse)> *
-        onReportTvChannelTvChannelLineupCallback =
-            new chip::Callback::Callback<decltype(&ReadTvChannelTvChannelLineup::OnAttributeResponse)>(
-                ReadTvChannelTvChannelLineup::OnAttributeResponse, this);
-    chip::Callback::Callback<decltype(&ReadTvChannelCurrentTvChannel::OnAttributeResponse)> *
-        onReportTvChannelCurrentTvChannelCallback =
-            new chip::Callback::Callback<decltype(&ReadTvChannelCurrentTvChannel::OnAttributeResponse)>(
-                ReadTvChannelCurrentTvChannel::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadTvChannelClusterRevision::OnAttributeResponse)> *
         onReportTvChannelClusterRevisionCallback =
             new chip::Callback::Callback<decltype(&ReadTvChannelClusterRevision::OnAttributeResponse)>(
@@ -3090,17 +3039,17 @@ private:
             new chip::Callback::Callback<decltype(&ReadThermostatClusterRevision::OnAttributeResponse)>(
                 ReadThermostatClusterRevision::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse)> *
-        onReportThermostatUserInterfaceConfigurationTemperatureDisplayModeCallback = new chip::Callback::Callback<decltype(
-            &ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse)>(
+        onReportThermostatUserInterfaceConfigurationTemperatureDisplayModeCallback = new chip::Callback::Callback<
+            decltype(&ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse)>(
             ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse)> *
         onReportThermostatUserInterfaceConfigurationKeypadLockoutCallback =
             new chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse)>(
                 ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse, this);
-    chip::Callback::Callback<decltype(
-        &ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)> *
-        onReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCallback = new chip::Callback::Callback<decltype(
-            &ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)>(
+    chip::Callback::Callback<
+        decltype(&ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)> *
+        onReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCallback = new chip::Callback::Callback<
+            decltype(&ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)>(
             ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationClusterRevision::OnAttributeResponse)> *
         onReportThermostatUserInterfaceConfigurationClusterRevisionCallback =
@@ -3179,8 +3128,8 @@ private:
             new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPartitionIdChangeCount::OnAttributeResponse)>(
                 ReadThreadNetworkDiagnosticsPartitionIdChangeCount::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse)> *
-        onReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCountCallback = new chip::Callback::Callback<decltype(
-            &ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse)>(
+        onReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCountCallback = new chip::Callback::Callback<
+            decltype(&ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse)>(
             ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse, this);
     chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsParentChangeCount::OnAttributeResponse)> *
         onReportThreadNetworkDiagnosticsParentChangeCountCallback =
