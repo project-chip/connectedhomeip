@@ -28,13 +28,25 @@ logger.setLevel(logging.INFO)
 NODE_ID = 1
 LIGHTING_ENDPOINT_ID = 1
 
+# Ignore failures decoding these attributes (e.g. not yet implemented)
+ignoreAttributeDecodeFailureList = [
+    '0/31/0', '0/31/1'
+]
+
+
+def _IgnoreAttributeDecodeFailure(path):
+    return str(path) in ignoreAttributeDecodeFailureList
+
 
 def _AssumeAttributesDecodeSuccess(values):
     for k, v in values['Attributes'].items():
         print(f"{k} = {v}")
         if isinstance(v.Data, ValueDecodeFailure):
-            raise AssertionError(
-                f"Cannot decode value for path {k}, got error: '{str(v.Data.Reason)}', raw TLV data: '{v.Data.TLVValue}'")
+            if _IgnoreAttributeDecodeFailure(k):
+                print(f"Ignoring attribute decode failure for path {k}")
+            else:
+                raise AssertionError(
+                    f"Cannot decode value for path {k}, got error: '{str(v.Data.Reason)}', raw TLV data: '{v.Data.TLVValue}'")
 
 
 def _AssumeEventsDecodeSuccess(values):
@@ -181,6 +193,11 @@ class ClusterObjectTests:
             '*'
         ]
         _AssumeAttributesDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+
+        logger.info("7: Reading Chunked List")
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListLongOctetString)])
+        if res.get('Attributes', {}).get(AttributePath(EndpointId=1, Attribute=Clusters.TestCluster.Attributes.ListLongOctetString)).Data.value != [b'0123456789abcdef' * 32] * 4:
+            raise AssertionError("Unexpected read result")
 
     @classmethod
     async def TestReadEventRequests(cls, devCtrl):

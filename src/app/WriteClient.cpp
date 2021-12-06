@@ -36,7 +36,6 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callbac
     VerifyOrReturnError(mpExchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    AttributeDataIBs::Builder attributeDataIBsBuilder;
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
 
@@ -45,8 +44,8 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callbac
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
     mWriteRequestBuilder.TimedRequest(false);
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
-    attributeDataIBsBuilder = mWriteRequestBuilder.CreateWriteRequests();
-    ReturnErrorOnFailure(attributeDataIBsBuilder.GetError());
+    mWriteRequestBuilder.CreateWriteRequests();
+    ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     ClearExistingExchangeContext();
     mpExchangeMgr         = apExchangeMgr;
     mpCallback            = apCallback;
@@ -136,12 +135,14 @@ exit:
 CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePathParams)
 {
     VerifyOrReturnError(attributePathParams.IsValidAttributePath(), CHIP_ERROR_INVALID_PATH_LIST);
-    AttributeDataIB::Builder attributeDataIB = mWriteRequestBuilder.GetWriteRequests().CreateAttributeDataIBBuilder();
-    ReturnErrorOnFailure(attributeDataIB.GetError());
+    AttributeDataIBs::Builder & writeRequests  = mWriteRequestBuilder.GetWriteRequests();
+    AttributeDataIB::Builder & attributeDataIB = writeRequests.CreateAttributeDataIBBuilder();
+    ReturnErrorOnFailure(writeRequests.GetError());
     // TODO: Add attribute version support
     attributeDataIB.DataVersion(0);
     ReturnErrorOnFailure(attributeDataIB.GetError());
-    ReturnErrorOnFailure(attributeDataIB.CreatePath().Encode(attributePathParams));
+    AttributePathIB::Builder & path = attributeDataIB.CreatePath();
+    ReturnErrorOnFailure(path.Encode(attributePathParams));
     return CHIP_NO_ERROR;
 }
 

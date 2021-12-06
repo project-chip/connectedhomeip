@@ -22,7 +22,10 @@
 
 #pragma once
 
+#include <lib/support/CodeUtils.h>
 #include <system/SystemConfig.h>
+
+#include <lib/support/Iterators.h>
 
 #include <atomic>
 #include <limits>
@@ -31,13 +34,6 @@
 #include <utility>
 
 namespace chip {
-
-enum class Loop : uint8_t
-{
-    Continue,
-    Break,
-    Finish,
-};
 
 namespace internal {
 
@@ -167,6 +163,16 @@ struct HeapObjectList : HeapObjectListNode
 } // namespace internal
 
 /**
+ * Action taken if objects remain allocated when a pool is destroyed.
+ */
+enum class OnObjectPoolDestruction
+{
+    AutoRelease,                   ///< Release any objects still allocated.
+    Die,                           ///< Abort if any objects remain allocated.
+    IgnoreUnsafeDoNotUseInNewCode, ///< Do nothing; keep historical behaviour until leaks are fixed.
+};
+
+/**
  * @class ObjectPool
  *
  * Depending on build configuration, ObjectPool is either a fixed-size static pool or a heap-allocated pool.
@@ -198,14 +204,24 @@ struct HeapObjectList : HeapObjectListNode
  *  @tparam     T   type of element to be allocated.
  *  @tparam     N   a positive integer max number of elements the pool provides.
  */
-template <class T, size_t N>
+template <class T, size_t N, OnObjectPoolDestruction Action = OnObjectPoolDestruction::Die>
 class BitMapObjectPool : public internal::StaticAllocatorBitmap, public internal::PoolCommon<T>
 {
 public:
     BitMapObjectPool() : StaticAllocatorBitmap(mData.mMemory, mUsage, N, sizeof(T)) {}
     ~BitMapObjectPool()
     {
-        // ReleaseAll();
+        switch (Action)
+        {
+        case OnObjectPoolDestruction::AutoRelease:
+            ReleaseAll();
+            break;
+        case OnObjectPoolDestruction::Die:
+            VerifyOrDie(Allocated() == 0);
+            break;
+        case OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode:
+            break;
+        }
     }
 
     template <typename... Args>
@@ -273,15 +289,24 @@ private:
  *
  *  @tparam     T   type to be allocated.
  */
-template <class T>
+template <class T, OnObjectPoolDestruction Action = OnObjectPoolDestruction::Die>
 class HeapObjectPool : public internal::Statistics, public internal::PoolCommon<T>
 {
 public:
     HeapObjectPool() {}
     ~HeapObjectPool()
     {
-        // TODO(#11880): Release all active objects (or verify that none are active) when destroying the pool.
-        // ReleaseAll();
+        switch (Action)
+        {
+        case OnObjectPoolDestruction::AutoRelease:
+            ReleaseAll();
+            break;
+        case OnObjectPoolDestruction::Die:
+            VerifyOrDie(Allocated() == 0);
+            break;
+        case OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode:
+            break;
+        }
     }
 
     template <typename... Args>
@@ -348,11 +373,11 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-template <typename T, unsigned int N>
-using ObjectPool = HeapObjectPool<T>;
+template <typename T, unsigned int N, OnObjectPoolDestruction Action = OnObjectPoolDestruction::Die>
+using ObjectPool = HeapObjectPool<T, Action>;
 #else  // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-template <typename T, unsigned int N>
-using ObjectPool = BitMapObjectPool<T, N>;
+template <typename T, unsigned int N, OnObjectPoolDestruction Action = OnObjectPoolDestruction::Die>
+using ObjectPool = BitMapObjectPool<T, N, Action>;
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 
 enum class ObjectPoolMem
@@ -363,17 +388,17 @@ enum class ObjectPoolMem
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
 };
 
-template <typename T, size_t N, ObjectPoolMem P>
+template <typename T, size_t N, ObjectPoolMem P, OnObjectPoolDestruction Action = OnObjectPoolDestruction::Die>
 class MemTypeObjectPool;
 
-template <typename T, size_t N>
-class MemTypeObjectPool<T, N, ObjectPoolMem::kStatic> : public BitMapObjectPool<T, N>
+template <typename T, size_t N, OnObjectPoolDestruction Action>
+class MemTypeObjectPool<T, N, ObjectPoolMem::kStatic, Action> : public BitMapObjectPool<T, N, Action>
 {
 };
 
 #if CHIP_SYSTEM_CONFIG_POOL_USE_HEAP
-template <typename T, size_t N>
-class MemTypeObjectPool<T, N, ObjectPoolMem::kDynamic> : public HeapObjectPool<T>
+template <typename T, size_t N, OnObjectPoolDestruction Action>
+class MemTypeObjectPool<T, N, ObjectPoolMem::kDynamic, Action> : public HeapObjectPool<T, Action>
 {
 };
 #endif // CHIP_SYSTEM_CONFIG_POOL_USE_HEAP

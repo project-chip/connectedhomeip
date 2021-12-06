@@ -261,13 +261,12 @@ bool emberAfIdentifyClusterIdentifyQueryCallback(CommandHandler * commandObj, co
 
     emberAfIdentifyClusterPrintln("Identifying for %u more seconds", identifyTime);
     {
-        app::CommandPathParams cmdParams = { endpoint, /* group id */ 0, Clusters::Identify::Id,
-                                             ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
+        app::ConcreteCommandPath path = { endpoint, Clusters::Identify::Id, ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID };
+        TLV::TLVWriter * writer       = nullptr;
 
         VerifyOrExit(commandObj != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+        SuccessOrExit(err = commandObj->PrepareCommand(path));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), identifyTime));
         SuccessOrExit(err = commandObj->FinishCommand());

@@ -36,6 +36,7 @@ tests:
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -56,11 +57,13 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
       response:
           value: 0
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -81,11 +84,13 @@ tests:
     - label: "Read ColorLoopDirection attribute from DUT"
       command: "readAttribute"
       attribute: "color loop direction"
+      PICS: A_COLORLOOPDIRECTION
       response:
           value: 0
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -106,11 +111,13 @@ tests:
     - label: "Read ColorLoopTime attribute from DUT"
       command: "readAttribute"
       attribute: "color loop time"
+      PICS: A_COLORLOOPTIME
       response:
           value: 30
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -131,11 +138,13 @@ tests:
     - label: "Read ColorLoopStartEnhancedHue attribute from DUT"
       command: "readAttribute"
       attribute: "color loop start enhanced hue"
+      PICS: A_COLORLOOPSTARTENHANCEDHUE
       response:
           value: 160
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -156,6 +165,7 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
       response:
           value: 1
 
@@ -164,6 +174,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "color loop stored enhanced hue"
+      PICS: A_COLORLOOPSTOREDENHANCEDHUE
       response:
           value: 0
 
@@ -173,6 +184,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
 
@@ -182,11 +194,13 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -207,6 +221,7 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
       response:
           value: 0
 
@@ -215,11 +230,13 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 0
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -240,11 +257,13 @@ tests:
     - label: "Read ColorLoopDirection attribute from DUT"
       command: "readAttribute"
       attribute: "color loop direction"
+      PICS: A_COLORLOOPDIRECTION
       response:
           value: 1
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -265,6 +284,7 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
       response:
           value: 1
 
@@ -273,6 +293,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "color loop stored enhanced hue"
+      PICS: A_COLORLOOPSTOREDENHANCEDHUE
       response:
           value: 0
 
@@ -282,6 +303,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
 
@@ -291,11 +313,13 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -316,6 +340,7 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
       response:
           value: 0
 
@@ -324,11 +349,13 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 0
 
     - label: "Enhanced Move To Hue command 10"
       command: "EnhancedMoveToHue"
+      PICS: CR_ENHANCEDMOVETOHUE
       arguments:
           values:
               - name: "enhancedHue"
@@ -353,11 +380,13 @@ tests:
     - label: "Read EnhancedCurrentHue attribute from DUT"
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 40960
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -378,11 +407,13 @@ tests:
     - label: "Read ColorLoopDirection attribute from DUT"
       command: "readAttribute"
       attribute: "color loop direction"
+      PICS: A_COLORLOOPDIRECTION
       response:
           value: 0
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -404,6 +435,7 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
       response:
           value: 1
 
@@ -412,6 +444,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "color loop stored enhanced hue"
+      PICS: A_COLORLOOPSTOREDENHANCEDHUE
       response:
           value: 0
 
@@ -421,6 +454,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
 
@@ -430,11 +464,13 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -455,6 +491,7 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
       response:
           value: 0
 
@@ -463,11 +500,13 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 0
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -489,11 +528,13 @@ tests:
     - label: "Read ColorLoopDirection attribute from DUT"
       command: "readAttribute"
       attribute: "color loop direction"
+      PICS: A_COLORLOOPDIRECTION
       response:
           value: 1
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -514,6 +555,7 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
       response:
           value: 1
 
@@ -522,6 +564,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "color loop stored enhanced hue"
+      PICS: A_COLORLOOPSTOREDENHANCEDHUE
       response:
           value: 0
 
@@ -531,6 +574,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
 
@@ -540,11 +584,13 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 500
 
     - label: "Sends ColorLoopSet Command - Set all Attributes"
       command: "ColorLoopSet"
+      PICS: CR_COLORLOOPSET
       arguments:
           values:
               - name: "updateFlags"
@@ -565,6 +611,7 @@ tests:
     - label: "Read ColorLoopActive attribute from DUT"
       command: "readAttribute"
       attribute: "color loop active"
+      PICS: A_COLORLOOPACTIVE
       response:
           value: 0
 
@@ -573,6 +620,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "enhanced current hue"
+      PICS: A_ENHANCEDCURRENTHUE
       response:
           value: 0
 

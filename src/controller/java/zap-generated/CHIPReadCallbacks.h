@@ -308,6 +308,59 @@ private:
     bool keepAlive;
 };
 
+class CHIPAccessControlAclAttributeCallback : public chip::Callback::Callback<CHIPAccessControlClusterAclAttributeCallbackType>
+{
+public:
+    CHIPAccessControlAclAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPAccessControlAclAttributeCallback();
+
+    static void maybeDestroy(CHIPAccessControlAclAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPAccessControlAclAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPAccessControlExtensionAttributeCallback
+    : public chip::Callback::Callback<CHIPAccessControlClusterExtensionAttributeCallbackType>
+{
+public:
+    CHIPAccessControlExtensionAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPAccessControlExtensionAttributeCallback();
+
+    static void maybeDestroy(CHIPAccessControlExtensionAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPAccessControlExtensionAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> &
+            list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPApplicationLauncherApplicationLauncherListAttributeCallback
     : public chip::Callback::Callback<CHIPApplicationLauncherClusterApplicationLauncherListAttributeCallbackType>
 {
@@ -1037,6 +1090,30 @@ private:
     bool keepAlive;
 };
 
+class CHIPPowerSourceConfigurationSourcesAttributeCallback
+    : public chip::Callback::Callback<CHIPPowerSourceConfigurationClusterSourcesAttributeCallbackType>
+{
+public:
+    CHIPPowerSourceConfigurationSourcesAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPPowerSourceConfigurationSourcesAttributeCallback();
+
+    static void maybeDestroy(CHIPPowerSourceConfigurationSourcesAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPPowerSourceConfigurationSourcesAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
 class CHIPPumpConfigurationAndControlLifetimeRunningHoursAttributeCallback
     : public chip::Callback::Callback<CHIPPumpConfigurationAndControlClusterLifetimeRunningHoursAttributeCallbackType>
 {
@@ -1283,6 +1360,30 @@ public:
     static void CallbackFn(void * context,
                            const chip::app::DataModel::DecodableList<
                                chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & list);
+
+private:
+    jobject javaCallbackRef;
+    bool keepAlive;
+};
+
+class CHIPTestClusterListLongOctetStringAttributeCallback
+    : public chip::Callback::Callback<CHIPTestClusterClusterListLongOctetStringAttributeCallbackType>
+{
+public:
+    CHIPTestClusterListLongOctetStringAttributeCallback(jobject javaCallback, bool keepAlive = false);
+
+    ~CHIPTestClusterListLongOctetStringAttributeCallback();
+
+    static void maybeDestroy(CHIPTestClusterListLongOctetStringAttributeCallback * callback)
+    {
+        if (!callback->keepAlive)
+        {
+            callback->Cancel();
+            chip::Platform::Delete<CHIPTestClusterListLongOctetStringAttributeCallback>(callback);
+        }
+    }
+
+    static void CallbackFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
 
 private:
     jobject javaCallbackRef;

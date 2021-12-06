@@ -228,6 +228,12 @@
 #define ZCL_FINISH_TIME_ATTRIBUTE_ID (0x0001)
 #define ZCL_REMAINING_TIME_ATTRIBUTE_ID (0x0002)
 
+// Attribute ids for cluster: Pulse Width Modulation
+
+// Client attributes
+
+// Server attributes
+
 // Attribute ids for cluster: Descriptor
 
 // Client attributes
@@ -237,6 +243,20 @@
 #define ZCL_SERVER_LIST_ATTRIBUTE_ID (0x0001)
 #define ZCL_CLIENT_LIST_ATTRIBUTE_ID (0x0002)
 #define ZCL_PARTS_LIST_ATTRIBUTE_ID (0x0003)
+
+// Attribute ids for cluster: Binding
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Access Control
+
+// Client attributes
+
+// Server attributes
+#define ZCL_ACL_ATTRIBUTE_ID (0x0000)
+#define ZCL_EXTENSION_ATTRIBUTE_ID (0x0001)
 
 // Attribute ids for cluster: Poll Control
 
@@ -322,6 +342,7 @@
 // Client attributes
 
 // Server attributes
+#define ZCL_SOURCES_ATTRIBUTE_ID (0x0000)
 
 // Attribute ids for cluster: Power Source
 
@@ -562,6 +583,14 @@
 #define ZCL_TRUSTED_ROOTS_ATTRIBUTE_ID (0x0004)
 #define ZCL_CURRENT_FABRIC_INDEX_ATTRIBUTE_ID (0x0005)
 
+// Attribute ids for cluster: Group Key Management
+
+// Client attributes
+
+// Server attributes
+#define ZCL_GROUPS_ATTRIBUTE_ID (0x0000)
+#define ZCL_GROUPKEYS_ATTRIBUTE_ID (0x0001)
+
 // Attribute ids for cluster: Fixed Label
 
 // Client attributes
@@ -575,6 +604,24 @@
 
 // Server attributes
 #define ZCL_LABEL_LIST_ATTRIBUTE_ID (0x0000)
+
+// Attribute ids for cluster: Proxy Configuration
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Proxy Discovery
+
+// Client attributes
+
+// Server attributes
+
+// Attribute ids for cluster: Proxy Valid
+
+// Client attributes
+
+// Server attributes
 
 // Attribute ids for cluster: Boolean State
 
@@ -1444,6 +1491,7 @@
 #define ZCL_RANGE_RESTRICTED_INT8S_ATTRIBUTE_ID (0x0027)
 #define ZCL_RANGE_RESTRICTED_INT16_U_ATTRIBUTE_ID (0x0028)
 #define ZCL_RANGE_RESTRICTED_INT16S_ATTRIBUTE_ID (0x0029)
+#define ZCL_LIST_LONG_OCTET_STRING_ATTRIBUTE_ID (0x002A)
 #define ZCL_TIMED_WRITE_BOOLEAN_ATTRIBUTE_ID (0x0030)
 #define ZCL_UNSUPPORTED_ATTRIBUTE_ID (0x00FF)
 #define ZCL_NULLABLE_BOOLEAN_ATTRIBUTE_ID (0x8000)
@@ -1669,17 +1717,3 @@
 #define ZCL_RMS_EXTREME_UNDER_VOLTAGE_PERIOD_PHASE_C_ATTRIBUTE_ID (0x0A15)
 #define ZCL_RMS_VOLTAGE_SAG_PERIOD_PHASE_C_ATTRIBUTE_ID (0x0A16)
 #define ZCL_RMS_VOLTAGE_SWELL_PERIOD_PHASE_C_ATTRIBUTE_ID (0x0A17)
-
-// Attribute ids for cluster: Binding
-
-// Client attributes
-
-// Server attributes
-
-// Attribute ids for cluster: Group Key Management
-
-// Client attributes
-
-// Server attributes
-#define ZCL_GROUPS_ATTRIBUTE_ID (0x0000)
-#define ZCL_GROUPKEYS_ATTRIBUTE_ID (0x0001)

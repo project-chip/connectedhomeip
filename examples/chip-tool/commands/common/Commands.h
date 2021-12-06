@@ -20,7 +20,6 @@
 
 #include "../../config/PersistentStorage.h"
 #include "Command.h"
-#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <map>
 
 class Commands

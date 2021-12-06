@@ -30,6 +30,18 @@
 namespace chip {
 namespace Controller {
 
+class DLL_EXPORT AccessControlCluster : public ClusterBase
+{
+public:
+    AccessControlCluster() : ClusterBase(app::Clusters::AccessControl::Id) {}
+    ~AccessControlCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR ReadAttributeAcl(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeExtension(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
+
 class DLL_EXPORT AccountLoginCluster : public ClusterBase
 {
 public:
@@ -441,69 +453,6 @@ public:
     ~BridgedDeviceBasicCluster() {}
 
     // Cluster Attributes
-    CHIP_ERROR ReadAttributeVendorName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeVendorName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeVendorName(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeVendorID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeVendorID(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                          uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeVendorID(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeProductName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeProductName(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                             uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeProductName(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeNodeLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR WriteAttributeNodeLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                       chip::CharSpan value);
-    CHIP_ERROR SubscribeAttributeNodeLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeNodeLabel(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeHardwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeHardwareVersion(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeHardwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeHardwareVersionString(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeSoftwareVersion(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                                 uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeSoftwareVersion(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeSoftwareVersionString(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                       uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeSoftwareVersionString(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeManufacturingDate(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
-                                                   uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeManufacturingDate(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributePartNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributePartNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributePartNumber(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeProductURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeProductURL(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                            uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeProductURL(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeProductLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeProductLabel(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeProductLabel(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeSerialNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeSerialNumber(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeSerialNumber(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeReachable(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR SubscribeAttributeReachable(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                           uint16_t minInterval, uint16_t maxInterval);
-    CHIP_ERROR ReportAttributeReachable(Callback::Cancelable * onReportCallback);
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
@@ -1874,6 +1823,17 @@ public:
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
 };
 
+class DLL_EXPORT PowerSourceConfigurationCluster : public ClusterBase
+{
+public:
+    PowerSourceConfigurationCluster() : ClusterBase(app::Clusters::PowerSourceConfiguration::Id) {}
+    ~PowerSourceConfigurationCluster() {}
+
+    // Cluster Attributes
+    CHIP_ERROR ReadAttributeSources(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
+};
+
 class DLL_EXPORT PressureMeasurementCluster : public ClusterBase
 {
 public:
@@ -2535,6 +2495,7 @@ public:
                                                        Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                        uint16_t maxInterval);
     CHIP_ERROR ReportAttributeRangeRestrictedInt16s(Callback::Cancelable * onReportCallback);
+    CHIP_ERROR ReadAttributeListLongOctetString(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR ReadAttributeTimedWriteBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR WriteAttributeTimedWriteBoolean(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                bool value);

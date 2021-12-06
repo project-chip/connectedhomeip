@@ -71,7 +71,7 @@ CHIP_ERROR AndroidClusterExceptions::CreateIllegalStateException(JNIEnv * env, c
 void AndroidClusterExceptions::ReturnIllegalStateException(JNIEnv * env, jobject callback, const char message[],
                                                            ChipError errorCode)
 {
-    VerifyOrReturn(callback == nullptr, ChipLogDetail(Zcl, "Callback is null in ReturnIllegalStateException(), exiting early"));
+    VerifyOrReturn(callback != nullptr, ChipLogDetail(Zcl, "Callback is null in ReturnIllegalStateException(), exiting early"));
 
     CHIP_ERROR err = CHIP_NO_ERROR;
     jmethodID method;

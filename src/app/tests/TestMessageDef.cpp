@@ -213,7 +213,7 @@ void ParseEventFilterIB(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 
 void BuildEventFilters(nlTestSuite * apSuite, EventFilterIBs::Builder & aEventFiltersBuilder)
 {
-    EventFilterIB::Builder eventFilterBuilder = aEventFiltersBuilder.CreateEventFilter();
+    EventFilterIB::Builder & eventFilterBuilder = aEventFiltersBuilder.CreateEventFilter();
     NL_TEST_ASSERT(apSuite, aEventFiltersBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventFilterIB(apSuite, eventFilterBuilder);
     aEventFiltersBuilder.EndOfEventFilters();
@@ -286,7 +286,7 @@ void ParseAttributePathIB(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 
 void BuildAttributePathList(nlTestSuite * apSuite, AttributePathIBs::Builder & aAttributePathListBuilder)
 {
-    AttributePathIB::Builder attributePathBuilder = aAttributePathListBuilder.CreatePath();
+    AttributePathIB::Builder & attributePathBuilder = aAttributePathListBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributePathIB(apSuite, attributePathBuilder);
 
@@ -348,7 +348,7 @@ void ParseEventPath(nlTestSuite * apSuite, EventPathIB::Parser & aEventPathParse
 
 void BuildEventPaths(nlTestSuite * apSuite, EventPathIBs::Builder & aEventPathsBuilder)
 {
-    EventPathIB::Builder eventPathBuilder = aEventPathsBuilder.CreatePath();
+    EventPathIB::Builder & eventPathBuilder = aEventPathsBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, eventPathBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventPath(apSuite, eventPathBuilder);
 
@@ -404,7 +404,7 @@ void BuildEventDataIB(nlTestSuite * apSuite, EventDataIB::Builder & aEventDataIB
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    EventPathIB::Builder eventPathBuilder = aEventDataIBBuilder.CreatePath();
+    EventPathIB::Builder & eventPathBuilder = aEventDataIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, eventPathBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventPath(apSuite, eventPathBuilder);
 
@@ -485,11 +485,11 @@ void ParseEventDataIB(nlTestSuite * apSuite, EventDataIB::Parser & aEventDataIBP
 
 void BuildEventStatusIB(nlTestSuite * apSuite, EventStatusIB::Builder & aEventStatusIBBuilder)
 {
-    EventPathIB::Builder eventPathBuilder = aEventStatusIBBuilder.CreatePath();
+    EventPathIB::Builder & eventPathBuilder = aEventStatusIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, aEventStatusIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventPath(apSuite, eventPathBuilder);
 
-    StatusIB::Builder statusIBBuilder = aEventStatusIBBuilder.CreateErrorStatus();
+    StatusIB::Builder & statusIBBuilder = aEventStatusIBBuilder.CreateErrorStatus();
     NL_TEST_ASSERT(apSuite, statusIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildStatusIB(apSuite, statusIBBuilder);
 
@@ -515,7 +515,7 @@ void ParseEventStatusIB(nlTestSuite * apSuite, EventStatusIB::Parser & aEventSta
 
 void BuildEventReportIB(nlTestSuite * apSuite, EventReportIB::Builder & aEventReportIBBuilder)
 {
-    EventDataIB::Builder eventDataIBBuilder = aEventReportIBBuilder.CreateEventData();
+    EventDataIB::Builder & eventDataIBBuilder = aEventReportIBBuilder.CreateEventData();
     NL_TEST_ASSERT(apSuite, aEventReportIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventDataIB(apSuite, eventDataIBBuilder);
 
@@ -540,7 +540,7 @@ void ParseEventReportIB(nlTestSuite * apSuite, EventReportIB::Parser & aEventRep
 
 void BuildEventReports(nlTestSuite * apSuite, EventReportIBs::Builder & aEventReportsBuilder)
 {
-    EventReportIB::Builder eventReportIBBuilder = aEventReportsBuilder.CreateEventReport();
+    EventReportIB::Builder & eventReportIBBuilder = aEventReportsBuilder.CreateEventReport();
     NL_TEST_ASSERT(apSuite, aEventReportsBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventReportIB(apSuite, eventReportIBBuilder);
 
@@ -563,11 +563,11 @@ void ParseEventReports(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 
 void BuildAttributeStatusIB(nlTestSuite * apSuite, AttributeStatusIB::Builder & aAttributeStatusIBBuilder)
 {
-    AttributePathIB::Builder attributePathBuilder = aAttributeStatusIBBuilder.CreatePath();
+    AttributePathIB::Builder & attributePathBuilder = aAttributeStatusIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributePathIB(apSuite, attributePathBuilder);
 
-    StatusIB::Builder statusIBBuilder = aAttributeStatusIBBuilder.CreateErrorStatus();
+    StatusIB::Builder & statusIBBuilder = aAttributeStatusIBBuilder.CreateErrorStatus();
     NL_TEST_ASSERT(apSuite, statusIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildStatusIB(apSuite, statusIBBuilder);
 
@@ -594,7 +594,7 @@ void ParseAttributeStatusIB(nlTestSuite * apSuite, AttributeStatusIB::Parser & a
 
 void BuildAttributeStatuses(nlTestSuite * apSuite, AttributeStatusIBs::Builder & aAttributeStatusesBuilder)
 {
-    AttributeStatusIB::Builder aAttributeStatusIBBuilder = aAttributeStatusesBuilder.CreateAttributeStatus();
+    AttributeStatusIB::Builder & aAttributeStatusIBBuilder = aAttributeStatusesBuilder.CreateAttributeStatus();
     NL_TEST_ASSERT(apSuite, aAttributeStatusesBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributeStatusIB(apSuite, aAttributeStatusIBBuilder);
 
@@ -621,7 +621,7 @@ void BuildAttributeDataIB(nlTestSuite * apSuite, AttributeDataIB::Builder & aAtt
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     aAttributeDataIBBuilder.DataVersion(2);
-    AttributePathIB::Builder attributePathBuilder = aAttributeDataIBBuilder.CreatePath();
+    AttributePathIB::Builder & attributePathBuilder = aAttributeDataIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, aAttributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributePathIB(apSuite, attributePathBuilder);
 
@@ -682,9 +682,9 @@ void ParseAttributeDataIB(nlTestSuite * apSuite, AttributeDataIB::Parser & aAttr
 
 void BuildAttributeDataIBs(nlTestSuite * apSuite, AttributeDataIBs::Builder & aAttributeDataIBsBuilder)
 {
-    AttributeDataIB::Builder AttributeDataIBBuilder = aAttributeDataIBsBuilder.CreateAttributeDataIBBuilder();
+    AttributeDataIB::Builder & attributeDataIBBuilder = aAttributeDataIBsBuilder.CreateAttributeDataIBBuilder();
     NL_TEST_ASSERT(apSuite, aAttributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
-    BuildAttributeDataIB(apSuite, AttributeDataIBBuilder);
+    BuildAttributeDataIB(apSuite, attributeDataIBBuilder);
 
     aAttributeDataIBsBuilder.EndOfAttributeDataIBs();
     NL_TEST_ASSERT(apSuite, aAttributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
@@ -705,7 +705,7 @@ void ParseAttributeDataIBs(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader
 
 void BuildAttributeReportIB(nlTestSuite * apSuite, AttributeReportIB::Builder & aAttributeReportIBBuilder)
 {
-    AttributeDataIB::Builder attributeDataIBBuilder = aAttributeReportIBBuilder.CreateAttributeData();
+    AttributeDataIB::Builder & attributeDataIBBuilder = aAttributeReportIBBuilder.CreateAttributeData();
     NL_TEST_ASSERT(apSuite, aAttributeReportIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributeDataIB(apSuite, attributeDataIBBuilder);
 
@@ -729,7 +729,7 @@ void ParseAttributeReportIB(nlTestSuite * apSuite, AttributeReportIB::Parser & a
 
 void BuildAttributeReportIBs(nlTestSuite * apSuite, AttributeReportIBs::Builder & aAttributeReportIBsBuilder)
 {
-    AttributeReportIB::Builder attributeReportIBBuilder = aAttributeReportIBsBuilder.CreateAttributeReport();
+    AttributeReportIB::Builder & attributeReportIBBuilder = aAttributeReportIBsBuilder.CreateAttributeReport();
     NL_TEST_ASSERT(apSuite, aAttributeReportIBsBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributeReportIB(apSuite, attributeReportIBBuilder);
 
@@ -754,7 +754,7 @@ void BuildCommandDataIB(nlTestSuite * apSuite, CommandDataIB::Builder & aCommand
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    CommandPathIB::Builder commandPathBuilder = aCommandDataIBBuilder.CreatePath();
+    CommandPathIB::Builder & commandPathBuilder = aCommandDataIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, aCommandDataIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildCommandPath(apSuite, commandPathBuilder);
 
@@ -809,11 +809,11 @@ void ParseCommandDataIB(nlTestSuite * apSuite, CommandDataIB::Parser & aCommandD
 
 void BuildCommandStatusIB(nlTestSuite * apSuite, CommandStatusIB::Builder & aCommandStatusIBBuilder)
 {
-    CommandPathIB::Builder commandPathBuilder = aCommandStatusIBBuilder.CreatePath();
+    CommandPathIB::Builder & commandPathBuilder = aCommandStatusIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, aCommandStatusIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildCommandPath(apSuite, commandPathBuilder);
 
-    StatusIB::Builder statusIBBuilder = aCommandStatusIBBuilder.CreateErrorStatus();
+    StatusIB::Builder & statusIBBuilder = aCommandStatusIBBuilder.CreateErrorStatus();
     NL_TEST_ASSERT(apSuite, statusIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildStatusIB(apSuite, statusIBBuilder);
 
@@ -839,10 +839,10 @@ void ParseCommandStatusIB(nlTestSuite * apSuite, CommandStatusIB::Parser & aComm
 
 void BuildWrongInvokeResponseIB(nlTestSuite * apSuite, InvokeResponseIB::Builder & aInvokeResponseIBBuilder)
 {
-    CommandDataIB::Builder commandDataBuilder = aInvokeResponseIBBuilder.CreateCommand();
+    CommandDataIB::Builder & commandDataBuilder = aInvokeResponseIBBuilder.CreateCommand();
     NL_TEST_ASSERT(apSuite, aInvokeResponseIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildCommandDataIB(apSuite, commandDataBuilder);
-    CommandStatusIB::Builder commandStatusBuilder = aInvokeResponseIBBuilder.CreateStatus();
+    CommandStatusIB::Builder & commandStatusBuilder = aInvokeResponseIBBuilder.CreateStatus();
     NL_TEST_ASSERT(apSuite, aInvokeResponseIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildCommandStatusIB(apSuite, commandStatusBuilder);
     aInvokeResponseIBBuilder.EndOfInvokeResponseIB();
@@ -851,7 +851,7 @@ void BuildWrongInvokeResponseIB(nlTestSuite * apSuite, InvokeResponseIB::Builder
 
 void BuildInvokeResponseIBWithCommandDataIB(nlTestSuite * apSuite, InvokeResponseIB::Builder & aInvokeResponseIBBuilder)
 {
-    CommandDataIB::Builder commandDataBuilder = aInvokeResponseIBBuilder.CreateCommand();
+    CommandDataIB::Builder & commandDataBuilder = aInvokeResponseIBBuilder.CreateCommand();
     NL_TEST_ASSERT(apSuite, aInvokeResponseIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildCommandDataIB(apSuite, commandDataBuilder);
     aInvokeResponseIBBuilder.EndOfInvokeResponseIB();
@@ -860,7 +860,7 @@ void BuildInvokeResponseIBWithCommandDataIB(nlTestSuite * apSuite, InvokeRespons
 
 void BuildInvokeResponseIBWithCommandStatusIB(nlTestSuite * apSuite, InvokeResponseIB::Builder & aInvokeResponseIBBuilder)
 {
-    CommandStatusIB::Builder commandStatusBuilder = aInvokeResponseIBBuilder.CreateStatus();
+    CommandStatusIB::Builder & commandStatusBuilder = aInvokeResponseIBBuilder.CreateStatus();
     NL_TEST_ASSERT(apSuite, aInvokeResponseIBBuilder.GetError() == CHIP_NO_ERROR);
     BuildCommandStatusIB(apSuite, commandStatusBuilder);
     aInvokeResponseIBBuilder.EndOfInvokeResponseIB();
@@ -905,7 +905,7 @@ void ParseWrongInvokeResponseIB(nlTestSuite * apSuite, InvokeResponseIB::Parser 
 
 void BuildInvokeRequests(nlTestSuite * apSuite, InvokeRequests::Builder & aInvokeRequestsBuilder)
 {
-    CommandDataIB::Builder aCommandDataIBBuilder = aInvokeRequestsBuilder.CreateCommandData();
+    CommandDataIB::Builder & aCommandDataIBBuilder = aInvokeRequestsBuilder.CreateCommandData();
     NL_TEST_ASSERT(apSuite, aInvokeRequestsBuilder.GetError() == CHIP_NO_ERROR);
     BuildCommandDataIB(apSuite, aCommandDataIBBuilder);
 
@@ -928,7 +928,7 @@ void ParseInvokeRequests(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 
 void BuildInvokeResponses(nlTestSuite * apSuite, InvokeResponseIBs::Builder & aInvokeResponsesBuilder)
 {
-    InvokeResponseIB::Builder invokeResponseIBBuilder = aInvokeResponsesBuilder.CreateInvokeResponse();
+    InvokeResponseIB::Builder & invokeResponseIBBuilder = aInvokeResponsesBuilder.CreateInvokeResponse();
     NL_TEST_ASSERT(apSuite, aInvokeResponsesBuilder.GetError() == CHIP_NO_ERROR);
     BuildInvokeResponseIBWithCommandDataIB(apSuite, invokeResponseIBBuilder);
 
@@ -957,7 +957,7 @@ void BuildInvokeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWr
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     invokeRequestMessageBuilder.SuppressResponse(true);
     invokeRequestMessageBuilder.TimedRequest(true);
-    InvokeRequests::Builder invokeRequestsBuilder = invokeRequestMessageBuilder.CreateInvokeRequests();
+    InvokeRequests::Builder & invokeRequestsBuilder = invokeRequestMessageBuilder.CreateInvokeRequests();
     NL_TEST_ASSERT(apSuite, invokeRequestsBuilder.GetError() == CHIP_NO_ERROR);
 
     BuildInvokeRequests(apSuite, invokeRequestsBuilder);
@@ -992,7 +992,7 @@ void BuildInvokeResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aW
     err = invokeResponseMessageBuilder.Init(&aWriter);
 
     invokeResponseMessageBuilder.SuppressResponse(true);
-    InvokeResponseIBs::Builder invokeResponsesBuilder = invokeResponseMessageBuilder.CreateInvokeResponses();
+    InvokeResponseIBs::Builder & invokeResponsesBuilder = invokeResponseMessageBuilder.CreateInvokeResponses();
     NL_TEST_ASSERT(apSuite, invokeResponseMessageBuilder.GetError() == CHIP_NO_ERROR);
 
     BuildInvokeResponses(apSuite, invokeResponsesBuilder);
@@ -1028,13 +1028,13 @@ void BuildReportDataMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWrite
     reportDataMessageBuilder.SubscriptionId(2);
     NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributeReportIBs::Builder AttributeReportIBs = reportDataMessageBuilder.CreateAttributeReportIBs();
+    AttributeReportIBs::Builder & attributeReportIBs = reportDataMessageBuilder.CreateAttributeReportIBs();
     NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
-    BuildAttributeReportIBs(apSuite, AttributeReportIBs);
+    BuildAttributeReportIBs(apSuite, attributeReportIBs);
 
-    EventReportIBs::Builder EventReportIBs = reportDataMessageBuilder.CreateEventReports();
+    EventReportIBs::Builder & eventReportIBs = reportDataMessageBuilder.CreateEventReports();
     NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
-    BuildEventReports(apSuite, EventReportIBs);
+    BuildEventReports(apSuite, eventReportIBs);
 
     reportDataMessageBuilder.MoreChunkedMessages(true).SuppressResponse(true);
     NL_TEST_ASSERT(apSuite, reportDataMessageBuilder.GetError() == CHIP_NO_ERROR);
@@ -1083,19 +1083,20 @@ void BuildReadRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWrit
     err = readRequestBuilder.Init(&aWriter);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributePathIBs::Builder AttributePathIBs = readRequestBuilder.CreateAttributeRequests();
+    AttributePathIBs::Builder & attributePathIBs = readRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
-    BuildAttributePathList(apSuite, AttributePathIBs);
+    BuildAttributePathList(apSuite, attributePathIBs);
 
     DataVersionFilterIBs::Builder & dataVersionFilters = readRequestBuilder.CreateDataVersionFilters();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildDataVersionFilterIBs(apSuite, dataVersionFilters);
 
-    EventPathIBs::Builder eventPathList = readRequestBuilder.CreateEventRequests();
+    EventPathIBs::Builder & eventPathList = readRequestBuilder.CreateEventRequests();
+
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventPaths(apSuite, eventPathList);
 
-    EventFilterIBs::Builder eventFilters = readRequestBuilder.CreateEventFilters();
+    EventFilterIBs::Builder & eventFilters = readRequestBuilder.CreateEventFilters();
     NL_TEST_ASSERT(apSuite, readRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventFilters(apSuite, eventFilters);
 
@@ -1153,9 +1154,9 @@ void BuildWriteRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWri
     writeRequestBuilder.TimedRequest(true);
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributeDataIBs::Builder AttributeDataIBs = writeRequestBuilder.CreateWriteRequests();
+    AttributeDataIBs::Builder & attributeDataIBs = writeRequestBuilder.CreateWriteRequests();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
-    BuildAttributeDataIBs(apSuite, AttributeDataIBs);
+    BuildAttributeDataIBs(apSuite, attributeDataIBs);
 
     writeRequestBuilder.MoreChunkedMessages(true);
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
@@ -1208,7 +1209,7 @@ void BuildWriteResponseMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWr
     err = writeResponseBuilder.Init(&aWriter);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    AttributeStatusIBs::Builder attributeStatuses = writeResponseBuilder.CreateWriteResponses();
+    AttributeStatusIBs::Builder & attributeStatuses = writeResponseBuilder.CreateWriteResponses();
     NL_TEST_ASSERT(apSuite, writeResponseBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributeStatuses(apSuite, attributeStatuses);
 
@@ -1249,7 +1250,7 @@ void BuildSubscribeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & 
     subscribeRequestBuilder.MaxIntervalCeilingSeconds(3);
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIBs::Builder attributePathIBs = subscribeRequestBuilder.CreateAttributeRequests();
+    AttributePathIBs::Builder & attributePathIBs = subscribeRequestBuilder.CreateAttributeRequests();
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributePathList(apSuite, attributePathIBs);
 
@@ -1257,11 +1258,12 @@ void BuildSubscribeRequestMessage(nlTestSuite * apSuite, chip::TLV::TLVWriter & 
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildDataVersionFilterIBs(apSuite, dataVersionFilters);
 
-    EventPathIBs::Builder eventPathList = subscribeRequestBuilder.CreateEventRequests();
+    EventPathIBs::Builder & eventPathList = subscribeRequestBuilder.CreateEventRequests();
+
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventPaths(apSuite, eventPathList);
 
-    EventFilterIBs::Builder eventFilters = subscribeRequestBuilder.CreateEventFilters();
+    EventFilterIBs::Builder & eventFilters = subscribeRequestBuilder.CreateEventFilters();
     NL_TEST_ASSERT(apSuite, subscribeRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventFilters(apSuite, eventFilters);
 
@@ -2227,24 +2229,24 @@ void CheckPointRollbackTest(nlTestSuite * apSuite, void * apContext)
     AttributeDataIBs::Parser AttributeDataIBsParser;
     chip::TLV::TLVWriter checkpoint;
     writer.Init(chip::System::PacketBufferHandle::New(chip::System::PacketBuffer::kMaxSize));
-    AttributeDataIBs::Builder AttributeDataIBsBuilder;
-    AttributeDataIBsBuilder.Init(&writer);
+    AttributeDataIBs::Builder attributeDataIBsBuilder;
+    attributeDataIBsBuilder.Init(&writer);
 
     // encode one attribute element
-    AttributeDataIB::Builder AttributeDataIBBuilder1 = AttributeDataIBsBuilder.CreateAttributeDataIBBuilder();
-    NL_TEST_ASSERT(apSuite, AttributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
-    BuildAttributeDataIB(apSuite, AttributeDataIBBuilder1);
+    AttributeDataIB::Builder & attributeDataIBBuilder1 = attributeDataIBsBuilder.CreateAttributeDataIBBuilder();
+    NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
+    BuildAttributeDataIB(apSuite, attributeDataIBBuilder1);
     // checkpoint
-    AttributeDataIBsBuilder.Checkpoint(checkpoint);
+    attributeDataIBsBuilder.Checkpoint(checkpoint);
     // encode another attribute element
-    AttributeDataIB::Builder AttributeDataIBBuilder2 = AttributeDataIBsBuilder.CreateAttributeDataIBBuilder();
-    NL_TEST_ASSERT(apSuite, AttributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
-    BuildAttributeDataIB(apSuite, AttributeDataIBBuilder2);
+    AttributeDataIB::Builder & attributeDataIBBuilder2 = attributeDataIBsBuilder.CreateAttributeDataIBBuilder();
+    NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
+    BuildAttributeDataIB(apSuite, attributeDataIBBuilder2);
     // rollback to previous checkpoint
-    AttributeDataIBsBuilder.Rollback(checkpoint);
+    attributeDataIBsBuilder.Rollback(checkpoint);
 
-    AttributeDataIBsBuilder.EndOfAttributeDataIBs();
-    NL_TEST_ASSERT(apSuite, AttributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
+    attributeDataIBsBuilder.EndOfAttributeDataIBs();
+    NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
 
     chip::System::PacketBufferHandle buf;
     err = writer.Finalize(&buf);

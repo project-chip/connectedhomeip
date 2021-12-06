@@ -4265,6 +4265,44 @@ class ApplianceControl(Cluster):
 
 
 @dataclass
+class PulseWidthModulation(Cluster):
+    id: typing.ClassVar[int] = 0x001C
+
+    class Attributes:
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = None
+
+
+@dataclass
 class Descriptor(Cluster):
     id: typing.ClassVar[int] = 0x001D
 
@@ -4370,6 +4408,236 @@ class Descriptor(Cluster):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x001D
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = None
+
+
+@dataclass
+class Binding(Cluster):
+    id: typing.ClassVar[int] = 0x001E
+
+    class Commands:
+        @dataclass
+        class Bind(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x001E
+            command_id: typing.ClassVar[int] = 0x0000
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="nodeId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="groupId", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="endpointId", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="clusterId", Tag=3, Type=uint),
+                    ])
+
+            nodeId: 'uint' = None
+            groupId: 'uint' = None
+            endpointId: 'uint' = None
+            clusterId: 'uint' = None
+
+        @dataclass
+        class Unbind(ClusterCommand):
+            cluster_id: typing.ClassVar[int] = 0x001E
+            command_id: typing.ClassVar[int] = 0x0001
+            is_client: typing.ClassVar[bool] = True
+
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="nodeId", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="groupId", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="endpointId", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="clusterId", Tag=3, Type=uint),
+                    ])
+
+            nodeId: 'uint' = None
+            groupId: 'uint' = None
+            endpointId: 'uint' = None
+            clusterId: 'uint' = None
+
+    class Attributes:
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = None
+
+
+@dataclass
+class AccessControl(Cluster):
+    id: typing.ClassVar[int] = 0x001F
+
+    class Enums:
+        class AuthMode(IntEnum):
+            kPase = 0x01
+            kCase = 0x02
+            kGroup = 0x03
+
+        class Privilege(IntEnum):
+            kView = 0x01
+            kProxyView = 0x02
+            kOperate = 0x03
+            kManage = 0x04
+            kAdminister = 0x05
+
+    class Structs:
+        @dataclass
+        class Target(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="cluster", Tag=0, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(
+                            Label="endpoint", Tag=1, Type=typing.Union[Nullable, uint]),
+                        ClusterObjectFieldDescriptor(
+                            Label="deviceType", Tag=2, Type=typing.Union[Nullable, uint]),
+                    ])
+
+            cluster: 'typing.Union[Nullable, uint]' = None
+            endpoint: 'typing.Union[Nullable, uint]' = None
+            deviceType: 'typing.Union[Nullable, uint]' = None
+
+        @dataclass
+        class AccessControlEntry(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="fabricIndex", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="privilege", Tag=1, Type=AccessControl.Enums.Privilege),
+                        ClusterObjectFieldDescriptor(
+                            Label="authMode", Tag=2, Type=AccessControl.Enums.AuthMode),
+                        ClusterObjectFieldDescriptor(
+                            Label="subjects", Tag=3, Type=typing.Union[Nullable, typing.List[uint]]),
+                        ClusterObjectFieldDescriptor(
+                            Label="targets", Tag=4, Type=typing.Union[Nullable, typing.List[AccessControl.Structs.Target]]),
+                    ])
+
+            fabricIndex: 'uint' = None
+            privilege: 'AccessControl.Enums.Privilege' = None
+            authMode: 'AccessControl.Enums.AuthMode' = None
+            subjects: 'typing.Union[Nullable, typing.List[uint]]' = None
+            targets: 'typing.Union[Nullable, typing.List[AccessControl.Structs.Target]]' = None
+
+        @dataclass
+        class ExtensionEntry(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="fabricIndex", Tag=0, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="data", Tag=1, Type=bytes),
+                    ])
+
+            fabricIndex: 'uint' = None
+            data: 'bytes' = None
+
+    class Attributes:
+        @dataclass
+        class Acl(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[AccessControl.Structs.AccessControlEntry])
+
+            value: 'typing.List[AccessControl.Structs.AccessControlEntry]' = None
+
+        @dataclass
+        class Extension(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[AccessControl.Structs.ExtensionEntry])
+
+            value: 'typing.List[AccessControl.Structs.ExtensionEntry]' = None
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x001F
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -5949,6 +6217,22 @@ class PowerSourceConfiguration(Cluster):
     id: typing.ClassVar[int] = 0x002E
 
     class Attributes:
+        @dataclass
+        class Sources(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x002E
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[uint])
+
+            value: 'typing.List[uint]' = None
+
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
@@ -10652,6 +10936,124 @@ class OperationalCredentials(Cluster):
 
 
 @dataclass
+class GroupKeyManagement(Cluster):
+    id: typing.ClassVar[int] = 0x003F
+
+    class Enums:
+        class GroupKeySecurityPolicy(IntEnum):
+            kStandard = 0x00
+            kLowLatency = 0x01
+
+    class Structs:
+        @dataclass
+        class GroupKey(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="vendorId", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeyIndex", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeyRoot", Tag=3, Type=bytes),
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeyEpochStartTime", Tag=4, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeySecurityPolicy", Tag=5, Type=GroupKeyManagement.Enums.GroupKeySecurityPolicy),
+                    ])
+
+            vendorId: 'uint' = None
+            groupKeyIndex: 'uint' = None
+            groupKeyRoot: 'bytes' = None
+            groupKeyEpochStartTime: 'uint' = None
+            groupKeySecurityPolicy: 'GroupKeyManagement.Enums.GroupKeySecurityPolicy' = None
+
+        @dataclass
+        class GroupState(ClusterObject):
+            @ChipUtility.classproperty
+            def descriptor(cls) -> ClusterObjectDescriptor:
+                return ClusterObjectDescriptor(
+                    Fields=[
+                        ClusterObjectFieldDescriptor(
+                            Label="vendorId", Tag=1, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="vendorGroupId", Tag=2, Type=uint),
+                        ClusterObjectFieldDescriptor(
+                            Label="groupKeySetIndex", Tag=3, Type=uint),
+                    ])
+
+            vendorId: 'uint' = None
+            vendorGroupId: 'uint' = None
+            groupKeySetIndex: 'uint' = None
+
+    class Attributes:
+        @dataclass
+        class Groups(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[GroupKeyManagement.Structs.GroupState])
+
+            value: 'typing.List[GroupKeyManagement.Structs.GroupState]' = None
+
+        @dataclass
+        class GroupKeys(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[GroupKeyManagement.Structs.GroupKey])
+
+            value: 'typing.List[GroupKeyManagement.Structs.GroupKey]' = None
+
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = None
+
+
+@dataclass
 class FixedLabel(Cluster):
     id: typing.ClassVar[int] = 0x0040
 
@@ -10779,6 +11181,120 @@ class UserLabel(Cluster):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0041
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = None
+
+
+@dataclass
+class ProxyConfiguration(Cluster):
+    id: typing.ClassVar[int] = 0x0042
+
+    class Attributes:
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0042
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0042
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = None
+
+
+@dataclass
+class ProxyDiscovery(Cluster):
+    id: typing.ClassVar[int] = 0x0043
+
+    class Attributes:
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0043
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0043
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFD
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = None
+
+
+@dataclass
+class ProxyValid(Cluster):
+    id: typing.ClassVar[int] = 0x0044
+
+    class Attributes:
+        @dataclass
+        class FeatureMap(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0044
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000FFFC
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
+
+            value: 'typing.Optional[uint]' = None
+
+        @dataclass
+        class ClusterRevision(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x0044
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:
@@ -25923,6 +26439,22 @@ class TestCluster(Cluster):
             value: 'int' = None
 
         @dataclass
+        class ListLongOctetString(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x050F
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x0000002A
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=typing.List[bytes])
+
+            value: 'typing.List[bytes]' = None
+
+        @dataclass
         class TimedWriteBoolean(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
@@ -29767,213 +30299,6 @@ class ElectricalMeasurement(Cluster):
             @ChipUtility.classproperty
             def cluster_id(cls) -> int:
                 return 0x0B04
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFFD
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-            value: 'uint' = None
-
-
-@dataclass
-class Binding(Cluster):
-    id: typing.ClassVar[int] = 0xF000
-
-    class Commands:
-        @dataclass
-        class Bind(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xF000
-            command_id: typing.ClassVar[int] = 0x0000
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(
-                            Label="nodeId", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupId", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="endpointId", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="clusterId", Tag=3, Type=uint),
-                    ])
-
-            nodeId: 'uint' = None
-            groupId: 'uint' = None
-            endpointId: 'uint' = None
-            clusterId: 'uint' = None
-
-        @dataclass
-        class Unbind(ClusterCommand):
-            cluster_id: typing.ClassVar[int] = 0xF000
-            command_id: typing.ClassVar[int] = 0x0001
-            is_client: typing.ClassVar[bool] = True
-
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(
-                            Label="nodeId", Tag=0, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupId", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="endpointId", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="clusterId", Tag=3, Type=uint),
-                    ])
-
-            nodeId: 'uint' = None
-            groupId: 'uint' = None
-            endpointId: 'uint' = None
-            clusterId: 'uint' = None
-
-    class Attributes:
-        @dataclass
-        class FeatureMap(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0xF000
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFFC
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class ClusterRevision(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0xF000
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFFD
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=uint)
-
-            value: 'uint' = None
-
-
-@dataclass
-class GroupKeyManagement(Cluster):
-    id: typing.ClassVar[int] = 0xF004
-
-    class Enums:
-        class GroupKeySecurityPolicy(IntEnum):
-            kStandard = 0x00
-            kLowLatency = 0x01
-
-    class Structs:
-        @dataclass
-        class GroupKey(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(
-                            Label="vendorId", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupKeyIndex", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupKeyRoot", Tag=3, Type=bytes),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupKeyEpochStartTime", Tag=4, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupKeySecurityPolicy", Tag=5, Type=GroupKeyManagement.Enums.GroupKeySecurityPolicy),
-                    ])
-
-            vendorId: 'uint' = None
-            groupKeyIndex: 'uint' = None
-            groupKeyRoot: 'bytes' = None
-            groupKeyEpochStartTime: 'uint' = None
-            groupKeySecurityPolicy: 'GroupKeyManagement.Enums.GroupKeySecurityPolicy' = None
-
-        @dataclass
-        class GroupState(ClusterObject):
-            @ChipUtility.classproperty
-            def descriptor(cls) -> ClusterObjectDescriptor:
-                return ClusterObjectDescriptor(
-                    Fields=[
-                        ClusterObjectFieldDescriptor(
-                            Label="vendorId", Tag=1, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="vendorGroupId", Tag=2, Type=uint),
-                        ClusterObjectFieldDescriptor(
-                            Label="groupKeySetIndex", Tag=3, Type=uint),
-                    ])
-
-            vendorId: 'uint' = None
-            vendorGroupId: 'uint' = None
-            groupKeySetIndex: 'uint' = None
-
-    class Attributes:
-        @dataclass
-        class Groups(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0xF004
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000000
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[GroupKeyManagement.Structs.GroupState])
-
-            value: 'typing.List[GroupKeyManagement.Structs.GroupState]' = None
-
-        @dataclass
-        class GroupKeys(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0xF004
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x00000001
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.List[GroupKeyManagement.Structs.GroupKey])
-
-            value: 'typing.List[GroupKeyManagement.Structs.GroupKey]' = None
-
-        @dataclass
-        class FeatureMap(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0xF004
-
-            @ChipUtility.classproperty
-            def attribute_id(cls) -> int:
-                return 0x0000FFFC
-
-            @ChipUtility.classproperty
-            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
-                return ClusterObjectFieldDescriptor(Type=typing.Optional[uint])
-
-            value: 'typing.Optional[uint]' = None
-
-        @dataclass
-        class ClusterRevision(ClusterAttributeDescriptor):
-            @ChipUtility.classproperty
-            def cluster_id(cls) -> int:
-                return 0xF004
 
             @ChipUtility.classproperty
             def attribute_id(cls) -> int:

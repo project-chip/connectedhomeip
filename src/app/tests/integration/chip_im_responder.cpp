@@ -67,21 +67,17 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
         chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
     }
 
-    chip::app::CommandPathParams commandPathParams = { kTestEndpointId, // Endpoint
-                                                       kTestGroupId,    // GroupId
-                                                       kTestClusterId,  // ClusterId
-                                                       kTestCommandId,  // CommandId
-                                                       (chip::app::CommandPathFlags::kEndpointIdValid) };
+    chip::app::ConcreteCommandPath path = {
+        kTestEndpointId, // Endpoint
+        kTestClusterId,  // ClusterId
+        kTestCommandId,  // CommandId
+    };
 
     // Add command data here
     if (statusCodeFlipper)
     {
-        chip::app::ConcreteCommandPath commandPath(kTestEndpointId, // Endpoint
-                                                   kTestClusterId,  // ClusterId
-                                                   kTestCommandId   // CommandId
-        );
         printf("responder constructing status code in command");
-        apCommandObj->AddStatus(commandPath, Protocols::InteractionModel::Status::Success);
+        apCommandObj->AddStatus(path, Protocols::InteractionModel::Status::Success);
     }
     else
     {
@@ -89,7 +85,7 @@ void DispatchSingleClusterCommand(const ConcreteCommandPath & aCommandPath, chip
 
         chip::TLV::TLVWriter * writer;
 
-        ReturnOnFailure(apCommandObj->PrepareCommand(commandPathParams));
+        ReturnOnFailure(apCommandObj->PrepareCommand(path));
 
         writer = apCommandObj->GetCommandDataIBTLVWriter();
         ReturnOnFailure(writer->Put(chip::TLV::ContextTag(kTestFieldId1), kTestFieldValue1));
@@ -111,18 +107,10 @@ void DispatchSingleClusterResponseCommand(const ConcreteCommandPath & aCommandPa
 }
 
 CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIB::Builder & aAttributeReport)
+                                 AttributeReportIBs::Builder & aAttributeReports,
+                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState)
 {
-    AttributeDataIB::Builder attributeData = aAttributeReport.CreateAttributeData();
-    attributeData.DataVersion(0);
-    ReturnErrorOnFailure(attributeData.GetError());
-    AttributePathIB::Builder attributePath = attributeData.CreatePath();
-    VerifyOrReturnError(aPath.mClusterId == kTestClusterId && aPath.mEndpointId == kTestEndpointId, CHIP_ERROR_INVALID_ARGUMENT);
-    attributePath.Endpoint(aPath.mEndpointId).Cluster(aPath.mClusterId).Attribute(aPath.mAttributeId).EndOfAttributePathIB();
-    ReturnErrorOnFailure(attributePath.GetError());
-    ReturnErrorOnFailure(AttributeValueEncoder(attributeData.GetWriter(), 0).Encode(kTestFieldValue1));
-    attributeData.EndOfAttributeDataIB();
-    ReturnErrorOnFailure(attributeData.GetError());
+    ReturnErrorOnFailure(AttributeValueEncoder(aAttributeReports, 0, aPath, 0).Encode(kTestFieldValue1));
     return CHIP_NO_ERROR;
 }
 

@@ -32,16 +32,16 @@ using namespace Protocols::InteractionModel;
 CHIP_ERROR WriteHandler::Init(InteractionModelDelegate * apDelegate)
 {
     IgnoreUnusedVariable(apDelegate);
-    VerifyOrReturnLogError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
-    VerifyOrReturnLogError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     mMessageWriter.Init(std::move(packet));
-    ReturnLogErrorOnFailure(mWriteResponseBuilder.Init(&mMessageWriter));
+    ReturnErrorOnFailure(mWriteResponseBuilder.Init(&mMessageWriter));
 
-    AttributeStatusIBs::Builder attributeStatusesBuilder = mWriteResponseBuilder.CreateWriteResponses();
-    ReturnLogErrorOnFailure(attributeStatusesBuilder.GetError());
+    mWriteResponseBuilder.CreateWriteResponses();
+    ReturnErrorOnFailure(mWriteResponseBuilder.GetError());
 
     MoveToState(State::Initialized);
 
@@ -263,29 +263,25 @@ exit:
 CHIP_ERROR WriteHandler::AddStatus(const AttributePathParams & aAttributePathParams,
                                    const Protocols::InteractionModel::Status aStatus)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    StatusIB::Builder statusIBBuilder;
+    AttributeStatusIBs::Builder & writeResponses   = mWriteResponseBuilder.GetWriteResponses();
+    AttributeStatusIB::Builder & attributeStatusIB = writeResponses.CreateAttributeStatus();
+    ReturnErrorOnFailure(writeResponses.GetError());
+
+    AttributePathIB::Builder & path = attributeStatusIB.CreatePath();
+    ReturnErrorOnFailure(attributeStatusIB.GetError());
+    ReturnErrorOnFailure(path.Encode(aAttributePathParams));
+
     StatusIB statusIB;
-    AttributeStatusIB::Builder attributeStatusIB = mWriteResponseBuilder.GetWriteResponses().CreateAttributeStatus();
-    err                                          = attributeStatusIB.GetError();
-    SuccessOrExit(err);
-
-    err = attributeStatusIB.CreatePath().Encode(aAttributePathParams);
-    SuccessOrExit(err);
-
-    statusIB.mStatus = aStatus;
-    statusIBBuilder  = attributeStatusIB.CreateErrorStatus();
+    statusIB.mStatus                    = aStatus;
+    StatusIB::Builder & statusIBBuilder = attributeStatusIB.CreateErrorStatus();
+    ReturnErrorOnFailure(attributeStatusIB.GetError());
     statusIBBuilder.EncodeStatusIB(statusIB);
-    err = statusIBBuilder.GetError();
-    SuccessOrExit(err);
-
+    ReturnErrorOnFailure(statusIBBuilder.GetError());
     attributeStatusIB.EndOfAttributeStatusIB();
-    err = attributeStatusIB.GetError();
-    SuccessOrExit(err);
-    MoveToState(State::AddStatus);
+    ReturnErrorOnFailure(attributeStatusIB.GetError());
 
-exit:
-    return err;
+    MoveToState(State::AddStatus);
+    return CHIP_NO_ERROR;
 }
 
 FabricIndex WriteHandler::GetAccessingFabricIndex() const

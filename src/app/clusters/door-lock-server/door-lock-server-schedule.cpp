@@ -197,10 +197,9 @@ bool emberAfDoorLockClusterGetWeekDayScheduleCallback(app::CommandHandler * comm
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
-                                             Commands::GetWeekDayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+        app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ::Id, Commands::GetWeekDayScheduleResponse::Id };
+        TLV::TLVWriter * writer       = nullptr;
+        SuccessOrExit(err = commandObj->PrepareCommand(path));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), scheduleId));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), userId));
@@ -302,10 +301,9 @@ bool emberAfDoorLockClusterGetYearDayScheduleCallback(app::CommandHandler * comm
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
-                                             Commands::GetYearDayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+        app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ::Id, Commands::GetYearDayScheduleResponse::Id };
+        TLV::TLVWriter * writer       = nullptr;
+        SuccessOrExit(err = commandObj->PrepareCommand(path));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), scheduleId));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), userId));
@@ -407,10 +405,9 @@ bool emberAfDoorLockClusterGetHolidayScheduleCallback(app::CommandHandler * comm
     }
 
     {
-        app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ::Id,
-                                             Commands::GetHolidayScheduleResponse::Id, (app::CommandPathFlags::kEndpointIdValid) };
-        TLV::TLVWriter * writer          = nullptr;
-        SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+        app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ::Id, Commands::GetHolidayScheduleResponse::Id };
+        TLV::TLVWriter * writer       = nullptr;
+        SuccessOrExit(err = commandObj->PrepareCommand(path));
         VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
         SuccessOrExit(err = writer->Put(TLV::ContextTag(0), holidayScheduleId));
         SuccessOrExit(err = writer->Put(TLV::ContextTag(1), zclStatus));

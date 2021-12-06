@@ -169,5 +169,25 @@ CommandPathIB::Builder & CommandPathIB::Builder::EndOfCommandPathIB()
     return *this;
 }
 
+CHIP_ERROR CommandPathIB::Builder::Encode(const CommandPathParams & aCommandPathParams)
+{
+    if (aCommandPathParams.mFlags.Has(CommandPathFlags::kEndpointIdValid))
+    {
+        EndpointId(aCommandPathParams.mEndpointId);
+    }
+
+    ClusterId(aCommandPathParams.mClusterId).CommandId(aCommandPathParams.mCommandId).EndOfCommandPathIB();
+    return GetError();
+}
+
+CHIP_ERROR CommandPathIB::Builder::Encode(const ConcreteCommandPath & aConcreteCommandPath)
+{
+    EndpointId(aConcreteCommandPath.mEndpointId)
+        .ClusterId(aConcreteCommandPath.mClusterId)
+        .CommandId(aConcreteCommandPath.mCommandId)
+        .EndOfCommandPathIB();
+    return GetError();
+}
+
 }; // namespace app
 }; // namespace chip

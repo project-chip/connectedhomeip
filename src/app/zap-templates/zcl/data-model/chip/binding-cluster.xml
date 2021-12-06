@@ -15,28 +15,28 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="CHIP"/>
+  <domain name="CHIP" />
   <cluster>
     <domain>General</domain>
     <name>Binding</name>
-    <code>0xF000</code>
+    <code>0x001e</code>
     <define>BINDING_CLUSTER</define>
     <client init="false" tick="false">true</client>
     <server init="false" tick="false">true</server>
     <description>The Binding Cluster is meant to replace the support from the Zigbee Device Object (ZDO) for supporting the binding table.</description>
     <command source="client" code="0x00" name="Bind" optional="false">
       <description>Add a binding</description>
-      <arg name="nodeId" type="NODE_ID"/>
-      <arg name="groupId" type="GROUP_ID"/>
-      <arg name="endpointId" type="ENDPOINT_NO"/>
-      <arg name="clusterId" type="CLUSTER_ID"/>
+      <arg name="nodeId" type="NODE_ID" />
+      <arg name="groupId" type="GROUP_ID" />
+      <arg name="endpointId" type="ENDPOINT_NO" />
+      <arg name="clusterId" type="CLUSTER_ID" />
     </command>
     <command source="client" code="0x01" name="Unbind" optional="false">
       <description>Remove a binding</description>
-      <arg name="nodeId" type="NODE_ID"/>
-      <arg name="groupId" type="GROUP_ID"/>
-      <arg name="endpointId" type="ENDPOINT_NO"/>
-      <arg name="clusterId" type="CLUSTER_ID"/>
+      <arg name="nodeId" type="NODE_ID" />
+      <arg name="groupId" type="GROUP_ID" />
+      <arg name="endpointId" type="ENDPOINT_NO" />
+      <arg name="clusterId" type="CLUSTER_ID" />
     </command>
   </cluster>
 </configurator>

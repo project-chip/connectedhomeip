@@ -33,15 +33,15 @@ struct AttributePathParams
     //
     // TODO: (#11420) This class is overlapped with ClusterInfo class, need to do a clean up.
     AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId) :
-        AttributePathParams(aEndpointId, aClusterId, ClusterInfo::kInvalidAttributeId, ClusterInfo::kInvalidListIndex)
+        AttributePathParams(aEndpointId, aClusterId, ClusterInfo::kInvalidAttributeId, kInvalidListIndex)
     {}
 
     AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId) :
-        AttributePathParams(aEndpointId, aClusterId, aAttributeId, ClusterInfo::kInvalidListIndex)
+        AttributePathParams(aEndpointId, aClusterId, aAttributeId, kInvalidListIndex)
     {}
 
     AttributePathParams(ClusterId aClusterId, AttributeId aAttributeId) :
-        AttributePathParams(kInvalidEndpointId, aClusterId, aAttributeId, ClusterInfo::kInvalidListIndex)
+        AttributePathParams(kInvalidEndpointId, aClusterId, aAttributeId, kInvalidListIndex)
     {}
 
     AttributePathParams(EndpointId aEndpointId, ClusterId aClusterId, AttributeId aAttributeId, ListIndex aListIndex) :
@@ -63,12 +63,12 @@ struct AttributePathParams
     inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
     inline bool HasWildcardClusterId() const { return mClusterId == ClusterInfo::kInvalidClusterId; }
     inline bool HasWildcardAttributeId() const { return mAttributeId == ClusterInfo::kInvalidAttributeId; }
-    inline bool HasWildcardListIndex() const { return mListIndex == ClusterInfo::kInvalidListIndex; }
+    inline bool HasWildcardListIndex() const { return mListIndex == kInvalidListIndex; }
 
     EndpointId mEndpointId   = kInvalidEndpointId;
     ClusterId mClusterId     = ClusterInfo::kInvalidClusterId;
     AttributeId mAttributeId = ClusterInfo::kInvalidAttributeId;
-    ListIndex mListIndex     = ClusterInfo::kInvalidListIndex;
+    ListIndex mListIndex     = kInvalidListIndex;
 };
 } // namespace app
 } // namespace chip

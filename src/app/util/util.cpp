@@ -309,6 +309,21 @@ void MatterOnOffSwitchConfigurationPluginServerInitCallback() {}
 void MatterPowerSourcePluginServerInitCallback() {}
 void MatterThermostatUserInterfaceConfigurationPluginServerInitCallback() {}
 void MatterBridgedDeviceBasicInformationPluginServerInitCallback() {}
+void MatterPowerConfigurationPluginServerInitCallback() {}
+void MatterPowerProfilePluginServerInitCallback() {}
+void MatterPulseWidthModulationPluginServerInitCallback() {}
+void MatterAlarmsPluginServerInitCallback() {}
+void MatterTimePluginServerInitCallback() {}
+void MatterAclPluginServerInitCallback() {}
+void MatterPollControlPluginServerInitCallback() {}
+void MatterLocalizationConfigurationPluginServerInitCallback() {}
+void MatterLocalizationUnitPluginServerInitCallback() {}
+void MatterLocalizationTimeFormatPluginServerInitCallback() {}
+void MatterUserLabelPluginServerInitCallback() {}
+void MatterTimeSynchronizationPluginServerInitCallback() {}
+void MatterProxyValidPluginServerInitCallback() {}
+void MatterProxyDiscoveryPluginServerInitCallback() {}
+void MatterProxyConfigurationPluginServerInitCallback() {}
 
 // ****************************************
 // This function is called by the application when the stack goes down,
@@ -767,15 +782,15 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
 {
     uint8_t frameControl;
 
-    if (chip::app::Compatibility::IMEmberAfSendDefaultResponseWithCallback(status))
-    {
-        // If the compatibility can handle this response
-        return EMBER_SUCCESS;
-    }
-
     // Default Response commands are only sent in response to unicast commands.
     if (cmd->type != EMBER_INCOMING_UNICAST && cmd->type != EMBER_INCOMING_UNICAST_REPLY)
     {
+        return EMBER_SUCCESS;
+    }
+
+    if (chip::app::Compatibility::IMEmberAfSendDefaultResponseWithCallback(status))
+    {
+        // If the compatibility can handle this response
         return EMBER_SUCCESS;
     }
 

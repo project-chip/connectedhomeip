@@ -78,20 +78,6 @@ public:
         delete onReportBooleanStateClusterRevisionCallback;
         delete onReportBridgedActionsSetupUrlCallback;
         delete onReportBridgedActionsClusterRevisionCallback;
-        delete onReportBridgedDeviceBasicVendorNameCallback;
-        delete onReportBridgedDeviceBasicVendorIDCallback;
-        delete onReportBridgedDeviceBasicProductNameCallback;
-        delete onReportBridgedDeviceBasicNodeLabelCallback;
-        delete onReportBridgedDeviceBasicHardwareVersionCallback;
-        delete onReportBridgedDeviceBasicHardwareVersionStringCallback;
-        delete onReportBridgedDeviceBasicSoftwareVersionCallback;
-        delete onReportBridgedDeviceBasicSoftwareVersionStringCallback;
-        delete onReportBridgedDeviceBasicManufacturingDateCallback;
-        delete onReportBridgedDeviceBasicPartNumberCallback;
-        delete onReportBridgedDeviceBasicProductURLCallback;
-        delete onReportBridgedDeviceBasicProductLabelCallback;
-        delete onReportBridgedDeviceBasicSerialNumberCallback;
-        delete onReportBridgedDeviceBasicReachableCallback;
         delete onReportBridgedDeviceBasicClusterRevisionCallback;
         delete onReportColorControlCurrentHueCallback;
         delete onReportColorControlCurrentSaturationCallback;
@@ -617,7 +603,7 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x000F, 0xFFFD,
                                        onReportBinaryInputBasicClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0xF000, 0xFFFD, onReportBindingClusterRevisionCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x001E, 0xFFFD, onReportBindingClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0045, 0x0000, onReportBooleanStateStateValueCallback->Cancel(),
                                        BasicAttributeFilter<BooleanAttributeCallback>);
@@ -628,42 +614,6 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0025, 0xFFFD,
                                        onReportBridgedActionsClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0001, onReportBridgedDeviceBasicVendorNameCallback->Cancel(),
-                                       BasicAttributeFilter<CharStringAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0002, onReportBridgedDeviceBasicVendorIDCallback->Cancel(),
-                                       BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0003,
-                                       onReportBridgedDeviceBasicProductNameCallback->Cancel(),
-                                       BasicAttributeFilter<CharStringAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0005, onReportBridgedDeviceBasicNodeLabelCallback->Cancel(),
-                                       BasicAttributeFilter<CharStringAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0007,
-                                       onReportBridgedDeviceBasicHardwareVersionCallback->Cancel(),
-                                       BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0008,
-                                       onReportBridgedDeviceBasicHardwareVersionStringCallback->Cancel(),
-                                       BasicAttributeFilter<CharStringAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0009,
-                                       onReportBridgedDeviceBasicSoftwareVersionCallback->Cancel(),
-                                       BasicAttributeFilter<Int32uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x000A,
-                                       onReportBridgedDeviceBasicSoftwareVersionStringCallback->Cancel(),
-                                       BasicAttributeFilter<CharStringAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x000B,
-                                       onReportBridgedDeviceBasicManufacturingDateCallback->Cancel(),
-                                       BasicAttributeFilter<CharStringAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x000C, onReportBridgedDeviceBasicPartNumberCallback->Cancel(),
-                                       BasicAttributeFilter<CharStringAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x000D, onReportBridgedDeviceBasicProductURLCallback->Cancel(),
-                                       BasicAttributeFilter<CharStringAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x000E,
-                                       onReportBridgedDeviceBasicProductLabelCallback->Cancel(),
-                                       BasicAttributeFilter<CharStringAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x000F,
-                                       onReportBridgedDeviceBasicSerialNumberCallback->Cancel(),
-                                       BasicAttributeFilter<CharStringAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0x0011, onReportBridgedDeviceBasicReachableCallback->Cancel(),
-                                       BasicAttributeFilter<BooleanAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0xFFFD,
                                        onReportBridgedDeviceBasicClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
@@ -906,7 +856,7 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0033, 0xFFFD,
                                        onReportGeneralDiagnosticsClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0xF004, 0xFFFD,
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003F, 0xFFFD,
                                        onReportGroupKeyManagementClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0004, 0x0000, onReportGroupsNameSupportCallback->Cancel(),
@@ -1878,34 +1828,6 @@ private:
         new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportBridgedActionsClusterRevisionCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicVendorNameCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBridgedDeviceBasicVendorIDCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicProductNameCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicNodeLabelCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBridgedDeviceBasicHardwareVersionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicHardwareVersionStringCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportBridgedDeviceBasicSoftwareVersionCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicSoftwareVersionStringCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicManufacturingDateCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicPartNumberCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicProductURLCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicProductLabelCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedDeviceBasicSerialNumberCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportBridgedDeviceBasicReachableCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
     chip::Callback::Callback<Int16uAttributeCallback> * onReportBridgedDeviceBasicClusterRevisionCallback =
         new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
     chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentHueCallback =

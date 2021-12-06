@@ -17,6 +17,19 @@ limitations under the License.
 -->
 <configurator>
     <deviceType>
+        <name>MA-orphan</name>
+        <domain>CHIP</domain>
+        <typeName>Matter Orphan Clusters</typeName>
+        <profileId editable="false">0x0103</profileId>
+        <deviceId editable="false">0xF001</deviceId>
+        <clusters lockOthers="true">
+            <include cluster="Proxy Configuration" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Proxy Discovery" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Proxy Valid" client="false" server="true" clientLocked="true" serverLocked="true"/>
+            <include cluster="Pulse Width Modulation" client="false" server="true" clientLocked="true" serverLocked="true"/>
+        </clusters>
+    </deviceType>
+    <deviceType>
         <name>MA-rootdevice</name>
         <domain>CHIP</domain>
         <typeName>Matter Root Node</typeName>
@@ -62,7 +75,7 @@ limitations under the License.
             <include cluster="Diagnostic Logs" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Software Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Ethernet Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Wifi Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="WiFi Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Thread Network Diagnostics" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
@@ -194,7 +207,7 @@ limitations under the License.
             <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="Bridged Device Basic Information" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Bridged Device Basic" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Power Source Configuration" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Power Source" client="false" server="true" clientLocked="true" serverLocked="true"></include>
         </clusters>
@@ -877,7 +890,7 @@ limitations under the License.
                 <requireCommand>GetSceneMembership</requireCommand>
                 <requireCommand>GetSceneMembershipResponse</requireCommand>
             </include>
-            <include cluster="On/off" client="false" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>ON_OFF</requireAttribute>
                 <requireCommand>Off</requireCommand>
                 <requireCommand>On</requireCommand>
@@ -892,7 +905,7 @@ limitations under the License.
                 <requireAttribute>Capacity</requireAttribute>
                 <requireAttribute>OperationMode</requireAttribute>
             </include>
-            <include cluster="Level" client="false" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Level Control" client="false" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Temperature Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Pressure Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Flow Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
@@ -1198,7 +1211,7 @@ limitations under the License.
                 <requireCommand>GetSceneMembership</requireCommand>
                 <requireCommand>GetSceneMembershipResponse</requireCommand>
             </include>
-            <include cluster="On/off" client="true" server="false" clientLocked="true" serverLocked="true">
+            <include cluster="On/Off" client="true" server="false" clientLocked="true" serverLocked="true">
                 <requireAttribute>ON_OFF</requireAttribute>
                 <requireCommand>Off</requireCommand>
                 <requireCommand>On</requireCommand>
@@ -1272,7 +1285,8 @@ limitations under the License.
                 <requireCommand>GetSceneMembershipResponse</requireCommand>
             </include>
             <include cluster="Switch" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="FixedLabel" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Fixed Label" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="User Label" client="false" server="false" clientLocked="true" serverLocked="false"></include>
         </clusters>
     </deviceType>
     <deviceType>
@@ -1635,8 +1649,8 @@ limitations under the License.
             </include>
             <include cluster="Door Lock" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Alarms" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="PollControl" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="ElectricalMeasurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Poll Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Electrical Measurement" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Time" client="false" server="false" clientLocked="false" serverLocked="true"></include>
             <include cluster="Time Synchronization" client="false" server="false" clientLocked="false" serverLocked="false"></include>
         </clusters>
@@ -1856,9 +1870,9 @@ limitations under the License.
                 <requireCommand>AddGroupIfIdentifying</requireCommand>
             </include>
             <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="Fancontrol" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Levelcontrol" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="On/off" client="false" server="true" clientLocked="true" serverLocked="true"></include>
+            <include cluster="Fan Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Level Control" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="true" serverLocked="true"></include>
             <include cluster="Time" client="false" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
@@ -1920,11 +1934,11 @@ limitations under the License.
             </include>
             <include cluster="Alarms" client="false" server="false" clientLocked="true" serverLocked="false"></include>
             <include cluster="Thermostat" client="false" server="true" clientLocked="true" serverLocked="true"></include>
-            <include cluster="ThermostatUserInterfaceConfiguration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
-            <include cluster="Fancontrol" client="false" server="false" clientLocked="false" serverLocked="false"></include>
-            <include cluster="Temperaturemeasurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
-            <include cluster="OccupancySensing" client="false" server="false" clientLocked="false" serverLocked="false"></include>
-            <include cluster="RelativeHumidityMeasurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Thermostat User Interface Configuration" client="false" server="false" clientLocked="true" serverLocked="false"></include>
+            <include cluster="Fan Control" client="false" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Temperature Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Occupancy Sensing" client="false" server="false" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Relative Humidity Measurement" client="false" server="false" clientLocked="false" serverLocked="false"></include>
             <include cluster="Time" client="false" server="false" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
@@ -1955,11 +1969,11 @@ limitations under the License.
             <include cluster="Keypad Input" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Application Launcher" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Media Input" client="false" server="true" clientLocked="false" serverLocked="false"></include>
-            <include cluster="On/off" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="TV Channel" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Audio Output" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Low Power" client="false" server="true" clientLocked="false" serverLocked="false"></include>
-            <include cluster="Wake On LAN" client="false" server="true" clientLocked="false" serverLocked="false"></include>
+            <include cluster="Wake on LAN" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Target Navigator" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Account Login" client="false" server="true" clientLocked="false" serverLocked="false"></include>
             <include cluster="Content Launcher" client="false" server="true" clientLocked="false" serverLocked="false"></include>
@@ -1988,7 +2002,7 @@ limitations under the License.
             <include cluster="Binding" client="true" server="false" clientLocked="false" serverLocked="true">
                 <requireAttribute>BINDING</requireAttribute>
             </include>
-            <include cluster="On/off" client="false" server="true" clientLocked="false" serverLocked="true"></include>
+            <include cluster="On/Off" client="false" server="true" clientLocked="false" serverLocked="true"></include>
             <include cluster="Level Control" client="false" server="true" clientLocked="false" serverLocked="true"></include>
         </clusters>
     </deviceType>
@@ -2205,7 +2219,7 @@ limitations under the License.
                 <requireCommand>StepWithOnOff</requireCommand>
                 <requireCommand>StopWithOnOff</requireCommand>
             </include>
-            <include cluster="On/off" client="true" server="true" clientLocked="true" serverLocked="true">
+            <include cluster="On/Off" client="true" server="true" clientLocked="true" serverLocked="true">
                 <requireAttribute>ON_OFF</requireAttribute>
                 <requireCommand>Off</requireCommand>
                 <requireCommand>On</requireCommand>
