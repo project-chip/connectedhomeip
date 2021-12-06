@@ -58,12 +58,14 @@ typedef void (*CHIPApplicationBasicClusterApplicationNameAttributeCallbackType)(
     void *, chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo::DecodableArgType);
 typedef void (*CHIPApplicationBasicClusterProductIdAttributeCallbackType)(
     void *, chip::app::Clusters::ApplicationBasic::Attributes::ProductId::TypeInfo::DecodableArgType);
-typedef void (*CHIPApplicationBasicClusterApplicationIdAttributeCallbackType)(
-    void *, chip::app::Clusters::ApplicationBasic::Attributes::ApplicationId::TypeInfo::DecodableArgType);
-typedef void (*CHIPApplicationBasicClusterCatalogVendorIdAttributeCallbackType)(
-    void *, chip::app::Clusters::ApplicationBasic::Attributes::CatalogVendorId::TypeInfo::DecodableArgType);
+typedef void (*CHIPApplicationBasicClusterApplicationAppAttributeCallbackType)(
+    void *, chip::app::Clusters::ApplicationBasic::Attributes::ApplicationApp::TypeInfo::DecodableArgType);
 typedef void (*CHIPApplicationBasicClusterApplicationStatusAttributeCallbackType)(
     void *, chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo::DecodableArgType);
+typedef void (*CHIPApplicationBasicClusterApplicationVersionAttributeCallbackType)(
+    void *, chip::app::Clusters::ApplicationBasic::Attributes::ApplicationVersion::TypeInfo::DecodableArgType);
+typedef void (*CHIPApplicationBasicClusterAllowedVendorListAttributeCallbackType)(
+    void *, const chip::app::Clusters::ApplicationBasic::Attributes::AllowedVendorList::TypeInfo::DecodableType &);
 typedef void (*CHIPApplicationBasicClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::ApplicationBasic::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPApplicationBasicClusterClusterRevisionAttributeCallbackType)(
@@ -73,10 +75,8 @@ typedef void (*CHIPApplicationLauncherClusterLaunchAppResponseCallbackType)(
 
 typedef void (*CHIPApplicationLauncherClusterApplicationLauncherListAttributeCallbackType)(
     void *, const chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherList::TypeInfo::DecodableType &);
-typedef void (*CHIPApplicationLauncherClusterCatalogVendorIdAttributeCallbackType)(
-    void *, chip::app::Clusters::ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo::DecodableArgType);
-typedef void (*CHIPApplicationLauncherClusterApplicationIdAttributeCallbackType)(
-    void *, chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationId::TypeInfo::DecodableArgType);
+typedef void (*CHIPApplicationLauncherClusterApplicationLauncherAppAttributeCallbackType)(
+    void *, chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherApp::TypeInfo::DecodableArgType);
 typedef void (*CHIPApplicationLauncherClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::ApplicationLauncher::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPApplicationLauncherClusterClusterRevisionAttributeCallbackType)(
@@ -301,8 +301,8 @@ typedef void (*CHIPContentLauncherClusterLaunchURLResponseCallbackType)(
 
 typedef void (*CHIPContentLauncherClusterAcceptsHeaderListAttributeCallbackType)(
     void *, const chip::app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::TypeInfo::DecodableType &);
-typedef void (*CHIPContentLauncherClusterSupportedStreamingTypesAttributeCallbackType)(
-    void *, const chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::TypeInfo::DecodableType &);
+typedef void (*CHIPContentLauncherClusterSupportedStreamingProtocolsAttributeCallbackType)(
+    void *, chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingProtocols::TypeInfo::DecodableArgType);
 typedef void (*CHIPContentLauncherClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::ContentLauncher::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPContentLauncherClusterClusterRevisionAttributeCallbackType)(
@@ -595,8 +595,6 @@ typedef void (*CHIPMediaPlaybackClusterStartTimeAttributeCallbackType)(
     void *, chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo::DecodableArgType);
 typedef void (*CHIPMediaPlaybackClusterDurationAttributeCallbackType)(
     void *, chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo::DecodableArgType);
-typedef void (*CHIPMediaPlaybackClusterPositionUpdatedAtAttributeCallbackType)(
-    void *, chip::app::Clusters::MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo::DecodableArgType);
 typedef void (*CHIPMediaPlaybackClusterPositionAttributeCallbackType)(
     void *, chip::app::Clusters::MediaPlayback::Attributes::Position::TypeInfo::DecodableArgType);
 typedef void (*CHIPMediaPlaybackClusterPlaybackSpeedAttributeCallbackType)(
@@ -894,12 +892,12 @@ typedef void (*CHIPSwitchClusterClusterRevisionAttributeCallbackType)(
 typedef void (*CHIPTvChannelClusterChangeChannelResponseCallbackType)(
     void *, const chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType &);
 
-typedef void (*CHIPTvChannelClusterTvChannelListAttributeCallbackType)(
-    void *, const chip::app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo::DecodableType &);
-typedef void (*CHIPTvChannelClusterTvChannelLineupAttributeCallbackType)(
-    void *, chip::app::Clusters::TvChannel::Attributes::TvChannelLineup::TypeInfo::DecodableArgType);
-typedef void (*CHIPTvChannelClusterCurrentTvChannelAttributeCallbackType)(
-    void *, chip::app::Clusters::TvChannel::Attributes::CurrentTvChannel::TypeInfo::DecodableArgType);
+typedef void (*CHIPTvChannelClusterChannelListAttributeCallbackType)(
+    void *, const chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo::DecodableType &);
+typedef void (*CHIPTvChannelClusterChannelLineupAttributeCallbackType)(
+    void *, chip::app::Clusters::TvChannel::Attributes::ChannelLineup::TypeInfo::DecodableArgType);
+typedef void (*CHIPTvChannelClusterCurrentChannelAttributeCallbackType)(
+    void *, chip::app::Clusters::TvChannel::Attributes::CurrentChannel::TypeInfo::DecodableArgType);
 typedef void (*CHIPTvChannelClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::TvChannel::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPTvChannelClusterClusterRevisionAttributeCallbackType)(
@@ -909,6 +907,8 @@ typedef void (*CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType)(
 
 typedef void (*CHIPTargetNavigatorClusterTargetNavigatorListAttributeCallbackType)(
     void *, const chip::app::Clusters::TargetNavigator::Attributes::TargetNavigatorList::TypeInfo::DecodableType &);
+typedef void (*CHIPTargetNavigatorClusterCurrentNavigatorTargetAttributeCallbackType)(
+    void *, chip::app::Clusters::TargetNavigator::Attributes::CurrentNavigatorTarget::TypeInfo::DecodableArgType);
 typedef void (*CHIPTargetNavigatorClusterAttributeListAttributeCallbackType)(
     void *, const chip::app::Clusters::TargetNavigator::Attributes::AttributeList::TypeInfo::DecodableType &);
 typedef void (*CHIPTargetNavigatorClusterClusterRevisionAttributeCallbackType)(
