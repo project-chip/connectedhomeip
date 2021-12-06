@@ -107,7 +107,7 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t mySessionId,
-                              SessionEstablishmentDelegate * delegate);
+                              Optional<ReliableMessageProtocolConfig> mrpConfig, SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -123,7 +123,8 @@ public:
      * @return CHIP_ERROR     The result of initialization
      */
     CHIP_ERROR WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt, uint16_t passcodeID,
-                              uint16_t mySessionId, SessionEstablishmentDelegate * delegate);
+                              uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                              SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -141,7 +142,8 @@ public:
      * @return CHIP_ERROR      The result of initialization
      */
     CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t mySessionId,
-                    Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate);
+                    Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
+                    SessionEstablishmentDelegate * delegate);
 
     /**
      * @brief
@@ -303,6 +305,8 @@ private:
     Messaging::ExchangeContext * mExchangeCtxt = nullptr;
 
     SessionEstablishmentExchangeDispatch mMessageDispatch;
+
+    Optional<ReliableMessageProtocolConfig> mLocalMRPConfig;
 
     struct Spake2pErrorMsg
     {

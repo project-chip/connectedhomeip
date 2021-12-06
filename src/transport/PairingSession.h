@@ -29,6 +29,7 @@
 #include <messaging/ExchangeContext.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
+#include <system/TLVPacketBufferBackingStore.h>
 #include <transport/CryptoContext.h>
 #include <transport/SecureSession.h>
 
@@ -158,6 +159,11 @@ protected:
 
         return err;
     }
+
+    static CHIP_ERROR EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,
+                                          System::PacketBufferTLVWriter & tlvWriter);
+
+    CHIP_ERROR DecodeMRPParametersIfPresent(System::PacketBufferTLVReader & tlvReader);
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear()

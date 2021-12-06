@@ -251,7 +251,8 @@ CHIP_ERROR PASESession::SetupSpake2p(uint32_t pbkdf2IterCount, const ByteSpan & 
 }
 
 CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                                       uint16_t mySessionId, SessionEstablishmentDelegate * delegate)
+                                       uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                                       SessionEstablishmentDelegate * delegate)
 {
     // Return early on error here, as we have not initalized any state yet
     ReturnErrorCodeIf(salt.empty(), CHIP_ERROR_INVALID_ARGUMENT);
@@ -281,6 +282,7 @@ CHIP_ERROR PASESession::WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2I
     mNextExpectedMsg = MsgType::PBKDFParamRequest;
     mPairingComplete = false;
     mPasscodeID      = 0;
+    mLocalMRPConfig  = mrpConfig;
 
     ChipLogDetail(SecureChannel, "Waiting for PBKDF param request");
 
@@ -293,9 +295,10 @@ exit:
 }
 
 CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint32_t pbkdf2IterCount, const ByteSpan & salt,
-                                       uint16_t passcodeID, uint16_t mySessionId, SessionEstablishmentDelegate * delegate)
+                                       uint16_t passcodeID, uint16_t mySessionId, Optional<ReliableMessageProtocolConfig> mrpConfig,
+                                       SessionEstablishmentDelegate * delegate)
 {
-    ReturnErrorOnFailure(WaitForPairing(0, pbkdf2IterCount, salt, mySessionId, delegate));
+    ReturnErrorOnFailure(WaitForPairing(0, pbkdf2IterCount, salt, mySessionId, mrpConfig, delegate));
 
     memmove(&mPASEVerifier, &verifier, sizeof(verifier));
     mComputeVerifier = false;
@@ -305,7 +308,8 @@ CHIP_ERROR PASESession::WaitForPairing(const PASEVerifier & verifier, uint32_t p
 }
 
 CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint16_t mySessionId,
-                             Messaging::ExchangeContext * exchangeCtxt, SessionEstablishmentDelegate * delegate)
+                             Optional<ReliableMessageProtocolConfig> mrpConfig, Messaging::ExchangeContext * exchangeCtxt,
+                             SessionEstablishmentDelegate * delegate)
 {
     ReturnErrorCodeIf(exchangeCtxt == nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     CHIP_ERROR err = Init(mySessionId, peerSetUpPINCode, delegate);
@@ -315,6 +319,8 @@ CHIP_ERROR PASESession::Pair(const Transport::PeerAddress peerAddress, uint32_t 
     mExchangeCtxt->SetResponseTimeout(kSpake2p_Response_Timeout);
 
     SetPeerAddress(peerAddress);
+
+    mLocalMRPConfig = mrpConfig;
 
     err = SendPBKDFParamRequest();
     SuccessOrExit(err);
@@ -355,13 +361,14 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
 {
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
-    const size_t max_msg_len       = TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize, // initiatorRandom,
+    const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
+    const size_t max_msg_len   = TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize, // initiatorRandom,
                                                            sizeof(uint16_t),            // initiatorSessionId
                                                            sizeof(uint16_t),            // passcodeId,
-                                                           sizeof(uint8_t)              // hasPBKDFParameters
-                                                           /* TLV::EstimateStructOverhead(sizeof(uint16_t),
-                                                              sizeof(uint16)_t), // initiatorMRPParams */
+                                                           sizeof(uint8_t),             // hasPBKDFParameters
+                                                           mrpParamsSize                // MRP Parameters
     );
+
     System::PacketBufferHandle req = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!req.IsNull(), CHIP_ERROR_NO_MEMORY);
 
@@ -374,9 +381,11 @@ CHIP_ERROR PASESession::SendPBKDFParamRequest()
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), GetLocalSessionId()));
     ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), mPasscodeID));
     ReturnErrorOnFailure(tlvWriter.PutBoolean(TLV::ContextTag(4), mHavePBKDFParameters));
-    // TODO - Add optional MRP parameter support to PASE
-    // When we add MRP params here, adjust the TLV::EstimateStructOverhead call
-    // above accordingly.
+    if (mLocalMRPConfig.HasValue())
+    {
+        ChipLogDetail(SecureChannel, "Including MRP parameters in PBKDF param request");
+        ReturnErrorOnFailure(EncodeMRPParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriter));
+    }
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&req));
 
@@ -433,7 +442,7 @@ CHIP_ERROR PASESession::HandlePBKDFParamRequest(System::PacketBufferHandle && ms
     VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
     SuccessOrExit(err = tlvReader.Get(hasPBKDFParameters));
 
-    // TODO - Check if optional MRP parameters were sent. If so, cache them.
+    SuccessOrExit(err = DecodeMRPParametersIfPresent(tlvReader));
 
     err = SendPBKDFParamResponse(ByteSpan(initiatorRandom), hasPBKDFParameters);
     SuccessOrExit(err);
@@ -453,14 +462,15 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
 {
     ReturnErrorOnFailure(DRBG_get_bytes(mPBKDFLocalRandomData, sizeof(mPBKDFLocalRandomData)));
 
+    const size_t mrpParamsSize = mLocalMRPConfig.HasValue() ? TLV::EstimateStructOverhead(sizeof(uint16_t), sizeof(uint16_t)) : 0;
     const size_t max_msg_len =
-        TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize,                               // initiatorRandom
-                                    kPBKDFParamRandomNumberSize,                               // responderRandom
-                                    sizeof(uint16_t),                                          // responderSessionId
-                                    TLV::EstimateStructOverhead(sizeof(uint32_t), mSaltLength) // pbkdf_parameters
-                                    /* TLV::EstimateStructOverhead(sizeof(uint16_t),
-                                        sizeof(uint16)_t), // responderMRPParams */
+        TLV::EstimateStructOverhead(kPBKDFParamRandomNumberSize,                                // initiatorRandom
+                                    kPBKDFParamRandomNumberSize,                                // responderRandom
+                                    sizeof(uint16_t),                                           // responderSessionId
+                                    TLV::EstimateStructOverhead(sizeof(uint32_t), mSaltLength), // pbkdf_parameters
+                                    mrpParamsSize                                               // MRP Parameters
         );
+
     System::PacketBufferHandle resp = System::PacketBufferHandle::New(max_msg_len);
     VerifyOrReturnError(!resp.IsNull(), CHIP_ERROR_NO_MEMORY);
 
@@ -483,8 +493,11 @@ CHIP_ERROR PASESession::SendPBKDFParamResponse(ByteSpan initiatorRandom, bool in
         ReturnErrorOnFailure(tlvWriter.EndContainer(pbkdfParamContainer));
     }
 
-    // When we add MRP params here, adjust the TLV::EstimateStructOverhead call
-    // above accordingly.
+    if (mLocalMRPConfig.HasValue())
+    {
+        ChipLogDetail(SecureChannel, "Including MRP parameters in PBKDF param response");
+        ReturnErrorOnFailure(EncodeMRPParameters(TLV::ContextTag(5), mLocalMRPConfig.Value(), tlvWriter));
+    }
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize(&resp));
@@ -549,6 +562,8 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
 
     if (mHavePBKDFParameters)
     {
+        SuccessOrExit(err = DecodeMRPParametersIfPresent(tlvReader));
+
         // TODO - Add a unit test that exercises mHavePBKDFParameters path
         err = SetupSpake2p(mIterationCount, ByteSpan(mSalt, mSaltLength));
         SuccessOrExit(err);
@@ -567,6 +582,10 @@ CHIP_ERROR PASESession::HandlePBKDFParamResponse(System::PacketBufferHandle && m
         VerifyOrExit(TLV::TagNumFromTag(tlvReader.GetTag()) == ++decodeTagIdSeq, err = CHIP_ERROR_INVALID_TLV_TAG);
         saltLength = tlvReader.GetLength();
         SuccessOrExit(err = tlvReader.GetDataPtr(salt));
+
+        SuccessOrExit(err = tlvReader.ExitContainer(containerType));
+
+        SuccessOrExit(err = DecodeMRPParametersIfPresent(tlvReader));
 
         err = SetupSpake2p(iterCount, ByteSpan(salt, saltLength));
         SuccessOrExit(err);
