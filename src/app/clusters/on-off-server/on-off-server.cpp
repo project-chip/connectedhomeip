@@ -138,8 +138,12 @@ EmberAfStatus OnOffServer::setOnOffValue(chip::EndpointId endpoint, uint8_t comm
             Attributes::OffWaitTime::Set(endpoint, 0);
 
             // Stop timer on the endpoint
-            emberEventControlSetInactive(getEventControl(endpoint));
-            emberAfOnOffClusterPrintln("On/Toggle Command - Stop Timer");
+            EmberEventControl * event = getEventControl(endpoint);
+            if (event != nullptr)
+            {
+                emberEventControlSetInactive(event);
+                emberAfOnOffClusterPrintln("On/Toggle Command - Stop Timer");
+            }
         }
 
         Attributes::GlobalSceneControl::Set(endpoint, true);
@@ -352,10 +356,15 @@ bool OnOffServer::OnWithRecallGlobalSceneCommand()
 
 bool OnOffServer::OnWithTimedOffCommand(BitFlags<OnOffControl> onOffControl, uint16_t onTime, uint16_t offWaitTime)
 {
-    EmberAfStatus status      = EMBER_ZCL_STATUS_SUCCESS;
-    chip::EndpointId endpoint = emberAfCurrentEndpoint();
+    EmberAfStatus status        = EMBER_ZCL_STATUS_SUCCESS;
+    chip::EndpointId endpoint   = emberAfCurrentEndpoint();
+    bool isOn                   = false;
+    uint16_t currentOffWaitTime = MAX_TIME_VALUE;
+    uint16_t currentOnTime      = 0;
 
-    bool isOn = false;
+    EmberEventControl * event = configureEventControl(endpoint);
+    VerifyOrExit(event != nullptr, status = EMBER_ZCL_STATUS_UNSUPPORTED_ENDPOINT);
+
     OnOff::Attributes::OnOff::Get(endpoint, &isOn);
 
     // OnOff is off and the commands is only accepted if on
@@ -365,10 +374,7 @@ bool OnOffServer::OnWithTimedOffCommand(BitFlags<OnOffControl> onOffControl, uin
         return true;
     }
 
-    uint16_t currentOffWaitTime = MAX_TIME_VALUE;
     OnOff::Attributes::OffWaitTime::Get(endpoint, &currentOffWaitTime);
-
-    uint16_t currentOnTime = 0;
     OnOff::Attributes::OnTime::Get(endpoint, &currentOnTime);
 
     if (currentOffWaitTime > 0 && !isOn)
@@ -397,6 +403,7 @@ bool OnOffServer::OnWithTimedOffCommand(BitFlags<OnOffControl> onOffControl, uin
         emberEventControlSetDelayMS(configureEventControl(endpoint), UPDATE_TIME_MS);
     }
 
+exit:
     emberAfSendImmediateDefaultResponse(status);
     return true;
 }
@@ -498,8 +505,15 @@ bool OnOffServer::areStartUpOnOffServerAttributesTokenized(EndpointId endpoint)
  */
 EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint)
 {
-    uint16_t index = emberAfFindClusterServerEndpointIndex(endpoint, OnOff::Id);
-    return &eventControls[index];
+    uint16_t index            = emberAfFindClusterServerEndpointIndex(endpoint, OnOff::Id);
+    EmberEventControl * event = nullptr;
+
+    if (index < EMBER_AF_ON_OFF_CLUSTER_SERVER_ENDPOINT_COUNT)
+    {
+        event = &eventControls[index];
+    }
+
+    return event;
 }
 
 /**
@@ -511,6 +525,7 @@ EmberEventControl * OnOffServer::getEventControl(EndpointId endpoint)
 EmberEventControl * OnOffServer::configureEventControl(EndpointId endpoint)
 {
     EmberEventControl * controller = getEventControl(endpoint);
+    VerifyOrReturnError(controller != nullptr, nullptr);
 
     controller->endpoint = endpoint;
     controller->callback = &onOffWaitTimeOffEventHandler;
