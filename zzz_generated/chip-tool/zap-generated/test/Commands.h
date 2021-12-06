@@ -31621,18 +31621,6 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Read attribute Application Launcher list\n");
             err = TestReadAttributeApplicationLauncherList_1();
             break;
-        case 2:
-            ChipLogProgress(chipTool, " ***** Test Step 2 : Launch App Command\n");
-            err = TestLaunchAppCommand_2();
-            break;
-        case 3:
-            ChipLogProgress(chipTool, " ***** Test Step 3 : Read attribute catalog vendor id\n");
-            err = TestReadAttributeCatalogVendorId_3();
-            break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read attribute application id\n");
-            err = TestReadAttributeApplicationId_4();
-            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -31644,7 +31632,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 2;
 
     static void OnFailureCallback_1(void * context, EmberAfStatus status)
     {
@@ -31654,26 +31642,6 @@ private:
     static void OnSuccessCallback_1(void * context, const chip::app::DataModel::DecodableList<uint16_t> & applicationLauncherList)
     {
         (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_1(applicationLauncherList);
-    }
-
-    static void OnFailureCallback_3(void * context, EmberAfStatus status)
-    {
-        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_3(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_3(void * context, uint8_t catalogVendorId)
-    {
-        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_3(catalogVendorId);
-    }
-
-    static void OnFailureCallback_4(void * context, EmberAfStatus status)
-    {
-        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_4(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_4(void * context, uint8_t applicationId)
-    {
-        (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_4(applicationId);
     }
 
     //
@@ -31706,74 +31674,6 @@ private:
         VerifyOrReturn(CheckNextListItemDecodes<decltype(applicationLauncherList)>("applicationLauncherList", iter, 1));
         VerifyOrReturn(CheckValue("applicationLauncherList[1]", iter.GetValue(), 456U));
         VerifyOrReturn(CheckNoMoreListItems<decltype(applicationLauncherList)>("applicationLauncherList", iter, 2));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestLaunchAppCommand_2()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        using RequestType               = chip::app::Clusters::ApplicationLauncher::Commands::LaunchApp::Type;
-
-        RequestType request;
-        request.data            = chip::Span<const char>("exampleDatagarbage: not in length on purpose", 11);
-        request.catalogVendorId = 1U;
-        request.applicationId   = chip::Span<const char>("appIdgarbage: not in length on purpose", 5);
-
-        auto success = [](void * context, const typename RequestType::ResponseType & data) {
-            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnSuccessResponse_2(data.status, data.data);
-        };
-
-        auto failure = [](void * context, EmberAfStatus status) {
-            (static_cast<TV_ApplicationLauncherCluster *>(context))->OnFailureResponse_2(status);
-        };
-
-        ReturnErrorOnFailure(chip::Controller::InvokeCommand(mDevices[kIdentityAlpha], this, success, failure, endpoint, request));
-        return CHIP_NO_ERROR;
-    }
-
-    void OnFailureResponse_2(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_2(chip::app::Clusters::ApplicationLauncher::ApplicationLauncherStatus status, chip::CharSpan data)
-    {
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadAttributeCatalogVendorId_3()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::ApplicationLauncherClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo>(
-            this, OnSuccessCallback_3, OnFailureCallback_3);
-    }
-
-    void OnFailureResponse_3(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_3(uint8_t catalogVendorId)
-    {
-        VerifyOrReturn(CheckValue("catalogVendorId", catalogVendorId, 0));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadAttributeApplicationId_4()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 1;
-        chip::Controller::ApplicationLauncherClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationId::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4);
-    }
-
-    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_4(uint8_t applicationId)
-    {
-        VerifyOrReturn(CheckValue("applicationId", applicationId, 0));
 
         NextTest();
     }
@@ -32117,10 +32017,6 @@ public:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Read attribute product id\n");
             err = TestReadAttributeProductId_3();
             break;
-        case 4:
-            ChipLogProgress(chipTool, " ***** Test Step 4 : Read attribute catalog vendor id\n");
-            err = TestReadAttributeCatalogVendorId_4();
-            break;
         }
 
         if (CHIP_NO_ERROR != err)
@@ -32132,7 +32028,7 @@ public:
 
 private:
     std::atomic_uint16_t mTestIndex;
-    const uint16_t mTestCount = 5;
+    const uint16_t mTestCount = 4;
 
     static void OnFailureCallback_2(void * context, EmberAfStatus status)
     {
@@ -32152,16 +32048,6 @@ private:
     static void OnSuccessCallback_3(void * context, uint16_t productId)
     {
         (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_3(productId);
-    }
-
-    static void OnFailureCallback_4(void * context, EmberAfStatus status)
-    {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnFailureResponse_4(chip::to_underlying(status));
-    }
-
-    static void OnSuccessCallback_4(void * context, uint16_t catalogVendorId)
-    {
-        (static_cast<TV_ApplicationBasicCluster *>(context))->OnSuccessResponse_4(catalogVendorId);
     }
 
     //
@@ -32232,25 +32118,6 @@ private:
     void OnSuccessResponse_3(uint16_t productId)
     {
         VerifyOrReturn(CheckValue("productId", productId, 1U));
-
-        NextTest();
-    }
-
-    CHIP_ERROR TestReadAttributeCatalogVendorId_4()
-    {
-        const chip::EndpointId endpoint = mEndpointId.HasValue() ? mEndpointId.Value() : 3;
-        chip::Controller::ApplicationBasicClusterTest cluster;
-        cluster.Associate(mDevices[kIdentityAlpha], endpoint);
-
-        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::CatalogVendorId::TypeInfo>(
-            this, OnSuccessCallback_4, OnFailureCallback_4);
-    }
-
-    void OnFailureResponse_4(uint8_t status) { ThrowFailureResponse(); }
-
-    void OnSuccessResponse_4(uint16_t catalogVendorId)
-    {
-        VerifyOrReturn(CheckValue("catalogVendorId", catalogVendorId, 1U));
 
         NextTest();
     }
@@ -32736,9 +32603,9 @@ private:
     static void OnSuccessCallback_1(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> &
-            tvChannelList)
+            channelList)
     {
-        (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_1(tvChannelList);
+        (static_cast<TV_TvChannelCluster *>(context))->OnSuccessResponse_1(channelList);
     }
 
     //
@@ -32757,34 +32624,32 @@ private:
         chip::Controller::TvChannelClusterTest cluster;
         cluster.Associate(mDevices[kIdentityAlpha], endpoint);
 
-        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo>(this, OnSuccessCallback_1,
-                                                                                                          OnFailureCallback_1);
+        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::ChannelList::TypeInfo>(this, OnSuccessCallback_1,
+                                                                                                        OnFailureCallback_1);
     }
 
     void OnFailureResponse_1(uint8_t status) { ThrowFailureResponse(); }
 
     void OnSuccessResponse_1(
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> &
-            tvChannelList)
+            channelList)
     {
-        auto iter = tvChannelList.begin();
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(tvChannelList)>("tvChannelList", iter, 0));
-        VerifyOrReturn(CheckValue("tvChannelList[0].majorNumber", iter.GetValue().majorNumber, 1U));
-        VerifyOrReturn(CheckValue("tvChannelList[0].minorNumber", iter.GetValue().minorNumber, 2U));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[0].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
-        VerifyOrReturn(
-            CheckValueAsString("tvChannelList[0].callSign", iter.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[0].affiliateCallSign", iter.GetValue().affiliateCallSign,
+        auto iter = channelList.begin();
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter, 0));
+        VerifyOrReturn(CheckValue("channelList[0].majorNumber", iter.GetValue().majorNumber, 1U));
+        VerifyOrReturn(CheckValue("channelList[0].minorNumber", iter.GetValue().minorNumber, 2U));
+        VerifyOrReturn(CheckValueAsString("channelList[0].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
+        VerifyOrReturn(CheckValueAsString("channelList[0].callSign", iter.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
+        VerifyOrReturn(CheckValueAsString("channelList[0].affiliateCallSign", iter.GetValue().affiliateCallSign,
                                           chip::CharSpan("exampleASign", 12)));
-        VerifyOrReturn(CheckNextListItemDecodes<decltype(tvChannelList)>("tvChannelList", iter, 1));
-        VerifyOrReturn(CheckValue("tvChannelList[1].majorNumber", iter.GetValue().majorNumber, 2U));
-        VerifyOrReturn(CheckValue("tvChannelList[1].minorNumber", iter.GetValue().minorNumber, 3U));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[1].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
-        VerifyOrReturn(
-            CheckValueAsString("tvChannelList[1].callSign", iter.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
-        VerifyOrReturn(CheckValueAsString("tvChannelList[1].affiliateCallSign", iter.GetValue().affiliateCallSign,
+        VerifyOrReturn(CheckNextListItemDecodes<decltype(channelList)>("channelList", iter, 1));
+        VerifyOrReturn(CheckValue("channelList[1].majorNumber", iter.GetValue().majorNumber, 2U));
+        VerifyOrReturn(CheckValue("channelList[1].minorNumber", iter.GetValue().minorNumber, 3U));
+        VerifyOrReturn(CheckValueAsString("channelList[1].name", iter.GetValue().name, chip::CharSpan("exampleName", 11)));
+        VerifyOrReturn(CheckValueAsString("channelList[1].callSign", iter.GetValue().callSign, chip::CharSpan("exampleCSign", 12)));
+        VerifyOrReturn(CheckValueAsString("channelList[1].affiliateCallSign", iter.GetValue().affiliateCallSign,
                                           chip::CharSpan("exampleASign", 12)));
-        VerifyOrReturn(CheckNoMoreListItems<decltype(tvChannelList)>("tvChannelList", iter, 2));
+        VerifyOrReturn(CheckNoMoreListItems<decltype(channelList)>("channelList", iter, 2));
 
         NextTest();
     }
