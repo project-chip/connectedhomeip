@@ -2316,6 +2316,23 @@ using CHIP_ERROR = ::chip::ChipError;
 #define CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS           CHIP_CORE_ERROR(0xd6)
 
 /**
+ * @def CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB
+ *
+ * @brief
+ *   The ClusterPathIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB             CHIP_CORE_ERROR(0xd6)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB
+ *
+ * @brief
+ *   The DataVersionFilterIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB             CHIP_CORE_ERROR(0xd7)
+/**
  *  @}
  */
 
