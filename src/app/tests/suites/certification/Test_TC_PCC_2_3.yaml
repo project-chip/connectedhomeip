@@ -26,12 +26,14 @@ tests:
     - label: "Write 0 to the OperationMode attribute to DUT"
       command: "writeAttribute"
       attribute: "OperationMode"
+      PICS: A_OPERATIONMODE
       arguments:
           value: 0
 
     - label: "Reads the attribute: EffectiveOperationMode"
       command: "readAttribute"
       attribute: "EffectiveOperationMode"
+      PICS: A_EFFECTIVEOPERATIONMODE
       response:
           value: 0
 
@@ -39,6 +41,7 @@ tests:
       disabled: true
       command: "writeAttribute"
       attribute: "ControlMode"
+      PICS: A_CONTROLMODE
       arguments:
           value: 0
 
@@ -46,6 +49,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "EffectiveControlMode"
+      PICS: A_EFFECTIVECONTROLMODE
       response:
           value: 0
 
@@ -53,6 +57,7 @@ tests:
       disabled: true
       command: "writeAttribute"
       attribute: "ControlMode"
+      PICS: A_CONTROLMODE
       arguments:
           value: 1
 
@@ -60,6 +65,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "EffectiveControlMode"
+      PICS: A_EFFECTIVECONTROLMODE
       response:
           value: 1
 
@@ -67,6 +73,7 @@ tests:
       disabled: true
       command: "writeAttribute"
       attribute: "ControlMode"
+      PICS: A_CONTROLMODE
       arguments:
           value: 2
 
@@ -74,6 +81,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "EffectiveControlMode"
+      PICS: A_EFFECTIVECONTROLMODE
       response:
           value: 2
 
@@ -81,6 +89,7 @@ tests:
       disabled: true
       command: "writeAttribute"
       attribute: "ControlMode"
+      PICS: A_CONTROLMODE
       arguments:
           value: 3
 
@@ -88,6 +97,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "EffectiveControlMode"
+      PICS: A_EFFECTIVECONTROLMODE
       response:
           value: 3
 
@@ -95,6 +105,7 @@ tests:
       disabled: true
       command: "writeAttribute"
       attribute: "ControlMode"
+      PICS: A_CONTROLMODE
       arguments:
           value: 5
 
@@ -102,6 +113,7 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "EffectiveControlMode"
+      PICS: A_EFFECTIVECONTROLMODE
       response:
           value: 5
 
@@ -109,6 +121,7 @@ tests:
       disabled: true
       command: "writeAttribute"
       attribute: "ControlMode"
+      PICS: A_CONTROLMODE
       arguments:
           value: 7
 
@@ -116,5 +129,6 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "EffectiveControlMode"
+      PICS: A_EFFECTIVECONTROLMODE
       response:
           value: 7

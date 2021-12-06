@@ -793,35 +793,35 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads PresentValue attribute from DUT\n");
-            err = TestReadsPresentValueAttributeFromDut_1();
+            err = ShouldSkip("A_PRESENTVALUE") ? CHIP_NO_ERROR : TestReadsPresentValueAttributeFromDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads OutOfService attribute from DUT\n");
-            err = TestReadsOutOfServiceAttributeFromDut_2();
+            err = ShouldSkip("A_OUTOFSERVICE") ? CHIP_NO_ERROR : TestReadsOutOfServiceAttributeFromDut_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Reads StatusFlags attribute from DUT\n");
-            err = TestReadsStatusFlagsAttributeFromDut_3();
+            err = ShouldSkip("A_STATUSFLAGS") ? CHIP_NO_ERROR : TestReadsStatusFlagsAttributeFromDut_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Reads PresentValue attribute from DUT\n");
-            err = TestReadsPresentValueAttributeFromDut_4();
+            err = ShouldSkip("A_PRESENTVALUE") ? CHIP_NO_ERROR : TestReadsPresentValueAttributeFromDut_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Reads OutOfService attribute from DUT\n");
-            err = TestReadsOutOfServiceAttributeFromDut_5();
+            err = ShouldSkip("A_OUTOFSERVICE") ? CHIP_NO_ERROR : TestReadsOutOfServiceAttributeFromDut_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Reads StatusFlags attribute from DUT\n");
-            err = TestReadsStatusFlagsAttributeFromDut_6();
+            err = ShouldSkip("A_STATUSFLAGS") ? CHIP_NO_ERROR : TestReadsStatusFlagsAttributeFromDut_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Reads StatusFlags attribute from DUT\n");
-            err = TestReadsStatusFlagsAttributeFromDut_7();
+            err = ShouldSkip("A_STATUSFLAGS") ? CHIP_NO_ERROR : TestReadsStatusFlagsAttributeFromDut_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Reads StatusFlags attribute from DUT\n");
-            err = TestReadsStatusFlagsAttributeFromDut_8();
+            err = ShouldSkip("A_STATUSFLAGS") ? CHIP_NO_ERROR : TestReadsStatusFlagsAttributeFromDut_8();
             break;
         }
 
@@ -11275,79 +11275,80 @@ public:
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_3();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Read ColorLoopActive attribute from DUT\n");
-            err = TestReadColorLoopActiveAttributeFromDut_4();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_5();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Read ColorLoopDirection attribute from DUT\n");
-            err = TestReadColorLoopDirectionAttributeFromDut_6();
+            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_7();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Read ColorLoopTime attribute from DUT\n");
-            err = TestReadColorLoopTimeAttributeFromDut_8();
+            err = ShouldSkip("A_COLORLOOPTIME") ? CHIP_NO_ERROR : TestReadColorLoopTimeAttributeFromDut_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_9();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : Read ColorLoopStartEnhancedHue attribute from DUT\n");
-            err = TestReadColorLoopStartEnhancedHueAttributeFromDut_10();
+            err =
+                ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE") ? CHIP_NO_ERROR : TestReadColorLoopStartEnhancedHueAttributeFromDut_10();
             break;
         case 11:
             ChipLogProgress(chipTool, " ***** Test Step 11 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_11();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_11();
             break;
         case 12:
             ChipLogProgress(chipTool, " ***** Test Step 12 : Read ColorLoopActive attribute from DUT\n");
-            err = TestReadColorLoopActiveAttributeFromDut_12();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_13();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_13();
             break;
         case 14:
             ChipLogProgress(chipTool, " ***** Test Step 14 : Read ColorLoopActive attribute from DUT\n");
-            err = TestReadColorLoopActiveAttributeFromDut_14();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_14();
             break;
         case 15:
             ChipLogProgress(chipTool, " ***** Test Step 15 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_15();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_15();
             break;
         case 16:
             ChipLogProgress(chipTool, " ***** Test Step 16 : Read ColorLoopDirection attribute from DUT\n");
-            err = TestReadColorLoopDirectionAttributeFromDut_16();
+            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_16();
             break;
         case 17:
             ChipLogProgress(chipTool, " ***** Test Step 17 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_17();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_17();
             break;
         case 18:
             ChipLogProgress(chipTool, " ***** Test Step 18 : Read ColorLoopActive attribute from DUT\n");
-            err = TestReadColorLoopActiveAttributeFromDut_18();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_18();
             break;
         case 19:
             ChipLogProgress(chipTool, " ***** Test Step 19 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_19();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_19();
             break;
         case 20:
             ChipLogProgress(chipTool, " ***** Test Step 20 : Read ColorLoopActive attribute from DUT\n");
-            err = TestReadColorLoopActiveAttributeFromDut_20();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_20();
             break;
         case 21:
             ChipLogProgress(chipTool, " ***** Test Step 21 : Enhanced Move To Hue command 10\n");
-            err = TestEnhancedMoveToHueCommand10_21();
+            err = ShouldSkip("CR_ENHANCEDMOVETOHUE") ? CHIP_NO_ERROR : TestEnhancedMoveToHueCommand10_21();
             break;
         case 22:
             ChipLogProgress(chipTool, " ***** Test Step 22 : Wait 2000ms\n");
@@ -11355,55 +11356,55 @@ public:
             break;
         case 23:
             ChipLogProgress(chipTool, " ***** Test Step 23 : Read EnhancedCurrentHue attribute from DUT\n");
-            err = TestReadEnhancedCurrentHueAttributeFromDut_23();
+            err = ShouldSkip("A_ENHANCEDCURRENTHUE") ? CHIP_NO_ERROR : TestReadEnhancedCurrentHueAttributeFromDut_23();
             break;
         case 24:
             ChipLogProgress(chipTool, " ***** Test Step 24 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_24();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_24();
             break;
         case 25:
             ChipLogProgress(chipTool, " ***** Test Step 25 : Read ColorLoopDirection attribute from DUT\n");
-            err = TestReadColorLoopDirectionAttributeFromDut_25();
+            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_25();
             break;
         case 26:
             ChipLogProgress(chipTool, " ***** Test Step 26 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_26();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_26();
             break;
         case 27:
             ChipLogProgress(chipTool, " ***** Test Step 27 : Read ColorLoopActive attribute from DUT\n");
-            err = TestReadColorLoopActiveAttributeFromDut_27();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_27();
             break;
         case 28:
             ChipLogProgress(chipTool, " ***** Test Step 28 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_28();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_28();
             break;
         case 29:
             ChipLogProgress(chipTool, " ***** Test Step 29 : Read ColorLoopActive attribute from DUT\n");
-            err = TestReadColorLoopActiveAttributeFromDut_29();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_29();
             break;
         case 30:
             ChipLogProgress(chipTool, " ***** Test Step 30 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_30();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_30();
             break;
         case 31:
             ChipLogProgress(chipTool, " ***** Test Step 31 : Read ColorLoopDirection attribute from DUT\n");
-            err = TestReadColorLoopDirectionAttributeFromDut_31();
+            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_31();
             break;
         case 32:
             ChipLogProgress(chipTool, " ***** Test Step 32 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_32();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_32();
             break;
         case 33:
             ChipLogProgress(chipTool, " ***** Test Step 33 : Read ColorLoopActive attribute from DUT\n");
-            err = TestReadColorLoopActiveAttributeFromDut_33();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_33();
             break;
         case 34:
             ChipLogProgress(chipTool, " ***** Test Step 34 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_34();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_34();
             break;
         case 35:
             ChipLogProgress(chipTool, " ***** Test Step 35 : Read ColorLoopActive attribute from DUT\n");
-            err = TestReadColorLoopActiveAttributeFromDut_35();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_35();
             break;
         case 36:
             ChipLogProgress(chipTool, " ***** Test Step 36 : Turn Off light for color control tests\n");
@@ -12500,47 +12501,47 @@ public:
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_3();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Read ColorLoopActive attribute from DUT\n");
-            err = TestReadColorLoopActiveAttributeFromDut_4();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Read ColorLoopDirection attribute from DUT.\n");
-            err = TestReadColorLoopDirectionAttributeFromDut_5();
+            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Read ColorLoopTime attribute from DUT.\n");
-            err = TestReadColorLoopTimeAttributeFromDut_6();
+            err = ShouldSkip("A_COLORLOOPTIME") ? CHIP_NO_ERROR : TestReadColorLoopTimeAttributeFromDut_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Read ColorLoopStartEnhancedHue attribute from DUT.\n");
-            err = TestReadColorLoopStartEnhancedHueAttributeFromDut_7();
+            err = ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE") ? CHIP_NO_ERROR : TestReadColorLoopStartEnhancedHueAttributeFromDut_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Color Loop Set Command - Set all Attributes\n");
-            err = TestColorLoopSetCommandSetAllAttributes_8();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestColorLoopSetCommandSetAllAttributes_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : Read ColorLoopActive attribute from DUT.\n");
-            err = TestReadColorLoopActiveAttributeFromDut_9();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : Color Loop Set Command - Start Color Loop\n");
-            err = TestColorLoopSetCommandStartColorLoop_10();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestColorLoopSetCommandStartColorLoop_10();
             break;
         case 11:
             ChipLogProgress(chipTool, " ***** Test Step 11 : Read ColorLoopDirection attribute from DUT.\n");
-            err = TestReadColorLoopDirectionAttributeFromDut_11();
+            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_11();
             break;
         case 12:
             ChipLogProgress(chipTool, " ***** Test Step 12 : Color Loop Set Command - Start Color Loop\n");
-            err = TestColorLoopSetCommandStartColorLoop_12();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestColorLoopSetCommandStartColorLoop_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : Read ColorLoopActive attribute from DUT\n");
-            err = TestReadColorLoopActiveAttributeFromDut_13();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_13();
             break;
         case 14:
             ChipLogProgress(chipTool, " ***** Test Step 14 : Turn off light for color control tests\n");
@@ -13012,47 +13013,47 @@ public:
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Sends ColorLoopSet Command - Set all Attributes\n");
-            err = TestSendsColorLoopSetCommandSetAllAttributes_3();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestSendsColorLoopSetCommandSetAllAttributes_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Read ColorLoopActive attribute from DUT\n");
-            err = TestReadColorLoopActiveAttributeFromDut_4();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Read ColorLoopDirection attribute from DUT.\n");
-            err = TestReadColorLoopDirectionAttributeFromDut_5();
+            err = ShouldSkip("A_COLORLOOPDIRECTION") ? CHIP_NO_ERROR : TestReadColorLoopDirectionAttributeFromDut_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Read ColorLoopTime attribute from DUT.\n");
-            err = TestReadColorLoopTimeAttributeFromDut_6();
+            err = ShouldSkip("A_COLORLOOPTIME") ? CHIP_NO_ERROR : TestReadColorLoopTimeAttributeFromDut_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Read ColorLoopStartEnhancedHue attribute from DUT.\n");
-            err = TestReadColorLoopStartEnhancedHueAttributeFromDut_7();
+            err = ShouldSkip("A_COLORLOOPSTARTENHANCEDHUE") ? CHIP_NO_ERROR : TestReadColorLoopStartEnhancedHueAttributeFromDut_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Color Loop Set Command - Set all Attributes\n");
-            err = TestColorLoopSetCommandSetAllAttributes_8();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestColorLoopSetCommandSetAllAttributes_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : Read ColorLoopActive attribute from DUT.\n");
-            err = TestReadColorLoopActiveAttributeFromDut_9();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : Color Loop Set Command - Start Color Loop\n");
-            err = TestColorLoopSetCommandStartColorLoop_10();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestColorLoopSetCommandStartColorLoop_10();
             break;
         case 11:
             ChipLogProgress(chipTool, " ***** Test Step 11 : Read ColorLoopTime attribute from DUT.\n");
-            err = TestReadColorLoopTimeAttributeFromDut_11();
+            err = ShouldSkip("A_COLORLOOPTIME") ? CHIP_NO_ERROR : TestReadColorLoopTimeAttributeFromDut_11();
             break;
         case 12:
             ChipLogProgress(chipTool, " ***** Test Step 12 : Color Loop Set Command - Start Color Loop\n");
-            err = TestColorLoopSetCommandStartColorLoop_12();
+            err = ShouldSkip("CR_COLORLOOPSET") ? CHIP_NO_ERROR : TestColorLoopSetCommandStartColorLoop_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : Read ColorLoopActive attribute from DUT\n");
-            err = TestReadColorLoopActiveAttributeFromDut_13();
+            err = ShouldSkip("A_COLORLOOPACTIVE") ? CHIP_NO_ERROR : TestReadColorLoopActiveAttributeFromDut_13();
             break;
         case 14:
             ChipLogProgress(chipTool, " ***** Test Step 14 : Turn off light for color control tests\n");
@@ -18324,11 +18325,11 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads Occupancy attribute from DUT\n");
-            err = TestReadsOccupancyAttributeFromDut_1();
+            err = ShouldSkip("A_OCCUPANCY") ? CHIP_NO_ERROR : TestReadsOccupancyAttributeFromDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads Occupancy attribute from DUT\n");
-            err = TestReadsOccupancyAttributeFromDut_2();
+            err = ShouldSkip("A_OCCUPANCY") ? CHIP_NO_ERROR : TestReadsOccupancyAttributeFromDut_2();
             break;
         }
 
@@ -19696,7 +19697,7 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Send On Command\n");
-            err = TestSendOnCommand_1();
+            err = ShouldSkip("CR_ON") ? CHIP_NO_ERROR : TestSendOnCommand_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Wait 1000ms\n");
@@ -19704,15 +19705,15 @@ public:
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Reads OnOff attribute from DUT\n");
-            err = TestReadsOnOffAttributeFromDut_3();
+            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Reads GlobalSceneControl attribute from DUT\n");
-            err = TestReadsGlobalSceneControlAttributeFromDut_4();
+            err = ShouldSkip("A_GLOBALSCENECONTROL") ? CHIP_NO_ERROR : TestReadsGlobalSceneControlAttributeFromDut_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Send On Command\n");
-            err = TestSendOnCommand_5();
+            err = ShouldSkip("CR_ON") ? CHIP_NO_ERROR : TestSendOnCommand_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Wait 1000ms\n");
@@ -19720,15 +19721,15 @@ public:
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Reads OnOff attribute from DUT\n");
-            err = TestReadsOnOffAttributeFromDut_7();
+            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Reads GlobalSceneControl attribute from DUT\n");
-            err = TestReadsGlobalSceneControlAttributeFromDut_8();
+            err = ShouldSkip("A_GLOBALSCENECONTROL") ? CHIP_NO_ERROR : TestReadsGlobalSceneControlAttributeFromDut_8();
             break;
         case 9:
             ChipLogProgress(chipTool, " ***** Test Step 9 : Send On Command\n");
-            err = TestSendOnCommand_9();
+            err = ShouldSkip("CR_ON") ? CHIP_NO_ERROR : TestSendOnCommand_9();
             break;
         case 10:
             ChipLogProgress(chipTool, " ***** Test Step 10 : Wait 1000ms\n");
@@ -19736,147 +19737,147 @@ public:
             break;
         case 11:
             ChipLogProgress(chipTool, " ***** Test Step 11 : Reads OnOff attribute from DUT\n");
-            err = TestReadsOnOffAttributeFromDut_11();
+            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_11();
             break;
         case 12:
             ChipLogProgress(chipTool, " ***** Test Step 12 : Reads GlobalSceneControl attribute from DUT\n");
-            err = TestReadsGlobalSceneControlAttributeFromDut_12();
+            err = ShouldSkip("A_GLOBALSCENECONTROL") ? CHIP_NO_ERROR : TestReadsGlobalSceneControlAttributeFromDut_12();
             break;
         case 13:
             ChipLogProgress(chipTool, " ***** Test Step 13 : Reads OnTime attribute from DUT\n");
-            err = TestReadsOnTimeAttributeFromDut_13();
+            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_13();
             break;
         case 14:
             ChipLogProgress(chipTool, " ***** Test Step 14 : Reads OffWaitTime attribute from DUT\n");
-            err = TestReadsOffWaitTimeAttributeFromDut_14();
+            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_14();
             break;
         case 15:
             ChipLogProgress(chipTool, " ***** Test Step 15 : Send On Command\n");
-            err = TestSendOnCommand_15();
+            err = ShouldSkip("CR_ON") ? CHIP_NO_ERROR : TestSendOnCommand_15();
             break;
         case 16:
             ChipLogProgress(chipTool, " ***** Test Step 16 : Reads OnOff attribute from DUT\n");
-            err = TestReadsOnOffAttributeFromDut_16();
+            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_16();
             break;
         case 17:
             ChipLogProgress(chipTool, " ***** Test Step 17 : Reads OnTime attribute from DUT\n");
-            err = TestReadsOnTimeAttributeFromDut_17();
+            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_17();
             break;
         case 18:
             ChipLogProgress(chipTool, " ***** Test Step 18 : Reads OffWaitTime attribute from DUT\n");
-            err = TestReadsOffWaitTimeAttributeFromDut_18();
+            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_18();
             break;
         case 19:
             ChipLogProgress(chipTool, " ***** Test Step 19 : Send Off Command\n");
-            err = TestSendOffCommand_19();
+            err = ShouldSkip("CR_OFF") ? CHIP_NO_ERROR : TestSendOffCommand_19();
             break;
         case 20:
             ChipLogProgress(chipTool, " ***** Test Step 20 : Reads OnOff attribute from DUT\n");
-            err = TestReadsOnOffAttributeFromDut_20();
+            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_20();
             break;
         case 21:
             ChipLogProgress(chipTool, " ***** Test Step 21 : Reads OnTime attribute from DUT\n");
-            err = TestReadsOnTimeAttributeFromDut_21();
+            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_21();
             break;
         case 22:
             ChipLogProgress(chipTool, " ***** Test Step 22 : Reads OnOff attribute from DUT\n");
-            err = TestReadsOnOffAttributeFromDut_22();
+            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_22();
             break;
         case 23:
             ChipLogProgress(chipTool, " ***** Test Step 23 : Reads OnTime attribute from DUT\n");
-            err = TestReadsOnTimeAttributeFromDut_23();
+            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_23();
             break;
         case 24:
             ChipLogProgress(chipTool, " ***** Test Step 24 : Reads OffWaitTime attribute from DUT\n");
-            err = TestReadsOffWaitTimeAttributeFromDut_24();
+            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_24();
             break;
         case 25:
             ChipLogProgress(chipTool, " ***** Test Step 25 : Send On Command\n");
-            err = TestSendOnCommand_25();
+            err = ShouldSkip("CR_ON") ? CHIP_NO_ERROR : TestSendOnCommand_25();
             break;
         case 26:
             ChipLogProgress(chipTool, " ***** Test Step 26 : Reads OnTime attribute from DUT\n");
-            err = TestReadsOnTimeAttributeFromDut_26();
+            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_26();
             break;
         case 27:
             ChipLogProgress(chipTool, " ***** Test Step 27 : Reads OffWaitTime attribute from DUT\n");
-            err = TestReadsOffWaitTimeAttributeFromDut_27();
+            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_27();
             break;
         case 28:
             ChipLogProgress(chipTool, " ***** Test Step 28 : Send Off Command\n");
-            err = TestSendOffCommand_28();
+            err = ShouldSkip("CR_OFF") ? CHIP_NO_ERROR : TestSendOffCommand_28();
             break;
         case 29:
             ChipLogProgress(chipTool, " ***** Test Step 29 : Reads OnOff attribute from DUT\n");
-            err = TestReadsOnOffAttributeFromDut_29();
+            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_29();
             break;
         case 30:
             ChipLogProgress(chipTool, " ***** Test Step 30 : Reads OnTime attribute from DUT\n");
-            err = TestReadsOnTimeAttributeFromDut_30();
+            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_30();
             break;
         case 31:
             ChipLogProgress(chipTool, " ***** Test Step 31 : Reads OnOff attribute from DUT\n");
-            err = TestReadsOnOffAttributeFromDut_31();
+            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_31();
             break;
         case 32:
             ChipLogProgress(chipTool, " ***** Test Step 32 : Reads OnTime attribute from DUT\n");
-            err = TestReadsOnTimeAttributeFromDut_32();
+            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_32();
             break;
         case 33:
             ChipLogProgress(chipTool, " ***** Test Step 33 : Send On Command\n");
-            err = TestSendOnCommand_33();
+            err = ShouldSkip("CR_ON") ? CHIP_NO_ERROR : TestSendOnCommand_33();
             break;
         case 34:
             ChipLogProgress(chipTool, " ***** Test Step 34 : Reads OnOff attribute from DUT\n");
-            err = TestReadsOnOffAttributeFromDut_34();
+            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_34();
             break;
         case 35:
             ChipLogProgress(chipTool, " ***** Test Step 35 : Reads OnTime attribute from DUT\n");
-            err = TestReadsOnTimeAttributeFromDut_35();
+            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_35();
             break;
         case 36:
             ChipLogProgress(chipTool, " ***** Test Step 36 : Reads OffWaitTime attribute from DUT\n");
-            err = TestReadsOffWaitTimeAttributeFromDut_36();
+            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_36();
             break;
         case 37:
             ChipLogProgress(chipTool, " ***** Test Step 37 : Send Off Command\n");
-            err = TestSendOffCommand_37();
+            err = ShouldSkip("CR_OFF") ? CHIP_NO_ERROR : TestSendOffCommand_37();
             break;
         case 38:
             ChipLogProgress(chipTool, " ***** Test Step 38 : Reads OnOff attribute from DUT\n");
-            err = TestReadsOnOffAttributeFromDut_38();
+            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_38();
             break;
         case 39:
             ChipLogProgress(chipTool, " ***** Test Step 39 : Reads OnTime attribute from DUT\n");
-            err = TestReadsOnTimeAttributeFromDut_39();
+            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_39();
             break;
         case 40:
             ChipLogProgress(chipTool, " ***** Test Step 40 : Reads OnOff attribute from DUT\n");
-            err = TestReadsOnOffAttributeFromDut_40();
+            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_40();
             break;
         case 41:
             ChipLogProgress(chipTool, " ***** Test Step 41 : Reads OnTime attribute from DUT\n");
-            err = TestReadsOnTimeAttributeFromDut_41();
+            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_41();
             break;
         case 42:
             ChipLogProgress(chipTool, " ***** Test Step 42 : Reads OffWaitTime attribute from DUT\n");
-            err = TestReadsOffWaitTimeAttributeFromDut_42();
+            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_42();
             break;
         case 43:
             ChipLogProgress(chipTool, " ***** Test Step 43 : Reads OnOff attribute from DUT\n");
-            err = TestReadsOnOffAttributeFromDut_43();
+            err = ShouldSkip("A_ONOFF") ? CHIP_NO_ERROR : TestReadsOnOffAttributeFromDut_43();
             break;
         case 44:
             ChipLogProgress(chipTool, " ***** Test Step 44 : Reads OnTime attribute from DUT\n");
-            err = TestReadsOnTimeAttributeFromDut_44();
+            err = ShouldSkip("A_ONTIME") ? CHIP_NO_ERROR : TestReadsOnTimeAttributeFromDut_44();
             break;
         case 45:
             ChipLogProgress(chipTool, " ***** Test Step 45 : Reads OffWaitTime attribute from DUT\n");
-            err = TestReadsOffWaitTimeAttributeFromDut_45();
+            err = ShouldSkip("A_OFFWAITTIME") ? CHIP_NO_ERROR : TestReadsOffWaitTimeAttributeFromDut_45();
             break;
         case 46:
             ChipLogProgress(chipTool, " ***** Test Step 46 : Send Off Command\n");
-            err = TestSendOffCommand_46();
+            err = ShouldSkip("CR_OFF") ? CHIP_NO_ERROR : TestSendOffCommand_46();
             break;
         }
 
@@ -22100,15 +22101,15 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Write 1 to the OperationMode attribute to DUT: OperationMode\n");
-            err = TestWrite1ToTheOperationModeAttributeToDutOperationMode_1();
+            err = ShouldSkip("A_OPERATIONMODE") ? CHIP_NO_ERROR : TestWrite1ToTheOperationModeAttributeToDutOperationMode_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Write 2 to the OperationMode attribute to DUT: OperationMode\n");
-            err = TestWrite2ToTheOperationModeAttributeToDutOperationMode_2();
+            err = ShouldSkip("A_OPERATIONMODE") ? CHIP_NO_ERROR : TestWrite2ToTheOperationModeAttributeToDutOperationMode_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Write 3 to the OperationMode attribute to DUT: OperationMode\n");
-            err = TestWrite3ToTheOperationModeAttributeToDutOperationMode_3();
+            err = ShouldSkip("A_OPERATIONMODE") ? CHIP_NO_ERROR : TestWrite3ToTheOperationModeAttributeToDutOperationMode_3();
             break;
         }
 
@@ -22242,11 +22243,11 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Write 0 to the OperationMode attribute to DUT\n");
-            err = TestWrite0ToTheOperationModeAttributeToDut_1();
+            err = ShouldSkip("A_OPERATIONMODE") ? CHIP_NO_ERROR : TestWrite0ToTheOperationModeAttributeToDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads the attribute: EffectiveOperationMode\n");
-            err = TestReadsTheAttributeEffectiveOperationMode_2();
+            err = ShouldSkip("A_EFFECTIVEOPERATIONMODE") ? CHIP_NO_ERROR : TestReadsTheAttributeEffectiveOperationMode_2();
             break;
         }
 
@@ -22611,11 +22612,11 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads MeasuredValue attribute from DUT\n");
-            err = TestReadsMeasuredValueAttributeFromDut_1();
+            err = ShouldSkip("A_RELATIVEHUMIDITY") ? CHIP_NO_ERROR : TestReadsMeasuredValueAttributeFromDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Read the mandatory attribute: MeasuredValue\n");
-            err = TestReadTheMandatoryAttributeMeasuredValue_2();
+            err = ShouldSkip("A_RELATIVEHUMIDITY") ? CHIP_NO_ERROR : TestReadTheMandatoryAttributeMeasuredValue_2();
             break;
         }
 
@@ -23016,11 +23017,11 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads MeasuredValue attribute from DUT\n");
-            err = TestReadsMeasuredValueAttributeFromDut_1();
+            err = ShouldSkip("A_TEMPERATURE") ? CHIP_NO_ERROR : TestReadsMeasuredValueAttributeFromDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Read the mandatory attribute: MeasuredValue\n");
-            err = TestReadTheMandatoryAttributeMeasuredValue_2();
+            err = ShouldSkip("A_TEMPERATURE") ? CHIP_NO_ERROR : TestReadTheMandatoryAttributeMeasuredValue_2();
             break;
         }
 
@@ -25355,264 +25356,344 @@ public:
             ChipLogProgress(chipTool,
                             " ***** Test Step 1 : Reads OccupiedCoolingSetpoint attribute from Server DUT and verifies that the "
                             "value is within range\n");
-            err = TestReadsOccupiedCoolingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_1();
+            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT")
+                ? CHIP_NO_ERROR
+                : TestReadsOccupiedCoolingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_1();
             break;
         case 2:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 2 : Writes a value back that is different but valid for OccupiedCoolingSetpoint attribute\n");
-            err = TestWritesAValueBackThatIsDifferentButValidForOccupiedCoolingSetpointAttribute_2();
+            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT")
+                ? CHIP_NO_ERROR
+                : TestWritesAValueBackThatIsDifferentButValidForOccupiedCoolingSetpointAttribute_2();
             break;
         case 3:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 3 : Reads it back again to confirm the successful write of OccupiedCoolingSetpoint attribute\n");
-            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedCoolingSetpointAttribute_3();
+            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT")
+                ? CHIP_NO_ERROR
+                : TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedCoolingSetpointAttribute_3();
             break;
         case 4:
             ChipLogProgress(chipTool,
                             " ***** Test Step 4 : Writes the limit of MinCoolSetpointLimit to OccupiedCoolingSetpoint attribute\n");
-            err = TestWritesTheLimitOfMinCoolSetpointLimitToOccupiedCoolingSetpointAttribute_4();
+            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT")
+                ? CHIP_NO_ERROR
+                : TestWritesTheLimitOfMinCoolSetpointLimitToOccupiedCoolingSetpointAttribute_4();
             break;
         case 5:
             ChipLogProgress(chipTool,
                             " ***** Test Step 5 : Writes the limit of MaxCoolSetpointLimit to OccupiedCoolingSetpoint attribute\n");
-            err = TestWritesTheLimitOfMaxCoolSetpointLimitToOccupiedCoolingSetpointAttribute_5();
+            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT")
+                ? CHIP_NO_ERROR
+                : TestWritesTheLimitOfMaxCoolSetpointLimitToOccupiedCoolingSetpointAttribute_5();
             break;
         case 6:
             ChipLogProgress(chipTool,
                             " ***** Test Step 6 : Reads OccupiedHeatingSetpoint attribute from Server DUT and verifies that the "
                             "value is within range\n");
-            err = TestReadsOccupiedHeatingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_6();
+            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT")
+                ? CHIP_NO_ERROR
+                : TestReadsOccupiedHeatingSetpointAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_6();
             break;
         case 7:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 7 : Writes a value back that is different but valid for OccupiedHeatingSetpoint attribute\n");
-            err = TestWritesAValueBackThatIsDifferentButValidForOccupiedHeatingSetpointAttribute_7();
+            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT")
+                ? CHIP_NO_ERROR
+                : TestWritesAValueBackThatIsDifferentButValidForOccupiedHeatingSetpointAttribute_7();
             break;
         case 8:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 8 : Reads it back again to confirm the successful write of OccupiedHeatingSetpoint attribute\n");
-            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedHeatingSetpointAttribute_8();
+            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT")
+                ? CHIP_NO_ERROR
+                : TestReadsItBackAgainToConfirmTheSuccessfulWriteOfOccupiedHeatingSetpointAttribute_8();
             break;
         case 9:
             ChipLogProgress(chipTool,
                             " ***** Test Step 9 : Writes the limit of MinHeatSetpointLimit to OccupiedHeatingSetpoint attribute\n");
-            err = TestWritesTheLimitOfMinHeatSetpointLimitToOccupiedHeatingSetpointAttribute_9();
+            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT")
+                ? CHIP_NO_ERROR
+                : TestWritesTheLimitOfMinHeatSetpointLimitToOccupiedHeatingSetpointAttribute_9();
             break;
         case 10:
             ChipLogProgress(
                 chipTool, " ***** Test Step 10 : Writes the limit of MaxHeatSetpointLimit to OccupiedHeatingSetpoint attribute\n");
-            err = TestWritesTheLimitOfMaxHeatSetpointLimitToOccupiedHeatingSetpointAttribute_10();
+            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT")
+                ? CHIP_NO_ERROR
+                : TestWritesTheLimitOfMaxHeatSetpointLimitToOccupiedHeatingSetpointAttribute_10();
             break;
         case 11:
             ChipLogProgress(chipTool,
                             " ***** Test Step 11 : Reads MinHeatSetpointLimit attribute from Server DUT and verifies that the "
                             "value is within range\n");
-            err = TestReadsMinHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_11();
+            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestReadsMinHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_11();
             break;
         case 12:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 12 : Writes a value back that is different but valid for MinHeatSetpointLimit attribute\n");
-            err = TestWritesAValueBackThatIsDifferentButValidForMinHeatSetpointLimitAttribute_12();
+            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesAValueBackThatIsDifferentButValidForMinHeatSetpointLimitAttribute_12();
             break;
         case 13:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 13 : Reads it back again to confirm the successful write of MinHeatSetpointLimit attribute\n");
-            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinHeatSetpointLimitAttribute_13();
+            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinHeatSetpointLimitAttribute_13();
             break;
         case 14:
             ChipLogProgress(
                 chipTool, " ***** Test Step 14 : Writes the limit of AbsMinHeatSetpointLimit to MinHeatSetpointLimit attribute\n");
-            err = TestWritesTheLimitOfAbsMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_14();
+            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesTheLimitOfAbsMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_14();
             break;
         case 15:
             ChipLogProgress(
                 chipTool, " ***** Test Step 15 : Writes the limit of AbsMaxHeatSetpointLimit to MinHeatSetpointLimit attribute\n");
-            err = TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_15();
+            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_15();
             break;
         case 16:
             ChipLogProgress(chipTool,
                             " ***** Test Step 16 : Reads MaxHeatSetpointLimit attribute from Server DUT and verifies that the "
                             "value is within range\n");
-            err = TestReadsMaxHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_16();
+            err = ShouldSkip("A_MAXHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestReadsMaxHeatSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_16();
             break;
         case 17:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 17 : Writes a value back that is different but valid for MaxHeatSetpointLimit attribute\n");
-            err = TestWritesAValueBackThatIsDifferentButValidForMaxHeatSetpointLimitAttribute_17();
+            err = ShouldSkip("A_MAXHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesAValueBackThatIsDifferentButValidForMaxHeatSetpointLimitAttribute_17();
             break;
         case 18:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 18 : Reads it back again to confirm the successful write of MaxHeatSetpointLimit attribute\n");
-            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxHeatSetpointLimitAttribute_18();
+            err = ShouldSkip("A_MAXHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxHeatSetpointLimitAttribute_18();
             break;
         case 19:
             ChipLogProgress(
                 chipTool, " ***** Test Step 19 : Writes the limit of AbsMinHeatSetpointLimit to MaxHeatSetpointLimit attribute\n");
-            err = TestWritesTheLimitOfAbsMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_19();
+            err = ShouldSkip("A_MAXHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesTheLimitOfAbsMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_19();
             break;
         case 20:
             ChipLogProgress(
                 chipTool, " ***** Test Step 20 : Writes the limit of AbsMaxHeatSetpointLimit to MaxHeatSetpointLimit attribute\n");
-            err = TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_20();
+            err = ShouldSkip("A_MAXHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesTheLimitOfAbsMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_20();
             break;
         case 21:
             ChipLogProgress(chipTool,
                             " ***** Test Step 21 : Reads MinCoolSetpointLimit attribute from Server DUT and verifies that the "
                             "value is within range\n");
-            err = TestReadsMinCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_21();
+            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestReadsMinCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_21();
             break;
         case 22:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 22 : Writes a value back that is different but valid for MinCoolSetpointLimit attribute\n");
-            err = TestWritesAValueBackThatIsDifferentButValidForMinCoolSetpointLimitAttribute_22();
+            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesAValueBackThatIsDifferentButValidForMinCoolSetpointLimitAttribute_22();
             break;
         case 23:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 23 : Reads it back again to confirm the successful write of MinCoolSetpointLimit attribute\n");
-            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinCoolSetpointLimitAttribute_23();
+            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMinCoolSetpointLimitAttribute_23();
             break;
         case 24:
             ChipLogProgress(
                 chipTool, " ***** Test Step 24 : Writes the limit of AbsMinCoolSetpointLimit to MinCoolSetpointLimit attribute\n");
-            err = TestWritesTheLimitOfAbsMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_24();
+            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesTheLimitOfAbsMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_24();
             break;
         case 25:
             ChipLogProgress(chipTool,
                             " ***** Test Step 25 : Writes the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute\n");
-            err = TestWritesTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_25();
+            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_25();
             break;
         case 26:
             ChipLogProgress(chipTool,
                             " ***** Test Step 26 : Reads MaxCoolSetpointLimit attribute from Server DUT and verifies that the "
                             "value is within range\n");
-            err = TestReadsMaxCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_26();
+            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestReadsMaxCoolSetpointLimitAttributeFromServerDutAndVerifiesThatTheValueIsWithinRange_26();
             break;
         case 27:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 27 : Writes a value back that is different but valid for MaxCoolSetpointLimit attribute\n");
-            err = TestWritesAValueBackThatIsDifferentButValidForMaxCoolSetpointLimitAttribute_27();
+            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesAValueBackThatIsDifferentButValidForMaxCoolSetpointLimitAttribute_27();
             break;
         case 28:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 28 : Reads it back again to confirm the successful write of MaxCoolSetpointLimit attribute\n");
-            err = TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxCoolSetpointLimitAttribute_28();
+            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestReadsItBackAgainToConfirmTheSuccessfulWriteOfMaxCoolSetpointLimitAttribute_28();
             break;
         case 29:
             ChipLogProgress(
                 chipTool, " ***** Test Step 29 : Writes the limit of AbsMinCoolSetpointLimit to MaxCoolSetpointLimit attribute\n");
-            err = TestWritesTheLimitOfAbsMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_29();
+            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesTheLimitOfAbsMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_29();
             break;
         case 30:
             ChipLogProgress(chipTool,
                             " ***** Test Step 30 : Writes the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute\n");
-            err = TestWritesTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_30();
+            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_30();
             break;
         case 31:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 31 : Writes (sets back) the limit of MinHeatSetpointLimit to MinHeatSetpointLimit attribute\n");
-            err = TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_31();
+            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMinHeatSetpointLimitAttribute_31();
             break;
         case 32:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 32 : Writes (sets back) the limit of MaxHeatSetpointLimit to MinHeatSetpointLimit attribute\n");
-            err = TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_32();
+            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMinHeatSetpointLimitAttribute_32();
             break;
         case 33:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 33 : Writes (sets back) the limit of MinHeatSetpointLimit to MaxHeatSetpointLimit attribute\n");
-            err = TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_33();
+            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesSetsBackTheLimitOfMinHeatSetpointLimitToMaxHeatSetpointLimitAttribute_33();
             break;
         case 34:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 34 : Writes (sets back) the limit of MaxHeatSetpointLimit to MaxHeatSetpointLimit attribute\n");
-            err = TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_34();
+            err = ShouldSkip("A_MINHEATSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesSetsBackTheLimitOfMaxHeatSetpointLimitToMaxHeatSetpointLimitAttribute_34();
             break;
         case 35:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 35 : Writes (sets back) the limit of MinCoolSetpointLimit to MinCoolSetpointLimit attribute\n");
-            err = TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_35();
+            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMinCoolSetpointLimitAttribute_35();
             break;
         case 36:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 36 : Writes (sets back) the limit of MaxCoolSetpointLimit to MinCoolSetpointLimit attribute\n");
-            err = TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_36();
+            err = ShouldSkip("A_MINCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMinCoolSetpointLimitAttribute_36();
             break;
         case 37:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 37 : Writes (sets back) the limit of MinCoolSetpointLimit to MaxCoolSetpointLimit attribute\n");
-            err = TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_37();
+            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesSetsBackTheLimitOfMinCoolSetpointLimitToMaxCoolSetpointLimitAttribute_37();
             break;
         case 38:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 38 : Writes (sets back) the limit of MaxCoolSetpointLimit to MaxCoolSetpointLimit attribute\n");
-            err = TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_38();
+            err = ShouldSkip("A_MAXCOOLSETPOINTLIMIT")
+                ? CHIP_NO_ERROR
+                : TestWritesSetsBackTheLimitOfMaxCoolSetpointLimitToMaxCoolSetpointLimitAttribute_38();
             break;
         case 39:
             ChipLogProgress(
                 chipTool,
                 " ***** Test Step 39 : Reads ControlSequenceOfOperation from Server DUT and verifies that the value is valid\n");
-            err = TestReadsControlSequenceOfOperationFromServerDutAndVerifiesThatTheValueIsValid_39();
+            err = ShouldSkip("A_CONTROLSEQUENCEOFOPERATION")
+                ? CHIP_NO_ERROR
+                : TestReadsControlSequenceOfOperationFromServerDutAndVerifiesThatTheValueIsValid_39();
             break;
         case 40:
             ChipLogProgress(
                 chipTool, " ***** Test Step 40 : Write Attribute command for ControlSequenceOfOperation with a new valid value\n");
-            err = TestWriteAttributeCommandForControlSequenceOfOperationWithANewValidValue_40();
+            err = ShouldSkip("A_CONTROLSEQUENCEOFOPERATION")
+                ? CHIP_NO_ERROR
+                : TestWriteAttributeCommandForControlSequenceOfOperationWithANewValidValue_40();
             break;
         case 41:
             ChipLogProgress(chipTool, " ***** Test Step 41 : Read it back again to confirm the successful write\n");
-            err = TestReadItBackAgainToConfirmTheSuccessfulWrite_41();
+            err = ShouldSkip("A_CONTROLSEQUENCEOFOPERATION") ? CHIP_NO_ERROR : TestReadItBackAgainToConfirmTheSuccessfulWrite_41();
             break;
         case 42:
             ChipLogProgress(chipTool, " ***** Test Step 42 : Sets OccupiedHeatingSetpoint to default value\n");
-            err = TestSetsOccupiedHeatingSetpointToDefaultValue_42();
+            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedHeatingSetpointToDefaultValue_42();
             break;
         case 43:
             ChipLogProgress(chipTool, " ***** Test Step 43 : Sets OccupiedHeatingSetpoint to default value\n");
-            err = TestSetsOccupiedHeatingSetpointToDefaultValue_43();
+            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedHeatingSetpointToDefaultValue_43();
             break;
         case 44:
             ChipLogProgress(chipTool, " ***** Test Step 44 : Sets OccupiedCoolingSetpoint to default value\n");
-            err = TestSetsOccupiedCoolingSetpointToDefaultValue_44();
+            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedCoolingSetpointToDefaultValue_44();
             break;
         case 45:
             ChipLogProgress(chipTool, " ***** Test Step 45 : Sets OccupiedCoolingSetpoint to default value\n");
-            err = TestSetsOccupiedCoolingSetpointToDefaultValue_45();
+            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedCoolingSetpointToDefaultValue_45();
             break;
         case 46:
             ChipLogProgress(chipTool, " ***** Test Step 46 : Sets OccupiedCoolingSetpoint to default value\n");
-            err = TestSetsOccupiedCoolingSetpointToDefaultValue_46();
+            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedCoolingSetpointToDefaultValue_46();
             break;
         case 47:
             ChipLogProgress(chipTool, " ***** Test Step 47 : Sets OccupiedHeatingSetpoint to default value\n");
-            err = TestSetsOccupiedHeatingSetpointToDefaultValue_47();
+            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedHeatingSetpointToDefaultValue_47();
             break;
         case 48:
             ChipLogProgress(chipTool, " ***** Test Step 48 : Sets OccupiedCoolingSetpoint to default value\n");
-            err = TestSetsOccupiedCoolingSetpointToDefaultValue_48();
+            err = ShouldSkip("A_OCCUPIEDCOOLINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedCoolingSetpointToDefaultValue_48();
             break;
         case 49:
             ChipLogProgress(chipTool, " ***** Test Step 49 : Sets OccupiedHeatingSetpoint to default value\n");
-            err = TestSetsOccupiedHeatingSetpointToDefaultValue_49();
+            err = ShouldSkip("A_OCCUPIEDHEATINGSETPOINT") ? CHIP_NO_ERROR : TestSetsOccupiedHeatingSetpointToDefaultValue_49();
             break;
         }
 
@@ -27599,45 +27680,51 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Writes a value of 0 to TemperatureDisplayMode attribute of DUT\n");
-            err = TestWritesAValueOf0ToTemperatureDisplayModeAttributeOfDut_1();
+            err = ShouldSkip("A_TEMPERATURE_DISPLAY_MODE") ? CHIP_NO_ERROR
+                                                           : TestWritesAValueOf0ToTemperatureDisplayModeAttributeOfDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Writes a value of 1 to TemperatureDisplayMode attribute of DUT\n");
-            err = TestWritesAValueOf1ToTemperatureDisplayModeAttributeOfDut_2();
+            err = ShouldSkip("A_TEMPERATURE_DISPLAY_MODE") ? CHIP_NO_ERROR
+                                                           : TestWritesAValueOf1ToTemperatureDisplayModeAttributeOfDut_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Writes a value of 0 to KeypadLockout attribute of DUT\n");
-            err = TestWritesAValueOf0ToKeypadLockoutAttributeOfDut_3();
+            err = ShouldSkip("A_KEYPAD_LOCKOUT") ? CHIP_NO_ERROR : TestWritesAValueOf0ToKeypadLockoutAttributeOfDut_3();
             break;
         case 4:
             ChipLogProgress(chipTool, " ***** Test Step 4 : Writes a value of 1 to KeypadLockout attribute of DUT\n");
-            err = TestWritesAValueOf1ToKeypadLockoutAttributeOfDut_4();
+            err = ShouldSkip("A_KEYPAD_LOCKOUT") ? CHIP_NO_ERROR : TestWritesAValueOf1ToKeypadLockoutAttributeOfDut_4();
             break;
         case 5:
             ChipLogProgress(chipTool, " ***** Test Step 5 : Writes a value of 2 to KeypadLockout attribute of DUT\n");
-            err = TestWritesAValueOf2ToKeypadLockoutAttributeOfDut_5();
+            err = ShouldSkip("A_KEYPAD_LOCKOUT") ? CHIP_NO_ERROR : TestWritesAValueOf2ToKeypadLockoutAttributeOfDut_5();
             break;
         case 6:
             ChipLogProgress(chipTool, " ***** Test Step 6 : Writes a value of 3 to KeypadLockout attribute of DUT\n");
-            err = TestWritesAValueOf3ToKeypadLockoutAttributeOfDut_6();
+            err = ShouldSkip("A_KEYPAD_LOCKOUT") ? CHIP_NO_ERROR : TestWritesAValueOf3ToKeypadLockoutAttributeOfDut_6();
             break;
         case 7:
             ChipLogProgress(chipTool, " ***** Test Step 7 : Writes a value of 4 to KeypadLockout attribute of DUT\n");
-            err = TestWritesAValueOf4ToKeypadLockoutAttributeOfDut_7();
+            err = ShouldSkip("A_KEYPAD_LOCKOUT") ? CHIP_NO_ERROR : TestWritesAValueOf4ToKeypadLockoutAttributeOfDut_7();
             break;
         case 8:
             ChipLogProgress(chipTool, " ***** Test Step 8 : Writes a value of 5 to KeypadLockout attribute of DUT\n");
-            err = TestWritesAValueOf5ToKeypadLockoutAttributeOfDut_8();
+            err = ShouldSkip("A_KEYPAD_LOCKOUT") ? CHIP_NO_ERROR : TestWritesAValueOf5ToKeypadLockoutAttributeOfDut_8();
             break;
         case 9:
             ChipLogProgress(chipTool,
                             " ***** Test Step 9 : Writes a value of 0 to ScheduleProgrammingVisibility attribute of DUT\n");
-            err = TestWritesAValueOf0ToScheduleProgrammingVisibilityAttributeOfDut_9();
+            err = ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY")
+                ? CHIP_NO_ERROR
+                : TestWritesAValueOf0ToScheduleProgrammingVisibilityAttributeOfDut_9();
             break;
         case 10:
             ChipLogProgress(chipTool,
                             " ***** Test Step 10 : Writes a value of 1 to ScheduleProgrammingVisibility attribute of DUT\n");
-            err = TestWritesAValueOf1ToScheduleProgrammingVisibilityAttributeOfDut_10();
+            err = ShouldSkip("A_SCHEDULE_PROGRAMMING_VISIBILITY")
+                ? CHIP_NO_ERROR
+                : TestWritesAValueOf1ToScheduleProgrammingVisibilityAttributeOfDut_10();
             break;
         }
 
@@ -30348,11 +30435,11 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads Type attribute from DUT\n");
-            err = TestReadsTypeAttributeFromDut_1();
+            err = ShouldSkip("A_TYPE") ? CHIP_NO_ERROR : TestReadsTypeAttributeFromDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads Type attribute constraints\n");
-            err = TestReadsTypeAttributeConstraints_2();
+            err = ShouldSkip("A_TYPE") ? CHIP_NO_ERROR : TestReadsTypeAttributeConstraints_2();
             break;
         }
 
@@ -30473,11 +30560,11 @@ public:
             break;
         case 1:
             ChipLogProgress(chipTool, " ***** Test Step 1 : Reads EndProductType attribute from DUT\n");
-            err = TestReadsEndProductTypeAttributeFromDut_1();
+            err = ShouldSkip("A_ENDPRODUCTTYPE") ? CHIP_NO_ERROR : TestReadsEndProductTypeAttributeFromDut_1();
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads EndProductType attribute constraints from DUT\n");
-            err = TestReadsEndProductTypeAttributeConstraintsFromDut_2();
+            err = ShouldSkip("A_ENDPRODUCTTYPE") ? CHIP_NO_ERROR : TestReadsEndProductTypeAttributeConstraintsFromDut_2();
             break;
         }
 
@@ -48811,11 +48898,12 @@ public:
             break;
         case 2:
             ChipLogProgress(chipTool, " ***** Test Step 2 : Reads CurrentHeapUsed non-global attribute value from DUT\n");
-            err = TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_2();
+            err = ShouldSkip("A_CURRENTHEAPUSED") ? CHIP_NO_ERROR : TestReadsCurrentHeapUsedNonGlobalAttributeValueFromDut_2();
             break;
         case 3:
             ChipLogProgress(chipTool, " ***** Test Step 3 : Reads CurrentHeapHighWaterMark non-global attribute value from DUT\n");
-            err = TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_3();
+            err = ShouldSkip("A_CURRENTHEAPHIGHWATERMARK") ? CHIP_NO_ERROR
+                                                           : TestReadsCurrentHeapHighWaterMarkNonGlobalAttributeValueFromDut_3();
             break;
         }
 
