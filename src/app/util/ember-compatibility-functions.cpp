@@ -21,6 +21,7 @@
  *          when calling ember callbacks.
  */
 
+#include <access/AccessControl.h>
 #include <app/ClusterInfo.h>
 #include <app/Command.h>
 #include <app/ConcreteAttributePath.h>
@@ -272,6 +273,23 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         return SendFailureStatus(aPath, attributeReport, Protocols::InteractionModel::Status::UnsupportedAttribute, nullptr);
     }
 
+    {
+        Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
+        Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+        Access::Privilege requestPrivilege = Access::Privilege::kView; // TODO: get actual request privilege
+        CHIP_ERROR err                     = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        if (err != CHIP_NO_ERROR)
+        {
+            AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
+            ReturnErrorOnFailure(aAttributeReports.GetError());
+            TLV::TLVWriter backup;
+            attributeReport.Checkpoint(backup);
+            auto status = (err == CHIP_ERROR_ACCESS_DENIED) ? Protocols::InteractionModel::Status::UnsupportedAccess
+                                                            : Protocols::InteractionModel::Status::Failure;
+            return SendFailureStatus(aPath, attributeReport, status, &backup);
+        }
+    }
+
     AttributeAccessInterface * attrOverride = findAttributeAccessOverride(aPath.mEndpointId, aPath.mClusterId);
     // Value encoder will encode the whole AttributeReport, including the path, value and the version.
     // The AttributeValueEncoder may encode more than one AttributeReportIB for the list chunking feature.
@@ -304,7 +322,6 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
     }
 
     AttributeReportIB::Builder attributeReport = aAttributeReports.CreateAttributeReport();
-
     ReturnErrorOnFailure(aAttributeReports.GetError());
     TLV::TLVWriter backup;
     attributeReport.Checkpoint(backup);
@@ -726,6 +743,19 @@ CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & a
     if (attributeMetadata->MustUseTimedWrite() && !apWriteHandler->IsTimedWrite())
     {
         return apWriteHandler->AddStatus(attributePathParams, Protocols::InteractionModel::Status::NeedsTimedInteraction);
+    }
+
+    {
+        Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
+        Access::RequestPath requestPath{ .cluster = aPath.mClusterId, .endpoint = aPath.mEndpointId };
+        Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
+        CHIP_ERROR err                     = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        if (err != CHIP_NO_ERROR)
+        {
+            auto status = (err == CHIP_ERROR_ACCESS_DENIED) ? Protocols::InteractionModel::Status::UnsupportedAccess
+                                                            : Protocols::InteractionModel::Status::Failure;
+            return apWriteHandler->AddStatus(attributePathParams, status);
+        }
     }
 
     if (auto * attrOverride = findAttributeAccessOverride(aClusterInfo.mEndpointId, aClusterInfo.mClusterId))

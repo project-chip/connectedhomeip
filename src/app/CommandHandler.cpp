@@ -28,6 +28,7 @@
 #include "InteractionModelEngine.h"
 #include "messaging/ExchangeContext.h"
 
+#include <access/AccessControl.h>
 #include <app/util/MatterCallbacks.h>
 #include <lib/support/TypeTraits.h>
 #include <protocols/secure_channel/Constants.h>
@@ -247,6 +248,21 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     VerifyOrExit(mpCallback->CommandExists(ConcreteCommandPath(endpointId, clusterId, commandId)),
                  err = CHIP_ERROR_INVALID_PROFILE_ID);
 
+    {
+        Access::SubjectDescriptor subjectDescriptor; // TODO: get actual subject descriptor
+        Access::RequestPath requestPath{ .cluster = clusterId, .endpoint = endpointId };
+        Access::Privilege requestPrivilege = Access::Privilege::kOperate; // TODO: get actual request privilege
+        err                                = Access::GetAccessControl().Check(subjectDescriptor, requestPath, requestPrivilege);
+        if (err != CHIP_NO_ERROR)
+        {
+            const ConcreteCommandPath concretePath(endpointId, clusterId, commandId);
+            auto status = (err == CHIP_ERROR_ACCESS_DENIED) ? Protocols::InteractionModel::Status::UnsupportedAccess
+                                                            : Protocols::InteractionModel::Status::Failure;
+            AddStatus(concretePath, status);
+            return CHIP_NO_ERROR;
+        }
+    }
+
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
     {
@@ -270,7 +286,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ConcreteCommandPath path(endpointId, clusterId, commandId);
+        const ConcreteCommandPath path(endpointId, clusterId, commandId);
 
         // The Path is the path in the request if there are any error occurred before we dispatch the command to clusters.
         // Currently, it could be failed to decode Path or failed to find cluster / command on desired endpoint.
