@@ -46705,7 +46705,7 @@ private:
     {
         auto iter = deviceList.begin();
         VerifyOrReturn(CheckNextListItemDecodes<decltype(deviceList)>("deviceList", iter, 0));
-        VerifyOrReturn(CheckValue("deviceList[0].type", iter.GetValue().type, 0UL));
+        VerifyOrReturn(CheckValue("deviceList[0].type", iter.GetValue().type, 22UL));
         VerifyOrReturn(CheckValue("deviceList[0].revision", iter.GetValue().revision, 1U));
         VerifyOrReturn(CheckNoMoreListItems<decltype(deviceList)>("deviceList", iter, 1));
 

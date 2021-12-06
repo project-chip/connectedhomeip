@@ -29820,7 +29820,7 @@ uint16_t readAttributeVendorIdDefaultValue;
         {
             id actualValue = value;
             XCTAssertEqual([actualValue count], 1);
-            XCTAssertEqual([((CHIPDescriptorClusterDeviceType *) actualValue[0]).type unsignedIntValue], 0UL);
+            XCTAssertEqual([((CHIPDescriptorClusterDeviceType *) actualValue[0]).type unsignedIntValue], 22UL);
             XCTAssertEqual([((CHIPDescriptorClusterDeviceType *) actualValue[0]).revision unsignedShortValue], 1U);
         }
 
