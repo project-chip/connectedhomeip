@@ -22,15 +22,15 @@
  ******************************************************************************/
 
 #include "door-lock-server.h"
-#include <app-common/zap-generated/attributes/Accessors.h>
 #include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/attribute-type.h>
+#include <app-common/zap-generated/attributes/Accessors.h>
+#include <app-common/zap-generated/callback.h>
 #include <app-common/zap-generated/cluster-id.h>
 #include <app-common/zap-generated/command-id.h>
 #include <app/util/af-event.h>
-#include <app/util/time-util.h>
 #include <app/util/af.h>
+#include <app/util/time-util.h>
 
 #include <app/CommandHandler.h>
 #include <app/ConcreteAttributePath.h>
@@ -123,7 +123,6 @@ bool DoorLockServer::SetSoundVolume(chip::EndpointId endpointId, uint8_t newSoun
 {
     return true;
 }
-
 
 bool DoorLockServer::SetOneTouchLocking(chip::EndpointId endpointId, bool isEnabled)
 {
@@ -234,19 +233,13 @@ MatterDoorLockClusterServerPreAttributeChangedCallback(const chip::app::Concrete
     return chip::Protocols::InteractionModel::Status::Success;
 }
 
-void emberAfPluginDoorLockServerLockoutEventHandler(void)
-{
-}
+void emberAfPluginDoorLockServerLockoutEventHandler(void) {}
 
-void emberAfPluginDoorLockServerRelockEventHandler(void)
-{
-}
+void emberAfPluginDoorLockServerRelockEventHandler(void) {}
 
 void MatterDoorLockPluginServerInitCallback()
 {
     emberAfDoorLockClusterPrintln("Door Lock server initialized");
 }
 
-void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath)
-{
-}
+void MatterDoorLockClusterServerAttributeChangedCallback(const app::ConcreteAttributePath & attributePath) {}
