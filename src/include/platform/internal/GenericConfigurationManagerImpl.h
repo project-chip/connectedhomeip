@@ -137,6 +137,20 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetVendorId(uint
 }
 
 template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetProductId(uint16_t & productId)
+{
+    productId = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
+inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetSoftwareVersion(uint16_t & softwareVer)
+{
+    softwareVer = static_cast<uint32_t>(CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION);
+    return CHIP_NO_ERROR;
+}
+
+template <class ConfigClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ConfigClass>::GetDeviceTypeId(uint16_t & deviceType)
 {
     deviceType = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEVICE_TYPE);
