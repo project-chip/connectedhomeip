@@ -63,6 +63,7 @@ const AndroidConfig::Key AndroidConfig::kConfigKey_MfrDeviceCert       = { kConf
 const AndroidConfig::Key AndroidConfig::kConfigKey_MfrDeviceICACerts   = { kConfigNamespace_ChipFactory, "device-ca-certs" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_MfrDevicePrivateKey = { kConfigNamespace_ChipFactory, "device-key" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_HardwareVersion     = { kConfigNamespace_ChipFactory, "hardware-ver" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_HardwareVersionString  = { kConfigNamespace_ChipFactory, "hardware-ver-str" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_ManufacturingDate   = { kConfigNamespace_ChipFactory, "mfg-date" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_SetupPinCode        = { kConfigNamespace_ChipFactory, "pin-code" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };

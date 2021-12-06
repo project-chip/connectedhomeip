@@ -21,8 +21,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import java.util.Base64;
 import java.util.Map;
 
@@ -43,10 +41,28 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
     String key = getKey(namespace, name);
 
     switch (key) {
+      /**
+       * The unique id assigned by the device vendor to identify the product or device type.  This
+       * number is scoped to the device vendor id. return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+       */
       case kConfigNamespace_ChipFactory+":"+kConfigKey_ProductId:
-        // The unique id assigned by the device vendor to identify the product or device type.  This
-        // number is scoped to the device vendor id. return a different value than src/include/platform/CHIPDeviceConfig.h for debug
         return 65278;
+
+      /**
+       * The default hardware version number assigned to the device or product by the device vendor.
+       *
+       * Hardware versions are specific to a particular device vendor and product id, and typically
+       * correspond to a revision of the physical device, a change to its packaging, and/or a change
+       * to its marketing presentation. This value is generally *not* incremented for device software
+       * revisions.
+       *
+       * This is a default value which is used when a hardware version has not been stored in device
+       * persistent storage (e.g. by a factory provisioning process).
+       *
+       * return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+       */
+      case kConfigNamespace_ChipFactory+":"+kConfigKey_HardwareVersion:
+        return 1;
     }
 
     if (preferences.contains(key)) {
@@ -64,10 +80,19 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
     String key = getKey(namespace, name);
 
     switch (key) {
+      /**
+       * Human readable name of the device model.
+       * return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+       */
       case kConfigNamespace_ChipFactory+":"+kConfigKey_ProductName:
-        // Human readable name of the device model.
-        // return a different value than src/include/platform/CHIPDeviceConfig.h for debug
         return "TEST_ANDROID_PRODUCT";
+
+      /**
+       * Human readable string identifying version of the product assigned by the device vendor.
+       * return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+       */
+      case kConfigNamespace_ChipFactory+":"+kConfigKey_HardwareVersionString:
+        return "TEST_ANDROID_VERSION";
     }
 
     if (preferences.contains(key)) {

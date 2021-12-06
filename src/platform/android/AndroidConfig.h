@@ -59,6 +59,7 @@ public:
     static const Key kConfigKey_MfrDeviceICACerts;
     static const Key kConfigKey_MfrDevicePrivateKey;
     static const Key kConfigKey_HardwareVersion;
+    static const Key kConfigKey_HardwareVersionString;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
     static const Key kConfigKey_FabricId;

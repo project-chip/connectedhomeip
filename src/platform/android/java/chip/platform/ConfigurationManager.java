@@ -31,6 +31,7 @@ public interface ConfigurationManager {
   String kConfigKey_MfrDeviceICACerts = "device-ca-certs";
   String kConfigKey_MfrDevicePrivateKey = "device-key";
   String kConfigKey_HardwareVersion = "hardware-ver";
+  String kConfigKey_HardwareVersionString = "hardware-ver-str";
   String kConfigKey_ManufacturingDate = "mfg-date";
   String kConfigKey_SetupPinCode = "pin-code";
   String kConfigKey_SetupDiscriminator = "discriminator";
