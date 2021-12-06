@@ -77,6 +77,8 @@ public:
     static const Key kConfigKey_Breadcrumb;
     static const Key kConfigKey_ProductId;
     static const Key kConfigKey_ProductName;
+    static const Key kConfigKey_SoftwareVersion;
+    static const Key kConfigKey_SoftwareVersionString;
 
     static const char kGroupKeyNamePrefix[];
 

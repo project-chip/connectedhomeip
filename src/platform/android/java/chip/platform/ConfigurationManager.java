@@ -37,6 +37,8 @@ public interface ConfigurationManager {
   String kConfigKey_SetupDiscriminator = "discriminator";
   String kConfigKey_ProductId = "product-id";
   String kConfigKey_ProductName = "product-name";
+  String kConfigKey_SoftwareVersion = "software-version";
+  String kConfigKey_SoftwareVersionString = "software-version-str";
 
   // Keys stored in the Chip-config namespace
   String kConfigKey_FabricId = "fabric-id";

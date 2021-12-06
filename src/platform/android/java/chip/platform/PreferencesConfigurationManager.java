@@ -63,6 +63,14 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
        */
       case kConfigNamespace_ChipFactory+":"+kConfigKey_HardwareVersion:
         return 1;
+
+      /**
+       * A monothonic number identifying the software version running on the device.
+       *
+       * return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+       */
+      case kConfigNamespace_ChipFactory+":"+kConfigKey_SoftwareVersion:
+        return 1;
     }
 
     if (preferences.contains(key)) {
@@ -89,10 +97,19 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
 
       /**
        * Human readable string identifying version of the product assigned by the device vendor.
+       *
        * return a different value than src/include/platform/CHIPDeviceConfig.h for debug
        */
       case kConfigNamespace_ChipFactory+":"+kConfigKey_HardwareVersionString:
         return "TEST_ANDROID_VERSION";
+
+      /**
+       * A string identifying the software version running on the device.
+       *
+       * return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+       */
+      case kConfigNamespace_ChipFactory+":"+kConfigKey_SoftwareVersionString:
+        return "prerelease(android)";
     }
 
     if (preferences.contains(key)) {

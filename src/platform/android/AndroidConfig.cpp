@@ -69,6 +69,8 @@ const AndroidConfig::Key AndroidConfig::kConfigKey_SetupPinCode        = { kConf
 const AndroidConfig::Key AndroidConfig::kConfigKey_SetupDiscriminator  = { kConfigNamespace_ChipFactory, "discriminator" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_ProductId  = { kConfigNamespace_ChipFactory, "product-id" };
 const AndroidConfig::Key AndroidConfig::kConfigKey_ProductName  = { kConfigNamespace_ChipFactory, "product-name" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_SoftwareVersion  = { kConfigNamespace_ChipFactory, "software-version" };
+const AndroidConfig::Key AndroidConfig::kConfigKey_SoftwareVersionString  = { kConfigNamespace_ChipFactory, "software-version-str" };
 
 // Keys stored in the Chip-config namespace
 const AndroidConfig::Key AndroidConfig::kConfigKey_FabricId           = { kConfigNamespace_ChipConfig, "fabric-id" };
