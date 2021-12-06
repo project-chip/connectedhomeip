@@ -110,6 +110,21 @@ public class PreferencesConfigurationManager implements ConfigurationManager {
        */
       case kConfigNamespace_ChipFactory+":"+kConfigKey_SoftwareVersionString:
         return "prerelease(android)";
+
+      /**
+       * The ManufacturingDate attribute SHALL specify the date that the Node was manufactured. The first 8 characters SHALL specify the date of manufacture of the Node in international date notation according to ISO 8601, i.e., YYYYMMDD, e.g., 20060814. The final 8 characters MAY include country, factory, line, shift or other related information at the option of the vendor. The format of this information is vendor defined.
+       */
+      case kConfigNamespace_ChipFactory+":"+kConfigKey_ManufacturingDate:
+        return "2021-12-06";
+
+      /**
+       * Enables the use of a hard-coded default serial number if none
+       *  * is found in Chip NV storage.
+       *
+       * return a different value than src/include/platform/CHIPDeviceConfig.h for debug
+       */
+      case kConfigNamespace_ChipFactory+":"+kConfigKey_SerialNum:
+        return "TEST_ANDROID_SN";
     }
 
     if (preferences.contains(key)) {
