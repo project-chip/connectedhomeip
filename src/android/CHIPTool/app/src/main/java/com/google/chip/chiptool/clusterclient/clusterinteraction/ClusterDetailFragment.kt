@@ -202,7 +202,7 @@ class ClusterDetailFragment : Fragment() {
       parameterList.removeAllViews()
       callbackList.removeAllViews()
       // populate all the commands that belong to the selected cluster
-      var selectedCluster: String = clusterAutoComplete.adapter.getItem(position).toString()
+      val selectedCluster: String = clusterAutoComplete.adapter.getItem(position).toString()
       val commandAdapter = getCommandOptions(selectedCluster)
       commandAutoComplete.setAdapter(commandAdapter)
     }
