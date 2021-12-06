@@ -973,6 +973,7 @@ void CHIPAdministratorCommissioningAttributeListListAttributeCallbackBridge::OnS
     DispatchSuccess(context, objCValue);
 };
 
+<<<<<<< HEAD
 void CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptionBridge *>(context);
@@ -988,6 +989,27 @@ void CHIPAdministratorCommissioningAttributeListListAttributeCallbackSubscriptio
         self->mEstablishedHandler = nil;
     }
 }
+=======
+void CHIPApplicationBasicAllowedVendorListListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedShort:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+>>>>>>> 359911f36 (Run zap tool successfully)
 
 void CHIPApplicationBasicAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
@@ -1633,6 +1655,7 @@ void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge::OnSuccessF
     DispatchSuccess(context, objCValue);
 };
 
+<<<<<<< HEAD
 void CHIPContentLauncherAcceptsHeaderListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPContentLauncherAcceptsHeaderListListAttributeCallbackSubscriptionBridge *>(context);
@@ -1688,6 +1711,8 @@ void CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackSubscription
     }
 }
 
+=======
+>>>>>>> 359911f36 (Run zap tool successfully)
 void CHIPContentLauncherAttributeListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<chip::AttributeId> & value)
 {
@@ -3843,6 +3868,7 @@ void CHIPSwitchAttributeListListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
+<<<<<<< HEAD
 void CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(void * context)
 {
     auto * self = static_cast<CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge *>(context);
@@ -3860,6 +3886,9 @@ void CHIPSwitchAttributeListListAttributeCallbackSubscriptionBridge::OnSubscript
 }
 
 void CHIPTvChannelTvChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
+=======
+void CHIPTvChannelChannelListListAttributeCallbackBridge::OnSuccessFn(void * context,
+>>>>>>> 359911f36 (Run zap tool successfully)
     const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
 {
     NSArray * _Nonnull objCValue;
@@ -4983,10 +5012,21 @@ void CHIPContentLauncherClusterLaunchContentResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPContentLauncherClusterLaunchContentResponseParams new];
     {
+<<<<<<< HEAD
         response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
     }
     {
         response.contentLaunchStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
+=======
+        NSNumber * value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
+        response.contentLaunchStatus = value;
+>>>>>>> c350a1134 (Run zap tool successfully)
+    }
+    {
+        NSString * value;
+        value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+        response.data = value;
     }
     DispatchSuccess(context, response);
 };
@@ -4996,10 +5036,21 @@ void CHIPContentLauncherClusterLaunchURLResponseCallbackBridge::OnSuccessFn(
 {
     auto * response = [CHIPContentLauncherClusterLaunchURLResponseParams new];
     {
+<<<<<<< HEAD
         response.data = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
     }
     {
         response.contentLaunchStatus = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
+=======
+        NSNumber * value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.contentLaunchStatus)];
+        response.contentLaunchStatus = value;
+>>>>>>> c350a1134 (Run zap tool successfully)
+    }
+    {
+        NSString * value;
+        value = [[NSString alloc] initWithBytes:data.data.data() length:data.data.size() encoding:NSUTF8StringEncoding];
+        response.data = value;
     }
     DispatchSuccess(context, response);
 };
@@ -11261,6 +11312,7 @@ void CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackBridg
     DispatchSuccess(context, objCValue);
 };
 
+<<<<<<< HEAD
 void CHIPNullableContentLauncherClusterContentLaunchStatusAttributeCallbackSubscriptionBridge::OnSubscriptionEstablished(
     void * context)
 {
@@ -11333,6 +11385,8 @@ void CHIPNullableContentLauncherClusterContentLaunchStreamingTypeAttributeCallba
     }
 }
 
+=======
+>>>>>>> 359911f36 (Run zap tool successfully)
 void CHIPAudioOutputClusterAudioOutputTypeAttributeCallbackBridge::OnSuccessFn(
     void * context, chip::app::Clusters::AudioOutput::AudioOutputType value)
 {

@@ -13496,7 +13496,7 @@
           ],
           "attributes": [
             {
-              "name": "tv channel list",
+              "name": "channel list",
               "code": 0,
               "mfgCode": null,
               "side": "server",
@@ -13511,12 +13511,12 @@
               "reportableChange": 0
             },
             {
-              "name": "tv channel lineup",
+              "name": "channel lineup",
               "code": 1,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -13526,12 +13526,12 @@
               "reportableChange": 0
             },
             {
-              "name": "current tv channel",
+              "name": "current channel",
               "code": 2,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -13901,12 +13901,12 @@
               "reportableChange": 0
             },
             {
-              "name": "position updated at",
+              "name": "position",
               "code": 3,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
@@ -13916,7 +13916,7 @@
               "reportableChange": 0
             },
             {
-              "name": "position",
+              "name": "playback speed",
               "code": 4,
               "mfgCode": null,
               "side": "server",
@@ -13931,7 +13931,7 @@
               "reportableChange": 0
             },
             {
-              "name": "playback speed",
+              "name": "seek range end",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -13946,23 +13946,8 @@
               "reportableChange": 0
             },
             {
-              "name": "seek range end",
-              "code": 6,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "",
-              "reportable": 1,
-              "minInterval": 1,
-              "maxInterval": 65534,
-              "reportableChange": 0
-            },
-            {
               "name": "seek range start",
-              "code": 7,
+              "code": 6,
               "mfgCode": null,
               "side": "server",
               "included": 1,
@@ -14522,27 +14507,12 @@
               "reportableChange": 0
             },
             {
-              "name": "catalog vendor id",
+              "name": "application launcher app",
               "code": 1,
               "mfgCode": null,
               "side": "server",
               "included": 1,
-              "storageOption": "RAM",
-              "singleton": 0,
-              "bounded": 0,
-              "defaultValue": "0x00",
-              "reportable": 1,
-              "minInterval": 0,
-              "maxInterval": 65344,
-              "reportableChange": 0
-            },
-            {
-              "name": "application id",
-              "code": 2,
-              "mfgCode": null,
-              "side": "server",
-              "included": 1,
-              "storageOption": "RAM",
+              "storageOption": "External",
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
@@ -14664,7 +14634,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application id",
+              "name": "application status",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -14679,7 +14649,7 @@
               "reportableChange": 0
             },
             {
-              "name": "catalog vendor id",
+              "name": "application version",
               "code": 6,
               "mfgCode": null,
               "side": "server",
@@ -14694,7 +14664,7 @@
               "reportableChange": 0
             },
             {
-              "name": "application status",
+              "name": "allowed vendor list",
               "code": 7,
               "mfgCode": null,
               "side": "server",
