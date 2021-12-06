@@ -158,7 +158,7 @@ CHIP_ERROR ContentLauncherManager::GetAcceptsHeader(chip::app::AttributeValueEnc
     VerifyOrExit(mGetAcceptsHeaderMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    return aEncoder.EncodeList([this, env](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
         jobjectArray headersArray = (jobjectArray) env->CallObjectMethod(mContentLauncherManagerObject, mGetAcceptsHeaderMethod);
         if (env->ExceptionCheck())
         {
@@ -206,7 +206,7 @@ CHIP_ERROR ContentLauncherManager::GetSupportedStreamingTypes(chip::app::Attribu
     VerifyOrExit(mGetSupportedStreamingTypesMethod != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(env != NULL, err = CHIP_JNI_ERROR_NO_ENV);
 
-    return aEncoder.EncodeList([this, env](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([this, env](const auto & encoder) -> CHIP_ERROR {
         jintArray typesArray = (jintArray) env->CallObjectMethod(mContentLauncherManagerObject, mGetSupportedStreamingTypesMethod);
         if (env->ExceptionCheck())
         {

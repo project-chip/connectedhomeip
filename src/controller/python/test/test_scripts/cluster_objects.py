@@ -28,13 +28,29 @@ logger.setLevel(logging.INFO)
 NODE_ID = 1
 LIGHTING_ENDPOINT_ID = 1
 
+# Ignore failures decoding these attributes (e.g. not yet implemented)
+ignoreAttributeDecodeFailureList = [
+    '0/31/0', '0/31/1'
+]
 
-def _AssumeDecodeSuccess(values):
-    for k, v in values.items():
+
+def _IgnoreAttributeDecodeFailure(path):
+    return str(path) in ignoreAttributeDecodeFailureList
+
+
+def _AssumeAttributesDecodeSuccess(values):
+    for k, v in values['Attributes'].items():
         print(f"{k} = {v}")
         if isinstance(v.Data, ValueDecodeFailure):
-            raise AssertionError(
-                f"Cannot decode value for path {k}, got error: '{str(v.Data.Reason)}', raw TLV data: '{v.Data.TLVValue}'")
+            if _IgnoreAttributeDecodeFailure(k):
+                print(f"Ignoring attribute decode failure for path {k}")
+            else:
+                raise AssertionError(
+                    f"Cannot decode value for path {k}, got error: '{str(v.Data.Reason)}', raw TLV data: '{v.Data.TLVValue}'")
+
+
+def _AssumeEventsDecodeSuccess(values):
+    print(f"Dump the events: {values} ")
 
 
 class ClusterObjectTests:
@@ -127,7 +143,7 @@ class ClusterObjectTests:
             raise AssertionError("Did not receive updated attribute")
 
     @classmethod
-    async def TestReadRequests(cls, devCtrl):
+    async def TestReadAttributeRequests(cls, devCtrl):
         '''
         Tests out various permutations of endpoint, cluster and attribute ID (with wildcards) to validate
         reads.
@@ -143,40 +159,73 @@ class ClusterObjectTests:
             (0, Clusters.Basic.Attributes.HardwareVersion),
         ]
         res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req)
-        if (len(res) != 3):
+        if (len(res['Attributes']) != 3):
             raise AssertionError(
-                f"Got back {len(res)} data items instead of 3")
-        _AssumeDecodeSuccess(res)
+                f"Got back {len(res['Attributes'])} data items instead of 3")
+        _AssumeAttributesDecodeSuccess(res)
 
         logger.info("2: Reading Ex Cx A*")
         req = [
             (0, Clusters.Basic),
         ]
-        _AssumeDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+        _AssumeAttributesDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
         logger.info("3: Reading E* Cx Ax")
         req = [
             Clusters.Descriptor.Attributes.ServerList
         ]
-        _AssumeDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+        _AssumeAttributesDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
         logger.info("4: Reading Ex C* A*")
         req = [
             0
         ]
-        _AssumeDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+        _AssumeAttributesDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
         logger.info("5: Reading E* Cx A*")
         req = [
             Clusters.Descriptor
         ]
-        _AssumeDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+        _AssumeAttributesDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
 
         logger.info("6: Reading E* C* A*")
         req = [
             '*'
         ]
-        _AssumeDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+        _AssumeAttributesDecodeSuccess(await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=req))
+
+        logger.info("7: Reading Chunked List")
+        res = await devCtrl.ReadAttribute(nodeid=NODE_ID, attributes=[(1, Clusters.TestCluster.Attributes.ListLongOctetString)])
+        if res.get('Attributes', {}).get(AttributePath(EndpointId=1, Attribute=Clusters.TestCluster.Attributes.ListLongOctetString)).Data.value != [b'0123456789abcdef' * 32] * 4:
+            raise AssertionError("Unexpected read result")
+
+    @classmethod
+    async def TestReadEventRequests(cls, devCtrl):
+        logger.info("1: Reading Ex Cx Ex")
+        req = [
+            (0, Clusters.TestCluster.Events.TestEvent),
+        ]
+        _AssumeEventsDecodeSuccess(await devCtrl.ReadEvent(nodeid=NODE_ID, events=req))
+
+        logger.info("2: Reading Ex Cx E*")
+        req = [
+            (0, Clusters.TestCluster),
+        ]
+        _AssumeEventsDecodeSuccess(await devCtrl.ReadEvent(nodeid=NODE_ID, events=req))
+
+        logger.info("3: Reading Ex C* E*")
+        req = [
+            0
+        ]
+        _AssumeEventsDecodeSuccess(await devCtrl.ReadEvent(nodeid=NODE_ID, events=req))
+
+        logger.info("4: Reading E* C* E*")
+        req = [
+            '*'
+        ]
+        _AssumeEventsDecodeSuccess(await devCtrl.ReadEvent(nodeid=NODE_ID, events=req))
+
+        # TODO: Add more wildcard test for IM events.
 
     @classmethod
     async def RunTest(cls, devCtrl):
@@ -186,7 +235,8 @@ class ClusterObjectTests:
             await cls.RoundTripTestWithBadEndpoint(devCtrl)
             await cls.SendCommandWithResponse(devCtrl)
             await cls.SendWriteRequest(devCtrl)
-            await cls.TestReadRequests(devCtrl)
+            await cls.TestReadAttributeRequests(devCtrl)
+            await cls.TestReadEventRequests(devCtrl)
             await cls.TestSubscribeAttribute(devCtrl)
         except Exception as ex:
             logger.error(

@@ -289,10 +289,20 @@ CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate
 
     ctxt.mCurrentEventNumber = GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->GetLastEventNumber();
     ctxt.mCurrentTime.mValue = GetPriorityBuffer(apOptions->mpEventSchema->mPriority)->GetLastEventTimestamp();
-    err                      = ConstructEvent(&ctxt, apDelegate, apOptions);
-    if (CHIP_NO_ERROR == err)
+
+    TLVWriter checkpoint = ctxt.mWriter;
+    err                  = ConstructEvent(&ctxt, apDelegate, apOptions);
+    if (err != CHIP_NO_ERROR)
     {
-        requiredSize = writer.GetLengthWritten();
+        ctxt.mWriter = checkpoint;
+    }
+    else
+    {
+        // update these variables since ConstructEvent can be used to track the
+        // state of a set of events over multiple calls.
+        ctxt.mCurrentEventNumber++;
+        ctxt.mCurrentTime = apOptions->mTimestamp;
+        requiredSize      = writer.GetLengthWritten();
     }
     return err;
 }
@@ -300,27 +310,22 @@ CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate
 CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate,
                                            const EventOptions * apOptions)
 {
-
-    CHIP_ERROR err       = CHIP_NO_ERROR;
-    TLVWriter checkpoint = apContext->mWriter;
     TLV::TLVType dataContainerType;
-    EventReportIB::Builder eventReportBuilder;
-    EventDataIB::Builder eventDataIBBuilder;
-    EventPathIB::Builder eventPathBuilder;
     uint64_t deltatime = 0;
 
-    VerifyOrExit(apContext->mCurrentEventNumber >= apContext->mStartingEventNumber,
-                 /* no-op: don't write event, but advance current event Number */);
+    VerifyOrReturnError(apContext->mCurrentEventNumber >= apContext->mStartingEventNumber, CHIP_NO_ERROR
+                        /* no-op: don't write event, but advance current event Number */);
 
-    VerifyOrExit(apOptions != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(apOptions != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
+    EventReportIB::Builder eventReportBuilder;
     eventReportBuilder.Init(&(apContext->mWriter));
     // TODO: Update IsUrgent, issue 11386
     // TODO: Update statusIB, issue 11388
-    eventDataIBBuilder = eventReportBuilder.CreateEventData();
-    eventPathBuilder   = eventDataIBBuilder.CreatePath();
-    err                = eventDataIBBuilder.GetError();
-    SuccessOrExit(err);
+    EventDataIB::Builder & eventDataIBBuilder = eventReportBuilder.CreateEventData();
+    ReturnErrorOnFailure(eventReportBuilder.GetError());
+    EventPathIB::Builder & eventPathBuilder = eventDataIBBuilder.CreatePath();
+    ReturnErrorOnFailure(eventDataIBBuilder.GetError());
 
     // TODO: Revisit NodeId since the the encoding spec and the IM seem to disagree on how this stuff works
     eventPathBuilder.Node(apOptions->mpEventSchema->mNodeId)
@@ -329,10 +334,9 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
         .Event(apOptions->mpEventSchema->mEventId)
         .IsUrgent(false)
         .EndOfEventPathIB();
-    err = eventPathBuilder.GetError();
-    SuccessOrExit(err);
-
+    ReturnErrorOnFailure(eventPathBuilder.GetError());
     eventDataIBBuilder.Priority(chip::to_underlying(apContext->mPriority));
+    ReturnErrorOnFailure(eventDataIBBuilder.GetError());
 
     deltatime = apOptions->mTimestamp.mValue - apContext->mCurrentTime.mValue;
     if (apOptions->mTimestamp.IsSystem())
@@ -344,42 +348,20 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
         eventDataIBBuilder.DeltaEpochTimestamp(deltatime);
     }
 
-    err = eventDataIBBuilder.GetError();
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(eventDataIBBuilder.GetError());
 
-    err = apContext->mWriter.StartContainer(ContextTag(chip::to_underlying(EventDataIB::Tag::kData)), TLV::kTLVType_Structure,
-                                            dataContainerType);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(apContext->mWriter.StartContainer(ContextTag(chip::to_underlying(EventDataIB::Tag::kData)),
+                                                           TLV::kTLVType_Structure, dataContainerType));
     // Callback to write the EventData
-    err = apDelegate->WriteEvent(apContext->mWriter);
-    SuccessOrExit(err);
-
-    err = apContext->mWriter.EndContainer(dataContainerType);
-    SuccessOrExit(err);
-
+    ReturnErrorOnFailure(apDelegate->WriteEvent(apContext->mWriter));
+    ReturnErrorOnFailure(apContext->mWriter.EndContainer(dataContainerType));
     eventDataIBBuilder.EndOfEventDataIB();
-    SuccessOrExit(err = eventDataIBBuilder.GetError());
+    ReturnErrorOnFailure(eventDataIBBuilder.GetError());
     eventReportBuilder.EndOfEventReportIB();
-    SuccessOrExit(err = eventReportBuilder.GetError());
-
-    err = apContext->mWriter.Finalize();
-    SuccessOrExit(err);
-
+    ReturnErrorOnFailure(eventReportBuilder.GetError());
+    ReturnErrorOnFailure(apContext->mWriter.Finalize());
     apContext->mFirst = false;
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        apContext->mWriter = checkpoint;
-    }
-    else
-    {
-        // update these variables since ConstructEvent can be used to track the
-        // state of a set of events over multiple calls.
-        apContext->mCurrentEventNumber++;
-        apContext->mCurrentTime = apOptions->mTimestamp;
-    }
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void EventManagement::CreateEventManagement(Messaging::ExchangeManager * apExchangeManager, uint32_t aNumBuffers,
@@ -449,12 +431,6 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
     CopyAndAdjustDeltaTimeContext * ctx = static_cast<CopyAndAdjustDeltaTimeContext *>(apContext);
     TLVReader reader(aReader);
 
-    if (aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kPath)))
-    {
-        err =
-            ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kEventNumber)), ctx->mpContext->mCurrentEventNumber);
-    }
-
     if (aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaSystemTimestamp)) ||
         aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kDeltaEpochTimestamp)))
     {
@@ -490,6 +466,11 @@ CHIP_ERROR EventManagement::CopyAndAdjustDeltaTime(const TLVReader & aReader, si
         err = ctx->mpWriter->CopyElement(reader);
     }
 
+    if (aReader.GetTag() == TLV::ContextTag(to_underlying(EventDataIB::Tag::kPath)))
+    {
+        err =
+            ctx->mpWriter->Put(TLV::ContextTag(to_underlying(EventDataIB::Tag::kEventNumber)), ctx->mpContext->mCurrentEventNumber);
+    }
     return err;
 }
 
@@ -762,7 +743,6 @@ CHIP_ERROR EventManagement::FetchEventsSince(TLVWriter & aWriter, ClusterInfo * 
     }
 
 exit:
-    ChipLogProgress(EventLogging, "Debug log, err: %s\n", chip::ErrorStr(err));
     aEventNumber = context.mCurrentEventNumber;
     aEventCount += context.mEventCount;
     return err;

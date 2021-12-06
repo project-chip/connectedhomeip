@@ -36,18 +36,16 @@ CHIP_ERROR WriteClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callbac
     VerifyOrReturnError(mpExchangeMgr == nullptr, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mpExchangeCtx == nullptr, CHIP_ERROR_INCORRECT_STATE);
 
-    AttributeDataIBs::Builder attributeDataIBsBuilder;
     System::PacketBufferHandle packet = System::PacketBufferHandle::New(chip::app::kMaxSecureSduLengthBytes);
     VerifyOrReturnError(!packet.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     mMessageWriter.Init(std::move(packet));
 
     ReturnErrorOnFailure(mWriteRequestBuilder.Init(&mMessageWriter));
-    mWriteRequestBuilder.TimedRequest(false).IsFabricFiltered(false);
+    mWriteRequestBuilder.TimedRequest(false);
     ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
-    attributeDataIBsBuilder = mWriteRequestBuilder.CreateWriteRequests();
-    ReturnErrorOnFailure(attributeDataIBsBuilder.GetError());
-
+    mWriteRequestBuilder.CreateWriteRequests();
+    ReturnErrorOnFailure(mWriteRequestBuilder.GetError());
     ClearExistingExchangeContext();
     mpExchangeMgr         = apExchangeMgr;
     mpCallback            = apCallback;
@@ -93,7 +91,7 @@ CHIP_ERROR WriteClient::ProcessWriteResponseMessage(System::PacketBufferHandle &
     System::PacketBufferTLVReader reader;
     TLV::TLVReader attributeStatusesReader;
     WriteResponseMessage::Parser writeResponse;
-    AttributeStatuses::Parser attributeStatusesParser;
+    AttributeStatusIBs::Parser attributeStatusesParser;
 
     reader.Init(std::move(payload));
     err = reader.Next();
@@ -137,9 +135,14 @@ exit:
 CHIP_ERROR WriteClient::PrepareAttribute(const AttributePathParams & attributePathParams)
 {
     VerifyOrReturnError(attributePathParams.IsValidAttributePath(), CHIP_ERROR_INVALID_PATH_LIST);
-    AttributeDataIB::Builder attributeDataIB = mWriteRequestBuilder.GetWriteRequests().CreateAttributeDataIBBuilder();
+    AttributeDataIBs::Builder & writeRequests  = mWriteRequestBuilder.GetWriteRequests();
+    AttributeDataIB::Builder & attributeDataIB = writeRequests.CreateAttributeDataIBBuilder();
+    ReturnErrorOnFailure(writeRequests.GetError());
+    // TODO: Add attribute version support
+    attributeDataIB.DataVersion(0);
     ReturnErrorOnFailure(attributeDataIB.GetError());
-    ReturnErrorOnFailure(attributeDataIB.CreatePath().Encode(attributePathParams));
+    AttributePathIB::Builder & path = attributeDataIB.CreatePath();
+    ReturnErrorOnFailure(path.Encode(attributePathParams));
     return CHIP_NO_ERROR;
 }
 
@@ -148,9 +151,6 @@ CHIP_ERROR WriteClient::FinishAttribute()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     AttributeDataIB::Builder AttributeDataIB = mWriteRequestBuilder.GetWriteRequests().GetAttributeDataIBBuilder();
-
-    // TODO: Add attribute version support
-    AttributeDataIB.DataVersion(0);
     AttributeDataIB.EndOfAttributeDataIB();
     SuccessOrExit(err = AttributeDataIB.GetError());
     MoveToState(State::AddAttribute);
@@ -173,7 +173,7 @@ CHIP_ERROR WriteClient::FinalizeMessage(System::PacketBufferHandle & aPacket)
     err                     = AttributeDataIBsBuilder.GetError();
     SuccessOrExit(err);
 
-    mWriteRequestBuilder.EndOfWriteRequestMessage();
+    mWriteRequestBuilder.IsFabricFiltered(false).EndOfWriteRequestMessage();
     err = mWriteRequestBuilder.GetError();
     SuccessOrExit(err);
 

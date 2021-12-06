@@ -20,7 +20,6 @@
 
 #include "../../config/PersistentStorage.h"
 #include "../common/CHIPCommand.h"
-#include <controller/ExampleOperationalCredentialsIssuer.h>
 
 class DiscoverCommand : public CHIPCommand, public chip::Controller::DeviceAddressUpdateDelegate
 {

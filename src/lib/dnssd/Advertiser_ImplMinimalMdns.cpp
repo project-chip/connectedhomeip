@@ -724,29 +724,30 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
 bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr)
 {
     auto & server = GlobalMinimalMdnsServer::Server();
-    for (unsigned i = 0; i < server.GetEndpointCount(); i++)
-    {
-        const ServerBase::EndpointInfo & info = server.GetEndpoints()[i];
 
-        if (info.listen_udp == nullptr)
+    bool result = false;
+
+    server.ForEachEndPoints([&](auto * info) {
+        if (info->mListenUdp == nullptr)
         {
-            continue;
+            return chip::Loop::Continue;
         }
 
-        if (info.interfaceId != id)
+        if (info->mInterfaceId != id)
         {
-            continue;
+            return chip::Loop::Continue;
         }
 
-        if (info.addressType != addr.Type())
+        if (info->mAddressType != addr.Type())
         {
-            continue;
+            return chip::Loop::Continue;
         }
 
-        return true;
-    }
+        result = true;
+        return chip::Loop::Break;
+    });
 
-    return false;
+    return result;
 }
 
 void AdvertiserMinMdns::AdvertiseRecords()

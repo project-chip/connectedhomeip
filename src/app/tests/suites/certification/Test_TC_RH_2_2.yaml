@@ -28,12 +28,14 @@ tests:
       disabled: true
       command: "readAttribute"
       attribute: "measured value"
+      PICS: A_RELATIVEHUMIDITY
       response:
           value: 0
 
     - label: "Reads MeasuredValue attribute from DUT"
       command: "readAttribute"
       attribute: "measured value"
+      PICS: A_RELATIVEHUMIDITY
       response:
           constraints:
               type: uint16
@@ -41,18 +43,21 @@ tests:
     #Disabled as UI prompts required for user action
     - label: "Operate on device to change the relative humidity significantly"
       disabled: true
+      PICS: MANUAL_RELATIVEHUMIDITY_CHANGE
 
     #Disabled as values needs to be compared with the value read in step 2
     - label: "Reads back MeasuredValue attribute from DUT after few seconds"
       disabled: true
       command: "readAttribute"
       attribute: "measured value"
+      PICS: A_RELATIVEHUMIDITY
       response:
           value: 0
 
     - label: "Read the mandatory attribute: MeasuredValue"
       command: "readAttribute"
       attribute: "measured value"
+      PICS: A_RELATIVEHUMIDITY
       response:
           constraints:
               type: uint16

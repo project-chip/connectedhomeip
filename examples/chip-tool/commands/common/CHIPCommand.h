@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+
 #include "../../config/PersistentStorage.h"
 #include "Command.h"
 
@@ -69,6 +71,7 @@ protected:
     PersistentStorage mDefaultStorage;
     PersistentStorage mCommissionerStorage;
     chip::SimpleFabricStorage mFabricStorage;
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
     std::string GetIdentity();
     void SetIdentity(const char * name);
@@ -88,7 +91,6 @@ private:
     static void RunQueuedCommand(intptr_t commandArg);
 
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
     CHIP_ERROR StartWaiting(chip::System::Clock::Timeout seconds);
     void StopWaiting();

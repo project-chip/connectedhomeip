@@ -14,6 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("args.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 
@@ -22,6 +23,9 @@ assert(chip_build_tools)
 executable("chip-tv-app") {
   sources = [
     "${chip_root}/examples/tv-app/tv-common/include/CHIPProjectAppConfig.h",
+    "AppImpl.cpp",
+    "AppImpl.h",
+    "AppPlatformShellCommands.cpp",
     "include/account-login/AccountLoginManager.cpp",
     "include/account-login/AccountLoginManager.h",
     "include/application-basic/ApplicationBasicManager.cpp",
@@ -61,6 +65,10 @@ executable("chip-tv-app") {
   ]
 
   cflags = [ "-Wconversion" ]
+
+  if (chip_build_libshell) {
+    cflags += [ "-DENABLE_CHIP_SHELL" ]
+  }
 
   output_dir = root_out_dir
 }

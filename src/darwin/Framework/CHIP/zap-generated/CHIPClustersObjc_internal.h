@@ -21,6 +21,10 @@
 
 #import "CHIPDevice.h"
 
+@interface CHIPAccessControl ()
+@property (readonly) chip::Controller::AccessControlCluster cppCluster;
+@end
+
 @interface CHIPAccountLogin ()
 @property (readonly) chip::Controller::AccountLoginCluster cppCluster;
 @end
@@ -183,6 +187,10 @@
 
 @interface CHIPPowerSource ()
 @property (readonly) chip::Controller::PowerSourceCluster cppCluster;
+@end
+
+@interface CHIPPowerSourceConfiguration ()
+@property (readonly) chip::Controller::PowerSourceConfigurationCluster cppCluster;
 @end
 
 @interface CHIPPressureMeasurement ()

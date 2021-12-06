@@ -15,34 +15,34 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 <configurator>
-  <domain name="CHIP"/>
+  <domain name="CHIP" />
 
   <struct name="GroupState">
-    <cluster code="0xF004"/>
-    <item name="VendorId" type="INT16U"/>
-    <item name="VendorGroupId" type="INT16U"/>
-    <item name="GroupKeySetIndex" type="INT16U"/>
+    <cluster code="0x003F" />
+    <item name="VendorId" type="INT16U" />
+    <item name="VendorGroupId" type="INT16U" />
+    <item name="GroupKeySetIndex" type="INT16U" />
   </struct>
 
   <struct name="GroupKey">
-    <cluster code="0xF004"/>
-    <item name="VendorId" type="INT16U"/>
-    <item name="GroupKeyIndex" type="INT16U"/>
-    <item name="GroupKeyRoot" type="OCTET_STRING" length="16"/>
-    <item name="GroupKeyEpochStartTime" type="INT64U"/>
-    <item name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicy"/>
+    <cluster code="0x003F" />
+    <item name="VendorId" type="INT16U" />
+    <item name="GroupKeyIndex" type="INT16U" />
+    <item name="GroupKeyRoot" type="OCTET_STRING" length="16" />
+    <item name="GroupKeyEpochStartTime" type="INT64U" />
+    <item name="GroupKeySecurityPolicy" type="GroupKeySecurityPolicy" />
   </struct>
 
   <enum name="GroupKeySecurityPolicy" type="ENUM8">
-    <cluster code="0xF004"/>
-    <item name="Standard" value="0x00"/>
-    <item name="LowLatency" value="0x01"/>
+    <cluster code="0x003F" />
+    <item name="Standard" value="0x00" />
+    <item name="LowLatency" value="0x01" />
   </enum>
 
   <cluster>
     <domain>General</domain>
     <name>Group Key Management</name>
-    <code>0xF004</code>
+    <code>0x003F</code>
     <define>GROUP_KEY_MANAGEMENT_CLUSTER</define>
     <description>The Group Key Management Cluster is the mechanism by which group keys are managed.</description>
     <attribute side="server" code="0x0000" define="GROUPS" type="ARRAY" entryType="GroupState" length="254" writable="false" optional="false">groups</attribute>

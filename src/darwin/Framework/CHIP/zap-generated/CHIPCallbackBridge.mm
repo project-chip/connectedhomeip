@@ -285,6 +285,97 @@ void CHIPNullableVendorIdAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPAccessControlAclListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+        value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPAccessControlClusterAccessControlEntry * newElement_0;
+        newElement_0 = [CHIPAccessControlClusterAccessControlEntry new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+        newElement_0.privilege = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.privilege)];
+        newElement_0.authMode = [NSNumber numberWithUnsignedChar:chip::to_underlying(entry_0.authMode)];
+        if (entry_0.subjects.IsNull()) {
+            newElement_0.subjects = nil;
+        } else {
+            auto * array_NaN = [NSMutableArray new];
+            auto iter_NaN = entry_0.subjects.Value().begin();
+            while (iter_NaN.Next()) {
+                auto & entry_NaN = iter_NaN.GetValue();
+                NSNumber * newElement_NaN;
+                newElement_NaN = [NSNumber numberWithUnsignedLongLong:entry_NaN];
+                [array_NaN addObject:newElement_NaN];
+            }
+            if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+            }
+            newElement_0.subjects = array_NaN;
+        }
+        if (entry_0.targets.IsNull()) {
+            newElement_0.targets = nil;
+        } else {
+            auto * array_NaN = [NSMutableArray new];
+            auto iter_NaN = entry_0.targets.Value().begin();
+            while (iter_NaN.Next()) {
+                auto & entry_NaN = iter_NaN.GetValue();
+                CHIPAccessControlClusterTarget * newElement_NaN;
+                newElement_NaN = [CHIPAccessControlClusterTarget new];
+                if (entry_NaN.cluster.IsNull()) {
+                    newElement_NaN.cluster = nil;
+                } else {
+                    newElement_NaN.cluster = [NSNumber numberWithUnsignedInt:entry_NaN.cluster.Value()];
+                }
+                if (entry_NaN.endpoint.IsNull()) {
+                    newElement_NaN.endpoint = nil;
+                } else {
+                    newElement_NaN.endpoint = [NSNumber numberWithUnsignedShort:entry_NaN.endpoint.Value()];
+                }
+                if (entry_NaN.deviceType.IsNull()) {
+                    newElement_NaN.deviceType = nil;
+                } else {
+                    newElement_NaN.deviceType = [NSNumber numberWithUnsignedInt:entry_NaN.deviceType.Value()];
+                }
+                [array_NaN addObject:newElement_NaN];
+            }
+            if (iter_NaN.GetStatus() != CHIP_NO_ERROR) {
+            }
+            newElement_0.targets = array_NaN;
+        }
+        [array_0 addObject:newElement_0];
+    }
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
+void CHIPAccessControlExtensionListAttributeCallbackBridge::OnSuccessFn(void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        CHIPAccessControlClusterExtensionEntry * newElement_0;
+        newElement_0 = [CHIPAccessControlClusterExtensionEntry new];
+        newElement_0.fabricIndex = [NSNumber numberWithUnsignedChar:entry_0.fabricIndex];
+        newElement_0.data = [NSData dataWithBytes:entry_0.data.data() length:entry_0.data.size()];
+        [array_0 addObject:newElement_0];
+    }
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
 void CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge::OnSuccessFn(
     void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
 {
@@ -830,6 +921,26 @@ void CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSNumber * newElement_0;
+        newElement_0 = [NSNumber numberWithUnsignedChar:entry_0];
+        [array_0 addObject:newElement_0];
+    }
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
 void CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
         value)
@@ -1150,6 +1261,26 @@ void CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge::
     DispatchSuccess(context, objCValue);
 };
 
+void CHIPTestClusterListLongOctetStringListAttributeCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+{
+    NSArray * _Nonnull objCValue;
+    auto * array_0 = [NSMutableArray new];
+    auto iter_0 = value.begin();
+    while (iter_0.Next()) {
+        auto & entry_0 = iter_0.GetValue();
+        NSData * newElement_0;
+        newElement_0 = [NSData dataWithBytes:entry_0.data() length:entry_0.size()];
+        [array_0 addObject:newElement_0];
+    }
+    if (iter_0.GetStatus() != CHIP_NO_ERROR) {
+        OnFailureFn(context, EMBER_ZCL_STATUS_INVALID_VALUE);
+        return;
+    }
+    objCValue = array_0;
+    DispatchSuccess(context, objCValue);
+};
+
 void CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge::OnSuccessFn(void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value)
@@ -1382,102 +1513,18 @@ void CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPDoorLockClusterClearAllPinsResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::ClearAllPinsResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterClearAllPinsResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::ClearAllRfidsResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterClearAllRfidsResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::ClearHolidayScheduleResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterClearHolidayScheduleResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterClearPinResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::ClearPinResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterClearPinResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterClearRfidResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::ClearRfidResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterClearRfidResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::ClearWeekdayScheduleResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterClearWeekdayScheduleResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::ClearYeardayScheduleResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterClearYeardayScheduleResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
 void CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
     void * context, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data)
 {
     auto * response = [CHIPDoorLockClusterGetHolidayScheduleResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.scheduleId];
-        response.scheduleId = value;
+        value = [NSNumber numberWithUnsignedChar:data.holidayIndex];
+        response.holidayIndex = value;
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
         response.status = value;
     }
     {
@@ -1492,8 +1539,8 @@ void CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.operatingModeDuringHoliday];
-        response.operatingModeDuringHoliday = value;
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.operatingMode)];
+        response.operatingMode = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1540,10 +1587,10 @@ void CHIPDoorLockClusterGetLogRecordResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPDoorLockClusterGetPinResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetPinResponse::DecodableType & data)
+void CHIPDoorLockClusterGetPINCodeResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType & data)
 {
-    auto * response = [CHIPDoorLockClusterGetPinResponseParams new];
+    auto * response = [CHIPDoorLockClusterGetPINCodeResponseParams new];
     {
         NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.userId];
@@ -1551,26 +1598,38 @@ void CHIPDoorLockClusterGetPinResponseCallbackBridge::OnSuccessFn(
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus)];
+        if (data.userStatus.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus.Value())];
+        }
         response.userStatus = value;
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType)];
+        if (data.userType.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType.Value())];
+        }
         response.userType = value;
     }
     {
         NSData * value;
-        value = [NSData dataWithBytes:data.pin.data() length:data.pin.size()];
+        if (data.pin.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSData dataWithBytes:data.pin.Value().data() length:data.pin.Value().size()];
+        }
         response.pin = value;
     }
     DispatchSuccess(context, response);
 };
 
-void CHIPDoorLockClusterGetRfidResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetRfidResponse::DecodableType & data)
+void CHIPDoorLockClusterGetRFIDCodeResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType & data)
 {
-    auto * response = [CHIPDoorLockClusterGetRfidResponseParams new];
+    auto * response = [CHIPDoorLockClusterGetRFIDCodeResponseParams new];
     {
         NSNumber * value;
         value = [NSNumber numberWithUnsignedShort:data.userId];
@@ -1578,18 +1637,30 @@ void CHIPDoorLockClusterGetRfidResponseCallbackBridge::OnSuccessFn(
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus)];
+        if (data.userStatus.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userStatus.Value())];
+        }
         response.userStatus = value;
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType)];
+        if (data.userType.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.userType.Value())];
+        }
         response.userType = value;
     }
     {
         NSData * value;
-        value = [NSData dataWithBytes:data.rfid.data() length:data.rfid.size()];
-        response.rfid = value;
+        if (data.rfidCode.IsNull()) {
+            value = nil;
+        } else {
+            value = [NSData dataWithBytes:data.rfidCode.Value().data() length:data.rfidCode.Value().size()];
+        }
+        response.rfidCode = value;
     }
     DispatchSuccess(context, response);
 };
@@ -1611,28 +1682,28 @@ void CHIPDoorLockClusterGetUserTypeResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekdayScheduleResponse::DecodableType & data)
+void CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data)
 {
-    auto * response = [CHIPDoorLockClusterGetWeekdayScheduleResponseParams new];
+    auto * response = [CHIPDoorLockClusterGetWeekDayScheduleResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.scheduleId];
-        response.scheduleId = value;
+        value = [NSNumber numberWithUnsignedChar:data.weekDayIndex];
+        response.weekDayIndex = value;
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.userId];
-        response.userId = value;
+        value = [NSNumber numberWithUnsignedShort:data.userIndex];
+        response.userIndex = value;
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
         response.status = value;
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.daysMask];
+        value = [NSNumber numberWithUnsignedChar:data.daysMask.Raw()];
         response.daysMask = value;
     }
     {
@@ -1658,23 +1729,23 @@ void CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge::OnSuccessFn(
     DispatchSuccess(context, response);
 };
 
-void CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::GetYeardayScheduleResponse::DecodableType & data)
+void CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge::OnSuccessFn(
+    void * context, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data)
 {
-    auto * response = [CHIPDoorLockClusterGetYeardayScheduleResponseParams new];
+    auto * response = [CHIPDoorLockClusterGetYearDayScheduleResponseParams new];
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.scheduleId];
-        response.scheduleId = value;
+        value = [NSNumber numberWithUnsignedChar:data.yearDayIndex];
+        response.yearDayIndex = value;
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedShort:data.userId];
-        response.userId = value;
+        value = [NSNumber numberWithUnsignedShort:data.userIndex];
+        response.userIndex = value;
     }
     {
         NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
+        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
         response.status = value;
     }
     {
@@ -1686,114 +1757,6 @@ void CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge::OnSuccessFn(
         NSNumber * value;
         value = [NSNumber numberWithUnsignedInt:data.localEndTime];
         response.localEndTime = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterLockDoorResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::LockDoorResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterLockDoorResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::SetHolidayScheduleResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterSetHolidayScheduleResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterSetPinResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::SetPinResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterSetPinResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterSetRfidResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::SetRfidResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterSetRfidResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:chip::to_underlying(data.status)];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterSetUserTypeResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::SetUserTypeResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterSetUserTypeResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::SetWeekdayScheduleResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterSetWeekdayScheduleResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::SetYeardayScheduleResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterSetYeardayScheduleResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterUnlockDoorResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::UnlockDoorResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterUnlockDoorResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
-    }
-    DispatchSuccess(context, response);
-};
-
-void CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge::OnSuccessFn(
-    void * context, const chip::app::Clusters::DoorLock::Commands::UnlockWithTimeoutResponse::DecodableType & data)
-{
-    auto * response = [CHIPDoorLockClusterUnlockWithTimeoutResponseParams new];
-    {
-        NSNumber * value;
-        value = [NSNumber numberWithUnsignedChar:data.status];
-        response.status = value;
     }
     DispatchSuccess(context, response);
 };

@@ -79,6 +79,60 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x001F: // Access Control Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // ACL
+        {
+            entryLength = 21;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _AccessControlEntry
+            _AccessControlEntry * entry = reinterpret_cast<_AccessControlEntry *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->FabricIndex, write ? (uint8_t *) &entry->FabricIndex : src, write,
+                           &entryOffset, sizeof(entry->FabricIndex)); // fabric_idx
+            copyListMember(write ? dest : (uint8_t *) &entry->Privilege, write ? (uint8_t *) &entry->Privilege : src, write,
+                           &entryOffset, sizeof(entry->Privilege)); // Privilege
+            copyListMember(write ? dest : (uint8_t *) &entry->AuthMode, write ? (uint8_t *) &entry->AuthMode : src, write,
+                           &entryOffset, sizeof(entry->AuthMode)); // AuthMode
+            copyListMember(write ? dest : (uint8_t *) &entry->Subjects, write ? (uint8_t *) &entry->Subjects : src, write,
+                           &entryOffset, sizeof(entry->Subjects)); // INT64U
+            copyListMember(write ? dest : (uint8_t *) &entry->Targets, write ? (uint8_t *) &entry->Targets : src, write,
+                           &entryOffset, sizeof(entry->Targets)); // Target
+            break;
+        }
+        case 0x0001: // Extension
+        {
+            entryLength = 257;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _ExtensionEntry
+            _ExtensionEntry * entry = reinterpret_cast<_ExtensionEntry *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->FabricIndex, write ? (uint8_t *) &entry->FabricIndex : src, write,
+                           &entryOffset, sizeof(entry->FabricIndex)); // fabric_idx
+            ByteSpan * DataSpan = &entry->Data;                       // OCTET_STRING
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 256, DataSpan) : ReadByteSpan(src + entryOffset, 256, DataSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 256);
+            break;
+        }
+        }
+        break;
+    }
     case 0x050C: // Application Launcher Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
@@ -458,7 +512,7 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
         }
         break;
     }
-    case 0xF004: // Group Key Management Cluster
+    case 0x003F: // Group Key Management Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
@@ -685,6 +739,26 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
             }
             entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
             copyListMember(dest, src, write, &entryOffset, entryLength); // ENUM8
+            break;
+        }
+        }
+        break;
+    }
+    case 0x002E: // Power Source Configuration Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // Sources
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // INT8U
             break;
         }
         }
@@ -949,6 +1023,33 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                            sizeof(entry->NullableOptionalList)); // SimpleEnum
             break;
         }
+        case 0x002A: // list_long_octet_string
+        {
+            entryOffset = GetByteSpanOffsetFromIndex(write ? dest : src, am->size, static_cast<uint16_t>(index - 1));
+            if (entryOffset == 0)
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+
+            ByteSpan * listLongOctetStringSpan         = reinterpret_cast<ByteSpan *>(write ? src : dest); // LONG_OCTET_STRING
+            uint16_t listLongOctetStringRemainingSpace = static_cast<uint16_t>(am->size - entryOffset);
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, listLongOctetStringRemainingSpace, listLongOctetStringSpan)
+                       : ReadByteSpan(src + entryOffset, listLongOctetStringRemainingSpace, listLongOctetStringSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+
+            if (!CanCastTo<uint16_t>(listLongOctetStringSpan->size()))
+            {
+                ChipLogError(Zcl, "Span size %zu is too large", listLongOctetStringSpan->size());
+                return 0;
+            }
+            entryLength = static_cast<uint16_t>(listLongOctetStringSpan->size());
+            break;
+        }
         }
         break;
     }
@@ -1126,6 +1227,19 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
     uint16_t entryLength = 0;
     switch (clusterId)
     {
+    case 0x001F: // Access Control Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // ACL
+            // Struct _AccessControlEntry
+            entryLength = 21;
+            break;
+        case 0x0001: // Extension
+            // Struct _ExtensionEntry
+            entryLength = 257;
+            break;
+        }
+        break;
     case 0x050C: // Application Launcher Cluster
         switch (attributeId)
         {
@@ -1230,7 +1344,7 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
             break;
         }
         break;
-    case 0xF004: // Group Key Management Cluster
+    case 0x003F: // Group Key Management Cluster
         switch (attributeId)
         {
         case 0x0000: // groups
@@ -1283,6 +1397,15 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
             break;
         }
         break;
+    case 0x002E: // Power Source Configuration Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // Sources
+            // uint8_t
+            entryLength = 1;
+            break;
+        }
+        break;
     case 0x0034: // Software Diagnostics Cluster
         switch (attributeId)
         {
@@ -1328,6 +1451,10 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x0023: // list_nullables_and_optionals_struct
             // Struct _NullablesAndOptionalsStruct
             entryLength = 75;
+            break;
+        case 0x002A: // list_long_octet_string
+            // chip::ByteSpan
+            return GetByteSpanOffsetFromIndex(buffer, 1002, entryCount);
             break;
         }
         break;

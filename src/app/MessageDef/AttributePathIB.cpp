@@ -24,6 +24,8 @@
 #include <stdio.h>
 
 #include <app/AppBuildConfig.h>
+#include <app/data-model/Encode.h>
+#include <app/data-model/Nullable.h>
 
 namespace chip {
 namespace app {
@@ -117,13 +119,19 @@ CHIP_ERROR AttributePathIB::Parser::CheckSchemaValidity() const
             // check if this tag has appeared before
             VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kListIndex))), CHIP_ERROR_INVALID_TLV_TAG);
             TagPresenceMask |= (1 << to_underlying(Tag::kListIndex));
-            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType() || TLV::kTLVType_Null == reader.GetType(),
+                                CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
+            // We have checked the element is either uint or null
             if (TLV::kTLVType_UnsignedInteger == reader.GetType())
             {
                 uint16_t listIndex;
                 ReturnErrorOnFailure(reader.Get(listIndex));
                 PRETTY_PRINT("\tListIndex = 0x%" PRIx16 ",", listIndex);
+            }
+            else
+            {
+                PRETTY_PRINT("\tListIndex = Null,");
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
@@ -185,6 +193,11 @@ CHIP_ERROR AttributePathIB::Parser::GetListIndex(ListIndex * const apListIndex) 
     return GetUnsignedInteger(to_underlying(Tag::kListIndex), apListIndex);
 }
 
+CHIP_ERROR AttributePathIB::Parser::GetListIndex(DataModel::Nullable<ListIndex> * const apListIndex) const
+{
+    return GetNullableUnsignedInteger(to_underlying(Tag::kListIndex), apListIndex);
+}
+
 AttributePathIB::Builder & AttributePathIB::Builder::EnableTagCompression(const bool aEnableTagCompression)
 {
     // skip if error has already been set
@@ -231,6 +244,16 @@ AttributePathIB::Builder & AttributePathIB::Builder::Attribute(const AttributeId
     if (mError == CHIP_NO_ERROR)
     {
         mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kAttribute)), aAttribute);
+    }
+    return *this;
+}
+
+AttributePathIB::Builder & AttributePathIB::Builder::ListIndex(const DataModel::Nullable<chip::ListIndex> & aListIndex)
+{
+    // skip if error has already been set
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = DataModel::Encode(*mpWriter, TLV::ContextTag(to_underlying(Tag::kListIndex)), aListIndex);
     }
     return *this;
 }

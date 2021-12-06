@@ -21,8 +21,6 @@
 #include "../../config/PersistentStorage.h"
 #include "../common/CHIPCommand.h"
 
-#include <controller/ExampleOperationalCredentialsIssuer.h>
-
 class ReportingCommand : public CHIPCommand
 {
 public:

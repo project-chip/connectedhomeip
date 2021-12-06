@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <app/MessageDef/AttributeReportIBs.h>
 #include <app/MessageDef/ReportDataMessage.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/support/CodeUtils.h>
@@ -281,7 +282,8 @@ private:
     // TODO(#8006): investgate if we can disable some IM functions on some compact accessories.
     // TODO(#8006): investgate if we can provide more flexible object management on devices with more resources.
     BitMapObjectPool<CommandHandler, CHIP_IM_MAX_NUM_COMMAND_HANDLER> mCommandHandlerObjs;
-    BitMapObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER> mTimedHandlers;
+    BitMapObjectPool<TimedHandler, CHIP_IM_MAX_NUM_TIMED_HANDLER, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode>
+        mTimedHandlers;
     ReadClient mReadClients[CHIP_IM_MAX_NUM_READ_CLIENT];
     ReadHandler mReadHandlers[CHIP_IM_MAX_NUM_READ_HANDLER];
     WriteClient mWriteClients[CHIP_IM_MAX_NUM_WRITE_CLIENT];
@@ -314,6 +316,8 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
 
 /**
  *  Fetch attribute value and version info and write to the AttributeReport provided.
+ *  The ReadSingleClusterData will do everything required for encoding an attribute, i.e. it will try to put one or more
+ * AttributeReportIB to the AttributeReportIBs::Builder.
  *  When the endpoint / cluster / attribute / event data specified by aClusterInfo does not exist, corresponding interaction model
  * error code will be put into the writer, and CHIP_NO_ERROR will be returned.
  *  If the data exists on the server, the data (with tag kData) and the data version (with tag kDataVersion) will be put
@@ -329,7 +333,8 @@ bool ServerClusterCommandExists(const ConcreteCommandPath & aCommandPath);
  *  @retval  CHIP_NO_ERROR on success
  */
 CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const ConcreteReadAttributePath & aPath,
-                                 AttributeReportIB::Builder & aAttributeReport);
+                                 AttributeReportIBs::Builder & aAttributeReports,
+                                 AttributeValueEncoder::AttributeEncodeState * apEncoderState);
 
 /**
  * TODO: Document.

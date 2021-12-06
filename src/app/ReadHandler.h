@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include <app/AttributeAccessInterface.h>
 #include <app/AttributePathExpandIterator.h>
 #include <app/ClusterInfo.h>
 #include <app/EventManagement.h>
@@ -140,6 +141,7 @@ public:
         // If the contents of the global dirty set have changed, we need to reset the iterator since the paths
         // we've sent up till now are no longer valid and need to be invalidated.
         mAttributePathExpandIterator = AttributePathExpandIterator(mpAttributeClusterInfoList);
+        mAttributeEncoderState       = AttributeValueEncoder::AttributeEncodeState();
     }
     void ClearDirty() { mDirty = false; }
     bool IsDirty() { return mDirty; }
@@ -151,6 +153,9 @@ public:
         mHoldReport = false;
         mDirty      = true;
     }
+
+    const AttributeValueEncoder::AttributeEncodeState & GetAttributeEncodeState() const { return mAttributeEncoderState; }
+    void SetAttributeEncodeState(const AttributeValueEncoder::AttributeEncodeState & aState) { mAttributeEncoderState = aState; }
 
 private:
     friend class TestReadInteraction;
@@ -170,7 +175,7 @@ private:
     CHIP_ERROR ProcessSubscribeRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessReadRequest(System::PacketBufferHandle && aPayload);
     CHIP_ERROR ProcessAttributePathList(AttributePathIBs::Parser & aAttributePathListParser);
-    CHIP_ERROR ProcessEventPaths(EventPaths::Parser & aEventPathsParser);
+    CHIP_ERROR ProcessEventPaths(EventPathIBs::Parser & aEventPathsParser);
     CHIP_ERROR OnStatusResponse(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
     CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                  System::PacketBufferHandle && aPayload) override;
@@ -221,6 +226,8 @@ private:
     AttributePathExpandIterator mAttributePathExpandIterator = AttributePathExpandIterator(nullptr);
     bool mIsFabricFiltered                                   = false;
     bool mHoldSync                                           = false;
+    // The detailed encoding state for a single attribute, used by list chunking feature.
+    AttributeValueEncoder::AttributeEncodeState mAttributeEncoderState;
 };
 } // namespace app
 } // namespace chip

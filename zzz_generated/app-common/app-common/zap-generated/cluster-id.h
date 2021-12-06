@@ -61,8 +61,17 @@ static constexpr chip::ClusterId ZCL_POWER_PROFILE_CLUSTER_ID = 0x001A;
 // Definitions for cluster: Appliance Control
 static constexpr chip::ClusterId ZCL_APPLIANCE_CONTROL_CLUSTER_ID = 0x001B;
 
+// Definitions for cluster: Pulse Width Modulation
+static constexpr chip::ClusterId ZCL_PWM_CLUSTER_ID = 0x001C;
+
 // Definitions for cluster: Descriptor
 static constexpr chip::ClusterId ZCL_DESCRIPTOR_CLUSTER_ID = 0x001D;
+
+// Definitions for cluster: Binding
+static constexpr chip::ClusterId ZCL_BINDING_CLUSTER_ID = 0x001E;
+
+// Definitions for cluster: Access Control
+static constexpr chip::ClusterId ZCL_ACCESS_CONTROL_CLUSTER_ID = 0x001F;
 
 // Definitions for cluster: Poll Control
 static constexpr chip::ClusterId ZCL_POLL_CONTROL_CLUSTER_ID = 0x0020;
@@ -133,11 +142,23 @@ static constexpr chip::ClusterId ZCL_ADMINISTRATOR_COMMISSIONING_CLUSTER_ID = 0x
 // Definitions for cluster: Operational Credentials
 static constexpr chip::ClusterId ZCL_OPERATIONAL_CREDENTIALS_CLUSTER_ID = 0x003E;
 
+// Definitions for cluster: Group Key Management
+static constexpr chip::ClusterId ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID = 0x003F;
+
 // Definitions for cluster: Fixed Label
 static constexpr chip::ClusterId ZCL_FIXED_LABEL_CLUSTER_ID = 0x0040;
 
 // Definitions for cluster: User Label
 static constexpr chip::ClusterId ZCL_USER_LABEL_CLUSTER_ID = 0x0041;
+
+// Definitions for cluster: Proxy Configuration
+static constexpr chip::ClusterId ZCL_PROXY_CONFIGURATION_CLUSTER_ID = 0x0042;
+
+// Definitions for cluster: Proxy Discovery
+static constexpr chip::ClusterId ZCL_PROXY_DISCOVERY_CLUSTER_ID = 0x0043;
+
+// Definitions for cluster: Proxy Valid
+static constexpr chip::ClusterId ZCL_PROXY_VALID_CLUSTER_ID = 0x0044;
 
 // Definitions for cluster: Boolean State
 static constexpr chip::ClusterId ZCL_BOOLEAN_STATE_CLUSTER_ID = 0x0045;
@@ -351,9 +372,3 @@ static constexpr chip::ClusterId ZCL_APPLIANCE_STATISTICS_CLUSTER_ID = 0x0B03;
 
 // Definitions for cluster: Electrical Measurement
 static constexpr chip::ClusterId ZCL_ELECTRICAL_MEASUREMENT_CLUSTER_ID = 0x0B04;
-
-// Definitions for cluster: Binding
-static constexpr chip::ClusterId ZCL_BINDING_CLUSTER_ID = 0xF000;
-
-// Definitions for cluster: Group Key Management
-static constexpr chip::ClusterId ZCL_GROUP_KEY_MANAGEMENT_CLUSTER_ID = 0xF004;
