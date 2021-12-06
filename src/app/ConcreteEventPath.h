@@ -34,7 +34,7 @@ struct ConcreteEventPath
 
     ConcreteEventPath() {}
 
-    ConcreteEventPath & operator=(ConcreteEventPath && other)
+    ConcreteEventPath & operator=(const ConcreteEventPath & other)
     {
         if (&other == this)
             return *this;
