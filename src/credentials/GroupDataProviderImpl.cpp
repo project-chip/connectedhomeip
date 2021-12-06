@@ -823,12 +823,11 @@ GroupDataProviderImpl::AllGroupMappingsIteratorImpl::AllGroupMappingsIteratorImp
 
 size_t GroupDataProviderImpl::AllGroupMappingsIteratorImpl::Count()
 {
-    // chip::EndpointId endpoint_id = mFirstEndpoint;
     size_t count          = 0;
     size_t endpoint_index = 0;
     EndpointData endpoint_data(mFabric, mFirstEndpoint);
 
-    // Loop throug the fabric's endpoints
+    // Loop through the fabric's endpoints
     while ((endpoint_index < mEndpointCount) && (CHIP_NO_ERROR == endpoint_data.Load(mProvider.mStorage)))
     {
         GroupData group_data(mFabric, endpoint_data.endpoint_id, endpoint_data.first_group);
