@@ -343,6 +343,7 @@ eno
 entrypoint
 enum
 env
+eq
 esd
 ESPPORT
 Espressif
@@ -646,6 +647,7 @@ navpad
 ncs
 nding
 NDK
+netcmp
 netif
 netplan
 NetworkCommissioning
