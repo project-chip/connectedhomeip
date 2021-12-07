@@ -157,7 +157,7 @@ static nlTestSuite sSuite =
 /**
  *  Main
  */
-int TestPairingSession()
+int TestPairingSessionInit()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, nullptr);
@@ -165,4 +165,4 @@ int TestPairingSession()
     return (nlTestRunnerStats(&sSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestPairingSession)
+CHIP_REGISTER_TEST_SUITE(TestPairingSessionInit)
