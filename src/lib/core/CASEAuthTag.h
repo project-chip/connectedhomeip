@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <lib/core/CHIPConfig.h>
-#include <lib/support/CodeUtils.h>
 #include <cstdint>
 #include <cstdlib>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/CodeUtils.h>
 
 namespace chip {
 
