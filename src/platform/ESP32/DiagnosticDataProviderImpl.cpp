@@ -167,28 +167,28 @@ CHIP_ERROR DiagnosticDataProviderImpl::GetTotalOperationalHours(uint32_t & total
 
 CHIP_ERROR DiagnosticDataProviderImpl::GetBootReason(uint8_t & bootReason)
 {
-    bootReason = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+    bootReason = BootReasonType::Unspecified;
     uint8_t reason;
     reason = static_cast<uint8_t>(esp_reset_reason());
     if (reason == ESP_RST_UNKNOWN)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_UNSPECIFIED;
+        bootReason = BootReasonType::Unspecified;
     }
     else if (reason == ESP_RST_POWERON)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_POWER_ON_REBOOT;
+        bootReason = BootReasonType::PowerOnReboot;
     }
     else if (reason == ESP_RST_BROWNOUT)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_BROWN_OUT_RESET;
+        bootReason = BootReasonType::BrownOutReset;
     }
     else if (reason == ESP_RST_SW)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_RESET;
+        bootReason = BootReasonType::SoftwareReset;
     }
     else if (reason == ESP_RST_INT_WDT)
     {
-        bootReason = EMBER_ZCL_BOOT_REASON_TYPE_SOFTWARE_WATCHDOG_RESET;
+        bootReason = BootReasonType::SoftwareWatchdogReset;
         /* Reboot can be due to hardware or software watchdog*/
     }
     return CHIP_NO_ERROR;

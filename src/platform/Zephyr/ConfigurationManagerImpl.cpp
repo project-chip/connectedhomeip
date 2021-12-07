@@ -52,6 +52,7 @@ ConfigurationManagerImpl & ConfigurationManagerImpl::GetDefaultInstance()
 CHIP_ERROR ConfigurationManagerImpl::Init()
 {
     CHIP_ERROR err;
+    uint32_t rebootCount;
     bool failSafeArmed;
 
     // Initialize the generic implementation base class.
@@ -71,6 +72,22 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
     }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
+    if (ZephyrConfig::ConfigValueExists(ZephyrConfig::kCounterKey_RebootCount))
+    {
+        err = GetRebootCount(rebootCount);
+        SuccessOrExit(err);
+
+        // Do not increment reboot count if the value is going to overflow UINT16.
+        err = StoreRebootCount(rebootCount < UINT16_MAX ? rebootCount + 1 : rebootCount);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        // The first boot after factory reset of the Node.
+        err = StoreRebootCount(1);
+        SuccessOrExit(err);
+    }
+
     // If the fail-safe was armed when the device last shutdown, initiate a factory reset.
     if (GetFailSafeArmed(failSafeArmed) == CHIP_NO_ERROR && failSafeArmed)
     {
@@ -82,6 +99,16 @@ CHIP_ERROR ConfigurationManagerImpl::Init()
 
 exit:
     return err;
+}
+
+CHIP_ERROR ConfigurationManagerImpl::GetRebootCount(uint32_t & rebootCount)
+{
+    return ReadConfigValue(ZephyrConfig::kCounterKey_RebootCount, rebootCount);
+}
+
+CHIP_ERROR ConfigurationManagerImpl::StoreRebootCount(uint32_t rebootCount)
+{
+    return WriteConfigValue(ZephyrConfig::kCounterKey_RebootCount, rebootCount);
 }
 
 void ConfigurationManagerImpl::InitiateFactoryReset()

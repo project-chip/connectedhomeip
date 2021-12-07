@@ -131,6 +131,17 @@ public:
 class DiagnosticDataProvider
 {
 public:
+    enum BootReasonType : uint8_t
+    {
+        Unspecified             = 0,
+        PowerOnReboot           = 1,
+        BrownOutReset           = 2,
+        SoftwareWatchdogReset   = 3,
+        HardwareWatchdogReset   = 4,
+        SoftwareUpdateCompleted = 5,
+        SoftwareReset           = 6,
+    };
+
     void SetGeneralDiagnosticsDelegate(GeneralDiagnosticsDelegate * delegate) { mGeneralDiagnosticsDelegate = delegate; }
     GeneralDiagnosticsDelegate * GetGeneralDiagnosticsDelegate() const { return mGeneralDiagnosticsDelegate; }
 
