@@ -30,7 +30,6 @@ AES
 algs
 alloc
 Ameba
-ameba
 amebad
 amebaiot
 AnnounceOTAProvider
@@ -89,7 +88,6 @@ befc
 bitbake
 bld
 BLE
-ble
 BleApplicationDelegate
 BleLayer
 BLEManager
@@ -161,7 +159,6 @@ CHIPTool
 chmod
 chrpath
 CIPD
-cipd
 CircleCI
 cJTAG
 CKIT
@@ -332,7 +329,6 @@ EEE
 eef
 ef
 EFR
-efr
 eg
 EjQ
 elftools
@@ -391,7 +387,6 @@ focusable
 forkpty
 formatOnSave
 FOTA
-fota
 FreeRTOS
 FreeRTOSConfig
 fsl
@@ -422,7 +417,6 @@ GND
 gni
 GNinja
 GNUARMEMB
-gnuarmemb
 gnueabihf
 googleapis
 googlesource
@@ -464,7 +458,6 @@ ifdefs
 IGMP
 ihex
 IM
-im
 imager
 imagetool
 img
@@ -502,7 +495,6 @@ iterable
 JDK
 jinja
 JLink
-jlink
 JLinkExe
 JLinkRTTClient
 JN
@@ -862,7 +854,6 @@ SDKs
 SDKTARGETSYSROOT
 sdl
 SEGGER
-segger
 semver
 sendto
 SERIALDEVICE
@@ -933,7 +924,6 @@ SysConfig
 sysctl
 sysdeps
 SYSROOT
-sysroot
 systemctl
 systemd
 systemdsystemunitdir
@@ -993,7 +983,6 @@ TvChannel
 TXD
 txt
 UART
-uart
 udhcpc
 UDP
 UDPEndPoint
@@ -1002,7 +991,6 @@ ug
 ui
 uint
 UNBLUR
-unblur
 uncommissioned
 unfocus
 Unicast
