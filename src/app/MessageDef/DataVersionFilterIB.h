@@ -1,7 +1,6 @@
 /**
  *
- *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2016-2017 Nest Labs, Inc.
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,18 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-/**
- *    @file
- *      This file defines AttributeDataVersionList parser and builder in CHIP interaction model
- *
- */
 
 #pragma once
 
-#include "ArrayBuilder.h"
-#include "ArrayParser.h"
-#include "AttributeDataIB.h"
-
+#include "ClusterPathIB.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 #include <app/AppBuildConfig.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
@@ -36,8 +29,14 @@
 
 namespace chip {
 namespace app {
-namespace AttributeDataVersionList {
-class Parser : public ArrayParser
+namespace DataVersionFilterIB {
+enum class Tag : uint8_t
+{
+    kPath        = 0,
+    kDataVersion = 1,
+};
+
+class Parser : public StructParser
 {
 public:
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
@@ -58,21 +57,18 @@ public:
 #endif
 
     /**
-     *  @brief Check if this element is valid
+     *  @brief Get a TLVReader for the AttributePathIB. Next() must be called before accessing them.
      *
-     *  @return A Boolean
+     *  @param [in] apClusterPath    A pointer to apClusterPath
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not a Path
+     *          #CHIP_END_OF_TLV if there is no such element
      */
-    bool IsElementValid(void);
+    CHIP_ERROR GetPath(ClusterPathIB::Parser * const apPath) const;
 
     /**
-     *  @brief Check if this element is NULL
-     *
-     *  @return A Boolean
-     */
-    bool IsNull(void);
-
-    /**
-     *  @brief Get a value for the DataVersion. Next() must be called before accessing them.
+     *  @brief Get the DataVersion.
      *
      *  @param [in] apVersion    A pointer to apVersion
      *
@@ -80,35 +76,39 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetVersion(chip::DataVersion * const apVersion);
+    CHIP_ERROR GetDataVersion(chip::DataVersion * const apVersion) const;
 };
 
-class Builder : public ArrayBuilder
+class Builder : public StructBuilder
 {
 public:
     /**
-     *  @brief Add version in AttributeDataVersionList
+     *  @brief Initialize a ClusterPathIB::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeDataVersionList::Builder
+     *  @return A reference to ClusterPathIB::Builder
      */
-    AttributeDataVersionList::Builder & AddVersion(const uint64_t aVersion);
+    ClusterPathIB::Builder & CreatePath();
 
     /**
-     *  @brief Add Null in version list
+     *  @brief Inject DataVersion into the TLV stream to indicate the numerical data version associated with
+     *  the cluster that is referenced by the path.
+     *
+     *  @param [in] aDataVersion The unsigned integer variable
      *
      *  @return A reference to *this
      */
-    AttributeDataVersionList::Builder & AddNull(void);
+    DataVersionFilterIB::Builder & DataVersion(const chip::DataVersion aDataVersion);
+
     /**
-     *  @brief Mark the end of this AttributeDataVersionList
+     *  @brief Mark the end of this DataVersionFilterIB
      *
      *  @return A reference to *this
      */
-    AttributeDataVersionList::Builder & EndOfAttributeDataVersionList();
+    DataVersionFilterIB::Builder & EndOfDataVersionFilterIB();
 
 private:
-    AttributeDataIB::Builder mAttributeDataIBBuilder;
+    ClusterPathIB::Builder mPath;
 };
-}; // namespace AttributeDataVersionList
+}; // namespace DataVersionFilterIB
 }; // namespace app
 }; // namespace chip

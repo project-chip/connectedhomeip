@@ -31,9 +31,14 @@ public interface ConfigurationManager {
   String kConfigKey_MfrDeviceICACerts = "device-ca-certs";
   String kConfigKey_MfrDevicePrivateKey = "device-key";
   String kConfigKey_HardwareVersion = "hardware-ver";
+  String kConfigKey_HardwareVersionString = "hardware-ver-str";
   String kConfigKey_ManufacturingDate = "mfg-date";
   String kConfigKey_SetupPinCode = "pin-code";
   String kConfigKey_SetupDiscriminator = "discriminator";
+  String kConfigKey_ProductId = "product-id";
+  String kConfigKey_ProductName = "product-name";
+  String kConfigKey_SoftwareVersion = "software-version";
+  String kConfigKey_SoftwareVersionString = "software-version-str";
 
   // Keys stored in the Chip-config namespace
   String kConfigKey_FabricId = "fabric-id";

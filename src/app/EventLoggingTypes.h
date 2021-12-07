@@ -88,22 +88,6 @@ static_assert(sizeof(std::underlying_type_t<PriorityLevel>) <= sizeof(unsigned),
 
 /**
  * @brief
- *   The structure that provides a full resolution of the cluster.
- */
-struct EventSchema
-{
-    EventSchema(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId, PriorityLevel aPriority) :
-        mNodeId(aNodeId), mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId), mPriority(aPriority)
-    {}
-    NodeId mNodeId          = 0;
-    EndpointId mEndpointId  = 0;
-    ClusterId mClusterId    = 0;
-    EventId mEventId        = 0;
-    PriorityLevel mPriority = PriorityLevel::Invalid;
-};
-
-/**
- * @brief
  *   The struct that provides an application set System or Epoch timestamp.
  */
 struct Timestamp
@@ -146,19 +130,16 @@ public:
         kUrgent = 0,
         kNotUrgent,
     };
-    EventOptions(void) : mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
+    EventOptions() : mPriority(PriorityLevel::Invalid), mUrgent(Type::kNotUrgent) {}
+    EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mPriority(PriorityLevel::Invalid), mUrgent(Type::kNotUrgent) {}
 
-    EventOptions(Type aType) : mpEventSchema(nullptr), mUrgent(aType) {}
-
-    EventOptions(Timestamp aTimestamp) : mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(Type::kNotUrgent) {}
-
-    EventOptions(Timestamp aTimestamp, Type aUrgent) : mTimestamp(aTimestamp), mpEventSchema(nullptr), mUrgent(aUrgent) {}
+    EventOptions(Timestamp aTimestamp, Type aUrgent) : mTimestamp(aTimestamp), mPriority(PriorityLevel::Invalid), mUrgent(aUrgent)
+    {}
+    ConcreteEventPath mPath;
     Timestamp mTimestamp;
-
-    EventSchema * mpEventSchema = nullptr; /**< A pointer to the schema of the cluster instance.*/
-
-    Type mUrgent = Type::kNotUrgent; /**< A flag denoting if the event is time sensitive.  When kUrgent is set, it causes
-                                            the event log to be flushed. */
+    PriorityLevel mPriority = PriorityLevel::Invalid;
+    Type mUrgent            = Type::kNotUrgent; /**< A flag denoting if the event is time sensitive.  When kUrgent is set, it causes
+                                                       the event log to be flushed. */
 };
 
 /**

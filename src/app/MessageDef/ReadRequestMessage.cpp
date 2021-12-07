@@ -57,6 +57,19 @@ CHIP_ERROR ReadRequestMessage::Parser::CheckSchemaValidity() const
                 PRETTY_PRINT_DECDEPTH();
             }
             break;
+        case to_underlying(Tag::kDataVersionFilters):
+            // check if this tag has appeared before
+            VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventFilters))), CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << to_underlying(Tag::kDataVersionFilters));
+            {
+                DataVersionFilterIBs::Parser dataVersionFilters;
+                ReturnErrorOnFailure(dataVersionFilters.Init(reader));
+
+                PRETTY_PRINT_INCDEPTH();
+                ReturnErrorOnFailure(dataVersionFilters.CheckSchemaValidity());
+                PRETTY_PRINT_DECDEPTH();
+            }
+            break;
         case to_underlying(Tag::kEventRequests):
             // check if this tag has appeared before
             VerifyOrReturnError(!(TagPresenceMask & (1 << to_underlying(Tag::kEventRequests))), CHIP_ERROR_INVALID_TLV_TAG);
@@ -130,6 +143,13 @@ CHIP_ERROR ReadRequestMessage::Parser::GetAttributeRequests(AttributePathIBs::Pa
     return apAttributeRequests->Init(reader);
 }
 
+CHIP_ERROR ReadRequestMessage::Parser::GetDataVersionFilters(DataVersionFilterIBs::Parser * const apDataVersionFilters) const
+{
+    TLV::TLVReader reader;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kDataVersionFilters)), reader));
+    return apDataVersionFilters->Init(reader);
+}
+
 CHIP_ERROR ReadRequestMessage::Parser::GetEventRequests(EventPathIBs::Parser * const apEventRequests) const
 {
     TLV::TLVReader reader;
@@ -157,6 +177,16 @@ AttributePathIBs::Builder & ReadRequestMessage::Builder::CreateAttributeRequests
         mError = mAttributeRequests.Init(mpWriter, to_underlying(Tag::kAttributeRequests));
     }
     return mAttributeRequests;
+}
+
+DataVersionFilterIBs::Builder & ReadRequestMessage::Builder::CreateDataVersionFilters()
+{
+    // skip if error has already been set
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mDataVersionFilters.Init(mpWriter, to_underlying(Tag::kDataVersionFilters));
+    }
+    return mDataVersionFilters;
 }
 
 EventPathIBs::Builder & ReadRequestMessage::Builder::CreateEventRequests()

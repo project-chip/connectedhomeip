@@ -48,7 +48,6 @@ uint8_t gDebugEventBuffer[128];
 uint8_t gInfoEventBuffer[128];
 uint8_t gCritEventBuffer[128];
 chip::app::CircularEventBuffer gCircularEventBuffer[3];
-chip::NodeId kTestNodeId              = 1;
 chip::ClusterId kTestClusterId        = 6;
 chip::ClusterId kInvalidTestClusterId = 7;
 chip::EndpointId kTestEndpointId      = 1;
@@ -110,16 +109,14 @@ void GenerateEvents(nlTestSuite * apSuite, void * apContext, bool aIsUrgent = fa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::EventNumber eid1, eid2;
-    chip::app::EventSchema schema1 = { kTestNodeId, kTestEndpointId, kTestClusterId, kTestEventIdDebug,
-                                       chip::app::PriorityLevel::Info };
-    chip::app::EventSchema schema2 = { kTestNodeId, kTestEndpointId, kTestClusterId, kTestEventIdCritical,
-                                       chip::app::PriorityLevel::Critical };
     chip::app::EventOptions options1;
-    chip::app::EventOptions options2;
-    TestEventGenerator testEventGenerator;
+    options1.mPath     = { kTestEndpointId, kTestClusterId, kTestEventIdDebug };
+    options1.mPriority = chip::app::PriorityLevel::Info;
 
-    options1.mpEventSchema = &schema1;
-    options2.mpEventSchema = &schema2;
+    chip::app::EventOptions options2;
+    options2.mPath     = { kTestEndpointId, kTestClusterId, kTestEventIdCritical };
+    options2.mPriority = chip::app::PriorityLevel::Critical;
+    TestEventGenerator testEventGenerator;
     if (aIsUrgent)
     {
         options2.mUrgent = chip::app::EventOptions::Type::kUrgent;
