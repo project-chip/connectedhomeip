@@ -120,8 +120,13 @@ class {{asUpperCamelCase name}}(Cluster):
 {{/first}}
         @dataclass
         class {{asUpperCamelCase name}}(ClusterEventDescriptor):
-            cluster_id: typing.ClassVar[int] = {{ asHex parent.code 4 }}
-            event_id: typing.ClassVar[int] = {{asMEI manufacturerCode code}}
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return {{ asHex parent.code 4 }}
+
+            @ChipUtility.classproperty
+            def event_id(cls) -> int:
+                return {{ asMEI manufacturerCode code }}
 
             @ChipUtility.classproperty
             def descriptor(cls) -> ClusterObjectDescriptor:
