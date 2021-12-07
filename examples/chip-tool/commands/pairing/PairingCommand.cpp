@@ -30,7 +30,6 @@
 using namespace ::chip;
 
 constexpr uint64_t kBreadcrumb = 0;
-constexpr uint32_t kTimeoutMs  = 6000;
 
 CHIP_ERROR PairingCommand::RunCommand()
 {
@@ -222,7 +221,7 @@ CHIP_ERROR PairingCommand::AddThreadNetwork()
     Callback::Cancelable * successCallback = mOnAddThreadNetworkCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnFailureCallback.Cancel();
 
-    return mCluster.AddThreadNetwork(successCallback, failureCallback, mOperationalDataset, kBreadcrumb, kTimeoutMs);
+    return mCluster.AddOrUpdateThreadNetwork(successCallback, failureCallback, mOperationalDataset, kBreadcrumb);
 }
 
 CHIP_ERROR PairingCommand::AddWiFiNetwork()
@@ -230,7 +229,7 @@ CHIP_ERROR PairingCommand::AddWiFiNetwork()
     Callback::Cancelable * successCallback = mOnAddWiFiNetworkCallback.Cancel();
     Callback::Cancelable * failureCallback = mOnFailureCallback.Cancel();
 
-    return mCluster.AddWiFiNetwork(successCallback, failureCallback, mSSID, mPassword, kBreadcrumb, kTimeoutMs);
+    return mCluster.AddOrUpdateWiFiNetwork(successCallback, failureCallback, mSSID, mPassword, kBreadcrumb);
 }
 
 chip::ByteSpan PairingCommand::GetThreadNetworkId()
@@ -273,7 +272,7 @@ CHIP_ERROR PairingCommand::EnableNetwork()
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    return mCluster.EnableNetwork(successCallback, failureCallback, networkId, kBreadcrumb, kTimeoutMs);
+    return mCluster.ConnectNetwork(successCallback, failureCallback, networkId, kBreadcrumb);
 }
 
 void PairingCommand::OnDefaultFailureResponse(void * context, uint8_t status)
@@ -292,7 +291,7 @@ void PairingCommand::OnAddNetworkResponse(void * context, uint8_t errorCode, Cha
 
     // Normally, the errorCode should be checked, but the current codebase send a default response
     // instead of the command specific response. So errorCode is not set correctly.
-    // if (EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS != errorCode)
+    // if (NetworkCommissioningStatus::kSuccess != errorCode)
     // {
     //    ChipLogError(chipTool, "Setup failure. Error calling EnableNetwork: %d", errorCode);
     //    command->SetCommandExitStatus(CHIP_ERROR_INTERNAL);
@@ -317,7 +316,7 @@ void PairingCommand::OnAddNetworkResponse(void * context, uint8_t errorCode, Cha
     }
 }
 
-void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, CharSpan debugText)
+void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, CharSpan debugText, int32_t errorValue)
 {
     ChipLogProgress(chipTool, "EnableNetworkResponse");
 
@@ -325,7 +324,7 @@ void PairingCommand::OnEnableNetworkResponse(void * context, uint8_t errorCode, 
 
     // Normally, the errorCode should be checked, but the current codebase send a default response
     // instead of the command specific response. So errorCode is not set correctly.
-    // if (EMBER_ZCL_NETWORK_COMMISSIONING_ERROR_SUCCESS != errorCode)
+    // if (NetworkCommissioningStatus::kSuccess != errorCode)
     // {
     //    ChipLogError(chipTool, "Setup failure. Error calling EnableNetwork: %d", errorCode);
     //    command->SetCommandExitStatus(CHIP_ERROR_INTERNAL);

@@ -158,7 +158,7 @@ class BaseTestHelper:
                 "breadcrumb": 0,
                 "timeoutMs": 1000}, blocking=True)
             self.logger.info(f"Received response: {resp}")
-            if resp.errorCode != 0:
+            if resp.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
                 self.logger.exception("Failed to add Thread network.")
                 return False
         except Exception as ex:
@@ -172,7 +172,7 @@ class BaseTestHelper:
                 "breadcrumb": 0,
                 "timeoutMs": 1000}, blocking=True)
             self.logger.info(f"Received response: {resp}")
-            if resp.errorCode != 0:
+            if resp.networkingStatus != Clusters.NetworkCommissioning.Enums.NetworkCommissioningStatus.kSuccess:
                 self.logger.exception("Failed to enable Thread network.")
                 return False
         except Exception as ex:

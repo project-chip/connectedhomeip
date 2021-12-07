@@ -35,55 +35,45 @@
 using namespace chip;
 using namespace chip::app::Clusters::NetworkCommissioning;
 
-bool emberAfNetworkCommissioningClusterAddThreadNetworkCallback(app::CommandHandler * commandObj,
-                                                                const app::ConcreteCommandPath & commandPath,
-                                                                const Commands::AddThreadNetwork::DecodableType & commandData)
+bool emberAfNetworkCommissioningClusterAddOrUpdateThreadNetworkCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::AddOrUpdateThreadNetwork::DecodableType & commandData)
 {
     auto & operationalDataset = commandData.operationalDataset;
     auto & breadcrumb         = commandData.breadcrumb;
-    auto & timeoutMs          = commandData.timeoutMs;
 
     app::Clusters::NetworkCommissioning::OnAddThreadNetworkCommandCallbackInternal(commandObj, commandPath, operationalDataset,
-                                                                                   breadcrumb, timeoutMs);
+                                                                                   breadcrumb, 0 /* ignored timeout ms */);
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterAddWiFiNetworkCallback(app::CommandHandler * commandObj,
-                                                              const app::ConcreteCommandPath & commandPath,
-                                                              const Commands::AddWiFiNetwork::DecodableType & commandData)
+bool emberAfNetworkCommissioningClusterAddOrUpdateWiFiNetworkCallback(
+    app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
+    const Commands::AddOrUpdateWiFiNetwork::DecodableType & commandData)
 {
     auto & ssid        = commandData.ssid;
     auto & credentials = commandData.credentials;
     auto & breadcrumb  = commandData.breadcrumb;
-    auto & timeoutMs   = commandData.timeoutMs;
 
     app::Clusters::NetworkCommissioning::OnAddWiFiNetworkCommandCallbackInternal(commandObj, commandPath, ssid, credentials,
-                                                                                 breadcrumb, timeoutMs);
+                                                                                 breadcrumb, 0 /* ignored timeout ms */);
     return true;
 }
 
-bool emberAfNetworkCommissioningClusterEnableNetworkCallback(app::CommandHandler * commandObj,
-                                                             const app::ConcreteCommandPath & commandPath,
-                                                             const Commands::EnableNetwork::DecodableType & commandData)
+bool emberAfNetworkCommissioningClusterConnectNetworkCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath,
+                                                              const Commands::ConnectNetwork::DecodableType & commandData)
 {
     auto & networkID  = commandData.networkID;
     auto & breadcrumb = commandData.breadcrumb;
-    auto & timeoutMs  = commandData.timeoutMs;
 
     app::Clusters::NetworkCommissioning::OnEnableNetworkCommandCallbackInternal(commandObj, commandPath, networkID, breadcrumb,
-                                                                                timeoutMs);
+                                                                                0 /* ignored timeout ms */);
     return true;
 }
 
 // TODO: The following commands needed to be implemented.
 // These commands are not implemented thus not handled yet, return false so ember will return a error.
-
-bool emberAfNetworkCommissioningClusterDisableNetworkCallback(app::CommandHandler * commandObj,
-                                                              const app::ConcreteCommandPath & commandPath,
-                                                              const Commands::DisableNetwork::DecodableType & commandData)
-{
-    return false;
-}
 
 bool emberAfNetworkCommissioningClusterRemoveNetworkCallback(app::CommandHandler * commandObj,
                                                              const app::ConcreteCommandPath & commandPath,
@@ -98,16 +88,10 @@ bool emberAfNetworkCommissioningClusterScanNetworksCallback(app::CommandHandler 
 {
     return false;
 }
-bool emberAfNetworkCommissioningClusterUpdateThreadNetworkCallback(app::CommandHandler * commandObj,
-                                                                   const app::ConcreteCommandPath & commandPath,
-                                                                   const Commands::UpdateThreadNetwork::DecodableType & commandData)
-{
-    return false;
-}
 
-bool emberAfNetworkCommissioningClusterUpdateWiFiNetworkCallback(app::CommandHandler * commandObj,
-                                                                 const app::ConcreteCommandPath & commandPath,
-                                                                 const Commands::UpdateWiFiNetwork::DecodableType & commandData)
+bool emberAfNetworkCommissioningClusterReorderNetworkCallback(app::CommandHandler * commandObj,
+                                                              const app::ConcreteCommandPath & commandPath,
+                                                              const Commands::ReorderNetwork::DecodableType & commandData)
 {
     return false;
 }

@@ -75,7 +75,7 @@ limitations under the License.
         <server tick="false" init="false">true</server>
 
         <attribute side="server" code="0x0000" define="MAX_NETWORKS" type="INT8U" writable="false" optional="false">MaxNetworks</attribute>
-        <attribute side="server" code="0x0001" define="NETWORKS" type="ARRAY" entryType="NetworkInfo" writable="false" optional="false">Networks</attribute>
+        <attribute side="server" code="0x0001" define="NETWORKS" type="ARRAY" entryType="NetworkInfo" length="12" writable="false" optional="false">Networks</attribute>
         <attribute side="server" code="0x0002" define="SCAN_MAX_TIME_SECONDS" type="INT8U" writable="false" optional="false">ScanMaxTimeSeconds</attribute>
         <attribute side="server" code="0x0003" define="CONNECT_MAX_TIME_SECONDS" type="INT8U" writable="false" optional="false">ConnectMaxTimeSeconds</attribute>
         <attribute side="server" code="0x0004" define="INTERFACE_ENABLED" type="BOOLEAN" writable="true" optional="false">InterfaceEnabled</attribute>
@@ -83,7 +83,7 @@ limitations under the License.
         <attribute side="server" code="0x0006" define="LAST_NETWORK_ID" type="OCTET_STRING" length="32" writable="false" optional="false">LastNetworkID</attribute>
         <attribute side="server" code="0x0007" define="LAST_CONNECT_ERROR_VALUE" type="INT32U" writable="false" optional="false">LastConnectErrorValue</attribute>
 
-        <command source="client" code="0x00" name="ScanNetworks" optional="false" cli="chip network_commissioning scannetworks">
+        <command source="client" code="0x00" name="ScanNetworks" optional="false" response="ScanNetworksResponse" cli="chip network_commissioning scannetworks">
             <description>TODO</description>
             <arg name="SSID" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
@@ -95,18 +95,18 @@ limitations under the License.
             <arg name="WiFiScanResults" type="WiFiInterfaceScanResult" array="true"/>
             <arg name="ThreadScanResults" type="ThreadInterfaceScanResult" array="true"/>
         </command>
-        <command source="client" code="0x02" name="AddOrUpdateWiFiNetwork" optional="true" cli="chip network_commissioning addwifinetwork">
+        <command source="client" code="0x02" name="AddOrUpdateWiFiNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addwifinetwork">
             <description>TODO</description>
             <arg name="SSID" type="OCTET_STRING"/>
             <arg name="Credentials" type="OCTET_STRING"/>
             <arg name="breadcrumb" type="INT64U"/>
         </command>
-        <command source="client" code="0x03" name="AddOrUpdateThreadNetwork" optional="true" cli="chip network_commissioning addthreadnetwork">
+        <command source="client" code="0x03" name="AddOrUpdateThreadNetwork" optional="true" response="NetworkConfigResponse" cli="chip network_commissioning addthreadnetwork">
             <description>TODO</description>
             <arg name="OperationalDataset" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
         </command>
-        <command source="client" code="0x04" name="RemoveNetwork" optional="false" cli="chip network_commissioning removenetwork">
+        <command source="client" code="0x04" name="RemoveNetwork" optional="false" response="NetworkConfigResponse" cli="chip network_commissioning removenetwork">
             <description>TODO</description>
             <arg name="NetworkID" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
@@ -116,7 +116,7 @@ limitations under the License.
             <arg name="NetworkingStatus" type="NetworkCommissioningStatus"/>
             <arg name="DebugText" type="CHAR_STRING"/>
         </command>
-        <command source="client" code="0x06" name="ConnectNetwork" optional="false" cli="chip network_commissioning enablenetwork">
+        <command source="client" code="0x06" name="ConnectNetwork" optional="false" response="ConnectNetworkResponse" cli="chip network_commissioning enablenetwork">
             <description>TODO</description>
             <arg name="NetworkID" type="OCTET_STRING"/>
             <arg name="Breadcrumb" type="INT64U"/>
@@ -127,7 +127,7 @@ limitations under the License.
             <arg name="DebugText" type="CHAR_STRING"/>
             <arg name="ErrorValue" type="INT32S"/>
         </command>
-        <command source="client" code="0x08" name="ReorderNetwork" optional="false" cli="chip network_commissioning enablenetwork">
+        <command source="client" code="0x08" name="ReorderNetwork" optional="false" response="NetworkConfigResponse" cli="chip network_commissioning enablenetwork">
             <description>TODO</description>
             <arg name="NetworkID" type="OCTET_STRING"/>
             <arg name="NetworkIndex" type="INT8U"/>
