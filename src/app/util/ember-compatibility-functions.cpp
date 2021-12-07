@@ -533,14 +533,9 @@ CHIP_ERROR ReadSingleClusterData(FabricIndex aAccessingFabricIndex, const Concre
         case ZCL_ARRAY_ATTRIBUTE_TYPE: {
             // We only get here for attributes of list type that have no override
             // registered.  There should not be any nonempty lists like that.
-            uint16_t size = emberAfAttributeValueSize(aPath.mClusterId, aPath.mAttributeId, attributeType, attributeData);
-            if (size != 2)
+            uint16_t length = emberAfGetInt16u(attributeData, 0, 2);
+            if (length != 0)
             {
-                // The value returned by emberAfAttributeValueSize for a list
-                // includes the space needed to store the list length (2 bytes) plus
-                // the space needed to store the actual list items.  We expect it to
-                // return 2 here, indicating a zero-length list.  If it doesn't,
-                // something has gone wrong.
                 return CHIP_ERROR_INCORRECT_STATE;
             }
 

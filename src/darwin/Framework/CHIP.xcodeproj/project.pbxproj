@@ -12,11 +12,9 @@
 		1E857306265519720050A4D9 /* CHIPClientCallbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E857305265519720050A4D9 /* CHIPClientCallbacks.cpp */; };
 		1E85730C265519AE0050A4D9 /* callback-stub.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E857307265519AE0050A4D9 /* callback-stub.cpp */; };
 		1E85730E265519AE0050A4D9 /* CHIPClusters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E857309265519AE0050A4D9 /* CHIPClusters.cpp */; };
-		1E85730F265519AE0050A4D9 /* attribute-size.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85730A265519AE0050A4D9 /* attribute-size.cpp */; };
 		1E857310265519AE0050A4D9 /* IMClusterCommandHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85730B265519AE0050A4D9 /* IMClusterCommandHandler.cpp */; };
 		1E85732226551A490050A4D9 /* binding-table.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731226551A490050A4D9 /* binding-table.cpp */; };
 		1E85732326551A490050A4D9 /* process-global-message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731326551A490050A4D9 /* process-global-message.cpp */; };
-		1E85732426551A490050A4D9 /* attribute-list-byte-span.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731426551A490050A4D9 /* attribute-list-byte-span.cpp */; };
 		1E85732526551A490050A4D9 /* message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731526551A490050A4D9 /* message.cpp */; };
 		1E85732626551A490050A4D9 /* attribute-storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731626551A490050A4D9 /* attribute-storage.cpp */; };
 		1E85732726551A490050A4D9 /* client-api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1E85731726551A490050A4D9 /* client-api.cpp */; };
@@ -103,11 +101,9 @@
 		1E857305265519720050A4D9 /* CHIPClientCallbacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CHIPClientCallbacks.cpp; path = "../../../../zzz_generated/controller-clusters/zap-generated/CHIPClientCallbacks.cpp"; sourceTree = "<group>"; };
 		1E857307265519AE0050A4D9 /* callback-stub.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "callback-stub.cpp"; path = "../../../../zzz_generated/controller-clusters/zap-generated/callback-stub.cpp"; sourceTree = "<group>"; };
 		1E857309265519AE0050A4D9 /* CHIPClusters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CHIPClusters.cpp; path = "../../../../zzz_generated/controller-clusters/zap-generated/CHIPClusters.cpp"; sourceTree = "<group>"; };
-		1E85730A265519AE0050A4D9 /* attribute-size.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-size.cpp"; path = "../../../../zzz_generated/controller-clusters/zap-generated/attribute-size.cpp"; sourceTree = "<group>"; };
 		1E85730B265519AE0050A4D9 /* IMClusterCommandHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = IMClusterCommandHandler.cpp; path = "../../../../zzz_generated/controller-clusters/zap-generated/IMClusterCommandHandler.cpp"; sourceTree = "<group>"; };
 		1E85731226551A490050A4D9 /* binding-table.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "binding-table.cpp"; path = "../../../app/util/binding-table.cpp"; sourceTree = "<group>"; };
 		1E85731326551A490050A4D9 /* process-global-message.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "process-global-message.cpp"; path = "../../../app/util/process-global-message.cpp"; sourceTree = "<group>"; };
-		1E85731426551A490050A4D9 /* attribute-list-byte-span.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-list-byte-span.cpp"; path = "../../../app/util/attribute-list-byte-span.cpp"; sourceTree = "<group>"; };
 		1E85731526551A490050A4D9 /* message.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = message.cpp; path = ../../../app/util/message.cpp; sourceTree = "<group>"; };
 		1E85731626551A490050A4D9 /* attribute-storage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "attribute-storage.cpp"; path = "../../../app/util/attribute-storage.cpp"; sourceTree = "<group>"; };
 		1E85731726551A490050A4D9 /* client-api.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = "client-api.cpp"; path = "../../../app/util/client-api.cpp"; sourceTree = "<group>"; };
@@ -210,7 +206,6 @@
 				2FD775542695557E00FF4B12 /* error-mapping.cpp */,
 				1E85731926551A490050A4D9 /* af-event.cpp */,
 				1E85731B26551A490050A4D9 /* af-main-common.cpp */,
-				1E85731426551A490050A4D9 /* attribute-list-byte-span.cpp */,
 				1E85731F26551A490050A4D9 /* attribute-size-util.cpp */,
 				1E85731626551A490050A4D9 /* attribute-storage.cpp */,
 				1E85731826551A490050A4D9 /* attribute-table.cpp */,
@@ -239,7 +234,6 @@
 				1E16A8F926B9835600683C53 /* CHIPTestClustersObjc.h */,
 				1E16A8FA26B9835700683C53 /* CHIPTestClustersObjc.mm */,
 				1ED276DF26C57CF000547A89 /* CHIPCallbackBridge.mm */,
-				1E85730A265519AE0050A4D9 /* attribute-size.cpp */,
 				1E857307265519AE0050A4D9 /* callback-stub.cpp */,
 				1E857309265519AE0050A4D9 /* CHIPClusters.cpp */,
 				1E85730B265519AE0050A4D9 /* IMClusterCommandHandler.cpp */,
@@ -499,7 +493,6 @@
 				2C8C8FC2253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.mm in Sources */,
 				2CB7163C252E8A7C0026E2BB /* CHIPDevicePairingDelegateBridge.mm in Sources */,
 				997DED162695343400975E97 /* CHIPThreadOperationalDataset.mm in Sources */,
-				1E85732426551A490050A4D9 /* attribute-list-byte-span.cpp in Sources */,
 				998F287126D56940001846C6 /* CHIPP256KeypairBridge.mm in Sources */,
 				1E85730E265519AE0050A4D9 /* CHIPClusters.cpp in Sources */,
 				1E16A90226B98AB700683C53 /* CHIPTestClustersObjc.mm in Sources */,
@@ -538,7 +531,6 @@
 				1E85732626551A490050A4D9 /* attribute-storage.cpp in Sources */,
 				1E85732C26551A490050A4D9 /* DataModelHandler.cpp in Sources */,
 				1E85733126551A490050A4D9 /* chip-message-send.cpp in Sources */,
-				1E85730F265519AE0050A4D9 /* attribute-size.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
