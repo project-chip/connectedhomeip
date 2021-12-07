@@ -279,7 +279,9 @@ if (CONFIG_CHIP_PW_RPC)
     chip_gn_arg_bool  ("chip_build_pw_rpc_lighting_proto"     CONFIG_CHIP_PW_RPC_LIGHTING_PROTO)
     chip_gn_arg_bool  ("chip_build_pw_rpc_locking_proto"      CONFIG_CHIP_PW_RPC_LOCKING_PROTO)
 endif(CONFIG_CHIP_PW_RPC)
-chip_gn_arg_bool  ("chip_enable_ota_requestor"            CONFIG_CHIP_OTA_REQUESTOR)
+if (CONFIG_CHIP_OTA_REQUESTOR)
+    chip_gn_arg_bool  ("chip_enable_ota_requestor"            CONFIG_CHIP_OTA_REQUESTOR)
+endif(CONFIG_CHIP_OTA_REQUESTOR)
 
 
 file(GENERATE OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/args.gn CONTENT ${CHIP_GN_ARGS})
@@ -443,6 +445,25 @@ if (CONFIG_CHIP_PW_RPC_LOCKING_PROTO)
 endif(CONFIG_CHIP_PW_RPC_LOCKING_PROTO)
 
 endif(CONFIG_CHIP_PW_RPC)
+
+if (CONFIG_CHIP_OTA_REQUESTOR)
+    target_include_directories(${APP_TARGET} PRIVATE
+        ${CHIP_ROOT}/zzz_generated/ota-requestor-app
+        ${CHIP_ROOT}/src/app/clusters/ota-requestor
+        ${CHIP_ROOT}/src/platform/mbed
+    )
+
+    target_sources(${APP_TARGET} PRIVATE
+        ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated/attribute-size.cpp
+        ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated/callback-stub.cpp
+        ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated/CHIPClusters.cpp
+        ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
+    )
+
+    list(APPEND CHIP_DEFINES 
+        CHIP_OTA_REQUESTOR=1
+    )
+endif(CONFIG_CHIP_OTA_REQUESTOR)
 
 
 target_include_directories(${APP_TARGET} PRIVATE 

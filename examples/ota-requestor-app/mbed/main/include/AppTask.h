@@ -20,8 +20,11 @@
 #pragma once
 
 #include "AppEvent.h"
+
+#ifdef CHIP_OTA_REQUESTOR
 #include <MbedOTADownloader.h>
 #include <MbedOTARequestor.h>
+#endif
 
 class AppTask
 {
@@ -36,13 +39,13 @@ private:
     void PostEvent(AppEvent * aEvent);
     void DispatchEvent(const AppEvent * event);
 
+#ifdef CHIP_OTA_REQUESTOR
     static void OnOtaEventHandler(AppEvent * aEvent);
 
     static void OnAnnounceProviderCallback();
-
     static void OnProviderResponseCallback(MbedOTARequestor::OTAUpdateDetails * updateDetails);
-
     static void OnDownloadCompletedCallback(chip::MbedOTADownloader::ImageInfo * imageInfo);
+#endif
 
     static AppTask sAppTask;
 };

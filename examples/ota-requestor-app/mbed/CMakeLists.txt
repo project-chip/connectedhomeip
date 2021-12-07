@@ -4,7 +4,6 @@
 cmake_minimum_required(VERSION 3.19.0)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../.. REALPATH)
-get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
 get_filename_component(MBED_COMMON ${CHIP_ROOT}/examples/platform/mbed REALPATH)
 get_filename_component(GEN_DIR ${CHIP_ROOT}/zzz_generated/ REALPATH)
 get_filename_component(NLIO_DIR ${CHIP_ROOT}/third_party/nlio/repo/include REALPATH)
@@ -37,13 +36,8 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
                            ${CMAKE_CURRENT_SOURCE_DIR}/main/include/
                            ${NLIO_DIR}
-                           ${GEN_DIR}
                            ${GEN_DIR}/app-common
-                           ${GEN_DIR}/ota-requestor-app
-                           ${APP_ROOT}/ota-requestor-common
                            ${MBED_COMMON}/util/include
-                           ${CHIP_ROOT}/src/app/clusters/ota-requestor
-                           ${CHIP_ROOT}/src/platform/mbed
 )
 
 target_sources(${APP_TARGET} PRIVATE
@@ -52,18 +46,13 @@ target_sources(${APP_TARGET} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/main/AppTask.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main/MbedOTARequestorDriver.cpp
     ${MBED_COMMON}/util/LEDWidget.cpp
-
-    ${GEN_DIR}/ota-requestor-app/zap-generated/attribute-size.cpp
-    ${GEN_DIR}/ota-requestor-app/zap-generated/callback-stub.cpp
-    ${GEN_DIR}/ota-requestor-app/zap-generated/CHIPClusters.cpp
-    ${GEN_DIR}/ota-requestor-app/zap-generated/IMClusterCommandHandler.cpp
 )
 
 chip_configure_data_model(${APP_TARGET}
-    INCLUDE_CLIENT_CALLBACKS
     INCLUDE_SERVER
-    ZAP_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../ota-requestor-common/ota-requestor-app.zap
-    GEN_DIR ${GEN_DIR}/ota-requestor-app/zap-generated
+    INCLUDE_CLIENT_CALLBACKS
+    ZAP_FILE ${CHIP_ROOT}/examples/ota-requestor-app/ota-requestor-common/ota-requestor-app.zap
+    GEN_DIR ${CHIP_ROOT}/zzz_generated/ota-requestor-app/zap-generated
 )
 
 target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)

@@ -17,19 +17,15 @@
 
 #include "AppTask.h"
 
-#ifdef CHIP_PW_RPC
-#include "Rpc.h"
-#endif
-
-#include "mbedtls/platform.h"
 #include <lib/support/CHIPMem.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <mbedtls/platform.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/mbed/Logging.h>
 
 using namespace ::chip;
-using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::Platform;
 using namespace ::chip::Logging::Platform;
 
 int main()
@@ -38,16 +34,6 @@ int main()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mbed_logging_init();
-
-#if CHIP_PW_RPC
-    auto rpcThread = chip::rpc::Init();
-    if (rpcThread == NULL)
-    {
-        ChipLogError(NotSpecified, "RPC service initialization and run failed");
-        ret = EXIT_FAILURE;
-        goto exit;
-    }
-#endif
 
     ChipLogProgress(SoftwareUpdate, "Mbed OTA Requestor example application start");
 
@@ -58,7 +44,7 @@ int main()
         goto exit;
     }
 
-    err = chip::Platform::MemoryInit();
+    err = MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(SoftwareUpdate, "Memory initalization failed: %s", err.AsString());
@@ -73,16 +59,6 @@ int main()
         ret = EXIT_FAILURE;
         goto exit;
     }
-
-#ifdef MBED_CONF_APP_BLE_DEVICE_NAME
-    err = ConnectivityMgr().SetBLEDeviceName(MBED_CONF_APP_BLE_DEVICE_NAME);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(NotSpecified, "Set BLE device name failed: %s", err.AsString());
-        ret = EXIT_FAILURE;
-        goto exit;
-    }
-#endif
 
     err = PlatformMgr().StartEventLoopTask();
     if (err != CHIP_NO_ERROR)
