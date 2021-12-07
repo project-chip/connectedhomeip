@@ -91,10 +91,8 @@ uint16_t emberAfAttributeValueSize(ClusterId clusterId, AttributeId attrId, Embe
     }
     else if (emberAfIsThisDataTypeAListType(dataType))
     {
-        if (buffer != 0)
-        {
-            dataSize = emberAfAttributeValueListSize(clusterId, attrId, buffer);
-        }
+        // Just claim to have a length and nothing else.
+        dataSize = 2;
     }
     else
     {

@@ -70,7 +70,6 @@ target_sources(app PRIVATE
                main/PumpManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${GEN_DIR}/pump-app/zap-generated/attribute-size.cpp
                ${GEN_DIR}/pump-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/pump-app/zap-generated/IMClusterCommandHandler.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp

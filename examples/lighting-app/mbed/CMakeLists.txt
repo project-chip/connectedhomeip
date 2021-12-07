@@ -47,7 +47,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${CMAKE_CURRENT_SOURCE_DIR}/main/LightingManager.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/main.cpp
                ${CMAKE_CURRENT_SOURCE_DIR}/main/ZclCallbacks.cpp
-               ${GEN_DIR}/lighting-app/zap-generated/attribute-size.cpp
                ${GEN_DIR}/lighting-app/zap-generated/callback-stub.cpp
                ${GEN_DIR}/lighting-app/zap-generated/IMClusterCommandHandler.cpp
                ${MBED_COMMON}/util/LEDWidget.cpp

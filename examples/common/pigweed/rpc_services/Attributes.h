@@ -102,14 +102,9 @@ public:
             response.which_data = chip_rpc_AttributeData_data_uint32_tag;
             break;
         case chip_rpc_AttributeType_ZCL_ARRAY_ATTRIBUTE_TYPE:
-            data = response.data.data_bytes.bytes;
-            size = sizeof(response.data.data_bytes.bytes);
-            RETURN_STATUS_IF_NOT_OK(emberAfReadServerAttribute(request.endpoint, request.cluster, request.attribute_id,
-                                                               static_cast<uint8_t *>(data), size));
-            size = emberAfAttributeValueListSize(request.cluster, request.attribute_id, (const uint8_t *) data);
-            response.data.data_bytes.size = size;
-            response.which_data           = chip_rpc_AttributeData_data_bytes_tag;
-            return pw::OkStatus();
+            // We don't know how to read these; need to get the right
+            // AttributeAccessInterface.
+            return pw::Status::InvalidArgument();
         case chip_rpc_AttributeType_ZCL_BITMAP64_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_INT24U_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_INT40U_ATTRIBUTE_TYPE:

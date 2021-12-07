@@ -161,7 +161,6 @@ template("chip_data_model") {
 
     if (defined(invoker.zap_pregenerated_dir)) {
       sources += [
-        "${invoker.zap_pregenerated_dir}/attribute-size.cpp",
         "${invoker.zap_pregenerated_dir}/callback-stub.cpp",
       ]
 

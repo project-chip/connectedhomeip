@@ -35,11 +35,6 @@
             "output": "PluginApplicationCallbacks.h"
         },
         {
-            "path": "templates/app/attribute-size-src.zapt",
-            "name": "ZCL attribute-size",
-            "output": "attribute-size.cpp"
-        },
-        {
             "path": "templates/app/callback-stub-src.zapt",
             "name": "ZCL callback-stub source",
             "output": "callback-stub.cpp"

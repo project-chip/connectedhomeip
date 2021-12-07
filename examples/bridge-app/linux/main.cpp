@@ -239,7 +239,6 @@ int RemoveDeviceEndpoint(Device * dev)
 void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, uint16_t length, EmberAfAttributeMetadata * am)
 {
     char zclOctetStrBuf[kFixedLabelElementsOctetStringSize];
-    uint16_t listCount = 1;
     _LabelStruct labelStruct;
 
     // TODO: This size is obviously wrong.  See
@@ -251,8 +250,7 @@ void EncodeFixedLabel(const char * label, const char * value, uint8_t * buffer, 
     // https://github.com/project-chip/connectedhomeip/issues/10743
     labelStruct.value = CharSpan(&zclOctetStrBuf[0], sizeof(zclOctetStrBuf));
 
-    emberAfCopyList(ZCL_FIXED_LABEL_CLUSTER_ID, am, true, buffer, reinterpret_cast<uint8_t *>(&labelStruct), 1);
-    emberAfCopyList(ZCL_FIXED_LABEL_CLUSTER_ID, am, true, buffer, reinterpret_cast<uint8_t *>(&listCount), 0);
+    // TODO: Need to set up an AttributeAccessInterface to handle the lists here.
 }
 
 void HandleDeviceStatusChanged(Device * dev, Device::Changed_t itemChangedMask)
@@ -454,7 +452,7 @@ EmberAfStatus HandleReadSwitchAttribute(DeviceSwitch * dev, chip::AttributeId at
 
 EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                   uint8_t * buffer, uint16_t maxReadLength, int32_t index)
+                                                   uint8_t * buffer, uint16_t maxReadLength)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
@@ -488,7 +486,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterI
 
 EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
                                                     EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
-                                                    uint8_t * buffer, int32_t index)
+                                                    uint8_t * buffer)
 {
     uint16_t endpointIndex = emberAfGetDynamicIndexFromEndpoint(endpoint);
 
