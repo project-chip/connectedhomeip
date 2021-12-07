@@ -17,6 +17,7 @@
 
 #include <app/server/Server.h>
 
+#include <app/EventManagement.h>
 #include <app/InteractionModelEngine.h>
 #include <app/server/Dnssd.h>
 #include <app/server/EchoHandler.h>
@@ -69,6 +70,16 @@ constexpr bool isRendezvousBypassed()
 namespace chip {
 
 Server Server::sServer;
+
+#define CHIP_NUM_EVENT_LOGGING_BUFFERS 3
+static uint8_t sCritEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_CRIT_BUFFER_SIZE];
+static uint8_t sInfoEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_INFO_BUFFER_SIZE];
+static uint8_t sDebugEventBuffer[CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE];
+static ::chip::PersistedCounter sCritEventIdCounter;
+static ::chip::PersistedCounter sInfoEventIdCounter;
+static ::chip::PersistedCounter sDebugEventIdCounter;
+
+static ::chip::app::CircularEventBuffer sLoggingBuffer[CHIP_NUM_EVENT_LOGGING_BUFFERS];
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
 {
@@ -138,6 +149,24 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&mExchangeMgr, nullptr);
     SuccessOrExit(err);
 
+    // Initialize event logging subsystem
+    {
+        ::chip::Platform::PersistedStorage::Key critEventIdCounterStorageKey  = CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_CRIT_EIDC_KEY;
+        ::chip::Platform::PersistedStorage::Key infoEventIdCounterStorageKey  = CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_INFO_EIDC_KEY;
+        ::chip::Platform::PersistedStorage::Key debugEventIdCounterStorageKey = CHIP_DEVICE_CONFIG_PERSISTED_STORAGE_DEBUG_EIDC_KEY;
+
+        ::chip::app::LogStorageResources logStorageResources[] = {
+            { &sCritEventBuffer[0], sizeof(sCritEventBuffer), &critEventIdCounterStorageKey,
+              CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH, &sCritEventIdCounter, ::chip::app::PriorityLevel::Critical },
+            { &sInfoEventBuffer[0], sizeof(sInfoEventBuffer), &infoEventIdCounterStorageKey,
+              CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH, &sInfoEventIdCounter, ::chip::app::PriorityLevel::Info },
+            { &sDebugEventBuffer[0], sizeof(sDebugEventBuffer), &debugEventIdCounterStorageKey,
+              CHIP_DEVICE_CONFIG_EVENT_ID_COUNTER_EPOCH, &sDebugEventIdCounter, ::chip::app::PriorityLevel::Debug }
+        };
+
+        chip::app::EventManagement::GetInstance().Init(&mExchangeMgr, CHIP_NUM_EVENT_LOGGING_BUFFERS, &sLoggingBuffer[0],
+                                                       &logStorageResources[0]);
+    }
 #if defined(CHIP_APP_USE_ECHO)
     err = InitEchoHandler(&gExchangeMgr);
     SuccessOrExit(err);

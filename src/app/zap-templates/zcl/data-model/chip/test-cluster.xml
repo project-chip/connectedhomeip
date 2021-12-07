@@ -370,6 +370,19 @@ limitations under the License.
       <arg name="arg1" type="BOOLEAN" optional="true"/>
     </command>
 
+    <command source="client" code="0x14" name="TestEmitTestEventRequest"
+             optional="false" response="TestEmitTestEventResponse">
+      <description>
+        Command that takes identical arguments to the fields of the TestEvent and logs the TestEvent to the buffer.  Command returns an event ID as the response.
+      </description>
+      <arg name="arg1" type="INT8U"/>
+      <arg name="arg2" type="SimpleEnum"/>
+      <arg name="arg3" type="BOOLEAN"/>
+      <arg name="arg4" type="SimpleStruct"/>
+      <arg name="arg5" type="SimpleStruct" array="true"/>
+      <arg name="arg6" type="SimpleEnum" array="true"/>
+    </command>
+
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">
       <description>
         Simple response for TestWithResponse with a simple return value
@@ -480,6 +493,13 @@ limitations under the License.
         of the struct depend on what we are responding to.
       </description>
       <arg name="arg1" type="SimpleStruct"/>
+    </command>
+
+    <command source="server" code="0x0A" name="TestEmitTestEventResponse" optional="false" disableDefaultResponse="true">
+      <description>
+        Delivers the ID of an event in response to test command emitting events.
+      </description>
+      <arg name="value" type="INT64U"/>
     </command>
 
     <event code="0x0001" name="TestEvent" priority="info" side="server">
