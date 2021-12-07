@@ -48,6 +48,8 @@ private:
     CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
 
+constexpr uint16_t BridgedActionsAttrAccess::ClusterRevision;
+
 CHIP_ERROR BridgedActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
     // Just return an empty list

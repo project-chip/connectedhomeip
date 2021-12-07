@@ -44,18 +44,9 @@ public:
                                    uint8_t location, chip::CharSpan countryCode, uint64_t breadcrumb, uint32_t timeoutMs);
 
     // Cluster Attributes
-    CHIP_ERROR ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                        uint64_t value);
     CHIP_ERROR SubscribeAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                             uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeBreadcrumb(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeBasicCommissioningInfoList(Callback::Cancelable * onSuccessCallback,
-                                                       Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeRegulatoryConfig(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeLocationCapability(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
@@ -80,8 +71,6 @@ public:
                             uint64_t breadcrumb, uint32_t timeoutMs);
 
     // Cluster Attributes
-    CHIP_ERROR ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);
@@ -112,25 +101,18 @@ public:
                                  chip::CharSpan label);
 
     // Cluster Attributes
-    CHIP_ERROR ReadAttributeFabricsList(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeSupportedFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SubscribeAttributeSupportedFabrics(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                   uint16_t maxInterval);
     CHIP_ERROR ReportAttributeSupportedFabrics(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeCommissionedFabrics(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SubscribeAttributeCommissionedFabrics(Callback::Cancelable * onSuccessCallback,
                                                      Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                      uint16_t maxInterval);
     CHIP_ERROR ReportAttributeCommissionedFabrics(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeTrustedRootCertificates(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback);
-    CHIP_ERROR ReadAttributeCurrentFabricIndex(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SubscribeAttributeCurrentFabricIndex(Callback::Cancelable * onSuccessCallback,
                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                     uint16_t maxInterval);
     CHIP_ERROR ReportAttributeCurrentFabricIndex(Callback::Cancelable * onReportCallback);
-    CHIP_ERROR ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
     CHIP_ERROR SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval);
     CHIP_ERROR ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback);

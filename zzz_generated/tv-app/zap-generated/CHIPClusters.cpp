@@ -171,28 +171,6 @@ exit:
 }
 
 // GeneralCommissioning Cluster Attributes
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000000;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::WriteAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback, uint64_t value)
-{
-    app::WriteClientHandle handle;
-    ReturnErrorOnFailure(
-        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
-        chip::app::AttributePathParams(mEndpoint, mClusterId, GeneralCommissioning::Attributes::Breadcrumb::Id), value));
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
 CHIP_ERROR GeneralCommissioningCluster::SubscribeAttributeBreadcrumb(Callback::Cancelable * onSuccessCallback,
                                                                      Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                                      uint16_t maxInterval)
@@ -208,61 +186,6 @@ CHIP_ERROR GeneralCommissioningCluster::ReportAttributeBreadcrumb(Callback::Canc
 {
     return RequestAttributeReporting(GeneralCommissioning::Attributes::Breadcrumb::Id, onReportCallback,
                                      BasicAttributeFilter<Int64uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeBasicCommissioningInfoList(Callback::Cancelable * onSuccessCallback,
-                                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000001;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             GeneralCommissioningClusterBasicCommissioningInfoListListAttributeFilter);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeRegulatoryConfig(Callback::Cancelable * onSuccessCallback,
-                                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000002;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeLocationCapability(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000003;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x0000FFFC;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR GeneralCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x0000FFFD;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 CHIP_ERROR GeneralCommissioningCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
@@ -469,28 +392,6 @@ exit:
 }
 
 // NetworkCommissioning Cluster Attributes
-CHIP_ERROR NetworkCommissioningCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x0000FFFC;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR NetworkCommissioningCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x0000FFFD;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
 CHIP_ERROR NetworkCommissioningCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback,
                                                                           uint16_t minInterval, uint16_t maxInterval)
@@ -814,28 +715,6 @@ exit:
 }
 
 // OperationalCredentials Cluster Attributes
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeFabricsList(Callback::Cancelable * onSuccessCallback,
-                                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000001;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             OperationalCredentialsClusterFabricsListListAttributeFilter);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeSupportedFabrics(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000002;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
 CHIP_ERROR OperationalCredentialsCluster::SubscribeAttributeSupportedFabrics(Callback::Cancelable * onSuccessCallback,
                                                                              Callback::Cancelable * onFailureCallback,
                                                                              uint16_t minInterval, uint16_t maxInterval)
@@ -851,17 +730,6 @@ CHIP_ERROR OperationalCredentialsCluster::ReportAttributeSupportedFabrics(Callba
 {
     return RequestAttributeReporting(OperationalCredentials::Attributes::SupportedFabrics::Id, onReportCallback,
                                      BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeCommissionedFabrics(Callback::Cancelable * onSuccessCallback,
-                                                                           Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000003;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
 CHIP_ERROR OperationalCredentialsCluster::SubscribeAttributeCommissionedFabrics(Callback::Cancelable * onSuccessCallback,
@@ -881,28 +749,6 @@ CHIP_ERROR OperationalCredentialsCluster::ReportAttributeCommissionedFabrics(Cal
                                      BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeTrustedRootCertificates(Callback::Cancelable * onSuccessCallback,
-                                                                               Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000004;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             OperationalCredentialsClusterTrustedRootCertificatesListAttributeFilter);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeCurrentFabricIndex(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000005;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
 CHIP_ERROR OperationalCredentialsCluster::SubscribeAttributeCurrentFabricIndex(Callback::Cancelable * onSuccessCallback,
                                                                                Callback::Cancelable * onFailureCallback,
                                                                                uint16_t minInterval, uint16_t maxInterval)
@@ -918,17 +764,6 @@ CHIP_ERROR OperationalCredentialsCluster::ReportAttributeCurrentFabricIndex(Call
 {
     return RequestAttributeReporting(OperationalCredentials::Attributes::CurrentFabricIndex::Id, onReportCallback,
                                      BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OperationalCredentialsCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x0000FFFD;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 CHIP_ERROR OperationalCredentialsCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,

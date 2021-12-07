@@ -188,16 +188,6 @@ exit:
 
 // OnOff Cluster Commands
 // OnOff Cluster Attributes
-CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000000;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
 CHIP_ERROR OnOffCluster::SubscribeAttributeOnOff(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
                                                  uint16_t minInterval, uint16_t maxInterval)
 {
@@ -212,17 +202,6 @@ CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Cancelable * onReportCal
 {
     return RequestAttributeReporting(OnOff::Attributes::OnOff::Id, onReportCallback,
                                      BasicAttributeFilter<BooleanAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::ReadAttributeGlobalSceneControl(Callback::Cancelable * onSuccessCallback,
-                                                         Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00004000;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<BooleanAttributeCallback>);
 }
 
 CHIP_ERROR OnOffCluster::SubscribeAttributeGlobalSceneControl(Callback::Cancelable * onSuccessCallback,
@@ -242,27 +221,6 @@ CHIP_ERROR OnOffCluster::ReportAttributeGlobalSceneControl(Callback::Cancelable 
                                      BasicAttributeFilter<BooleanAttributeCallback>);
 }
 
-CHIP_ERROR OnOffCluster::ReadAttributeOnTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00004001;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::WriteAttributeOnTime(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback,
-                                              uint16_t value)
-{
-    app::WriteClientHandle handle;
-    ReturnErrorOnFailure(
-        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
-        chip::app::AttributePathParams(mEndpoint, mClusterId, OnOff::Attributes::OnTime::Id), value));
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
 CHIP_ERROR OnOffCluster::SubscribeAttributeOnTime(Callback::Cancelable * onSuccessCallback,
                                                   Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                   uint16_t maxInterval)
@@ -278,28 +236,6 @@ CHIP_ERROR OnOffCluster::ReportAttributeOnTime(Callback::Cancelable * onReportCa
 {
     return RequestAttributeReporting(OnOff::Attributes::OnTime::Id, onReportCallback,
                                      BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::ReadAttributeOffWaitTime(Callback::Cancelable * onSuccessCallback,
-                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00004002;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::WriteAttributeOffWaitTime(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback, uint16_t value)
-{
-    app::WriteClientHandle handle;
-    ReturnErrorOnFailure(
-        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
-        chip::app::AttributePathParams(mEndpoint, mClusterId, OnOff::Attributes::OffWaitTime::Id), value));
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
 }
 
 CHIP_ERROR OnOffCluster::SubscribeAttributeOffWaitTime(Callback::Cancelable * onSuccessCallback,
@@ -319,28 +255,6 @@ CHIP_ERROR OnOffCluster::ReportAttributeOffWaitTime(Callback::Cancelable * onRep
                                      BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
-CHIP_ERROR OnOffCluster::ReadAttributeStartUpOnOff(Callback::Cancelable * onSuccessCallback,
-                                                   Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00004003;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int8uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::WriteAttributeStartUpOnOff(Callback::Cancelable * onSuccessCallback,
-                                                    Callback::Cancelable * onFailureCallback, uint8_t value)
-{
-    app::WriteClientHandle handle;
-    ReturnErrorOnFailure(
-        app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(
-        chip::app::AttributePathParams(mEndpoint, mClusterId, OnOff::Attributes::StartUpOnOff::Id), value));
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
 CHIP_ERROR OnOffCluster::SubscribeAttributeStartUpOnOff(Callback::Cancelable * onSuccessCallback,
                                                         Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                         uint16_t maxInterval)
@@ -358,16 +272,6 @@ CHIP_ERROR OnOffCluster::ReportAttributeStartUpOnOff(Callback::Cancelable * onRe
                                      BasicAttributeFilter<Int8uAttributeCallback>);
 }
 
-CHIP_ERROR OnOffCluster::ReadAttributeFeatureMap(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x0000FFFC;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
 CHIP_ERROR OnOffCluster::SubscribeAttributeFeatureMap(Callback::Cancelable * onSuccessCallback,
                                                       Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                       uint16_t maxInterval)
@@ -383,17 +287,6 @@ CHIP_ERROR OnOffCluster::ReportAttributeFeatureMap(Callback::Cancelable * onRepo
 {
     return RequestAttributeReporting(Globals::Attributes::FeatureMap::Id, onReportCallback,
                                      BasicAttributeFilter<Int32uAttributeCallback>);
-}
-
-CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                      Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x0000FFFD;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 CHIP_ERROR OnOffCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,

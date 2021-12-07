@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "../cluster/Commands.h" // For the LogValue bits and read callbacks
 #include <commands/reporting/ReportingCommand.h>
 
 typedef void (*UnsupportedAttributeCallback)(void * context);
@@ -1699,972 +1700,1765 @@ public:
                                        BasicAttributeFilter<Int16uAttributeCallback>);
     }
 
-    static void OnDefaultSuccessResponse(void * context) { ChipLogProgress(chipTool, "Default Success Response"); }
-
-    static void OnDefaultFailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Default Failure Response: 0x%02x", status);
-    }
-
-    static void OnUnsupportedAttributeResponse(void * context)
-    {
-        ChipLogError(chipTool, "Unsupported attribute Response. This should never happen !");
-    }
-
-    static void OnBooleanAttributeResponse(void * context, bool value)
-    {
-        ChipLogProgress(chipTool, "Boolean attribute Response: %d", value);
-    }
-
-    static void OnInt8uAttributeResponse(void * context, uint8_t value)
-    {
-        ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
-    }
-
-    static void OnInt16uAttributeResponse(void * context, uint16_t value)
-    {
-        ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
-    }
-
-    static void OnInt16sAttributeResponse(void * context, int16_t value)
-    {
-        ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
-    }
-
 private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportAccountLoginClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportAdministratorCommissioningClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportApplicationBasicVendorNameCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportApplicationBasicVendorIdCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportApplicationBasicApplicationNameCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportApplicationBasicProductIdCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportApplicationBasicApplicationIdCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportApplicationBasicCatalogVendorIdCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportApplicationBasicApplicationStatusCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportApplicationBasicClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportApplicationLauncherCatalogVendorIdCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportApplicationLauncherApplicationIdCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportApplicationLauncherClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportAudioOutputCurrentAudioOutputCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportAudioOutputClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportBarrierControlBarrierMovingStateCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBarrierControlBarrierSafetyStatusCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportBarrierControlBarrierCapabilitiesCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportBarrierControlBarrierPositionCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBarrierControlClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBasicInteractionModelVersionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicVendorNameCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBasicVendorIDCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicProductNameCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBasicProductIDCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicNodeLabelCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicLocationCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBasicHardwareVersionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicHardwareVersionStringCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportBasicSoftwareVersionCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicSoftwareVersionStringCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicManufacturingDateCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicPartNumberCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicProductURLCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicProductLabelCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBasicSerialNumberCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportBasicLocalConfigDisabledCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportBasicReachableCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBasicClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportBinaryInputBasicOutOfServiceCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportBinaryInputBasicPresentValueCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportBinaryInputBasicStatusFlagsCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBinaryInputBasicClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBindingClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportBooleanStateStateValueCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBooleanStateClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportBridgedActionsSetupUrlCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBridgedActionsClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportBridgedDeviceBasicClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentHueCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentSaturationCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlRemainingTimeCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlCurrentXCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlCurrentYCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlDriftCompensationCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportColorControlCompensationTextCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorTemperatureCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlColorModeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlColorControlOptionsCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlNumberOfPrimariesCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlPrimary1XCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlPrimary1YCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlPrimary1IntensityCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlPrimary2XCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlPrimary2YCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlPrimary2IntensityCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlPrimary3XCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlPrimary3YCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlPrimary3IntensityCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlPrimary4XCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlPrimary4YCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlPrimary4IntensityCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlPrimary5XCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlPrimary5YCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlPrimary5IntensityCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlPrimary6XCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlPrimary6YCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlPrimary6IntensityCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlWhitePointXCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlWhitePointYCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorPointRXCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorPointRYCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlColorPointRIntensityCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorPointGXCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorPointGYCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlColorPointGIntensityCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorPointBXCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorPointBYCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlColorPointBIntensityCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlEnhancedCurrentHueCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlEnhancedColorModeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlColorLoopActiveCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlColorLoopDirectionCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorLoopTimeCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorLoopStartEnhancedHueCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorLoopStoredEnhancedHueCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorCapabilitiesCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorTempPhysicalMinCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorTempPhysicalMaxCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlCoupleColorTempToLevelMinMiredsCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlStartUpColorTemperatureMiredsCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportContentLauncherClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportDescriptorClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportDoorLockActuatorEnabledCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportDoorLockClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportElectricalMeasurementMeasurementTypeCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32sAttributeCallback> * onReportElectricalMeasurementTotalActivePowerCallback =
-        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportElectricalMeasurementRmsVoltageCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportElectricalMeasurementRmsVoltageMinCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportElectricalMeasurementRmsVoltageMaxCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportElectricalMeasurementRmsCurrentCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportElectricalMeasurementRmsCurrentMinCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportElectricalMeasurementRmsCurrentMaxCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportElectricalMeasurementActivePowerCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportElectricalMeasurementActivePowerMinCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportElectricalMeasurementActivePowerMaxCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportElectricalMeasurementClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportEthernetNetworkDiagnosticsPHYRateCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportEthernetNetworkDiagnosticsFullDuplexCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportEthernetNetworkDiagnosticsPacketRxCountCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportEthernetNetworkDiagnosticsPacketTxCountCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportEthernetNetworkDiagnosticsTxErrCountCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportEthernetNetworkDiagnosticsCollisionCountCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportEthernetNetworkDiagnosticsOverrunCountCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportEthernetNetworkDiagnosticsCarrierDetectCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportEthernetNetworkDiagnosticsTimeSinceResetCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportEthernetNetworkDiagnosticsClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportFixedLabelClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportFlowMeasurementMeasuredValueCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportFlowMeasurementMinMeasuredValueCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportFlowMeasurementMaxMeasuredValueCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportFlowMeasurementToleranceCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportFlowMeasurementClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportGeneralCommissioningBreadcrumbCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportGeneralCommissioningClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportGeneralDiagnosticsRebootCountCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportGeneralDiagnosticsUpTimeCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportGeneralDiagnosticsTotalOperationalHoursCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportGeneralDiagnosticsBootReasonsCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportGeneralDiagnosticsClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportGroupKeyManagementClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportGroupsNameSupportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportGroupsClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportIdentifyIdentifyTimeCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportIdentifyIdentifyTypeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportIdentifyClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportIlluminanceMeasurementMeasuredValueCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportIlluminanceMeasurementMinMeasuredValueCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportIlluminanceMeasurementMaxMeasuredValueCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportIlluminanceMeasurementToleranceCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportIlluminanceMeasurementLightSensorTypeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportIlluminanceMeasurementClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportKeypadInputClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportLevelControlRemainingTimeCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlMinLevelCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlMaxLevelCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportLevelControlCurrentFrequencyCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportLevelControlMinFrequencyCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportLevelControlMaxFrequencyCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlOptionsCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportLevelControlOnOffTransitionTimeCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlOnLevelCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportLevelControlOnTransitionTimeCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportLevelControlOffTransitionTimeCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlDefaultMoveRateCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlStartUpCurrentLevelCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportLevelControlClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportLowPowerClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportMediaInputCurrentMediaInputCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportMediaInputClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportMediaPlaybackPlaybackStateCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportMediaPlaybackStartTimeCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportMediaPlaybackDurationCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportMediaPlaybackPositionUpdatedAtCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportMediaPlaybackPositionCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportMediaPlaybackPlaybackSpeedCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportMediaPlaybackSeekRangeEndCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportMediaPlaybackSeekRangeStartCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportMediaPlaybackClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportModeSelectCurrentModeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportModeSelectOnModeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportModeSelectStartUpModeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportModeSelectDescriptionCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportModeSelectClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportNetworkCommissioningFeatureMapCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportNetworkCommissioningClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportOtaSoftwareUpdateProviderClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<OctetStringAttributeCallback> * onReportOtaSoftwareUpdateRequestorDefaultOtaProviderCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportOtaSoftwareUpdateRequestorUpdatePossibleCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportOtaSoftwareUpdateRequestorClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportOccupancySensingOccupancyCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportOccupancySensingOccupancySensorTypeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportOccupancySensingOccupancySensorTypeBitmapCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportOccupancySensingClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffGlobalSceneControlCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportOnOffOnTimeCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportOnOffOffWaitTimeCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportOnOffStartUpOnOffCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportOnOffFeatureMapCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportOnOffClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportOnOffSwitchConfigurationSwitchTypeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportOnOffSwitchConfigurationSwitchActionsCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportOnOffSwitchConfigurationClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportOperationalCredentialsSupportedFabricsCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportOperationalCredentialsCommissionedFabricsCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportOperationalCredentialsCurrentFabricIndexCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportOperationalCredentialsClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportPowerSourceStatusCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportPowerSourceOrderCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportPowerSourceDescriptionCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportPowerSourceBatteryVoltageCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportPowerSourceBatteryPercentRemainingCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportPowerSourceBatteryTimeRemainingCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportPowerSourceBatteryChargeLevelCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportPowerSourceBatteryChargeStateCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportPowerSourceFeatureMapCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportPowerSourceClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPressureMeasurementMeasuredValueCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPressureMeasurementMinMeasuredValueCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPressureMeasurementMaxMeasuredValueCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportPressureMeasurementClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlMaxPressureCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlMaxSpeedCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlMaxFlowCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlMinConstPressureCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlMaxConstPressureCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlMinCompPressureCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlMaxCompPressureCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlMinConstSpeedCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlMaxConstSpeedCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlMinConstFlowCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlMaxConstFlowCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlMinConstTempCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlMaxConstTempCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlPumpStatusCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportPumpConfigurationAndControlEffectiveOperationModeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportPumpConfigurationAndControlEffectiveControlModeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlCapacityCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlSpeedCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportPumpConfigurationAndControlLifetimeRunningHoursCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportPumpConfigurationAndControlPowerCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportPumpConfigurationAndControlLifetimeEnergyConsumedCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportPumpConfigurationAndControlOperationModeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportPumpConfigurationAndControlControlModeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlAlarmMaskCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportPumpConfigurationAndControlFeatureMapCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementMeasuredValueCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementMinMeasuredValueCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementMaxMeasuredValueCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementToleranceCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportScenesSceneCountCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportScenesCurrentSceneCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportScenesCurrentGroupCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportScenesSceneValidCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportScenesNameSupportCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportScenesClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportSoftwareDiagnosticsCurrentHeapFreeCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportSoftwareDiagnosticsCurrentHeapUsedCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportSoftwareDiagnosticsCurrentHeapHighWatermarkCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportSoftwareDiagnosticsClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportSwitchNumberOfPositionsCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportSwitchCurrentPositionCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportSwitchMultiPressMaxCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportSwitchFeatureMapCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportSwitchClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<OctetStringAttributeCallback> * onReportTvChannelTvChannelLineupCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<OctetStringAttributeCallback> * onReportTvChannelCurrentTvChannelCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTvChannelClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTargetNavigatorClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportTemperatureMeasurementMeasuredValueCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportTemperatureMeasurementMinMeasuredValueCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportTemperatureMeasurementMaxMeasuredValueCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTemperatureMeasurementToleranceCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTemperatureMeasurementClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportTestClusterBooleanCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportTestClusterBitmap8Callback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterBitmap16Callback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportTestClusterBitmap32Callback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterBitmap64Callback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportTestClusterInt8uCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterInt16uCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportTestClusterInt24uCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportTestClusterInt32uCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterInt40uCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterInt48uCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterInt56uCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterInt64uCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int8sAttributeCallback> * onReportTestClusterInt8sCallback =
-        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportTestClusterInt16sCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int32sAttributeCallback> * onReportTestClusterInt24sCallback =
-        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
-    chip::Callback::Callback<Int32sAttributeCallback> * onReportTestClusterInt32sCallback =
-        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
-    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterInt40sCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterInt48sCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterInt56sCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterInt64sCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportTestClusterEnum8Callback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterEnum16Callback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<FloatAttributeCallback> * onReportTestClusterFloatSingleCallback =
-        new chip::Callback::Callback<FloatAttributeCallback>(OnFloatAttributeResponse, this);
-    chip::Callback::Callback<DoubleAttributeCallback> * onReportTestClusterFloatDoubleCallback =
-        new chip::Callback::Callback<DoubleAttributeCallback>(OnDoubleAttributeResponse, this);
-    chip::Callback::Callback<OctetStringAttributeCallback> * onReportTestClusterOctetStringCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<OctetStringAttributeCallback> * onReportTestClusterLongOctetStringCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportTestClusterCharStringCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportTestClusterLongCharStringCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterEpochUsCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportTestClusterEpochSCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterVendorIdCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportTestClusterRangeRestrictedInt8uCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8sAttributeCallback> * onReportTestClusterRangeRestrictedInt8sCallback =
-        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterRangeRestrictedInt16uCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportTestClusterRangeRestrictedInt16sCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportTestClusterUnsupportedCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportTestClusterNullableBooleanCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportTestClusterNullableBitmap8Callback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterNullableBitmap16Callback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportTestClusterNullableBitmap32Callback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterNullableBitmap64Callback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportTestClusterNullableInt8uCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterNullableInt16uCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportTestClusterNullableInt24uCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportTestClusterNullableInt32uCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterNullableInt40uCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterNullableInt48uCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterNullableInt56uCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportTestClusterNullableInt64uCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int8sAttributeCallback> * onReportTestClusterNullableInt8sCallback =
-        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportTestClusterNullableInt16sCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int32sAttributeCallback> * onReportTestClusterNullableInt24sCallback =
-        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
-    chip::Callback::Callback<Int32sAttributeCallback> * onReportTestClusterNullableInt32sCallback =
-        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
-    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterNullableInt40sCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterNullableInt48sCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterNullableInt56sCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<Int64sAttributeCallback> * onReportTestClusterNullableInt64sCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportTestClusterNullableEnum8Callback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterNullableEnum16Callback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<FloatAttributeCallback> * onReportTestClusterNullableFloatSingleCallback =
-        new chip::Callback::Callback<FloatAttributeCallback>(OnFloatAttributeResponse, this);
-    chip::Callback::Callback<DoubleAttributeCallback> * onReportTestClusterNullableFloatDoubleCallback =
-        new chip::Callback::Callback<DoubleAttributeCallback>(OnDoubleAttributeResponse, this);
-    chip::Callback::Callback<OctetStringAttributeCallback> * onReportTestClusterNullableOctetStringCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportTestClusterNullableCharStringCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportTestClusterNullableRangeRestrictedInt8uCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8sAttributeCallback> * onReportTestClusterNullableRangeRestrictedInt8sCallback =
-        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterNullableRangeRestrictedInt16uCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportTestClusterNullableRangeRestrictedInt16sCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTestClusterClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatLocalTemperatureCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatAbsMinHeatSetpointLimitCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatAbsMaxHeatSetpointLimitCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatAbsMinCoolSetpointLimitCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatAbsMaxCoolSetpointLimitCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatOccupiedCoolingSetpointCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatOccupiedHeatingSetpointCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatMinHeatSetpointLimitCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatMaxHeatSetpointLimitCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatMinCoolSetpointLimitCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatMaxCoolSetpointLimitCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int8sAttributeCallback> * onReportThermostatMinSetpointDeadBandCallback =
-        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThermostatControlSequenceOfOperationCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThermostatSystemModeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThermostatStartOfWeekCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThermostatNumberOfWeeklyTransitionsCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThermostatNumberOfDailyTransitionsCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThermostatFeatureMapCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportThermostatClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThermostatUserInterfaceConfigurationTemperatureDisplayModeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThermostatUserInterfaceConfigurationKeypadLockoutCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> *
-        onReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCallback =
-            new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportThermostatUserInterfaceConfigurationClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportThreadNetworkDiagnosticsChannelCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThreadNetworkDiagnosticsRoutingRoleCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<OctetStringAttributeCallback> * onReportThreadNetworkDiagnosticsNetworkNameCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportThreadNetworkDiagnosticsPanIdCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportThreadNetworkDiagnosticsExtendedPanIdCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<OctetStringAttributeCallback> * onReportThreadNetworkDiagnosticsMeshLocalPrefixCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportThreadNetworkDiagnosticsOverrunCountCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsPartitionIdCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThreadNetworkDiagnosticsWeightingCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThreadNetworkDiagnosticsDataVersionCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThreadNetworkDiagnosticsStableDataVersionCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportThreadNetworkDiagnosticsLeaderRouterIdCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportThreadNetworkDiagnosticsDetachedRoleCountCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportThreadNetworkDiagnosticsChildRoleCountCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportThreadNetworkDiagnosticsRouterRoleCountCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportThreadNetworkDiagnosticsLeaderRoleCountCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportThreadNetworkDiagnosticsAttachAttemptCountCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportThreadNetworkDiagnosticsPartitionIdChangeCountCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCountCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportThreadNetworkDiagnosticsParentChangeCountCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxTotalCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxUnicastCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxBroadcastCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxAckRequestedCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxAckedCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxNoAckRequestedCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxDataCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxDataPollCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxBeaconCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxBeaconRequestCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxOtherCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxRetryCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxErrCcaCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxErrAbortCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsTxErrBusyChannelCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxTotalCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxUnicastCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxBroadcastCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxDataCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxDataPollCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxBeaconCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxBeaconRequestCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxOtherCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxAddressFilteredCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxDestAddrFilteredCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxDuplicatedCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxErrNoFrameCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxErrUnknownNeighborCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxErrInvalidSrcAddrCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxErrSecCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxErrFcsCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsRxErrOtherCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportThreadNetworkDiagnosticsActiveTimestampCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportThreadNetworkDiagnosticsPendingTimestampCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportThreadNetworkDiagnosticsDelayCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<OctetStringAttributeCallback> * onReportThreadNetworkDiagnosticsChannelMaskCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportThreadNetworkDiagnosticsClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<CharStringAttributeCallback> * onReportWakeOnLanWakeOnLanMacAddressCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWakeOnLanClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<OctetStringAttributeCallback> * onReportWiFiNetworkDiagnosticsBssidCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWiFiNetworkDiagnosticsSecurityTypeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWiFiNetworkDiagnosticsWiFiVersionCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWiFiNetworkDiagnosticsChannelNumberCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8sAttributeCallback> * onReportWiFiNetworkDiagnosticsRssiCallback =
-        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportWiFiNetworkDiagnosticsBeaconLostCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportWiFiNetworkDiagnosticsBeaconRxCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportWiFiNetworkDiagnosticsPacketMulticastRxCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportWiFiNetworkDiagnosticsPacketMulticastTxCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportWiFiNetworkDiagnosticsPacketUnicastRxCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportWiFiNetworkDiagnosticsPacketUnicastTxCountCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportWiFiNetworkDiagnosticsCurrentMaxRateCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int64uAttributeCallback> * onReportWiFiNetworkDiagnosticsOverrunCountCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWiFiNetworkDiagnosticsClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringTypeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringCurrentPositionLiftCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringCurrentPositionTiltCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringConfigStatusCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringCurrentPositionLiftPercentageCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringCurrentPositionTiltPercentageCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringOperationalStatusCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringTargetPositionLiftPercent100thsCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringTargetPositionTiltPercent100thsCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringEndProductTypeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringCurrentPositionLiftPercent100thsCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringCurrentPositionTiltPercent100thsCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringInstalledOpenLimitLiftCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringInstalledClosedLimitLiftCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringInstalledOpenLimitTiltCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringInstalledClosedLimitTiltCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringModeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringSafetyStatusCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int32uAttributeCallback> * onReportWindowCoveringFeatureMapCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringClusterRevisionCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadAccountLoginClusterRevision::OnAttributeResponse)> *
+        onReportAccountLoginClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadAccountLoginClusterRevision::OnAttributeResponse)>(
+                ReadAccountLoginClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadAdministratorCommissioningClusterRevision::OnAttributeResponse)> *
+        onReportAdministratorCommissioningClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadAdministratorCommissioningClusterRevision::OnAttributeResponse)>(
+                ReadAdministratorCommissioningClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicVendorName::OnAttributeResponse)> *
+        onReportApplicationBasicVendorNameCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicVendorName::OnAttributeResponse)>(
+                ReadApplicationBasicVendorName::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicVendorId::OnAttributeResponse)> *
+        onReportApplicationBasicVendorIdCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicVendorId::OnAttributeResponse)>(
+                ReadApplicationBasicVendorId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationName::OnAttributeResponse)> *
+        onReportApplicationBasicApplicationNameCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationName::OnAttributeResponse)>(
+                ReadApplicationBasicApplicationName::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicProductId::OnAttributeResponse)> *
+        onReportApplicationBasicProductIdCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicProductId::OnAttributeResponse)>(
+                ReadApplicationBasicProductId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationId::OnAttributeResponse)> *
+        onReportApplicationBasicApplicationIdCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationId::OnAttributeResponse)>(
+                ReadApplicationBasicApplicationId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicCatalogVendorId::OnAttributeResponse)> *
+        onReportApplicationBasicCatalogVendorIdCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicCatalogVendorId::OnAttributeResponse)>(
+                ReadApplicationBasicCatalogVendorId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationStatus::OnAttributeResponse)> *
+        onReportApplicationBasicApplicationStatusCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationStatus::OnAttributeResponse)>(
+                ReadApplicationBasicApplicationStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicClusterRevision::OnAttributeResponse)> *
+        onReportApplicationBasicClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicClusterRevision::OnAttributeResponse)>(
+                ReadApplicationBasicClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationLauncherCatalogVendorId::OnAttributeResponse)> *
+        onReportApplicationLauncherCatalogVendorIdCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationLauncherCatalogVendorId::OnAttributeResponse)>(
+                ReadApplicationLauncherCatalogVendorId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationLauncherApplicationId::OnAttributeResponse)> *
+        onReportApplicationLauncherApplicationIdCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationLauncherApplicationId::OnAttributeResponse)>(
+                ReadApplicationLauncherApplicationId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationLauncherClusterRevision::OnAttributeResponse)> *
+        onReportApplicationLauncherClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationLauncherClusterRevision::OnAttributeResponse)>(
+                ReadApplicationLauncherClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadAudioOutputCurrentAudioOutput::OnAttributeResponse)> *
+        onReportAudioOutputCurrentAudioOutputCallback =
+            new chip::Callback::Callback<decltype(&ReadAudioOutputCurrentAudioOutput::OnAttributeResponse)>(
+                ReadAudioOutputCurrentAudioOutput::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadAudioOutputClusterRevision::OnAttributeResponse)> *
+        onReportAudioOutputClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadAudioOutputClusterRevision::OnAttributeResponse)>(
+                ReadAudioOutputClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBarrierControlBarrierMovingState::OnAttributeResponse)> *
+        onReportBarrierControlBarrierMovingStateCallback =
+            new chip::Callback::Callback<decltype(&ReadBarrierControlBarrierMovingState::OnAttributeResponse)>(
+                ReadBarrierControlBarrierMovingState::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBarrierControlBarrierSafetyStatus::OnAttributeResponse)> *
+        onReportBarrierControlBarrierSafetyStatusCallback =
+            new chip::Callback::Callback<decltype(&ReadBarrierControlBarrierSafetyStatus::OnAttributeResponse)>(
+                ReadBarrierControlBarrierSafetyStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBarrierControlBarrierCapabilities::OnAttributeResponse)> *
+        onReportBarrierControlBarrierCapabilitiesCallback =
+            new chip::Callback::Callback<decltype(&ReadBarrierControlBarrierCapabilities::OnAttributeResponse)>(
+                ReadBarrierControlBarrierCapabilities::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBarrierControlBarrierPosition::OnAttributeResponse)> *
+        onReportBarrierControlBarrierPositionCallback =
+            new chip::Callback::Callback<decltype(&ReadBarrierControlBarrierPosition::OnAttributeResponse)>(
+                ReadBarrierControlBarrierPosition::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBarrierControlClusterRevision::OnAttributeResponse)> *
+        onReportBarrierControlClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadBarrierControlClusterRevision::OnAttributeResponse)>(
+                ReadBarrierControlClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicInteractionModelVersion::OnAttributeResponse)> *
+        onReportBasicInteractionModelVersionCallback =
+            new chip::Callback::Callback<decltype(&ReadBasicInteractionModelVersion::OnAttributeResponse)>(
+                ReadBasicInteractionModelVersion::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicVendorName::OnAttributeResponse)> * onReportBasicVendorNameCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicVendorName::OnAttributeResponse)>(ReadBasicVendorName::OnAttributeResponse,
+                                                                                          this);
+    chip::Callback::Callback<decltype(&ReadBasicVendorID::OnAttributeResponse)> * onReportBasicVendorIDCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicVendorID::OnAttributeResponse)>(ReadBasicVendorID::OnAttributeResponse,
+                                                                                        this);
+    chip::Callback::Callback<decltype(&ReadBasicProductName::OnAttributeResponse)> * onReportBasicProductNameCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicProductName::OnAttributeResponse)>(
+            ReadBasicProductName::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicProductID::OnAttributeResponse)> * onReportBasicProductIDCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicProductID::OnAttributeResponse)>(ReadBasicProductID::OnAttributeResponse,
+                                                                                         this);
+    chip::Callback::Callback<decltype(&ReadBasicNodeLabel::OnAttributeResponse)> * onReportBasicNodeLabelCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicNodeLabel::OnAttributeResponse)>(ReadBasicNodeLabel::OnAttributeResponse,
+                                                                                         this);
+    chip::Callback::Callback<decltype(&ReadBasicLocation::OnAttributeResponse)> * onReportBasicLocationCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicLocation::OnAttributeResponse)>(ReadBasicLocation::OnAttributeResponse,
+                                                                                        this);
+    chip::Callback::Callback<decltype(&ReadBasicHardwareVersion::OnAttributeResponse)> * onReportBasicHardwareVersionCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicHardwareVersion::OnAttributeResponse)>(
+            ReadBasicHardwareVersion::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicHardwareVersionString::OnAttributeResponse)> *
+        onReportBasicHardwareVersionStringCallback =
+            new chip::Callback::Callback<decltype(&ReadBasicHardwareVersionString::OnAttributeResponse)>(
+                ReadBasicHardwareVersionString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicSoftwareVersion::OnAttributeResponse)> * onReportBasicSoftwareVersionCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicSoftwareVersion::OnAttributeResponse)>(
+            ReadBasicSoftwareVersion::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicSoftwareVersionString::OnAttributeResponse)> *
+        onReportBasicSoftwareVersionStringCallback =
+            new chip::Callback::Callback<decltype(&ReadBasicSoftwareVersionString::OnAttributeResponse)>(
+                ReadBasicSoftwareVersionString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicManufacturingDate::OnAttributeResponse)> * onReportBasicManufacturingDateCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicManufacturingDate::OnAttributeResponse)>(
+            ReadBasicManufacturingDate::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicPartNumber::OnAttributeResponse)> * onReportBasicPartNumberCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicPartNumber::OnAttributeResponse)>(ReadBasicPartNumber::OnAttributeResponse,
+                                                                                          this);
+    chip::Callback::Callback<decltype(&ReadBasicProductURL::OnAttributeResponse)> * onReportBasicProductURLCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicProductURL::OnAttributeResponse)>(ReadBasicProductURL::OnAttributeResponse,
+                                                                                          this);
+    chip::Callback::Callback<decltype(&ReadBasicProductLabel::OnAttributeResponse)> * onReportBasicProductLabelCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicProductLabel::OnAttributeResponse)>(
+            ReadBasicProductLabel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicSerialNumber::OnAttributeResponse)> * onReportBasicSerialNumberCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicSerialNumber::OnAttributeResponse)>(
+            ReadBasicSerialNumber::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicLocalConfigDisabled::OnAttributeResponse)> *
+        onReportBasicLocalConfigDisabledCallback =
+            new chip::Callback::Callback<decltype(&ReadBasicLocalConfigDisabled::OnAttributeResponse)>(
+                ReadBasicLocalConfigDisabled::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicReachable::OnAttributeResponse)> * onReportBasicReachableCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicReachable::OnAttributeResponse)>(ReadBasicReachable::OnAttributeResponse,
+                                                                                         this);
+    chip::Callback::Callback<decltype(&ReadBasicClusterRevision::OnAttributeResponse)> * onReportBasicClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicClusterRevision::OnAttributeResponse)>(
+            ReadBasicClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBinaryInputBasicOutOfService::OnAttributeResponse)> *
+        onReportBinaryInputBasicOutOfServiceCallback =
+            new chip::Callback::Callback<decltype(&ReadBinaryInputBasicOutOfService::OnAttributeResponse)>(
+                ReadBinaryInputBasicOutOfService::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBinaryInputBasicPresentValue::OnAttributeResponse)> *
+        onReportBinaryInputBasicPresentValueCallback =
+            new chip::Callback::Callback<decltype(&ReadBinaryInputBasicPresentValue::OnAttributeResponse)>(
+                ReadBinaryInputBasicPresentValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBinaryInputBasicStatusFlags::OnAttributeResponse)> *
+        onReportBinaryInputBasicStatusFlagsCallback =
+            new chip::Callback::Callback<decltype(&ReadBinaryInputBasicStatusFlags::OnAttributeResponse)>(
+                ReadBinaryInputBasicStatusFlags::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBinaryInputBasicClusterRevision::OnAttributeResponse)> *
+        onReportBinaryInputBasicClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadBinaryInputBasicClusterRevision::OnAttributeResponse)>(
+                ReadBinaryInputBasicClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBindingClusterRevision::OnAttributeResponse)> * onReportBindingClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadBindingClusterRevision::OnAttributeResponse)>(
+            ReadBindingClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBooleanStateStateValue::OnAttributeResponse)> * onReportBooleanStateStateValueCallback =
+        new chip::Callback::Callback<decltype(&ReadBooleanStateStateValue::OnAttributeResponse)>(
+            ReadBooleanStateStateValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBooleanStateClusterRevision::OnAttributeResponse)> *
+        onReportBooleanStateClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadBooleanStateClusterRevision::OnAttributeResponse)>(
+                ReadBooleanStateClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBridgedActionsSetupUrl::OnAttributeResponse)> * onReportBridgedActionsSetupUrlCallback =
+        new chip::Callback::Callback<decltype(&ReadBridgedActionsSetupUrl::OnAttributeResponse)>(
+            ReadBridgedActionsSetupUrl::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBridgedActionsClusterRevision::OnAttributeResponse)> *
+        onReportBridgedActionsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadBridgedActionsClusterRevision::OnAttributeResponse)>(
+                ReadBridgedActionsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBridgedDeviceBasicClusterRevision::OnAttributeResponse)> *
+        onReportBridgedDeviceBasicClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadBridgedDeviceBasicClusterRevision::OnAttributeResponse)>(
+                ReadBridgedDeviceBasicClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlCurrentHue::OnAttributeResponse)> * onReportColorControlCurrentHueCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlCurrentHue::OnAttributeResponse)>(
+            ReadColorControlCurrentHue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlCurrentSaturation::OnAttributeResponse)> *
+        onReportColorControlCurrentSaturationCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlCurrentSaturation::OnAttributeResponse)>(
+                ReadColorControlCurrentSaturation::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlRemainingTime::OnAttributeResponse)> *
+        onReportColorControlRemainingTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlRemainingTime::OnAttributeResponse)>(
+                ReadColorControlRemainingTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlCurrentX::OnAttributeResponse)> * onReportColorControlCurrentXCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlCurrentX::OnAttributeResponse)>(
+            ReadColorControlCurrentX::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlCurrentY::OnAttributeResponse)> * onReportColorControlCurrentYCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlCurrentY::OnAttributeResponse)>(
+            ReadColorControlCurrentY::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlDriftCompensation::OnAttributeResponse)> *
+        onReportColorControlDriftCompensationCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlDriftCompensation::OnAttributeResponse)>(
+                ReadColorControlDriftCompensation::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlCompensationText::OnAttributeResponse)> *
+        onReportColorControlCompensationTextCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlCompensationText::OnAttributeResponse)>(
+                ReadColorControlCompensationText::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorTemperature::OnAttributeResponse)> *
+        onReportColorControlColorTemperatureCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorTemperature::OnAttributeResponse)>(
+                ReadColorControlColorTemperature::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorMode::OnAttributeResponse)> * onReportColorControlColorModeCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlColorMode::OnAttributeResponse)>(
+            ReadColorControlColorMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorControlOptions::OnAttributeResponse)> *
+        onReportColorControlColorControlOptionsCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorControlOptions::OnAttributeResponse)>(
+                ReadColorControlColorControlOptions::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlNumberOfPrimaries::OnAttributeResponse)> *
+        onReportColorControlNumberOfPrimariesCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlNumberOfPrimaries::OnAttributeResponse)>(
+                ReadColorControlNumberOfPrimaries::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary1X::OnAttributeResponse)> * onReportColorControlPrimary1XCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary1X::OnAttributeResponse)>(
+            ReadColorControlPrimary1X::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary1Y::OnAttributeResponse)> * onReportColorControlPrimary1YCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary1Y::OnAttributeResponse)>(
+            ReadColorControlPrimary1Y::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary1Intensity::OnAttributeResponse)> *
+        onReportColorControlPrimary1IntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlPrimary1Intensity::OnAttributeResponse)>(
+                ReadColorControlPrimary1Intensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary2X::OnAttributeResponse)> * onReportColorControlPrimary2XCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary2X::OnAttributeResponse)>(
+            ReadColorControlPrimary2X::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary2Y::OnAttributeResponse)> * onReportColorControlPrimary2YCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary2Y::OnAttributeResponse)>(
+            ReadColorControlPrimary2Y::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary2Intensity::OnAttributeResponse)> *
+        onReportColorControlPrimary2IntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlPrimary2Intensity::OnAttributeResponse)>(
+                ReadColorControlPrimary2Intensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary3X::OnAttributeResponse)> * onReportColorControlPrimary3XCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary3X::OnAttributeResponse)>(
+            ReadColorControlPrimary3X::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary3Y::OnAttributeResponse)> * onReportColorControlPrimary3YCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary3Y::OnAttributeResponse)>(
+            ReadColorControlPrimary3Y::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary3Intensity::OnAttributeResponse)> *
+        onReportColorControlPrimary3IntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlPrimary3Intensity::OnAttributeResponse)>(
+                ReadColorControlPrimary3Intensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary4X::OnAttributeResponse)> * onReportColorControlPrimary4XCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary4X::OnAttributeResponse)>(
+            ReadColorControlPrimary4X::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary4Y::OnAttributeResponse)> * onReportColorControlPrimary4YCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary4Y::OnAttributeResponse)>(
+            ReadColorControlPrimary4Y::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary4Intensity::OnAttributeResponse)> *
+        onReportColorControlPrimary4IntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlPrimary4Intensity::OnAttributeResponse)>(
+                ReadColorControlPrimary4Intensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary5X::OnAttributeResponse)> * onReportColorControlPrimary5XCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary5X::OnAttributeResponse)>(
+            ReadColorControlPrimary5X::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary5Y::OnAttributeResponse)> * onReportColorControlPrimary5YCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary5Y::OnAttributeResponse)>(
+            ReadColorControlPrimary5Y::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary5Intensity::OnAttributeResponse)> *
+        onReportColorControlPrimary5IntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlPrimary5Intensity::OnAttributeResponse)>(
+                ReadColorControlPrimary5Intensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary6X::OnAttributeResponse)> * onReportColorControlPrimary6XCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary6X::OnAttributeResponse)>(
+            ReadColorControlPrimary6X::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary6Y::OnAttributeResponse)> * onReportColorControlPrimary6YCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary6Y::OnAttributeResponse)>(
+            ReadColorControlPrimary6Y::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary6Intensity::OnAttributeResponse)> *
+        onReportColorControlPrimary6IntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlPrimary6Intensity::OnAttributeResponse)>(
+                ReadColorControlPrimary6Intensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlWhitePointX::OnAttributeResponse)> *
+        onReportColorControlWhitePointXCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlWhitePointX::OnAttributeResponse)>(
+                ReadColorControlWhitePointX::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlWhitePointY::OnAttributeResponse)> *
+        onReportColorControlWhitePointYCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlWhitePointY::OnAttributeResponse)>(
+                ReadColorControlWhitePointY::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointRX::OnAttributeResponse)> *
+        onReportColorControlColorPointRXCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointRX::OnAttributeResponse)>(
+                ReadColorControlColorPointRX::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointRY::OnAttributeResponse)> *
+        onReportColorControlColorPointRYCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointRY::OnAttributeResponse)>(
+                ReadColorControlColorPointRY::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointRIntensity::OnAttributeResponse)> *
+        onReportColorControlColorPointRIntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointRIntensity::OnAttributeResponse)>(
+                ReadColorControlColorPointRIntensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointGX::OnAttributeResponse)> *
+        onReportColorControlColorPointGXCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointGX::OnAttributeResponse)>(
+                ReadColorControlColorPointGX::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointGY::OnAttributeResponse)> *
+        onReportColorControlColorPointGYCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointGY::OnAttributeResponse)>(
+                ReadColorControlColorPointGY::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointGIntensity::OnAttributeResponse)> *
+        onReportColorControlColorPointGIntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointGIntensity::OnAttributeResponse)>(
+                ReadColorControlColorPointGIntensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointBX::OnAttributeResponse)> *
+        onReportColorControlColorPointBXCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointBX::OnAttributeResponse)>(
+                ReadColorControlColorPointBX::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointBY::OnAttributeResponse)> *
+        onReportColorControlColorPointBYCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointBY::OnAttributeResponse)>(
+                ReadColorControlColorPointBY::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointBIntensity::OnAttributeResponse)> *
+        onReportColorControlColorPointBIntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointBIntensity::OnAttributeResponse)>(
+                ReadColorControlColorPointBIntensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlEnhancedCurrentHue::OnAttributeResponse)> *
+        onReportColorControlEnhancedCurrentHueCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlEnhancedCurrentHue::OnAttributeResponse)>(
+                ReadColorControlEnhancedCurrentHue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlEnhancedColorMode::OnAttributeResponse)> *
+        onReportColorControlEnhancedColorModeCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlEnhancedColorMode::OnAttributeResponse)>(
+                ReadColorControlEnhancedColorMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorLoopActive::OnAttributeResponse)> *
+        onReportColorControlColorLoopActiveCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorLoopActive::OnAttributeResponse)>(
+                ReadColorControlColorLoopActive::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorLoopDirection::OnAttributeResponse)> *
+        onReportColorControlColorLoopDirectionCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorLoopDirection::OnAttributeResponse)>(
+                ReadColorControlColorLoopDirection::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorLoopTime::OnAttributeResponse)> *
+        onReportColorControlColorLoopTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorLoopTime::OnAttributeResponse)>(
+                ReadColorControlColorLoopTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorLoopStartEnhancedHue::OnAttributeResponse)> *
+        onReportColorControlColorLoopStartEnhancedHueCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorLoopStartEnhancedHue::OnAttributeResponse)>(
+                ReadColorControlColorLoopStartEnhancedHue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorLoopStoredEnhancedHue::OnAttributeResponse)> *
+        onReportColorControlColorLoopStoredEnhancedHueCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorLoopStoredEnhancedHue::OnAttributeResponse)>(
+                ReadColorControlColorLoopStoredEnhancedHue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorCapabilities::OnAttributeResponse)> *
+        onReportColorControlColorCapabilitiesCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorCapabilities::OnAttributeResponse)>(
+                ReadColorControlColorCapabilities::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorTempPhysicalMin::OnAttributeResponse)> *
+        onReportColorControlColorTempPhysicalMinCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorTempPhysicalMin::OnAttributeResponse)>(
+                ReadColorControlColorTempPhysicalMin::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorTempPhysicalMax::OnAttributeResponse)> *
+        onReportColorControlColorTempPhysicalMaxCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorTempPhysicalMax::OnAttributeResponse)>(
+                ReadColorControlColorTempPhysicalMax::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlCoupleColorTempToLevelMinMireds::OnAttributeResponse)> *
+        onReportColorControlCoupleColorTempToLevelMinMiredsCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlCoupleColorTempToLevelMinMireds::OnAttributeResponse)>(
+                ReadColorControlCoupleColorTempToLevelMinMireds::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlStartUpColorTemperatureMireds::OnAttributeResponse)> *
+        onReportColorControlStartUpColorTemperatureMiredsCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlStartUpColorTemperatureMireds::OnAttributeResponse)>(
+                ReadColorControlStartUpColorTemperatureMireds::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlClusterRevision::OnAttributeResponse)> *
+        onReportColorControlClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlClusterRevision::OnAttributeResponse)>(
+                ReadColorControlClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadContentLauncherClusterRevision::OnAttributeResponse)> *
+        onReportContentLauncherClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadContentLauncherClusterRevision::OnAttributeResponse)>(
+                ReadContentLauncherClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadDescriptorClusterRevision::OnAttributeResponse)> *
+        onReportDescriptorClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadDescriptorClusterRevision::OnAttributeResponse)>(
+                ReadDescriptorClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadDoorLockActuatorEnabled::OnAttributeResponse)> *
+        onReportDoorLockActuatorEnabledCallback =
+            new chip::Callback::Callback<decltype(&ReadDoorLockActuatorEnabled::OnAttributeResponse)>(
+                ReadDoorLockActuatorEnabled::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadDoorLockClusterRevision::OnAttributeResponse)> *
+        onReportDoorLockClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadDoorLockClusterRevision::OnAttributeResponse)>(
+                ReadDoorLockClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementMeasurementType::OnAttributeResponse)> *
+        onReportElectricalMeasurementMeasurementTypeCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementMeasurementType::OnAttributeResponse)>(
+                ReadElectricalMeasurementMeasurementType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementTotalActivePower::OnAttributeResponse)> *
+        onReportElectricalMeasurementTotalActivePowerCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementTotalActivePower::OnAttributeResponse)>(
+                ReadElectricalMeasurementTotalActivePower::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsVoltage::OnAttributeResponse)> *
+        onReportElectricalMeasurementRmsVoltageCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsVoltage::OnAttributeResponse)>(
+                ReadElectricalMeasurementRmsVoltage::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsVoltageMin::OnAttributeResponse)> *
+        onReportElectricalMeasurementRmsVoltageMinCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsVoltageMin::OnAttributeResponse)>(
+                ReadElectricalMeasurementRmsVoltageMin::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsVoltageMax::OnAttributeResponse)> *
+        onReportElectricalMeasurementRmsVoltageMaxCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsVoltageMax::OnAttributeResponse)>(
+                ReadElectricalMeasurementRmsVoltageMax::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsCurrent::OnAttributeResponse)> *
+        onReportElectricalMeasurementRmsCurrentCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsCurrent::OnAttributeResponse)>(
+                ReadElectricalMeasurementRmsCurrent::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsCurrentMin::OnAttributeResponse)> *
+        onReportElectricalMeasurementRmsCurrentMinCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsCurrentMin::OnAttributeResponse)>(
+                ReadElectricalMeasurementRmsCurrentMin::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsCurrentMax::OnAttributeResponse)> *
+        onReportElectricalMeasurementRmsCurrentMaxCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsCurrentMax::OnAttributeResponse)>(
+                ReadElectricalMeasurementRmsCurrentMax::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementActivePower::OnAttributeResponse)> *
+        onReportElectricalMeasurementActivePowerCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementActivePower::OnAttributeResponse)>(
+                ReadElectricalMeasurementActivePower::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementActivePowerMin::OnAttributeResponse)> *
+        onReportElectricalMeasurementActivePowerMinCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementActivePowerMin::OnAttributeResponse)>(
+                ReadElectricalMeasurementActivePowerMin::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementActivePowerMax::OnAttributeResponse)> *
+        onReportElectricalMeasurementActivePowerMaxCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementActivePowerMax::OnAttributeResponse)>(
+                ReadElectricalMeasurementActivePowerMax::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementClusterRevision::OnAttributeResponse)> *
+        onReportElectricalMeasurementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementClusterRevision::OnAttributeResponse)>(
+                ReadElectricalMeasurementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsPHYRate::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsPHYRateCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsPHYRate::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsPHYRate::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsFullDuplex::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsFullDuplexCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsFullDuplex::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsFullDuplex::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsPacketRxCount::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsPacketRxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsPacketRxCount::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsPacketRxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsPacketTxCount::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsPacketTxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsPacketTxCount::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsPacketTxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsTxErrCount::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsTxErrCountCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsTxErrCount::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsTxErrCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsCollisionCount::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsCollisionCountCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsCollisionCount::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsCollisionCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsOverrunCount::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsOverrunCountCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsOverrunCount::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsOverrunCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsCarrierDetect::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsCarrierDetectCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsCarrierDetect::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsCarrierDetect::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsTimeSinceReset::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsTimeSinceResetCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsTimeSinceReset::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsTimeSinceReset::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsClusterRevision::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsClusterRevision::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadFixedLabelClusterRevision::OnAttributeResponse)> *
+        onReportFixedLabelClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadFixedLabelClusterRevision::OnAttributeResponse)>(
+                ReadFixedLabelClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadFlowMeasurementMeasuredValue::OnAttributeResponse)> *
+        onReportFlowMeasurementMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadFlowMeasurementMeasuredValue::OnAttributeResponse)>(
+                ReadFlowMeasurementMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadFlowMeasurementMinMeasuredValue::OnAttributeResponse)> *
+        onReportFlowMeasurementMinMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadFlowMeasurementMinMeasuredValue::OnAttributeResponse)>(
+                ReadFlowMeasurementMinMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadFlowMeasurementMaxMeasuredValue::OnAttributeResponse)> *
+        onReportFlowMeasurementMaxMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadFlowMeasurementMaxMeasuredValue::OnAttributeResponse)>(
+                ReadFlowMeasurementMaxMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadFlowMeasurementTolerance::OnAttributeResponse)> *
+        onReportFlowMeasurementToleranceCallback =
+            new chip::Callback::Callback<decltype(&ReadFlowMeasurementTolerance::OnAttributeResponse)>(
+                ReadFlowMeasurementTolerance::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadFlowMeasurementClusterRevision::OnAttributeResponse)> *
+        onReportFlowMeasurementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadFlowMeasurementClusterRevision::OnAttributeResponse)>(
+                ReadFlowMeasurementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralCommissioningBreadcrumb::OnAttributeResponse)> *
+        onReportGeneralCommissioningBreadcrumbCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralCommissioningBreadcrumb::OnAttributeResponse)>(
+                ReadGeneralCommissioningBreadcrumb::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralCommissioningClusterRevision::OnAttributeResponse)> *
+        onReportGeneralCommissioningClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralCommissioningClusterRevision::OnAttributeResponse)>(
+                ReadGeneralCommissioningClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsRebootCount::OnAttributeResponse)> *
+        onReportGeneralDiagnosticsRebootCountCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsRebootCount::OnAttributeResponse)>(
+                ReadGeneralDiagnosticsRebootCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsUpTime::OnAttributeResponse)> *
+        onReportGeneralDiagnosticsUpTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsUpTime::OnAttributeResponse)>(
+                ReadGeneralDiagnosticsUpTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsTotalOperationalHours::OnAttributeResponse)> *
+        onReportGeneralDiagnosticsTotalOperationalHoursCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsTotalOperationalHours::OnAttributeResponse)>(
+                ReadGeneralDiagnosticsTotalOperationalHours::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsBootReasons::OnAttributeResponse)> *
+        onReportGeneralDiagnosticsBootReasonsCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsBootReasons::OnAttributeResponse)>(
+                ReadGeneralDiagnosticsBootReasons::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsClusterRevision::OnAttributeResponse)> *
+        onReportGeneralDiagnosticsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsClusterRevision::OnAttributeResponse)>(
+                ReadGeneralDiagnosticsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGroupKeyManagementClusterRevision::OnAttributeResponse)> *
+        onReportGroupKeyManagementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadGroupKeyManagementClusterRevision::OnAttributeResponse)>(
+                ReadGroupKeyManagementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGroupsNameSupport::OnAttributeResponse)> * onReportGroupsNameSupportCallback =
+        new chip::Callback::Callback<decltype(&ReadGroupsNameSupport::OnAttributeResponse)>(
+            ReadGroupsNameSupport::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGroupsClusterRevision::OnAttributeResponse)> * onReportGroupsClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadGroupsClusterRevision::OnAttributeResponse)>(
+            ReadGroupsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIdentifyIdentifyTime::OnAttributeResponse)> * onReportIdentifyIdentifyTimeCallback =
+        new chip::Callback::Callback<decltype(&ReadIdentifyIdentifyTime::OnAttributeResponse)>(
+            ReadIdentifyIdentifyTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIdentifyIdentifyType::OnAttributeResponse)> * onReportIdentifyIdentifyTypeCallback =
+        new chip::Callback::Callback<decltype(&ReadIdentifyIdentifyType::OnAttributeResponse)>(
+            ReadIdentifyIdentifyType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIdentifyClusterRevision::OnAttributeResponse)> *
+        onReportIdentifyClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadIdentifyClusterRevision::OnAttributeResponse)>(
+                ReadIdentifyClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementMeasuredValue::OnAttributeResponse)> *
+        onReportIlluminanceMeasurementMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementMeasuredValue::OnAttributeResponse)>(
+                ReadIlluminanceMeasurementMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementMinMeasuredValue::OnAttributeResponse)> *
+        onReportIlluminanceMeasurementMinMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementMinMeasuredValue::OnAttributeResponse)>(
+                ReadIlluminanceMeasurementMinMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementMaxMeasuredValue::OnAttributeResponse)> *
+        onReportIlluminanceMeasurementMaxMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementMaxMeasuredValue::OnAttributeResponse)>(
+                ReadIlluminanceMeasurementMaxMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementTolerance::OnAttributeResponse)> *
+        onReportIlluminanceMeasurementToleranceCallback =
+            new chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementTolerance::OnAttributeResponse)>(
+                ReadIlluminanceMeasurementTolerance::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementLightSensorType::OnAttributeResponse)> *
+        onReportIlluminanceMeasurementLightSensorTypeCallback =
+            new chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementLightSensorType::OnAttributeResponse)>(
+                ReadIlluminanceMeasurementLightSensorType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementClusterRevision::OnAttributeResponse)> *
+        onReportIlluminanceMeasurementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementClusterRevision::OnAttributeResponse)>(
+                ReadIlluminanceMeasurementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadKeypadInputClusterRevision::OnAttributeResponse)> *
+        onReportKeypadInputClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadKeypadInputClusterRevision::OnAttributeResponse)>(
+                ReadKeypadInputClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlCurrentLevel::OnAttributeResponse)> *
+        onReportLevelControlCurrentLevelCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlCurrentLevel::OnAttributeResponse)>(
+                ReadLevelControlCurrentLevel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlRemainingTime::OnAttributeResponse)> *
+        onReportLevelControlRemainingTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlRemainingTime::OnAttributeResponse)>(
+                ReadLevelControlRemainingTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlMinLevel::OnAttributeResponse)> * onReportLevelControlMinLevelCallback =
+        new chip::Callback::Callback<decltype(&ReadLevelControlMinLevel::OnAttributeResponse)>(
+            ReadLevelControlMinLevel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlMaxLevel::OnAttributeResponse)> * onReportLevelControlMaxLevelCallback =
+        new chip::Callback::Callback<decltype(&ReadLevelControlMaxLevel::OnAttributeResponse)>(
+            ReadLevelControlMaxLevel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlCurrentFrequency::OnAttributeResponse)> *
+        onReportLevelControlCurrentFrequencyCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlCurrentFrequency::OnAttributeResponse)>(
+                ReadLevelControlCurrentFrequency::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlMinFrequency::OnAttributeResponse)> *
+        onReportLevelControlMinFrequencyCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlMinFrequency::OnAttributeResponse)>(
+                ReadLevelControlMinFrequency::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlMaxFrequency::OnAttributeResponse)> *
+        onReportLevelControlMaxFrequencyCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlMaxFrequency::OnAttributeResponse)>(
+                ReadLevelControlMaxFrequency::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlOptions::OnAttributeResponse)> * onReportLevelControlOptionsCallback =
+        new chip::Callback::Callback<decltype(&ReadLevelControlOptions::OnAttributeResponse)>(
+            ReadLevelControlOptions::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlOnOffTransitionTime::OnAttributeResponse)> *
+        onReportLevelControlOnOffTransitionTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlOnOffTransitionTime::OnAttributeResponse)>(
+                ReadLevelControlOnOffTransitionTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlOnLevel::OnAttributeResponse)> * onReportLevelControlOnLevelCallback =
+        new chip::Callback::Callback<decltype(&ReadLevelControlOnLevel::OnAttributeResponse)>(
+            ReadLevelControlOnLevel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlOnTransitionTime::OnAttributeResponse)> *
+        onReportLevelControlOnTransitionTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlOnTransitionTime::OnAttributeResponse)>(
+                ReadLevelControlOnTransitionTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlOffTransitionTime::OnAttributeResponse)> *
+        onReportLevelControlOffTransitionTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlOffTransitionTime::OnAttributeResponse)>(
+                ReadLevelControlOffTransitionTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlDefaultMoveRate::OnAttributeResponse)> *
+        onReportLevelControlDefaultMoveRateCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlDefaultMoveRate::OnAttributeResponse)>(
+                ReadLevelControlDefaultMoveRate::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlStartUpCurrentLevel::OnAttributeResponse)> *
+        onReportLevelControlStartUpCurrentLevelCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlStartUpCurrentLevel::OnAttributeResponse)>(
+                ReadLevelControlStartUpCurrentLevel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlClusterRevision::OnAttributeResponse)> *
+        onReportLevelControlClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlClusterRevision::OnAttributeResponse)>(
+                ReadLevelControlClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLowPowerClusterRevision::OnAttributeResponse)> *
+        onReportLowPowerClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadLowPowerClusterRevision::OnAttributeResponse)>(
+                ReadLowPowerClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaInputCurrentMediaInput::OnAttributeResponse)> *
+        onReportMediaInputCurrentMediaInputCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaInputCurrentMediaInput::OnAttributeResponse)>(
+                ReadMediaInputCurrentMediaInput::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaInputClusterRevision::OnAttributeResponse)> *
+        onReportMediaInputClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaInputClusterRevision::OnAttributeResponse)>(
+                ReadMediaInputClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackPlaybackState::OnAttributeResponse)> *
+        onReportMediaPlaybackPlaybackStateCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaPlaybackPlaybackState::OnAttributeResponse)>(
+                ReadMediaPlaybackPlaybackState::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackStartTime::OnAttributeResponse)> * onReportMediaPlaybackStartTimeCallback =
+        new chip::Callback::Callback<decltype(&ReadMediaPlaybackStartTime::OnAttributeResponse)>(
+            ReadMediaPlaybackStartTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackDuration::OnAttributeResponse)> * onReportMediaPlaybackDurationCallback =
+        new chip::Callback::Callback<decltype(&ReadMediaPlaybackDuration::OnAttributeResponse)>(
+            ReadMediaPlaybackDuration::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackPositionUpdatedAt::OnAttributeResponse)> *
+        onReportMediaPlaybackPositionUpdatedAtCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaPlaybackPositionUpdatedAt::OnAttributeResponse)>(
+                ReadMediaPlaybackPositionUpdatedAt::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackPosition::OnAttributeResponse)> * onReportMediaPlaybackPositionCallback =
+        new chip::Callback::Callback<decltype(&ReadMediaPlaybackPosition::OnAttributeResponse)>(
+            ReadMediaPlaybackPosition::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackPlaybackSpeed::OnAttributeResponse)> *
+        onReportMediaPlaybackPlaybackSpeedCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaPlaybackPlaybackSpeed::OnAttributeResponse)>(
+                ReadMediaPlaybackPlaybackSpeed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackSeekRangeEnd::OnAttributeResponse)> *
+        onReportMediaPlaybackSeekRangeEndCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaPlaybackSeekRangeEnd::OnAttributeResponse)>(
+                ReadMediaPlaybackSeekRangeEnd::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackSeekRangeStart::OnAttributeResponse)> *
+        onReportMediaPlaybackSeekRangeStartCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaPlaybackSeekRangeStart::OnAttributeResponse)>(
+                ReadMediaPlaybackSeekRangeStart::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackClusterRevision::OnAttributeResponse)> *
+        onReportMediaPlaybackClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaPlaybackClusterRevision::OnAttributeResponse)>(
+                ReadMediaPlaybackClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadModeSelectCurrentMode::OnAttributeResponse)> * onReportModeSelectCurrentModeCallback =
+        new chip::Callback::Callback<decltype(&ReadModeSelectCurrentMode::OnAttributeResponse)>(
+            ReadModeSelectCurrentMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadModeSelectOnMode::OnAttributeResponse)> * onReportModeSelectOnModeCallback =
+        new chip::Callback::Callback<decltype(&ReadModeSelectOnMode::OnAttributeResponse)>(
+            ReadModeSelectOnMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadModeSelectStartUpMode::OnAttributeResponse)> * onReportModeSelectStartUpModeCallback =
+        new chip::Callback::Callback<decltype(&ReadModeSelectStartUpMode::OnAttributeResponse)>(
+            ReadModeSelectStartUpMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadModeSelectDescription::OnAttributeResponse)> * onReportModeSelectDescriptionCallback =
+        new chip::Callback::Callback<decltype(&ReadModeSelectDescription::OnAttributeResponse)>(
+            ReadModeSelectDescription::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadModeSelectClusterRevision::OnAttributeResponse)> *
+        onReportModeSelectClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadModeSelectClusterRevision::OnAttributeResponse)>(
+                ReadModeSelectClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadNetworkCommissioningFeatureMap::OnAttributeResponse)> *
+        onReportNetworkCommissioningFeatureMapCallback =
+            new chip::Callback::Callback<decltype(&ReadNetworkCommissioningFeatureMap::OnAttributeResponse)>(
+                ReadNetworkCommissioningFeatureMap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadNetworkCommissioningClusterRevision::OnAttributeResponse)> *
+        onReportNetworkCommissioningClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadNetworkCommissioningClusterRevision::OnAttributeResponse)>(
+                ReadNetworkCommissioningClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateProviderClusterRevision::OnAttributeResponse)> *
+        onReportOtaSoftwareUpdateProviderClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateProviderClusterRevision::OnAttributeResponse)>(
+                ReadOtaSoftwareUpdateProviderClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateRequestorDefaultOtaProvider::OnAttributeResponse)> *
+        onReportOtaSoftwareUpdateRequestorDefaultOtaProviderCallback =
+            new chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateRequestorDefaultOtaProvider::OnAttributeResponse)>(
+                ReadOtaSoftwareUpdateRequestorDefaultOtaProvider::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateRequestorUpdatePossible::OnAttributeResponse)> *
+        onReportOtaSoftwareUpdateRequestorUpdatePossibleCallback =
+            new chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateRequestorUpdatePossible::OnAttributeResponse)>(
+                ReadOtaSoftwareUpdateRequestorUpdatePossible::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateRequestorClusterRevision::OnAttributeResponse)> *
+        onReportOtaSoftwareUpdateRequestorClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateRequestorClusterRevision::OnAttributeResponse)>(
+                ReadOtaSoftwareUpdateRequestorClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOccupancySensingOccupancy::OnAttributeResponse)> *
+        onReportOccupancySensingOccupancyCallback =
+            new chip::Callback::Callback<decltype(&ReadOccupancySensingOccupancy::OnAttributeResponse)>(
+                ReadOccupancySensingOccupancy::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOccupancySensingOccupancySensorType::OnAttributeResponse)> *
+        onReportOccupancySensingOccupancySensorTypeCallback =
+            new chip::Callback::Callback<decltype(&ReadOccupancySensingOccupancySensorType::OnAttributeResponse)>(
+                ReadOccupancySensingOccupancySensorType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOccupancySensingOccupancySensorTypeBitmap::OnAttributeResponse)> *
+        onReportOccupancySensingOccupancySensorTypeBitmapCallback =
+            new chip::Callback::Callback<decltype(&ReadOccupancySensingOccupancySensorTypeBitmap::OnAttributeResponse)>(
+                ReadOccupancySensingOccupancySensorTypeBitmap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOccupancySensingClusterRevision::OnAttributeResponse)> *
+        onReportOccupancySensingClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadOccupancySensingClusterRevision::OnAttributeResponse)>(
+                ReadOccupancySensingClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffOnOff::OnAttributeResponse)> * onReportOnOffOnOffCallback =
+        new chip::Callback::Callback<decltype(&ReadOnOffOnOff::OnAttributeResponse)>(ReadOnOffOnOff::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffGlobalSceneControl::OnAttributeResponse)> *
+        onReportOnOffGlobalSceneControlCallback =
+            new chip::Callback::Callback<decltype(&ReadOnOffGlobalSceneControl::OnAttributeResponse)>(
+                ReadOnOffGlobalSceneControl::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffOnTime::OnAttributeResponse)> * onReportOnOffOnTimeCallback =
+        new chip::Callback::Callback<decltype(&ReadOnOffOnTime::OnAttributeResponse)>(ReadOnOffOnTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffOffWaitTime::OnAttributeResponse)> * onReportOnOffOffWaitTimeCallback =
+        new chip::Callback::Callback<decltype(&ReadOnOffOffWaitTime::OnAttributeResponse)>(
+            ReadOnOffOffWaitTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffStartUpOnOff::OnAttributeResponse)> * onReportOnOffStartUpOnOffCallback =
+        new chip::Callback::Callback<decltype(&ReadOnOffStartUpOnOff::OnAttributeResponse)>(
+            ReadOnOffStartUpOnOff::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffFeatureMap::OnAttributeResponse)> * onReportOnOffFeatureMapCallback =
+        new chip::Callback::Callback<decltype(&ReadOnOffFeatureMap::OnAttributeResponse)>(ReadOnOffFeatureMap::OnAttributeResponse,
+                                                                                          this);
+    chip::Callback::Callback<decltype(&ReadOnOffClusterRevision::OnAttributeResponse)> * onReportOnOffClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadOnOffClusterRevision::OnAttributeResponse)>(
+            ReadOnOffClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffSwitchConfigurationSwitchType::OnAttributeResponse)> *
+        onReportOnOffSwitchConfigurationSwitchTypeCallback =
+            new chip::Callback::Callback<decltype(&ReadOnOffSwitchConfigurationSwitchType::OnAttributeResponse)>(
+                ReadOnOffSwitchConfigurationSwitchType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffSwitchConfigurationSwitchActions::OnAttributeResponse)> *
+        onReportOnOffSwitchConfigurationSwitchActionsCallback =
+            new chip::Callback::Callback<decltype(&ReadOnOffSwitchConfigurationSwitchActions::OnAttributeResponse)>(
+                ReadOnOffSwitchConfigurationSwitchActions::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffSwitchConfigurationClusterRevision::OnAttributeResponse)> *
+        onReportOnOffSwitchConfigurationClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadOnOffSwitchConfigurationClusterRevision::OnAttributeResponse)>(
+                ReadOnOffSwitchConfigurationClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOperationalCredentialsSupportedFabrics::OnAttributeResponse)> *
+        onReportOperationalCredentialsSupportedFabricsCallback =
+            new chip::Callback::Callback<decltype(&ReadOperationalCredentialsSupportedFabrics::OnAttributeResponse)>(
+                ReadOperationalCredentialsSupportedFabrics::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOperationalCredentialsCommissionedFabrics::OnAttributeResponse)> *
+        onReportOperationalCredentialsCommissionedFabricsCallback =
+            new chip::Callback::Callback<decltype(&ReadOperationalCredentialsCommissionedFabrics::OnAttributeResponse)>(
+                ReadOperationalCredentialsCommissionedFabrics::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOperationalCredentialsCurrentFabricIndex::OnAttributeResponse)> *
+        onReportOperationalCredentialsCurrentFabricIndexCallback =
+            new chip::Callback::Callback<decltype(&ReadOperationalCredentialsCurrentFabricIndex::OnAttributeResponse)>(
+                ReadOperationalCredentialsCurrentFabricIndex::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOperationalCredentialsClusterRevision::OnAttributeResponse)> *
+        onReportOperationalCredentialsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadOperationalCredentialsClusterRevision::OnAttributeResponse)>(
+                ReadOperationalCredentialsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceStatus::OnAttributeResponse)> * onReportPowerSourceStatusCallback =
+        new chip::Callback::Callback<decltype(&ReadPowerSourceStatus::OnAttributeResponse)>(
+            ReadPowerSourceStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceOrder::OnAttributeResponse)> * onReportPowerSourceOrderCallback =
+        new chip::Callback::Callback<decltype(&ReadPowerSourceOrder::OnAttributeResponse)>(
+            ReadPowerSourceOrder::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceDescription::OnAttributeResponse)> * onReportPowerSourceDescriptionCallback =
+        new chip::Callback::Callback<decltype(&ReadPowerSourceDescription::OnAttributeResponse)>(
+            ReadPowerSourceDescription::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceBatteryVoltage::OnAttributeResponse)> *
+        onReportPowerSourceBatteryVoltageCallback =
+            new chip::Callback::Callback<decltype(&ReadPowerSourceBatteryVoltage::OnAttributeResponse)>(
+                ReadPowerSourceBatteryVoltage::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceBatteryPercentRemaining::OnAttributeResponse)> *
+        onReportPowerSourceBatteryPercentRemainingCallback =
+            new chip::Callback::Callback<decltype(&ReadPowerSourceBatteryPercentRemaining::OnAttributeResponse)>(
+                ReadPowerSourceBatteryPercentRemaining::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceBatteryTimeRemaining::OnAttributeResponse)> *
+        onReportPowerSourceBatteryTimeRemainingCallback =
+            new chip::Callback::Callback<decltype(&ReadPowerSourceBatteryTimeRemaining::OnAttributeResponse)>(
+                ReadPowerSourceBatteryTimeRemaining::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceBatteryChargeLevel::OnAttributeResponse)> *
+        onReportPowerSourceBatteryChargeLevelCallback =
+            new chip::Callback::Callback<decltype(&ReadPowerSourceBatteryChargeLevel::OnAttributeResponse)>(
+                ReadPowerSourceBatteryChargeLevel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceBatteryChargeState::OnAttributeResponse)> *
+        onReportPowerSourceBatteryChargeStateCallback =
+            new chip::Callback::Callback<decltype(&ReadPowerSourceBatteryChargeState::OnAttributeResponse)>(
+                ReadPowerSourceBatteryChargeState::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceFeatureMap::OnAttributeResponse)> * onReportPowerSourceFeatureMapCallback =
+        new chip::Callback::Callback<decltype(&ReadPowerSourceFeatureMap::OnAttributeResponse)>(
+            ReadPowerSourceFeatureMap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceClusterRevision::OnAttributeResponse)> *
+        onReportPowerSourceClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadPowerSourceClusterRevision::OnAttributeResponse)>(
+                ReadPowerSourceClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPressureMeasurementMeasuredValue::OnAttributeResponse)> *
+        onReportPressureMeasurementMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadPressureMeasurementMeasuredValue::OnAttributeResponse)>(
+                ReadPressureMeasurementMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPressureMeasurementMinMeasuredValue::OnAttributeResponse)> *
+        onReportPressureMeasurementMinMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadPressureMeasurementMinMeasuredValue::OnAttributeResponse)>(
+                ReadPressureMeasurementMinMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPressureMeasurementMaxMeasuredValue::OnAttributeResponse)> *
+        onReportPressureMeasurementMaxMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadPressureMeasurementMaxMeasuredValue::OnAttributeResponse)>(
+                ReadPressureMeasurementMaxMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPressureMeasurementClusterRevision::OnAttributeResponse)> *
+        onReportPressureMeasurementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadPressureMeasurementClusterRevision::OnAttributeResponse)>(
+                ReadPressureMeasurementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxPressure::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxPressureCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxPressure::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxPressure::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxSpeed::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxSpeedCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxSpeed::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxSpeed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxFlow::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxFlowCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxFlow::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxFlow::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstPressure::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMinConstPressureCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstPressure::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMinConstPressure::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstPressure::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxConstPressureCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstPressure::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxConstPressure::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinCompPressure::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMinCompPressureCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinCompPressure::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMinCompPressure::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxCompPressure::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxCompPressureCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxCompPressure::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxCompPressure::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstSpeed::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMinConstSpeedCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstSpeed::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMinConstSpeed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstSpeed::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxConstSpeedCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstSpeed::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxConstSpeed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstFlow::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMinConstFlowCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstFlow::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMinConstFlow::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstFlow::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxConstFlowCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstFlow::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxConstFlow::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstTemp::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMinConstTempCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstTemp::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMinConstTemp::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstTemp::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxConstTempCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstTemp::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxConstTemp::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlPumpStatus::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlPumpStatusCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlPumpStatus::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlPumpStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlEffectiveOperationMode::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlEffectiveOperationModeCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlEffectiveOperationMode::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlEffectiveOperationMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlEffectiveControlMode::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlEffectiveControlModeCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlEffectiveControlMode::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlEffectiveControlMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlCapacity::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlCapacityCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlCapacity::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlCapacity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlSpeed::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlSpeedCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlSpeed::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlSpeed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlLifetimeRunningHours::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlLifetimeRunningHoursCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlLifetimeRunningHours::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlLifetimeRunningHours::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlPower::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlPowerCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlPower::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlPower::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlLifetimeEnergyConsumed::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlLifetimeEnergyConsumedCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlLifetimeEnergyConsumed::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlLifetimeEnergyConsumed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlOperationMode::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlOperationModeCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlOperationMode::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlOperationMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlControlMode::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlControlModeCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlControlMode::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlControlMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlAlarmMask::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlAlarmMaskCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlAlarmMask::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlAlarmMask::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlFeatureMap::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlFeatureMapCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlFeatureMap::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlFeatureMap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlClusterRevision::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlClusterRevision::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementMeasuredValue::OnAttributeResponse)> *
+        onReportRelativeHumidityMeasurementMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementMeasuredValue::OnAttributeResponse)>(
+                ReadRelativeHumidityMeasurementMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementMinMeasuredValue::OnAttributeResponse)> *
+        onReportRelativeHumidityMeasurementMinMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementMinMeasuredValue::OnAttributeResponse)>(
+                ReadRelativeHumidityMeasurementMinMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementMaxMeasuredValue::OnAttributeResponse)> *
+        onReportRelativeHumidityMeasurementMaxMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementMaxMeasuredValue::OnAttributeResponse)>(
+                ReadRelativeHumidityMeasurementMaxMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementTolerance::OnAttributeResponse)> *
+        onReportRelativeHumidityMeasurementToleranceCallback =
+            new chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementTolerance::OnAttributeResponse)>(
+                ReadRelativeHumidityMeasurementTolerance::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementClusterRevision::OnAttributeResponse)> *
+        onReportRelativeHumidityMeasurementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementClusterRevision::OnAttributeResponse)>(
+                ReadRelativeHumidityMeasurementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadScenesSceneCount::OnAttributeResponse)> * onReportScenesSceneCountCallback =
+        new chip::Callback::Callback<decltype(&ReadScenesSceneCount::OnAttributeResponse)>(
+            ReadScenesSceneCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadScenesCurrentScene::OnAttributeResponse)> * onReportScenesCurrentSceneCallback =
+        new chip::Callback::Callback<decltype(&ReadScenesCurrentScene::OnAttributeResponse)>(
+            ReadScenesCurrentScene::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadScenesCurrentGroup::OnAttributeResponse)> * onReportScenesCurrentGroupCallback =
+        new chip::Callback::Callback<decltype(&ReadScenesCurrentGroup::OnAttributeResponse)>(
+            ReadScenesCurrentGroup::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadScenesSceneValid::OnAttributeResponse)> * onReportScenesSceneValidCallback =
+        new chip::Callback::Callback<decltype(&ReadScenesSceneValid::OnAttributeResponse)>(
+            ReadScenesSceneValid::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadScenesNameSupport::OnAttributeResponse)> * onReportScenesNameSupportCallback =
+        new chip::Callback::Callback<decltype(&ReadScenesNameSupport::OnAttributeResponse)>(
+            ReadScenesNameSupport::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadScenesClusterRevision::OnAttributeResponse)> * onReportScenesClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadScenesClusterRevision::OnAttributeResponse)>(
+            ReadScenesClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsCurrentHeapFree::OnAttributeResponse)> *
+        onReportSoftwareDiagnosticsCurrentHeapFreeCallback =
+            new chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsCurrentHeapFree::OnAttributeResponse)>(
+                ReadSoftwareDiagnosticsCurrentHeapFree::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsCurrentHeapUsed::OnAttributeResponse)> *
+        onReportSoftwareDiagnosticsCurrentHeapUsedCallback =
+            new chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsCurrentHeapUsed::OnAttributeResponse)>(
+                ReadSoftwareDiagnosticsCurrentHeapUsed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsCurrentHeapHighWatermark::OnAttributeResponse)> *
+        onReportSoftwareDiagnosticsCurrentHeapHighWatermarkCallback =
+            new chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsCurrentHeapHighWatermark::OnAttributeResponse)>(
+                ReadSoftwareDiagnosticsCurrentHeapHighWatermark::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsClusterRevision::OnAttributeResponse)> *
+        onReportSoftwareDiagnosticsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsClusterRevision::OnAttributeResponse)>(
+                ReadSoftwareDiagnosticsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSwitchNumberOfPositions::OnAttributeResponse)> *
+        onReportSwitchNumberOfPositionsCallback =
+            new chip::Callback::Callback<decltype(&ReadSwitchNumberOfPositions::OnAttributeResponse)>(
+                ReadSwitchNumberOfPositions::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSwitchCurrentPosition::OnAttributeResponse)> * onReportSwitchCurrentPositionCallback =
+        new chip::Callback::Callback<decltype(&ReadSwitchCurrentPosition::OnAttributeResponse)>(
+            ReadSwitchCurrentPosition::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSwitchMultiPressMax::OnAttributeResponse)> * onReportSwitchMultiPressMaxCallback =
+        new chip::Callback::Callback<decltype(&ReadSwitchMultiPressMax::OnAttributeResponse)>(
+            ReadSwitchMultiPressMax::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSwitchFeatureMap::OnAttributeResponse)> * onReportSwitchFeatureMapCallback =
+        new chip::Callback::Callback<decltype(&ReadSwitchFeatureMap::OnAttributeResponse)>(
+            ReadSwitchFeatureMap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSwitchClusterRevision::OnAttributeResponse)> * onReportSwitchClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadSwitchClusterRevision::OnAttributeResponse)>(
+            ReadSwitchClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTvChannelTvChannelLineup::OnAttributeResponse)> *
+        onReportTvChannelTvChannelLineupCallback =
+            new chip::Callback::Callback<decltype(&ReadTvChannelTvChannelLineup::OnAttributeResponse)>(
+                ReadTvChannelTvChannelLineup::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTvChannelCurrentTvChannel::OnAttributeResponse)> *
+        onReportTvChannelCurrentTvChannelCallback =
+            new chip::Callback::Callback<decltype(&ReadTvChannelCurrentTvChannel::OnAttributeResponse)>(
+                ReadTvChannelCurrentTvChannel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTvChannelClusterRevision::OnAttributeResponse)> *
+        onReportTvChannelClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadTvChannelClusterRevision::OnAttributeResponse)>(
+                ReadTvChannelClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTargetNavigatorClusterRevision::OnAttributeResponse)> *
+        onReportTargetNavigatorClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadTargetNavigatorClusterRevision::OnAttributeResponse)>(
+                ReadTargetNavigatorClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTemperatureMeasurementMeasuredValue::OnAttributeResponse)> *
+        onReportTemperatureMeasurementMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadTemperatureMeasurementMeasuredValue::OnAttributeResponse)>(
+                ReadTemperatureMeasurementMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTemperatureMeasurementMinMeasuredValue::OnAttributeResponse)> *
+        onReportTemperatureMeasurementMinMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadTemperatureMeasurementMinMeasuredValue::OnAttributeResponse)>(
+                ReadTemperatureMeasurementMinMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTemperatureMeasurementMaxMeasuredValue::OnAttributeResponse)> *
+        onReportTemperatureMeasurementMaxMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadTemperatureMeasurementMaxMeasuredValue::OnAttributeResponse)>(
+                ReadTemperatureMeasurementMaxMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTemperatureMeasurementTolerance::OnAttributeResponse)> *
+        onReportTemperatureMeasurementToleranceCallback =
+            new chip::Callback::Callback<decltype(&ReadTemperatureMeasurementTolerance::OnAttributeResponse)>(
+                ReadTemperatureMeasurementTolerance::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTemperatureMeasurementClusterRevision::OnAttributeResponse)> *
+        onReportTemperatureMeasurementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadTemperatureMeasurementClusterRevision::OnAttributeResponse)>(
+                ReadTemperatureMeasurementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterBoolean::OnAttributeResponse)> * onReportTestClusterBooleanCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterBoolean::OnAttributeResponse)>(
+            ReadTestClusterBoolean::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterBitmap8::OnAttributeResponse)> * onReportTestClusterBitmap8Callback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterBitmap8::OnAttributeResponse)>(
+            ReadTestClusterBitmap8::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterBitmap16::OnAttributeResponse)> * onReportTestClusterBitmap16Callback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterBitmap16::OnAttributeResponse)>(
+            ReadTestClusterBitmap16::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterBitmap32::OnAttributeResponse)> * onReportTestClusterBitmap32Callback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterBitmap32::OnAttributeResponse)>(
+            ReadTestClusterBitmap32::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterBitmap64::OnAttributeResponse)> * onReportTestClusterBitmap64Callback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterBitmap64::OnAttributeResponse)>(
+            ReadTestClusterBitmap64::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt8u::OnAttributeResponse)> * onReportTestClusterInt8uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt8u::OnAttributeResponse)>(
+            ReadTestClusterInt8u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt16u::OnAttributeResponse)> * onReportTestClusterInt16uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt16u::OnAttributeResponse)>(
+            ReadTestClusterInt16u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt24u::OnAttributeResponse)> * onReportTestClusterInt24uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt24u::OnAttributeResponse)>(
+            ReadTestClusterInt24u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt32u::OnAttributeResponse)> * onReportTestClusterInt32uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt32u::OnAttributeResponse)>(
+            ReadTestClusterInt32u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt40u::OnAttributeResponse)> * onReportTestClusterInt40uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt40u::OnAttributeResponse)>(
+            ReadTestClusterInt40u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt48u::OnAttributeResponse)> * onReportTestClusterInt48uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt48u::OnAttributeResponse)>(
+            ReadTestClusterInt48u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt56u::OnAttributeResponse)> * onReportTestClusterInt56uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt56u::OnAttributeResponse)>(
+            ReadTestClusterInt56u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt64u::OnAttributeResponse)> * onReportTestClusterInt64uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt64u::OnAttributeResponse)>(
+            ReadTestClusterInt64u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt8s::OnAttributeResponse)> * onReportTestClusterInt8sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt8s::OnAttributeResponse)>(
+            ReadTestClusterInt8s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt16s::OnAttributeResponse)> * onReportTestClusterInt16sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt16s::OnAttributeResponse)>(
+            ReadTestClusterInt16s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt24s::OnAttributeResponse)> * onReportTestClusterInt24sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt24s::OnAttributeResponse)>(
+            ReadTestClusterInt24s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt32s::OnAttributeResponse)> * onReportTestClusterInt32sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt32s::OnAttributeResponse)>(
+            ReadTestClusterInt32s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt40s::OnAttributeResponse)> * onReportTestClusterInt40sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt40s::OnAttributeResponse)>(
+            ReadTestClusterInt40s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt48s::OnAttributeResponse)> * onReportTestClusterInt48sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt48s::OnAttributeResponse)>(
+            ReadTestClusterInt48s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt56s::OnAttributeResponse)> * onReportTestClusterInt56sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt56s::OnAttributeResponse)>(
+            ReadTestClusterInt56s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt64s::OnAttributeResponse)> * onReportTestClusterInt64sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt64s::OnAttributeResponse)>(
+            ReadTestClusterInt64s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterEnum8::OnAttributeResponse)> * onReportTestClusterEnum8Callback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterEnum8::OnAttributeResponse)>(
+            ReadTestClusterEnum8::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterEnum16::OnAttributeResponse)> * onReportTestClusterEnum16Callback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterEnum16::OnAttributeResponse)>(
+            ReadTestClusterEnum16::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterFloatSingle::OnAttributeResponse)> * onReportTestClusterFloatSingleCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterFloatSingle::OnAttributeResponse)>(
+            ReadTestClusterFloatSingle::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterFloatDouble::OnAttributeResponse)> * onReportTestClusterFloatDoubleCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterFloatDouble::OnAttributeResponse)>(
+            ReadTestClusterFloatDouble::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterOctetString::OnAttributeResponse)> * onReportTestClusterOctetStringCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterOctetString::OnAttributeResponse)>(
+            ReadTestClusterOctetString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterLongOctetString::OnAttributeResponse)> *
+        onReportTestClusterLongOctetStringCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterLongOctetString::OnAttributeResponse)>(
+                ReadTestClusterLongOctetString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterCharString::OnAttributeResponse)> * onReportTestClusterCharStringCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterCharString::OnAttributeResponse)>(
+            ReadTestClusterCharString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterLongCharString::OnAttributeResponse)> *
+        onReportTestClusterLongCharStringCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterLongCharString::OnAttributeResponse)>(
+                ReadTestClusterLongCharString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterEpochUs::OnAttributeResponse)> * onReportTestClusterEpochUsCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterEpochUs::OnAttributeResponse)>(
+            ReadTestClusterEpochUs::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterEpochS::OnAttributeResponse)> * onReportTestClusterEpochSCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterEpochS::OnAttributeResponse)>(
+            ReadTestClusterEpochS::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterVendorId::OnAttributeResponse)> * onReportTestClusterVendorIdCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterVendorId::OnAttributeResponse)>(
+            ReadTestClusterVendorId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt8u::OnAttributeResponse)> *
+        onReportTestClusterRangeRestrictedInt8uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt8u::OnAttributeResponse)>(
+                ReadTestClusterRangeRestrictedInt8u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt8s::OnAttributeResponse)> *
+        onReportTestClusterRangeRestrictedInt8sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt8s::OnAttributeResponse)>(
+                ReadTestClusterRangeRestrictedInt8s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt16u::OnAttributeResponse)> *
+        onReportTestClusterRangeRestrictedInt16uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt16u::OnAttributeResponse)>(
+                ReadTestClusterRangeRestrictedInt16u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt16s::OnAttributeResponse)> *
+        onReportTestClusterRangeRestrictedInt16sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt16s::OnAttributeResponse)>(
+                ReadTestClusterRangeRestrictedInt16s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterUnsupported::OnAttributeResponse)> * onReportTestClusterUnsupportedCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterUnsupported::OnAttributeResponse)>(
+            ReadTestClusterUnsupported::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableBoolean::OnAttributeResponse)> *
+        onReportTestClusterNullableBooleanCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableBoolean::OnAttributeResponse)>(
+                ReadTestClusterNullableBoolean::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap8::OnAttributeResponse)> *
+        onReportTestClusterNullableBitmap8Callback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap8::OnAttributeResponse)>(
+                ReadTestClusterNullableBitmap8::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap16::OnAttributeResponse)> *
+        onReportTestClusterNullableBitmap16Callback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap16::OnAttributeResponse)>(
+                ReadTestClusterNullableBitmap16::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap32::OnAttributeResponse)> *
+        onReportTestClusterNullableBitmap32Callback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap32::OnAttributeResponse)>(
+                ReadTestClusterNullableBitmap32::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap64::OnAttributeResponse)> *
+        onReportTestClusterNullableBitmap64Callback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap64::OnAttributeResponse)>(
+                ReadTestClusterNullableBitmap64::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt8u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt8uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt8u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt8u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt16u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt16uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt16u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt16u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt24u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt24uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt24u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt24u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt32u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt32uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt32u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt32u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt40u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt40uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt40u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt40u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt48u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt48uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt48u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt48u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt56u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt56uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt56u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt56u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt64u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt64uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt64u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt64u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt8s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt8sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt8s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt8s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt16s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt16sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt16s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt16s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt24s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt24sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt24s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt24s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt32s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt32sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt32s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt32s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt40s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt40sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt40s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt40s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt48s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt48sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt48s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt48s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt56s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt56sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt56s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt56s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt64s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt64sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt64s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt64s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableEnum8::OnAttributeResponse)> *
+        onReportTestClusterNullableEnum8Callback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableEnum8::OnAttributeResponse)>(
+                ReadTestClusterNullableEnum8::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableEnum16::OnAttributeResponse)> *
+        onReportTestClusterNullableEnum16Callback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableEnum16::OnAttributeResponse)>(
+                ReadTestClusterNullableEnum16::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableFloatSingle::OnAttributeResponse)> *
+        onReportTestClusterNullableFloatSingleCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableFloatSingle::OnAttributeResponse)>(
+                ReadTestClusterNullableFloatSingle::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableFloatDouble::OnAttributeResponse)> *
+        onReportTestClusterNullableFloatDoubleCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableFloatDouble::OnAttributeResponse)>(
+                ReadTestClusterNullableFloatDouble::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableOctetString::OnAttributeResponse)> *
+        onReportTestClusterNullableOctetStringCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableOctetString::OnAttributeResponse)>(
+                ReadTestClusterNullableOctetString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableCharString::OnAttributeResponse)> *
+        onReportTestClusterNullableCharStringCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableCharString::OnAttributeResponse)>(
+                ReadTestClusterNullableCharString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt8u::OnAttributeResponse)> *
+        onReportTestClusterNullableRangeRestrictedInt8uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt8u::OnAttributeResponse)>(
+                ReadTestClusterNullableRangeRestrictedInt8u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt8s::OnAttributeResponse)> *
+        onReportTestClusterNullableRangeRestrictedInt8sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt8s::OnAttributeResponse)>(
+                ReadTestClusterNullableRangeRestrictedInt8s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt16u::OnAttributeResponse)> *
+        onReportTestClusterNullableRangeRestrictedInt16uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt16u::OnAttributeResponse)>(
+                ReadTestClusterNullableRangeRestrictedInt16u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt16s::OnAttributeResponse)> *
+        onReportTestClusterNullableRangeRestrictedInt16sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt16s::OnAttributeResponse)>(
+                ReadTestClusterNullableRangeRestrictedInt16s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterClusterRevision::OnAttributeResponse)> *
+        onReportTestClusterClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterClusterRevision::OnAttributeResponse)>(
+                ReadTestClusterClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatLocalTemperature::OnAttributeResponse)> *
+        onReportThermostatLocalTemperatureCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatLocalTemperature::OnAttributeResponse)>(
+                ReadThermostatLocalTemperature::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatAbsMinHeatSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatAbsMinHeatSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatAbsMinHeatSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatAbsMinHeatSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatAbsMaxHeatSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatAbsMaxHeatSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatAbsMaxHeatSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatAbsMaxHeatSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatAbsMinCoolSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatAbsMinCoolSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatAbsMinCoolSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatAbsMinCoolSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatAbsMaxCoolSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatAbsMaxCoolSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatAbsMaxCoolSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatAbsMaxCoolSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatOccupiedCoolingSetpoint::OnAttributeResponse)> *
+        onReportThermostatOccupiedCoolingSetpointCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatOccupiedCoolingSetpoint::OnAttributeResponse)>(
+                ReadThermostatOccupiedCoolingSetpoint::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatOccupiedHeatingSetpoint::OnAttributeResponse)> *
+        onReportThermostatOccupiedHeatingSetpointCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatOccupiedHeatingSetpoint::OnAttributeResponse)>(
+                ReadThermostatOccupiedHeatingSetpoint::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatMinHeatSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatMinHeatSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatMinHeatSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatMinHeatSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatMaxHeatSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatMaxHeatSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatMaxHeatSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatMaxHeatSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatMinCoolSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatMinCoolSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatMinCoolSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatMinCoolSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatMaxCoolSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatMaxCoolSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatMaxCoolSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatMaxCoolSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatMinSetpointDeadBand::OnAttributeResponse)> *
+        onReportThermostatMinSetpointDeadBandCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatMinSetpointDeadBand::OnAttributeResponse)>(
+                ReadThermostatMinSetpointDeadBand::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatControlSequenceOfOperation::OnAttributeResponse)> *
+        onReportThermostatControlSequenceOfOperationCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatControlSequenceOfOperation::OnAttributeResponse)>(
+                ReadThermostatControlSequenceOfOperation::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatSystemMode::OnAttributeResponse)> * onReportThermostatSystemModeCallback =
+        new chip::Callback::Callback<decltype(&ReadThermostatSystemMode::OnAttributeResponse)>(
+            ReadThermostatSystemMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatStartOfWeek::OnAttributeResponse)> * onReportThermostatStartOfWeekCallback =
+        new chip::Callback::Callback<decltype(&ReadThermostatStartOfWeek::OnAttributeResponse)>(
+            ReadThermostatStartOfWeek::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatNumberOfWeeklyTransitions::OnAttributeResponse)> *
+        onReportThermostatNumberOfWeeklyTransitionsCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatNumberOfWeeklyTransitions::OnAttributeResponse)>(
+                ReadThermostatNumberOfWeeklyTransitions::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatNumberOfDailyTransitions::OnAttributeResponse)> *
+        onReportThermostatNumberOfDailyTransitionsCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatNumberOfDailyTransitions::OnAttributeResponse)>(
+                ReadThermostatNumberOfDailyTransitions::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatFeatureMap::OnAttributeResponse)> * onReportThermostatFeatureMapCallback =
+        new chip::Callback::Callback<decltype(&ReadThermostatFeatureMap::OnAttributeResponse)>(
+            ReadThermostatFeatureMap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatClusterRevision::OnAttributeResponse)> *
+        onReportThermostatClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatClusterRevision::OnAttributeResponse)>(
+                ReadThermostatClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse)> *
+        onReportThermostatUserInterfaceConfigurationTemperatureDisplayModeCallback = new chip::Callback::Callback<decltype(
+            &ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse)>(
+            ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse)> *
+        onReportThermostatUserInterfaceConfigurationKeypadLockoutCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse)>(
+                ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(
+        &ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)> *
+        onReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCallback = new chip::Callback::Callback<decltype(
+            &ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)>(
+            ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationClusterRevision::OnAttributeResponse)> *
+        onReportThermostatUserInterfaceConfigurationClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationClusterRevision::OnAttributeResponse)>(
+                ReadThermostatUserInterfaceConfigurationClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsChannel::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsChannelCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsChannel::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsChannel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRoutingRole::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRoutingRoleCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRoutingRole::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRoutingRole::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsNetworkName::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsNetworkNameCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsNetworkName::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsNetworkName::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPanId::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsPanIdCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPanId::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsPanId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsExtendedPanId::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsExtendedPanIdCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsExtendedPanId::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsExtendedPanId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsMeshLocalPrefix::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsMeshLocalPrefixCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsMeshLocalPrefix::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsMeshLocalPrefix::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsOverrunCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsOverrunCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsOverrunCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsOverrunCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPartitionId::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsPartitionIdCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPartitionId::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsPartitionId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsWeighting::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsWeightingCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsWeighting::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsWeighting::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsDataVersion::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsDataVersionCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsDataVersion::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsDataVersion::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsStableDataVersion::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsStableDataVersionCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsStableDataVersion::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsStableDataVersion::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsLeaderRouterId::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsLeaderRouterIdCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsLeaderRouterId::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsLeaderRouterId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsDetachedRoleCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsDetachedRoleCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsDetachedRoleCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsDetachedRoleCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsChildRoleCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsChildRoleCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsChildRoleCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsChildRoleCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRouterRoleCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRouterRoleCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRouterRoleCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRouterRoleCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsLeaderRoleCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsLeaderRoleCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsLeaderRoleCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsLeaderRoleCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsAttachAttemptCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsAttachAttemptCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsAttachAttemptCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsAttachAttemptCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPartitionIdChangeCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsPartitionIdChangeCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPartitionIdChangeCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsPartitionIdChangeCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCountCallback = new chip::Callback::Callback<decltype(
+            &ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse)>(
+            ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsParentChangeCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsParentChangeCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsParentChangeCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsParentChangeCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxTotalCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxTotalCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxTotalCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxTotalCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxUnicastCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxUnicastCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxUnicastCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxUnicastCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxBroadcastCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxBroadcastCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxBroadcastCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxBroadcastCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxAckRequestedCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxAckRequestedCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxAckRequestedCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxAckRequestedCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxAckedCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxAckedCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxAckedCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxAckedCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxNoAckRequestedCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxNoAckRequestedCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxNoAckRequestedCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxNoAckRequestedCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxDataCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxDataCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxDataCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxDataCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxDataPollCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxDataPollCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxDataPollCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxDataPollCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxBeaconCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxBeaconCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxBeaconCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxBeaconCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxBeaconRequestCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxBeaconRequestCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxBeaconRequestCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxBeaconRequestCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxOtherCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxOtherCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxOtherCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxOtherCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxRetryCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxRetryCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxRetryCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxRetryCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxErrCcaCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxErrCcaCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxErrCcaCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxErrCcaCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxErrAbortCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxErrAbortCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxErrAbortCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxErrAbortCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxErrBusyChannelCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxErrBusyChannelCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxErrBusyChannelCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxErrBusyChannelCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxTotalCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxTotalCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxTotalCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxTotalCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxUnicastCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxUnicastCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxUnicastCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxUnicastCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxBroadcastCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxBroadcastCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxBroadcastCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxBroadcastCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDataCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxDataCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDataCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxDataCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDataPollCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxDataPollCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDataPollCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxDataPollCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxBeaconCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxBeaconCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxBeaconCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxBeaconCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxBeaconRequestCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxBeaconRequestCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxBeaconRequestCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxBeaconRequestCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxOtherCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxOtherCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxOtherCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxOtherCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxAddressFilteredCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxAddressFilteredCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxAddressFilteredCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxAddressFilteredCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxDestAddrFilteredCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDuplicatedCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxDuplicatedCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDuplicatedCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxDuplicatedCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrNoFrameCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxErrNoFrameCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrNoFrameCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxErrNoFrameCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxErrUnknownNeighborCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxErrInvalidSrcAddrCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrSecCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxErrSecCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrSecCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxErrSecCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrFcsCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxErrFcsCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrFcsCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxErrFcsCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrOtherCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxErrOtherCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrOtherCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxErrOtherCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsActiveTimestamp::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsActiveTimestampCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsActiveTimestamp::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsActiveTimestamp::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPendingTimestamp::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsPendingTimestampCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPendingTimestamp::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsPendingTimestamp::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsDelay::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsDelayCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsDelay::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsDelay::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsChannelMask::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsChannelMaskCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsChannelMask::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsChannelMask::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsClusterRevision::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsClusterRevision::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWakeOnLanWakeOnLanMacAddress::OnAttributeResponse)> *
+        onReportWakeOnLanWakeOnLanMacAddressCallback =
+            new chip::Callback::Callback<decltype(&ReadWakeOnLanWakeOnLanMacAddress::OnAttributeResponse)>(
+                ReadWakeOnLanWakeOnLanMacAddress::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWakeOnLanClusterRevision::OnAttributeResponse)> *
+        onReportWakeOnLanClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadWakeOnLanClusterRevision::OnAttributeResponse)>(
+                ReadWakeOnLanClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsBssid::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsBssidCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsBssid::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsBssid::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsSecurityType::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsSecurityTypeCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsSecurityType::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsSecurityType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsWiFiVersion::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsWiFiVersionCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsWiFiVersion::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsWiFiVersion::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsChannelNumber::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsChannelNumberCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsChannelNumber::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsChannelNumber::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsRssi::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsRssiCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsRssi::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsRssi::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsBeaconLostCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsBeaconLostCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsBeaconLostCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsBeaconLostCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsBeaconRxCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsBeaconRxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsBeaconRxCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsBeaconRxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketMulticastRxCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsPacketMulticastRxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketMulticastRxCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsPacketMulticastRxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketMulticastTxCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsPacketMulticastTxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketMulticastTxCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsPacketMulticastTxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketUnicastRxCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsPacketUnicastRxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketUnicastRxCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsPacketUnicastRxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketUnicastTxCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsPacketUnicastTxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketUnicastTxCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsPacketUnicastTxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsCurrentMaxRate::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsCurrentMaxRateCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsCurrentMaxRate::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsCurrentMaxRate::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsOverrunCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsOverrunCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsOverrunCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsOverrunCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsClusterRevision::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsClusterRevision::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringType::OnAttributeResponse)> * onReportWindowCoveringTypeCallback =
+        new chip::Callback::Callback<decltype(&ReadWindowCoveringType::OnAttributeResponse)>(
+            ReadWindowCoveringType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionLift::OnAttributeResponse)> *
+        onReportWindowCoveringCurrentPositionLiftCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionLift::OnAttributeResponse)>(
+                ReadWindowCoveringCurrentPositionLift::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionTilt::OnAttributeResponse)> *
+        onReportWindowCoveringCurrentPositionTiltCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionTilt::OnAttributeResponse)>(
+                ReadWindowCoveringCurrentPositionTilt::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringConfigStatus::OnAttributeResponse)> *
+        onReportWindowCoveringConfigStatusCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringConfigStatus::OnAttributeResponse)>(
+                ReadWindowCoveringConfigStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionLiftPercentage::OnAttributeResponse)> *
+        onReportWindowCoveringCurrentPositionLiftPercentageCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionLiftPercentage::OnAttributeResponse)>(
+                ReadWindowCoveringCurrentPositionLiftPercentage::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionTiltPercentage::OnAttributeResponse)> *
+        onReportWindowCoveringCurrentPositionTiltPercentageCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionTiltPercentage::OnAttributeResponse)>(
+                ReadWindowCoveringCurrentPositionTiltPercentage::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringOperationalStatus::OnAttributeResponse)> *
+        onReportWindowCoveringOperationalStatusCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringOperationalStatus::OnAttributeResponse)>(
+                ReadWindowCoveringOperationalStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringTargetPositionLiftPercent100ths::OnAttributeResponse)> *
+        onReportWindowCoveringTargetPositionLiftPercent100thsCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringTargetPositionLiftPercent100ths::OnAttributeResponse)>(
+                ReadWindowCoveringTargetPositionLiftPercent100ths::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringTargetPositionTiltPercent100ths::OnAttributeResponse)> *
+        onReportWindowCoveringTargetPositionTiltPercent100thsCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringTargetPositionTiltPercent100ths::OnAttributeResponse)>(
+                ReadWindowCoveringTargetPositionTiltPercent100ths::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringEndProductType::OnAttributeResponse)> *
+        onReportWindowCoveringEndProductTypeCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringEndProductType::OnAttributeResponse)>(
+                ReadWindowCoveringEndProductType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionLiftPercent100ths::OnAttributeResponse)> *
+        onReportWindowCoveringCurrentPositionLiftPercent100thsCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionLiftPercent100ths::OnAttributeResponse)>(
+                ReadWindowCoveringCurrentPositionLiftPercent100ths::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionTiltPercent100ths::OnAttributeResponse)> *
+        onReportWindowCoveringCurrentPositionTiltPercent100thsCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionTiltPercent100ths::OnAttributeResponse)>(
+                ReadWindowCoveringCurrentPositionTiltPercent100ths::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledOpenLimitLift::OnAttributeResponse)> *
+        onReportWindowCoveringInstalledOpenLimitLiftCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledOpenLimitLift::OnAttributeResponse)>(
+                ReadWindowCoveringInstalledOpenLimitLift::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledClosedLimitLift::OnAttributeResponse)> *
+        onReportWindowCoveringInstalledClosedLimitLiftCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledClosedLimitLift::OnAttributeResponse)>(
+                ReadWindowCoveringInstalledClosedLimitLift::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledOpenLimitTilt::OnAttributeResponse)> *
+        onReportWindowCoveringInstalledOpenLimitTiltCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledOpenLimitTilt::OnAttributeResponse)>(
+                ReadWindowCoveringInstalledOpenLimitTilt::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledClosedLimitTilt::OnAttributeResponse)> *
+        onReportWindowCoveringInstalledClosedLimitTiltCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledClosedLimitTilt::OnAttributeResponse)>(
+                ReadWindowCoveringInstalledClosedLimitTilt::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringMode::OnAttributeResponse)> * onReportWindowCoveringModeCallback =
+        new chip::Callback::Callback<decltype(&ReadWindowCoveringMode::OnAttributeResponse)>(
+            ReadWindowCoveringMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringSafetyStatus::OnAttributeResponse)> *
+        onReportWindowCoveringSafetyStatusCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringSafetyStatus::OnAttributeResponse)>(
+                ReadWindowCoveringSafetyStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringFeatureMap::OnAttributeResponse)> *
+        onReportWindowCoveringFeatureMapCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringFeatureMap::OnAttributeResponse)>(
+                ReadWindowCoveringFeatureMap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringClusterRevision::OnAttributeResponse)> *
+        onReportWindowCoveringClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringClusterRevision::OnAttributeResponse)>(
+                ReadWindowCoveringClusterRevision::OnAttributeResponse, this);
 };
 
 void registerCommandsReporting(Commands & commands)

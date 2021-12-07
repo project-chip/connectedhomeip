@@ -22,8 +22,9 @@
  *      working with Certification Declaration elements.
  */
 
-#include <inttypes.h>
-#include <stddef.h>
+#include <algorithm>
+#include <cinttypes>
+#include <cstddef>
 
 #include <credentials/CertificationDeclaration.h>
 #include <crypto/CHIPCryptoPAL.h>

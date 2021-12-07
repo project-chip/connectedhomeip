@@ -23,6 +23,7 @@
 #pragma once
 
 #include <lib/support/ObjectLifeCycle.h>
+#include <lib/support/Pool.h>
 #include <platform/LockTracker.h>
 #include <system/SystemLayer.h>
 #include <system/SystemStats.h>

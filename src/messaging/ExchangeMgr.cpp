@@ -237,6 +237,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             return;
         }
     }
+    else
+    {
+        ChipLogProgress(ExchangeManager, "Received Groupcast Message with GroupId of %d",
+                        packetHeader.GetDestinationGroupId().Value());
+    }
 
     // If it's not a duplicate message, search for an unsolicited message handler if it is marked as being sent by an initiator.
     // Since we didn't find an existing exchange that matches the message, it must be an unsolicited message. However all

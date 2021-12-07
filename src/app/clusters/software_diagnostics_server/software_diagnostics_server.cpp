@@ -131,7 +131,7 @@ class SoftwareDiagnosticsDelegate : public DeviceLayer::SoftwareDiagnosticsDeleg
     {
         ChipLogProgress(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
 
-        ForAllEndpointsWithServerCluster(GeneralDiagnostics::Id, [](EndpointId endpoint, intptr_t) -> Loop {
+        ForAllEndpointsWithServerCluster(SoftwareDiagnostics::Id, [](EndpointId endpoint, intptr_t) -> Loop {
             // TODO: Log SoftwareFault event and walk them all.
             return Loop::Break;
         });

@@ -6920,6 +6920,89 @@ struct TypeInfo
 };
 } // namespace ClusterRevision
 } // namespace Attributes
+namespace Events {
+namespace StateChanged {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000000;
+
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+    kNewState = 2,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    ActionStatusEnum newState;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    ActionStatusEnum newState;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace StateChanged
+namespace ActionFailed {
+static constexpr PriorityLevel kPriorityLevel = PriorityLevel::Info;
+static constexpr EventId kEventId             = 0x00000001;
+
+enum class Fields
+{
+    kActionID = 0,
+    kInvokeID = 1,
+    kNewState = 2,
+    kError    = 3,
+};
+
+struct Type
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    ActionStatusEnum newState;
+    ActionErrorEnum error;
+
+    CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
+};
+
+struct DecodableType
+{
+public:
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
+    static constexpr ClusterId GetClusterId() { return Clusters::BridgedActions::Id; }
+
+    uint16_t actionID;
+    uint32_t invokeID;
+    ActionStatusEnum newState;
+    ActionErrorEnum error;
+
+    CHIP_ERROR Decode(TLV::TLVReader & reader);
+};
+} // namespace ActionFailed
+} // namespace Events
 } // namespace BridgedActions
 namespace Basic {
 
@@ -12746,6 +12829,13 @@ public:
 } // namespace Events
 } // namespace Switch
 namespace AdministratorCommissioning {
+// Enum for CommissioningWindowStatus
+enum class CommissioningWindowStatus : uint8_t
+{
+    kWindowNotOpen      = 0x00,
+    kEnhancedWindowOpen = 0x01,
+    kBasicWindowOpen    = 0x02,
+};
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
@@ -12891,6 +12981,42 @@ public:
 } // namespace Commands
 
 namespace Attributes {
+namespace WindowStatus {
+struct TypeInfo
+{
+    using Type             = uint8_t;
+    using DecodableType    = uint8_t;
+    using DecodableArgType = uint8_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::WindowStatus::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace WindowStatus
+namespace AdminFabricIndex {
+struct TypeInfo
+{
+    using Type             = chip::FabricIndex;
+    using DecodableType    = chip::FabricIndex;
+    using DecodableArgType = chip::FabricIndex;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AdminFabricIndex::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AdminFabricIndex
+namespace AdminVendorId {
+struct TypeInfo
+{
+    using Type             = uint16_t;
+    using DecodableType    = uint16_t;
+    using DecodableArgType = uint16_t;
+
+    static constexpr ClusterId GetClusterId() { return Clusters::AdministratorCommissioning::Id; }
+    static constexpr AttributeId GetAttributeId() { return Attributes::AdminVendorId::Id; }
+    static constexpr bool MustUseTimedWrite() { return false; }
+};
+} // namespace AdminVendorId
 namespace FeatureMap {
 struct TypeInfo
 {

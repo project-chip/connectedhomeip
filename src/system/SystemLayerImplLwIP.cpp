@@ -38,8 +38,6 @@ CHIP_ERROR LayerImplLwIP::Init()
 
     RegisterLwIPErrorFormatter();
 
-    ReturnErrorOnFailure(mTimerList.Init());
-
     VerifyOrReturnError(mLayerState.SetInitialized(), CHIP_ERROR_INCORRECT_STATE);
     return CHIP_NO_ERROR;
 }
@@ -58,7 +56,7 @@ CHIP_ERROR LayerImplLwIP::StartTimer(Clock::Timeout delay, TimerCompleteCallback
 
     CancelTimer(onComplete, appState);
 
-    Timer * timer = Timer::New(*this, delay, onComplete, appState);
+    TimerList::Node * timer = mTimerPool.Create(*this, delay, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
     if (mTimerList.Add(timer) == timer)
@@ -78,34 +76,25 @@ void LayerImplLwIP::CancelTimer(TimerCompleteCallback onComplete, void * appStat
 {
     VerifyOrReturn(mLayerState.IsInitialized());
 
-    Timer * timer = mTimerList.Remove(onComplete, appState);
-    VerifyOrReturn(timer != nullptr);
-
-    timer->Clear();
-    timer->Release();
+    TimerList::Node * timer = mTimerList.Remove(onComplete, appState);
+    if (timer != nullptr)
+    {
+        mTimerPool.Release(timer);
+    }
 }
 
 CHIP_ERROR LayerImplLwIP::ScheduleWork(TimerCompleteCallback onComplete, void * appState)
 {
     VerifyOrReturnError(mLayerState.IsInitialized(), CHIP_ERROR_INCORRECT_STATE);
 
-    Timer * timer = Timer::New(*this, System::Clock::kZero, onComplete, appState);
+    TimerList::Node * timer = mTimerPool.Create(*this, System::Clock::kZero, onComplete, appState);
     VerifyOrReturnError(timer != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    return ScheduleLambda([timer] { timer->HandleComplete(); });
+    return ScheduleLambda([this, timer] { this->mTimerPool.Invoke(timer); });
 }
 
 /**
  * Start the platform timer with specified millsecond duration.
- *
- *  @brief
- *      Calls the Platform specific API to start a platform timer. This API is called by the chip::System::Timer class when
- *      one or more timers are active and require deferred execution.
- *
- *  @param[in]  aDelay  The timer duration in milliseconds.
- *
- *  @return CHIP_NO_ERROR on success, error code otherwise.
- *
  */
 CHIP_ERROR LayerImplLwIP::StartPlatformTimer(System::Clock::Timeout aDelay)
 {
@@ -142,14 +131,13 @@ CHIP_ERROR LayerImplLwIP::HandlePlatformTimer()
     // limit the number of timers handled before the control is returned to the event queue.  The bound is similar to
     // (though not exactly same) as that on the sockets-based systems.
 
-    size_t timersHandled = 0;
-    Timer * timer        = nullptr;
+    size_t timersHandled    = 0;
+    TimerList::Node * timer = nullptr;
     while ((timersHandled < CHIP_SYSTEM_CONFIG_NUM_TIMERS) && ((timer = mTimerList.PopIfEarlier(expirationTime)) != nullptr))
     {
         mHandlingTimerComplete = true;
-        timer->HandleComplete();
+        mTimerPool.Invoke(timer);
         mHandlingTimerComplete = false;
-
         timersHandled++;
     }
 
@@ -160,10 +148,10 @@ CHIP_ERROR LayerImplLwIP::HandlePlatformTimer()
 
         Clock::Timestamp currentTime = SystemClock().GetMonotonicTimestamp();
 
-        if (currentTime < mTimerList.Earliest()->mAwakenTime)
+        if (currentTime < mTimerList.Earliest()->AwakenTime())
         {
             // the next timer expires in the future, so set the delay to a non-zero value
-            delay = mTimerList.Earliest()->mAwakenTime - currentTime;
+            delay = mTimerList.Earliest()->AwakenTime() - currentTime;
         }
 
         StartPlatformTimer(delay);

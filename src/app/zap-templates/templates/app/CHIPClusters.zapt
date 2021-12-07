@@ -31,12 +31,6 @@ public:
     // Cluster Attributes
     {{#chip_server_cluster_attributes}}
     {{#unless (isStrEqual chipCallback.name "Unsupported")}}
-    CHIP_ERROR ReadAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback);
-    {{#if isWritableAttribute}}
-    {{#unless isList}}
-    CHIP_ERROR WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value);
-    {{/unless}}
-    {{/if}}
     {{#if isReportableAttribute}}
     {{#unless isList}}
     CHIP_ERROR SubscribeAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval);

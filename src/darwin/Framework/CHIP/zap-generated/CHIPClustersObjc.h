@@ -81,6 +81,15 @@ NS_ASSUME_NONNULL_BEGIN
                         completionHandler:(StatusCompletion)completionHandler;
 - (void)revokeCommissioningWithCompletionHandler:(StatusCompletion)completionHandler;
 
+- (void)readAttributeWindowStatusWithCompletionHandler:(void (^)(
+                                                           NSNumber * _Nullable value, NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeAdminFabricIndexWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                               NSError * _Nullable error))completionHandler;
+
+- (void)readAttributeAdminVendorIdWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
+                                                            NSError * _Nullable error))completionHandler;
+
 - (void)readAttributeClusterRevisionWithCompletionHandler:(void (^)(NSNumber * _Nullable value,
                                                               NSError * _Nullable error))completionHandler;
 - (void)subscribeAttributeClusterRevisionWithMinInterval:(uint16_t)minInterval
