@@ -1650,7 +1650,8 @@ exit:
 }
 
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
-                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen)
+                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen,
+                                    CertificateChainValidationResult & result)
 {
     CHIP_ERROR err             = CHIP_NO_ERROR;
     int status                 = 0;
@@ -1660,38 +1661,45 @@ CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t root
     X509 * x509CACertificate   = nullptr;
     X509 * x509LeafCertificate = nullptr;
 
+    VerifyOrReturnError(rootCertificate != nullptr && rootCertificateLen != 0,
+                        (result = CertificateChainValidationResult::kRootArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(caCertificate != nullptr && caCertificateLen != 0,
+                        (result = CertificateChainValidationResult::kICAArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(leafCertificate != nullptr && leafCertificateLen != 0,
+                        (result = CertificateChainValidationResult::kLeafArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
+
     store = X509_STORE_new();
-    VerifyOrExit(store != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(store != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
 
     verifyCtx = X509_STORE_CTX_new();
-    VerifyOrExit(verifyCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(verifyCtx != nullptr, (result = CertificateChainValidationResult::kNoMemory, err = CHIP_ERROR_NO_MEMORY));
 
     x509RootCertificate = d2i_X509(NULL, &rootCertificate, static_cast<long>(rootCertificateLen));
-    VerifyOrExit(x509RootCertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(x509RootCertificate != nullptr,
+                 (result = CertificateChainValidationResult::kRootFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
     status = X509_STORE_add_cert(store, x509RootCertificate);
-    VerifyOrExit(status == 1, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
 
-    if (caCertificate != nullptr && caCertificateLen != 0)
-    {
-        x509CACertificate = d2i_X509(NULL, &caCertificate, static_cast<long>(caCertificateLen));
-        VerifyOrExit(x509CACertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    x509CACertificate = d2i_X509(NULL, &caCertificate, static_cast<long>(caCertificateLen));
+    VerifyOrExit(x509CACertificate != nullptr,
+                 (result = CertificateChainValidationResult::kICAFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
-        status = X509_STORE_add_cert(store, x509CACertificate);
-        VerifyOrExit(status == 1, err = CHIP_ERROR_INTERNAL);
-    }
+    status = X509_STORE_add_cert(store, x509CACertificate);
+    VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
 
     x509LeafCertificate = d2i_X509(NULL, &leafCertificate, static_cast<long>(leafCertificateLen));
-    VerifyOrExit(x509LeafCertificate != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(x509LeafCertificate != nullptr,
+                 (result = CertificateChainValidationResult::kLeafFormatInvalid, err = CHIP_ERROR_INTERNAL));
 
     status = X509_STORE_CTX_init(verifyCtx, store, x509LeafCertificate, NULL);
-    VerifyOrExit(status == 1, err = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kInternalFrameworkError, err = CHIP_ERROR_INTERNAL));
 
-    // TODO: If any specific error occurs here, it should be flagged accordingly
     status = X509_verify_cert(verifyCtx);
-    VerifyOrExit(status == 1, err = CHIP_ERROR_CERT_NOT_TRUSTED);
+    VerifyOrExit(status == 1, (result = CertificateChainValidationResult::kChainInvalid, err = CHIP_ERROR_CERT_NOT_TRUSTED));
 
-    err = CHIP_NO_ERROR;
+    err    = CHIP_NO_ERROR;
+    result = CertificateChainValidationResult::kSuccess;
 
 exit:
     X509_free(x509LeafCertificate);

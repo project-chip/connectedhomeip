@@ -115,6 +115,42 @@ const ByteSpan kTestPaaRoots[] = {
 
 const ArrayAttestationTrustStore kTestAttestationTrustStore{ &kTestPaaRoots[0], ArraySize(kTestPaaRoots) };
 
+AttestationVerificationResult MapError(CertificateChainValidationResult certificateChainValidationResult)
+{
+    switch (certificateChainValidationResult)
+    {
+    case CertificateChainValidationResult::kRootFormatInvalid:
+        return AttestationVerificationResult::kPaaFormatInvalid;
+
+    case CertificateChainValidationResult::kRootArgumentInvalid:
+        return AttestationVerificationResult::kPaaArgumentInvalid;
+
+    case CertificateChainValidationResult::kICAFormatInvalid:
+        return AttestationVerificationResult::kPaiFormatInvalid;
+
+    case CertificateChainValidationResult::kICAArgumentInvalid:
+        return AttestationVerificationResult::kPaiArgumentInvalid;
+
+    case CertificateChainValidationResult::kLeafFormatInvalid:
+        return AttestationVerificationResult::kDacFormatInvalid;
+
+    case CertificateChainValidationResult::kLeafArgumentInvalid:
+        return AttestationVerificationResult::kDacArgumentInvalid;
+
+    case CertificateChainValidationResult::kChainInvalid:
+        return AttestationVerificationResult::kDacSignatureInvalid;
+
+    case CertificateChainValidationResult::kNoMemory:
+        return AttestationVerificationResult::kNoMemory;
+
+    case CertificateChainValidationResult::kInternalFrameworkError:
+        return AttestationVerificationResult::kInternalError;
+
+    default:
+        return AttestationVerificationResult::kInternalError;
+    }
+}
+
 /**
  * @brief Look-up of well-known keys used for CD signing by CSA.
  *
@@ -258,9 +294,10 @@ AttestationVerificationResult DefaultDACVerifier::VerifyAttestationInformation(c
     VerifyOrReturnError(IsCertificateValidAtIssuance(dacDerBuffer, paaDerBuffer) == CHIP_NO_ERROR,
                         AttestationVerificationResult::kPaaExpired);
 
+    CertificateChainValidationResult chainValidationResult;
     VerifyOrReturnError(ValidateCertificateChain(paaDerBuffer.data(), paaDerBuffer.size(), paiDerBuffer.data(), paiDerBuffer.size(),
-                                                 dacDerBuffer.data(), dacDerBuffer.size()) == CHIP_NO_ERROR,
-                        AttestationVerificationResult::kDacSignatureInvalid);
+                                                 dacDerBuffer.data(), dacDerBuffer.size(), chainValidationResult) == CHIP_NO_ERROR,
+                        MapError(chainValidationResult));
 
     // if PAA contains VID, see if matches with DAC's VID.
     {

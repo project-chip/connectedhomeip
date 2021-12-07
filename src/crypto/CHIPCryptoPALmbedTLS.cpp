@@ -1217,46 +1217,63 @@ CHIP_ERROR GetNumberOfCertsFromPKCS7(const char * pkcs7, uint32_t * n_certs)
 }
 
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
-                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen)
+                                    size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen,
+                                    CertificateChainValidationResult & result)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
-    mbedtls_x509_crt cert_chain;
-    mbedtls_x509_crt root_cert;
-    int result;
+    mbedtls_x509_crt certChain;
+    mbedtls_x509_crt rootCert;
+    int mbedResult;
     uint32_t flags;
 
-    mbedtls_x509_crt_init(&cert_chain);
-    mbedtls_x509_crt_init(&root_cert);
+    VerifyOrReturnError(rootCertificate != nullptr && rootCertificateLen != 0,
+                        (result = CertificateChainValidationResult::kRootArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(caCertificate != nullptr && caCertificateLen != 0,
+                        (result = CertificateChainValidationResult::kICAArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
+    VerifyOrReturnError(leafCertificate != nullptr && leafCertificateLen != 0,
+                        (result = CertificateChainValidationResult::kLeafArgumentInvalid, CHIP_ERROR_INVALID_ARGUMENT));
+
+    mbedtls_x509_crt_init(&certChain);
+    mbedtls_x509_crt_init(&rootCert);
 
     /* Start of chain  */
-    result = mbedtls_x509_crt_parse(&cert_chain, Uint8::to_const_uchar(leafCertificate), leafCertificateLen);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    mbedResult = mbedtls_x509_crt_parse(&certChain, Uint8::to_const_uchar(leafCertificate), leafCertificateLen);
+    VerifyOrExit(mbedResult == 0, (result = CertificateChainValidationResult::kLeafFormatInvalid, error = CHIP_ERROR_INTERNAL));
 
-    if (caCertificate != nullptr && caCertificateLen != 0)
-    {
-        /* Add the intermediate to the chain  */
-        result = mbedtls_x509_crt_parse(&cert_chain, Uint8::to_const_uchar(caCertificate), caCertificateLen);
-        VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
-    }
+    /* Add the intermediate to the chain  */
+    mbedResult = mbedtls_x509_crt_parse(&certChain, Uint8::to_const_uchar(caCertificate), caCertificateLen);
+    VerifyOrExit(mbedResult == 0, (result = CertificateChainValidationResult::kICAFormatInvalid, error = CHIP_ERROR_INTERNAL));
 
     /* Add the root to the chain */
-    result = mbedtls_x509_crt_parse(&cert_chain, Uint8::to_const_uchar(rootCertificate), rootCertificateLen);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    mbedResult = mbedtls_x509_crt_parse(&certChain, Uint8::to_const_uchar(rootCertificate), rootCertificateLen);
+    VerifyOrExit(mbedResult == 0, (result = CertificateChainValidationResult::kRootFormatInvalid, error = CHIP_ERROR_INTERNAL));
 
     /* Parse the root cert */
-    result = mbedtls_x509_crt_parse(&root_cert, Uint8::to_const_uchar(rootCertificate), rootCertificateLen);
-    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    mbedResult = mbedtls_x509_crt_parse(&rootCert, Uint8::to_const_uchar(rootCertificate), rootCertificateLen);
+    VerifyOrExit(mbedResult == 0, (result = CertificateChainValidationResult::kRootFormatInvalid, error = CHIP_ERROR_INTERNAL));
 
-    // TODO: If any specific error occurs here, it should be flagged accordingly, such as specific chain element errors
     /* Verify the chain against the root */
-    result = mbedtls_x509_crt_verify(&cert_chain, &root_cert, NULL, NULL, &flags, NULL, NULL);
-    VerifyOrExit(result == 0 && flags == 0, error = CHIP_ERROR_CERT_NOT_TRUSTED);
+    mbedResult = mbedtls_x509_crt_verify(&certChain, &rootCert, NULL, NULL, &flags, NULL, NULL);
+
+    switch (mbedResult)
+    {
+    case 0:
+        VerifyOrExit(flags == 0, (result = CertificateChainValidationResult::kInternalFrameworkError, error = CHIP_ERROR_INTERNAL));
+        result = CertificateChainValidationResult::kSuccess;
+        break;
+    case MBEDTLS_ERR_X509_CERT_VERIFY_FAILED:
+        result = CertificateChainValidationResult::kChainInvalid;
+        error  = CHIP_ERROR_CERT_NOT_TRUSTED;
+        break;
+    default:
+        SuccessOrExit((result = CertificateChainValidationResult::kInternalFrameworkError, error = CHIP_ERROR_INTERNAL));
+    }
 
 exit:
-    _log_mbedTLS_error(result);
-    mbedtls_x509_crt_free(&cert_chain);
-    mbedtls_x509_crt_free(&root_cert);
+    _log_mbedTLS_error(mbedResult);
+    mbedtls_x509_crt_free(&certChain);
+    mbedtls_x509_crt_free(&rootCert);
 
 #else
     (void) rootCertificate;
