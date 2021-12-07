@@ -57,3 +57,6 @@ docs/html
 
 # compilation database for VSCode and other Ides
 compile_commands.json
+
+# backup files, usually created by the ZAP tool
+*~
