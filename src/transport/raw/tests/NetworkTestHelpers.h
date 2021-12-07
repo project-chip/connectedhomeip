@@ -18,7 +18,8 @@
 
 #include <functional>
 
-#include <inet/InetLayer.h>
+#include <inet/TCPEndPoint.h>
+#include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPError.h>
 #include <lib/support/CodeUtils.h>
 #include <system/SystemLayer.h>
@@ -51,11 +52,13 @@ public:
     void DriveIOUntil(System::Clock::Timeout maxWait, std::function<bool(void)> completionFunction);
 
     System::Layer & GetSystemLayer() { return *mSystemLayer; }
-    Inet::InetLayer & GetInetLayer() { return *mInetLayer; }
+    Inet::EndPointManager<Inet::TCPEndPoint> * GetTCPEndPointManager() { return mTCPEndPointManager; }
+    Inet::EndPointManager<Inet::UDPEndPoint> * GetUDPEndPointManager() { return mUDPEndPointManager; }
 
 private:
-    System::Layer * mSystemLayer = nullptr;
-    Inet::InetLayer * mInetLayer = nullptr;
+    System::Layer * mSystemLayer                                   = nullptr;
+    Inet::EndPointManager<Inet::TCPEndPoint> * mTCPEndPointManager = nullptr;
+    Inet::EndPointManager<Inet::UDPEndPoint> * mUDPEndPointManager = nullptr;
 };
 
 class LoopbackTransport : public Transport::Base

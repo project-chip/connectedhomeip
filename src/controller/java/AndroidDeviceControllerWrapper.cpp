@@ -167,10 +167,10 @@ CHIP_ERROR AndroidDeviceControllerWrapper::GenerateNOCChain(const ByteSpan & csr
     return CHIP_NO_ERROR;
 }
 
-AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(JavaVM * vm, jobject deviceControllerObj,
-                                                                             chip::NodeId nodeId, chip::System::Layer * systemLayer,
-                                                                             chip::Inet::InetLayer * inetLayer,
-                                                                             CHIP_ERROR * errInfoOnFailure)
+AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(
+    JavaVM * vm, jobject deviceControllerObj, chip::NodeId nodeId, chip::System::Layer * systemLayer,
+    chip::Inet::EndPointManager<Inet::TCPEndPoint> * tcpEndPointManager,
+    chip::Inet::EndPointManager<Inet::UDPEndPoint> * udpEndPointManager, CHIP_ERROR * errInfoOnFailure)
 {
     if (errInfoOnFailure == nullptr)
     {
@@ -183,9 +183,15 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
         *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
         return nullptr;
     }
-    if (inetLayer == nullptr)
+    if (tcpEndPointManager == nullptr)
     {
-        ChipLogError(Controller, "Missing inet layer");
+        ChipLogError(Controller, "Missing TCP layer");
+        *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
+        return nullptr;
+    }
+    if (udpEndPointManager == nullptr)
+    {
+        ChipLogError(Controller, "Missing UDP layer");
         *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
         return nullptr;
     }
@@ -211,9 +217,10 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     chip::Controller::FactoryInitParams initParams;
     chip::Controller::SetupParams setupParams;
 
-    initParams.systemLayer   = systemLayer;
-    initParams.inetLayer     = inetLayer;
-    initParams.fabricStorage = wrapper.get();
+    initParams.systemLayer        = systemLayer;
+    initParams.tcpEndPointManager = tcpEndPointManager;
+    initParams.udpEndPointManager = udpEndPointManager;
+    initParams.fabricStorage      = wrapper.get();
     // move bleLayer into platform/android to share with app server
 #if CONFIG_NETWORK_LAYER_BLE
     initParams.bleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();

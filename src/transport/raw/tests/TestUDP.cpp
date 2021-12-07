@@ -90,7 +90,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext, Inet::IPAddres
 
     Transport::UDP udp;
 
-    CHIP_ERROR err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(type).SetListenPort(0));
+    CHIP_ERROR err = udp.Init(Transport::UdpListenParameters(ctx.GetUDPEndPointManager()).SetAddressType(type).SetListenPort(0));
 
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
@@ -122,7 +122,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
 
     Transport::UDP udp;
 
-    err = udp.Init(Transport::UdpListenParameters(&ctx.GetInetLayer()).SetAddressType(addr.Type()).SetListenPort(0));
+    err = udp.Init(Transport::UdpListenParameters(ctx.GetUDPEndPointManager()).SetAddressType(addr.Type()).SetListenPort(0));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     MockTransportMgrDelegate gMockTransportMgrDelegate(inSuite);

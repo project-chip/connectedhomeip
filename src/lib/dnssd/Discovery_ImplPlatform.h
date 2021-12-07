@@ -37,7 +37,7 @@ class DiscoveryImplPlatform : public ServiceAdvertiser, public Resolver
 {
 public:
     // Members that implement both ServiceAdveriser and Resolver interfaces.
-    CHIP_ERROR Init(Inet::InetLayer *) override { return InitImpl(); }
+    CHIP_ERROR Init(Inet::EndPointManager<Inet::UDPEndPoint> *) override { return InitImpl(); }
     void Shutdown() override;
 
     // Members that implement ServiceAdvertiser interface.

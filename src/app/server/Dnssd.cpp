@@ -146,7 +146,7 @@ bool DnssdServer::OnExpiration(System::Clock::Timestamp expirationMs)
 
     ChipLogDetail(Discovery, "OnExpiration - valid time out");
 
-    CHIP_ERROR err = Dnssd::ServiceAdvertiser::Instance().Init(&chip::DeviceLayer::InetLayer());
+    CHIP_ERROR err = Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to initialize advertiser: %s", chip::ErrorStr(err));
@@ -410,7 +410,7 @@ void DnssdServer::StartServer(chip::Dnssd::CommissioningMode mode)
 
     DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEventWrapper, 0);
 
-    CHIP_ERROR err = Dnssd::ServiceAdvertiser::Instance().Init(&chip::DeviceLayer::InetLayer());
+    CHIP_ERROR err = Dnssd::ServiceAdvertiser::Instance().Init(chip::DeviceLayer::UDPEndPointManager());
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Discovery, "Failed to initialize advertiser: %s", chip::ErrorStr(err));

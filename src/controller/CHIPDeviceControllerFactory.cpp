@@ -62,8 +62,9 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState()
     FactoryInitParams params;
     if (mSystemState != nullptr)
     {
-        params.systemLayer = mSystemState->SystemLayer();
-        params.inetLayer   = mSystemState->InetLayer();
+        params.systemLayer        = mSystemState->SystemLayer();
+        params.tcpEndPointManager = mSystemState->TCPEndPointManager();
+        params.udpEndPointManager = mSystemState->UDPEndPointManager();
 #if CONFIG_NETWORK_LAYER_BLE
         params.bleLayer = mSystemState->BleLayer();
 #endif
@@ -90,16 +91,18 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 #if CONFIG_DEVICE_LAYER
     ReturnErrorOnFailure(DeviceLayer::PlatformMgr().InitChipStack());
 
-    stateParams.systemLayer = &DeviceLayer::SystemLayer();
-    stateParams.inetLayer   = &DeviceLayer::InetLayer();
+    stateParams.systemLayer        = &DeviceLayer::SystemLayer();
+    stateParams.tcpEndPointManager = DeviceLayer::TCPEndPointManager();
+    stateParams.udpEndPointManager = DeviceLayer::UDPEndPointManager();
 #else
-    stateParams.systemLayer = params.systemLayer;
-    stateParams.inetLayer   = params.inetLayer;
+    stateParams.systemLayer        = params.systemLayer;
+    stateParams.tcpEndPointManager = params.tcpEndPointManager;
+    stateParams.udpEndPointManager = params.udpEndPointManager;
     ChipLogError(Controller, "Warning: Device Controller Factory should be with a CHIP Device Layer...");
 #endif // CONFIG_DEVICE_LAYER
 
     VerifyOrReturnError(stateParams.systemLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(stateParams.inetLayer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(stateParams.udpEndPointManager != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CONFIG_NETWORK_LAYER_BLE
 #if CONFIG_DEVICE_LAYER
@@ -112,17 +115,20 @@ CHIP_ERROR DeviceControllerFactory::InitSystemState(FactoryInitParams params)
 
     stateParams.transportMgr = chip::Platform::New<DeviceTransportMgr>();
 
-    ReturnErrorOnFailure(stateParams.transportMgr->Init(
-        Transport::UdpListenParameters(stateParams.inetLayer).SetAddressType(Inet::IPAddressType::kIPv6).SetListenPort(mListenPort)
+    ReturnErrorOnFailure(stateParams.transportMgr->Init(Transport::UdpListenParameters(stateParams.udpEndPointManager)
+                                                            .SetAddressType(Inet::IPAddressType::kIPv6)
+                                                            .SetListenPort(mListenPort)
 #if INET_CONFIG_ENABLE_IPV4
-            ,
-        Transport::UdpListenParameters(stateParams.inetLayer).SetAddressType(Inet::IPAddressType::kIPv4).SetListenPort(mListenPort)
+                                                            ,
+                                                        Transport::UdpListenParameters(stateParams.udpEndPointManager)
+                                                            .SetAddressType(Inet::IPAddressType::kIPv4)
+                                                            .SetListenPort(mListenPort)
 #endif
 #if CONFIG_NETWORK_LAYER_BLE
-            ,
-        Transport::BleListenParameters(stateParams.bleLayer)
+                                                            ,
+                                                        Transport::BleListenParameters(stateParams.bleLayer)
 #endif
-            ));
+                                                            ));
 
     if (params.imDelegate == nullptr)
     {
@@ -254,8 +260,8 @@ CHIP_ERROR DeviceControllerSystemState::Shutdown()
         mSessionMgr->Shutdown();
     }
 
-    mSystemLayer = nullptr;
-    mInetLayer   = nullptr;
+    mSystemLayer          = nullptr;
+    mUDPEndPointManager   = nullptr;
 
     if (mMessageCounterManager != nullptr)
     {
