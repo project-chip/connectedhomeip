@@ -1,7 +1,6 @@
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
- *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,31 +17,27 @@
 
 #pragma once
 
-#include "AuthMode.h"
-
-#include <lib/core/CASEAuthTag.h>
-#include <lib/core/DataModelTypes.h>
-#include <lib/core/NodeId.h>
+#include <cstdint>
+#include <lib/core/CHIPConfig.h>
+#include <lib/support/CodeUtils.h>
+#include <stdlib.h>
 
 namespace chip {
-namespace Access {
 
-struct SubjectDescriptor
+typedef uint32_t CASEAuthTag;
+
+static constexpr CASEAuthTag kUndefinedCAT = 0;
+
+// Muximum number of CASE Authenticated Tags (CAT) in the CHIP certificate subject.
+static constexpr size_t kMaxSubjectCATAttributeCount = CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES - 2;
+
+struct CATValues
 {
-    // Holds FabricIndex of fabric, 0 if no fabric.
-    FabricIndex fabricIndex = kUndefinedFabricIndex;
+    CASEAuthTag val[kMaxSubjectCATAttributeCount];
 
-    // Holds AuthMode of subject(s), kNone if no access.
-    AuthMode authMode = AuthMode::kNone;
-
-    // NOTE: due to packing there should be free bytes here
-
-    // Holds subject according to auth mode.
-    NodeId subject = kUndefinedNodeId;
-
-    // CASE Authenticated Tags (CATs) only valid if auth mode is CASE.
-    CATValues cats = kUndefinedCATs;
+    size_t size() const { return ArraySize(val); }
 };
 
-} // namespace Access
+static constexpr CATValues kUndefinedCATs = { { kUndefinedCAT } };
+
 } // namespace chip

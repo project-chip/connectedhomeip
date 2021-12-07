@@ -64,7 +64,7 @@ struct CASESessionCachable
     uint8_t mSharedSecret[Crypto::kMax_ECDH_Secret_Length];
     FabricIndex mLocalFabricIndex;
     NodeId mPeerNodeId;
-    Credentials::CATValues mPeerCATs;
+    CATValues mPeerCATs;
     uint8_t mResumptionId[kCASEResumptionIDSize];
     uint64_t mSessionSetupTimeStamp;
 };

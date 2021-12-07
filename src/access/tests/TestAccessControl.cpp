@@ -47,6 +47,24 @@ constexpr NodeId kPaseVerifier1 = 0xFFFFFFFB0000'0001;
 constexpr NodeId kPaseVerifier3 = 0xFFFFFFFB0000'0003;
 constexpr NodeId kPaseVerifier5 = 0xFFFFFFFB0000'0005;
 
+constexpr NodeId kOperationalNodeId0 = 0x0123456789ABCDEF;
+constexpr NodeId kOperationalNodeId1 = 0x1234567812345678;
+constexpr NodeId kOperationalNodeId2 = 0x1122334455667788;
+constexpr NodeId kOperationalNodeId3 = 0x1111111111111111;
+constexpr NodeId kOperationalNodeId4 = 0x2222222222222222;
+
+constexpr CASEAuthTag kCASEAuthTag0 = 0x0001'0001;
+constexpr CASEAuthTag kCASEAuthTag1 = 0x0002'0001;
+constexpr CASEAuthTag kCASEAuthTag2 = 0xABCD'0002;
+constexpr CASEAuthTag kCASEAuthTag3 = 0xABCD'0008;
+constexpr CASEAuthTag kCASEAuthTag4 = 0xABCD'ABCD;
+
+constexpr NodeId kCASEAuthTagAsNodeId0 = kMinCASEAuthTag | kCASEAuthTag0;
+constexpr NodeId kCASEAuthTagAsNodeId1 = kMinCASEAuthTag | kCASEAuthTag1;
+constexpr NodeId kCASEAuthTagAsNodeId2 = kMinCASEAuthTag | kCASEAuthTag2;
+constexpr NodeId kCASEAuthTagAsNodeId3 = kMinCASEAuthTag | kCASEAuthTag3;
+constexpr NodeId kCASEAuthTagAsNodeId4 = kMinCASEAuthTag | kCASEAuthTag4;
+
 constexpr NodeId kGroup2 = 0xFFFFFFFFFFFF'0002;
 constexpr NodeId kGroup4 = 0xFFFFFFFFFFFF'0004;
 constexpr NodeId kGroup6 = 0xFFFFFFFFFFFF'0006;
@@ -65,9 +83,9 @@ constexpr NodeId subjects[][3] = { {
                                        kPaseVerifier5,
                                    },
                                    {
-                                       0x0123456789ABCDEF,  // CASE node
-                                       0xFFFFFFFD'00000001, // CAT1
-                                       0xFFFFFFFC'00000002, // CAT2
+                                       kOperationalNodeId0,
+                                       kCASEAuthTagAsNodeId1,
+                                       kCASEAuthTagAsNodeId2,
                                    },
                                    {
                                        kGroup4,
@@ -282,7 +300,7 @@ constexpr EntryData entryData1[] = {
         .fabricIndex = 1,
         .privilege   = Privilege::kAdminister,
         .authMode    = AuthMode::kCase,
-        .subjects    = { 0x1111111111111111 },
+        .subjects    = { kOperationalNodeId3 },
     },
     {
         .fabricIndex = 1,
@@ -293,7 +311,7 @@ constexpr EntryData entryData1[] = {
         .fabricIndex = 2,
         .privilege   = Privilege::kAdminister,
         .authMode    = AuthMode::kCase,
-        .subjects    = { 0x2222222222222222 },
+        .subjects    = { kOperationalNodeId4 },
     },
     {
         .fabricIndex = 1,
@@ -317,7 +335,32 @@ constexpr EntryData entryData1[] = {
                      { .flags = Target::kCluster, .cluster = kOnOffCluster },
                      { .flags = Target::kEndpoint, .endpoint = 2 } },
     },
+    // entry 6
+    {
+        .fabricIndex = 1,
+        .privilege   = Privilege::kAdminister,
+        .authMode    = AuthMode::kCase,
+        .subjects    = { kCASEAuthTagAsNodeId0 },
+    },
+    // entry 7
+    {
+        .fabricIndex = 2,
+        .privilege   = Privilege::kManage,
+        .authMode    = AuthMode::kCase,
+        .subjects    = { kCASEAuthTagAsNodeId3, kCASEAuthTagAsNodeId1 },
+        .targets     = { { .flags = Target::kCluster, .cluster = kOnOffCluster } },
+    },
+    // entry 8
+    {
+        .fabricIndex = 2,
+        .privilege   = Privilege::kOperate,
+        .authMode    = AuthMode::kCase,
+        .subjects    = { kCASEAuthTagAsNodeId4, kCASEAuthTagAsNodeId1 },
+        .targets     = { { .flags = Target::kCluster, .cluster = kLevelControlCluster } },
+    },
 };
+
+constexpr size_t entryData1Count = ArraySize(entryData1);
 
 struct CheckData
 {
@@ -327,321 +370,285 @@ struct CheckData
     bool allow;
 };
 
-constexpr CheckData checkData1[] =
-{
+constexpr CheckData checkData1[] = {
     // Checks for entry 0
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { 0x1111111111111111 }, },
-        .requestPath = { .cluster = kAccessControlCluster, .endpoint = 0 },
-        .privilege = Privilege::kAdminister,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { 0x1111111111111111 }, },
-        .requestPath = { .cluster = 1, .endpoint = 2 },
-        .privilege = Privilege::kManage,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { 0x1111111111111111 }, },
-        .requestPath = { .cluster = 3, .endpoint = 4 },
-        .privilege = Privilege::kOperate,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { 0x1111111111111111 }, },
-        .requestPath = { .cluster = 5, .endpoint = 6 },
-        .privilege = Privilege::kView,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { 0x1111111111111111 }, },
-        .requestPath = { .cluster = 7, .endpoint = 8 },
-        .privilege = Privilege::kProxyView,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subjects = { 0x1111111111111111 }, },
-        .requestPath = { .cluster = 1, .endpoint = 2 },
-        .privilege = Privilege::kAdminister,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kPase, .subjects = { 0x1111111111111111 }, },
-        .requestPath = { .cluster = 1, .endpoint = 2 },
-        .privilege = Privilege::kAdminister,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subjects = { 0x1111111111111111 }, },
-        .requestPath = { .cluster = 1, .endpoint = 2 },
-        .privilege = Privilege::kAdminister,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { 0x2222222222222222 }, },
-        .requestPath = { .cluster = 1, .endpoint = 2 },
-        .privilege = Privilege::kAdminister,
-        .allow = false
-    },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId3 },
+      .requestPath       = { .cluster = kAccessControlCluster, .endpoint = 0 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId3 },
+      .requestPath       = { .cluster = 1, .endpoint = 2 },
+      .privilege         = Privilege::kManage,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId3 },
+      .requestPath       = { .cluster = 3, .endpoint = 4 },
+      .privilege         = Privilege::kOperate,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId3 },
+      .requestPath       = { .cluster = 5, .endpoint = 6 },
+      .privilege         = Privilege::kView,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId3 },
+      .requestPath       = { .cluster = 7, .endpoint = 8 },
+      .privilege         = Privilege::kProxyView,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId3 },
+      .requestPath       = { .cluster = 1, .endpoint = 2 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kPase, .subject = kOperationalNodeId3 },
+      .requestPath       = { .cluster = 1, .endpoint = 2 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = kOperationalNodeId3 },
+      .requestPath       = { .cluster = 1, .endpoint = 2 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId4 },
+      .requestPath       = { .cluster = 1, .endpoint = 2 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = false },
     // Checks for entry 1
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { 0x1234567812345678 }, },
-        .requestPath = { .cluster = 11, .endpoint = 13 },
-        .privilege = Privilege::kView,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { 0x1234567812345678 }, },
-        .requestPath = { .cluster = 11, .endpoint = 13 },
-        .privilege = Privilege::kOperate,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subjects = { 0x1234567812345678 }, },
-        .requestPath = { .cluster = 11, .endpoint = 13 },
-        .privilege = Privilege::kView,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kPase, .subjects = { 0x1234567812345678 }, },
-        .requestPath = { .cluster = 11, .endpoint = 13 },
-        .privilege = Privilege::kView,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subjects = { 0x1234567812345678 }, },
-        .requestPath = { .cluster = 11, .endpoint = 13 },
-        .privilege = Privilege::kView,
-        .allow = false
-    },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
+      .requestPath       = { .cluster = 11, .endpoint = 13 },
+      .privilege         = Privilege::kView,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
+      .requestPath       = { .cluster = 11, .endpoint = 13 },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
+      .requestPath       = { .cluster = 11, .endpoint = 13 },
+      .privilege         = Privilege::kView,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kPase, .subject = kOperationalNodeId1 },
+      .requestPath       = { .cluster = 11, .endpoint = 13 },
+      .privilege         = Privilege::kView,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = kOperationalNodeId1 },
+      .requestPath       = { .cluster = 11, .endpoint = 13 },
+      .privilege         = Privilege::kView,
+      .allow             = false },
     // Checks for entry 2
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subjects = { 0x2222222222222222 }, },
-        .requestPath = { .cluster = kAccessControlCluster, .endpoint = 0 },
-        .privilege = Privilege::kAdminister,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subjects = { 0x2222222222222222 }, },
-        .requestPath = { .cluster = 1, .endpoint = 2 },
-        .privilege = Privilege::kManage,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subjects = { 0x2222222222222222 }, },
-        .requestPath = { .cluster = 3, .endpoint = 4 },
-        .privilege = Privilege::kOperate,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subjects = { 0x2222222222222222 }, },
-        .requestPath = { .cluster = 5, .endpoint = 6 },
-        .privilege = Privilege::kView,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subjects = { 0x2222222222222222 }, },
-        .requestPath = { .cluster = 7, .endpoint = 8 },
-        .privilege = Privilege::kProxyView,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { 0x2222222222222222 }, },
-        .requestPath = { .cluster = 1, .endpoint = 2 },
-        .privilege = Privilege::kAdminister,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subjects = { 0x2222222222222222 }, },
-        .requestPath = { .cluster = 1, .endpoint = 2 },
-        .privilege = Privilege::kAdminister,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subjects = { 0x2222222222222222 }, },
-        .requestPath = { .cluster = 1, .endpoint = 2 },
-        .privilege = Privilege::kAdminister,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subjects = { 0x1111111111111111 }, },
-        .requestPath = { .cluster = 1, .endpoint = 2 },
-        .privilege = Privilege::kAdminister,
-        .allow = false
-    },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId4 },
+      .requestPath       = { .cluster = kAccessControlCluster, .endpoint = 0 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId4 },
+      .requestPath       = { .cluster = 1, .endpoint = 2 },
+      .privilege         = Privilege::kManage,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId4 },
+      .requestPath       = { .cluster = 3, .endpoint = 4 },
+      .privilege         = Privilege::kOperate,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId4 },
+      .requestPath       = { .cluster = 5, .endpoint = 6 },
+      .privilege         = Privilege::kView,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId4 },
+      .requestPath       = { .cluster = 7, .endpoint = 8 },
+      .privilege         = Privilege::kProxyView,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId4 },
+      .requestPath       = { .cluster = 1, .endpoint = 2 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kOperationalNodeId4 },
+      .requestPath       = { .cluster = 1, .endpoint = 2 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = kOperationalNodeId4 },
+      .requestPath       = { .cluster = 1, .endpoint = 2 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId3 },
+      .requestPath       = { .cluster = 1, .endpoint = 2 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = false },
     // Checks for entry 3
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { 0x1234567812345678 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 11 },
-        .privilege = Privilege::kOperate,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { 0x1122334455667788 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 13 },
-        .privilege = Privilege::kOperate,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subjects = { 0x1234567812345678 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 11 },
-        .privilege = Privilege::kOperate,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kPase, .subjects = { 0x1234567812345678 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 11 },
-        .privilege = Privilege::kOperate,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { 0x1234567812345678 }, },
-        .requestPath = { .cluster = 123, .endpoint = 11 },
-        .privilege = Privilege::kOperate,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subjects = { 0x1234567812345678 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 11 },
-        .privilege = Privilege::kManage,
-        .allow = false
-    },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 11 },
+      .privilege         = Privilege::kOperate,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId2 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 13 },
+      .privilege         = Privilege::kOperate,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 11 },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kPase, .subject = kOperationalNodeId1 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 11 },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
+      .requestPath       = { .cluster = 123, .endpoint = 11 },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kCase, .subject = kOperationalNodeId1 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 11 },
+      .privilege         = Privilege::kManage,
+      .allow             = false },
     // Checks for entry 4
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subjects = { kPaseVerifier1 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 2 },
-        .privilege = Privilege::kManage,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kPase, .subjects = { kPaseVerifier1 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 2 },
-        .privilege = Privilege::kManage,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subjects = { kPaseVerifier1 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 2 },
-        .privilege = Privilege::kManage,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subjects = { kPaseVerifier1 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 2 },
-        .privilege = Privilege::kManage,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subjects = { kPaseVerifier0 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 2 },
-        .privilege = Privilege::kManage,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subjects = { kPaseVerifier3 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 2 },
-        .privilege = Privilege::kManage,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subjects = { kPaseVerifier1 }, },
-        .requestPath = { .cluster = kLevelControlCluster, .endpoint = 2 },
-        .privilege = Privilege::kManage,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subjects = { kPaseVerifier1 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 1 },
-        .privilege = Privilege::kManage,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subjects = { kPaseVerifier1 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 2 },
-        .privilege = Privilege::kAdminister,
-        .allow = false
-    },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier1 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
+      .privilege         = Privilege::kManage,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kPase, .subject = kPaseVerifier1 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
+      .privilege         = Privilege::kManage,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kPaseVerifier1 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
+      .privilege         = Privilege::kManage,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = kPaseVerifier1 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
+      .privilege         = Privilege::kManage,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier0 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
+      .privilege         = Privilege::kManage,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier3 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
+      .privilege         = Privilege::kManage,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier1 },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 2 },
+      .privilege         = Privilege::kManage,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier1 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 1 },
+      .privilege         = Privilege::kManage,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kPaseVerifier1 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 2 },
+      .privilege         = Privilege::kAdminister,
+      .allow             = false },
     // Checks for entry 5
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subjects = { kGroup2 }, },
-        .requestPath = { .cluster = kLevelControlCluster, .endpoint = 1 },
-        .privilege = Privilege::kProxyView,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subjects = { kGroup2 }, },
-        .requestPath = { .cluster = kOnOffCluster, .endpoint = 3 },
-        .privilege = Privilege::kProxyView,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subjects = { kGroup2 }, },
-        .requestPath = { .cluster = kColorControlCluster, .endpoint = 2 },
-        .privilege = Privilege::kProxyView,
-        .allow = true
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subjects = { kGroup2 }, },
-        .requestPath = { .cluster = kLevelControlCluster, .endpoint = 1 },
-        .privilege = Privilege::kProxyView,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subjects = { kGroup2 }, },
-        .requestPath = { .cluster = kLevelControlCluster, .endpoint = 1 },
-        .privilege = Privilege::kProxyView,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subjects = { kGroup2 }, },
-        .requestPath = { .cluster = kLevelControlCluster, .endpoint = 1 },
-        .privilege = Privilege::kProxyView,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subjects = { kGroup4 }, },
-        .requestPath = { .cluster = kLevelControlCluster, .endpoint = 1 },
-        .privilege = Privilege::kProxyView,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subjects = { kGroup2 }, },
-        .requestPath = { .cluster = kColorControlCluster, .endpoint = 1 },
-        .privilege = Privilege::kProxyView,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subjects = { kGroup2 }, },
-        .requestPath = { .cluster = kColorControlCluster, .endpoint = 1 },
-        .privilege = Privilege::kProxyView,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subjects = { kGroup2 }, },
-        .requestPath = { .cluster = kLevelControlCluster, .endpoint = 3 },
-        .privilege = Privilege::kProxyView,
-        .allow = false
-    },
-    {
-        .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subjects = { kGroup2 }, },
-        .requestPath = { .cluster = kLevelControlCluster, .endpoint = 1 },
-        .privilege = Privilege::kOperate,
-        .allow = false
-    },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = kGroup2 },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 1 },
+      .privilege         = Privilege::kProxyView,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = kGroup2 },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 3 },
+      .privilege         = Privilege::kProxyView,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = kGroup2 },
+      .requestPath       = { .cluster = kColorControlCluster, .endpoint = 2 },
+      .privilege         = Privilege::kProxyView,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 1, .authMode = AuthMode::kGroup, .subject = kGroup2 },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 1 },
+      .privilege         = Privilege::kProxyView,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kPase, .subject = kGroup2 },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 1 },
+      .privilege         = Privilege::kProxyView,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kCase, .subject = kGroup2 },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 1 },
+      .privilege         = Privilege::kProxyView,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = kGroup4 },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 1 },
+      .privilege         = Privilege::kProxyView,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = kGroup2 },
+      .requestPath       = { .cluster = kColorControlCluster, .endpoint = 1 },
+      .privilege         = Privilege::kProxyView,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = kGroup2 },
+      .requestPath       = { .cluster = kColorControlCluster, .endpoint = 1 },
+      .privilege         = Privilege::kProxyView,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = kGroup2 },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 3 },
+      .privilege         = Privilege::kProxyView,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2, .authMode = AuthMode::kGroup, .subject = kGroup2 },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 1 },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
+    // Checks for entry 6
+    { .subjectDescriptor = { .fabricIndex = 2,
+                             .authMode    = AuthMode::kCase,
+                             .cats        = { kCASEAuthTag0, kUndefinedCAT, kUndefinedCAT } },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 1 },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 1,
+                             .authMode    = AuthMode::kCase,
+                             .cats        = { kCASEAuthTag0, kUndefinedCAT, kUndefinedCAT } },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 1 },
+      .privilege         = Privilege::kOperate,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 1,
+                             .authMode    = AuthMode::kCase,
+                             .cats        = { kCASEAuthTag1, kUndefinedCAT, kUndefinedCAT } },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 1 },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
+    // Checks for entry 7
+    { .subjectDescriptor = { .fabricIndex = 2,
+                             .authMode    = AuthMode::kCase,
+                             .cats        = { kCASEAuthTag0, kUndefinedCAT, kUndefinedCAT } },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 1 },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2,
+                             .authMode    = AuthMode::kCase,
+                             .cats        = { kCASEAuthTag0, kCASEAuthTag2, kUndefinedCAT } },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 1 },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2,
+                             .authMode    = AuthMode::kCase,
+                             .cats        = { kCASEAuthTag0, kCASEAuthTag3, kUndefinedCAT } },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 1 },
+      .privilege         = Privilege::kOperate,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 2,
+                             .authMode    = AuthMode::kCase,
+                             .cats        = { kCASEAuthTag0, kCASEAuthTag4, kUndefinedCAT } },
+      .requestPath       = { .cluster = kOnOffCluster, .endpoint = 1 },
+      .privilege         = Privilege::kManage,
+      .allow             = true },
+    // Checks for entry 8
+    { .subjectDescriptor = { .fabricIndex = 2,
+                             .authMode    = AuthMode::kCase,
+                             .cats        = { kCASEAuthTag0, kCASEAuthTag3, kUndefinedCAT } },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 1 },
+      .privilege         = Privilege::kOperate,
+      .allow             = false },
+    { .subjectDescriptor = { .fabricIndex = 2,
+                             .authMode    = AuthMode::kCase,
+                             .cats        = { kCASEAuthTag0, kCASEAuthTag4, kUndefinedCAT } },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 2 },
+      .privilege         = Privilege::kOperate,
+      .allow             = true },
+    { .subjectDescriptor = { .fabricIndex = 2,
+                             .authMode    = AuthMode::kCase,
+                             .cats        = { kCASEAuthTag1, kUndefinedCAT, kUndefinedCAT } },
+      .requestPath       = { .cluster = kLevelControlCluster, .endpoint = 2 },
+      .privilege         = Privilege::kOperate,
+      .allow             = true },
 };
 
 void MetaTest(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, entryData1, ArraySize(entryData1)) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, entryData1, ArraySize(entryData1)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, entryData1, entryData1Count) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, entryData1, entryData1Count) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, accessControl.DeleteEntry(3) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, entryData1, ArraySize(entryData1)) != CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, entryData1, entryData1Count) != CHIP_NO_ERROR);
 }
 
 void TestCheck(nlTestSuite * inSuite, void * inContext)
 {
-    LoadAccessControl(accessControl, entryData1, ArraySize(entryData1));
+    LoadAccessControl(accessControl, entryData1, entryData1Count);
     for (const auto & checkData : checkData1)
     {
         CHIP_ERROR expectedResult = checkData.allow ? CHIP_NO_ERROR : CHIP_ERROR_ACCESS_DENIED;
@@ -653,7 +660,7 @@ void TestCheck(nlTestSuite * inSuite, void * inContext)
 
 void TestCreateReadEntry(nlTestSuite * inSuite, void * inContext)
 {
-    for (size_t i = 0; i < ArraySize(entryData1); ++i)
+    for (size_t i = 0; i < entryData1Count; ++i)
     {
         NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, entryData1 + i, 1) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, entryData1, i + 1) == CHIP_NO_ERROR);
@@ -662,7 +669,7 @@ void TestCreateReadEntry(nlTestSuite * inSuite, void * inContext)
 
 void TestDeleteEntry(nlTestSuite * inSuite, void * inContext)
 {
-    EntryData data[ArraySize(entryData1)];
+    EntryData data[entryData1Count];
     for (size_t pos = 0; pos < ArraySize(data); ++pos)
     {
         for (size_t count = ArraySize(data) - pos; count > 0; --count)
@@ -687,15 +694,15 @@ void TestFabricFilteredCreateEntry(nlTestSuite * inSuite, void * inContext)
 {
     for (auto & fabricIndex : fabricIndexes)
     {
-        for (size_t count = 0; count < ArraySize(entryData1); ++count)
+        for (size_t count = 0; count < entryData1Count; ++count)
         {
             NL_TEST_ASSERT(inSuite, ClearAccessControl(accessControl) == CHIP_NO_ERROR);
             NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, entryData1, count) == CHIP_NO_ERROR);
 
-            constexpr size_t expectedIndexes[][ArraySize(entryData1)] = {
-                { 0, 1, 2, 2, 3, 3 },
-                { 0, 0, 0, 1, 1, 2 },
-                { 0, 0, 0, 0, 0, 0 },
+            constexpr size_t expectedIndexes[][entryData1Count] = {
+                { 0, 1, 2, 2, 3, 3, 3, 4, 4 },
+                { 0, 0, 0, 1, 1, 2, 3, 3, 4 },
+                { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             };
             const size_t expectedIndex = expectedIndexes[&fabricIndex - fabricIndexes][count];
 
@@ -715,18 +722,18 @@ void TestFabricFilteredCreateEntry(nlTestSuite * inSuite, void * inContext)
 
 void TestFabricFilteredReadEntry(nlTestSuite * inSuite, void * inContext)
 {
-    NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, entryData1, ArraySize(entryData1)) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, entryData1, entryData1Count) == CHIP_NO_ERROR);
 
     for (auto & fabricIndex : fabricIndexes)
     {
-        constexpr size_t indexes[] = { 0, 1, 2, 3 };
+        constexpr size_t indexes[] = { 0, 1, 2, 3, 4, 5 };
         for (auto & index : indexes)
         {
-            constexpr size_t illegalIndex                          = ArraySize(entryData1);
+            constexpr size_t illegalIndex                          = entryData1Count;
             constexpr size_t expectedIndexes[][ArraySize(indexes)] = {
-                { 0, 1, 3, illegalIndex },
-                { 2, 4, 5, illegalIndex },
-                { illegalIndex, illegalIndex, illegalIndex, illegalIndex },
+                { 0, 1, 3, 6, illegalIndex, illegalIndex },
+                { 2, 4, 5, 7, 8, illegalIndex },
+                { illegalIndex, illegalIndex, illegalIndex, illegalIndex, illegalIndex, illegalIndex },
             };
             const size_t expectedIndex = expectedIndexes[&fabricIndex - fabricIndexes][&index - indexes];
 
@@ -748,7 +755,7 @@ void TestFabricFilteredReadEntry(nlTestSuite * inSuite, void * inContext)
 
 void TestIterator(nlTestSuite * inSuite, void * inContext)
 {
-    LoadAccessControl(accessControl, entryData1, ArraySize(entryData1));
+    LoadAccessControl(accessControl, entryData1, entryData1Count);
 
     FabricIndex fabricIndex;
     EntryIterator iterator;
@@ -762,7 +769,7 @@ void TestIterator(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, CompareEntry(entry, entryData1[count]) == CHIP_NO_ERROR);
         count++;
     }
-    NL_TEST_ASSERT(inSuite, count == ArraySize(entryData1));
+    NL_TEST_ASSERT(inSuite, count == entryData1Count);
 
     fabricIndex = kUndefinedFabricIndex;
     NL_TEST_ASSERT(inSuite, accessControl.Entries(iterator, &fabricIndex) == CHIP_NO_ERROR);
@@ -770,7 +777,7 @@ void TestIterator(nlTestSuite * inSuite, void * inContext)
 
     fabricIndex = 1;
     NL_TEST_ASSERT(inSuite, accessControl.Entries(iterator, &fabricIndex) == CHIP_NO_ERROR);
-    size_t fabric1[] = { 0, 1, 3 };
+    size_t fabric1[] = { 0, 1, 3, 6 };
     count            = 0;
     while (iterator.Next(entry) == CHIP_NO_ERROR)
     {
@@ -781,14 +788,14 @@ void TestIterator(nlTestSuite * inSuite, void * inContext)
 
     fabricIndex = 2;
     NL_TEST_ASSERT(inSuite, accessControl.Entries(iterator, &fabricIndex) == CHIP_NO_ERROR);
-    size_t fabric2[] = { 2, 4, 5 };
+    size_t fabric2[] = { 2, 4, 5, 7, 8 };
     count            = 0;
     while (iterator.Next(entry) == CHIP_NO_ERROR)
     {
         NL_TEST_ASSERT(inSuite, CompareEntry(entry, entryData1[fabric2[count]]) == CHIP_NO_ERROR);
         count++;
     }
-    NL_TEST_ASSERT(inSuite, count == ArraySize(fabric1));
+    NL_TEST_ASSERT(inSuite, count == ArraySize(fabric2));
 }
 
 void TestPrepareEntry(nlTestSuite * inSuite, void * inContext)
@@ -1043,12 +1050,12 @@ void TestSubjectsTargets(nlTestSuite * inSuite, void * inContext)
 
 void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
 {
-    EntryData data[6];
+    EntryData data[entryData1Count];
     memcpy(data, entryData1, sizeof(data));
-    NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, data, 6) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, LoadAccessControl(accessControl, data, ArraySize(data)) == CHIP_NO_ERROR);
 
     EntryData updateData;
-    for (size_t i = 0; i < 6; ++i)
+    for (size_t i = 0; i < ArraySize(data); ++i)
     {
         updateData.authMode    = authModes[i % 3];
         updateData.fabricIndex = fabricIndexes[i % 3];
@@ -1072,7 +1079,7 @@ void TestUpdateEntry(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, accessControl.UpdateEntry(i, entry) == CHIP_NO_ERROR);
         }
 
-        NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, data, 6) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, CompareAccessControl(accessControl, data, ArraySize(data)) == CHIP_NO_ERROR);
     }
 }
 

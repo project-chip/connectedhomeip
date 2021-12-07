@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2021 Project CHIP Authors
@@ -153,7 +152,7 @@ CHIP_ERROR CASESession::FromCachable(const CASESessionCachable & cachableSession
     memcpy(mSharedSecret, cachableSession.mSharedSecret, length);
 
     SetPeerNodeId(LittleEndian::HostSwap64(cachableSession.mPeerNodeId));
-    Credentials::CATValues peerCATs;
+    CATValues peerCATs;
     for (size_t i = 0; i < cachableSession.mPeerCATs.size(); i++)
     {
         peerCATs.val[i] = LittleEndian::HostSwap32(cachableSession.mPeerCATs.val[i]);
@@ -826,7 +825,7 @@ CHIP_ERROR CASESession::HandleSigma2(System::PacketBufferHandle && msg)
     SuccessOrExit(err = decryptedDataTlvReader.GetBytes(mResumptionId, static_cast<uint32_t>(sizeof(mResumptionId))));
 
     // Retrieve peer CASE Authenticated Tags (CATs) from peer's NOC.
-    Credentials::CATValues peerCATs;
+    CATValues peerCATs;
     SuccessOrExit(err = ExtractCATsFromOpCert(responderNOC, peerCATs));
     SetPeerCATs(peerCATs);
 
@@ -1088,7 +1087,7 @@ CHIP_ERROR CASESession::HandleSigma3(System::PacketBufferHandle && msg)
     SuccessOrExit(err = mCommissioningHash.Finish(messageDigestSpan));
 
     // Retrieve peer CASE Authenticated Tags (CATs) from peer's NOC.
-    Credentials::CATValues peerCATs;
+    CATValues peerCATs;
     SuccessOrExit(err = ExtractCATsFromOpCert(initiatorNOC, peerCATs));
     SetPeerCATs(peerCATs);
 

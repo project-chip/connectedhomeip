@@ -47,7 +47,7 @@ public:
     // SetPeerNodeId is not necessary.
     NodeId GetPeerNodeId() const { return mPeerNodeId; }
 
-    Credentials::CATValues GetPeerCATs() const { return mPeerCATs; }
+    CATValues GetPeerCATs() const { return mPeerCATs; }
 
     // TODO: the local key id should be allocateed at start
     // mLocalSessionId should be const and assigned at the construction, such that GetLocalSessionId will always return a valid key
@@ -103,7 +103,7 @@ public:
 protected:
     void SetSecureSessionType(Transport::SecureSession::Type secureSessionType) { mSecureSessionType = secureSessionType; }
     void SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; }
-    void SetPeerCATs(Credentials::CATValues peerCATs) { mPeerCATs = peerCATs; }
+    void SetPeerCATs(CATValues peerCATs) { mPeerCATs = peerCATs; }
     void SetPeerSessionId(uint16_t id) { mPeerSessionId.SetValue(id); }
     void SetLocalSessionId(uint16_t id) { mLocalSessionId = id; }
     void SetPeerAddress(const Transport::PeerAddress & address) { mPeerAddress = address; }
@@ -164,7 +164,7 @@ protected:
     {
         mSecureSessionType = Transport::SecureSession::Type::kUndefined;
         mPeerNodeId        = kUndefinedNodeId;
-        mPeerCATs          = Credentials::kUndefinedCATs;
+        mPeerCATs          = kUndefinedCATs;
         mPeerAddress       = Transport::PeerAddress::Uninitialized();
         mPeerSessionId.ClearValue();
         mLocalSessionId = kInvalidKeyId;
@@ -173,7 +173,7 @@ protected:
 private:
     Transport::SecureSession::Type mSecureSessionType = Transport::SecureSession::Type::kUndefined;
     NodeId mPeerNodeId                                = kUndefinedNodeId;
-    Credentials::CATValues mPeerCATs                  = Credentials::kUndefinedCATs;
+    CATValues mPeerCATs                               = kUndefinedCATs;
 
     // TODO: the local key id should be allocateed at start
     // then we can remove kInvalidKeyId

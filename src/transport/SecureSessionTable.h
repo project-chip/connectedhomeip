@@ -59,7 +59,7 @@ public:
      */
     CHECK_RETURN_VALUE
     SecureSession * CreateNewSecureSession(SecureSession::Type secureSessionType, uint16_t localSessionId, NodeId peerNodeId,
-                                           Credentials::CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
+                                           CATValues peerCATs, uint16_t peerSessionId, FabricIndex fabric,
                                            const ReliableMessageProtocolConfig & config)
     {
         return mEntries.CreateObject(secureSessionType, localSessionId, peerNodeId, peerCATs, peerSessionId, fabric, config,

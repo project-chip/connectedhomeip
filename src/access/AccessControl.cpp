@@ -20,7 +20,9 @@
 
 namespace {
 
+using chip::CATValues;
 using chip::FabricIndex;
+using chip::NodeId;
 using namespace chip::Access;
 
 AccessControl defaultAccessControl;
@@ -56,6 +58,26 @@ bool CheckRequestPrivilegeAgainstEntryPrivilege(Privilege requestPrivilege, Priv
             requestPrivilege == Privilege::kOperate || requestPrivilege == Privilege::kView ||
             requestPrivilege == Privilege::kProxyView;
     }
+    return false;
+}
+
+bool CheckSubjectDescriptorCATsAgainstEntrySubject(CATValues cats, NodeId subject)
+{
+    constexpr uint64_t kTagIdentifierMask = 0x0000'0000'FFFF'0000ULL;
+    constexpr uint64_t kTagVersionMask    = 0x0000'0000'0000'FFFFULL;
+
+    for (size_t i = 0; i < cats.size(); ++i)
+    {
+        if (cats.val[i] != chip::kUndefinedCAT)
+        {
+            if (((cats.val[i] & kTagIdentifierMask) == (subject & kTagIdentifierMask)) &&
+                ((cats.val[i] & kTagVersionMask) >= (subject & kTagVersionMask)))
+            {
+                return true;
+            }
+        }
+    }
+
     return false;
 }
 
@@ -115,12 +137,45 @@ CHIP_ERROR AccessControl::Check(const SubjectDescriptor & subjectDescriptor, con
             {
                 NodeId subject = kUndefinedNodeId;
                 ReturnErrorOnFailure(entry.GetSubject(i, subject));
-                if (subject == subjectDescriptor.subjects[0])
+                if (IsOperationalNodeId(subject))
                 {
-                    subjectMatched = true;
-                    break;
+                    if (subject == subjectDescriptor.subject)
+                    {
+                        subjectMatched = true;
+                        break;
+                    }
                 }
-                // TODO: check against CATs in subject descriptor
+                else if (IsGroupId(subject))
+                {
+                    VerifyOrReturnError(authMode == AuthMode::kGroup, CHIP_ERROR_INVALID_ARGUMENT);
+                    if (subject == subjectDescriptor.subject)
+                    {
+                        subjectMatched = true;
+                        break;
+                    }
+                }
+                else if (IsPAKEKeyId(subject))
+                {
+                    VerifyOrReturnError(authMode == AuthMode::kPase, CHIP_ERROR_INVALID_ARGUMENT);
+                    if (subject == subjectDescriptor.subject)
+                    {
+                        subjectMatched = true;
+                        break;
+                    }
+                }
+                else if (IsCASEAuthTag(subject))
+                {
+                    VerifyOrReturnError(authMode == AuthMode::kCase, CHIP_ERROR_INVALID_ARGUMENT);
+                    if (CheckSubjectDescriptorCATsAgainstEntrySubject(subjectDescriptor.cats, subject))
+                    {
+                        subjectMatched = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    return CHIP_ERROR_INVALID_ARGUMENT;
+                }
             }
             if (!subjectMatched)
             {
