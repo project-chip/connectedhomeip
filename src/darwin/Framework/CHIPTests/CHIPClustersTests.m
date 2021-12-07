@@ -70,7 +70,7 @@ void WaitForCommissionee(XCTestExpectation * expectation, dispatch_queue_t queue
                  }];
 }
 
-CHIPDevice * GetConnectedDevice()
+CHIPDevice * GetConnectedDevice(void)
 {
     XCTAssertNotNil(mConnectedDevice);
     return mConnectedDevice;
