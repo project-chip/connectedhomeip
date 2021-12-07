@@ -100,7 +100,6 @@ template("chip_data_model") {
       "${_app_root}/util/DataModelHandler.cpp",
       "${_app_root}/util/af-event.cpp",
       "${_app_root}/util/af-main-common.cpp",
-      "${_app_root}/util/attribute-list-byte-span.cpp",
       "${_app_root}/util/attribute-size-util.cpp",
       "${_app_root}/util/attribute-storage.cpp",
       "${_app_root}/util/attribute-table.cpp",
@@ -160,10 +159,7 @@ template("chip_data_model") {
     }
 
     if (defined(invoker.zap_pregenerated_dir)) {
-      sources += [
-        "${invoker.zap_pregenerated_dir}/attribute-size.cpp",
-        "${invoker.zap_pregenerated_dir}/callback-stub.cpp",
-      ]
+      sources += [ "${invoker.zap_pregenerated_dir}/callback-stub.cpp" ]
 
       if (chip_controller) {
         sources += [

@@ -26,7 +26,6 @@
 #include <app/util/CHIPDeviceCallbacksMgr.h>
 #include <app/util/af-enums.h>
 #include <app/util/af.h>
-#include <app/util/attribute-list-byte-span.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPEncoding.h>
 #include <lib/support/SafeInt.h>
@@ -35,7 +34,6 @@
 
 using namespace ::chip;
 using namespace ::chip::app::DataModel;
-using namespace ::chip::app::List;
 
 namespace {
 [[maybe_unused]] constexpr uint16_t kByteSpanSizeLengthInBytes = 2;

@@ -431,13 +431,8 @@ static uint8_t * singletonAttributeLocation(EmberAfAttributeMetadata * am)
 // If src == NULL, then this method will set memory to zeroes
 // See documentation for emAfReadOrWriteAttribute for the semantics of
 // readLength when reading and writing.
-//
-// The index argument is used exclusively for List. When reading or writing a List attribute, it could take 3 types of values:
-//  -1: Read/Write the whole list content, including the number of elements in the list
-//   0: Read/Write the number of elements in the list, represented as a uint16_t
-//   n: Read/Write the nth element of the list
 static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, uint8_t * src, EmberAfAttributeMetadata * am,
-                                          bool write, uint16_t readLength, int32_t index)
+                                          bool write, uint16_t readLength)
 {
     EmberAfAttributeType attributeType = am->attributeType;
     // readLength == 0 for a read indicates that we should just trust that the
@@ -468,7 +463,8 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
 
-        emberAfCopyList(clusterId, am, write, dest, src, index);
+        // Just copy the length.
+        memmove(dest, src, 2);
     }
     else
     {
@@ -530,7 +526,7 @@ bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am,
 // attribute.  This means the resulting string may be truncated.  The length
 // byte(s) in the resulting string will reflect any truncated.
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,
-                                       uint8_t * buffer, uint16_t readLength, bool write, int32_t index)
+                                       uint8_t * buffer, uint16_t readLength, bool write)
 {
     uint16_t attributeOffsetIndex = 0;
 
@@ -598,19 +594,19 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                 // Is the attribute externally stored?
                                 if (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE)
                                 {
-                                    return (write ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                          am, EMBER_AF_NULL_MANUFACTURER_CODE,
-                                                                                          buffer, index)
-                                                  : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                         am, EMBER_AF_NULL_MANUFACTURER_CODE,
-                                                                                         buffer, emberAfAttributeSize(am), index));
+                                    return (write
+                                                ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                        am, EMBER_AF_NULL_MANUFACTURER_CODE, buffer)
+                                                : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                       am, EMBER_AF_NULL_MANUFACTURER_CODE, buffer,
+                                                                                       emberAfAttributeSize(am)));
                                 }
                                 else
                                 {
                                     // Internal storage is only supported for fixed endpoints
                                     if (!isDynamicEndpoint)
                                     {
-                                        return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength, index);
+                                        return typeSensitiveMemCopy(attRecord->clusterId, dst, src, am, write, readLength);
                                     }
                                     else
                                     {
