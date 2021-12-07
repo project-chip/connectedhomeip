@@ -44,16 +44,6 @@ limitations under the License.
     <attribute side="server" code="17" define="REACHABLE"                 type="boolean"                                default="1"                 optional="true">Reachable</attribute>
     <attribute side="server" code="18" define="UNIQUE_ID"                 type="char_string"               length="32"                              optional="true">UniqueID</attribute>
 
-    <command source="server" code="0x00" name="StartUp">
-      <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
-    </command>
-    <command source="server" code="0x01" name="ShutDown">
-      <description>The ShutDown event SHOULD be emitted by a Node prior to any orderly shutdown sequence on a best-effort basis.</description>
-    </command>
-    <command source="server" code="0x02" name="Leave">
-      <description>The Leave event SHOULD be emitted by a Node prior to permanently leaving the Fabric.</description>
-    </command>
-
     <event side="server" code="0x00" name="StartUp" priority="critical" optional="false">
       <description>The StartUp event SHALL be emitted by a Node as soon as reasonable after completing a boot or reboot process.</description>
       <field id="0" name="SoftwareVersion" type="INT32U"/>
