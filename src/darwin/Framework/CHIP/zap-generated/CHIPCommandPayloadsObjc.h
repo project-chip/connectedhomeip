@@ -1873,6 +1873,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 @end
 
+@interface CHIPTestClusterClusterTestEmitTestEventResponseParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull value;
+- (instancetype)init;
+@end
+
 @interface CHIPTestClusterClusterTestNestedStructListArgumentRequestParams : NSObject
 @property (strong, nonatomic) CHIPTestClusterClusterNestedStructList * _Nonnull arg1;
 - (instancetype)init;
@@ -1922,6 +1927,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPTestClusterClusterTestSimpleOptionalArgumentRequestParams : NSObject
 @property (strong, nonatomic) NSNumber * _Nullable arg1;
+- (instancetype)init;
+@end
+
+@interface CHIPTestClusterClusterTestEmitTestEventRequestParams : NSObject
+@property (strong, nonatomic) NSNumber * _Nonnull arg1;
+@property (strong, nonatomic) NSNumber * _Nonnull arg2;
+@property (strong, nonatomic) NSNumber * _Nonnull arg3;
 - (instancetype)init;
 @end
 
