@@ -28,7 +28,7 @@ typedef uint32_t CASEAuthTag;
 
 static constexpr CASEAuthTag kUndefinedCAT = 0;
 
-// Muximum number of CASE Authenticated Tags (CAT) in the CHIP certificate subject.
+// Maximum number of CASE Authenticated Tags (CAT) in the CHIP certificate subject.
 static constexpr size_t kMaxSubjectCATAttributeCount = CHIP_CONFIG_CERT_MAX_RDN_ATTRIBUTES - 2;
 
 struct CATValues
