@@ -24,7 +24,7 @@
 namespace chip {
 
 CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,
-                                               System::PacketBufferTLVWriter & tlvWriter)
+                                               TLV::TLVWriter & tlvWriter)
 {
     VerifyOrReturnError(CanCastTo<uint16_t>(mrpConfig.mIdleRetransTimeout.count()), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(CanCastTo<uint16_t>(mrpConfig.mActiveRetransTimeout.count()), CHIP_ERROR_INVALID_ARGUMENT);
@@ -36,7 +36,7 @@ CHIP_ERROR PairingSession::EncodeMRPParameters(TLV::Tag tag, const ReliableMessa
     return tlvWriter.EndContainer(mrpParamsContainer);
 }
 
-CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(System::PacketBufferTLVReader & tlvReader)
+CHIP_ERROR PairingSession::DecodeMRPParametersIfPresent(TLV::ContiguousBufferTLVReader & tlvReader)
 {
     // The MRP parameters are optional.
     CHIP_ERROR err = tlvReader.Next();

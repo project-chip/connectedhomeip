@@ -33,6 +33,7 @@
 #include <lib/support/UnitTestRegistration.h>
 #include <stdarg.h>
 #include <system/SystemClock.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 using namespace chip;
 using namespace chip::System::Clock;

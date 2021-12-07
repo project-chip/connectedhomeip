@@ -26,10 +26,10 @@
 #pragma once
 
 #include <lib/core/CHIPError.h>
+#include <lib/core/CHIPTLV.h>
 #include <messaging/ExchangeContext.h>
 #include <protocols/secure_channel/Constants.h>
 #include <protocols/secure_channel/StatusReport.h>
-#include <system/TLVPacketBufferBackingStore.h>
 #include <transport/CryptoContext.h>
 #include <transport/SecureSession.h>
 
@@ -101,7 +101,7 @@ public:
      * Encode the provided MRP parameters using the provided TLV tag.
      */
     static CHIP_ERROR EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,
-                                          System::PacketBufferTLVWriter & tlvWriter);
+                                          TLV::TLVWriter & tlvWriter);
 
 protected:
     void SetSecureSessionType(Transport::SecureSession::Type secureSessionType) { mSecureSessionType = secureSessionType; }
@@ -172,7 +172,7 @@ protected:
      * If the parameters are present, but TLV reader fails to correctly parse it, the function will
      * return the corresponding error.
      */
-    CHIP_ERROR DecodeMRPParametersIfPresent(System::PacketBufferTLVReader & tlvReader);
+    CHIP_ERROR DecodeMRPParametersIfPresent(TLV::ContiguousBufferTLVReader & tlvReader);
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
     void Clear()
