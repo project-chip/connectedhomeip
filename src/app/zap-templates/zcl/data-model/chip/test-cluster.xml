@@ -378,9 +378,6 @@ limitations under the License.
       <arg name="arg1" type="INT8U"/>
       <arg name="arg2" type="SimpleEnum"/>
       <arg name="arg3" type="BOOLEAN"/>
-      <arg name="arg4" type="SimpleStruct"/>
-      <arg name="arg5" type="SimpleStruct" array="true"/>
-      <arg name="arg6" type="SimpleEnum" array="true"/>
     </command>
 
     <command source="server" code="0x00" name="TestSpecificResponse" optional="false" disableDefaultResponse="true">

@@ -15398,6 +15398,14 @@
               "outgoing": 0
             },
             {
+              "name": "TestEmitTestEventRequest",
+              "code": 20,
+              "mfgCode": null,
+              "source": "client",
+              "incoming": 1,
+              "outgoing": 0
+            },
+            {
               "name": "TestSimpleOptionalArgumentRequest",
               "code": 19,
               "mfgCode": null,
@@ -15475,6 +15483,14 @@
             {
               "name": "SimpleStructResponse",
               "code": 9,
+              "mfgCode": null,
+              "source": "server",
+              "incoming": 0,
+              "outgoing": 1
+            },
+            {
+              "name": "TestEmitTestEventResponse",
+              "code": 10,
               "mfgCode": null,
               "source": "server",
               "incoming": 0,

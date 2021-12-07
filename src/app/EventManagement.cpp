@@ -309,9 +309,7 @@ CHIP_ERROR EventManagement::CalculateEventSize(EventLoggingDelegate * apDelegate
 CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, EventLoggingDelegate * apDelegate,
                                            const EventOptions * apOptions)
 {
-    TLV::TLVType dataContainerType;
     uint64_t deltatime = 0;
-
     VerifyOrReturnError(apContext->mCurrentEventNumber >= apContext->mStartingEventNumber, CHIP_NO_ERROR
                         /* no-op: don't write event, but advance current event Number */);
 
@@ -347,11 +345,8 @@ CHIP_ERROR EventManagement::ConstructEvent(EventLoadOutContext * apContext, Even
 
     ReturnErrorOnFailure(eventDataIBBuilder.GetError());
 
-    ReturnErrorOnFailure(apContext->mWriter.StartContainer(ContextTag(chip::to_underlying(EventDataIB::Tag::kData)),
-                                                           TLV::kTLVType_Structure, dataContainerType));
     // Callback to write the EventData
     ReturnErrorOnFailure(apDelegate->WriteEvent(apContext->mWriter));
-    ReturnErrorOnFailure(apContext->mWriter.EndContainer(dataContainerType));
     eventDataIBBuilder.EndOfEventDataIB();
     ReturnErrorOnFailure(eventDataIBBuilder.GetError());
     eventReportBuilder.EndOfEventReportIB();
@@ -512,15 +507,12 @@ CHIP_ERROR EventManagement::LogEventPrivate(EventLoggingDelegate * apDelegate, E
     opts = EventOptions(timestamp);
     // Start the event container (anonymous structure) in the circular buffer
     writer.Init(*mpEventBuffer);
-
     // check whether the entry is to be logged or discarded silently
     VerifyOrExit(aEventOptions.mPriority >= CHIP_CONFIG_EVENT_GLOBAL_PRIORITY, /* no-op */);
 
     opts.mPriority = aEventOptions.mPriority;
     // Create all event specific data
     // Timestamp; encoded as a delta time
-
-    opts.mTimestamp = aEventOptions.mTimestamp;
 
     if (GetPriorityBuffer(aEventOptions.mPriority)->GetFirstEventTimestamp() == 0)
     {
@@ -576,17 +568,16 @@ exit:
 
 #if CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
         ChipLogDetail(EventLogging,
-                      "LogEvent event number: 0x" ChipLogFormatX64 " schema priority: %u cluster id: " ChipLogFormatMEI
-                      " event id: 0x%" PRIx32 " %s timestamp: 0x" ChipLogFormatX64,
-                      ChipLogValueX64(aEventNumber), static_cast<unsigned>(opts.mPriority), ChipLogValueMEI(opts.mPath.mClusterId),
-                      opts.mPath.mEventId, opts.mTimestamp.mType == Timestamp::Type::kSystem ? "Sys" : "Epoch",
-                      ChipLogValueX64(opts.mTimestamp.mValue));
+                      "LogEvent event number: 0x" ChipLogFormatX64 " schema priority: %u, endpoint id:  0x%" PRIx16
+                      " cluster id: " ChipLogFormatMEI " event id: 0x%" PRIx32 " %s timestamp: 0x" ChipLogFormatX64,
+                      ChipLogValueX64(aEventNumber), static_cast<unsigned>(opts.mPriority), opts.mPath.mEndpointId,
+                      ChipLogValueMEI(opts.mPath.mClusterId), opts.mPath.mEventId,
+                      opts.mTimestamp.mType == Timestamp::Type::kSystem ? "Sys" : "Epoch", ChipLogValueX64(opts.mTimestamp.mValue));
 #endif // CHIP_CONFIG_EVENT_LOGGING_VERBOSE_DEBUG_LOGS
 
         if (opts.mUrgent == EventOptions::Type::kUrgent)
         {
-            ConcreteEventPath path(opts.mPath.mEndpointId, opts.mPath.mClusterId, opts.mPath.mEventId);
-            err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDelivery(path);
+            err = InteractionModelEngine::GetInstance()->GetReportingEngine().ScheduleUrgentEventDelivery(opts.mPath);
         }
     }
 

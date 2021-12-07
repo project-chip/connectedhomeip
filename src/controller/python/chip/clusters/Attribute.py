@@ -35,8 +35,8 @@ import builtins
 
 @unique
 class EventTimestampType(Enum):
-    SYSTEM = 1
-    EPOCH = 2
+    SYSTEM = 0
+    EPOCH = 1
 
 
 @unique
@@ -104,7 +104,7 @@ class EventPath:
         self.EventId = EventId
 
     def __str__(self) -> str:
-        return f"{self.EndpointId}/{self.EventId}/{self.EventId}"
+        return f"{self.EndpointId}/{self.ClusterId}/{self.EventId}"
 
     def __hash__(self):
         return str(self).__hash__()
@@ -187,6 +187,7 @@ class ValueDecodeFailure:
     Reason: Exception = None
 
 
+@dataclass
 class EventReadResult(EventStatus):
     Data: Any = None
 
@@ -278,7 +279,7 @@ def _BuildEventIndex():
     for clusterName, obj in inspect.getmembers(sys.modules['chip.clusters.Objects']):
         if ('chip.clusters.Objects' in str(obj)) and inspect.isclass(obj):
             for objName, subclass in inspect.getmembers(obj):
-                if inspect.isclass(subclass) and (('Events') in str(subclass)):
+                if inspect.isclass(subclass) and (('Events' == objName)):
                     for eventName, event in inspect.getmembers(subclass):
                         if inspect.isclass(event):
                             base_classes = inspect.getmro(event)
@@ -288,7 +289,8 @@ def _BuildEventIndex():
                                 value for value in base_classes if 'ClusterEventDescriptor' in str(value)]
                             if (matched == []):
                                 continue
-
+                            logging.error(
+                                f"event iterate {event.cluster_id} and {event.event_id}")
                             _EventIndex[str(EventPath(ClusterId=event.cluster_id, EventId=event.event_id))] = eval(
                                 'chip.clusters.Objects.' + clusterName + '.Events.' + eventName)
 
@@ -375,24 +377,12 @@ class AsyncReadTransaction:
                 eventValue = ValueDecodeFailure(
                     tlvData, LookupError("event schema not found"))
             else:
-                try:
-                    eventValue = eventType(eventType.FromTLV(data))
-                except Exception as ex:
-                    logging.error(
-                        f"Error convering TLV to Cluster Object for path: Endpoint = {path.EndpointId}/Cluster = {path.ClusterId}/Event = {path.EventId}")
-                    logging.error(
-                        f"Failed Cluster Object: {str(eventType)}")
-                    logging.error(ex)
-                    eventValue = ValueDecodeFailure(
-                        tlvData, ex)
-
-                    # If we're in debug mode, raise the exception so that we can better debug what's happening.
-                    if (builtins.enableDebugMode):
-                        raise
+                eventValue = tlvData
+                header.Event = eventType
 
             with self._resLock:
-                self._res['Events'].append[EventReadResult(
-                    Header=header, Data=eventValue)]
+                self._res['Events'].append(EventReadResult(
+                    Header=header, Status=chip.interaction_model.Status.Success, Data=eventValue))
         except Exception as ex:
             logging.exception(ex)
 

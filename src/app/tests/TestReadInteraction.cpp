@@ -94,9 +94,11 @@ class TestEventGenerator : public chip::app::EventLoggingDelegate
 public:
     CHIP_ERROR WriteEvent(chip::TLV::TLVWriter & aWriter)
     {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-        err            = aWriter.Put(kTestEventTag, mStatus);
-        return err;
+        chip::TLV::TLVType dataContainerType;
+        ReturnErrorOnFailure(aWriter.StartContainer(chip::TLV::ContextTag(chip::to_underlying(chip::app::EventDataIB::Tag::kData)),
+                                                    chip::TLV::kTLVType_Structure, dataContainerType));
+        ReturnErrorOnFailure(aWriter.Put(kTestEventTag, mStatus));
+        return aWriter.EndContainer(dataContainerType);
     }
 
     void SetStatus(int32_t aStatus) { mStatus = aStatus; }
