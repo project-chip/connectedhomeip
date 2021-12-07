@@ -23,16 +23,6 @@ class ClusterInteractionSettingsFragment : Fragment() {
   }
 
   companion object {
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment ClusterInteractionSettingsFragment.
-     */
-    fun newInstance() =
-      ClusterInteractionSettingsFragment().apply {
-        arguments = Bundle().apply {
-        }
-      }
+    fun newInstance() = ClusterInteractionSettingsFragment()
   }
 }

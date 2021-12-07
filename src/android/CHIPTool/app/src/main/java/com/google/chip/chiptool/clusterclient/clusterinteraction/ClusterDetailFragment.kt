@@ -52,6 +52,17 @@ class ClusterDetailFragment : Fragment() {
     get() = ChipClient.getDeviceController(requireContext())
 
   private val scope = CoroutineScope(Dispatchers.Main + Job())
+  private var clusterMap: Map<String, ClusterInfo> = ClusterInfoMapping().clusterMap
+  private lateinit var selectedClusterInfo: ClusterInfo
+  private lateinit var selectedCluster: ChipClusters.BaseChipCluster
+  private lateinit var selectedCommandCallback: DelegatedClusterCallback
+  private lateinit var selectedInteractionInfo: InteractionInfo
+
+  // when user opens detail page from home page of cluster interaction, historyCommand will be
+  // null, and nothing will be autocompleted. If the detail page is opened from history page,
+  // cluster name, command name and potential parameter list will be filled out based on historyCommand
+  private var historyCommand: HistoryCommand? = null
+  private var devicePtr = ClusterInteractionFragment.devicePtr
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -59,17 +70,12 @@ class ClusterDetailFragment : Fragment() {
     savedInstanceState: Bundle?
   ): View {
     endpointId = checkNotNull(requireArguments().getInt(ENDPOINT_ID_KEY))
-    historyCommand = if (requireArguments().getSerializable(HISTORY_COMMAND) == null) {
-      HistoryCommand("", "", mutableListOf(), emptyMap<CommandResponseInfo, Any>(), "")
-    } else {
-      requireArguments().getSerializable(HISTORY_COMMAND) as HistoryCommand
-    }
-    Log.d(TAG, historyCommand.toString())
+    historyCommand = requireArguments().getSerializable(HISTORY_COMMAND) as HistoryCommand
     return inflater.inflate(R.layout.cluster_detail_fragment, container, false).apply {
       deviceController.setCompletionListener(GenericChipDeviceListener())
-      if (requireArguments().getSerializable(HISTORY_COMMAND) != null) {
-        autoComplete(
-          historyCommand,
+      if (historyCommand != null) {
+        autoCompleteBasedOnHistoryCommand(
+          historyCommand!!,
           clusterAutoCompleteTv,
           commandAutoCompleteTv,
           parameterList,
@@ -134,7 +140,8 @@ class ClusterDetailFragment : Fragment() {
     }
   }
 
-  private fun autoComplete(
+  // Cluster name, command name and parameter list will be autofill based on the given historyCommand
+  private fun autoCompleteBasedOnHistoryCommand(
     historyCommand: HistoryCommand,
     clusterAutoComplete: AutoCompleteTextView,
     commandAutoComplete: AutoCompleteTextView,
@@ -152,9 +159,6 @@ class ClusterDetailFragment : Fragment() {
     historyCommand.parameterList.forEach {
       val param = inflater.inflate(R.layout.cluster_parameter_item, null, false) as ConstraintLayout
       param.clusterParameterNameTv.text = "${it.parameterName}"
-      // byte[].class will be output as class [B, which is not readable, so dynamically change it
-      // to Byte[]. If more custom logic is required, should add a className field in
-      // commandParameterInfo
       param.clusterParameterTypeTv.text = formatParameterType(it.parameterType)
       param.clusterParameterData.setText(it.parameterData)
       parameterList.addView(param)
@@ -359,13 +363,6 @@ class ClusterDetailFragment : Fragment() {
     private const val TAG = "ClusterDetailFragment"
     private const val ENDPOINT_ID_KEY = "endpointId"
     private const val HISTORY_COMMAND = "historyCommand"
-    private var clusterMap: Map<String, ClusterInfo> = ClusterInfoMapping().clusterMap
-    private lateinit var selectedClusterInfo: ClusterInfo
-    private lateinit var selectedCluster: ChipClusters.BaseChipCluster
-    private lateinit var selectedCommandCallback: DelegatedClusterCallback
-    private lateinit var selectedInteractionInfo: InteractionInfo
-    private lateinit var historyCommand: HistoryCommand
-    private var devicePtr = ClusterInteractionFragment.devicePtr
     var endpointId by Delegates.notNull<Int>()
 
     fun newInstance(

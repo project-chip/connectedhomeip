@@ -45,25 +45,22 @@ class ClusterInteractionHistoryFragment : Fragment() {
   }
 
   companion object {
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     * @return A new instance of fragment ClusterInteractionHistoryFragment.
-     */
-
     private const val TAG = "ClusterInteractionHistoryFragment"
+    // The history list is a most-recent-first, therefore adding the most recent executed
+    // command on the top of the list
     var clusterInteractionHistoryList = ArrayDeque<HistoryCommand>()
     fun newInstance() =
-      ClusterInteractionHistoryFragment().apply {
-        arguments = Bundle().apply {
-        }
-      }
+      ClusterInteractionHistoryFragment()
   }
 
   inner class HistoryCommandListener : HistoryCommandAdapter.OnItemClickListener {
     override fun onItemClick(position: Int) {
-      Toast.makeText(requireContext(), "Item $position clicked", Toast.LENGTH_SHORT).show()
-      showFragment(ClusterDetailFragment.newInstance(endpointId, clusterInteractionHistoryList[position]))
+      showFragment(
+        ClusterDetailFragment.newInstance(
+          endpointId,
+          clusterInteractionHistoryList[position]
+        )
+      )
     }
   }
 }
