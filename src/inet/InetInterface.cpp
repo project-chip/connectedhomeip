@@ -174,7 +174,7 @@ CHIP_ERROR InterfaceIterator::GetHardwareAddress(uint8_t * addressBuffer, uint8_
 {
     VerifyOrReturnError(addressBuffer != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrReturnError(addressSize >= mCurNetif->hwaddr_len, CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrReturnError(addressBufferSize >= mCurNetif->hwaddr_len, CHIP_ERROR_BUFFER_TOO_SMALL);
     addressSize = mCurNetif->hwaddr_len;
     memcpy(addressBuffer, mCurNetif->hwaddr, addressSize);
     return CHIP_NO_ERROR;
