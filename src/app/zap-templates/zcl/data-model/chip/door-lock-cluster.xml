@@ -528,7 +528,7 @@ limitations under the License.
             <arg name="credentials" type="DlCredential" array="true" isNullable="true" />
             <arg name="creatorFabricIndex" type="fabric_idx" isNullable="true" />
             <arg name="lastModifiedFabricIndex" type="fabric_idx" isNullable="true" />
-            <arg name="nextUserIndex" type="INT16U" />
+            <arg name="nextUserIndex" type="INT16U" isNullable="true" />
         </command>
         <!-- Conformance feature USR - for now optional -->
         <command source="client" code="29" name="ClearUser" optional="true">
