@@ -40,8 +40,8 @@
 #include <sys/time.h>
 
 #include <inet/InetLayer.h>
-#include <inet/TCPEndPoint.h>
-#include <inet/UDPEndPoint.h>
+#include <inet/TCPEndPointImpl.h>
+#include <inet/UDPEndPointImpl.h>
 #include <lib/support/CodeUtils.h>
 #include <system/SystemLayerImpl.h>
 

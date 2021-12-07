@@ -19,6 +19,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <inet/TCPEndPointImpl.h>
+#include <inet/UDPEndPointImpl.h>
 #include <platform/internal/BLEManager.h>
 #include <system/SystemLayerImpl.h>
 
