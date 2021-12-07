@@ -272,23 +272,6 @@ private:
     const char * GetStateStr() const;
 
     /**
-     * Validate that the Event ID and Cluster ID in the header match that of the type information present in the object and
-     * decode the data. The template parameter T is generally expected to be a ClusterName::Events::EventName::Type struct
-     *
-     * @param [in] aEventHeader  The header of the event being validated.
-     * @param [in] aEvent        The event data.
-     * @param [in] aReader       The tlv reader.
-     */
-    template <typename EventDataT>
-    CHIP_ERROR DecodeEvent(const EventHeader & aEventHeader, const EventDataT & aEvent, TLV::TLVReader & aReader)
-    {
-        VerifyOrReturnError((aEventHeader.mPath.mEventId == aEvent.GetEventId()) &&
-                                (aEventHeader.mPath.mClusterId == aEvent.GetClusterId()),
-                            CHIP_ERROR_INVALID_ARGUMENT);
-        return DataModel::Decode(aReader, aEvent);
-    }
-
-    /**
      * Internal shutdown method that we use when we know what's going on with
      * our exchange and don't need to manually close it.
      */
