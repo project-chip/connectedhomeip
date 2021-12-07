@@ -215,7 +215,7 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPathIB::Parser commandPath;
-    ConcreteCommandPath concreteCommandPath(0, 0, 0);
+    ConcreteCommandPath concretePath(0, 0, 0);
     TLV::TLVReader commandDataReader;
 
     // NOTE: errors may occur before the concrete command path is even fully decoded.
@@ -223,10 +223,10 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
     err = aCommandElement.GetPath(&commandPath);
     SuccessOrExit(err);
 
-    err = commandPath.GetClusterId(&concreteCommandPath.mClusterId);
+    err = commandPath.GetClusterId(&concretePath.mClusterId);
     SuccessOrExit(err);
 
-    err = commandPath.GetCommandId(&concreteCommandPath.mCommandId);
+    err = commandPath.GetCommandId(&concretePath.mCommandId);
     SuccessOrExit(err);
 
     if (mpExchangeCtx != nullptr && mpExchangeCtx->IsGroupExchangeContext())
@@ -235,16 +235,16 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         // Issue 11075
 
         // Using endpoint 1 for test purposes
-        concreteCommandPath.mEndpointId = 1;
-        err                             = CHIP_NO_ERROR;
+        concretePath.mEndpointId = 1;
+        err                      = CHIP_NO_ERROR;
     }
     else
     {
-        err = commandPath.GetEndpointId(&concreteCommandPath.mEndpointId);
+        err = commandPath.GetEndpointId(&concretePath.mEndpointId);
     }
     SuccessOrExit(err);
 
-    VerifyOrExit(mpCallback->CommandExists(concreteCommandPath), err = CHIP_ERROR_INVALID_PROFILE_ID);
+    VerifyOrExit(mpCallback->CommandExists(concretePath), err = CHIP_ERROR_INVALID_PROFILE_ID);
 
     err = aCommandElement.GetData(&commandDataReader);
     if (CHIP_END_OF_TLV == err)
@@ -252,19 +252,17 @@ CHIP_ERROR CommandHandler::ProcessCommandDataIB(CommandDataIB::Parser & aCommand
         ChipLogDetail(DataManagement,
                       "Received command without data for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI
                       " Command=" ChipLogFormatMEI,
-                      concreteCommandPath.mEndpointId, ChipLogValueMEI(concreteCommandPath.mClusterId),
-                      ChipLogValueMEI(concreteCommandPath.mCommandId));
+                      concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
         err = CHIP_NO_ERROR;
     }
     if (CHIP_NO_ERROR == err)
     {
         ChipLogDetail(DataManagement,
                       "Received command for Endpoint=%" PRIu16 " Cluster=" ChipLogFormatMEI " Command=" ChipLogFormatMEI,
-                      concreteCommandPath.mEndpointId, ChipLogValueMEI(concreteCommandPath.mClusterId),
-                      ChipLogValueMEI(concreteCommandPath.mCommandId));
-        SuccessOrExit(MatterPreCommandReceivedCallback(concreteCommandPath));
-        mpCallback->DispatchCommand(*this, concreteCommandPath, commandDataReader);
-        MatterPostCommandReceivedCallback(concreteCommandPath);
+                      concretePath.mEndpointId, ChipLogValueMEI(concretePath.mClusterId), ChipLogValueMEI(concretePath.mCommandId));
+        SuccessOrExit(MatterPreCommandReceivedCallback(concretePath));
+        mpCallback->DispatchCommand(*this, concretePath, commandDataReader);
+        MatterPostCommandReceivedCallback(concretePath);
     }
 
 exit:
@@ -277,11 +275,11 @@ exit:
         if (err == CHIP_ERROR_INVALID_PROFILE_ID)
         {
             ChipLogDetail(DataManagement, "No Cluster " ChipLogFormatMEI " on Endpoint 0x%" PRIx16,
-                          ChipLogValueMEI(concreteCommandPath.mClusterId), concreteCommandPath.mEndpointId);
+                          ChipLogValueMEI(concretePath.mClusterId), concretePath.mEndpointId);
         }
 
         // TODO:in particular different reasons for ServerClusterCommandExists to test false should result in different errors here
-        AddStatus(concreteCommandPath, Protocols::InteractionModel::Status::InvalidCommand);
+        AddStatus(concretePath, Protocols::InteractionModel::Status::InvalidCommand);
     }
 
     // We have handled the error status above and put the error status in response, now return success status so we can process
