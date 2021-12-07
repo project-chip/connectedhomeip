@@ -35,6 +35,8 @@ using namespace chip::Access;
 
 namespace AccessControlCluster = chip::app::Clusters::AccessControl;
 
+namespace {
+
 struct AccessControlEntryCodec
 {
     static CHIP_ERROR Convert(AuthMode from, AccessControlCluster::AuthMode & to)
@@ -318,10 +320,12 @@ struct AccessControlEntryCodec
 class AccessControlAttribute : public chip::app::AttributeAccessInterface
 {
 public:
-    AccessControlAttribute() : AttributeAccessInterface(Optional<EndpointId>(0), Clusters::AccessControl::Id) {}
+    AccessControlAttribute() : AttributeAccessInterface(Optional<EndpointId>(0), AccessControlCluster::Id) {}
 
     CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
     CHIP_ERROR Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder) override;
+
+    static constexpr uint16_t ClusterRevision = 1;
 
 private:
     CHIP_ERROR ReadAcl(AttributeValueEncoder & aEncoder);
@@ -330,13 +334,17 @@ private:
     CHIP_ERROR WriteExtension(AttributeValueDecoder & aDecoder);
 };
 
+constexpr uint16_t AccessControlAttribute::ClusterRevision;
+
 CHIP_ERROR AccessControlAttribute::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     switch (aPath.mAttributeId)
     {
-    case Clusters::AccessControl::Attributes::Acl::Id:
+    case AccessControlCluster::Attributes::Acl::Id:
         return ReadAcl(aEncoder);
-    case Clusters::AccessControl::Attributes::Extension::Id:
+    case AccessControlCluster::Attributes::ClusterRevision::Id:
+        return aEncoder.Encode(ClusterRevision);
+    case AccessControlCluster::Attributes::Extension::Id:
         return ReadExtension(aEncoder);
     }
 
@@ -348,31 +356,30 @@ CHIP_ERROR AccessControlAttribute::ReadAcl(AttributeValueEncoder & aEncoder)
     AccessControlEntryCodec codec;
     AccessControl::EntryIterator iterator;
 
-    GetAccessControl().Entries(iterator);
+    ReturnErrorOnFailure(GetAccessControl().Entries(iterator));
 
-    CHIP_ERROR err = aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
-        while (iterator.Next(codec.entry) == CHIP_NO_ERROR)
+    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR {
+        CHIP_ERROR err;
+        while ((err = iterator.Next(codec.entry)) == CHIP_NO_ERROR)
         {
-            encoder.Encode(codec);
+            ReturnErrorOnFailure(encoder.Encode(codec));
         }
-        return CHIP_NO_ERROR;
+        return err;
     });
-
-    return err;
 }
 
 CHIP_ERROR AccessControlAttribute::ReadExtension(AttributeValueEncoder & aEncoder)
 {
-    return CHIP_NO_ERROR;
+    return aEncoder.EncodeList([&](const auto & encoder) -> CHIP_ERROR { return CHIP_NO_ERROR; });
 }
 
 CHIP_ERROR AccessControlAttribute::Write(const ConcreteDataAttributePath & aPath, AttributeValueDecoder & aDecoder)
 {
     switch (aPath.mAttributeId)
     {
-    case Clusters::AccessControl::Attributes::Acl::Id:
+    case AccessControlCluster::Attributes::Acl::Id:
         return WriteAcl(aDecoder);
-    case Clusters::AccessControl::Attributes::Extension::Id:
+    case AccessControlCluster::Attributes::Extension::Id:
         return WriteExtension(aDecoder);
     }
 
@@ -419,12 +426,16 @@ CHIP_ERROR AccessControlAttribute::WriteAcl(AttributeValueDecoder & aDecoder)
 
 CHIP_ERROR AccessControlAttribute::WriteExtension(AttributeValueDecoder & aDecoder)
 {
+    DataModel::DecodableList<AccessControlCluster::Structs::ExtensionEntry::DecodableType> list;
+    ReturnErrorOnFailure(aDecoder.Decode(list));
     return CHIP_NO_ERROR;
 }
 
 AccessControlAttribute gAttribute;
 
 AccessControl gAccessControl(Examples::GetAccessControlDelegate());
+
+} // namespace
 
 void MatterAccessControlPluginServerInitCallback()
 {
