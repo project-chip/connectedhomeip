@@ -29,9 +29,40 @@ tests:
       cluster: "DelayCommands"
       command: "WaitForCommissionee"
 
-    #TODO : Add Group membership command when implemented Issue #11077
-    # - label: "Add device to Group"
-    #   command: "TODO"
+    - label: "Add Group 1 - endpoint 1"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 1
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x1234
+              - name: "groupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x1234
+
+    - label: "Add Group 1 - endpoint 2"
+      cluster: "Groups"
+      command: "AddGroup"
+      endpoint: 2
+      arguments:
+          values:
+              - name: "groupId"
+                value: 0x1234
+              - name: "groupName"
+                value: "Group #1"
+      response:
+          values:
+              - name: "status"
+                value: 0
+              - name: "groupId"
+                value: 0x1234
+
     # Test Pair 1 : Sends a Group Write Attribute
     - label: "Group Write Attribute"
       command: "writeAttribute"
@@ -66,13 +97,23 @@ tests:
     - label: "Turn On the light to see attribute change"
       cluster: "On/Off"
       command: "On"
-      groupId: "1234"
+      groupId: "4660"
 
-      # Test Pair 3 : Validates previous group command with a unicast to read
-    - label: "Check on/off attribute value is true after on command"
+    # Test Pair 3 : Validates previous group command with a unicast to read
+    - label:
+          "Check on/off attribute value is true after on command for endpoint 1"
       cluster: "On/Off"
       command: "readAttribute"
       attribute: "OnOff"
-      endpoint: 1
+      disabled: true
+      response:
+          value: 1
+
+    - label:
+          "Check on/off attribute value is true after on command for endpoint 2"
+      cluster: "On/Off"
+      command: "readAttribute"
+      attribute: "OnOff"
+      endpoint: 2
       response:
           value: 1

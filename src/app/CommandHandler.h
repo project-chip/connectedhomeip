@@ -249,6 +249,7 @@ private:
     void Close();
 
     CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement);
+    CHIP_ERROR ProcessGroupCommandDataIB(CommandDataIB::Parser & aCommandElement);
     CHIP_ERROR SendCommandResponse();
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
                                  const Optional<ClusterStatus> & aClusterStatus);
