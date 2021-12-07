@@ -1362,7 +1362,7 @@ void CHIPBridgedActionsActionListAttributeCallback::CallbackFn(
         bool statusNull     = false;
         bool statusHasValue = true;
 
-        chip::app::Clusters::BridgedActions::ActionStatusEnum statusValue = entry.status;
+        chip::app::Clusters::BridgedActions::ActionStateEnum statusValue = entry.status;
 
         jobject status = nullptr;
         if (!statusNull && statusHasValue)

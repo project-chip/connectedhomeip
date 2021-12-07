@@ -4761,7 +4761,7 @@ class BridgedActions(Cluster):
             kUnknown = 0x00
             kInterrupted = 0x01
 
-        class ActionStatusEnum(IntEnum):
+        class ActionStateEnum(IntEnum):
             kInactive = 0x00
             kActive = 0x01
             kPaused = 0x02
@@ -4794,7 +4794,7 @@ class BridgedActions(Cluster):
                             ClusterObjectFieldDescriptor(Label="type", Tag=3, Type=BridgedActions.Enums.ActionTypeEnum),
                             ClusterObjectFieldDescriptor(Label="endpointListID", Tag=4, Type=uint),
                             ClusterObjectFieldDescriptor(Label="supportedCommands", Tag=5, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="status", Tag=6, Type=BridgedActions.Enums.ActionStatusEnum),
+                            ClusterObjectFieldDescriptor(Label="status", Tag=6, Type=BridgedActions.Enums.ActionStateEnum),
                     ])
 
             actionID: 'uint' = 0
@@ -4802,7 +4802,7 @@ class BridgedActions(Cluster):
             type: 'BridgedActions.Enums.ActionTypeEnum' = 0
             endpointListID: 'uint' = 0
             supportedCommands: 'uint' = 0
-            status: 'BridgedActions.Enums.ActionStatusEnum' = 0
+            status: 'BridgedActions.Enums.ActionStateEnum' = 0
 
         @dataclass
         class EndpointListStruct(ClusterObject):
@@ -5133,12 +5133,12 @@ class BridgedActions(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="actionID", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="invokeID", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="newState", Tag=2, Type=BridgedActions.Enums.ActionStatusEnum),
+                            ClusterObjectFieldDescriptor(Label="newState", Tag=2, Type=BridgedActions.Enums.ActionStateEnum),
                     ])
 
             actionID: 'uint' = 0
             invokeID: 'uint' = 0
-            newState: 'BridgedActions.Enums.ActionStatusEnum' = 0
+            newState: 'BridgedActions.Enums.ActionStateEnum' = 0
 
         @dataclass
         class ActionFailed(ClusterEventDescriptor):
@@ -5151,13 +5151,13 @@ class BridgedActions(Cluster):
                     Fields = [
                             ClusterObjectFieldDescriptor(Label="actionID", Tag=0, Type=uint),
                             ClusterObjectFieldDescriptor(Label="invokeID", Tag=1, Type=uint),
-                            ClusterObjectFieldDescriptor(Label="newState", Tag=2, Type=BridgedActions.Enums.ActionStatusEnum),
+                            ClusterObjectFieldDescriptor(Label="newState", Tag=2, Type=BridgedActions.Enums.ActionStateEnum),
                             ClusterObjectFieldDescriptor(Label="error", Tag=3, Type=BridgedActions.Enums.ActionErrorEnum),
                     ])
 
             actionID: 'uint' = 0
             invokeID: 'uint' = 0
-            newState: 'BridgedActions.Enums.ActionStatusEnum' = 0
+            newState: 'BridgedActions.Enums.ActionStateEnum' = 0
             error: 'BridgedActions.Enums.ActionErrorEnum' = 0
 
 

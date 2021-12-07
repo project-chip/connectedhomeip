@@ -6249,8 +6249,8 @@ enum class ActionErrorEnum : uint8_t
     kUnknown     = 0x00,
     kInterrupted = 0x01,
 };
-// Enum for ActionStatusEnum
-enum class ActionStatusEnum : uint8_t
+// Enum for ActionStateEnum
+enum class ActionStateEnum : uint8_t
 {
     kInactive = 0x00,
     kActive   = 0x01,
@@ -6313,7 +6313,7 @@ public:
     ActionTypeEnum type;
     uint16_t endpointListID;
     uint16_t supportedCommands;
-    ActionStatusEnum status;
+    ActionStateEnum status;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
     CHIP_ERROR Decode(TLV::TLVReader & reader);
@@ -6941,7 +6941,7 @@ public:
 
     uint16_t actionID;
     uint32_t invokeID;
-    ActionStatusEnum newState;
+    ActionStateEnum newState;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
 };
@@ -6955,7 +6955,7 @@ public:
 
     uint16_t actionID;
     uint32_t invokeID;
-    ActionStatusEnum newState;
+    ActionStateEnum newState;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
 };
@@ -6981,7 +6981,7 @@ public:
 
     uint16_t actionID;
     uint32_t invokeID;
-    ActionStatusEnum newState;
+    ActionStateEnum newState;
     ActionErrorEnum error;
 
     CHIP_ERROR Encode(TLV::TLVWriter & writer, TLV::Tag tag) const;
@@ -6996,7 +6996,7 @@ public:
 
     uint16_t actionID;
     uint32_t invokeID;
-    ActionStatusEnum newState;
+    ActionStateEnum newState;
     ActionErrorEnum error;
 
     CHIP_ERROR Decode(TLV::TLVReader & reader);
