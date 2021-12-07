@@ -17,38 +17,25 @@
  */
 
 #include "AppTask.h"
-#include "LEDWidget.h"
-#include <app/server/OnboardingCodesUtil.h>
+#include <LEDWidget.h>
 
-// FIXME: Undefine the `sleep()` function included by the CHIPDeviceLayer.h
-// from unistd.h to avoid a conflicting declaration with the `sleep()` provided
-// by Mbed-OS in mbed_power_mgmt.h.
-#define sleep unistd_sleep
 #include <app/server/Dnssd.h>
+#include <app/server/OnboardingCodesUtil.h>
 #include <app/server/Server.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <platform/CHIPDeviceLayer.h>
-#undef sleep
-
 #include <lib/support/logging/CHIPLogging.h>
-
-// ZAP -- ZCL Advanced Platform
-#include <app-common/zap-generated/attribute-id.h>
-#include <app-common/zap-generated/attribute-type.h>
-#include <app-common/zap-generated/cluster-id.h>
-#include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceLayer.h>
 
 // mbed-os headers
-#include "drivers/InterruptIn.h"
-#include "drivers/Timeout.h"
 #include "events/EventQueue.h"
-#include "platform/Callback.h"
 
+#ifdef CHIP_OTA_REQUESTOR
+#include "MbedOTARequestorDriver.h"
 #include <MbedOTADownloader.h>
 #include <MbedOTAImageProcessor.h>
 #include <MbedOTARequestor.h>
-#include <MbedOTARequestorDriver.h>
+#endif // CHIP_OTA_REQUESTOR
 
 static bool sIsWiFiStationProvisioned = false;
 static bool sIsWiFiStationEnabled     = false;
@@ -68,6 +55,7 @@ AppTask AppTask::sAppTask;
 
 int AppTask::Init()
 {
+    CHIP_ERROR error;
     // Register the callback to init the MDNS server when connectivity is available
     PlatformMgr().AddEventHandler(
         [](const ChipDeviceEvent * event, intptr_t arg) {
@@ -83,13 +71,28 @@ int AppTask::Init()
         },
         0);
 
+#ifdef MBED_CONF_APP_BLE_DEVICE_NAME
+    error = ConnectivityMgr().SetBLEDeviceName(MBED_CONF_APP_BLE_DEVICE_NAME);
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Set BLE device name failed: %s", error.AsString());
+        return EXIT_FAILURE;
+    }
+#endif
+
     // Start BLE advertising if needed
     if (!CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART)
     {
         ChipLogProgress(NotSpecified, "Enabling BLE advertising.");
-        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+        error = ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+        if (error != CHIP_NO_ERROR)
+        {
+            ChipLogError(NotSpecified, "Set BLE advertising enabled failed: %s", error.AsString());
+            return EXIT_FAILURE;
+        }
     }
 
+#ifdef CHIP_OTA_REQUESTOR
     // Initialize and interconnect the Requestor and Image Processor objects -- START
     // Initialize the instance of the main Requestor Class
     MbedOTARequestor * requestorCore = new MbedOTARequestor(OnAnnounceProviderCallback, OnProviderResponseCallback);
@@ -111,11 +114,17 @@ int AppTask::Init()
     // Connect the Downloader and Image Processor objects
     downloaderCore->SetImageProcessorDelegate(downloaderUser);
     // Initialize and interconnect the Requestor and Image Processor objects -- END
+#endif // CHIP_OTA_REQUESTOR
 
-    chip::DeviceLayer::ConnectivityMgrImpl().StartWiFiManagement();
+    ConnectivityMgrImpl().StartWiFiManagement();
 
     // Init ZCL Data Model and start server
-    chip::Server::GetInstance().Init();
+    error = Server::GetInstance().Init();
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "Server initalization failed: %s", error.AsString());
+        return EXIT_FAILURE;
+    }
 
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
@@ -186,6 +195,28 @@ int AppTask::StartApp()
     }
 }
 
+void AppTask::PostEvent(AppEvent * aEvent)
+{
+    auto handle = sAppEventQueue.call([event = *aEvent, this] { DispatchEvent(&event); });
+    if (!handle)
+    {
+        ChipLogError(NotSpecified, "Failed to post event to app task event queue: Not enough memory");
+    }
+}
+
+void AppTask::DispatchEvent(const AppEvent * aEvent)
+{
+    if (aEvent->Handler)
+    {
+        aEvent->Handler(const_cast<AppEvent *>(aEvent));
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Event received with no handler. Dropping event.");
+    }
+}
+
+#ifdef CHIP_OTA_REQUESTOR
 void AppTask::OnOtaEventHandler(AppEvent * aEvent)
 {
     switch (aEvent->Type)
@@ -241,24 +272,4 @@ void AppTask::OnDownloadCompletedCallback(MbedOTADownloader::ImageInfo * imageIn
     ota_download_completed_event.OTADownloadCompletedEvent.imageInfo = imageInfo;
     sAppTask.PostEvent(&ota_download_completed_event);
 }
-
-void AppTask::PostEvent(AppEvent * aEvent)
-{
-    auto handle = sAppEventQueue.call([event = *aEvent, this] { DispatchEvent(&event); });
-    if (!handle)
-    {
-        ChipLogError(NotSpecified, "Failed to post event to app task event queue: Not enough memory");
-    }
-}
-
-void AppTask::DispatchEvent(const AppEvent * aEvent)
-{
-    if (aEvent->Handler)
-    {
-        aEvent->Handler(const_cast<AppEvent *>(aEvent));
-    }
-    else
-    {
-        ChipLogError(NotSpecified, "Event received with no handler. Dropping event.");
-    }
-}
+#endif
