@@ -150,7 +150,7 @@ public:
     /////////// Network Commissioning Callbacks /////////
     static void OnDefaultFailureResponse(void * context, uint8_t status);
     static void OnAddNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText);
-    static void OnEnableNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void OnEnableNetworkResponse(void * context, uint8_t errorCode, chip::CharSpan debugText, int32_t errorValue);
 
 private:
     CHIP_ERROR RunInternal(NodeId remoteId);
@@ -186,9 +186,9 @@ private:
     uint64_t mDiscoveryFilterCode;
     char * mDiscoveryFilterInstanceName;
 
-    chip::Callback::Callback<NetworkCommissioningClusterAddThreadNetworkResponseCallback> mOnAddThreadNetworkCallback;
-    chip::Callback::Callback<NetworkCommissioningClusterAddWiFiNetworkResponseCallback> mOnAddWiFiNetworkCallback;
-    chip::Callback::Callback<NetworkCommissioningClusterEnableNetworkResponseCallback> mOnEnableNetworkCallback;
+    chip::Callback::Callback<NetworkCommissioningClusterNetworkConfigResponseCallback> mOnAddThreadNetworkCallback;
+    chip::Callback::Callback<NetworkCommissioningClusterNetworkConfigResponseCallback> mOnAddWiFiNetworkCallback;
+    chip::Callback::Callback<NetworkCommissioningClusterConnectNetworkResponseCallback> mOnEnableNetworkCallback;
     chip::Callback::Callback<DefaultFailureCallback> mOnFailureCallback;
     chip::CommissioneeDeviceProxy * mDevice;
     chip::Controller::NetworkCommissioningCluster mCluster;
