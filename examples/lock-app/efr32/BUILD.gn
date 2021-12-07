@@ -70,7 +70,7 @@ efr32_sdk("sdk") {
     defines += [
       "HAL_VCOM_ENABLE=1",
       "PW_RPC_ENABLED",
-     ]
+    ]
   }
 }
 
