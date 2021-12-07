@@ -195,25 +195,44 @@ CHIP_ERROR SessionManager::SendPreparedMessage(SessionHandle sessionHandle, cons
 
     if (sessionHandle.IsSecure())
     {
-        // Find an active connection to the specified peer node
-        SecureSession * session = GetSecureSession(sessionHandle);
-        if (session == nullptr)
+        if (sessionHandle.IsGroupSession())
         {
-            ChipLogError(Inet, "Secure transport could not find a valid PeerConnection");
-            return CHIP_ERROR_NOT_CONNECTED;
+            chip::Transport::PeerAddress multicastAddress =
+                Transport::PeerAddress::Multicast(sessionHandle.GetFabricIndex(), sessionHandle.GetGroupId().Value());
+            destination = static_cast<Transport::PeerAddress *>(&multicastAddress);
+            char addressStr[Transport::PeerAddress::kMaxToStringSize];
+            multicastAddress.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
+
+            ChipLogProgress(Inet,
+                            "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to %d"
+                            " at monotonic time: %" PRId64
+                            " msec to Multicast IPV6 address : %s with GroupID of %d and fabric Id of %d",
+                            "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(), sessionHandle.GetGroupId().Value(),
+                            System::SystemClock().GetMonotonicMilliseconds64().count(), addressStr,
+                            sessionHandle.GetGroupId().Value(), sessionHandle.GetFabricIndex());
         }
+        else
+        {
+            // Find an active connection to the specified peer node
+            SecureSession * session = GetSecureSession(sessionHandle);
+            if (session == nullptr)
+            {
+                ChipLogError(Inet, "Secure transport could not find a valid PeerConnection");
+                return CHIP_ERROR_NOT_CONNECTED;
+            }
 
-        // This marks any connection where we send data to as 'active'
-        mSecureSessions.MarkSessionActive(session);
+            // This marks any connection where we send data to as 'active'
+            mSecureSessions.MarkSessionActive(session);
 
-        destination = &session->GetPeerAddress();
+            destination = &session->GetPeerAddress();
 
-        ChipLogProgress(Inet,
-                        "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
-                        " (%u) at monotonic time: %" PRId64 " msec",
-                        "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(),
-                        ChipLogValueX64(session->GetPeerNodeId()), session->GetFabricIndex(),
-                        System::SystemClock().GetMonotonicMilliseconds64().count());
+            ChipLogProgress(Inet,
+                            "Sending %s msg %p with MessageCounter:" ChipLogFormatMessageCounter " to 0x" ChipLogFormatX64
+                            " (%u) at monotonic time: %" PRId64 " msec",
+                            "encrypted", &preparedMessage, preparedMessage.GetMessageCounter(),
+                            ChipLogValueX64(session->GetPeerNodeId()), session->GetFabricIndex(),
+                            System::SystemClock().GetMonotonicMilliseconds64().count());
+        }
     }
     else
     {
