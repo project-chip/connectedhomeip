@@ -26,7 +26,7 @@
 
 #include <controller/CHIPDeviceControllerFactory.h>
 #include <credentials/DeviceAttestationVerifier.h>
-#include <credentials/examples/DeviceAttestationVerifierExample.h>
+#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/PersistentStorageMacros.h>
 #include <lib/support/SafeInt.h>
@@ -204,7 +204,9 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(Jav
     wrapper->SetJavaObjectRef(vm, deviceControllerObj);
 
     // Initialize device attestation verifier
-    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
+    // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+    const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+    SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
 
     chip::Controller::FactoryInitParams initParams;
     chip::Controller::SetupParams setupParams;
@@ -326,10 +328,6 @@ CHIP_ERROR AndroidDeviceControllerWrapper::InitializeOperationalCredentialsIssue
     mInitialized = true;
     return CHIP_NO_ERROR;
 }
-
-void AndroidDeviceControllerWrapper::OnMessage(chip::System::PacketBufferHandle && msg) {}
-
-void AndroidDeviceControllerWrapper::OnStatusChange(void) {}
 
 CHIP_ERROR AndroidDeviceControllerWrapper::SyncGetKeyValue(const char * key, void * value, uint16_t & size)
 {

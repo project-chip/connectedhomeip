@@ -44,6 +44,8 @@ parser.add_argument('--dist_dir', help='directory to place distribution in')
 parser.add_argument('--manifest', help='list of files to package')
 parser.add_argument(
     '--plat-name', help='platform name to embed in generated filenames')
+parser.add_argument(
+    '--server', help='build the server variant', default=False, type=bool)
 
 args = parser.parse_args()
 
@@ -56,14 +58,20 @@ class InstalledScriptInfo:
         self.installName = os.path.splitext(name)[0]
 
 
-chipDLLName = '_ChipDeviceCtrl.so'
+if args.server:
+    chipDLLName = "_ChipServer.so"
+else:
+    chipDLLName = "_ChipDeviceCtrl.so"
 packageName = args.package_name
 chipPackageVer = args.build_number
 
-installScripts = [
-    InstalledScriptInfo('chip-device-ctrl.py'),
-    InstalledScriptInfo('chip-repl.py'),
-]
+if args.server:
+    installScripts = []
+else:
+    installScripts = [
+        InstalledScriptInfo("chip-device-ctrl.py"),
+        InstalledScriptInfo("chip-repl.py"),
+    ]
 
 # Record the current directory at the start of execution.
 curDir = os.curdir
@@ -74,9 +82,9 @@ distDir = os.path.abspath(args.dist_dir)
 
 # Use a temporary directory within the build directory to assemble the components
 # for the installable package.
-tmpDir = os.path.join(buildDir, 'chip-wheel-components')
+tmpDir = os.path.join(buildDir, "chip-wheel-components")
 
-manifest = json.load(open(manifestFile, 'r'))
+manifest = json.load(open(manifestFile, "r"))
 
 try:
 
@@ -116,16 +124,24 @@ try:
     requiredPackages = [
         "coloredlogs",
         'construct',
-        'ipython',
+
+        #
+        # IPython 7.30.0 has a bug which results in the use of await ... failing on some platforms (see https://github.com/ipython/ipython/pull/13269)
+        # For now, let's just avoid that version.
+        #
+        'ipython!=7.30.0',
         'dacite',
+        'rich',
+        'stringcase',
+        'pyyaml',
     ]
 
-    if platform.system() == 'Darwin':
-        requiredPackages.append('pyobjc-framework-corebluetooth')
+    if platform.system() == "Darwin":
+        requiredPackages.append("pyobjc-framework-corebluetooth")
 
-    if platform.system() == 'Linux':
-        requiredPackages.append('dbus-python')
-        requiredPackages.append('pygobject')
+    if platform.system() == "Linux":
+        requiredPackages.append("dbus-python")
+        requiredPackages.append("pygobject")
 
     #
     # Build the chip package...
@@ -146,23 +162,31 @@ try:
         'chip.tlv',
         'chip.setup_payload',
     ]
+    #print ("Server: {}".format(args.server))
+    if args.server:
+        packages.append('chip.server')
+
+    #print("packages: {}".format(packages))
+
+    print("packageName: {}".format(packageName))
+    print("chipDLLName: {}".format(chipDLLName))
 
     # Invoke the setuptools 'bdist_wheel' command to generate a wheel containing
     # the CHIP python packages, shared libraries and scripts.
     setup(
         name=packageName,
         version=chipPackageVer,
-        description='Python-base APIs and tools for CHIP.',
-        url='https://github.com/project-chip/connectedhomeip',
-        license='Apache',
+        description="Python-base APIs and tools for CHIP.",
+        url="https://github.com/project-chip/connectedhomeip",
+        license="Apache",
         classifiers=[
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: Apache Software License',
-            'Programming Language :: Python :: 2',
-            'Programming Language :: Python :: 2.7',
-            'Programming Language :: Python :: 3',
+            "Intended Audience :: Developers",
+            "License :: OSI Approved :: Apache Software License",
+            "Programming Language :: Python :: 2",
+            "Programming Language :: Python :: 2.7",
+            "Programming Language :: Python :: 3",
         ],
-        python_requires='>=2.7',
+        python_requires=">=2.7",
         packages=packages,
         package_dir={
             # By default, look in the tmp directory for packages/modules to be included.

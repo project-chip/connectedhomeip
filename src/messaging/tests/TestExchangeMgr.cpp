@@ -49,7 +49,7 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
 
-using TestContext = chip::Test::MessagingContext;
+using TestContext = chip::Test::LoopbackMessagingContext<Test::LoopbackTransport>;
 
 enum : uint8_t
 {
@@ -58,9 +58,6 @@ enum : uint8_t
 };
 
 TestContext sContext;
-
-TransportMgr<Test::LoopbackTransport> gTransportMgr;
-Test::IOContext gIOContext;
 
 class MockAppDelegate : public ExchangeDelegate
 {
@@ -124,7 +121,7 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
     ExchangeContext * ec1 = ctx.NewExchangeToBob(&sendDelegate);
 
     // Expire the session this exchange is supposedly on.
-    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSessionHandle());
+    ctx.GetExchangeManager().ExpireExchangesForSession(ec1->GetSessionHandle());
 
     MockAppDelegate receiveDelegate;
     CHIP_ERROR err =
@@ -134,6 +131,8 @@ void CheckSessionExpirationBasics(nlTestSuite * inSuite, void * inContext)
     err = ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                            SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+    ctx.DrainAndServiceIO();
+
     NL_TEST_ASSERT(inSuite, !receiveDelegate.IsOnMessageReceivedCalled);
     ec1->Close();
 
@@ -150,11 +149,13 @@ void CheckSessionExpirationTimeout(nlTestSuite * inSuite, void * inContext)
 
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kExpectResponse).Set(Messaging::SendMessageFlags::kNoAutoRequestAck));
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, !sendDelegate.IsOnResponseTimeoutCalled);
 
     // Expire the session this exchange is supposedly on.  This should close the
     // exchange.
-    ctx.GetExchangeManager().OnConnectionExpired(ec1->GetSessionHandle());
+    ctx.GetExchangeManager().ExpireExchangesForSession(ec1->GetSessionHandle());
     NL_TEST_ASSERT(inSuite, sendDelegate.IsOnResponseTimeoutCalled);
 }
 
@@ -203,6 +204,8 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     // send a malicious packet
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST2, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     ec1 = ctx.NewExchangeToAlice(&mockSolicitedAppDelegate);
@@ -210,6 +213,8 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     // send a good packet
     ec1->SendMessage(Protocols::BDX::Id, kMsgType_TEST1, System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize),
                      SendFlags(Messaging::SendMessageFlags::kNoAutoRequestAck));
+
+    ctx.DrainAndServiceIO();
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     err = ctx.GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::BDX::Id, kMsgType_TEST1);
@@ -234,45 +239,15 @@ const nlTest sTests[] =
 };
 // clang-format on
 
-int Initialize(void * aContext);
-int Finalize(void * aContext);
-
 // clang-format off
 nlTestSuite sSuite =
 {
     "Test-CHIP-ExchangeManager",
     &sTests[0],
-    Initialize,
-    Finalize
+    TestContext::InitializeAsync,
+    TestContext::Finalize
 };
 // clang-format on
-
-/**
- *  Initialize the test suite.
- */
-int Initialize(void * aContext)
-{
-    // Initialize System memory and resources
-    VerifyOrReturnError(chip::Platform::MemoryInit() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gIOContext.Init() == CHIP_NO_ERROR, FAILURE);
-    VerifyOrReturnError(gTransportMgr.Init("LOOPBACK") == CHIP_NO_ERROR, FAILURE);
-
-    auto * ctx = static_cast<TestContext *>(aContext);
-    VerifyOrReturnError(ctx->Init(&gTransportMgr, &gIOContext) == CHIP_NO_ERROR, FAILURE);
-
-    return SUCCESS;
-}
-
-/**
- *  Finalize the test suite.
- */
-int Finalize(void * aContext)
-{
-    CHIP_ERROR err = reinterpret_cast<TestContext *>(aContext)->Shutdown();
-    gIOContext.Shutdown();
-    chip::Platform::MemoryShutdown();
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
-}
 
 } // namespace
 

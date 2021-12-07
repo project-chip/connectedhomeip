@@ -26,9 +26,9 @@ AdvRouterAddr
 AdvSendAdvert
 AE
 aef
+AES
 algs
 alloc
-ameba
 Ameba
 amebad
 amebaiot
@@ -39,6 +39,7 @@ AppConfig
 ApplicationBasic
 ApplicationIdentifier
 ApplicationLauncher
+ApplyUpdateRequest
 approver
 appspot
 aps
@@ -50,6 +51,7 @@ armeabi
 ARMmbed
 armv
 asdk
+AssertionError
 ASYNC
 att
 attId
@@ -80,11 +82,11 @@ BasicCHIPRegression
 baudrate
 BD
 BDX
+BDXDownloader
 BeagleBone
 befc
 bitbake
 bld
-ble
 BLE
 BleApplicationDelegate
 BleLayer
@@ -156,7 +158,6 @@ CHIPTest
 CHIPTool
 chmod
 chrpath
-cipd
 CIPD
 CircleCI
 cJTAG
@@ -215,6 +216,7 @@ cppreference
 CPROTO
 cpuapp
 cpython
+CQM
 crypto
 cryptographic
 CSA
@@ -269,6 +271,7 @@ DevKitC
 DevKitM
 df
 dfu
+dhclient
 DHCP
 DHCPC
 DHCPv
@@ -277,6 +280,7 @@ dialout
 diffstat
 diffsyms
 dimmable
+dirname
 dirs
 disambiguated
 discoverable
@@ -288,6 +292,7 @@ DK
 DL
 DM
 DMG
+DMM
 DNS
 Dnsmasq
 dnsmasqd
@@ -310,6 +315,8 @@ eabi
 EB
 ECC
 ECD
+ECDH
+ECDSA
 EchoMessage
 EchoRequests
 EchoResponse
@@ -321,7 +328,6 @@ ee
 EEE
 eef
 ef
-efr
 EFR
 eg
 EjQ
@@ -337,9 +343,11 @@ eno
 entrypoint
 enum
 env
+eq
 esd
 ESPPORT
 Espressif
+esptool
 eth
 EthernetNetworkDiagnostics
 ethernets
@@ -379,11 +387,11 @@ flashdebug
 focusable
 forkpty
 formatOnSave
-fota
 FOTA
 FreeRTOS
 FreeRTOSConfig
 fsl
+fstab
 fsync
 fullclean
 gcloud
@@ -409,7 +417,6 @@ gn
 GND
 gni
 GNinja
-gnuarmemb
 GNUARMEMB
 gnueabihf
 googleapis
@@ -427,6 +434,7 @@ Gv
 gz
 hardcoded
 hardknott
+hardwarever
 HardwareVersion
 HardwareVersionString
 hci
@@ -435,6 +443,7 @@ hciconfig
 hdlc
 HKDF
 hoc
+homebrew
 hostapd
 hostname
 href
@@ -449,7 +458,6 @@ ifdef
 ifdefs
 IGMP
 ihex
-im
 IM
 imager
 imagetool
@@ -485,13 +493,14 @@ IPv
 ISCAN
 itemName
 iterable
+JDK
 jinja
-jlink
 JLink
 JLinkExe
 JLinkRTTClient
 JN
 jpg
+jre
 js
 json
 JTAG
@@ -535,6 +544,8 @@ lightin
 LightingColor
 LightingState
 LinkSoftwareAndDocumentationPack
+LinuxOTAImageProcessor
+LinuxOTARequestorDriver
 LocalConfigDisabled
 localhost
 localstatedir
@@ -636,6 +647,7 @@ navpad
 ncs
 nding
 NDK
+netcmp
 netif
 netplan
 NetworkCommissioning
@@ -672,6 +684,7 @@ OnOff
 OnOffClusterTest
 OnPlatformEvent
 OO
+openjdk
 OpenOCD
 OpenSSL
 OpenThread
@@ -686,6 +699,16 @@ optionsMask
 optionsOverride
 orgs
 OTA
+OTADownloader
+OTAImageProcessorDriver
+OTAImageProcessorInterface
+OTAProviderIpAddress
+OTAProviderNodeId
+OTAProviderSerialPort
+OTARequesterImpl
+OTARequestor
+OTARequestorDriver
+OTARequestorSerialPort
 OTBR
 otcli
 PAA
@@ -731,8 +754,6 @@ prj
 ProductID
 ProductLabel
 ProductName
-productrev
-ProductRevision
 ProductURL
 proto
 protobuf
@@ -757,6 +778,7 @@ PyFunction
 pylint
 PyObject
 PyRun
+pytest
 QEMU
 Qorvo
 QPG
@@ -770,6 +792,7 @@ qvCHIP
 RADVD
 raspberryPi
 RasPi
+rAv
 RCP
 ReadConfigValue
 readelf
@@ -832,7 +855,6 @@ SDK's
 SDKs
 SDKTARGETSYSROOT
 sdl
-segger
 SEGGER
 semver
 sendto
@@ -840,10 +862,15 @@ SERIALDEVICE
 SerialNumber
 ServiceId
 SetDns
+SetImageProcessorDelegate
+SetOtaRequestorDriver
 SetpointRaiseLower
+SetRequestorInstance
 SetUpPINCode
 SetupQRCode
 sexualized
+SHA
+shubhamdp
 SIGINT
 SiLabs
 SiliconLabs
@@ -854,6 +881,7 @@ SLAAC
 SLTB
 SLWSTK
 SmartThings
+smoketest
 SMP
 socat
 socio
@@ -882,6 +910,7 @@ subcommand
 subcommands
 subdirectories
 subdirectory
+subfolder
 submodule
 submodules
 subprocess
@@ -896,7 +925,6 @@ sysconfdir
 SysConfig
 sysctl
 sysdeps
-sysroot
 SYSROOT
 systemctl
 systemd
@@ -956,7 +984,6 @@ ttyUSB
 TvChannel
 TXD
 txt
-uart
 UART
 udhcpc
 UDP
@@ -965,7 +992,6 @@ udpPort
 ug
 ui
 uint
-unblur
 UNBLUR
 uncommissioned
 unfocus
@@ -980,6 +1006,7 @@ URI
 usbmodem
 USBtoUART
 uscif
+userguide
 USERINTERFACE
 UserLabel
 usermod

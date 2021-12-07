@@ -277,6 +277,7 @@ public:
     uint64_t GetStartOffset() const { return mStartOffset; }
     uint64_t GetTransferLength() const { return mTransferLength; }
     uint16_t GetTransferBlockSize() const { return mTransferMaxBlockSize; }
+    size_t GetNumBytesProcessed() const { return mNumBytesProcessed; }
 
     TransferSession();
 

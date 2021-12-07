@@ -34,7 +34,6 @@ using chip::Server;
 
 // Mock function for linking
 void InitDataModelHandler(chip::Messaging::ExchangeManager * exchangeMgr) {}
-void HandleDataModelMessage(chip::Messaging::ExchangeContext * exchange, chip::System::PacketBufferHandle && buffer) {}
 
 namespace {
 
@@ -48,8 +47,9 @@ void InitializeChip(nlTestSuite * suite)
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     err = Server::GetInstance().Init();
-    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
+    Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+    chip::DeviceLayer::PlatformMgr().StartEventLoopTask();
 }
 
 void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
@@ -59,9 +59,14 @@ void CheckCommissioningWindowManagerBasicWindowOpenCloseTask(intptr_t context)
     CHIP_ERROR err =
         commissionMgr.OpenBasicCommissioningWindow(kNoCommissioningTimeout, CommissioningWindowAdvertisement::kDnssdOnly);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
+    NL_TEST_ASSERT(suite,
+                   commissionMgr.CommissioningWindowStatus() ==
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen);
+    NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     commissionMgr.CloseCommissioningWindow();
-    NL_TEST_ASSERT(suite, !commissionMgr.IsCommissioningWindowOpen());
+    NL_TEST_ASSERT(suite,
+                   commissionMgr.CommissioningWindowStatus() ==
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
 }
 
 void CheckCommissioningWindowManagerBasicWindowOpenClose(nlTestSuite * suite, void *)
@@ -75,7 +80,9 @@ void CheckCommissioningWindowManagerWindowClosedTask(chip::System::Layer *, void
 {
     nlTestSuite * suite                        = static_cast<nlTestSuite *>(context);
     CommissioningWindowManager & commissionMgr = Server::GetInstance().GetCommissioningWindowManager();
-    NL_TEST_ASSERT(suite, !commissionMgr.IsCommissioningWindowOpen());
+    NL_TEST_ASSERT(suite,
+                   commissionMgr.CommissioningWindowStatus() ==
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
 }
 
 void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
@@ -87,7 +94,10 @@ void CheckCommissioningWindowManagerWindowTimeoutTask(intptr_t context)
     constexpr unsigned kSleepPadding           = 100;
     CHIP_ERROR err = commissionMgr.OpenBasicCommissioningWindow(kTimeoutSeconds, CommissioningWindowAdvertisement::kDnssdOnly);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
+    NL_TEST_ASSERT(suite,
+                   commissionMgr.CommissioningWindowStatus() ==
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen);
+    NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     chip::DeviceLayer::SystemLayer().StartTimer(chip::System::Clock::Milliseconds32(kTimeoutMs + kSleepPadding),
                                                 CheckCommissioningWindowManagerWindowClosedTask, suite);
 }
@@ -117,13 +127,18 @@ void CheckCommissioningWindowManagerEnhancedWindowTask(intptr_t context)
     err = commissionMgr.OpenEnhancedCommissioningWindow(kNoCommissioningTimeout, newDiscriminator, verifier, kIterations, saltData,
                                                         kPasscodeID);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(suite, commissionMgr.IsCommissioningWindowOpen());
+    NL_TEST_ASSERT(suite,
+                   commissionMgr.CommissioningWindowStatus() ==
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen);
+    NL_TEST_ASSERT(suite, !chip::DeviceLayer::ConnectivityMgr().IsBLEAdvertisingEnabled());
     err = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(currentDiscriminator);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(suite, currentDiscriminator == newDiscriminator);
 
     commissionMgr.CloseCommissioningWindow();
-    NL_TEST_ASSERT(suite, !commissionMgr.IsCommissioningWindowOpen());
+    NL_TEST_ASSERT(suite,
+                   commissionMgr.CommissioningWindowStatus() ==
+                       chip::app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen);
     err = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(currentDiscriminator);
     NL_TEST_ASSERT(suite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(suite, currentDiscriminator == originDiscriminator);
@@ -139,7 +154,6 @@ void CheckCommissioningWindowManagerEnhancedWindow(nlTestSuite * suite, void *)
 void TearDownTask(intptr_t context)
 {
     chip::Server::GetInstance().Shutdown();
-    chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 
 const nlTest sTests[] = {
@@ -168,6 +182,8 @@ int TestCommissioningWindowManager()
     // TODO: The platform memory was intentionally left not deinitialized so that minimal mdns can destruct
     chip::DeviceLayer::PlatformMgr().ScheduleWork(TearDownTask, 0);
     sleep(kTestTaskWaitSeconds);
+    chip::DeviceLayer::PlatformMgr().StopEventLoopTask();
+    chip::DeviceLayer::PlatformMgr().Shutdown();
 
     return (nlTestRunnerStats(&theSuite));
 }

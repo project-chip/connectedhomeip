@@ -71,11 +71,18 @@ void MakePrintableName(char (&location)[N], FullQName name)
 
 } // namespace
 
-class CheckOnlyServer : public ServerBase, public ParserDelegate, public TxtRecordDelegate
+class CheckOnlyServer : private chip::PoolImpl<ServerBase::EndpointInfo, 0, chip::OnObjectPoolDestruction::Die,
+                                               ServerBase::EndpointInfoPoolType::Interface>,
+                        public ServerBase,
+                        public ParserDelegate,
+                        public TxtRecordDelegate
 {
 public:
-    CheckOnlyServer(nlTestSuite * inSuite) : ServerBase(nullptr, 0), mInSuite(inSuite) { Reset(); }
-    CheckOnlyServer() : ServerBase(nullptr, 0), mInSuite(nullptr) { Reset(); }
+    CheckOnlyServer(nlTestSuite * inSuite) : ServerBase(*static_cast<ServerBase::EndpointInfoPoolType *>(this)), mInSuite(inSuite)
+    {
+        Reset();
+    }
+    CheckOnlyServer() : ServerBase(*static_cast<ServerBase::EndpointInfoPoolType *>(this)), mInSuite(nullptr) { Reset(); }
     ~CheckOnlyServer() {}
 
     // Parser delegates
@@ -102,11 +109,11 @@ public:
         switch (data.GetType())
         {
         case QType::PTR:
-            ParsePtrRecord(data.GetData(), data.GetData(), &target);
+            ParsePtrRecord(data.GetData(), mPacketData, &target);
             break;
         case QType::SRV: {
             SrvRecord srv;
-            bool srvParseOk = srv.Parse(data.GetData(), data.GetData());
+            bool srvParseOk = srv.Parse(data.GetData(), mPacketData);
             NL_TEST_ASSERT(mInSuite, srvParseOk);
             if (!srvParseOk)
             {
@@ -223,7 +230,8 @@ public:
     DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
                chip::Inet::InterfaceId interface) override
     {
-        ParsePacket(BytesRange(data->Start(), data->Start() + data->TotalLength()), this);
+        mPacketData = BytesRange(data->Start(), data->Start() + data->TotalLength());
+        ParsePacket(mPacketData, this);
         if (mHeaderFound)
         {
             TestGotAllExpectedPackets();
@@ -311,6 +319,7 @@ private:
     bool mSendCalled              = false;
     int mTotalRecords             = 0;
     FullQName kIgnoreQname        = FullQName(kIgnoreQNameParts);
+    BytesRange mPacketData;
 
     int GetNumExpectedRecords() const
     {
@@ -393,7 +402,11 @@ private:
 
 struct ServerSwapper
 {
-    ServerSwapper(CheckOnlyServer * server) { chip::Dnssd::GlobalMinimalMdnsServer::Instance().SetReplacementServer(server); }
+    ServerSwapper(CheckOnlyServer * server)
+    {
+        chip::Dnssd::GlobalMinimalMdnsServer::Instance().Server().Shutdown();
+        chip::Dnssd::GlobalMinimalMdnsServer::Instance().SetReplacementServer(server);
+    }
     ~ServerSwapper() { chip::Dnssd::GlobalMinimalMdnsServer::Instance().SetReplacementServer(nullptr); }
 };
 

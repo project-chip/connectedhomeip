@@ -56,7 +56,64 @@ public:
          * Method that signals to a registered callback that this object
          * has completed doing useful work and is now safe for release/destruction.
          */
-        virtual void OnDone(CommandHandler * apCommandObj) = 0;
+        virtual void OnDone(CommandHandler & apCommandObj) = 0;
+
+        /*
+         * Upon processing of a CommandDataIB, this method is invoked to dispatch the command
+         * to the right server-side handler provided by the application.
+         */
+        virtual void DispatchCommand(CommandHandler & apCommandObj, const ConcreteCommandPath & aCommandPath,
+                                     TLV::TLVReader & apPayload) = 0;
+
+        /*
+         * Check to see if a command implementation exists for a specific concrete command path.
+         */
+        virtual bool CommandExists(const ConcreteCommandPath & aCommandPath) = 0;
+    };
+
+    class Handle
+    {
+    public:
+        Handle() {}
+        Handle(const Handle & handle) = delete;
+        Handle(Handle && handle)
+        {
+            mpHandler        = handle.mpHandler;
+            mMagic           = handle.mMagic;
+            handle.mpHandler = nullptr;
+            handle.mMagic    = 0;
+        }
+        Handle(decltype(nullptr)) {}
+        Handle(CommandHandler * handle);
+        ~Handle() { Release(); }
+
+        Handle & operator=(Handle && handle)
+        {
+            Release();
+            mpHandler        = handle.mpHandler;
+            mMagic           = handle.mMagic;
+            handle.mpHandler = nullptr;
+            handle.mMagic    = 0;
+            return *this;
+        }
+
+        Handle & operator=(decltype(nullptr))
+        {
+            Release();
+            return *this;
+        }
+
+        /**
+         * Get the CommandHandler object it holds. Get() may return a nullptr if the CommandHandler object is holds is no longer
+         * valid.
+         */
+        CommandHandler * Get();
+
+        void Release();
+
+    private:
+        CommandHandler * mpHandler = nullptr;
+        uint32_t mMagic            = 0;
     };
 
     /*
@@ -71,21 +128,26 @@ public:
      *
      * This function will always call the OnDone function above on the registered callback
      * before returning.
+     *
+     * isTimedInvoke is true if and only if this is part of a Timed Invoke
+     * transaction (i.e. was preceded by a Timed Request).  If we reach here,
+     * the timer verification has already been done.
      */
     CHIP_ERROR OnInvokeCommandRequest(Messaging::ExchangeContext * ec, const PayloadHeader & payloadHeader,
-                                      System::PacketBufferHandle && payload);
+                                      System::PacketBufferHandle && payload, bool isTimedInvoke);
     CHIP_ERROR AddStatus(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus) override;
 
     CHIP_ERROR AddClusterSpecificSuccess(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus) override;
 
     CHIP_ERROR AddClusterSpecificFailure(const ConcreteCommandPath & aCommandPath, ClusterStatus aClusterStatus) override;
 
-    CHIP_ERROR ProcessInvokeRequest(System::PacketBufferHandle && payload);
-    CHIP_ERROR PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct = true);
+    CHIP_ERROR ProcessInvokeRequest(System::PacketBufferHandle && payload, bool isTimedInvoke);
+    CHIP_ERROR PrepareCommand(const ConcreteCommandPath & aCommandPath, bool aStartDataStruct = true);
     CHIP_ERROR FinishCommand(bool aStartDataStruct = true);
-    CHIP_ERROR PrepareStatus(const CommandPathParams & aCommandPathParams);
+    CHIP_ERROR PrepareStatus(const ConcreteCommandPath & aCommandPath);
     CHIP_ERROR FinishStatus();
     TLV::TLVWriter * GetCommandDataIBTLVWriter();
+    FabricIndex GetAccessingFabricIndex() const;
 
     /**
      * API for adding a data response.  The template parameter T is generally
@@ -100,7 +162,8 @@ public:
     template <typename CommandData>
     CHIP_ERROR AddResponseData(const ConcreteCommandPath & aRequestCommandPath, const CommandData & aData)
     {
-        ReturnErrorOnFailure(PrepareResponse(aRequestCommandPath, CommandData::GetCommandId()));
+        ConcreteCommandPath path = { aRequestCommandPath.mEndpointId, aRequestCommandPath.mClusterId, CommandData::GetCommandId() };
+        ReturnErrorOnFailure(PrepareCommand(path, false));
         TLV::TLVWriter * writer = GetCommandDataIBTLVWriter();
         VerifyOrReturnError(writer != nullptr, CHIP_ERROR_INCORRECT_STATE);
         ReturnErrorOnFailure(DataModel::Encode(*writer, TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)), aData));
@@ -108,8 +171,29 @@ public:
         return FinishCommand(/* aEndDataStruct = */ false);
     }
 
+    /**
+     * Check whether the InvokeRequest we are handling is a timed invoke.
+     */
+    bool IsTimedInvoke() const { return mTimedRequest; }
+
 private:
     friend class TestCommandInteraction;
+    friend class CommandHandler::Handle;
+
+    /**
+     * IncrementHoldOff will increase the inner refcount of the CommandHandler.
+     *
+     * Users should use CommandHandler::Handle for management the lifespan of the CommandHandler.
+     * DefRef should be released in reasonable time, and Close() should only be called when the refcount reached 0.
+     */
+    void IncrementHoldOff();
+
+    /**
+     * DecrementHoldOff is used by CommandHandler::Handle for decreasing the refcount of the CommandHandler.
+     * When refcount reached 0, CommandHandler will send the response to the peer and shutdown.
+     */
+    void DecrementHoldOff();
+
     /*
      * Allocates a packet buffer used for encoding an invoke response payload.
      *
@@ -118,24 +202,25 @@ private:
      */
     CHIP_ERROR AllocateBuffer();
 
-    //
-    // Called internally to signal the completion of all work on this object, gracefully close the
-    // exchange (by calling into the base class) and finally, signal to a registerd callback that it's
-    // safe to release this object.
-    //
+    /**
+     * Called internally to signal the completion of all work on this object, gracefully close the
+     * exchange (by calling into the base class) and finally, signal to a registerd callback that it's
+     * safe to release this object.
+     */
     void Close();
 
     CHIP_ERROR ProcessCommandDataIB(CommandDataIB::Parser & aCommandElement);
     CHIP_ERROR SendCommandResponse();
-    CHIP_ERROR PrepareResponse(const ConcreteCommandPath & aRequestCommandPath, CommandId aResponseCommand);
     CHIP_ERROR AddStatusInternal(const ConcreteCommandPath & aCommandPath, const Protocols::InteractionModel::Status aStatus,
                                  const Optional<ClusterStatus> & aClusterStatus);
 
     Callback * mpCallback = nullptr;
     InvokeResponseMessage::Builder mInvokeResponseBuilder;
     TLV::TLVType mDataElementContainerType = TLV::kTLVType_NotSpecified;
+    size_t mPendingWork                    = 0;
     bool mSuppressResponse                 = false;
     bool mTimedRequest                     = false;
 };
+
 } // namespace app
 } // namespace chip

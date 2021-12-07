@@ -7,8 +7,10 @@
 #import <Foundation/Foundation.h>
 
 #include <CHIP/CHIPCluster.h>
+#include <CHIP/CHIPCommandPayloadsObjc.h>
 
-typedef void (^ResponseHandler)(NSError * _Nullable error, NSDictionary * _Nullable values);
+typedef void (^ResponseHandler)(NSError * _Nullable error, id _Nullable values);
+typedef void (^StatusCompletion)(NSError * _Nullable error);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -22,23 +24,32 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIP{{asUpperCamelCase name}} : CHIPCluster
 
 {{#chip_cluster_commands}}
-{{#if (zcl_command_arguments_count this.id)}}
-- (void){{asLowerCamelCase name}}:{{#chip_cluster_command_arguments_with_structs_expanded}}{{#not_first}}{{asLowerCamelCase label}}:{{/not_first}}({{asObjectiveCBasicType type}}){{asLowerCamelCase label}} {{/chip_cluster_command_arguments_with_structs_expanded}}responseHandler:(ResponseHandler)responseHandler;
+{{! zcl_command_arguments_count is unreliable when used in a conditional.  As
+    a workaround, just use iteration over the arguments directly to see if we
+    have any. }}
+{{#chip_cluster_command_arguments}}
+{{#first}}
+- (void){{asLowerCamelCase parent.name}}WithParams:(CHIP{{asUpperCamelCase parent.parent.name}}Cluster{{asUpperCamelCase parent.name}}Params * {{#unless (commandHasRequiredField parent)}}_Nullable{{/unless}})params completionHandler:({{>command_completion_type command=parent}})completionHandler;
+{{/first}}
 {{else}}
-- (void){{asLowerCamelCase name}}:(ResponseHandler)responseHandler;
-{{/if}}
+- (void){{asLowerCamelCase parent.name}}WithCompletionHandler:({{>command_completion_type command=parent}})completionHandler;
+{{/chip_cluster_command_arguments}}
 {{/chip_cluster_commands}}
 
 {{#chip_server_cluster_attributes}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
-- (void)read{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler;
+- (void)read{{>attribute}}WithCompletionHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))completionHandler;
 {{#if isWritableAttribute}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler;
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler;
 {{/if}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
 - (void) subscribe{{>attribute}}WithMinInterval:(uint16_t)minInterval  maxInterval:(uint16_t)maxInterval responseHandler:(ResponseHandler)responseHandler;
-- (void) report{{>attribute}}WithResponseHandler:(ResponseHandler)responseHandler;
+- (void) report{{>attribute}}WithResponseHandler:(void (^)({{asObjectiveCClass type parent.name}} * _Nullable value, NSError * _Nullable error))responseHandler;
+{{/unless}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 
 @end

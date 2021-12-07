@@ -35,6 +35,7 @@
 
 #include <CHIPVersion.h>
 
+#include <inet/IPPrefix.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 
@@ -81,12 +82,6 @@ void HandleTimer(Layer * aLayer, void * aAppState)
 // Test before init network, Inet is not initialized
 static void TestInetPre(nlTestSuite * inSuite, void * inContext)
 {
-#if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    UDPEndPoint * testUDPEP = nullptr;
-#endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-#if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    TCPEndPoint * testTCPEP = nullptr;
-#endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Deinit system layer and network
@@ -97,13 +92,13 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     }
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    err = gInet.NewUDPEndPoint(&testUDPEP);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EndPointManager<UDPEndPoint> * udpEndPointManager = gInet.GetUDPEndPointManager();
+    NL_TEST_ASSERT(inSuite, udpEndPointManager == nullptr);
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
-    err = gInet.NewTCPEndPoint(&testTCPEP);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
+    EndPointManager<TCPEndPoint> * tcpEndPointManager = gInet.GetTCPEndPointManager();
+    NL_TEST_ASSERT(inSuite, tcpEndPointManager == nullptr);
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
     err = gSystemLayer.StartTimer(10_ms32, HandleTimer, nullptr);
@@ -131,10 +126,19 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
     InterfaceId intId;
     IPAddress addr;
     IPPrefix addrWithPrefix;
+    InterfaceType intType;
+    // 64 bit IEEE MAC address
+    const uint8_t kMaxHardwareAddressSize = 8;
+    uint8_t intHwAddress[kMaxHardwareAddressSize];
+    uint8_t intHwAddressSize;
+
     CHIP_ERROR err;
 
+#ifndef __MBED__
+    // Mbed interface name has different format
     err = InterfaceId::InterfaceNameToId("0", intId);
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
+#endif
 
     err = InterfaceId::Null().GetInterfaceName(intName, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -142,10 +146,10 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
     err = InterfaceId::Null().GetInterfaceName(intName, sizeof(intName));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR && intName[0] == '\0');
 
-    err = gInet.GetInterfaceFromAddr(addr, intId);
+    intId = InterfaceId::FromIPAddress(addr);
     NL_TEST_ASSERT(inSuite, !intId.IsPresent());
 
-    err = gInet.GetLinkLocalAddr(intId, nullptr);
+    err = intId.GetLinkLocalAddr(nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INVALID_ARGUMENT);
 
     printf("    Interfaces:\n");
@@ -165,14 +169,37 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
                intName, intIterator.IsUp() ? "UP" : "DOWN", intIterator.SupportsMulticast() ? "supports" : "no",
                intIterator.HasBroadcastAddress() ? "has" : "no");
 
-        gInet.GetLinkLocalAddr(intId, &addr);
-        gInet.MatchLocalIPv6Subnet(addr);
+        intId.GetLinkLocalAddr(&addr);
+        InterfaceId::MatchLocalIPv6Subnet(addr);
+
+        // Not all platforms support getting interface type and hardware address
+        err = intIterator.GetInterfaceType(intType);
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED);
+
+        err = intIterator.GetHardwareAddress(intHwAddress, intHwAddressSize, sizeof(intHwAddress));
+        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR || err == CHIP_ERROR_NOT_IMPLEMENTED);
+        if (err == CHIP_NO_ERROR)
+        {
+            NL_TEST_ASSERT(inSuite, intHwAddressSize == 6 || intHwAddressSize == 8);
+            NL_TEST_ASSERT(inSuite,
+                           intIterator.GetHardwareAddress(nullptr, intHwAddressSize, sizeof(intHwAddress)) ==
+                               CHIP_ERROR_INVALID_ARGUMENT);
+            NL_TEST_ASSERT(inSuite,
+                           intIterator.GetHardwareAddress(intHwAddress, intHwAddressSize, 4) == CHIP_ERROR_BUFFER_TOO_SMALL);
+        }
     }
+
     NL_TEST_ASSERT(inSuite, !intIterator.Next());
     NL_TEST_ASSERT(inSuite, intIterator.GetInterfaceId() == InterfaceId::Null());
     NL_TEST_ASSERT(inSuite, intIterator.GetInterfaceName(intName, sizeof(intName)) == CHIP_ERROR_INCORRECT_STATE);
     NL_TEST_ASSERT(inSuite, !intIterator.SupportsMulticast());
     NL_TEST_ASSERT(inSuite, !intIterator.HasBroadcastAddress());
+
+    // Not all platforms support getting interface type and hardware address
+    err = intIterator.GetInterfaceType(intType);
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE || err == CHIP_ERROR_NOT_IMPLEMENTED);
+    err = intIterator.GetHardwareAddress(intHwAddress, intHwAddressSize, sizeof(intHwAddress));
+    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE || err == CHIP_ERROR_NOT_IMPLEMENTED);
 
     printf("    Addresses:\n");
     for (; addrIterator.HasCurrent(); addrIterator.Next())
@@ -223,16 +250,16 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     PacketBufferHandle buf   = PacketBufferHandle::New(PacketBuffer::kMaxSize);
 
     // init all the EndPoints
-    err = gInet.NewUDPEndPoint(&testUDPEP);
+    err = gInet.GetUDPEndPointManager()->NewEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = gInet.NewTCPEndPoint(&testTCPEP1);
+    err = gInet.GetTCPEndPointManager()->NewEndPoint(&testTCPEP1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = gInet.GetLinkLocalAddr(InterfaceId::Null(), &addr);
+    err = InterfaceId::Null().GetLinkLocalAddr(&addr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = gInet.GetInterfaceFromAddr(addr, intId);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    intId = InterfaceId::FromIPAddress(addr);
+    NL_TEST_ASSERT(inSuite, intId.IsPresent());
 
 #if INET_CONFIG_ENABLE_IPV4
     NL_TEST_ASSERT(inSuite, IPAddress::FromString("10.0.0.1", addr_v4));
@@ -263,7 +290,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
     testUDPEP->Free();
 
-    err = gInet.NewUDPEndPoint(&testUDPEP);
+    err = gInet.GetUDPEndPointManager()->NewEndPoint(&testUDPEP);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 #if INET_CONFIG_ENABLE_IPV4
     err = testUDPEP->Bind(IPAddressType::kIPv4, addr_v4, 3000, intId);
@@ -321,16 +348,19 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // TODO: err is not validated EXCEPT the last call
-    for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS + 1; i++)
-        err = gInet.NewUDPEndPoint(&testUDPEP[i]);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
+    for (int i = INET_CONFIG_NUM_UDP_ENDPOINTS; i >= 0; --i)
+    {
+        err = gInet.GetUDPEndPointManager()->NewEndPoint(&testUDPEP[i]);
+        NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+    }
 
-    // TODO: err is not validated EXCEPT the last call
-    for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS + 1; i++)
-        err = gInet.NewTCPEndPoint(&testTCPEP[i]);
-    NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_ENDPOINT_POOL_FULL);
+    for (int i = INET_CONFIG_NUM_TCP_ENDPOINTS; i >= 0; --i)
+    {
+        err = gInet.GetTCPEndPointManager()->NewEndPoint(&testTCPEP[i]);
+        NL_TEST_ASSERT(inSuite, err == (i ? CHIP_NO_ERROR : CHIP_ERROR_ENDPOINT_POOL_FULL));
+    }
 
+#if CHIP_SYSTEM_CONFIG_NUM_TIMERS
     // Verify same aComplete and aAppState args do not exhaust timer pool
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
     {
@@ -338,18 +368,14 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     }
 
-#if CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
     char numTimersTest[CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1];
     for (int i = 0; i < CHIP_SYSTEM_CONFIG_NUM_TIMERS + 1; i++)
         err = gSystemLayer.StartTimer(10_ms32, HandleTimer, &numTimersTest[i]);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_NO_MEMORY);
-#endif // CHIP_SYSTEM_CONFIG_USE_TIMER_POOL
-
-    ShutdownNetwork();
-    ShutdownSystemLayer();
+#endif // CHIP_SYSTEM_CONFIG_NUM_TIMERS
 
     // Release UDP endpoints
-    for (int i = 0; i < INET_CONFIG_NUM_UDP_ENDPOINTS; i++)
+    for (int i = 0; i <= INET_CONFIG_NUM_UDP_ENDPOINTS; i++)
     {
         if (testUDPEP[i] != nullptr)
         {
@@ -358,13 +384,16 @@ static void TestInetEndPointLimit(nlTestSuite * inSuite, void * inContext)
     }
 
     // Release TCP endpoints
-    for (int i = 0; i < INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
+    for (int i = 0; i <= INET_CONFIG_NUM_TCP_ENDPOINTS; i++)
     {
         if (testTCPEP[i] != nullptr)
         {
             testTCPEP[i]->Free();
         }
     }
+
+    ShutdownNetwork();
+    ShutdownSystemLayer();
 }
 #endif
 

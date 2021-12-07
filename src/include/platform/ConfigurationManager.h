@@ -26,6 +26,7 @@
 
 #include <cstdint>
 
+#include <app-common/zap-generated/enums.h>
 #include <lib/support/Span.h>
 #include <platform/CHIPDeviceBuildConfig.h>
 #include <platform/PersistedStorage.h>
@@ -58,8 +59,19 @@ public:
 
     enum
     {
-        kMaxSerialNumberLength     = 32,
-        kMaxFirmwareRevisionLength = 32,
+        kMaxVendorNameLength            = 32,
+        kMaxProductNameLength           = 32,
+        kMaxNodeLabelLength             = 32,
+        kMaxLocationLength              = 2,
+        kMaxHardwareVersionStringLength = 64,
+        kMaxSoftwareVersionLength       = 64,
+        kMaxManufacturingDateLength     = 16,
+        kMaxPartNumberLength            = 32,
+        kMaxProductURLLength            = 256,
+        kMaxProductLabelLength          = 64,
+        kMaxSerialNumberLength          = 32,
+        kMaxUniqueIDLength              = 32,
+
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         kPrimaryMACAddressLength = 8,
 #else
@@ -72,21 +84,19 @@ public:
     virtual CHIP_ERROR GetVendorId(uint16_t & vendorId)                                             = 0;
     virtual CHIP_ERROR GetProductName(char * buf, size_t bufSize)                                   = 0;
     virtual CHIP_ERROR GetProductId(uint16_t & productId)                                           = 0;
-    virtual CHIP_ERROR GetProductRevisionString(char * buf, size_t bufSize)                         = 0;
-    virtual CHIP_ERROR GetProductRevision(uint16_t & productRev)                                    = 0;
+    virtual CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize)                         = 0;
+    virtual CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVer)                                   = 0;
     virtual CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize)                                  = 0;
     virtual CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf)                                    = 0;
     virtual CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf)                                      = 0;
     virtual CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf)                                    = 0;
     virtual CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth) = 0;
-    virtual CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize)                        = 0;
-    virtual CHIP_ERROR GetFirmwareRevision(uint16_t & firmwareRev)                                  = 0;
+    virtual CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize)                         = 0;
+    virtual CHIP_ERROR GetSoftwareVersion(uint16_t & softwareVer)                                   = 0;
     virtual CHIP_ERROR GetSetupPinCode(uint32_t & setupPinCode)                                     = 0;
     virtual CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator)                         = 0;
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
     // Lifetime counter is monotonic counter that is incremented only in the case of a factory reset
-    virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) = 0;
-#endif
+    virtual CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter)                  = 0;
     virtual CHIP_ERROR GetRegulatoryLocation(uint32_t & location)                      = 0;
     virtual CHIP_ERROR GetCountryCode(char * buf, size_t bufSize, size_t & codeLen)    = 0;
     virtual CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb)                            = 0;
@@ -94,18 +104,22 @@ public:
     virtual CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf)                 = 0;
     virtual CHIP_ERROR StorePrimary802154MACAddress(const uint8_t * buf)               = 0;
     virtual CHIP_ERROR StoreManufacturingDate(const char * mfgDate, size_t mfgDateLen) = 0;
-    virtual CHIP_ERROR StoreProductRevision(uint16_t productRev)                       = 0;
+    virtual CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer)                      = 0;
     virtual CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode)                        = 0;
     virtual CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator)            = 0;
     virtual CHIP_ERROR StoreRegulatoryLocation(uint32_t location)                      = 0;
     virtual CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen)             = 0;
     virtual CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb)                            = 0;
+    virtual CHIP_ERROR GetRebootCount(uint32_t & rebootCount)                          = 0;
+    virtual CHIP_ERROR StoreRebootCount(uint32_t rebootCount)                          = 0;
+    virtual CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours)      = 0;
+    virtual CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours)      = 0;
+    virtual CHIP_ERROR GetBootReason(uint32_t & bootReason)                            = 0;
+    virtual CHIP_ERROR StoreBootReason(uint32_t bootReason)                            = 0;
 
     virtual CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) = 0;
 
-#if !defined(NDEBUG)
     virtual CHIP_ERROR RunUnitTests() = 0;
-#endif
 
     virtual bool IsFullyProvisioned()   = 0;
     virtual void InitiateFactoryReset() = 0;
@@ -120,6 +134,9 @@ public:
     virtual CHIP_ERROR GetInitialPairingInstruction(char * buf, size_t bufSize)   = 0;
     virtual CHIP_ERROR GetSecondaryPairingHint(uint16_t & pairingHint)            = 0;
     virtual CHIP_ERROR GetSecondaryPairingInstruction(char * buf, size_t bufSize) = 0;
+
+    virtual CHIP_ERROR GetRegulatoryConfig(uint8_t & location);
+    virtual CHIP_ERROR GetLocationCapability(uint8_t & location);
 
 protected:
     // ===== Members for internal use by the following friends.
@@ -151,20 +168,30 @@ protected:
 };
 
 /**
- * Returns a reference to the public interface of the ConfigurationManager singleton object.
+ * Returns a reference to a ConfigurationManager object.
  *
- * chip application should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
+ * Applications should use this to access the features of the ConfigurationManager.
  */
 extern ConfigurationManager & ConfigurationMgr();
 
 /**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
+ * Sets a reference to a ConfigurationManager object.
  *
- * chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the selected platform.
+ * This must be called before any calls to ConfigurationMgr. If a nullptr is passed in,
+ * no changes will be made.
  */
-extern ConfigurationManagerImpl & ConfigurationMgrImpl();
+extern void SetConfigurationMgr(ConfigurationManager * configurationManager);
+
+inline CHIP_ERROR ConfigurationManager::GetRegulatoryConfig(uint8_t & location)
+{
+    return GetLocationCapability(location);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetLocationCapability(uint8_t & location)
+{
+    location = EMBER_ZCL_REGULATORY_LOCATION_TYPE_INDOOR;
+    return CHIP_NO_ERROR;
+}
 
 } // namespace DeviceLayer
 } // namespace chip

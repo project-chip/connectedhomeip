@@ -21,8 +21,8 @@
 #include <controller/CHIPCommissionableNodeController.h>
 #include <credentials/DeviceAttestationCredsProvider.h>
 #include <credentials/DeviceAttestationVerifier.h>
+#include <credentials/examples/DefaultDeviceAttestationVerifier.h>
 #include <credentials/examples/DeviceAttestationCredsExample.h>
-#include <credentials/examples/DeviceAttestationVerifierExample.h>
 #include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/SafeInt.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -37,13 +37,13 @@ using chip::ArgParser::HelpOptions;
 using chip::ArgParser::OptionDef;
 using chip::ArgParser::OptionSet;
 
-struct DeviceType
+struct TVExampleDeviceType
 {
     const char * name;
     uint16_t id;
 };
 
-constexpr DeviceType kKnownDeviceTypes[]             = { { "video-player", 35 }, { "dimmable-light", 257 } };
+constexpr TVExampleDeviceType kKnownDeviceTypes[]    = { { "video-player", 35 }, { "dimmable-light", 257 } };
 constexpr int kKnownDeviceTypesCount                 = sizeof kKnownDeviceTypes / sizeof *kKnownDeviceTypes;
 constexpr uint16_t kOptionDeviceType                 = 't';
 constexpr uint16_t kCommissioningWindowTimeoutInSec  = 3 * 60;
@@ -195,8 +195,12 @@ int main(int argc, char * argv[])
     // Initialize device attestation config
     SetDeviceAttestationCredentialsProvider(Examples::GetExampleDACProvider());
 
-    // Initialize device attestation verifier
-    SetDeviceAttestationVerifier(Examples::GetExampleDACVerifier());
+    // Initialize device attestation verifier from a constant version
+    {
+        // TODO: Replace testingRootStore with a AttestationTrustStore that has the necessary official PAA roots available
+        const chip::Credentials::AttestationTrustStore * testingRootStore = chip::Credentials::GetTestAttestationTrustStore();
+        SetDeviceAttestationVerifier(GetDefaultDACVerifier(testingRootStore));
+    }
 
     if (!chip::ArgParser::ParseArgs(argv[0], argc, argv, allOptions))
     {

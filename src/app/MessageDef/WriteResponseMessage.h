@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "AttributeStatuses.h"
+#include "AttributeStatusIBs.h"
 #include "StructBuilder.h"
 
 #include "StructParser.h"
@@ -52,32 +52,32 @@ public:
     CHIP_ERROR CheckSchemaValidity() const;
 
     /**
-     *  @brief Get a TLVReader for the AttributeStatuses. Next() must be called before accessing them.
+     *  @brief Get a TLVReader for the AttributeStatusIBs. Next() must be called before accessing them.
      *
      *  @param [in] apWriteResponses    A pointer to apWriteResponses
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetWriteResponses(AttributeStatuses::Parser * const apWriteResponses) const;
+    CHIP_ERROR GetWriteResponses(AttributeStatusIBs::Parser * const apWriteResponses) const;
 };
 
 class Builder : public StructBuilder
 {
 public:
     /**
-     *  @brief Initialize a AttributeStatuses::Builder for writing into the TLV stream
+     *  @brief Initialize a AttributeStatusIBs::Builder for writing into the TLV stream
      *
-     *  @return A reference to AttributeStatuses::Builder
+     *  @return A reference to AttributeStatusIBs::Builder
      */
-    AttributeStatuses::Builder & CreateWriteResponses();
+    AttributeStatusIBs::Builder & CreateWriteResponses();
 
     /**
-     *  @brief Get reference to AttributeStatuses::Builder
+     *  @brief Get reference to AttributeStatusIBs::Builder
      *
-     *  @return A reference to AttributeStatuses::Builder
+     *  @return A reference to AttributeStatusIBs::Builder
      */
-    AttributeStatuses::Builder & GetWriteResponses();
+    AttributeStatusIBs::Builder & GetWriteResponses();
 
     /**
      *  @brief Mark the end of this WriteResponseMessage
@@ -87,7 +87,7 @@ public:
     WriteResponseMessage::Builder & EndOfWriteResponseMessage();
 
 private:
-    AttributeStatuses::Builder mWriteResponses;
+    AttributeStatusIBs::Builder mWriteResponses;
 };
 } // namespace WriteResponseMessage
 } // namespace app

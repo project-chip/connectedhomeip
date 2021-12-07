@@ -1,0 +1,75 @@
+{{#if isOptional}}
+chip::JniReferences::GetInstance().GetOptionalValue({{source}}, {{source}});
+{{/if}}
+{{#if isNullable}}
+{{#if_chip_enum type}}
+  decltype({{target}}) {{source}}Value;
+  if ({{source}} != nullptr) {
+    {{source}}Value = static_cast<decltype({{target}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}}));
+  }
+{{else}}
+{{#if isArray}}
+{{! TODO: Support array types. }}
+{{else if isStruct}}
+{{! TODO: Use if_is_struct, which works better for nested types. Currently can't because inline partials aren't found in its else block. }}
+{{! TODO: Support struct types. }}
+{{else if (isOctetString type)}}
+  chip::ByteSpan {{source}}Value;
+  if ({{source}} != nullptr) {
+    {{source}}Value = chip::JniByteArray(env, static_cast<jbyteArray>({{source}})).byteSpan();
+  }
+{{else if (isCharString type)}}
+  chip::CharSpan {{source}}Value;
+  if ({{source}} != nullptr) {
+    {{source}}Value = chip::JniUtfString(env, static_cast<jstring>({{source}})).charSpan();
+  }
+{{else}}
+  {{#if_is_bitmap type}}
+    decltype({{target}}) {{source}}Value;
+    if ({{source}} != nullptr) {
+      {{source}}Value = static_cast<decltype({{target}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}}));
+    }
+  {{else}}
+    {{chipType}} {{source}}Value;
+    if ({{source}} != nullptr) {
+      {{source}}Value = chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}});
+    }
+  {{/if_is_bitmap}}
+{{/if}}
+{{/if_chip_enum}}
+{{/if}}
+{{#*inline "value"}}
+{{! TODO Implement complex types parsing in order to properly set the request parameters }}
+{{#if isArray}}
+{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}()
+{{else if isStruct}}
+{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}()
+{{else if (isOctetString type)}}
+chip::JniByteArray(env, static_cast<jbyteArray>({{source}})).byteSpan()
+{{else if (isCharString type)}}
+chip::JniUtfString(env, static_cast<jstring>({{source}})).charSpan()
+{{else}}
+  {{#if_chip_enum type}}
+    static_cast<decltype({{target}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}}))
+  {{else}}
+    {{#if_is_bitmap type}}
+      static_cast<decltype({{target}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}}))
+    {{else}}
+      static_cast<decltype({{target}})>(chip::JniReferences::GetInstance().{{asJavaBoxedType type}}ToPrimitive({{source}}))
+    {{/if_is_bitmap}}
+  {{/if_chip_enum}}
+{{/if}}
+{{/inline}}
+{{target}} =
+{{#if isOptional}}
+{{zapTypeToEncodableClusterObjectType type ns=parent.parent.name}}(
+{{/if}}
+{{#if isNullable}}
+  {{source}} == nullptr ? chip::app::DataModel::Nullable<{{chipType}}>() : chip::app::DataModel::Nullable<{{chipType}}>({{source}}Value)
+  {{else}}
+{{! TODO If the inline partial is indented, generation fails with "result.split is not a function". }}
+{{>value}}
+{{/if}}
+{{#if isOptional}}
+)
+{{/if}};

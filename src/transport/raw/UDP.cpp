@@ -46,7 +46,7 @@ CHIP_ERROR UDP::Init(UdpListenParameters & params)
         Close();
     }
 
-    err = params.GetInetLayer()->NewUDPEndPoint(&mUDPEndPoint);
+    err = params.GetEndPointManager()->NewEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
 
     ChipLogDetail(Inet, "UDP::Init bind&listen port=%d", params.GetListenPort());
@@ -114,7 +114,7 @@ CHIP_ERROR UDP::SendMessage(const Transport::PeerAddress & address, System::Pack
 void UDP::OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle && buffer, const Inet::IPPacketInfo * pktInfo)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
-    UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
+    UDP * udp               = reinterpret_cast<UDP *>(endPoint->mAppState);
     PeerAddress peerAddress = PeerAddress::UDP(pktInfo->SrcAddress, pktInfo->SrcPort, pktInfo->Interface);
 
     udp->HandleMessageReceived(peerAddress, std::move(buffer));
@@ -122,6 +122,23 @@ void UDP::OnUdpReceive(Inet::UDPEndPoint * endPoint, System::PacketBufferHandle 
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Inet, "Failed to receive UDP message: %s", ErrorStr(err));
+    }
+}
+
+CHIP_ERROR UDP::MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join)
+{
+    char addressStr[Transport::PeerAddress::kMaxToStringSize];
+    address.ToString(addressStr, Transport::PeerAddress::kMaxToStringSize);
+
+    if (join)
+    {
+        ChipLogProgress(Inet, "Joining Multicast Group with address %s", addressStr);
+        return mUDPEndPoint->JoinMulticastGroup(mUDPEndPoint->GetBoundInterface(), address.GetIPAddress());
+    }
+    else
+    {
+        ChipLogProgress(Inet, "Leaving Multicast Group with address %s", addressStr);
+        return mUDPEndPoint->LeaveMulticastGroup(mUDPEndPoint->GetBoundInterface(), address.GetIPAddress());
     }
 }
 

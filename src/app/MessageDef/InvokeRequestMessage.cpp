@@ -25,14 +25,6 @@
 
 namespace chip {
 namespace app {
-CHIP_ERROR InvokeRequestMessage::Parser::Init(const TLV::TLVReader & aReader)
-{
-    mReader.Init(aReader);
-    VerifyOrReturnError(TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR InvokeRequestMessage::Parser::CheckSchemaValidity() const
 {
@@ -127,7 +119,7 @@ CHIP_ERROR InvokeRequestMessage::Parser::GetSuppressResponse(bool * const apSupp
 
 CHIP_ERROR InvokeRequestMessage::Parser::GetTimedRequest(bool * const apTimedRequest) const
 {
-    return GetSimpleValue(to_underlying(Tag::kSuppressResponse), TLV::kTLVType_Boolean, apTimedRequest);
+    return GetSimpleValue(to_underlying(Tag::kTimedRequest), TLV::kTLVType_Boolean, apTimedRequest);
 }
 
 CHIP_ERROR InvokeRequestMessage::Parser::GetInvokeRequests(InvokeRequests::Parser * const apInvokeRequests) const

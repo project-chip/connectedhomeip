@@ -23,9 +23,8 @@
 #pragma once
 
 #include "AttributeDataIBs.h"
-#include "AttributeDataVersionList.h"
-#include "Builder.h"
-#include "Parser.h"
+#include "StructBuilder.h"
+#include "StructParser.h"
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -35,26 +34,18 @@
 namespace chip {
 namespace app {
 namespace WriteRequestMessage {
-enum
+enum class Tag : uint8_t
 {
-    kCsTag_SuppressResponse         = 0,
-    kCsTag_AttributeDataIBs         = 1,
-    kCsTag_AttributeDataVersionList = 2,
-    kCsTag_MoreChunkedMessages      = 3,
+    kSuppressResponse    = 0,
+    kTimedRequest        = 1,
+    kWriteRequests       = 2,
+    kMoreChunkedMessages = 3,
+    kIsFabricFiltered    = 4,
 };
 
-class Parser : public chip::app::Parser
+class Parser : public StructParser
 {
 public:
-    /**
-     *  @brief Initialize the parser object with TLVReader
-     *
-     *  @param [in] aReader A pointer to a TLVReader, which should point to the beginning of this request
-     *
-     *  @return #CHIP_NO_ERROR on success
-     */
-    CHIP_ERROR Init(const chip::TLV::TLVReader & aReader);
-
     /**
      *  @brief Roughly verify the message is correctly formed
      *   1) all mandatory tags are present
@@ -69,7 +60,7 @@ public:
     CHIP_ERROR CheckSchemaValidity() const;
 
     /**
-     *  @brief Get GetSuppressResponse Next() must be called before accessing them.
+     *  @brief Get SuppressResponse boolean
      *
      *  @param [in] apSuppressResponse    A pointer to apSuppressResponse
      *
@@ -79,6 +70,16 @@ public:
     CHIP_ERROR GetSuppressResponse(bool * const apSuppressResponse) const;
 
     /**
+     *  @brief Get TimedRequest boolean
+     *
+     *  @param [in] apTimedRequest    A pointer to apTimedRequest
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetTimedRequest(bool * const apTimedRequest) const;
+
+    /**
      *  @brief Get a TLVReader for the AttributePathIBs. Next() must be called before accessing them.
      *
      *  @param [in] apAttributeDataIBs    A pointer to apAttributeDataIBs
@@ -86,20 +87,10 @@ public:
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetAttributeReportIBs(AttributeDataIBs::Parser * const apAttributeDataIBs) const;
+    CHIP_ERROR GetWriteRequests(AttributeDataIBs::Parser * const apAttributeDataIBs) const;
 
     /**
-     *  @brief Get a TLVReader for the AttributeDataVersionList. Next() must be called before accessing them.
-     *
-     *  @param [in] apAttributeDataVersionList    A pointer to apAttributeDataVersionList
-     *
-     *  @return #CHIP_NO_ERROR on success
-     *          #CHIP_END_OF_TLV if there is no such element
-     */
-    CHIP_ERROR GetAttributeDataVersionList(AttributeDataVersionList::Parser * const apAttributeDataVersionList) const;
-
-    /**
-     *  @brief Get MoreChunkedMessages message. Next() must be called before accessing them.
+     *  @brief Get MoreChunkedMessages boolean
      *
      *  @param [in] apMoreChunkedMessages    A pointer to apMoreChunkedMessages
      *
@@ -107,20 +98,21 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetMoreChunkedMessages(bool * const apMoreChunkedMessages) const;
-};
 
-class Builder : public chip::app::Builder
-{
-public:
     /**
-     *  @brief Initialize a WriteRequestMessage::Builder for writing into a TLV stream
+     *  @brief Get IsFabricFiltered boolean
      *
-     *  @param [in] apWriter    A pointer to TLVWriter
+     *  @param [in] apIsFabricFiltered    A pointer to apIsFabricFiltered
      *
      *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
+    CHIP_ERROR GetIsFabricFiltered(bool * const apIsFabricFiltered) const;
+};
 
+class Builder : public StructBuilder
+{
+public:
     /**
      *  @brief This can be used to optionally signal to the server that no responses are to be sent back.
      *  @param [in] aSuppressResponse true if client need to signal suppress response
@@ -129,18 +121,18 @@ public:
     WriteRequestMessage::Builder & SuppressResponse(const bool aSuppressResponse);
 
     /**
+     *  @brief flag action as part of a timed write transaction
+     *  @param [in] aSuppressResponse true if client need to signal suppress response
+     *  @return A reference to *this
+     */
+    WriteRequestMessage::Builder & TimedRequest(const bool aTimedRequest);
+
+    /**
      *  @brief Initialize a AttributeDataIBs::Builder for writing into the TLV stream
      *
      *  @return A reference to AttributeDataIBs::Builder
      */
-    AttributeDataIBs::Builder & CreateAttributeDataIBsBuilder();
-
-    /**
-     *  @brief Initialize a AttributeDataVersionList::Builder for writing into the TLV stream
-     *
-     *  @return A reference to EventPaths::Builder
-     */
-    AttributeDataVersionList::Builder & CreateAttributeDataVersionListBuilder();
+    AttributeDataIBs::Builder & CreateWriteRequests();
 
     /**
      *  @brief Set True if the set of AttributeDataIBs have to be sent across multiple packets in a single transaction
@@ -149,7 +141,13 @@ public:
      */
     WriteRequestMessage::Builder & MoreChunkedMessages(const bool aMoreChunkedMessages);
 
-    AttributeDataIBs::Builder & GetAttributeReportIBsBuilder();
+    AttributeDataIBs::Builder & GetWriteRequests() { return mWriteRequests; };
+
+    /**
+     *  @brief  limits the data written within fabric-scoped lists to the accessing fabric
+     *  @return A reference to *this
+     */
+    WriteRequestMessage::Builder & IsFabricFiltered(const bool aIsFabricFiltered);
 
     /**
      *  @brief Mark the end of this WriteRequestMessage
@@ -159,9 +157,8 @@ public:
     WriteRequestMessage::Builder & EndOfWriteRequestMessage();
 
 private:
-    AttributeDataIBs::Builder mAttributeDataIBsBuilder;
-    AttributeDataVersionList::Builder mAttributeDataVersionListBuilder;
+    AttributeDataIBs::Builder mWriteRequests;
 };
-}; // namespace WriteRequestMessage
-}; // namespace app
-}; // namespace chip
+} // namespace WriteRequestMessage
+} // namespace app
+} // namespace chip

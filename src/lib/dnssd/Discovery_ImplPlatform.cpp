@@ -128,8 +128,7 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
                                 char (&mrpRetryActiveStorage)[N_active], char (&tcpSupportedStorage)[N_tcp],
                                 TextEntry txtEntryStorage[], size_t & txtEntryIdx)
 {
-    Optional<uint32_t> mrpRetryIntervalIdle, mrpRetryIntervalActive;
-    params.GetMRPRetryIntervals(mrpRetryIntervalIdle, mrpRetryIntervalActive);
+    auto optionalMrp = params.GetMRPConfig();
 
     // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value
     // change or device type change.
@@ -137,44 +136,47 @@ CHIP_ERROR AddCommonTxtElements(const BaseAdvertisingParams<Derived> & params, c
     // in with the correct values and set one level up from here.
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     chip::DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
-    sedPollingConfig.Clear();
     ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig));
     // Increment default MRP retry intervals by SED poll period to be on the safe side
     // and avoid unnecessary retransmissions.
-    if (mrpRetryIntervalIdle.HasValue())
+    if (optionalMrp.HasValue())
     {
-        mrpRetryIntervalIdle.SetValue(mrpRetryIntervalIdle.Value() + sedPollingConfig.SlowPollingIntervalMS);
-    }
-    if (mrpRetryIntervalActive.HasValue())
-    {
-        mrpRetryIntervalActive.SetValue(mrpRetryIntervalActive.Value() + sedPollingConfig.FastPollingIntervalMS);
+        auto mrp = optionalMrp.Value();
+        optionalMrp.SetValue(ReliableMessageProtocolConfig(mrp.mIdleRetransTimeout + sedPollingConfig.SlowPollingIntervalMS,
+                                                           mrp.mActiveRetransTimeout + sedPollingConfig.FastPollingIntervalMS));
     }
 #endif
-    if (mrpRetryIntervalIdle.HasValue())
+    if (optionalMrp.HasValue())
     {
-        if (mrpRetryIntervalIdle.Value() > kMaxRetryInterval)
+        auto mrp = optionalMrp.Value();
         {
-            ChipLogProgress(Discovery, "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
-            mrpRetryIntervalIdle.SetValue(kMaxRetryInterval);
+            if (mrp.mIdleRetransTimeout > kMaxRetryInterval)
+            {
+                ChipLogProgress(Discovery,
+                                "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
+                mrp.mIdleRetransTimeout = kMaxRetryInterval;
+            }
+            size_t writtenCharactersNumber =
+                snprintf(mrpRetryIdleStorage, sizeof(mrpRetryIdleStorage), "%" PRIu32, mrp.mIdleRetransTimeout.count());
+            VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalIdleMaxLength),
+                                CHIP_ERROR_INVALID_STRING_LENGTH);
+            txtEntryStorage[txtEntryIdx++] = { "CRI", Uint8::from_const_char(mrpRetryIdleStorage), strlen(mrpRetryIdleStorage) };
         }
-        size_t writtenCharactersNumber =
-            snprintf(mrpRetryIdleStorage, sizeof(mrpRetryIdleStorage), "%" PRIu32, mrpRetryIntervalIdle.Value());
-        VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalIdleMaxLength),
-                            CHIP_ERROR_INVALID_STRING_LENGTH);
-        txtEntryStorage[txtEntryIdx++] = { "CRI", Uint8::from_const_char(mrpRetryIdleStorage), strlen(mrpRetryIdleStorage) };
-    }
-    if (mrpRetryIntervalActive.HasValue())
-    {
-        if (mrpRetryIntervalActive.Value() > kMaxRetryInterval)
+
         {
-            ChipLogProgress(Discovery, "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
-            mrpRetryIntervalActive.SetValue(kMaxRetryInterval);
+            if (mrp.mActiveRetransTimeout > kMaxRetryInterval)
+            {
+                ChipLogProgress(Discovery,
+                                "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
+                mrp.mActiveRetransTimeout = kMaxRetryInterval;
+            }
+            size_t writtenCharactersNumber =
+                snprintf(mrpRetryActiveStorage, sizeof(mrpRetryActiveStorage), "%" PRIu32, mrp.mActiveRetransTimeout.count());
+            VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalActiveMaxLength),
+                                CHIP_ERROR_INVALID_STRING_LENGTH);
+            txtEntryStorage[txtEntryIdx++] = { "CRA", Uint8::from_const_char(mrpRetryActiveStorage),
+                                               strlen(mrpRetryActiveStorage) };
         }
-        size_t writtenCharactersNumber =
-            snprintf(mrpRetryActiveStorage, sizeof(mrpRetryActiveStorage), "%" PRIu32, mrpRetryIntervalActive.Value());
-        VerifyOrReturnError((writtenCharactersNumber > 0) && (writtenCharactersNumber <= kTxtRetryIntervalActiveMaxLength),
-                            CHIP_ERROR_INVALID_STRING_LENGTH);
-        txtEntryStorage[txtEntryIdx++] = { "CRA", Uint8::from_const_char(mrpRetryActiveStorage), strlen(mrpRetryActiveStorage) };
     }
     if (params.GetTcpSupported().HasValue())
     {
@@ -454,29 +456,21 @@ CHIP_ERROR DiscoveryImplPlatform::FinalizeServiceUpdate()
     return ChipDnssdFinalizeServiceUpdate();
 }
 
-CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
+CHIP_ERROR DiscoveryImplPlatform::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type,
+                                                Resolver::CacheBypass dnssdCacheBypass)
 {
     ReturnErrorOnFailure(InitImpl());
 
 #if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    Inet::IPAddress addr;
-    uint16_t port;
-    Inet::InterfaceId iface;
-
-    /* see if the entry is cached and use it.... */
-
-    if (sDnssdCache.Lookup(peerId, addr, port, iface) == CHIP_NO_ERROR)
+    if (dnssdCacheBypass == Resolver::CacheBypass::Off)
     {
+        /* see if the entry is cached and use it.... */
         ResolvedNodeData nodeData;
-
-        nodeData.mInterfaceId = iface;
-        nodeData.mPort        = port;
-        nodeData.mAddress     = addr;
-        nodeData.mPeerId      = peerId;
-
-        mResolverDelegate->OnNodeIdResolved(nodeData);
-
-        return CHIP_NO_ERROR;
+        if (sDnssdCache.Lookup(peerId, nodeData) == CHIP_NO_ERROR)
+        {
+            mResolverDelegate->OnNodeIdResolved(nodeData);
+            return CHIP_NO_ERROR;
+        }
     }
 #endif
 
@@ -514,6 +508,7 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, DnssdService * res
     DiscoveryImplPlatform * mgr = static_cast<DiscoveryImplPlatform *>(context);
     DiscoveredNodeData data;
     Platform::CopyString(data.hostName, result->mHostName);
+    Platform::CopyString(data.instanceName, result->mName);
 
     if (result->mAddress.HasValue() && data.numIPs < DiscoveredNodeData::kMaxIPAddresses)
     {
@@ -536,7 +531,7 @@ void DiscoveryImplPlatform::HandleNodeResolve(void * context, DnssdService * res
 CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(InitImpl());
-    char serviceName[kMaxCommisisonableServiceNameSize];
+    char serviceName[kMaxCommissionableServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionableNode));
 
     return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
@@ -546,7 +541,7 @@ CHIP_ERROR DiscoveryImplPlatform::FindCommissionableNodes(DiscoveryFilter filter
 CHIP_ERROR DiscoveryImplPlatform::FindCommissioners(DiscoveryFilter filter)
 {
     ReturnErrorOnFailure(InitImpl());
-    char serviceName[kMaxCommisisonerServiceNameSize];
+    char serviceName[kMaxCommissionerServiceNameSize];
     ReturnErrorOnFailure(MakeServiceTypeName(serviceName, sizeof(serviceName), filter, DiscoveryType::kCommissionerNode));
 
     return ChipDnssdBrowse(serviceName, DnssdServiceProtocol::kDnssdProtocolUdp, Inet::IPAddressType::kAny,
@@ -586,22 +581,16 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
         return;
     }
 
-#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
-    // TODO --  define appropriate TTL, for now use 2000 msec (rfc default)
-    // figure out way to use TTL value from mDNS packet in  future update
-    error = mgr->sDnssdCache.Insert(nodeData.mPeerId, result->mAddress.Value(), result->mPort, result->mInterface,
-                                    System::Clock::Seconds16(2));
-
-    if (CHIP_NO_ERROR != error)
-    {
-        ChipLogError(Discovery, "DnssdCache insert failed with %s", chip::ErrorStr(error));
-    }
-#endif
-
+    // TODO: Expand the results to include all the addresses.
     Platform::CopyString(nodeData.mHostName, result->mHostName);
     nodeData.mInterfaceId = result->mInterface;
-    nodeData.mAddress     = result->mAddress.ValueOr({});
+    nodeData.mAddress[0]  = result->mAddress.ValueOr({});
     nodeData.mPort        = result->mPort;
+    nodeData.mNumIPs      = 1;
+    // TODO: Use seconds?
+    const System::Clock::Timestamp currentTime = System::SystemClock().GetMonotonicTimestamp();
+
+    nodeData.mExpiryTime = currentTime + System::Clock::Seconds16(result->mTtlSeconds);
 
     for (size_t i = 0; i < result->mTextEntrySize; ++i)
     {
@@ -611,6 +600,14 @@ void DiscoveryImplPlatform::HandleNodeIdResolve(void * context, DnssdService * r
     }
 
     nodeData.LogNodeIdResolved();
+#if CHIP_CONFIG_MDNS_CACHE_SIZE > 0
+    error = mgr->sDnssdCache.Insert(nodeData);
+
+    if (CHIP_NO_ERROR != error)
+    {
+        ChipLogError(Discovery, "DnssdCache insert failed with %s", chip::ErrorStr(error));
+    }
+#endif
     mgr->mResolverDelegate->OnNodeIdResolved(nodeData);
 }
 

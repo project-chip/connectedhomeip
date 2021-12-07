@@ -21,17 +21,12 @@
 #include "../../config/PersistentStorage.h"
 #include "../common/CHIPCommand.h"
 #include <app/chip-zcl-zpro-codec.h>
-#include <controller/ExampleOperationalCredentialsIssuer.h>
 #include <lib/core/CHIPEncoding.h>
-
-// Limits on endpoint values.
-#define CHIP_ZCL_ENDPOINT_MIN 0x00
-#define CHIP_ZCL_ENDPOINT_MAX 0xF0
 
 class ModelCommand : public CHIPCommand
 {
 public:
-    using ChipDevice = ::chip::Controller::Device;
+    using ChipDevice = ::chip::OperationalDeviceProxy;
 
     ModelCommand(const char * commandName) :
         CHIPCommand(commandName), mOnDeviceConnectedCallback(OnDeviceConnectedFn, this),
@@ -42,6 +37,7 @@ public:
     {
         AddArgument("node-id", 0, UINT64_MAX, &mNodeId);
         AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId);
+        AddArgument("timedInteractionTimeoutMs", 0, UINT16_MAX, &mTimedInteractionTimeoutMs);
     }
 
     /////////// CHIPCommand Interface /////////
@@ -50,6 +46,9 @@ public:
 
     virtual CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endPointId) = 0;
 
+protected:
+    chip::Optional<uint16_t> mTimedInteractionTimeoutMs;
+
 private:
     chip::NodeId mNodeId;
     uint8_t mEndPointId;
@@ -57,6 +56,6 @@ private:
     static void OnDeviceConnectedFn(void * context, ChipDevice * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 
-    chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
-    chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 };

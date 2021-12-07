@@ -288,6 +288,19 @@ CHIP_ERROR OperationalDataset::GetExtendedPanId(uint8_t (&aExtendedPanId)[kSizeE
     return CHIP_ERROR_TLV_TAG_NOT_FOUND;
 }
 
+CHIP_ERROR OperationalDataset::GetExtendedPanIdAsByteSpan(ByteSpan & span) const
+{
+    const ThreadTLV * tlv = Locate(ThreadTLV::kExtendedPanId);
+
+    if (tlv != nullptr)
+    {
+        span = ByteSpan(reinterpret_cast<const uint8_t *>(tlv->GetValue()), tlv->GetLength());
+        return CHIP_NO_ERROR;
+    }
+
+    return CHIP_ERROR_TLV_TAG_NOT_FOUND;
+}
+
 CHIP_ERROR OperationalDataset::SetExtendedPanId(const uint8_t (&aExtendedPanId)[kSizeExtendedPanId])
 {
     ThreadTLV * tlv = MakeRoom(ThreadTLV::kExtendedPanId, sizeof(*tlv) + sizeof(aExtendedPanId));

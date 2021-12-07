@@ -139,16 +139,18 @@
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-                [cluster bind:nodeId
-                            groupId:groupId
-                         endpointId:endpointId
-                          clusterId:clusterId
-                    responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                        NSString * resultString = (error == nil)
-                            ? @"Bind command: success!"
-                            : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
-                        NSLog(resultString, nil);
-                    }];
+                __auto_type * params = [[CHIPBindingClusterBindParams alloc] init];
+                params.nodeId = @(nodeId);
+                params.groupId = @(groupId);
+                params.endpointId = @(endpointId);
+                params.clusterId = @(clusterId);
+                [cluster bindWithParams:params
+                      completionHandler:^(NSError * _Nullable error) {
+                          NSString * resultString = (error == nil)
+                              ? @"Bind command: success!"
+                              : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
+                          NSLog(resultString, nil);
+                      }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }
@@ -169,16 +171,18 @@
     if (CHIPGetConnectedDevice(^(CHIPDevice * _Nullable chipDevice, NSError * _Nullable error) {
             if (chipDevice) {
                 CHIPBinding * cluster = [[CHIPBinding alloc] initWithDevice:chipDevice endpoint:0 queue:dispatch_get_main_queue()];
-                [cluster unbind:nodeId
-                            groupId:groupId
-                         endpointId:endpointId
-                          clusterId:clusterId
-                    responseHandler:^(NSError * _Nullable error, NSDictionary * _Nullable values) {
-                        NSString * resultString = (error == nil)
-                            ? @"Unbind command: success!"
-                            : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
-                        NSLog(resultString, nil);
-                    }];
+                __auto_type * params = [[CHIPBindingClusterUnbindParams alloc] init];
+                params.nodeId = @(nodeId);
+                params.groupId = @(groupId);
+                params.endpointId = @(endpointId);
+                params.clusterId = @(clusterId);
+                [cluster unbindWithParams:params
+                        completionHandler:^(NSError * _Nullable error) {
+                            NSString * resultString = (error == nil)
+                                ? @"Unbind command: success!"
+                                : [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code];
+                            NSLog(resultString, nil);
+                        }];
             } else {
                 NSLog(@"Status: Failed to establish a connection with the device");
             }

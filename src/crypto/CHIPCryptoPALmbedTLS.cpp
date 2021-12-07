@@ -46,6 +46,7 @@
 
 #include <lib/core/CHIPSafeCasts.h>
 #include <lib/support/BufferWriter.h>
+#include <lib/support/CHIPArgParser.hpp>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafePointerCast.h>
 #include <lib/support/logging/CHIPLogging.h>
@@ -1270,6 +1271,100 @@ exit:
     return error;
 }
 
+inline bool IsTimeGreaterThanEqual(const mbedtls_x509_time * const timeA, const mbedtls_x509_time * const timeB)
+{
+    return timeA->year > timeB->year || (timeA->year == timeB->year && timeA->mon > timeB->mon) ||
+        (timeA->year == timeB->year && timeA->mon == timeB->mon && timeA->day > timeB->day) ||
+        (timeA->year == timeB->year && timeA->mon == timeB->mon && timeA->day == timeB->day && timeA->hour > timeB->hour) ||
+        (timeA->year == timeB->year && timeA->mon == timeB->mon && timeA->day == timeB->day && timeA->hour == timeB->hour &&
+         timeA->min > timeB->min) ||
+        (timeA->year == timeB->year && timeA->mon == timeB->mon && timeA->day == timeB->day && timeA->hour == timeB->hour &&
+         timeA->min == timeB->min && timeA->sec >= timeB->sec);
+}
+
+CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, const ByteSpan & toBeEvaluatedCertificate)
+{
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    mbedtls_x509_crt mbedReferenceCertificate;
+    mbedtls_x509_crt mbedToBeEvaluatedCertificate;
+    mbedtls_x509_time refNotBeforeTime;
+    mbedtls_x509_time tbeNotBeforeTime;
+    mbedtls_x509_time tbeNotAfterTime;
+    int result;
+
+    VerifyOrReturnError(!referenceCertificate.empty() && !toBeEvaluatedCertificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    mbedtls_x509_crt_init(&mbedReferenceCertificate);
+    mbedtls_x509_crt_init(&mbedToBeEvaluatedCertificate);
+
+    result = mbedtls_x509_crt_parse(&mbedReferenceCertificate, Uint8::to_const_uchar(referenceCertificate.data()),
+                                    referenceCertificate.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_x509_crt_parse(&mbedToBeEvaluatedCertificate, Uint8::to_const_uchar(toBeEvaluatedCertificate.data()),
+                                    toBeEvaluatedCertificate.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    refNotBeforeTime = mbedReferenceCertificate.valid_from;
+    tbeNotBeforeTime = mbedToBeEvaluatedCertificate.valid_from;
+    tbeNotAfterTime  = mbedToBeEvaluatedCertificate.valid_to;
+
+    // TODO: Handle PAA/PAI re-issue and enable below time validation
+    // check if referenceCertificate is issued at or after tbeCertificate's notBefore timestamp
+    // VerifyOrExit(IsTimeGreaterThanEqual(&refNotBeforeTime, &tbeNotBeforeTime), error = CHIP_ERROR_CERT_EXPIRED);
+
+    // check if referenceCertificate is issued at or before tbeCertificate's notAfter timestamp
+    // VerifyOrExit(IsTimeGreaterThanEqual(&tbeNotAfterTime, &refNotBeforeTime), error = CHIP_ERROR_CERT_EXPIRED);
+
+exit:
+    _log_mbedTLS_error(result);
+    mbedtls_x509_crt_free(&mbedReferenceCertificate);
+    mbedtls_x509_crt_free(&mbedToBeEvaluatedCertificate);
+
+#else
+    (void) referenceCertificate;
+    (void) toBeEvaluatedCertificate;
+    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+
+    return error;
+}
+
+CHIP_ERROR IsCertificateValidAtCurrentTime(const ByteSpan & certificate)
+{
+#if defined(MBEDTLS_X509_CRT_PARSE_C)
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    mbedtls_x509_crt mbedCertificate;
+    int result;
+
+    VerifyOrReturnError(!certificate.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+
+    mbedtls_x509_crt_init(&mbedCertificate);
+
+    result = mbedtls_x509_crt_parse(&mbedCertificate, Uint8::to_const_uchar(certificate.data()), certificate.size());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    // check if certificate's notBefore timestamp is earlier than or equal to current time.
+    result = mbedtls_x509_time_is_past(&mbedCertificate.valid_from);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_CERT_EXPIRED);
+
+    // check if certificate's notAfter timestamp is later than current time.
+    result = mbedtls_x509_time_is_future(&mbedCertificate.valid_to);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_CERT_EXPIRED);
+
+exit:
+    _log_mbedTLS_error(result);
+    mbedtls_x509_crt_free(&mbedCertificate);
+
+#else
+    (void) certificate;
+    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
+#endif // defined(MBEDTLS_X509_CRT_PARSE_C)
+
+    return error;
+}
+
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
@@ -1405,38 +1500,77 @@ CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
     return ExtractKIDFromX509Cert(false, certificate, akid);
 }
 
-CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid)
+namespace {
+
+CHIP_ERROR ExtractDNAttributeFromX509Cert(const uint8_t * oidAttribute, size_t oidAttributeLen, const ByteSpan & certificate,
+                                          uint16_t & id)
 {
 #if defined(MBEDTLS_X509_CRT_PARSE_C)
     CHIP_ERROR error = CHIP_NO_ERROR;
     mbedtls_x509_crt mbed_cert;
+    mbedtls_asn1_named_data * dnIterator    = nullptr;
+    constexpr size_t dnAttributeSize        = 4;
+    constexpr size_t dnAttributeStringSize  = dnAttributeSize + 1;
+    char dnAttribute[dnAttributeStringSize] = { 0 };
 
     mbedtls_x509_crt_init(&mbed_cert);
 
     int result = mbedtls_x509_crt_parse(&mbed_cert, Uint8::to_const_uchar(certificate.data()), certificate.size());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
-    // vendor id is the second element of subject and should be of size 4
-    // returning CHIP_ERROR_KEY_NOT_FOUND to sinalize VID is not present in the certificate.
-    VerifyOrExit(mbed_cert.subject.next->val.p != nullptr && mbed_cert.subject.next->val.len == 4,
-                 error = CHIP_ERROR_KEY_NOT_FOUND);
+    for (dnIterator = &mbed_cert.subject; dnIterator != nullptr; dnIterator = dnIterator->next)
+    {
+        if (dnIterator != nullptr && dnIterator->oid.p != nullptr && dnIterator->oid.len == oidAttributeLen &&
+            memcmp(oidAttribute, dnIterator->oid.p, dnIterator->oid.len) == 0 && dnIterator->val.p != nullptr &&
+            dnIterator->val.len == dnAttributeSize)
+        {
+            // vendor id is of size 4, we should ensure the string is null terminated before passing in to strtoul to avoid
+            // undefined behavior
+            memcpy(dnAttribute, dnIterator->val.p, dnAttributeSize);
+            dnAttribute[dnAttributeSize] = 0;
+            VerifyOrExit(ArgParser::ParseInt(dnAttribute, id, 16), error = CHIP_ERROR_INTERNAL);
+            break;
+        }
+    }
 
-    // vendor id is of size 4, we should ensure the string is null terminated before passing in to strtoul to avoid undefined
-    // behavior
-    mbed_cert.subject.next->val.p[4] = 0;
-    vid = static_cast<VendorId>(strtoul(reinterpret_cast<const char *>(mbed_cert.subject.next->val.p), NULL, 16));
+    // returning CHIP_ERROR_KEY_NOT_FOUND to indicate that the DN Attribute is not present in the certificate.
+    VerifyOrExit(dnIterator != nullptr, error = CHIP_ERROR_KEY_NOT_FOUND);
 
 exit:
     _log_mbedTLS_error(result);
     mbedtls_x509_crt_free(&mbed_cert);
 
 #else
+    (void) oidAttribute;
+    (void) oidAttributeLen;
     (void) certificate;
-    (void) vid;
+    (void) id;
     CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // defined(MBEDTLS_X509_CRT_PARSE_C)
 
     return error;
+}
+
+} // namespace
+
+CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & certificate, uint16_t & id)
+{
+    constexpr uint8_t sOID_AttributeType_ChipVendorId[]  = { 0x2B, 0x06, 0x01, 0x04, 0x01, 0x82, 0xA2, 0x7C, 0x02, 0x01 };
+    constexpr uint8_t sOID_AttributeType_ChipProductId[] = { 0x2B, 0x06, 0x01, 0x04, 0x01, 0x82, 0xA2, 0x7C, 0x02, 0x02 };
+
+    switch (matterOid)
+    {
+    case MatterOid::kVendorId:
+        id = VendorId::NotSpecified;
+        return ExtractDNAttributeFromX509Cert(sOID_AttributeType_ChipVendorId, sizeof(sOID_AttributeType_ChipVendorId), certificate,
+                                              id);
+    case MatterOid::kProductId:
+        id = 0; // PID not specified value
+        return ExtractDNAttributeFromX509Cert(sOID_AttributeType_ChipProductId, sizeof(sOID_AttributeType_ChipProductId),
+                                              certificate, id);
+    default:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 }
 
 } // namespace Crypto

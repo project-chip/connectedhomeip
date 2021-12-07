@@ -30,8 +30,8 @@
 #define __APPLE_USE_RFC_3542
 #include <inet/UDPEndPoint.h>
 
+#include <inet/IPPacketInfo.h>
 #include <inet/InetFaultInjection.h>
-#include <inet/InetLayer.h>
 #include <inet/arpa-inet-compatibility.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/SafeInt.h>
@@ -130,15 +130,12 @@
 namespace chip {
 namespace Inet {
 
-BitMapObjectPool<UDPEndPoint, INET_CONFIG_NUM_UDP_ENDPOINTS> UDPEndPoint::sPool;
-
 #if CHIP_SYSTEM_CONFIG_USE_LWIP || CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 namespace {
 
 CHIP_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
-    VerifyOrReturnError(aInterfaceId.IsPresent(), INET_ERROR_UNKNOWN_INTERFACE);
     VerifyOrReturnError(aAddress.IsMulticast(), INET_ERROR_WRONG_ADDRESS_TYPE);
     return CHIP_NO_ERROR;
 }
@@ -149,7 +146,8 @@ CHIP_ERROR CheckMulticastGroupArgs(InterfaceId aInterfaceId, const IPAddress & a
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port, InterfaceId interfaceId)
+CHIP_ERROR UDPEndPointImplLwIP::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
+                                         InterfaceId interfaceId)
 {
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -205,7 +203,7 @@ CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addressType, const IPAddress & ad
     return res;
 }
 
-CHIP_ERROR UDPEndPoint::BindInterfaceImpl(IPAddressType addrType, InterfaceId intfId)
+CHIP_ERROR UDPEndPointImplLwIP::BindInterfaceImpl(IPAddressType addrType, InterfaceId intfId)
 {
     // A lock is required because the LwIP thread may be referring to intf_filter,
     // while this code running in the Inet application is potentially modifying it.
@@ -225,12 +223,12 @@ CHIP_ERROR UDPEndPoint::BindInterfaceImpl(IPAddressType addrType, InterfaceId in
     return err;
 }
 
-CHIP_ERROR UDPEndPoint::LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId)
+CHIP_ERROR UDPEndPointImplLwIP::LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId)
 {
     struct netif * netifp = nullptr;
     if (intfId.IsPresent())
     {
-        netifp = UDPEndPoint::FindNetifFromInterfaceId(intfId);
+        netifp = UDPEndPointImplLwIP::FindNetifFromInterfaceId(intfId);
         if (netifp == nullptr)
         {
             return INET_ERROR_UNKNOWN_INTERFACE;
@@ -241,7 +239,7 @@ CHIP_ERROR UDPEndPoint::LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId int
     return CHIP_NO_ERROR;
 }
 
-InterfaceId UDPEndPoint::GetBoundInterface() const
+InterfaceId UDPEndPointImplLwIP::GetBoundInterface() const
 {
 #if HAVE_LWIP_UDP_BIND_NETIF
     return InterfaceId(netif_get_by_index(mUDP->netif_idx));
@@ -250,12 +248,12 @@ InterfaceId UDPEndPoint::GetBoundInterface() const
 #endif
 }
 
-uint16_t UDPEndPoint::GetBoundPort() const
+uint16_t UDPEndPointImplLwIP::GetBoundPort() const
 {
     return mUDP->local_port;
 }
 
-CHIP_ERROR UDPEndPoint::ListenImpl()
+CHIP_ERROR UDPEndPointImplLwIP::ListenImpl()
 {
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -279,7 +277,7 @@ CHIP_ERROR UDPEndPoint::ListenImpl()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
+CHIP_ERROR UDPEndPointImplLwIP::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
 {
     const IPAddress & destAddr = pktInfo->DestAddress;
 
@@ -406,7 +404,7 @@ CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::Packet
     return res;
 }
 
-void UDPEndPoint::CloseImpl()
+void UDPEndPointImplLwIP::CloseImpl()
 {
 
     // Lock LwIP stack
@@ -425,13 +423,13 @@ void UDPEndPoint::CloseImpl()
     UNLOCK_TCPIP_CORE();
 }
 
-void UDPEndPoint::Free()
+void UDPEndPointImplLwIP::Free()
 {
     Close();
     Release();
 }
 
-void UDPEndPoint::HandleDataReceived(System::PacketBufferHandle && msg)
+void UDPEndPointImplLwIP::HandleDataReceived(System::PacketBufferHandle && msg)
 {
     if ((mState == State::kListening) && (OnMessageReceived != nullptr))
     {
@@ -453,7 +451,7 @@ void UDPEndPoint::HandleDataReceived(System::PacketBufferHandle && msg)
     }
 }
 
-CHIP_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
+CHIP_ERROR UDPEndPointImplLwIP::GetPCB(IPAddressType addrType)
 {
     // IMPORTANT: This method MUST be called with the LwIP stack LOCKED!
 
@@ -531,13 +529,13 @@ CHIP_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
 }
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
-void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr, u16_t port)
+void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr,
+                                                u16_t port)
 #else  // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
-void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port)
+void UDPEndPointImplLwIP::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, ip_addr_t * addr, u16_t port)
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 {
-    UDPEndPoint * ep               = static_cast<UDPEndPoint *>(arg);
-    System::Layer * lSystemLayer   = ep->Layer().SystemLayer();
+    UDPEndPointImplLwIP * ep       = static_cast<UDPEndPointImplLwIP *>(arg);
     IPPacketInfo * pktInfo         = nullptr;
     System::PacketBufferHandle buf = System::PacketBufferHandle::Adopt(p);
     if (buf->HasChainedBuffer())
@@ -586,10 +584,8 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
     }
 
     ep->Retain();
-    CHIP_ERROR err = lSystemLayer->ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf)] {
+    CHIP_ERROR err = ep->GetSystemLayer().ScheduleLambda([ep, p = System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(buf)] {
         ep->HandleDataReceived(System::PacketBufferHandle::Adopt(p));
-        InetLayer & lInetLayer = ep->Layer();
-        lInetLayer.DroppableEventDequeued();
         ep->Release();
     });
     if (err == CHIP_NO_ERROR)
@@ -603,7 +599,7 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
     }
 }
 
-CHIP_ERROR UDPEndPoint::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
+CHIP_ERROR UDPEndPointImplLwIP::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
 {
 #if HAVE_LWIP_MULTICAST_LOOP
     if (mLwIPEndPointType == LwIPEndPointType::UDP)
@@ -622,10 +618,8 @@ CHIP_ERROR UDPEndPoint::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopbac
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-void UDPEndPoint::InitImpl() {}
-
 #if INET_CONFIG_ENABLE_IPV4
-CHIP_ERROR UDPEndPoint::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
+CHIP_ERROR UDPEndPointImplLwIP::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
 #if LWIP_IPV4 && LWIP_IGMP
     const auto method = join ? igmp_joingroup_netif : igmp_leavegroup_netif;
@@ -646,7 +640,7 @@ CHIP_ERROR UDPEndPoint::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId
 }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-CHIP_ERROR UDPEndPoint::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
+CHIP_ERROR UDPEndPointImplLwIP::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
 #ifdef HAVE_IPV6_MULTICAST
     const auto method = join ? mld6_joingroup_netif : mld6_leavegroup_netif;
@@ -667,7 +661,7 @@ CHIP_ERROR UDPEndPoint::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId
 #endif // HAVE_IPV6_MULTICAST
 }
 
-struct netif * UDPEndPoint::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
+struct netif * UDPEndPointImplLwIP::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
 {
     struct netif * lRetval = nullptr;
 
@@ -687,7 +681,7 @@ struct netif * UDPEndPoint::FindNetifFromInterfaceId(InterfaceId aInterfaceId)
     return (lRetval);
 }
 
-IPPacketInfo * UDPEndPoint::GetPacketInfo(const System::PacketBufferHandle & aBuffer)
+IPPacketInfo * UDPEndPointImplLwIP::GetPacketInfo(const System::PacketBufferHandle & aBuffer)
 {
     if (!aBuffer->EnsureReservedSize(sizeof(IPPacketInfo) + 3))
     {
@@ -786,11 +780,11 @@ CHIP_ERROR IPv4Bind(int socket, const IPAddress & address, uint16_t port)
 } // anonymous namespace
 
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
-UDPEndPoint::MulticastGroupHandler UDPEndPoint::sJoinMulticastGroupHandler;
-UDPEndPoint::MulticastGroupHandler UDPEndPoint::sLeaveMulticastGroupHandler;
+UDPEndPointImplSockets::MulticastGroupHandler UDPEndPointImplSockets::sJoinMulticastGroupHandler;
+UDPEndPointImplSockets::MulticastGroupHandler UDPEndPointImplSockets::sLeaveMulticastGroupHandler;
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 
-CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addressType, const IPAddress & addr, uint16_t port, InterfaceId interface)
+CHIP_ERROR UDPEndPointImplSockets::BindImpl(IPAddressType addressType, const IPAddress & addr, uint16_t port, InterfaceId interface)
 {
     // Make sure we have the appropriate type of socket.
     ReturnErrorOnFailure(GetSocket(addressType));
@@ -833,7 +827,7 @@ CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addressType, const IPAddress & ad
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_DISPATCH
-    dispatch_queue_t dispatchQueue = static_cast<System::LayerSocketsLoop *>(Layer().SystemLayer())->GetDispatchQueue();
+    dispatch_queue_t dispatchQueue = static_cast<System::LayerSocketsLoop *>(&GetSystemLayer())->GetDispatchQueue();
     if (dispatchQueue != nullptr)
     {
         unsigned long fd = static_cast<unsigned long>(mSocket);
@@ -851,7 +845,7 @@ CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addressType, const IPAddress & ad
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UDPEndPoint::BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId)
+CHIP_ERROR UDPEndPointImplSockets::BindInterfaceImpl(IPAddressType addressType, InterfaceId interfaceId)
 {
     // Make sure we have the appropriate type of socket.
     ReturnErrorOnFailure(GetSocket(addressType));
@@ -892,25 +886,25 @@ CHIP_ERROR UDPEndPoint::BindInterfaceImpl(IPAddressType addressType, InterfaceId
 #endif // HAVE_SO_BINDTODEVICE
 }
 
-InterfaceId UDPEndPoint::GetBoundInterface() const
+InterfaceId UDPEndPointImplSockets::GetBoundInterface() const
 {
     return mBoundIntfId;
 }
 
-uint16_t UDPEndPoint::GetBoundPort() const
+uint16_t UDPEndPointImplSockets::GetBoundPort() const
 {
     return mBoundPort;
 }
 
-CHIP_ERROR UDPEndPoint::ListenImpl()
+CHIP_ERROR UDPEndPointImplSockets::ListenImpl()
 {
     // Wait for ability to read on this endpoint.
-    auto * layer = static_cast<System::LayerSockets *>(Layer().SystemLayer());
+    auto * layer = static_cast<System::LayerSockets *>(&GetSystemLayer());
     ReturnErrorOnFailure(layer->SetCallback(mWatch, HandlePendingIO, reinterpret_cast<intptr_t>(this)));
     return layer->RequestCallbackOnPendingRead(mWatch);
 }
 
-CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * aPktInfo, System::PacketBufferHandle && msg)
+CHIP_ERROR UDPEndPointImplSockets::SendMsgImpl(const IPPacketInfo * aPktInfo, System::PacketBufferHandle && msg)
 {
     // Make sure we have the appropriate type of socket based on the
     // destination address.
@@ -1050,11 +1044,11 @@ CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * aPktInfo, System::Packe
     return CHIP_NO_ERROR;
 }
 
-void UDPEndPoint::CloseImpl()
+void UDPEndPointImplSockets::CloseImpl()
 {
     if (mSocket != kInvalidSocketFd)
     {
-        static_cast<System::LayerSockets *>(Layer().SystemLayer())->StopWatchingSocket(&mWatch);
+        static_cast<System::LayerSockets *>(&GetSystemLayer())->StopWatchingSocket(&mWatch);
         close(mSocket);
         mSocket = kInvalidSocketFd;
     }
@@ -1068,13 +1062,13 @@ void UDPEndPoint::CloseImpl()
 #endif // CHIP_SYSTEM_CONFIG_USE_DISPATCH
 }
 
-void UDPEndPoint::Free()
+void UDPEndPointImplSockets::Free()
 {
     Close();
     Release();
 }
 
-CHIP_ERROR UDPEndPoint::GetSocket(IPAddressType addressType)
+CHIP_ERROR UDPEndPointImplSockets::GetSocket(IPAddressType addressType)
 {
     if (mSocket == kInvalidSocketFd)
     {
@@ -1104,7 +1098,7 @@ CHIP_ERROR UDPEndPoint::GetSocket(IPAddressType addressType)
         {
             return CHIP_ERROR_POSIX(errno);
         }
-        ReturnErrorOnFailure(static_cast<System::LayerSockets *>(Layer().SystemLayer())->StartWatchingSocket(mSocket, &mWatch));
+        ReturnErrorOnFailure(static_cast<System::LayerSockets *>(&GetSystemLayer())->StartWatchingSocket(mSocket, &mWatch));
 
         mAddrType = addressType;
 
@@ -1191,12 +1185,12 @@ CHIP_ERROR UDPEndPoint::GetSocket(IPAddressType addressType)
 }
 
 // static
-void UDPEndPoint::HandlePendingIO(System::SocketEvents events, intptr_t data)
+void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events, intptr_t data)
 {
-    reinterpret_cast<UDPEndPoint *>(data)->HandlePendingIO(events);
+    reinterpret_cast<UDPEndPointImplSockets *>(data)->HandlePendingIO(events);
 }
 
-void UDPEndPoint::HandlePendingIO(System::SocketEvents events)
+void UDPEndPointImplSockets::HandlePendingIO(System::SocketEvents events)
 {
     if (mState != State::kListening || OnMessageReceived == nullptr || !events.Has(System::SocketEventFlags::kRead))
     {
@@ -1365,7 +1359,7 @@ static CHIP_ERROR SocketsSetMulticastLoopback(int aSocket, IPVersion aIPVersion,
 #endif // IPV6_MULTICAST_LOOP
 }
 
-CHIP_ERROR UDPEndPoint::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
+CHIP_ERROR UDPEndPointImplSockets::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
 {
     CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
 
@@ -1376,14 +1370,9 @@ exit:
     return (lRetval);
 }
 
-void UDPEndPoint::InitImpl()
-{
-    mBoundIntfId = InterfaceId::Null();
-}
-
 #if INET_CONFIG_ENABLE_IPV4
 
-CHIP_ERROR UDPEndPoint::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
+CHIP_ERROR UDPEndPointImplSockets::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
     IPAddress lInterfaceAddress;
     bool lInterfaceAddressFound = false;
@@ -1419,7 +1408,7 @@ CHIP_ERROR UDPEndPoint::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId
 
 #endif // INET_CONFIG_ENABLE_IPV4
 
-CHIP_ERROR UDPEndPoint::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
+CHIP_ERROR UDPEndPointImplSockets::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
 {
 #if CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
     MulticastGroupHandler handler = join ? sJoinMulticastGroupHandler : sLeaveMulticastGroupHandler;
@@ -1429,7 +1418,7 @@ CHIP_ERROR UDPEndPoint::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId
     }
 #endif // CHIP_SYSTEM_CONFIG_USE_PLATFORM_MULTICAST_API
 
-#if defined(INET_IPV6_ADD_MEMBERSHIP) && defined(INET_IPV6_DROP_MEMBERSHIP)
+#ifdef IPV6_MULTICAST_IMPLEMENTED
     const InterfaceId::PlatformType lIfIndex = aInterfaceId.GetPlatformInterface();
 
     struct ipv6_mreq lMulticastRequest;
@@ -1445,16 +1434,17 @@ CHIP_ERROR UDPEndPoint::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId
         return CHIP_ERROR_POSIX(errno);
     }
     return CHIP_NO_ERROR;
-#else  // defined(INET_IPV6_ADD_MEMBERSHIP) && defined(INET_IPV6_DROP_MEMBERSHIP)
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // defined(INET_IPV6_ADD_MEMBERSHIP) && defined(INET_IPV6_DROP_MEMBERSHIP)
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
-CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port, InterfaceId intfId)
+CHIP_ERROR UDPEndPointImplNetworkFramework::BindImpl(IPAddressType addressType, const IPAddress & address, uint16_t port,
+                                                     InterfaceId intfId)
 {
     nw_parameters_configure_protocol_block_t configure_tls;
     nw_parameters_t parameters;
@@ -1495,28 +1485,28 @@ CHIP_ERROR UDPEndPoint::BindImpl(IPAddressType addressType, const IPAddress & ad
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UDPEndPoint::BindInterfaceImpl(IPAddressType addrType, InterfaceId intfId)
+CHIP_ERROR UDPEndPointImplNetworkFramework::BindInterfaceImpl(IPAddressType addrType, InterfaceId intfId)
 {
     return INET_ERROR_UNKNOWN_INTERFACE;
 }
 
-InterfaceId UDPEndPoint::GetBoundInterface() const
+InterfaceId UDPEndPointImplNetworkFramework::GetBoundInterface() const
 {
     return InterfaceId::Null();
 }
 
-uint16_t UDPEndPoint::GetBoundPort() const
+uint16_t UDPEndPointImplNetworkFramework::GetBoundPort() const
 {
     nw_endpoint_t endpoint = nw_parameters_copy_local_endpoint(mParameters);
     return nw_endpoint_get_port(endpoint);
 }
 
-CHIP_ERROR UDPEndPoint::ListenImpl()
+CHIP_ERROR UDPEndPointImplNetworkFramework::ListenImpl()
 {
     return StartListener();
 }
 
-CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
+CHIP_ERROR UDPEndPointImplNetworkFramework::SendMsgImpl(const IPPacketInfo * pktInfo, System::PacketBufferHandle && msg)
 {
     dispatch_data_t content;
 
@@ -1556,12 +1546,12 @@ CHIP_ERROR UDPEndPoint::SendMsgImpl(const IPPacketInfo * pktInfo, System::Packet
     return res;
 }
 
-void UDPEndPoint::CloseImpl()
+void UDPEndPointImplNetworkFramework::CloseImpl()
 {
     ReleaseAll();
 }
 
-void UDPEndPoint::ReleaseAll()
+void UDPEndPointImplNetworkFramework::ReleaseAll()
 {
 
     OnMessageReceived = nullptr;
@@ -1609,30 +1599,32 @@ void UDPEndPoint::ReleaseAll()
     }
 }
 
-void UDPEndPoint::Free()
+void UDPEndPointImplNetworkFramework::Free()
 {
     Close();
     Release();
 }
 
-CHIP_ERROR UDPEndPoint::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
+CHIP_ERROR UDPEndPointImplNetworkFramework::SetMulticastLoopback(IPVersion aIPVersion, bool aLoopback)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 #if INET_CONFIG_ENABLE_IPV4
-CHIP_ERROR UDPEndPoint::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
+CHIP_ERROR UDPEndPointImplNetworkFramework::IPv4JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress,
+                                                                            bool join)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-CHIP_ERROR UDPEndPoint::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress, bool join)
+CHIP_ERROR UDPEndPointImplNetworkFramework::IPv6JoinLeaveMulticastGroupImpl(InterfaceId aInterfaceId, const IPAddress & aAddress,
+                                                                            bool join)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR UDPEndPoint::ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters)
+CHIP_ERROR UDPEndPointImplNetworkFramework::ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters)
 {
     CHIP_ERROR res = CHIP_NO_ERROR;
 
@@ -1662,7 +1654,7 @@ CHIP_ERROR UDPEndPoint::ConfigureProtocol(IPAddressType aAddressType, const nw_p
     return res;
 }
 
-void UDPEndPoint::GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo)
+void UDPEndPointImplNetworkFramework::GetPacketInfo(const nw_connection_t & aConnection, IPPacketInfo & aPacketInfo)
 {
     nw_path_t path              = nw_connection_copy_current_path(aConnection);
     nw_endpoint_t dest_endpoint = nw_path_copy_effective_local_endpoint(path);
@@ -1675,8 +1667,8 @@ void UDPEndPoint::GetPacketInfo(const nw_connection_t & aConnection, IPPacketInf
     aPacketInfo.DestPort    = nw_endpoint_get_port(dest_endpoint);
 }
 
-CHIP_ERROR UDPEndPoint::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddressType aAddressType, const IPAddress & aAddress,
-                                    uint16_t aPort)
+CHIP_ERROR UDPEndPointImplNetworkFramework::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddressType aAddressType,
+                                                        const IPAddress & aAddress, uint16_t aPort)
 {
     char addrStr[INET6_ADDRSTRLEN];
     char portStr[INET_PORTSTRLEN];
@@ -1701,7 +1693,7 @@ CHIP_ERROR UDPEndPoint::GetEndPoint(nw_endpoint_t & aEndPoint, const IPAddressTy
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UDPEndPoint::GetConnection(const IPPacketInfo * aPktInfo)
+CHIP_ERROR UDPEndPointImplNetworkFramework::GetConnection(const IPPacketInfo * aPktInfo)
 {
     VerifyOrReturnError(mParameters != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
@@ -1730,7 +1722,7 @@ CHIP_ERROR UDPEndPoint::GetConnection(const IPPacketInfo * aPktInfo)
     return StartConnection(connection);
 }
 
-CHIP_ERROR UDPEndPoint::StartListener()
+CHIP_ERROR UDPEndPointImplNetworkFramework::StartListener()
 {
     __block CHIP_ERROR res = CHIP_NO_ERROR;
     nw_listener_t listener;
@@ -1803,7 +1795,7 @@ CHIP_ERROR UDPEndPoint::StartListener()
     return res;
 }
 
-CHIP_ERROR UDPEndPoint::StartConnection(nw_connection_t & aConnection)
+CHIP_ERROR UDPEndPointImplNetworkFramework::StartConnection(nw_connection_t & aConnection)
 {
     __block CHIP_ERROR res = CHIP_NO_ERROR;
 
@@ -1863,7 +1855,7 @@ CHIP_ERROR UDPEndPoint::StartConnection(nw_connection_t & aConnection)
     return res;
 }
 
-void UDPEndPoint::HandleDataReceived(const nw_connection_t & aConnection)
+void UDPEndPointImplNetworkFramework::HandleDataReceived(const nw_connection_t & aConnection)
 {
     nw_connection_receive_completion_t handler =
         ^(dispatch_data_t content, nw_content_context_t context, bool is_complete, nw_error_t receive_error) {
@@ -1911,7 +1903,7 @@ void UDPEndPoint::HandleDataReceived(const nw_connection_t & aConnection)
     nw_connection_receive_message(aConnection, handler);
 }
 
-CHIP_ERROR UDPEndPoint::ReleaseListener()
+CHIP_ERROR UDPEndPointImplNetworkFramework::ReleaseListener()
 {
     VerifyOrReturnError(mListener, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mDispatchQueue, CHIP_ERROR_INCORRECT_STATE);
@@ -1925,7 +1917,7 @@ CHIP_ERROR UDPEndPoint::ReleaseListener()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR UDPEndPoint::ReleaseConnection()
+CHIP_ERROR UDPEndPointImplNetworkFramework::ReleaseConnection()
 {
     VerifyOrReturnError(mConnection, CHIP_ERROR_INCORRECT_STATE);
     VerifyOrReturnError(mDispatchQueue, CHIP_ERROR_INCORRECT_STATE);
@@ -1988,7 +1980,7 @@ CHIP_ERROR UDPEndPoint::Listen(OnMessageReceivedFunct onMessageReceived, OnRecei
 
     OnMessageReceived = onMessageReceived;
     OnReceiveError    = onReceiveError;
-    AppState          = appState;
+    mAppState         = appState;
 
     ReturnErrorOnFailure(ListenImpl());
 
@@ -2028,15 +2020,9 @@ void UDPEndPoint::Close()
     }
 }
 
-void UDPEndPoint::Init(InetLayer * inetLayer)
-{
-    InitEndPointBasis(*inetLayer);
-    InitImpl();
-}
-
 CHIP_ERROR UDPEndPoint::JoinMulticastGroup(InterfaceId aInterfaceId, const IPAddress & aAddress)
 {
-    CHIP_ERROR lRetval = CHIP_ERROR_NOT_IMPLEMENTED;
+    CHIP_ERROR lRetval = CHIP_NO_ERROR;
 
     const IPAddressType lAddrType = aAddress.Type();
     lRetval                       = CheckMulticastGroupArgs(aInterfaceId, aAddress);

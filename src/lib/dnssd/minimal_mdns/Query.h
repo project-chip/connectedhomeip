@@ -21,6 +21,7 @@
 
 #include <lib/dnssd/minimal_mdns/core/Constants.h>
 #include <lib/dnssd/minimal_mdns/core/QName.h>
+#include <lib/dnssd/minimal_mdns/core/RecordWriter.h>
 
 namespace mdns {
 namespace Minimal {
@@ -56,7 +57,7 @@ public:
     ///
     /// @param hdr will be updated with a query count
     /// @param out where to write the query data
-    bool Append(HeaderRef & hdr, chip::Encoding::BigEndian::BufferWriter & out) const
+    bool Append(HeaderRef & hdr, RecordWriter & out) const
     {
         // Questions can only be appended before any other data is added
         if ((hdr.GetAdditionalCount() != 0) || (hdr.GetAnswerCount() != 0) || (hdr.GetAuthorityCount() != 0))
@@ -64,17 +65,17 @@ public:
             return false;
         }
 
-        mQName.Output(out);
+        out.WriteQName(mQName)
+            .Put16(static_cast<uint16_t>(mType))
+            .Put16(static_cast<uint16_t>(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kQClassUnicastAnswerFlag : 0)));
 
-        out.Put16(static_cast<uint16_t>(mType));
-        out.Put16(static_cast<uint16_t>(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kQClassUnicastAnswerFlag : 0)));
-
-        if (out.Fit())
+        if (!out.Fit())
         {
-            hdr.SetQueryCount(static_cast<uint16_t>(hdr.GetQueryCount() + 1));
+            return false;
         }
 
-        return out.Fit();
+        hdr.SetQueryCount(static_cast<uint16_t>(hdr.GetQueryCount() + 1));
+        return true;
     }
 
 private:

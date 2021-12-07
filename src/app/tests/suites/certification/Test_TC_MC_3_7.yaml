@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
       disabled: true
@@ -54,7 +58,7 @@ tests:
               - name: "applicationId"
                 value: "NonAvailableApp"
       response:
-          error: 1
+          error: UNSUPPORTED_WRITE
 
     # TODO: Update the corresponding values when feature is supported
     - label: "Launch an app with the provided a application ID"
@@ -82,4 +86,4 @@ tests:
               - name: "applicationId"
                 value: "HelloWorldApp2"
       response:
-          error: 2
+          error: INVALID_COMMAND

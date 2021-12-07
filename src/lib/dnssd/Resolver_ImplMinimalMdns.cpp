@@ -20,6 +20,7 @@
 
 #include <limits>
 
+#include <inet/IPPacketInfo.h>
 #include <lib/core/CHIPConfig.h>
 #include <lib/dnssd/MinimalMdnsServer.h>
 #include <lib/dnssd/ServiceNaming.h>
@@ -74,8 +75,7 @@ public:
         mDelegate(delegate),
         mDiscoveryType(discoveryType), mPacketRange(packet)
     {
-        mInterfaceId           = interfaceId;
-        mNodeData.mInterfaceId = interfaceId;
+        mInterfaceId = interfaceId;
     }
 
     // ParserDelegate implementation
@@ -109,8 +109,9 @@ private:
 
 void PacketDataReporter::OnQuery(const QueryData & data)
 {
-    ChipLogError(Discovery, "Unexpected query packet being parsed as a response");
-    mValid = false;
+    // Ignore queries:
+    //   - unicast answers will include the corresponding query in the answer
+    //     packet, however that is not interesting for the resolver.
 }
 
 void PacketDataReporter::OnHeader(ConstHeaderRef & header)
@@ -177,8 +178,13 @@ void PacketDataReporter::OnOperationalIPAddress(const chip::Inet::IPAddress & ad
     // This code assumes that all entries in the mDNS packet relate to the
     // same entity. This may not be correct if multiple servers are reported
     // (if multi-admin decides to use unique ports for every ecosystem).
-    mNodeData.mAddress = addr;
-    mHasIP             = true;
+    if (mNodeData.mNumIPs >= ResolvedNodeData::kMaxIPAddresses)
+    {
+        return;
+    }
+    mNodeData.mAddress[mNodeData.mNumIPs++] = addr;
+    mNodeData.mInterfaceId                  = mInterfaceId;
+    mHasIP                                  = true;
 }
 
 void PacketDataReporter::OnDiscoveredNodeIPAddress(const chip::Inet::IPAddress & addr)
@@ -344,7 +350,7 @@ public:
     CHIP_ERROR Init(chip::Inet::InetLayer * inetLayer) override;
     void Shutdown() override;
     void SetResolverDelegate(ResolverDelegate * delegate) override { mDelegate = delegate; }
-    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) override;
+    CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass) override;
     CHIP_ERROR FindCommissionableNodes(DiscoveryFilter filter = DiscoveryFilter()) override;
     CHIP_ERROR FindCommissioners(DiscoveryFilter filter = DiscoveryFilter()) override;
 
@@ -402,12 +408,12 @@ CHIP_ERROR MinMdnsResolver::Init(chip::Inet::InetLayer * inetLayer)
 {
     /// Note: we do not double-check the port as we assume the APP will always use
     /// the same inetLayer and port for mDNS.
+    mSystemLayer = inetLayer->SystemLayer();
+
     if (GlobalMinimalMdnsServer::Server().IsListening())
     {
         return CHIP_NO_ERROR;
     }
-
-    mSystemLayer = inetLayer->SystemLayer();
 
     return GlobalMinimalMdnsServer::Instance().StartServer(inetLayer, kMdnsPort);
 }
@@ -427,14 +433,13 @@ CHIP_ERROR MinMdnsResolver::SendQuery(mdns::Minimal::FullQName qname, mdns::Mini
 
     mdns::Minimal::Query query(qname);
     query.SetType(type).SetClass(mdns::Minimal::QClass::IN);
-    // TODO(cecille): Not sure why unicast response isn't working - fix.
-    query.SetAnswerViaUnicast(false);
+    query.SetAnswerViaUnicast(true);
 
     builder.AddQuery(query);
 
     ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
 
-    return GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort);
+    return GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort);
 }
 
 CHIP_ERROR MinMdnsResolver::FindCommissionableNodes(DiscoveryFilter filter)
@@ -500,7 +505,7 @@ CHIP_ERROR MinMdnsResolver::BrowseNodes(DiscoveryType type, DiscoveryFilter filt
     return SendQuery(qname, mdns::Minimal::QType::ANY);
 }
 
-CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type)
+CHIP_ERROR MinMdnsResolver::ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type, Resolver::CacheBypass dnssdCacheBypass)
 {
     mDiscoveryType = DiscoveryType::kOperational;
     mActiveResolves.MarkPending(peerId);
@@ -555,9 +560,9 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
             Query query(instanceQName);
 
             query
-                .SetClass(QClass::IN)       //
-                .SetType(QType::ANY)        //
-                .SetAnswerViaUnicast(false) //
+                .SetClass(QClass::IN)      //
+                .SetType(QType::ANY)       //
+                .SetAnswerViaUnicast(true) //
                 ;
 
             // NOTE: type above is NOT A or AAAA because the name searched for is
@@ -578,7 +583,7 @@ CHIP_ERROR MinMdnsResolver::SendPendingResolveQueries()
 
         ReturnErrorCodeIf(!builder.Ok(), CHIP_ERROR_INTERNAL);
 
-        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastSend(builder.ReleasePacket(), kMdnsPort));
+        ReturnErrorOnFailure(GlobalMinimalMdnsServer::Server().BroadcastUnicastQuery(builder.ReleasePacket(), kMdnsPort));
     }
 
     return ScheduleResolveRetries();

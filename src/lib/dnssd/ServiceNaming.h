@@ -37,11 +37,11 @@ constexpr char kCommissionProtocol[]        = "_udp";
 constexpr char kLocalDomain[]               = "local";
 
 // each includes space for a null terminator, which becomes a . when the names are appended.
-constexpr size_t kMaxCommisisonableServiceNameSize =
+constexpr size_t kMaxCommissionableServiceNameSize =
     Common::kSubTypeMaxLength + 1 + sizeof(kSubtypeServiceNamePart) + sizeof(kCommissionableServiceName);
 
 // each includes space for a null terminator, which becomes a . when the names are appended.
-constexpr size_t kMaxCommisisonerServiceNameSize =
+constexpr size_t kMaxCommissionerServiceNameSize =
     Common::kSubTypeMaxLength + 1 + sizeof(kSubtypeServiceNamePart) + sizeof(kCommissionerServiceName);
 
 // + 1 for nullchar on prefix.

@@ -34,10 +34,13 @@ class ChannelContext;
  *  @brief
  *    This class is used to manage Channel Contexts with other CHIP nodes.
  */
-class DLL_EXPORT ChannelManager : public ExchangeMgrDelegate
+class DLL_EXPORT ChannelManager : public SessionCreationDelegate
 {
 public:
-    ChannelManager(ExchangeManager * exchangeManager) : mExchangeManager(exchangeManager) { exchangeManager->SetDelegate(this); }
+    ChannelManager(ExchangeManager * exchangeManager) : mExchangeManager(exchangeManager)
+    {
+        exchangeManager->GetSessionManager()->RegisterCreationDelegate(*this);
+    }
     ChannelManager(const ChannelManager &) = delete;
     ChannelManager operator=(const ChannelManager &) = delete;
 
@@ -54,31 +57,19 @@ public:
         mChannelHandles.ForEachActiveObject([&](ChannelContextHandleAssociation * association) {
             if (association->mChannelContext == channel)
                 event(association->mChannelDelegate);
-            return true;
+            return Loop::Continue;
         });
     }
 
-    void OnNewConnection(SessionHandle session, ExchangeManager * mgr) override
+    void OnNewSession(SessionHandle session) override
     {
         mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-            if (context->MatchesSession(session, mgr->GetSessionManager()))
+            if (context->MatchesSession(session, mExchangeManager->GetSessionManager()))
             {
                 context->OnNewConnection(session);
-                return false;
+                return Loop::Break;
             }
-            return true;
-        });
-    }
-
-    void OnConnectionExpired(SessionHandle session, ExchangeManager * mgr) override
-    {
-        mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
-            if (context->MatchesSession(session, mgr->GetSessionManager()))
-            {
-                context->OnConnectionExpired(session);
-                return false;
-            }
-            return true;
+            return Loop::Continue;
         });
     }
 

@@ -28,7 +28,9 @@ chip_build_tests = false
 
 chip_mdns = "platform"
 
-mbedtls_target = "${chip_root}/third_party/k32w_sdk/nxp/k32w/k32w0:mbedtls"
+chip_detail_logging = false
+
+mbedtls_target = "${chip_root}/third_party/nxp/k32w0_sdk:mbedtls"
 openthread_external_mbedtls = mbedtls_target
 
 openthread_project_core_config_file = "OpenThreadConfig.h"

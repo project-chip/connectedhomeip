@@ -19,25 +19,50 @@ config:
     endpoint: 0
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Read attribute Device list"
       command: "readAttribute"
       attribute: "Device List"
       response:
-          value: [{ deviceTypeId: 1, revision: 1 }]
+          value: [{ type: 22, revision: 1 }]
 
     - label: "Read attribute Server list"
       command: "readAttribute"
       attribute: "Server List"
       response:
-          value: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    # CLUSTER_ID value is dummy 0 since yaml compares only the length of the List.
-    # right now
+          value: [
+                  0x0003, # Identify
+                  0x001D, # Descriptor
+                  0x001E, # Binding
+                  0x001F, # Access Control
+                  0x0028, # Basic Information
+                  0x0029, # OTA Software Update Provider
+                  0x002A, # OTA Software Update Requestor
+                  0x002E, # Power Source Configuration
+                  0x0030, # General Commissioning
+                  0x0031, # Network Commissioning
+                  0x0032, # Diagnostic Logs
+                  0x0033, # General Diagnostics
+                  0x0034, # Software Diagnostics
+                  0x0035, # Thread Network Diagnostiscs
+                  0x0036, # WiFi Network Diagnostics
+                  0x0037, # Ethernet Network Diagnostics
+                  0x003C, # Administrator Commissioning
+                  0x003E, # Operational Credentials
+                  0x003F, # Group Key Management
+                  0x0405, # Relative Humidity Measurement (why on EP0?)
+              ]
 
     - label: "Read attribute Client list"
       command: "readAttribute"
       attribute: "Client List"
       response:
-          value: []
+          value: [
+                  0x0029, # OTA Software Update Provider
+              ]
 
     - label: "Read attribute Parts list"
       command: "readAttribute"

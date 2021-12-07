@@ -22,6 +22,7 @@
 
 #include <algorithm>
 #include <new>
+#include <tuple>
 #include <type_traits>
 #include <typeinfo>
 #include <utility>
@@ -188,6 +189,14 @@ public:
     std::size_t GetType() const { return mTypeId; }
 
     bool Valid() const { return (mTypeId != kInvalidType); }
+
+    template <typename T, typename... Args>
+    static Variant<Ts...> Create(Args &&... args)
+    {
+        Variant<Ts...> instance;
+        instance.template Set<T>(std::forward<Args>(args)...);
+        return instance;
+    }
 
     template <typename T, typename... Args>
     void Set(Args &&... args)

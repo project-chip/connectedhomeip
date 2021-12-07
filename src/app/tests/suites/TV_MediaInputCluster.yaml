@@ -19,14 +19,28 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Read attribute media input list"
       command: "readAttribute"
       attribute: "media input list"
       response:
           value:
               [
-                  { index: 1, inputType: 4, name: 12, description: 19 },
-                  { index: 2, inputType: 4, name: 12, description: 19 },
+                  {
+                      index: 1,
+                      inputType: 4,
+                      name: "exampleName",
+                      description: "exampleDescription",
+                  },
+                  {
+                      index: 2,
+                      inputType: 4,
+                      name: "exampleName",
+                      description: "exampleDescription",
+                  },
               ]
 
     - label: "Select Input Command"

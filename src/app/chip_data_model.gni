@@ -14,6 +14,7 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("${chip_root}/src/platform/python.gni")
 
 import("${chip_root}/src/lib/core/core.gni")
 
@@ -145,7 +146,13 @@ template("chip_data_model") {
       } else if (cluster == "mode-select-server") {
         sources += [
           "${_app_root}/clusters/${cluster}/${cluster}.cpp",
-          "${_app_root}/clusters/${cluster}/static-supported-modes-manager.cpp",
+          "${_app_root}/clusters/${cluster}/supported-modes-manager.h",
+        ]
+      } else if (cluster == "application-launcher-server") {
+        sources += [
+          "${_app_root}/clusters/${cluster}/${cluster}.cpp",
+          "${_app_root}/util/ContentApp.cpp",
+          "${_app_root}/util/ContentAppPlatform.cpp",
         ]
       } else {
         sources += [ "${_app_root}/clusters/${cluster}/${cluster}.cpp" ]
@@ -154,13 +161,16 @@ template("chip_data_model") {
 
     if (defined(invoker.zap_pregenerated_dir)) {
       sources += [
-        "${invoker.zap_pregenerated_dir}/CHIPClusters.cpp",
-        "${invoker.zap_pregenerated_dir}/CHIPClusters.h",
-        "${invoker.zap_pregenerated_dir}/CHIPClustersInvoke.cpp",
-        "${invoker.zap_pregenerated_dir}/CHIPClustersWrite.cpp",
         "${invoker.zap_pregenerated_dir}/attribute-size.cpp",
         "${invoker.zap_pregenerated_dir}/callback-stub.cpp",
       ]
+
+      if (chip_controller) {
+        sources += [
+          "${invoker.zap_pregenerated_dir}/CHIPClusters.cpp",
+          "${invoker.zap_pregenerated_dir}/CHIPClusters.h",
+        ]
+      }
 
       if (_use_default_client_callbacks) {
         sources += [
@@ -175,11 +185,8 @@ template("chip_data_model") {
       }
 
       if (_use_tests_apis) {
-        sources += [
-          "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.cpp",
-          "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.h",
-          "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTestWrite.cpp",
-        ]
+        sources +=
+            [ "${invoker.zap_pregenerated_dir}/tests/CHIPClustersTest.h" ]
       }
     }
 

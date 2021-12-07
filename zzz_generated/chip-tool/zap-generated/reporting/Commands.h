@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "../cluster/Commands.h" // For the LogValue bits and read callbacks
 #include <commands/reporting/ReportingCommand.h>
 
 typedef void (*UnsupportedAttributeCallback)(void * context);
@@ -30,97 +31,1629 @@ public:
 
     ~Listen()
     {
+        delete onReportAccountLoginClusterRevisionCallback;
+        delete onReportAdministratorCommissioningClusterRevisionCallback;
+        delete onReportApplicationBasicVendorNameCallback;
+        delete onReportApplicationBasicVendorIdCallback;
+        delete onReportApplicationBasicApplicationNameCallback;
+        delete onReportApplicationBasicProductIdCallback;
+        delete onReportApplicationBasicApplicationIdCallback;
+        delete onReportApplicationBasicCatalogVendorIdCallback;
+        delete onReportApplicationBasicApplicationStatusCallback;
+        delete onReportApplicationBasicClusterRevisionCallback;
+        delete onReportApplicationLauncherCatalogVendorIdCallback;
+        delete onReportApplicationLauncherApplicationIdCallback;
+        delete onReportApplicationLauncherClusterRevisionCallback;
+        delete onReportAudioOutputCurrentAudioOutputCallback;
+        delete onReportAudioOutputClusterRevisionCallback;
+        delete onReportBarrierControlBarrierMovingStateCallback;
+        delete onReportBarrierControlBarrierSafetyStatusCallback;
+        delete onReportBarrierControlBarrierCapabilitiesCallback;
+        delete onReportBarrierControlBarrierPositionCallback;
+        delete onReportBarrierControlClusterRevisionCallback;
+        delete onReportBasicInteractionModelVersionCallback;
+        delete onReportBasicVendorNameCallback;
+        delete onReportBasicVendorIDCallback;
+        delete onReportBasicProductNameCallback;
+        delete onReportBasicProductIDCallback;
+        delete onReportBasicNodeLabelCallback;
+        delete onReportBasicLocationCallback;
+        delete onReportBasicHardwareVersionCallback;
+        delete onReportBasicHardwareVersionStringCallback;
+        delete onReportBasicSoftwareVersionCallback;
+        delete onReportBasicSoftwareVersionStringCallback;
+        delete onReportBasicManufacturingDateCallback;
+        delete onReportBasicPartNumberCallback;
+        delete onReportBasicProductURLCallback;
+        delete onReportBasicProductLabelCallback;
+        delete onReportBasicSerialNumberCallback;
+        delete onReportBasicLocalConfigDisabledCallback;
+        delete onReportBasicReachableCallback;
+        delete onReportBasicClusterRevisionCallback;
+        delete onReportBinaryInputBasicOutOfServiceCallback;
         delete onReportBinaryInputBasicPresentValueCallback;
         delete onReportBinaryInputBasicStatusFlagsCallback;
+        delete onReportBinaryInputBasicClusterRevisionCallback;
+        delete onReportBindingClusterRevisionCallback;
         delete onReportBooleanStateStateValueCallback;
+        delete onReportBooleanStateClusterRevisionCallback;
+        delete onReportBridgedActionsSetupUrlCallback;
+        delete onReportBridgedActionsClusterRevisionCallback;
+        delete onReportBridgedDeviceBasicClusterRevisionCallback;
         delete onReportColorControlCurrentHueCallback;
         delete onReportColorControlCurrentSaturationCallback;
+        delete onReportColorControlRemainingTimeCallback;
         delete onReportColorControlCurrentXCallback;
         delete onReportColorControlCurrentYCallback;
+        delete onReportColorControlDriftCompensationCallback;
+        delete onReportColorControlCompensationTextCallback;
         delete onReportColorControlColorTemperatureCallback;
-        delete onReportDoorLockLockStateCallback;
+        delete onReportColorControlColorModeCallback;
+        delete onReportColorControlColorControlOptionsCallback;
+        delete onReportColorControlNumberOfPrimariesCallback;
+        delete onReportColorControlPrimary1XCallback;
+        delete onReportColorControlPrimary1YCallback;
+        delete onReportColorControlPrimary1IntensityCallback;
+        delete onReportColorControlPrimary2XCallback;
+        delete onReportColorControlPrimary2YCallback;
+        delete onReportColorControlPrimary2IntensityCallback;
+        delete onReportColorControlPrimary3XCallback;
+        delete onReportColorControlPrimary3YCallback;
+        delete onReportColorControlPrimary3IntensityCallback;
+        delete onReportColorControlPrimary4XCallback;
+        delete onReportColorControlPrimary4YCallback;
+        delete onReportColorControlPrimary4IntensityCallback;
+        delete onReportColorControlPrimary5XCallback;
+        delete onReportColorControlPrimary5YCallback;
+        delete onReportColorControlPrimary5IntensityCallback;
+        delete onReportColorControlPrimary6XCallback;
+        delete onReportColorControlPrimary6YCallback;
+        delete onReportColorControlPrimary6IntensityCallback;
+        delete onReportColorControlWhitePointXCallback;
+        delete onReportColorControlWhitePointYCallback;
+        delete onReportColorControlColorPointRXCallback;
+        delete onReportColorControlColorPointRYCallback;
+        delete onReportColorControlColorPointRIntensityCallback;
+        delete onReportColorControlColorPointGXCallback;
+        delete onReportColorControlColorPointGYCallback;
+        delete onReportColorControlColorPointGIntensityCallback;
+        delete onReportColorControlColorPointBXCallback;
+        delete onReportColorControlColorPointBYCallback;
+        delete onReportColorControlColorPointBIntensityCallback;
+        delete onReportColorControlEnhancedCurrentHueCallback;
+        delete onReportColorControlEnhancedColorModeCallback;
+        delete onReportColorControlColorLoopActiveCallback;
+        delete onReportColorControlColorLoopDirectionCallback;
+        delete onReportColorControlColorLoopTimeCallback;
+        delete onReportColorControlColorLoopStartEnhancedHueCallback;
+        delete onReportColorControlColorLoopStoredEnhancedHueCallback;
+        delete onReportColorControlColorCapabilitiesCallback;
+        delete onReportColorControlColorTempPhysicalMinCallback;
+        delete onReportColorControlColorTempPhysicalMaxCallback;
+        delete onReportColorControlCoupleColorTempToLevelMinMiredsCallback;
+        delete onReportColorControlStartUpColorTemperatureMiredsCallback;
+        delete onReportColorControlClusterRevisionCallback;
+        delete onReportContentLauncherClusterRevisionCallback;
+        delete onReportDescriptorClusterRevisionCallback;
+        delete onReportDoorLockActuatorEnabledCallback;
+        delete onReportDoorLockClusterRevisionCallback;
+        delete onReportElectricalMeasurementMeasurementTypeCallback;
+        delete onReportElectricalMeasurementTotalActivePowerCallback;
+        delete onReportElectricalMeasurementRmsVoltageCallback;
+        delete onReportElectricalMeasurementRmsVoltageMinCallback;
+        delete onReportElectricalMeasurementRmsVoltageMaxCallback;
+        delete onReportElectricalMeasurementRmsCurrentCallback;
+        delete onReportElectricalMeasurementRmsCurrentMinCallback;
+        delete onReportElectricalMeasurementRmsCurrentMaxCallback;
+        delete onReportElectricalMeasurementActivePowerCallback;
+        delete onReportElectricalMeasurementActivePowerMinCallback;
+        delete onReportElectricalMeasurementActivePowerMaxCallback;
+        delete onReportElectricalMeasurementClusterRevisionCallback;
+        delete onReportEthernetNetworkDiagnosticsPHYRateCallback;
+        delete onReportEthernetNetworkDiagnosticsFullDuplexCallback;
+        delete onReportEthernetNetworkDiagnosticsPacketRxCountCallback;
+        delete onReportEthernetNetworkDiagnosticsPacketTxCountCallback;
+        delete onReportEthernetNetworkDiagnosticsTxErrCountCallback;
+        delete onReportEthernetNetworkDiagnosticsCollisionCountCallback;
+        delete onReportEthernetNetworkDiagnosticsOverrunCountCallback;
+        delete onReportEthernetNetworkDiagnosticsCarrierDetectCallback;
+        delete onReportEthernetNetworkDiagnosticsTimeSinceResetCallback;
+        delete onReportEthernetNetworkDiagnosticsClusterRevisionCallback;
+        delete onReportFixedLabelClusterRevisionCallback;
+        delete onReportFlowMeasurementMeasuredValueCallback;
+        delete onReportFlowMeasurementMinMeasuredValueCallback;
+        delete onReportFlowMeasurementMaxMeasuredValueCallback;
+        delete onReportFlowMeasurementToleranceCallback;
+        delete onReportFlowMeasurementClusterRevisionCallback;
+        delete onReportGeneralCommissioningBreadcrumbCallback;
+        delete onReportGeneralCommissioningClusterRevisionCallback;
+        delete onReportGeneralDiagnosticsRebootCountCallback;
+        delete onReportGeneralDiagnosticsUpTimeCallback;
+        delete onReportGeneralDiagnosticsTotalOperationalHoursCallback;
+        delete onReportGeneralDiagnosticsBootReasonsCallback;
+        delete onReportGeneralDiagnosticsClusterRevisionCallback;
+        delete onReportGroupKeyManagementClusterRevisionCallback;
+        delete onReportGroupsNameSupportCallback;
+        delete onReportGroupsClusterRevisionCallback;
+        delete onReportIdentifyIdentifyTimeCallback;
+        delete onReportIdentifyIdentifyTypeCallback;
+        delete onReportIdentifyClusterRevisionCallback;
         delete onReportIlluminanceMeasurementMeasuredValueCallback;
+        delete onReportIlluminanceMeasurementMinMeasuredValueCallback;
+        delete onReportIlluminanceMeasurementMaxMeasuredValueCallback;
+        delete onReportIlluminanceMeasurementToleranceCallback;
+        delete onReportIlluminanceMeasurementLightSensorTypeCallback;
+        delete onReportIlluminanceMeasurementClusterRevisionCallback;
+        delete onReportKeypadInputClusterRevisionCallback;
         delete onReportLevelControlCurrentLevelCallback;
+        delete onReportLevelControlRemainingTimeCallback;
+        delete onReportLevelControlMinLevelCallback;
+        delete onReportLevelControlMaxLevelCallback;
+        delete onReportLevelControlCurrentFrequencyCallback;
+        delete onReportLevelControlMinFrequencyCallback;
+        delete onReportLevelControlMaxFrequencyCallback;
+        delete onReportLevelControlOptionsCallback;
+        delete onReportLevelControlOnOffTransitionTimeCallback;
+        delete onReportLevelControlOnLevelCallback;
+        delete onReportLevelControlOnTransitionTimeCallback;
+        delete onReportLevelControlOffTransitionTimeCallback;
+        delete onReportLevelControlDefaultMoveRateCallback;
+        delete onReportLevelControlStartUpCurrentLevelCallback;
+        delete onReportLevelControlClusterRevisionCallback;
+        delete onReportLowPowerClusterRevisionCallback;
+        delete onReportMediaInputCurrentMediaInputCallback;
+        delete onReportMediaInputClusterRevisionCallback;
+        delete onReportMediaPlaybackPlaybackStateCallback;
+        delete onReportMediaPlaybackStartTimeCallback;
+        delete onReportMediaPlaybackDurationCallback;
+        delete onReportMediaPlaybackPositionUpdatedAtCallback;
+        delete onReportMediaPlaybackPositionCallback;
+        delete onReportMediaPlaybackPlaybackSpeedCallback;
+        delete onReportMediaPlaybackSeekRangeEndCallback;
+        delete onReportMediaPlaybackSeekRangeStartCallback;
+        delete onReportMediaPlaybackClusterRevisionCallback;
         delete onReportModeSelectCurrentModeCallback;
+        delete onReportModeSelectOnModeCallback;
+        delete onReportModeSelectStartUpModeCallback;
+        delete onReportModeSelectDescriptionCallback;
+        delete onReportModeSelectClusterRevisionCallback;
+        delete onReportNetworkCommissioningFeatureMapCallback;
+        delete onReportNetworkCommissioningClusterRevisionCallback;
+        delete onReportOtaSoftwareUpdateProviderClusterRevisionCallback;
+        delete onReportOtaSoftwareUpdateRequestorDefaultOtaProviderCallback;
+        delete onReportOtaSoftwareUpdateRequestorUpdatePossibleCallback;
+        delete onReportOtaSoftwareUpdateRequestorClusterRevisionCallback;
         delete onReportOccupancySensingOccupancyCallback;
+        delete onReportOccupancySensingOccupancySensorTypeCallback;
+        delete onReportOccupancySensingOccupancySensorTypeBitmapCallback;
+        delete onReportOccupancySensingClusterRevisionCallback;
         delete onReportOnOffOnOffCallback;
+        delete onReportOnOffGlobalSceneControlCallback;
+        delete onReportOnOffOnTimeCallback;
+        delete onReportOnOffOffWaitTimeCallback;
+        delete onReportOnOffStartUpOnOffCallback;
+        delete onReportOnOffFeatureMapCallback;
+        delete onReportOnOffClusterRevisionCallback;
+        delete onReportOnOffSwitchConfigurationSwitchTypeCallback;
+        delete onReportOnOffSwitchConfigurationSwitchActionsCallback;
+        delete onReportOnOffSwitchConfigurationClusterRevisionCallback;
+        delete onReportOperationalCredentialsSupportedFabricsCallback;
+        delete onReportOperationalCredentialsCommissionedFabricsCallback;
+        delete onReportOperationalCredentialsCurrentFabricIndexCallback;
+        delete onReportOperationalCredentialsClusterRevisionCallback;
+        delete onReportPowerSourceStatusCallback;
+        delete onReportPowerSourceOrderCallback;
+        delete onReportPowerSourceDescriptionCallback;
+        delete onReportPowerSourceBatteryVoltageCallback;
+        delete onReportPowerSourceBatteryPercentRemainingCallback;
+        delete onReportPowerSourceBatteryTimeRemainingCallback;
+        delete onReportPowerSourceBatteryChargeLevelCallback;
+        delete onReportPowerSourceBatteryChargeStateCallback;
+        delete onReportPowerSourceFeatureMapCallback;
+        delete onReportPowerSourceClusterRevisionCallback;
         delete onReportPressureMeasurementMeasuredValueCallback;
+        delete onReportPressureMeasurementMinMeasuredValueCallback;
+        delete onReportPressureMeasurementMaxMeasuredValueCallback;
+        delete onReportPressureMeasurementClusterRevisionCallback;
+        delete onReportPumpConfigurationAndControlMaxPressureCallback;
+        delete onReportPumpConfigurationAndControlMaxSpeedCallback;
+        delete onReportPumpConfigurationAndControlMaxFlowCallback;
+        delete onReportPumpConfigurationAndControlMinConstPressureCallback;
+        delete onReportPumpConfigurationAndControlMaxConstPressureCallback;
+        delete onReportPumpConfigurationAndControlMinCompPressureCallback;
+        delete onReportPumpConfigurationAndControlMaxCompPressureCallback;
+        delete onReportPumpConfigurationAndControlMinConstSpeedCallback;
+        delete onReportPumpConfigurationAndControlMaxConstSpeedCallback;
+        delete onReportPumpConfigurationAndControlMinConstFlowCallback;
+        delete onReportPumpConfigurationAndControlMaxConstFlowCallback;
+        delete onReportPumpConfigurationAndControlMinConstTempCallback;
+        delete onReportPumpConfigurationAndControlMaxConstTempCallback;
         delete onReportPumpConfigurationAndControlPumpStatusCallback;
+        delete onReportPumpConfigurationAndControlEffectiveOperationModeCallback;
+        delete onReportPumpConfigurationAndControlEffectiveControlModeCallback;
         delete onReportPumpConfigurationAndControlCapacityCallback;
+        delete onReportPumpConfigurationAndControlSpeedCallback;
+        delete onReportPumpConfigurationAndControlLifetimeRunningHoursCallback;
+        delete onReportPumpConfigurationAndControlPowerCallback;
+        delete onReportPumpConfigurationAndControlLifetimeEnergyConsumedCallback;
+        delete onReportPumpConfigurationAndControlOperationModeCallback;
+        delete onReportPumpConfigurationAndControlControlModeCallback;
+        delete onReportPumpConfigurationAndControlAlarmMaskCallback;
+        delete onReportPumpConfigurationAndControlFeatureMapCallback;
+        delete onReportPumpConfigurationAndControlClusterRevisionCallback;
         delete onReportRelativeHumidityMeasurementMeasuredValueCallback;
+        delete onReportRelativeHumidityMeasurementMinMeasuredValueCallback;
+        delete onReportRelativeHumidityMeasurementMaxMeasuredValueCallback;
         delete onReportRelativeHumidityMeasurementToleranceCallback;
+        delete onReportRelativeHumidityMeasurementClusterRevisionCallback;
+        delete onReportScenesSceneCountCallback;
+        delete onReportScenesCurrentSceneCallback;
+        delete onReportScenesCurrentGroupCallback;
+        delete onReportScenesSceneValidCallback;
+        delete onReportScenesNameSupportCallback;
+        delete onReportScenesClusterRevisionCallback;
+        delete onReportSoftwareDiagnosticsCurrentHeapFreeCallback;
+        delete onReportSoftwareDiagnosticsCurrentHeapUsedCallback;
+        delete onReportSoftwareDiagnosticsCurrentHeapHighWatermarkCallback;
+        delete onReportSoftwareDiagnosticsClusterRevisionCallback;
+        delete onReportSwitchNumberOfPositionsCallback;
         delete onReportSwitchCurrentPositionCallback;
+        delete onReportSwitchMultiPressMaxCallback;
+        delete onReportSwitchFeatureMapCallback;
+        delete onReportSwitchClusterRevisionCallback;
+        delete onReportTvChannelTvChannelLineupCallback;
+        delete onReportTvChannelCurrentTvChannelCallback;
+        delete onReportTvChannelClusterRevisionCallback;
+        delete onReportTargetNavigatorClusterRevisionCallback;
         delete onReportTemperatureMeasurementMeasuredValueCallback;
+        delete onReportTemperatureMeasurementMinMeasuredValueCallback;
+        delete onReportTemperatureMeasurementMaxMeasuredValueCallback;
         delete onReportTemperatureMeasurementToleranceCallback;
+        delete onReportTemperatureMeasurementClusterRevisionCallback;
+        delete onReportTestClusterBooleanCallback;
+        delete onReportTestClusterBitmap8Callback;
+        delete onReportTestClusterBitmap16Callback;
+        delete onReportTestClusterBitmap32Callback;
+        delete onReportTestClusterBitmap64Callback;
+        delete onReportTestClusterInt8uCallback;
+        delete onReportTestClusterInt16uCallback;
+        delete onReportTestClusterInt24uCallback;
+        delete onReportTestClusterInt32uCallback;
+        delete onReportTestClusterInt40uCallback;
+        delete onReportTestClusterInt48uCallback;
+        delete onReportTestClusterInt56uCallback;
+        delete onReportTestClusterInt64uCallback;
+        delete onReportTestClusterInt8sCallback;
+        delete onReportTestClusterInt16sCallback;
+        delete onReportTestClusterInt24sCallback;
+        delete onReportTestClusterInt32sCallback;
+        delete onReportTestClusterInt40sCallback;
+        delete onReportTestClusterInt48sCallback;
+        delete onReportTestClusterInt56sCallback;
+        delete onReportTestClusterInt64sCallback;
+        delete onReportTestClusterEnum8Callback;
+        delete onReportTestClusterEnum16Callback;
+        delete onReportTestClusterFloatSingleCallback;
+        delete onReportTestClusterFloatDoubleCallback;
+        delete onReportTestClusterOctetStringCallback;
+        delete onReportTestClusterLongOctetStringCallback;
+        delete onReportTestClusterCharStringCallback;
+        delete onReportTestClusterLongCharStringCallback;
+        delete onReportTestClusterEpochUsCallback;
+        delete onReportTestClusterEpochSCallback;
+        delete onReportTestClusterVendorIdCallback;
+        delete onReportTestClusterRangeRestrictedInt8uCallback;
+        delete onReportTestClusterRangeRestrictedInt8sCallback;
+        delete onReportTestClusterRangeRestrictedInt16uCallback;
+        delete onReportTestClusterRangeRestrictedInt16sCallback;
+        delete onReportTestClusterUnsupportedCallback;
+        delete onReportTestClusterNullableBooleanCallback;
+        delete onReportTestClusterNullableBitmap8Callback;
+        delete onReportTestClusterNullableBitmap16Callback;
+        delete onReportTestClusterNullableBitmap32Callback;
+        delete onReportTestClusterNullableBitmap64Callback;
+        delete onReportTestClusterNullableInt8uCallback;
+        delete onReportTestClusterNullableInt16uCallback;
+        delete onReportTestClusterNullableInt24uCallback;
+        delete onReportTestClusterNullableInt32uCallback;
+        delete onReportTestClusterNullableInt40uCallback;
+        delete onReportTestClusterNullableInt48uCallback;
+        delete onReportTestClusterNullableInt56uCallback;
+        delete onReportTestClusterNullableInt64uCallback;
+        delete onReportTestClusterNullableInt8sCallback;
+        delete onReportTestClusterNullableInt16sCallback;
+        delete onReportTestClusterNullableInt24sCallback;
+        delete onReportTestClusterNullableInt32sCallback;
+        delete onReportTestClusterNullableInt40sCallback;
+        delete onReportTestClusterNullableInt48sCallback;
+        delete onReportTestClusterNullableInt56sCallback;
+        delete onReportTestClusterNullableInt64sCallback;
+        delete onReportTestClusterNullableEnum8Callback;
+        delete onReportTestClusterNullableEnum16Callback;
+        delete onReportTestClusterNullableFloatSingleCallback;
+        delete onReportTestClusterNullableFloatDoubleCallback;
+        delete onReportTestClusterNullableOctetStringCallback;
+        delete onReportTestClusterNullableCharStringCallback;
+        delete onReportTestClusterNullableRangeRestrictedInt8uCallback;
+        delete onReportTestClusterNullableRangeRestrictedInt8sCallback;
+        delete onReportTestClusterNullableRangeRestrictedInt16uCallback;
+        delete onReportTestClusterNullableRangeRestrictedInt16sCallback;
+        delete onReportTestClusterClusterRevisionCallback;
         delete onReportThermostatLocalTemperatureCallback;
+        delete onReportThermostatAbsMinHeatSetpointLimitCallback;
+        delete onReportThermostatAbsMaxHeatSetpointLimitCallback;
+        delete onReportThermostatAbsMinCoolSetpointLimitCallback;
+        delete onReportThermostatAbsMaxCoolSetpointLimitCallback;
+        delete onReportThermostatOccupiedCoolingSetpointCallback;
+        delete onReportThermostatOccupiedHeatingSetpointCallback;
+        delete onReportThermostatMinHeatSetpointLimitCallback;
+        delete onReportThermostatMaxHeatSetpointLimitCallback;
+        delete onReportThermostatMinCoolSetpointLimitCallback;
+        delete onReportThermostatMaxCoolSetpointLimitCallback;
+        delete onReportThermostatMinSetpointDeadBandCallback;
+        delete onReportThermostatControlSequenceOfOperationCallback;
+        delete onReportThermostatSystemModeCallback;
+        delete onReportThermostatStartOfWeekCallback;
+        delete onReportThermostatNumberOfWeeklyTransitionsCallback;
+        delete onReportThermostatNumberOfDailyTransitionsCallback;
+        delete onReportThermostatFeatureMapCallback;
+        delete onReportThermostatClusterRevisionCallback;
+        delete onReportThermostatUserInterfaceConfigurationTemperatureDisplayModeCallback;
+        delete onReportThermostatUserInterfaceConfigurationKeypadLockoutCallback;
+        delete onReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCallback;
+        delete onReportThermostatUserInterfaceConfigurationClusterRevisionCallback;
+        delete onReportThreadNetworkDiagnosticsChannelCallback;
+        delete onReportThreadNetworkDiagnosticsRoutingRoleCallback;
+        delete onReportThreadNetworkDiagnosticsNetworkNameCallback;
+        delete onReportThreadNetworkDiagnosticsPanIdCallback;
+        delete onReportThreadNetworkDiagnosticsExtendedPanIdCallback;
+        delete onReportThreadNetworkDiagnosticsMeshLocalPrefixCallback;
+        delete onReportThreadNetworkDiagnosticsOverrunCountCallback;
+        delete onReportThreadNetworkDiagnosticsPartitionIdCallback;
+        delete onReportThreadNetworkDiagnosticsWeightingCallback;
+        delete onReportThreadNetworkDiagnosticsDataVersionCallback;
+        delete onReportThreadNetworkDiagnosticsStableDataVersionCallback;
+        delete onReportThreadNetworkDiagnosticsLeaderRouterIdCallback;
+        delete onReportThreadNetworkDiagnosticsDetachedRoleCountCallback;
+        delete onReportThreadNetworkDiagnosticsChildRoleCountCallback;
+        delete onReportThreadNetworkDiagnosticsRouterRoleCountCallback;
+        delete onReportThreadNetworkDiagnosticsLeaderRoleCountCallback;
+        delete onReportThreadNetworkDiagnosticsAttachAttemptCountCallback;
+        delete onReportThreadNetworkDiagnosticsPartitionIdChangeCountCallback;
+        delete onReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCountCallback;
+        delete onReportThreadNetworkDiagnosticsParentChangeCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxTotalCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxUnicastCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxBroadcastCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxAckRequestedCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxAckedCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxNoAckRequestedCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxDataCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxDataPollCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxBeaconCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxBeaconRequestCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxOtherCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxRetryCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxErrCcaCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxErrAbortCountCallback;
+        delete onReportThreadNetworkDiagnosticsTxErrBusyChannelCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxTotalCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxUnicastCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxBroadcastCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxDataCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxDataPollCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxBeaconCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxBeaconRequestCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxOtherCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxAddressFilteredCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxDestAddrFilteredCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxDuplicatedCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxErrNoFrameCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxErrUnknownNeighborCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxErrInvalidSrcAddrCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxErrSecCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxErrFcsCountCallback;
+        delete onReportThreadNetworkDiagnosticsRxErrOtherCountCallback;
+        delete onReportThreadNetworkDiagnosticsActiveTimestampCallback;
+        delete onReportThreadNetworkDiagnosticsPendingTimestampCallback;
+        delete onReportThreadNetworkDiagnosticsDelayCallback;
+        delete onReportThreadNetworkDiagnosticsChannelMaskCallback;
+        delete onReportThreadNetworkDiagnosticsClusterRevisionCallback;
+        delete onReportWakeOnLanWakeOnLanMacAddressCallback;
+        delete onReportWakeOnLanClusterRevisionCallback;
+        delete onReportWiFiNetworkDiagnosticsBssidCallback;
+        delete onReportWiFiNetworkDiagnosticsSecurityTypeCallback;
+        delete onReportWiFiNetworkDiagnosticsWiFiVersionCallback;
+        delete onReportWiFiNetworkDiagnosticsChannelNumberCallback;
+        delete onReportWiFiNetworkDiagnosticsRssiCallback;
+        delete onReportWiFiNetworkDiagnosticsBeaconLostCountCallback;
+        delete onReportWiFiNetworkDiagnosticsBeaconRxCountCallback;
+        delete onReportWiFiNetworkDiagnosticsPacketMulticastRxCountCallback;
+        delete onReportWiFiNetworkDiagnosticsPacketMulticastTxCountCallback;
+        delete onReportWiFiNetworkDiagnosticsPacketUnicastRxCountCallback;
+        delete onReportWiFiNetworkDiagnosticsPacketUnicastTxCountCallback;
+        delete onReportWiFiNetworkDiagnosticsCurrentMaxRateCallback;
+        delete onReportWiFiNetworkDiagnosticsOverrunCountCallback;
+        delete onReportWiFiNetworkDiagnosticsClusterRevisionCallback;
+        delete onReportWindowCoveringTypeCallback;
+        delete onReportWindowCoveringCurrentPositionLiftCallback;
+        delete onReportWindowCoveringCurrentPositionTiltCallback;
+        delete onReportWindowCoveringConfigStatusCallback;
         delete onReportWindowCoveringCurrentPositionLiftPercentageCallback;
         delete onReportWindowCoveringCurrentPositionTiltPercentageCallback;
         delete onReportWindowCoveringOperationalStatusCallback;
         delete onReportWindowCoveringTargetPositionLiftPercent100thsCallback;
         delete onReportWindowCoveringTargetPositionTiltPercent100thsCallback;
+        delete onReportWindowCoveringEndProductTypeCallback;
         delete onReportWindowCoveringCurrentPositionLiftPercent100thsCallback;
         delete onReportWindowCoveringCurrentPositionTiltPercent100thsCallback;
+        delete onReportWindowCoveringInstalledOpenLimitLiftCallback;
+        delete onReportWindowCoveringInstalledClosedLimitLiftCallback;
+        delete onReportWindowCoveringInstalledOpenLimitTiltCallback;
+        delete onReportWindowCoveringInstalledClosedLimitTiltCallback;
+        delete onReportWindowCoveringModeCallback;
         delete onReportWindowCoveringSafetyStatusCallback;
+        delete onReportWindowCoveringFeatureMapCallback;
+        delete onReportWindowCoveringClusterRevisionCallback;
     }
 
     void AddReportCallbacks(NodeId remoteId, uint8_t endpointId) override
     {
         chip::app::CHIPDeviceCallbacksMgr & callbacksMgr = chip::app::CHIPDeviceCallbacksMgr::GetInstance();
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050E, 0xFFFD, onReportAccountLoginClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003C, 0xFFFD,
+                                       onReportAdministratorCommissioningClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0x0000, onReportApplicationBasicVendorNameCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0x0001, onReportApplicationBasicVendorIdCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0x0002,
+                                       onReportApplicationBasicApplicationNameCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0x0003, onReportApplicationBasicProductIdCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0x0005,
+                                       onReportApplicationBasicApplicationIdCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0x0006,
+                                       onReportApplicationBasicCatalogVendorIdCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0x0007,
+                                       onReportApplicationBasicApplicationStatusCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050D, 0xFFFD,
+                                       onReportApplicationBasicClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050C, 0x0001,
+                                       onReportApplicationLauncherCatalogVendorIdCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050C, 0x0002,
+                                       onReportApplicationLauncherApplicationIdCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050C, 0xFFFD,
+                                       onReportApplicationLauncherClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050B, 0x0001,
+                                       onReportAudioOutputCurrentAudioOutputCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050B, 0xFFFD, onReportAudioOutputClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0103, 0x0001,
+                                       onReportBarrierControlBarrierMovingStateCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0103, 0x0002,
+                                       onReportBarrierControlBarrierSafetyStatusCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0103, 0x0003,
+                                       onReportBarrierControlBarrierCapabilitiesCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0103, 0x000A,
+                                       onReportBarrierControlBarrierPositionCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0103, 0xFFFD,
+                                       onReportBarrierControlClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0000, onReportBasicInteractionModelVersionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0001, onReportBasicVendorNameCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0002, onReportBasicVendorIDCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0003, onReportBasicProductNameCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0004, onReportBasicProductIDCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0005, onReportBasicNodeLabelCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0006, onReportBasicLocationCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0007, onReportBasicHardwareVersionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0008, onReportBasicHardwareVersionStringCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0009, onReportBasicSoftwareVersionCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x000A, onReportBasicSoftwareVersionStringCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x000B, onReportBasicManufacturingDateCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x000C, onReportBasicPartNumberCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x000D, onReportBasicProductURLCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x000E, onReportBasicProductLabelCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x000F, onReportBasicSerialNumberCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0010, onReportBasicLocalConfigDisabledCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0x0011, onReportBasicReachableCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0028, 0xFFFD, onReportBasicClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x000F, 0x0051, onReportBinaryInputBasicOutOfServiceCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x000F, 0x0055, onReportBinaryInputBasicPresentValueCallback->Cancel(),
                                        BasicAttributeFilter<BooleanAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x000F, 0x006F, onReportBinaryInputBasicStatusFlagsCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x000F, 0xFFFD,
+                                       onReportBinaryInputBasicClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x001E, 0xFFFD, onReportBindingClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0045, 0x0000, onReportBooleanStateStateValueCallback->Cancel(),
                                        BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0045, 0xFFFD, onReportBooleanStateClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0025, 0x0002, onReportBridgedActionsSetupUrlCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0025, 0xFFFD,
+                                       onReportBridgedActionsClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0039, 0xFFFD,
+                                       onReportBridgedDeviceBasicClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0000, onReportColorControlCurrentHueCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0001,
                                        onReportColorControlCurrentSaturationCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0002, onReportColorControlRemainingTimeCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0003, onReportColorControlCurrentXCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0004, onReportColorControlCurrentYCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0005,
+                                       onReportColorControlDriftCompensationCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0006, onReportColorControlCompensationTextCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0007, onReportColorControlColorTemperatureCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
-        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0000, onReportDoorLockLockStateCallback->Cancel(),
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0008, onReportColorControlColorModeCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x000F,
+                                       onReportColorControlColorControlOptionsCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0010,
+                                       onReportColorControlNumberOfPrimariesCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0011, onReportColorControlPrimary1XCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0012, onReportColorControlPrimary1YCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0013,
+                                       onReportColorControlPrimary1IntensityCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0015, onReportColorControlPrimary2XCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0016, onReportColorControlPrimary2YCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0017,
+                                       onReportColorControlPrimary2IntensityCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0019, onReportColorControlPrimary3XCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x001A, onReportColorControlPrimary3YCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x001B,
+                                       onReportColorControlPrimary3IntensityCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0020, onReportColorControlPrimary4XCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0021, onReportColorControlPrimary4YCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0022,
+                                       onReportColorControlPrimary4IntensityCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0024, onReportColorControlPrimary5XCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0025, onReportColorControlPrimary5YCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0026,
+                                       onReportColorControlPrimary5IntensityCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0028, onReportColorControlPrimary6XCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0029, onReportColorControlPrimary6YCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x002A,
+                                       onReportColorControlPrimary6IntensityCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0030, onReportColorControlWhitePointXCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0031, onReportColorControlWhitePointYCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0032, onReportColorControlColorPointRXCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0033, onReportColorControlColorPointRYCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0034,
+                                       onReportColorControlColorPointRIntensityCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0036, onReportColorControlColorPointGXCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0037, onReportColorControlColorPointGYCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x0038,
+                                       onReportColorControlColorPointGIntensityCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x003A, onReportColorControlColorPointBXCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x003B, onReportColorControlColorPointBYCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x003C,
+                                       onReportColorControlColorPointBIntensityCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x4000,
+                                       onReportColorControlEnhancedCurrentHueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x4001,
+                                       onReportColorControlEnhancedColorModeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x4002, onReportColorControlColorLoopActiveCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x4003,
+                                       onReportColorControlColorLoopDirectionCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x4004, onReportColorControlColorLoopTimeCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x4005,
+                                       onReportColorControlColorLoopStartEnhancedHueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x4006,
+                                       onReportColorControlColorLoopStoredEnhancedHueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x400A,
+                                       onReportColorControlColorCapabilitiesCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x400B,
+                                       onReportColorControlColorTempPhysicalMinCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x400C,
+                                       onReportColorControlColorTempPhysicalMaxCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x400D,
+                                       onReportColorControlCoupleColorTempToLevelMinMiredsCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0x4010,
+                                       onReportColorControlStartUpColorTemperatureMiredsCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0300, 0xFFFD, onReportColorControlClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050A, 0xFFFD,
+                                       onReportContentLauncherClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x001D, 0xFFFD, onReportDescriptorClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0x0002, onReportDoorLockActuatorEnabledCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0101, 0xFFFD, onReportDoorLockClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0B04, 0x0000,
+                                       onReportElectricalMeasurementMeasurementTypeCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0B04, 0x0304,
+                                       onReportElectricalMeasurementTotalActivePowerCallback->Cancel(),
+                                       BasicAttributeFilter<Int32sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0B04, 0x0505,
+                                       onReportElectricalMeasurementRmsVoltageCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0B04, 0x0506,
+                                       onReportElectricalMeasurementRmsVoltageMinCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0B04, 0x0507,
+                                       onReportElectricalMeasurementRmsVoltageMaxCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0B04, 0x0508,
+                                       onReportElectricalMeasurementRmsCurrentCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0B04, 0x0509,
+                                       onReportElectricalMeasurementRmsCurrentMinCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0B04, 0x050A,
+                                       onReportElectricalMeasurementRmsCurrentMaxCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0B04, 0x050B,
+                                       onReportElectricalMeasurementActivePowerCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0B04, 0x050C,
+                                       onReportElectricalMeasurementActivePowerMinCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0B04, 0x050D,
+                                       onReportElectricalMeasurementActivePowerMaxCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0B04, 0xFFFD,
+                                       onReportElectricalMeasurementClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0037, 0x0000,
+                                       onReportEthernetNetworkDiagnosticsPHYRateCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0037, 0x0001,
+                                       onReportEthernetNetworkDiagnosticsFullDuplexCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0037, 0x0002,
+                                       onReportEthernetNetworkDiagnosticsPacketRxCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0037, 0x0003,
+                                       onReportEthernetNetworkDiagnosticsPacketTxCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0037, 0x0004,
+                                       onReportEthernetNetworkDiagnosticsTxErrCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0037, 0x0005,
+                                       onReportEthernetNetworkDiagnosticsCollisionCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0037, 0x0006,
+                                       onReportEthernetNetworkDiagnosticsOverrunCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0037, 0x0007,
+                                       onReportEthernetNetworkDiagnosticsCarrierDetectCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0037, 0x0008,
+                                       onReportEthernetNetworkDiagnosticsTimeSinceResetCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0037, 0xFFFD,
+                                       onReportEthernetNetworkDiagnosticsClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0040, 0xFFFD, onReportFixedLabelClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0404, 0x0000, onReportFlowMeasurementMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0404, 0x0001,
+                                       onReportFlowMeasurementMinMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0404, 0x0002,
+                                       onReportFlowMeasurementMaxMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0404, 0x0003, onReportFlowMeasurementToleranceCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0404, 0xFFFD,
+                                       onReportFlowMeasurementClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0030, 0x0000,
+                                       onReportGeneralCommissioningBreadcrumbCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0030, 0xFFFD,
+                                       onReportGeneralCommissioningClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0033, 0x0001,
+                                       onReportGeneralDiagnosticsRebootCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0033, 0x0002, onReportGeneralDiagnosticsUpTimeCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0033, 0x0003,
+                                       onReportGeneralDiagnosticsTotalOperationalHoursCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0033, 0x0004,
+                                       onReportGeneralDiagnosticsBootReasonsCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0033, 0xFFFD,
+                                       onReportGeneralDiagnosticsClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003F, 0xFFFD,
+                                       onReportGroupKeyManagementClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0004, 0x0000, onReportGroupsNameSupportCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0004, 0xFFFD, onReportGroupsClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0003, 0x0000, onReportIdentifyIdentifyTimeCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0003, 0x0001, onReportIdentifyIdentifyTypeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0003, 0xFFFD, onReportIdentifyClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0400, 0x0000,
                                        onReportIlluminanceMeasurementMeasuredValueCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0400, 0x0001,
+                                       onReportIlluminanceMeasurementMinMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0400, 0x0002,
+                                       onReportIlluminanceMeasurementMaxMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0400, 0x0003,
+                                       onReportIlluminanceMeasurementToleranceCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0400, 0x0004,
+                                       onReportIlluminanceMeasurementLightSensorTypeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0400, 0xFFFD,
+                                       onReportIlluminanceMeasurementClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0509, 0xFFFD, onReportKeypadInputClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0000, onReportLevelControlCurrentLevelCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0001, onReportLevelControlRemainingTimeCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0002, onReportLevelControlMinLevelCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0003, onReportLevelControlMaxLevelCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0004, onReportLevelControlCurrentFrequencyCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0005, onReportLevelControlMinFrequencyCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0006, onReportLevelControlMaxFrequencyCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x000F, onReportLevelControlOptionsCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0010,
+                                       onReportLevelControlOnOffTransitionTimeCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0011, onReportLevelControlOnLevelCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0012, onReportLevelControlOnTransitionTimeCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0013,
+                                       onReportLevelControlOffTransitionTimeCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x0014, onReportLevelControlDefaultMoveRateCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0x4000,
+                                       onReportLevelControlStartUpCurrentLevelCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0008, 0xFFFD, onReportLevelControlClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0508, 0xFFFD, onReportLowPowerClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0507, 0x0001, onReportMediaInputCurrentMediaInputCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0507, 0xFFFD, onReportMediaInputClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0000, onReportMediaPlaybackPlaybackStateCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0001, onReportMediaPlaybackStartTimeCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0002, onReportMediaPlaybackDurationCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0003,
+                                       onReportMediaPlaybackPositionUpdatedAtCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0004, onReportMediaPlaybackPositionCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0005, onReportMediaPlaybackPlaybackSpeedCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0006, onReportMediaPlaybackSeekRangeEndCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0x0007, onReportMediaPlaybackSeekRangeStartCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0506, 0xFFFD, onReportMediaPlaybackClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0050, 0x0000, onReportModeSelectCurrentModeCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0050, 0x0002, onReportModeSelectOnModeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0050, 0x0003, onReportModeSelectStartUpModeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0050, 0x0004, onReportModeSelectDescriptionCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0050, 0xFFFD, onReportModeSelectClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0031, 0xFFFC,
+                                       onReportNetworkCommissioningFeatureMapCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0031, 0xFFFD,
+                                       onReportNetworkCommissioningClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0029, 0xFFFD,
+                                       onReportOtaSoftwareUpdateProviderClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x002A, 0x0001,
+                                       onReportOtaSoftwareUpdateRequestorDefaultOtaProviderCallback->Cancel(),
+                                       BasicAttributeFilter<OctetStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x002A, 0x0002,
+                                       onReportOtaSoftwareUpdateRequestorUpdatePossibleCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x002A, 0xFFFD,
+                                       onReportOtaSoftwareUpdateRequestorClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0406, 0x0000, onReportOccupancySensingOccupancyCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0406, 0x0001,
+                                       onReportOccupancySensingOccupancySensorTypeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0406, 0x0002,
+                                       onReportOccupancySensingOccupancySensorTypeBitmapCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0406, 0xFFFD,
+                                       onReportOccupancySensingClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0006, 0x0000, onReportOnOffOnOffCallback->Cancel(),
                                        BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0006, 0x4000, onReportOnOffGlobalSceneControlCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0006, 0x4001, onReportOnOffOnTimeCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0006, 0x4002, onReportOnOffOffWaitTimeCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0006, 0x4003, onReportOnOffStartUpOnOffCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0006, 0xFFFC, onReportOnOffFeatureMapCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0006, 0xFFFD, onReportOnOffClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0007, 0x0000,
+                                       onReportOnOffSwitchConfigurationSwitchTypeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0007, 0x0010,
+                                       onReportOnOffSwitchConfigurationSwitchActionsCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0007, 0xFFFD,
+                                       onReportOnOffSwitchConfigurationClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003E, 0x0002,
+                                       onReportOperationalCredentialsSupportedFabricsCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003E, 0x0003,
+                                       onReportOperationalCredentialsCommissionedFabricsCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003E, 0x0005,
+                                       onReportOperationalCredentialsCurrentFabricIndexCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003E, 0xFFFD,
+                                       onReportOperationalCredentialsClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x002F, 0x0000, onReportPowerSourceStatusCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x002F, 0x0001, onReportPowerSourceOrderCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x002F, 0x0002, onReportPowerSourceDescriptionCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x002F, 0x000B, onReportPowerSourceBatteryVoltageCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x002F, 0x000C,
+                                       onReportPowerSourceBatteryPercentRemainingCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x002F, 0x000D,
+                                       onReportPowerSourceBatteryTimeRemainingCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x002F, 0x000E,
+                                       onReportPowerSourceBatteryChargeLevelCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x002F, 0x001A,
+                                       onReportPowerSourceBatteryChargeStateCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x002F, 0xFFFC, onReportPowerSourceFeatureMapCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x002F, 0xFFFD, onReportPowerSourceClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0403, 0x0000,
                                        onReportPressureMeasurementMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0403, 0x0001,
+                                       onReportPressureMeasurementMinMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0403, 0x0002,
+                                       onReportPressureMeasurementMaxMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0403, 0xFFFD,
+                                       onReportPressureMeasurementClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0000,
+                                       onReportPumpConfigurationAndControlMaxPressureCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0001,
+                                       onReportPumpConfigurationAndControlMaxSpeedCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0002,
+                                       onReportPumpConfigurationAndControlMaxFlowCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0003,
+                                       onReportPumpConfigurationAndControlMinConstPressureCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0004,
+                                       onReportPumpConfigurationAndControlMaxConstPressureCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0005,
+                                       onReportPumpConfigurationAndControlMinCompPressureCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0006,
+                                       onReportPumpConfigurationAndControlMaxCompPressureCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0007,
+                                       onReportPumpConfigurationAndControlMinConstSpeedCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0008,
+                                       onReportPumpConfigurationAndControlMaxConstSpeedCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0009,
+                                       onReportPumpConfigurationAndControlMinConstFlowCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x000A,
+                                       onReportPumpConfigurationAndControlMaxConstFlowCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x000B,
+                                       onReportPumpConfigurationAndControlMinConstTempCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x000C,
+                                       onReportPumpConfigurationAndControlMaxConstTempCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0010,
                                        onReportPumpConfigurationAndControlPumpStatusCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0011,
+                                       onReportPumpConfigurationAndControlEffectiveOperationModeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0012,
+                                       onReportPumpConfigurationAndControlEffectiveControlModeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0013,
                                        onReportPumpConfigurationAndControlCapacityCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0014,
+                                       onReportPumpConfigurationAndControlSpeedCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0015,
+                                       onReportPumpConfigurationAndControlLifetimeRunningHoursCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0016,
+                                       onReportPumpConfigurationAndControlPowerCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0017,
+                                       onReportPumpConfigurationAndControlLifetimeEnergyConsumedCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0020,
+                                       onReportPumpConfigurationAndControlOperationModeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0021,
+                                       onReportPumpConfigurationAndControlControlModeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0x0022,
+                                       onReportPumpConfigurationAndControlAlarmMaskCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0xFFFC,
+                                       onReportPumpConfigurationAndControlFeatureMapCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0200, 0xFFFD,
+                                       onReportPumpConfigurationAndControlClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0405, 0x0000,
                                        onReportRelativeHumidityMeasurementMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0405, 0x0001,
+                                       onReportRelativeHumidityMeasurementMinMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0405, 0x0002,
+                                       onReportRelativeHumidityMeasurementMaxMeasuredValueCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0405, 0x0003,
                                        onReportRelativeHumidityMeasurementToleranceCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0405, 0xFFFD,
+                                       onReportRelativeHumidityMeasurementClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0005, 0x0000, onReportScenesSceneCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0005, 0x0001, onReportScenesCurrentSceneCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0005, 0x0002, onReportScenesCurrentGroupCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0005, 0x0003, onReportScenesSceneValidCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0005, 0x0004, onReportScenesNameSupportCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0005, 0xFFFD, onReportScenesClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0034, 0x0001,
+                                       onReportSoftwareDiagnosticsCurrentHeapFreeCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0034, 0x0002,
+                                       onReportSoftwareDiagnosticsCurrentHeapUsedCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0034, 0x0003,
+                                       onReportSoftwareDiagnosticsCurrentHeapHighWatermarkCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0034, 0xFFFD,
+                                       onReportSoftwareDiagnosticsClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003B, 0x0000, onReportSwitchNumberOfPositionsCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003B, 0x0001, onReportSwitchCurrentPositionCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003B, 0x0002, onReportSwitchMultiPressMaxCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003B, 0xFFFC, onReportSwitchFeatureMapCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x003B, 0xFFFD, onReportSwitchClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0504, 0x0001, onReportTvChannelTvChannelLineupCallback->Cancel(),
+                                       BasicAttributeFilter<OctetStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0504, 0x0002, onReportTvChannelCurrentTvChannelCallback->Cancel(),
+                                       BasicAttributeFilter<OctetStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0504, 0xFFFD, onReportTvChannelClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0505, 0xFFFD,
+                                       onReportTargetNavigatorClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0402, 0x0000,
                                        onReportTemperatureMeasurementMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0402, 0x0001,
+                                       onReportTemperatureMeasurementMinMeasuredValueCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0402, 0x0002,
+                                       onReportTemperatureMeasurementMaxMeasuredValueCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0402, 0x0003,
                                        onReportTemperatureMeasurementToleranceCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0402, 0xFFFD,
+                                       onReportTemperatureMeasurementClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0000, onReportTestClusterBooleanCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0001, onReportTestClusterBitmap8Callback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0002, onReportTestClusterBitmap16Callback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0003, onReportTestClusterBitmap32Callback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0004, onReportTestClusterBitmap64Callback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0005, onReportTestClusterInt8uCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0006, onReportTestClusterInt16uCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0007, onReportTestClusterInt24uCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0008, onReportTestClusterInt32uCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0009, onReportTestClusterInt40uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x000A, onReportTestClusterInt48uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x000B, onReportTestClusterInt56uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x000C, onReportTestClusterInt64uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x000D, onReportTestClusterInt8sCallback->Cancel(),
+                                       BasicAttributeFilter<Int8sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x000E, onReportTestClusterInt16sCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x000F, onReportTestClusterInt24sCallback->Cancel(),
+                                       BasicAttributeFilter<Int32sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0010, onReportTestClusterInt32sCallback->Cancel(),
+                                       BasicAttributeFilter<Int32sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0011, onReportTestClusterInt40sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0012, onReportTestClusterInt48sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0013, onReportTestClusterInt56sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0014, onReportTestClusterInt64sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0015, onReportTestClusterEnum8Callback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0016, onReportTestClusterEnum16Callback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0017, onReportTestClusterFloatSingleCallback->Cancel(),
+                                       BasicAttributeFilter<FloatAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0018, onReportTestClusterFloatDoubleCallback->Cancel(),
+                                       BasicAttributeFilter<DoubleAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0019, onReportTestClusterOctetStringCallback->Cancel(),
+                                       BasicAttributeFilter<OctetStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x001D, onReportTestClusterLongOctetStringCallback->Cancel(),
+                                       BasicAttributeFilter<OctetStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x001E, onReportTestClusterCharStringCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x001F, onReportTestClusterLongCharStringCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0020, onReportTestClusterEpochUsCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0021, onReportTestClusterEpochSCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0022, onReportTestClusterVendorIdCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0026,
+                                       onReportTestClusterRangeRestrictedInt8uCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0027,
+                                       onReportTestClusterRangeRestrictedInt8sCallback->Cancel(),
+                                       BasicAttributeFilter<Int8sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0028,
+                                       onReportTestClusterRangeRestrictedInt16uCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x0029,
+                                       onReportTestClusterRangeRestrictedInt16sCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x00FF, onReportTestClusterUnsupportedCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8000, onReportTestClusterNullableBooleanCallback->Cancel(),
+                                       BasicAttributeFilter<BooleanAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8001, onReportTestClusterNullableBitmap8Callback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8002, onReportTestClusterNullableBitmap16Callback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8003, onReportTestClusterNullableBitmap32Callback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8004, onReportTestClusterNullableBitmap64Callback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8005, onReportTestClusterNullableInt8uCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8006, onReportTestClusterNullableInt16uCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8007, onReportTestClusterNullableInt24uCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8008, onReportTestClusterNullableInt32uCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8009, onReportTestClusterNullableInt40uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x800A, onReportTestClusterNullableInt48uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x800B, onReportTestClusterNullableInt56uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x800C, onReportTestClusterNullableInt64uCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x800D, onReportTestClusterNullableInt8sCallback->Cancel(),
+                                       BasicAttributeFilter<Int8sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x800E, onReportTestClusterNullableInt16sCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x800F, onReportTestClusterNullableInt24sCallback->Cancel(),
+                                       BasicAttributeFilter<Int32sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8010, onReportTestClusterNullableInt32sCallback->Cancel(),
+                                       BasicAttributeFilter<Int32sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8011, onReportTestClusterNullableInt40sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8012, onReportTestClusterNullableInt48sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8013, onReportTestClusterNullableInt56sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8014, onReportTestClusterNullableInt64sCallback->Cancel(),
+                                       BasicAttributeFilter<Int64sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8015, onReportTestClusterNullableEnum8Callback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8016, onReportTestClusterNullableEnum16Callback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8017,
+                                       onReportTestClusterNullableFloatSingleCallback->Cancel(),
+                                       BasicAttributeFilter<FloatAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8018,
+                                       onReportTestClusterNullableFloatDoubleCallback->Cancel(),
+                                       BasicAttributeFilter<DoubleAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8019,
+                                       onReportTestClusterNullableOctetStringCallback->Cancel(),
+                                       BasicAttributeFilter<OctetStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x801E,
+                                       onReportTestClusterNullableCharStringCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8026,
+                                       onReportTestClusterNullableRangeRestrictedInt8uCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8027,
+                                       onReportTestClusterNullableRangeRestrictedInt8sCallback->Cancel(),
+                                       BasicAttributeFilter<Int8sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8028,
+                                       onReportTestClusterNullableRangeRestrictedInt16uCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0x8029,
+                                       onReportTestClusterNullableRangeRestrictedInt16sCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x050F, 0xFFFD, onReportTestClusterClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0000, onReportThermostatLocalTemperatureCallback->Cancel(),
                                        BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0003,
+                                       onReportThermostatAbsMinHeatSetpointLimitCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0004,
+                                       onReportThermostatAbsMaxHeatSetpointLimitCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0005,
+                                       onReportThermostatAbsMinCoolSetpointLimitCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0006,
+                                       onReportThermostatAbsMaxCoolSetpointLimitCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0011,
+                                       onReportThermostatOccupiedCoolingSetpointCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0012,
+                                       onReportThermostatOccupiedHeatingSetpointCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0015,
+                                       onReportThermostatMinHeatSetpointLimitCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0016,
+                                       onReportThermostatMaxHeatSetpointLimitCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0017,
+                                       onReportThermostatMinCoolSetpointLimitCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0018,
+                                       onReportThermostatMaxCoolSetpointLimitCallback->Cancel(),
+                                       BasicAttributeFilter<Int16sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0019,
+                                       onReportThermostatMinSetpointDeadBandCallback->Cancel(),
+                                       BasicAttributeFilter<Int8sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x001B,
+                                       onReportThermostatControlSequenceOfOperationCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x001C, onReportThermostatSystemModeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0020, onReportThermostatStartOfWeekCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0021,
+                                       onReportThermostatNumberOfWeeklyTransitionsCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0x0022,
+                                       onReportThermostatNumberOfDailyTransitionsCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0xFFFC, onReportThermostatFeatureMapCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0201, 0xFFFD, onReportThermostatClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0204, 0x0000,
+                                       onReportThermostatUserInterfaceConfigurationTemperatureDisplayModeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0204, 0x0001,
+                                       onReportThermostatUserInterfaceConfigurationKeypadLockoutCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0204, 0x0002,
+                                       onReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0204, 0xFFFD,
+                                       onReportThermostatUserInterfaceConfigurationClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0000,
+                                       onReportThreadNetworkDiagnosticsChannelCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0001,
+                                       onReportThreadNetworkDiagnosticsRoutingRoleCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0002,
+                                       onReportThreadNetworkDiagnosticsNetworkNameCallback->Cancel(),
+                                       BasicAttributeFilter<OctetStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0003,
+                                       onReportThreadNetworkDiagnosticsPanIdCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0004,
+                                       onReportThreadNetworkDiagnosticsExtendedPanIdCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0005,
+                                       onReportThreadNetworkDiagnosticsMeshLocalPrefixCallback->Cancel(),
+                                       BasicAttributeFilter<OctetStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0006,
+                                       onReportThreadNetworkDiagnosticsOverrunCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0009,
+                                       onReportThreadNetworkDiagnosticsPartitionIdCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x000A,
+                                       onReportThreadNetworkDiagnosticsWeightingCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x000B,
+                                       onReportThreadNetworkDiagnosticsDataVersionCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x000C,
+                                       onReportThreadNetworkDiagnosticsStableDataVersionCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x000D,
+                                       onReportThreadNetworkDiagnosticsLeaderRouterIdCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x000E,
+                                       onReportThreadNetworkDiagnosticsDetachedRoleCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x000F,
+                                       onReportThreadNetworkDiagnosticsChildRoleCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0010,
+                                       onReportThreadNetworkDiagnosticsRouterRoleCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0011,
+                                       onReportThreadNetworkDiagnosticsLeaderRoleCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0012,
+                                       onReportThreadNetworkDiagnosticsAttachAttemptCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0013,
+                                       onReportThreadNetworkDiagnosticsPartitionIdChangeCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0014,
+                                       onReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0015,
+                                       onReportThreadNetworkDiagnosticsParentChangeCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0016,
+                                       onReportThreadNetworkDiagnosticsTxTotalCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0017,
+                                       onReportThreadNetworkDiagnosticsTxUnicastCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0018,
+                                       onReportThreadNetworkDiagnosticsTxBroadcastCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0019,
+                                       onReportThreadNetworkDiagnosticsTxAckRequestedCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x001A,
+                                       onReportThreadNetworkDiagnosticsTxAckedCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x001B,
+                                       onReportThreadNetworkDiagnosticsTxNoAckRequestedCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x001C,
+                                       onReportThreadNetworkDiagnosticsTxDataCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x001D,
+                                       onReportThreadNetworkDiagnosticsTxDataPollCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x001E,
+                                       onReportThreadNetworkDiagnosticsTxBeaconCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x001F,
+                                       onReportThreadNetworkDiagnosticsTxBeaconRequestCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0020,
+                                       onReportThreadNetworkDiagnosticsTxOtherCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0021,
+                                       onReportThreadNetworkDiagnosticsTxRetryCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0022,
+                                       onReportThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0023,
+                                       onReportThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0024,
+                                       onReportThreadNetworkDiagnosticsTxErrCcaCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0025,
+                                       onReportThreadNetworkDiagnosticsTxErrAbortCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0026,
+                                       onReportThreadNetworkDiagnosticsTxErrBusyChannelCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0027,
+                                       onReportThreadNetworkDiagnosticsRxTotalCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0028,
+                                       onReportThreadNetworkDiagnosticsRxUnicastCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0029,
+                                       onReportThreadNetworkDiagnosticsRxBroadcastCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x002A,
+                                       onReportThreadNetworkDiagnosticsRxDataCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x002B,
+                                       onReportThreadNetworkDiagnosticsRxDataPollCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x002C,
+                                       onReportThreadNetworkDiagnosticsRxBeaconCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x002D,
+                                       onReportThreadNetworkDiagnosticsRxBeaconRequestCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x002E,
+                                       onReportThreadNetworkDiagnosticsRxOtherCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x002F,
+                                       onReportThreadNetworkDiagnosticsRxAddressFilteredCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0030,
+                                       onReportThreadNetworkDiagnosticsRxDestAddrFilteredCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0031,
+                                       onReportThreadNetworkDiagnosticsRxDuplicatedCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0032,
+                                       onReportThreadNetworkDiagnosticsRxErrNoFrameCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0033,
+                                       onReportThreadNetworkDiagnosticsRxErrUnknownNeighborCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0034,
+                                       onReportThreadNetworkDiagnosticsRxErrInvalidSrcAddrCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0035,
+                                       onReportThreadNetworkDiagnosticsRxErrSecCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0036,
+                                       onReportThreadNetworkDiagnosticsRxErrFcsCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0037,
+                                       onReportThreadNetworkDiagnosticsRxErrOtherCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0038,
+                                       onReportThreadNetworkDiagnosticsActiveTimestampCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x0039,
+                                       onReportThreadNetworkDiagnosticsPendingTimestampCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x003A,
+                                       onReportThreadNetworkDiagnosticsDelayCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0x003C,
+                                       onReportThreadNetworkDiagnosticsChannelMaskCallback->Cancel(),
+                                       BasicAttributeFilter<OctetStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0035, 0xFFFD,
+                                       onReportThreadNetworkDiagnosticsClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0503, 0x0000, onReportWakeOnLanWakeOnLanMacAddressCallback->Cancel(),
+                                       BasicAttributeFilter<CharStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0503, 0xFFFD, onReportWakeOnLanClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0x0000, onReportWiFiNetworkDiagnosticsBssidCallback->Cancel(),
+                                       BasicAttributeFilter<OctetStringAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0x0001,
+                                       onReportWiFiNetworkDiagnosticsSecurityTypeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0x0002,
+                                       onReportWiFiNetworkDiagnosticsWiFiVersionCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0x0003,
+                                       onReportWiFiNetworkDiagnosticsChannelNumberCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0x0004, onReportWiFiNetworkDiagnosticsRssiCallback->Cancel(),
+                                       BasicAttributeFilter<Int8sAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0x0005,
+                                       onReportWiFiNetworkDiagnosticsBeaconLostCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0x0006,
+                                       onReportWiFiNetworkDiagnosticsBeaconRxCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0x0007,
+                                       onReportWiFiNetworkDiagnosticsPacketMulticastRxCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0x0008,
+                                       onReportWiFiNetworkDiagnosticsPacketMulticastTxCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0x0009,
+                                       onReportWiFiNetworkDiagnosticsPacketUnicastRxCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0x000A,
+                                       onReportWiFiNetworkDiagnosticsPacketUnicastTxCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0x000B,
+                                       onReportWiFiNetworkDiagnosticsCurrentMaxRateCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0x000C,
+                                       onReportWiFiNetworkDiagnosticsOverrunCountCallback->Cancel(),
+                                       BasicAttributeFilter<Int64uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0036, 0xFFFD,
+                                       onReportWiFiNetworkDiagnosticsClusterRevisionCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x0000, onReportWindowCoveringTypeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x0003,
+                                       onReportWindowCoveringCurrentPositionLiftCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x0004,
+                                       onReportWindowCoveringCurrentPositionTiltCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x0007, onReportWindowCoveringConfigStatusCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x0008,
                                        onReportWindowCoveringCurrentPositionLiftPercentageCallback->Cancel(),
                                        BasicAttributeFilter<Int8uAttributeCallback>);
@@ -136,111 +1669,1796 @@ public:
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x000C,
                                        onReportWindowCoveringTargetPositionTiltPercent100thsCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x000D, onReportWindowCoveringEndProductTypeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x000E,
                                        onReportWindowCoveringCurrentPositionLiftPercent100thsCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x000F,
                                        onReportWindowCoveringCurrentPositionTiltPercent100thsCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x0010,
+                                       onReportWindowCoveringInstalledOpenLimitLiftCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x0011,
+                                       onReportWindowCoveringInstalledClosedLimitLiftCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x0012,
+                                       onReportWindowCoveringInstalledOpenLimitTiltCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x0013,
+                                       onReportWindowCoveringInstalledClosedLimitTiltCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x0017, onReportWindowCoveringModeCallback->Cancel(),
+                                       BasicAttributeFilter<Int8uAttributeCallback>);
         callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0x001A, onReportWindowCoveringSafetyStatusCallback->Cancel(),
+                                       BasicAttributeFilter<Int16uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0xFFFC, onReportWindowCoveringFeatureMapCallback->Cancel(),
+                                       BasicAttributeFilter<Int32uAttributeCallback>);
+        callbacksMgr.AddReportCallback(remoteId, endpointId, 0x0102, 0xFFFD,
+                                       onReportWindowCoveringClusterRevisionCallback->Cancel(),
                                        BasicAttributeFilter<Int16uAttributeCallback>);
     }
 
-    static void OnDefaultSuccessResponse(void * context) { ChipLogProgress(chipTool, "Default Success Response"); }
-
-    static void OnDefaultFailureResponse(void * context, uint8_t status)
-    {
-        ChipLogProgress(chipTool, "Default Failure Response: 0x%02x", status);
-    }
-
-    static void OnUnsupportedAttributeResponse(void * context)
-    {
-        ChipLogError(chipTool, "Unsupported attribute Response. This should never happen !");
-    }
-
-    static void OnBooleanAttributeResponse(void * context, bool value)
-    {
-        ChipLogProgress(chipTool, "Boolean attribute Response: %d", value);
-    }
-
-    static void OnInt8uAttributeResponse(void * context, uint8_t value)
-    {
-        ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
-    }
-
-    static void OnInt16uAttributeResponse(void * context, uint16_t value)
-    {
-        ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
-    }
-
-    static void OnInt16sAttributeResponse(void * context, int16_t value)
-    {
-        ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
-    }
-
 private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportBinaryInputBasicPresentValueCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportBinaryInputBasicStatusFlagsCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportBooleanStateStateValueCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentHueCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportColorControlCurrentSaturationCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlCurrentXCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlCurrentYCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportColorControlColorTemperatureCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportDoorLockLockStateCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportIlluminanceMeasurementMeasuredValueCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportLevelControlCurrentLevelCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportModeSelectCurrentModeCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportOccupancySensingOccupancyCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<BooleanAttributeCallback> * onReportOnOffOnOffCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPressureMeasurementMeasuredValueCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportPumpConfigurationAndControlPumpStatusCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportPumpConfigurationAndControlCapacityCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementMeasuredValueCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportRelativeHumidityMeasurementToleranceCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportSwitchCurrentPositionCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportTemperatureMeasurementMeasuredValueCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportTemperatureMeasurementToleranceCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16sAttributeCallback> * onReportThermostatLocalTemperatureCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringCurrentPositionLiftPercentageCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringCurrentPositionTiltPercentageCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int8uAttributeCallback> * onReportWindowCoveringOperationalStatusCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringTargetPositionLiftPercent100thsCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringTargetPositionTiltPercent100thsCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringCurrentPositionLiftPercent100thsCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringCurrentPositionTiltPercent100thsCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<Int16uAttributeCallback> * onReportWindowCoveringSafetyStatusCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadAccountLoginClusterRevision::OnAttributeResponse)> *
+        onReportAccountLoginClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadAccountLoginClusterRevision::OnAttributeResponse)>(
+                ReadAccountLoginClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadAdministratorCommissioningClusterRevision::OnAttributeResponse)> *
+        onReportAdministratorCommissioningClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadAdministratorCommissioningClusterRevision::OnAttributeResponse)>(
+                ReadAdministratorCommissioningClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicVendorName::OnAttributeResponse)> *
+        onReportApplicationBasicVendorNameCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicVendorName::OnAttributeResponse)>(
+                ReadApplicationBasicVendorName::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicVendorId::OnAttributeResponse)> *
+        onReportApplicationBasicVendorIdCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicVendorId::OnAttributeResponse)>(
+                ReadApplicationBasicVendorId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationName::OnAttributeResponse)> *
+        onReportApplicationBasicApplicationNameCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationName::OnAttributeResponse)>(
+                ReadApplicationBasicApplicationName::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicProductId::OnAttributeResponse)> *
+        onReportApplicationBasicProductIdCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicProductId::OnAttributeResponse)>(
+                ReadApplicationBasicProductId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationId::OnAttributeResponse)> *
+        onReportApplicationBasicApplicationIdCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationId::OnAttributeResponse)>(
+                ReadApplicationBasicApplicationId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicCatalogVendorId::OnAttributeResponse)> *
+        onReportApplicationBasicCatalogVendorIdCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicCatalogVendorId::OnAttributeResponse)>(
+                ReadApplicationBasicCatalogVendorId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationStatus::OnAttributeResponse)> *
+        onReportApplicationBasicApplicationStatusCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicApplicationStatus::OnAttributeResponse)>(
+                ReadApplicationBasicApplicationStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationBasicClusterRevision::OnAttributeResponse)> *
+        onReportApplicationBasicClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationBasicClusterRevision::OnAttributeResponse)>(
+                ReadApplicationBasicClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationLauncherCatalogVendorId::OnAttributeResponse)> *
+        onReportApplicationLauncherCatalogVendorIdCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationLauncherCatalogVendorId::OnAttributeResponse)>(
+                ReadApplicationLauncherCatalogVendorId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationLauncherApplicationId::OnAttributeResponse)> *
+        onReportApplicationLauncherApplicationIdCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationLauncherApplicationId::OnAttributeResponse)>(
+                ReadApplicationLauncherApplicationId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadApplicationLauncherClusterRevision::OnAttributeResponse)> *
+        onReportApplicationLauncherClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadApplicationLauncherClusterRevision::OnAttributeResponse)>(
+                ReadApplicationLauncherClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadAudioOutputCurrentAudioOutput::OnAttributeResponse)> *
+        onReportAudioOutputCurrentAudioOutputCallback =
+            new chip::Callback::Callback<decltype(&ReadAudioOutputCurrentAudioOutput::OnAttributeResponse)>(
+                ReadAudioOutputCurrentAudioOutput::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadAudioOutputClusterRevision::OnAttributeResponse)> *
+        onReportAudioOutputClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadAudioOutputClusterRevision::OnAttributeResponse)>(
+                ReadAudioOutputClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBarrierControlBarrierMovingState::OnAttributeResponse)> *
+        onReportBarrierControlBarrierMovingStateCallback =
+            new chip::Callback::Callback<decltype(&ReadBarrierControlBarrierMovingState::OnAttributeResponse)>(
+                ReadBarrierControlBarrierMovingState::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBarrierControlBarrierSafetyStatus::OnAttributeResponse)> *
+        onReportBarrierControlBarrierSafetyStatusCallback =
+            new chip::Callback::Callback<decltype(&ReadBarrierControlBarrierSafetyStatus::OnAttributeResponse)>(
+                ReadBarrierControlBarrierSafetyStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBarrierControlBarrierCapabilities::OnAttributeResponse)> *
+        onReportBarrierControlBarrierCapabilitiesCallback =
+            new chip::Callback::Callback<decltype(&ReadBarrierControlBarrierCapabilities::OnAttributeResponse)>(
+                ReadBarrierControlBarrierCapabilities::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBarrierControlBarrierPosition::OnAttributeResponse)> *
+        onReportBarrierControlBarrierPositionCallback =
+            new chip::Callback::Callback<decltype(&ReadBarrierControlBarrierPosition::OnAttributeResponse)>(
+                ReadBarrierControlBarrierPosition::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBarrierControlClusterRevision::OnAttributeResponse)> *
+        onReportBarrierControlClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadBarrierControlClusterRevision::OnAttributeResponse)>(
+                ReadBarrierControlClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicInteractionModelVersion::OnAttributeResponse)> *
+        onReportBasicInteractionModelVersionCallback =
+            new chip::Callback::Callback<decltype(&ReadBasicInteractionModelVersion::OnAttributeResponse)>(
+                ReadBasicInteractionModelVersion::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicVendorName::OnAttributeResponse)> * onReportBasicVendorNameCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicVendorName::OnAttributeResponse)>(ReadBasicVendorName::OnAttributeResponse,
+                                                                                          this);
+    chip::Callback::Callback<decltype(&ReadBasicVendorID::OnAttributeResponse)> * onReportBasicVendorIDCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicVendorID::OnAttributeResponse)>(ReadBasicVendorID::OnAttributeResponse,
+                                                                                        this);
+    chip::Callback::Callback<decltype(&ReadBasicProductName::OnAttributeResponse)> * onReportBasicProductNameCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicProductName::OnAttributeResponse)>(
+            ReadBasicProductName::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicProductID::OnAttributeResponse)> * onReportBasicProductIDCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicProductID::OnAttributeResponse)>(ReadBasicProductID::OnAttributeResponse,
+                                                                                         this);
+    chip::Callback::Callback<decltype(&ReadBasicNodeLabel::OnAttributeResponse)> * onReportBasicNodeLabelCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicNodeLabel::OnAttributeResponse)>(ReadBasicNodeLabel::OnAttributeResponse,
+                                                                                         this);
+    chip::Callback::Callback<decltype(&ReadBasicLocation::OnAttributeResponse)> * onReportBasicLocationCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicLocation::OnAttributeResponse)>(ReadBasicLocation::OnAttributeResponse,
+                                                                                        this);
+    chip::Callback::Callback<decltype(&ReadBasicHardwareVersion::OnAttributeResponse)> * onReportBasicHardwareVersionCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicHardwareVersion::OnAttributeResponse)>(
+            ReadBasicHardwareVersion::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicHardwareVersionString::OnAttributeResponse)> *
+        onReportBasicHardwareVersionStringCallback =
+            new chip::Callback::Callback<decltype(&ReadBasicHardwareVersionString::OnAttributeResponse)>(
+                ReadBasicHardwareVersionString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicSoftwareVersion::OnAttributeResponse)> * onReportBasicSoftwareVersionCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicSoftwareVersion::OnAttributeResponse)>(
+            ReadBasicSoftwareVersion::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicSoftwareVersionString::OnAttributeResponse)> *
+        onReportBasicSoftwareVersionStringCallback =
+            new chip::Callback::Callback<decltype(&ReadBasicSoftwareVersionString::OnAttributeResponse)>(
+                ReadBasicSoftwareVersionString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicManufacturingDate::OnAttributeResponse)> * onReportBasicManufacturingDateCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicManufacturingDate::OnAttributeResponse)>(
+            ReadBasicManufacturingDate::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicPartNumber::OnAttributeResponse)> * onReportBasicPartNumberCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicPartNumber::OnAttributeResponse)>(ReadBasicPartNumber::OnAttributeResponse,
+                                                                                          this);
+    chip::Callback::Callback<decltype(&ReadBasicProductURL::OnAttributeResponse)> * onReportBasicProductURLCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicProductURL::OnAttributeResponse)>(ReadBasicProductURL::OnAttributeResponse,
+                                                                                          this);
+    chip::Callback::Callback<decltype(&ReadBasicProductLabel::OnAttributeResponse)> * onReportBasicProductLabelCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicProductLabel::OnAttributeResponse)>(
+            ReadBasicProductLabel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicSerialNumber::OnAttributeResponse)> * onReportBasicSerialNumberCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicSerialNumber::OnAttributeResponse)>(
+            ReadBasicSerialNumber::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicLocalConfigDisabled::OnAttributeResponse)> *
+        onReportBasicLocalConfigDisabledCallback =
+            new chip::Callback::Callback<decltype(&ReadBasicLocalConfigDisabled::OnAttributeResponse)>(
+                ReadBasicLocalConfigDisabled::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBasicReachable::OnAttributeResponse)> * onReportBasicReachableCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicReachable::OnAttributeResponse)>(ReadBasicReachable::OnAttributeResponse,
+                                                                                         this);
+    chip::Callback::Callback<decltype(&ReadBasicClusterRevision::OnAttributeResponse)> * onReportBasicClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadBasicClusterRevision::OnAttributeResponse)>(
+            ReadBasicClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBinaryInputBasicOutOfService::OnAttributeResponse)> *
+        onReportBinaryInputBasicOutOfServiceCallback =
+            new chip::Callback::Callback<decltype(&ReadBinaryInputBasicOutOfService::OnAttributeResponse)>(
+                ReadBinaryInputBasicOutOfService::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBinaryInputBasicPresentValue::OnAttributeResponse)> *
+        onReportBinaryInputBasicPresentValueCallback =
+            new chip::Callback::Callback<decltype(&ReadBinaryInputBasicPresentValue::OnAttributeResponse)>(
+                ReadBinaryInputBasicPresentValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBinaryInputBasicStatusFlags::OnAttributeResponse)> *
+        onReportBinaryInputBasicStatusFlagsCallback =
+            new chip::Callback::Callback<decltype(&ReadBinaryInputBasicStatusFlags::OnAttributeResponse)>(
+                ReadBinaryInputBasicStatusFlags::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBinaryInputBasicClusterRevision::OnAttributeResponse)> *
+        onReportBinaryInputBasicClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadBinaryInputBasicClusterRevision::OnAttributeResponse)>(
+                ReadBinaryInputBasicClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBindingClusterRevision::OnAttributeResponse)> * onReportBindingClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadBindingClusterRevision::OnAttributeResponse)>(
+            ReadBindingClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBooleanStateStateValue::OnAttributeResponse)> * onReportBooleanStateStateValueCallback =
+        new chip::Callback::Callback<decltype(&ReadBooleanStateStateValue::OnAttributeResponse)>(
+            ReadBooleanStateStateValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBooleanStateClusterRevision::OnAttributeResponse)> *
+        onReportBooleanStateClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadBooleanStateClusterRevision::OnAttributeResponse)>(
+                ReadBooleanStateClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBridgedActionsSetupUrl::OnAttributeResponse)> * onReportBridgedActionsSetupUrlCallback =
+        new chip::Callback::Callback<decltype(&ReadBridgedActionsSetupUrl::OnAttributeResponse)>(
+            ReadBridgedActionsSetupUrl::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBridgedActionsClusterRevision::OnAttributeResponse)> *
+        onReportBridgedActionsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadBridgedActionsClusterRevision::OnAttributeResponse)>(
+                ReadBridgedActionsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadBridgedDeviceBasicClusterRevision::OnAttributeResponse)> *
+        onReportBridgedDeviceBasicClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadBridgedDeviceBasicClusterRevision::OnAttributeResponse)>(
+                ReadBridgedDeviceBasicClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlCurrentHue::OnAttributeResponse)> * onReportColorControlCurrentHueCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlCurrentHue::OnAttributeResponse)>(
+            ReadColorControlCurrentHue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlCurrentSaturation::OnAttributeResponse)> *
+        onReportColorControlCurrentSaturationCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlCurrentSaturation::OnAttributeResponse)>(
+                ReadColorControlCurrentSaturation::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlRemainingTime::OnAttributeResponse)> *
+        onReportColorControlRemainingTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlRemainingTime::OnAttributeResponse)>(
+                ReadColorControlRemainingTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlCurrentX::OnAttributeResponse)> * onReportColorControlCurrentXCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlCurrentX::OnAttributeResponse)>(
+            ReadColorControlCurrentX::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlCurrentY::OnAttributeResponse)> * onReportColorControlCurrentYCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlCurrentY::OnAttributeResponse)>(
+            ReadColorControlCurrentY::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlDriftCompensation::OnAttributeResponse)> *
+        onReportColorControlDriftCompensationCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlDriftCompensation::OnAttributeResponse)>(
+                ReadColorControlDriftCompensation::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlCompensationText::OnAttributeResponse)> *
+        onReportColorControlCompensationTextCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlCompensationText::OnAttributeResponse)>(
+                ReadColorControlCompensationText::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorTemperature::OnAttributeResponse)> *
+        onReportColorControlColorTemperatureCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorTemperature::OnAttributeResponse)>(
+                ReadColorControlColorTemperature::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorMode::OnAttributeResponse)> * onReportColorControlColorModeCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlColorMode::OnAttributeResponse)>(
+            ReadColorControlColorMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorControlOptions::OnAttributeResponse)> *
+        onReportColorControlColorControlOptionsCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorControlOptions::OnAttributeResponse)>(
+                ReadColorControlColorControlOptions::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlNumberOfPrimaries::OnAttributeResponse)> *
+        onReportColorControlNumberOfPrimariesCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlNumberOfPrimaries::OnAttributeResponse)>(
+                ReadColorControlNumberOfPrimaries::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary1X::OnAttributeResponse)> * onReportColorControlPrimary1XCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary1X::OnAttributeResponse)>(
+            ReadColorControlPrimary1X::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary1Y::OnAttributeResponse)> * onReportColorControlPrimary1YCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary1Y::OnAttributeResponse)>(
+            ReadColorControlPrimary1Y::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary1Intensity::OnAttributeResponse)> *
+        onReportColorControlPrimary1IntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlPrimary1Intensity::OnAttributeResponse)>(
+                ReadColorControlPrimary1Intensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary2X::OnAttributeResponse)> * onReportColorControlPrimary2XCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary2X::OnAttributeResponse)>(
+            ReadColorControlPrimary2X::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary2Y::OnAttributeResponse)> * onReportColorControlPrimary2YCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary2Y::OnAttributeResponse)>(
+            ReadColorControlPrimary2Y::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary2Intensity::OnAttributeResponse)> *
+        onReportColorControlPrimary2IntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlPrimary2Intensity::OnAttributeResponse)>(
+                ReadColorControlPrimary2Intensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary3X::OnAttributeResponse)> * onReportColorControlPrimary3XCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary3X::OnAttributeResponse)>(
+            ReadColorControlPrimary3X::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary3Y::OnAttributeResponse)> * onReportColorControlPrimary3YCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary3Y::OnAttributeResponse)>(
+            ReadColorControlPrimary3Y::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary3Intensity::OnAttributeResponse)> *
+        onReportColorControlPrimary3IntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlPrimary3Intensity::OnAttributeResponse)>(
+                ReadColorControlPrimary3Intensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary4X::OnAttributeResponse)> * onReportColorControlPrimary4XCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary4X::OnAttributeResponse)>(
+            ReadColorControlPrimary4X::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary4Y::OnAttributeResponse)> * onReportColorControlPrimary4YCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary4Y::OnAttributeResponse)>(
+            ReadColorControlPrimary4Y::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary4Intensity::OnAttributeResponse)> *
+        onReportColorControlPrimary4IntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlPrimary4Intensity::OnAttributeResponse)>(
+                ReadColorControlPrimary4Intensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary5X::OnAttributeResponse)> * onReportColorControlPrimary5XCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary5X::OnAttributeResponse)>(
+            ReadColorControlPrimary5X::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary5Y::OnAttributeResponse)> * onReportColorControlPrimary5YCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary5Y::OnAttributeResponse)>(
+            ReadColorControlPrimary5Y::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary5Intensity::OnAttributeResponse)> *
+        onReportColorControlPrimary5IntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlPrimary5Intensity::OnAttributeResponse)>(
+                ReadColorControlPrimary5Intensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary6X::OnAttributeResponse)> * onReportColorControlPrimary6XCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary6X::OnAttributeResponse)>(
+            ReadColorControlPrimary6X::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary6Y::OnAttributeResponse)> * onReportColorControlPrimary6YCallback =
+        new chip::Callback::Callback<decltype(&ReadColorControlPrimary6Y::OnAttributeResponse)>(
+            ReadColorControlPrimary6Y::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlPrimary6Intensity::OnAttributeResponse)> *
+        onReportColorControlPrimary6IntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlPrimary6Intensity::OnAttributeResponse)>(
+                ReadColorControlPrimary6Intensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlWhitePointX::OnAttributeResponse)> *
+        onReportColorControlWhitePointXCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlWhitePointX::OnAttributeResponse)>(
+                ReadColorControlWhitePointX::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlWhitePointY::OnAttributeResponse)> *
+        onReportColorControlWhitePointYCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlWhitePointY::OnAttributeResponse)>(
+                ReadColorControlWhitePointY::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointRX::OnAttributeResponse)> *
+        onReportColorControlColorPointRXCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointRX::OnAttributeResponse)>(
+                ReadColorControlColorPointRX::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointRY::OnAttributeResponse)> *
+        onReportColorControlColorPointRYCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointRY::OnAttributeResponse)>(
+                ReadColorControlColorPointRY::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointRIntensity::OnAttributeResponse)> *
+        onReportColorControlColorPointRIntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointRIntensity::OnAttributeResponse)>(
+                ReadColorControlColorPointRIntensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointGX::OnAttributeResponse)> *
+        onReportColorControlColorPointGXCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointGX::OnAttributeResponse)>(
+                ReadColorControlColorPointGX::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointGY::OnAttributeResponse)> *
+        onReportColorControlColorPointGYCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointGY::OnAttributeResponse)>(
+                ReadColorControlColorPointGY::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointGIntensity::OnAttributeResponse)> *
+        onReportColorControlColorPointGIntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointGIntensity::OnAttributeResponse)>(
+                ReadColorControlColorPointGIntensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointBX::OnAttributeResponse)> *
+        onReportColorControlColorPointBXCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointBX::OnAttributeResponse)>(
+                ReadColorControlColorPointBX::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointBY::OnAttributeResponse)> *
+        onReportColorControlColorPointBYCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointBY::OnAttributeResponse)>(
+                ReadColorControlColorPointBY::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorPointBIntensity::OnAttributeResponse)> *
+        onReportColorControlColorPointBIntensityCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorPointBIntensity::OnAttributeResponse)>(
+                ReadColorControlColorPointBIntensity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlEnhancedCurrentHue::OnAttributeResponse)> *
+        onReportColorControlEnhancedCurrentHueCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlEnhancedCurrentHue::OnAttributeResponse)>(
+                ReadColorControlEnhancedCurrentHue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlEnhancedColorMode::OnAttributeResponse)> *
+        onReportColorControlEnhancedColorModeCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlEnhancedColorMode::OnAttributeResponse)>(
+                ReadColorControlEnhancedColorMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorLoopActive::OnAttributeResponse)> *
+        onReportColorControlColorLoopActiveCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorLoopActive::OnAttributeResponse)>(
+                ReadColorControlColorLoopActive::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorLoopDirection::OnAttributeResponse)> *
+        onReportColorControlColorLoopDirectionCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorLoopDirection::OnAttributeResponse)>(
+                ReadColorControlColorLoopDirection::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorLoopTime::OnAttributeResponse)> *
+        onReportColorControlColorLoopTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorLoopTime::OnAttributeResponse)>(
+                ReadColorControlColorLoopTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorLoopStartEnhancedHue::OnAttributeResponse)> *
+        onReportColorControlColorLoopStartEnhancedHueCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorLoopStartEnhancedHue::OnAttributeResponse)>(
+                ReadColorControlColorLoopStartEnhancedHue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorLoopStoredEnhancedHue::OnAttributeResponse)> *
+        onReportColorControlColorLoopStoredEnhancedHueCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorLoopStoredEnhancedHue::OnAttributeResponse)>(
+                ReadColorControlColorLoopStoredEnhancedHue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorCapabilities::OnAttributeResponse)> *
+        onReportColorControlColorCapabilitiesCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorCapabilities::OnAttributeResponse)>(
+                ReadColorControlColorCapabilities::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorTempPhysicalMin::OnAttributeResponse)> *
+        onReportColorControlColorTempPhysicalMinCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorTempPhysicalMin::OnAttributeResponse)>(
+                ReadColorControlColorTempPhysicalMin::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlColorTempPhysicalMax::OnAttributeResponse)> *
+        onReportColorControlColorTempPhysicalMaxCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlColorTempPhysicalMax::OnAttributeResponse)>(
+                ReadColorControlColorTempPhysicalMax::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlCoupleColorTempToLevelMinMireds::OnAttributeResponse)> *
+        onReportColorControlCoupleColorTempToLevelMinMiredsCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlCoupleColorTempToLevelMinMireds::OnAttributeResponse)>(
+                ReadColorControlCoupleColorTempToLevelMinMireds::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlStartUpColorTemperatureMireds::OnAttributeResponse)> *
+        onReportColorControlStartUpColorTemperatureMiredsCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlStartUpColorTemperatureMireds::OnAttributeResponse)>(
+                ReadColorControlStartUpColorTemperatureMireds::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadColorControlClusterRevision::OnAttributeResponse)> *
+        onReportColorControlClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadColorControlClusterRevision::OnAttributeResponse)>(
+                ReadColorControlClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadContentLauncherClusterRevision::OnAttributeResponse)> *
+        onReportContentLauncherClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadContentLauncherClusterRevision::OnAttributeResponse)>(
+                ReadContentLauncherClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadDescriptorClusterRevision::OnAttributeResponse)> *
+        onReportDescriptorClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadDescriptorClusterRevision::OnAttributeResponse)>(
+                ReadDescriptorClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadDoorLockActuatorEnabled::OnAttributeResponse)> *
+        onReportDoorLockActuatorEnabledCallback =
+            new chip::Callback::Callback<decltype(&ReadDoorLockActuatorEnabled::OnAttributeResponse)>(
+                ReadDoorLockActuatorEnabled::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadDoorLockClusterRevision::OnAttributeResponse)> *
+        onReportDoorLockClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadDoorLockClusterRevision::OnAttributeResponse)>(
+                ReadDoorLockClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementMeasurementType::OnAttributeResponse)> *
+        onReportElectricalMeasurementMeasurementTypeCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementMeasurementType::OnAttributeResponse)>(
+                ReadElectricalMeasurementMeasurementType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementTotalActivePower::OnAttributeResponse)> *
+        onReportElectricalMeasurementTotalActivePowerCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementTotalActivePower::OnAttributeResponse)>(
+                ReadElectricalMeasurementTotalActivePower::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsVoltage::OnAttributeResponse)> *
+        onReportElectricalMeasurementRmsVoltageCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsVoltage::OnAttributeResponse)>(
+                ReadElectricalMeasurementRmsVoltage::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsVoltageMin::OnAttributeResponse)> *
+        onReportElectricalMeasurementRmsVoltageMinCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsVoltageMin::OnAttributeResponse)>(
+                ReadElectricalMeasurementRmsVoltageMin::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsVoltageMax::OnAttributeResponse)> *
+        onReportElectricalMeasurementRmsVoltageMaxCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsVoltageMax::OnAttributeResponse)>(
+                ReadElectricalMeasurementRmsVoltageMax::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsCurrent::OnAttributeResponse)> *
+        onReportElectricalMeasurementRmsCurrentCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsCurrent::OnAttributeResponse)>(
+                ReadElectricalMeasurementRmsCurrent::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsCurrentMin::OnAttributeResponse)> *
+        onReportElectricalMeasurementRmsCurrentMinCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsCurrentMin::OnAttributeResponse)>(
+                ReadElectricalMeasurementRmsCurrentMin::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsCurrentMax::OnAttributeResponse)> *
+        onReportElectricalMeasurementRmsCurrentMaxCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementRmsCurrentMax::OnAttributeResponse)>(
+                ReadElectricalMeasurementRmsCurrentMax::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementActivePower::OnAttributeResponse)> *
+        onReportElectricalMeasurementActivePowerCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementActivePower::OnAttributeResponse)>(
+                ReadElectricalMeasurementActivePower::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementActivePowerMin::OnAttributeResponse)> *
+        onReportElectricalMeasurementActivePowerMinCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementActivePowerMin::OnAttributeResponse)>(
+                ReadElectricalMeasurementActivePowerMin::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementActivePowerMax::OnAttributeResponse)> *
+        onReportElectricalMeasurementActivePowerMaxCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementActivePowerMax::OnAttributeResponse)>(
+                ReadElectricalMeasurementActivePowerMax::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadElectricalMeasurementClusterRevision::OnAttributeResponse)> *
+        onReportElectricalMeasurementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadElectricalMeasurementClusterRevision::OnAttributeResponse)>(
+                ReadElectricalMeasurementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsPHYRate::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsPHYRateCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsPHYRate::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsPHYRate::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsFullDuplex::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsFullDuplexCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsFullDuplex::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsFullDuplex::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsPacketRxCount::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsPacketRxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsPacketRxCount::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsPacketRxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsPacketTxCount::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsPacketTxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsPacketTxCount::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsPacketTxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsTxErrCount::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsTxErrCountCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsTxErrCount::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsTxErrCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsCollisionCount::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsCollisionCountCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsCollisionCount::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsCollisionCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsOverrunCount::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsOverrunCountCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsOverrunCount::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsOverrunCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsCarrierDetect::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsCarrierDetectCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsCarrierDetect::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsCarrierDetect::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsTimeSinceReset::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsTimeSinceResetCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsTimeSinceReset::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsTimeSinceReset::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsClusterRevision::OnAttributeResponse)> *
+        onReportEthernetNetworkDiagnosticsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadEthernetNetworkDiagnosticsClusterRevision::OnAttributeResponse)>(
+                ReadEthernetNetworkDiagnosticsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadFixedLabelClusterRevision::OnAttributeResponse)> *
+        onReportFixedLabelClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadFixedLabelClusterRevision::OnAttributeResponse)>(
+                ReadFixedLabelClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadFlowMeasurementMeasuredValue::OnAttributeResponse)> *
+        onReportFlowMeasurementMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadFlowMeasurementMeasuredValue::OnAttributeResponse)>(
+                ReadFlowMeasurementMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadFlowMeasurementMinMeasuredValue::OnAttributeResponse)> *
+        onReportFlowMeasurementMinMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadFlowMeasurementMinMeasuredValue::OnAttributeResponse)>(
+                ReadFlowMeasurementMinMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadFlowMeasurementMaxMeasuredValue::OnAttributeResponse)> *
+        onReportFlowMeasurementMaxMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadFlowMeasurementMaxMeasuredValue::OnAttributeResponse)>(
+                ReadFlowMeasurementMaxMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadFlowMeasurementTolerance::OnAttributeResponse)> *
+        onReportFlowMeasurementToleranceCallback =
+            new chip::Callback::Callback<decltype(&ReadFlowMeasurementTolerance::OnAttributeResponse)>(
+                ReadFlowMeasurementTolerance::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadFlowMeasurementClusterRevision::OnAttributeResponse)> *
+        onReportFlowMeasurementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadFlowMeasurementClusterRevision::OnAttributeResponse)>(
+                ReadFlowMeasurementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralCommissioningBreadcrumb::OnAttributeResponse)> *
+        onReportGeneralCommissioningBreadcrumbCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralCommissioningBreadcrumb::OnAttributeResponse)>(
+                ReadGeneralCommissioningBreadcrumb::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralCommissioningClusterRevision::OnAttributeResponse)> *
+        onReportGeneralCommissioningClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralCommissioningClusterRevision::OnAttributeResponse)>(
+                ReadGeneralCommissioningClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsRebootCount::OnAttributeResponse)> *
+        onReportGeneralDiagnosticsRebootCountCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsRebootCount::OnAttributeResponse)>(
+                ReadGeneralDiagnosticsRebootCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsUpTime::OnAttributeResponse)> *
+        onReportGeneralDiagnosticsUpTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsUpTime::OnAttributeResponse)>(
+                ReadGeneralDiagnosticsUpTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsTotalOperationalHours::OnAttributeResponse)> *
+        onReportGeneralDiagnosticsTotalOperationalHoursCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsTotalOperationalHours::OnAttributeResponse)>(
+                ReadGeneralDiagnosticsTotalOperationalHours::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsBootReasons::OnAttributeResponse)> *
+        onReportGeneralDiagnosticsBootReasonsCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsBootReasons::OnAttributeResponse)>(
+                ReadGeneralDiagnosticsBootReasons::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsClusterRevision::OnAttributeResponse)> *
+        onReportGeneralDiagnosticsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadGeneralDiagnosticsClusterRevision::OnAttributeResponse)>(
+                ReadGeneralDiagnosticsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGroupKeyManagementClusterRevision::OnAttributeResponse)> *
+        onReportGroupKeyManagementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadGroupKeyManagementClusterRevision::OnAttributeResponse)>(
+                ReadGroupKeyManagementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGroupsNameSupport::OnAttributeResponse)> * onReportGroupsNameSupportCallback =
+        new chip::Callback::Callback<decltype(&ReadGroupsNameSupport::OnAttributeResponse)>(
+            ReadGroupsNameSupport::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadGroupsClusterRevision::OnAttributeResponse)> * onReportGroupsClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadGroupsClusterRevision::OnAttributeResponse)>(
+            ReadGroupsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIdentifyIdentifyTime::OnAttributeResponse)> * onReportIdentifyIdentifyTimeCallback =
+        new chip::Callback::Callback<decltype(&ReadIdentifyIdentifyTime::OnAttributeResponse)>(
+            ReadIdentifyIdentifyTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIdentifyIdentifyType::OnAttributeResponse)> * onReportIdentifyIdentifyTypeCallback =
+        new chip::Callback::Callback<decltype(&ReadIdentifyIdentifyType::OnAttributeResponse)>(
+            ReadIdentifyIdentifyType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIdentifyClusterRevision::OnAttributeResponse)> *
+        onReportIdentifyClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadIdentifyClusterRevision::OnAttributeResponse)>(
+                ReadIdentifyClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementMeasuredValue::OnAttributeResponse)> *
+        onReportIlluminanceMeasurementMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementMeasuredValue::OnAttributeResponse)>(
+                ReadIlluminanceMeasurementMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementMinMeasuredValue::OnAttributeResponse)> *
+        onReportIlluminanceMeasurementMinMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementMinMeasuredValue::OnAttributeResponse)>(
+                ReadIlluminanceMeasurementMinMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementMaxMeasuredValue::OnAttributeResponse)> *
+        onReportIlluminanceMeasurementMaxMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementMaxMeasuredValue::OnAttributeResponse)>(
+                ReadIlluminanceMeasurementMaxMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementTolerance::OnAttributeResponse)> *
+        onReportIlluminanceMeasurementToleranceCallback =
+            new chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementTolerance::OnAttributeResponse)>(
+                ReadIlluminanceMeasurementTolerance::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementLightSensorType::OnAttributeResponse)> *
+        onReportIlluminanceMeasurementLightSensorTypeCallback =
+            new chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementLightSensorType::OnAttributeResponse)>(
+                ReadIlluminanceMeasurementLightSensorType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementClusterRevision::OnAttributeResponse)> *
+        onReportIlluminanceMeasurementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadIlluminanceMeasurementClusterRevision::OnAttributeResponse)>(
+                ReadIlluminanceMeasurementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadKeypadInputClusterRevision::OnAttributeResponse)> *
+        onReportKeypadInputClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadKeypadInputClusterRevision::OnAttributeResponse)>(
+                ReadKeypadInputClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlCurrentLevel::OnAttributeResponse)> *
+        onReportLevelControlCurrentLevelCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlCurrentLevel::OnAttributeResponse)>(
+                ReadLevelControlCurrentLevel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlRemainingTime::OnAttributeResponse)> *
+        onReportLevelControlRemainingTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlRemainingTime::OnAttributeResponse)>(
+                ReadLevelControlRemainingTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlMinLevel::OnAttributeResponse)> * onReportLevelControlMinLevelCallback =
+        new chip::Callback::Callback<decltype(&ReadLevelControlMinLevel::OnAttributeResponse)>(
+            ReadLevelControlMinLevel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlMaxLevel::OnAttributeResponse)> * onReportLevelControlMaxLevelCallback =
+        new chip::Callback::Callback<decltype(&ReadLevelControlMaxLevel::OnAttributeResponse)>(
+            ReadLevelControlMaxLevel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlCurrentFrequency::OnAttributeResponse)> *
+        onReportLevelControlCurrentFrequencyCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlCurrentFrequency::OnAttributeResponse)>(
+                ReadLevelControlCurrentFrequency::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlMinFrequency::OnAttributeResponse)> *
+        onReportLevelControlMinFrequencyCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlMinFrequency::OnAttributeResponse)>(
+                ReadLevelControlMinFrequency::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlMaxFrequency::OnAttributeResponse)> *
+        onReportLevelControlMaxFrequencyCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlMaxFrequency::OnAttributeResponse)>(
+                ReadLevelControlMaxFrequency::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlOptions::OnAttributeResponse)> * onReportLevelControlOptionsCallback =
+        new chip::Callback::Callback<decltype(&ReadLevelControlOptions::OnAttributeResponse)>(
+            ReadLevelControlOptions::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlOnOffTransitionTime::OnAttributeResponse)> *
+        onReportLevelControlOnOffTransitionTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlOnOffTransitionTime::OnAttributeResponse)>(
+                ReadLevelControlOnOffTransitionTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlOnLevel::OnAttributeResponse)> * onReportLevelControlOnLevelCallback =
+        new chip::Callback::Callback<decltype(&ReadLevelControlOnLevel::OnAttributeResponse)>(
+            ReadLevelControlOnLevel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlOnTransitionTime::OnAttributeResponse)> *
+        onReportLevelControlOnTransitionTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlOnTransitionTime::OnAttributeResponse)>(
+                ReadLevelControlOnTransitionTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlOffTransitionTime::OnAttributeResponse)> *
+        onReportLevelControlOffTransitionTimeCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlOffTransitionTime::OnAttributeResponse)>(
+                ReadLevelControlOffTransitionTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlDefaultMoveRate::OnAttributeResponse)> *
+        onReportLevelControlDefaultMoveRateCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlDefaultMoveRate::OnAttributeResponse)>(
+                ReadLevelControlDefaultMoveRate::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlStartUpCurrentLevel::OnAttributeResponse)> *
+        onReportLevelControlStartUpCurrentLevelCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlStartUpCurrentLevel::OnAttributeResponse)>(
+                ReadLevelControlStartUpCurrentLevel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLevelControlClusterRevision::OnAttributeResponse)> *
+        onReportLevelControlClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadLevelControlClusterRevision::OnAttributeResponse)>(
+                ReadLevelControlClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadLowPowerClusterRevision::OnAttributeResponse)> *
+        onReportLowPowerClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadLowPowerClusterRevision::OnAttributeResponse)>(
+                ReadLowPowerClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaInputCurrentMediaInput::OnAttributeResponse)> *
+        onReportMediaInputCurrentMediaInputCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaInputCurrentMediaInput::OnAttributeResponse)>(
+                ReadMediaInputCurrentMediaInput::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaInputClusterRevision::OnAttributeResponse)> *
+        onReportMediaInputClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaInputClusterRevision::OnAttributeResponse)>(
+                ReadMediaInputClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackPlaybackState::OnAttributeResponse)> *
+        onReportMediaPlaybackPlaybackStateCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaPlaybackPlaybackState::OnAttributeResponse)>(
+                ReadMediaPlaybackPlaybackState::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackStartTime::OnAttributeResponse)> * onReportMediaPlaybackStartTimeCallback =
+        new chip::Callback::Callback<decltype(&ReadMediaPlaybackStartTime::OnAttributeResponse)>(
+            ReadMediaPlaybackStartTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackDuration::OnAttributeResponse)> * onReportMediaPlaybackDurationCallback =
+        new chip::Callback::Callback<decltype(&ReadMediaPlaybackDuration::OnAttributeResponse)>(
+            ReadMediaPlaybackDuration::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackPositionUpdatedAt::OnAttributeResponse)> *
+        onReportMediaPlaybackPositionUpdatedAtCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaPlaybackPositionUpdatedAt::OnAttributeResponse)>(
+                ReadMediaPlaybackPositionUpdatedAt::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackPosition::OnAttributeResponse)> * onReportMediaPlaybackPositionCallback =
+        new chip::Callback::Callback<decltype(&ReadMediaPlaybackPosition::OnAttributeResponse)>(
+            ReadMediaPlaybackPosition::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackPlaybackSpeed::OnAttributeResponse)> *
+        onReportMediaPlaybackPlaybackSpeedCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaPlaybackPlaybackSpeed::OnAttributeResponse)>(
+                ReadMediaPlaybackPlaybackSpeed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackSeekRangeEnd::OnAttributeResponse)> *
+        onReportMediaPlaybackSeekRangeEndCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaPlaybackSeekRangeEnd::OnAttributeResponse)>(
+                ReadMediaPlaybackSeekRangeEnd::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackSeekRangeStart::OnAttributeResponse)> *
+        onReportMediaPlaybackSeekRangeStartCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaPlaybackSeekRangeStart::OnAttributeResponse)>(
+                ReadMediaPlaybackSeekRangeStart::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadMediaPlaybackClusterRevision::OnAttributeResponse)> *
+        onReportMediaPlaybackClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadMediaPlaybackClusterRevision::OnAttributeResponse)>(
+                ReadMediaPlaybackClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadModeSelectCurrentMode::OnAttributeResponse)> * onReportModeSelectCurrentModeCallback =
+        new chip::Callback::Callback<decltype(&ReadModeSelectCurrentMode::OnAttributeResponse)>(
+            ReadModeSelectCurrentMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadModeSelectOnMode::OnAttributeResponse)> * onReportModeSelectOnModeCallback =
+        new chip::Callback::Callback<decltype(&ReadModeSelectOnMode::OnAttributeResponse)>(
+            ReadModeSelectOnMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadModeSelectStartUpMode::OnAttributeResponse)> * onReportModeSelectStartUpModeCallback =
+        new chip::Callback::Callback<decltype(&ReadModeSelectStartUpMode::OnAttributeResponse)>(
+            ReadModeSelectStartUpMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadModeSelectDescription::OnAttributeResponse)> * onReportModeSelectDescriptionCallback =
+        new chip::Callback::Callback<decltype(&ReadModeSelectDescription::OnAttributeResponse)>(
+            ReadModeSelectDescription::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadModeSelectClusterRevision::OnAttributeResponse)> *
+        onReportModeSelectClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadModeSelectClusterRevision::OnAttributeResponse)>(
+                ReadModeSelectClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadNetworkCommissioningFeatureMap::OnAttributeResponse)> *
+        onReportNetworkCommissioningFeatureMapCallback =
+            new chip::Callback::Callback<decltype(&ReadNetworkCommissioningFeatureMap::OnAttributeResponse)>(
+                ReadNetworkCommissioningFeatureMap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadNetworkCommissioningClusterRevision::OnAttributeResponse)> *
+        onReportNetworkCommissioningClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadNetworkCommissioningClusterRevision::OnAttributeResponse)>(
+                ReadNetworkCommissioningClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateProviderClusterRevision::OnAttributeResponse)> *
+        onReportOtaSoftwareUpdateProviderClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateProviderClusterRevision::OnAttributeResponse)>(
+                ReadOtaSoftwareUpdateProviderClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateRequestorDefaultOtaProvider::OnAttributeResponse)> *
+        onReportOtaSoftwareUpdateRequestorDefaultOtaProviderCallback =
+            new chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateRequestorDefaultOtaProvider::OnAttributeResponse)>(
+                ReadOtaSoftwareUpdateRequestorDefaultOtaProvider::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateRequestorUpdatePossible::OnAttributeResponse)> *
+        onReportOtaSoftwareUpdateRequestorUpdatePossibleCallback =
+            new chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateRequestorUpdatePossible::OnAttributeResponse)>(
+                ReadOtaSoftwareUpdateRequestorUpdatePossible::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateRequestorClusterRevision::OnAttributeResponse)> *
+        onReportOtaSoftwareUpdateRequestorClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadOtaSoftwareUpdateRequestorClusterRevision::OnAttributeResponse)>(
+                ReadOtaSoftwareUpdateRequestorClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOccupancySensingOccupancy::OnAttributeResponse)> *
+        onReportOccupancySensingOccupancyCallback =
+            new chip::Callback::Callback<decltype(&ReadOccupancySensingOccupancy::OnAttributeResponse)>(
+                ReadOccupancySensingOccupancy::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOccupancySensingOccupancySensorType::OnAttributeResponse)> *
+        onReportOccupancySensingOccupancySensorTypeCallback =
+            new chip::Callback::Callback<decltype(&ReadOccupancySensingOccupancySensorType::OnAttributeResponse)>(
+                ReadOccupancySensingOccupancySensorType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOccupancySensingOccupancySensorTypeBitmap::OnAttributeResponse)> *
+        onReportOccupancySensingOccupancySensorTypeBitmapCallback =
+            new chip::Callback::Callback<decltype(&ReadOccupancySensingOccupancySensorTypeBitmap::OnAttributeResponse)>(
+                ReadOccupancySensingOccupancySensorTypeBitmap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOccupancySensingClusterRevision::OnAttributeResponse)> *
+        onReportOccupancySensingClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadOccupancySensingClusterRevision::OnAttributeResponse)>(
+                ReadOccupancySensingClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffOnOff::OnAttributeResponse)> * onReportOnOffOnOffCallback =
+        new chip::Callback::Callback<decltype(&ReadOnOffOnOff::OnAttributeResponse)>(ReadOnOffOnOff::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffGlobalSceneControl::OnAttributeResponse)> *
+        onReportOnOffGlobalSceneControlCallback =
+            new chip::Callback::Callback<decltype(&ReadOnOffGlobalSceneControl::OnAttributeResponse)>(
+                ReadOnOffGlobalSceneControl::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffOnTime::OnAttributeResponse)> * onReportOnOffOnTimeCallback =
+        new chip::Callback::Callback<decltype(&ReadOnOffOnTime::OnAttributeResponse)>(ReadOnOffOnTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffOffWaitTime::OnAttributeResponse)> * onReportOnOffOffWaitTimeCallback =
+        new chip::Callback::Callback<decltype(&ReadOnOffOffWaitTime::OnAttributeResponse)>(
+            ReadOnOffOffWaitTime::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffStartUpOnOff::OnAttributeResponse)> * onReportOnOffStartUpOnOffCallback =
+        new chip::Callback::Callback<decltype(&ReadOnOffStartUpOnOff::OnAttributeResponse)>(
+            ReadOnOffStartUpOnOff::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffFeatureMap::OnAttributeResponse)> * onReportOnOffFeatureMapCallback =
+        new chip::Callback::Callback<decltype(&ReadOnOffFeatureMap::OnAttributeResponse)>(ReadOnOffFeatureMap::OnAttributeResponse,
+                                                                                          this);
+    chip::Callback::Callback<decltype(&ReadOnOffClusterRevision::OnAttributeResponse)> * onReportOnOffClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadOnOffClusterRevision::OnAttributeResponse)>(
+            ReadOnOffClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffSwitchConfigurationSwitchType::OnAttributeResponse)> *
+        onReportOnOffSwitchConfigurationSwitchTypeCallback =
+            new chip::Callback::Callback<decltype(&ReadOnOffSwitchConfigurationSwitchType::OnAttributeResponse)>(
+                ReadOnOffSwitchConfigurationSwitchType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffSwitchConfigurationSwitchActions::OnAttributeResponse)> *
+        onReportOnOffSwitchConfigurationSwitchActionsCallback =
+            new chip::Callback::Callback<decltype(&ReadOnOffSwitchConfigurationSwitchActions::OnAttributeResponse)>(
+                ReadOnOffSwitchConfigurationSwitchActions::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOnOffSwitchConfigurationClusterRevision::OnAttributeResponse)> *
+        onReportOnOffSwitchConfigurationClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadOnOffSwitchConfigurationClusterRevision::OnAttributeResponse)>(
+                ReadOnOffSwitchConfigurationClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOperationalCredentialsSupportedFabrics::OnAttributeResponse)> *
+        onReportOperationalCredentialsSupportedFabricsCallback =
+            new chip::Callback::Callback<decltype(&ReadOperationalCredentialsSupportedFabrics::OnAttributeResponse)>(
+                ReadOperationalCredentialsSupportedFabrics::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOperationalCredentialsCommissionedFabrics::OnAttributeResponse)> *
+        onReportOperationalCredentialsCommissionedFabricsCallback =
+            new chip::Callback::Callback<decltype(&ReadOperationalCredentialsCommissionedFabrics::OnAttributeResponse)>(
+                ReadOperationalCredentialsCommissionedFabrics::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOperationalCredentialsCurrentFabricIndex::OnAttributeResponse)> *
+        onReportOperationalCredentialsCurrentFabricIndexCallback =
+            new chip::Callback::Callback<decltype(&ReadOperationalCredentialsCurrentFabricIndex::OnAttributeResponse)>(
+                ReadOperationalCredentialsCurrentFabricIndex::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadOperationalCredentialsClusterRevision::OnAttributeResponse)> *
+        onReportOperationalCredentialsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadOperationalCredentialsClusterRevision::OnAttributeResponse)>(
+                ReadOperationalCredentialsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceStatus::OnAttributeResponse)> * onReportPowerSourceStatusCallback =
+        new chip::Callback::Callback<decltype(&ReadPowerSourceStatus::OnAttributeResponse)>(
+            ReadPowerSourceStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceOrder::OnAttributeResponse)> * onReportPowerSourceOrderCallback =
+        new chip::Callback::Callback<decltype(&ReadPowerSourceOrder::OnAttributeResponse)>(
+            ReadPowerSourceOrder::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceDescription::OnAttributeResponse)> * onReportPowerSourceDescriptionCallback =
+        new chip::Callback::Callback<decltype(&ReadPowerSourceDescription::OnAttributeResponse)>(
+            ReadPowerSourceDescription::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceBatteryVoltage::OnAttributeResponse)> *
+        onReportPowerSourceBatteryVoltageCallback =
+            new chip::Callback::Callback<decltype(&ReadPowerSourceBatteryVoltage::OnAttributeResponse)>(
+                ReadPowerSourceBatteryVoltage::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceBatteryPercentRemaining::OnAttributeResponse)> *
+        onReportPowerSourceBatteryPercentRemainingCallback =
+            new chip::Callback::Callback<decltype(&ReadPowerSourceBatteryPercentRemaining::OnAttributeResponse)>(
+                ReadPowerSourceBatteryPercentRemaining::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceBatteryTimeRemaining::OnAttributeResponse)> *
+        onReportPowerSourceBatteryTimeRemainingCallback =
+            new chip::Callback::Callback<decltype(&ReadPowerSourceBatteryTimeRemaining::OnAttributeResponse)>(
+                ReadPowerSourceBatteryTimeRemaining::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceBatteryChargeLevel::OnAttributeResponse)> *
+        onReportPowerSourceBatteryChargeLevelCallback =
+            new chip::Callback::Callback<decltype(&ReadPowerSourceBatteryChargeLevel::OnAttributeResponse)>(
+                ReadPowerSourceBatteryChargeLevel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceBatteryChargeState::OnAttributeResponse)> *
+        onReportPowerSourceBatteryChargeStateCallback =
+            new chip::Callback::Callback<decltype(&ReadPowerSourceBatteryChargeState::OnAttributeResponse)>(
+                ReadPowerSourceBatteryChargeState::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceFeatureMap::OnAttributeResponse)> * onReportPowerSourceFeatureMapCallback =
+        new chip::Callback::Callback<decltype(&ReadPowerSourceFeatureMap::OnAttributeResponse)>(
+            ReadPowerSourceFeatureMap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPowerSourceClusterRevision::OnAttributeResponse)> *
+        onReportPowerSourceClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadPowerSourceClusterRevision::OnAttributeResponse)>(
+                ReadPowerSourceClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPressureMeasurementMeasuredValue::OnAttributeResponse)> *
+        onReportPressureMeasurementMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadPressureMeasurementMeasuredValue::OnAttributeResponse)>(
+                ReadPressureMeasurementMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPressureMeasurementMinMeasuredValue::OnAttributeResponse)> *
+        onReportPressureMeasurementMinMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadPressureMeasurementMinMeasuredValue::OnAttributeResponse)>(
+                ReadPressureMeasurementMinMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPressureMeasurementMaxMeasuredValue::OnAttributeResponse)> *
+        onReportPressureMeasurementMaxMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadPressureMeasurementMaxMeasuredValue::OnAttributeResponse)>(
+                ReadPressureMeasurementMaxMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPressureMeasurementClusterRevision::OnAttributeResponse)> *
+        onReportPressureMeasurementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadPressureMeasurementClusterRevision::OnAttributeResponse)>(
+                ReadPressureMeasurementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxPressure::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxPressureCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxPressure::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxPressure::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxSpeed::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxSpeedCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxSpeed::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxSpeed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxFlow::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxFlowCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxFlow::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxFlow::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstPressure::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMinConstPressureCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstPressure::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMinConstPressure::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstPressure::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxConstPressureCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstPressure::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxConstPressure::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinCompPressure::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMinCompPressureCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinCompPressure::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMinCompPressure::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxCompPressure::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxCompPressureCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxCompPressure::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxCompPressure::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstSpeed::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMinConstSpeedCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstSpeed::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMinConstSpeed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstSpeed::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxConstSpeedCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstSpeed::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxConstSpeed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstFlow::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMinConstFlowCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstFlow::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMinConstFlow::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstFlow::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxConstFlowCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstFlow::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxConstFlow::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstTemp::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMinConstTempCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMinConstTemp::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMinConstTemp::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstTemp::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlMaxConstTempCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlMaxConstTemp::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlMaxConstTemp::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlPumpStatus::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlPumpStatusCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlPumpStatus::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlPumpStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlEffectiveOperationMode::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlEffectiveOperationModeCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlEffectiveOperationMode::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlEffectiveOperationMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlEffectiveControlMode::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlEffectiveControlModeCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlEffectiveControlMode::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlEffectiveControlMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlCapacity::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlCapacityCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlCapacity::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlCapacity::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlSpeed::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlSpeedCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlSpeed::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlSpeed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlLifetimeRunningHours::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlLifetimeRunningHoursCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlLifetimeRunningHours::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlLifetimeRunningHours::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlPower::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlPowerCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlPower::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlPower::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlLifetimeEnergyConsumed::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlLifetimeEnergyConsumedCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlLifetimeEnergyConsumed::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlLifetimeEnergyConsumed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlOperationMode::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlOperationModeCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlOperationMode::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlOperationMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlControlMode::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlControlModeCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlControlMode::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlControlMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlAlarmMask::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlAlarmMaskCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlAlarmMask::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlAlarmMask::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlFeatureMap::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlFeatureMapCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlFeatureMap::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlFeatureMap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlClusterRevision::OnAttributeResponse)> *
+        onReportPumpConfigurationAndControlClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadPumpConfigurationAndControlClusterRevision::OnAttributeResponse)>(
+                ReadPumpConfigurationAndControlClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementMeasuredValue::OnAttributeResponse)> *
+        onReportRelativeHumidityMeasurementMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementMeasuredValue::OnAttributeResponse)>(
+                ReadRelativeHumidityMeasurementMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementMinMeasuredValue::OnAttributeResponse)> *
+        onReportRelativeHumidityMeasurementMinMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementMinMeasuredValue::OnAttributeResponse)>(
+                ReadRelativeHumidityMeasurementMinMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementMaxMeasuredValue::OnAttributeResponse)> *
+        onReportRelativeHumidityMeasurementMaxMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementMaxMeasuredValue::OnAttributeResponse)>(
+                ReadRelativeHumidityMeasurementMaxMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementTolerance::OnAttributeResponse)> *
+        onReportRelativeHumidityMeasurementToleranceCallback =
+            new chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementTolerance::OnAttributeResponse)>(
+                ReadRelativeHumidityMeasurementTolerance::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementClusterRevision::OnAttributeResponse)> *
+        onReportRelativeHumidityMeasurementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadRelativeHumidityMeasurementClusterRevision::OnAttributeResponse)>(
+                ReadRelativeHumidityMeasurementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadScenesSceneCount::OnAttributeResponse)> * onReportScenesSceneCountCallback =
+        new chip::Callback::Callback<decltype(&ReadScenesSceneCount::OnAttributeResponse)>(
+            ReadScenesSceneCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadScenesCurrentScene::OnAttributeResponse)> * onReportScenesCurrentSceneCallback =
+        new chip::Callback::Callback<decltype(&ReadScenesCurrentScene::OnAttributeResponse)>(
+            ReadScenesCurrentScene::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadScenesCurrentGroup::OnAttributeResponse)> * onReportScenesCurrentGroupCallback =
+        new chip::Callback::Callback<decltype(&ReadScenesCurrentGroup::OnAttributeResponse)>(
+            ReadScenesCurrentGroup::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadScenesSceneValid::OnAttributeResponse)> * onReportScenesSceneValidCallback =
+        new chip::Callback::Callback<decltype(&ReadScenesSceneValid::OnAttributeResponse)>(
+            ReadScenesSceneValid::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadScenesNameSupport::OnAttributeResponse)> * onReportScenesNameSupportCallback =
+        new chip::Callback::Callback<decltype(&ReadScenesNameSupport::OnAttributeResponse)>(
+            ReadScenesNameSupport::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadScenesClusterRevision::OnAttributeResponse)> * onReportScenesClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadScenesClusterRevision::OnAttributeResponse)>(
+            ReadScenesClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsCurrentHeapFree::OnAttributeResponse)> *
+        onReportSoftwareDiagnosticsCurrentHeapFreeCallback =
+            new chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsCurrentHeapFree::OnAttributeResponse)>(
+                ReadSoftwareDiagnosticsCurrentHeapFree::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsCurrentHeapUsed::OnAttributeResponse)> *
+        onReportSoftwareDiagnosticsCurrentHeapUsedCallback =
+            new chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsCurrentHeapUsed::OnAttributeResponse)>(
+                ReadSoftwareDiagnosticsCurrentHeapUsed::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsCurrentHeapHighWatermark::OnAttributeResponse)> *
+        onReportSoftwareDiagnosticsCurrentHeapHighWatermarkCallback =
+            new chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsCurrentHeapHighWatermark::OnAttributeResponse)>(
+                ReadSoftwareDiagnosticsCurrentHeapHighWatermark::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsClusterRevision::OnAttributeResponse)> *
+        onReportSoftwareDiagnosticsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadSoftwareDiagnosticsClusterRevision::OnAttributeResponse)>(
+                ReadSoftwareDiagnosticsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSwitchNumberOfPositions::OnAttributeResponse)> *
+        onReportSwitchNumberOfPositionsCallback =
+            new chip::Callback::Callback<decltype(&ReadSwitchNumberOfPositions::OnAttributeResponse)>(
+                ReadSwitchNumberOfPositions::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSwitchCurrentPosition::OnAttributeResponse)> * onReportSwitchCurrentPositionCallback =
+        new chip::Callback::Callback<decltype(&ReadSwitchCurrentPosition::OnAttributeResponse)>(
+            ReadSwitchCurrentPosition::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSwitchMultiPressMax::OnAttributeResponse)> * onReportSwitchMultiPressMaxCallback =
+        new chip::Callback::Callback<decltype(&ReadSwitchMultiPressMax::OnAttributeResponse)>(
+            ReadSwitchMultiPressMax::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSwitchFeatureMap::OnAttributeResponse)> * onReportSwitchFeatureMapCallback =
+        new chip::Callback::Callback<decltype(&ReadSwitchFeatureMap::OnAttributeResponse)>(
+            ReadSwitchFeatureMap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadSwitchClusterRevision::OnAttributeResponse)> * onReportSwitchClusterRevisionCallback =
+        new chip::Callback::Callback<decltype(&ReadSwitchClusterRevision::OnAttributeResponse)>(
+            ReadSwitchClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTvChannelTvChannelLineup::OnAttributeResponse)> *
+        onReportTvChannelTvChannelLineupCallback =
+            new chip::Callback::Callback<decltype(&ReadTvChannelTvChannelLineup::OnAttributeResponse)>(
+                ReadTvChannelTvChannelLineup::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTvChannelCurrentTvChannel::OnAttributeResponse)> *
+        onReportTvChannelCurrentTvChannelCallback =
+            new chip::Callback::Callback<decltype(&ReadTvChannelCurrentTvChannel::OnAttributeResponse)>(
+                ReadTvChannelCurrentTvChannel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTvChannelClusterRevision::OnAttributeResponse)> *
+        onReportTvChannelClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadTvChannelClusterRevision::OnAttributeResponse)>(
+                ReadTvChannelClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTargetNavigatorClusterRevision::OnAttributeResponse)> *
+        onReportTargetNavigatorClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadTargetNavigatorClusterRevision::OnAttributeResponse)>(
+                ReadTargetNavigatorClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTemperatureMeasurementMeasuredValue::OnAttributeResponse)> *
+        onReportTemperatureMeasurementMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadTemperatureMeasurementMeasuredValue::OnAttributeResponse)>(
+                ReadTemperatureMeasurementMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTemperatureMeasurementMinMeasuredValue::OnAttributeResponse)> *
+        onReportTemperatureMeasurementMinMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadTemperatureMeasurementMinMeasuredValue::OnAttributeResponse)>(
+                ReadTemperatureMeasurementMinMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTemperatureMeasurementMaxMeasuredValue::OnAttributeResponse)> *
+        onReportTemperatureMeasurementMaxMeasuredValueCallback =
+            new chip::Callback::Callback<decltype(&ReadTemperatureMeasurementMaxMeasuredValue::OnAttributeResponse)>(
+                ReadTemperatureMeasurementMaxMeasuredValue::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTemperatureMeasurementTolerance::OnAttributeResponse)> *
+        onReportTemperatureMeasurementToleranceCallback =
+            new chip::Callback::Callback<decltype(&ReadTemperatureMeasurementTolerance::OnAttributeResponse)>(
+                ReadTemperatureMeasurementTolerance::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTemperatureMeasurementClusterRevision::OnAttributeResponse)> *
+        onReportTemperatureMeasurementClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadTemperatureMeasurementClusterRevision::OnAttributeResponse)>(
+                ReadTemperatureMeasurementClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterBoolean::OnAttributeResponse)> * onReportTestClusterBooleanCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterBoolean::OnAttributeResponse)>(
+            ReadTestClusterBoolean::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterBitmap8::OnAttributeResponse)> * onReportTestClusterBitmap8Callback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterBitmap8::OnAttributeResponse)>(
+            ReadTestClusterBitmap8::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterBitmap16::OnAttributeResponse)> * onReportTestClusterBitmap16Callback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterBitmap16::OnAttributeResponse)>(
+            ReadTestClusterBitmap16::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterBitmap32::OnAttributeResponse)> * onReportTestClusterBitmap32Callback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterBitmap32::OnAttributeResponse)>(
+            ReadTestClusterBitmap32::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterBitmap64::OnAttributeResponse)> * onReportTestClusterBitmap64Callback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterBitmap64::OnAttributeResponse)>(
+            ReadTestClusterBitmap64::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt8u::OnAttributeResponse)> * onReportTestClusterInt8uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt8u::OnAttributeResponse)>(
+            ReadTestClusterInt8u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt16u::OnAttributeResponse)> * onReportTestClusterInt16uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt16u::OnAttributeResponse)>(
+            ReadTestClusterInt16u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt24u::OnAttributeResponse)> * onReportTestClusterInt24uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt24u::OnAttributeResponse)>(
+            ReadTestClusterInt24u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt32u::OnAttributeResponse)> * onReportTestClusterInt32uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt32u::OnAttributeResponse)>(
+            ReadTestClusterInt32u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt40u::OnAttributeResponse)> * onReportTestClusterInt40uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt40u::OnAttributeResponse)>(
+            ReadTestClusterInt40u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt48u::OnAttributeResponse)> * onReportTestClusterInt48uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt48u::OnAttributeResponse)>(
+            ReadTestClusterInt48u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt56u::OnAttributeResponse)> * onReportTestClusterInt56uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt56u::OnAttributeResponse)>(
+            ReadTestClusterInt56u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt64u::OnAttributeResponse)> * onReportTestClusterInt64uCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt64u::OnAttributeResponse)>(
+            ReadTestClusterInt64u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt8s::OnAttributeResponse)> * onReportTestClusterInt8sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt8s::OnAttributeResponse)>(
+            ReadTestClusterInt8s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt16s::OnAttributeResponse)> * onReportTestClusterInt16sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt16s::OnAttributeResponse)>(
+            ReadTestClusterInt16s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt24s::OnAttributeResponse)> * onReportTestClusterInt24sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt24s::OnAttributeResponse)>(
+            ReadTestClusterInt24s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt32s::OnAttributeResponse)> * onReportTestClusterInt32sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt32s::OnAttributeResponse)>(
+            ReadTestClusterInt32s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt40s::OnAttributeResponse)> * onReportTestClusterInt40sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt40s::OnAttributeResponse)>(
+            ReadTestClusterInt40s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt48s::OnAttributeResponse)> * onReportTestClusterInt48sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt48s::OnAttributeResponse)>(
+            ReadTestClusterInt48s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt56s::OnAttributeResponse)> * onReportTestClusterInt56sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt56s::OnAttributeResponse)>(
+            ReadTestClusterInt56s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterInt64s::OnAttributeResponse)> * onReportTestClusterInt64sCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterInt64s::OnAttributeResponse)>(
+            ReadTestClusterInt64s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterEnum8::OnAttributeResponse)> * onReportTestClusterEnum8Callback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterEnum8::OnAttributeResponse)>(
+            ReadTestClusterEnum8::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterEnum16::OnAttributeResponse)> * onReportTestClusterEnum16Callback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterEnum16::OnAttributeResponse)>(
+            ReadTestClusterEnum16::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterFloatSingle::OnAttributeResponse)> * onReportTestClusterFloatSingleCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterFloatSingle::OnAttributeResponse)>(
+            ReadTestClusterFloatSingle::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterFloatDouble::OnAttributeResponse)> * onReportTestClusterFloatDoubleCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterFloatDouble::OnAttributeResponse)>(
+            ReadTestClusterFloatDouble::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterOctetString::OnAttributeResponse)> * onReportTestClusterOctetStringCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterOctetString::OnAttributeResponse)>(
+            ReadTestClusterOctetString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterLongOctetString::OnAttributeResponse)> *
+        onReportTestClusterLongOctetStringCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterLongOctetString::OnAttributeResponse)>(
+                ReadTestClusterLongOctetString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterCharString::OnAttributeResponse)> * onReportTestClusterCharStringCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterCharString::OnAttributeResponse)>(
+            ReadTestClusterCharString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterLongCharString::OnAttributeResponse)> *
+        onReportTestClusterLongCharStringCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterLongCharString::OnAttributeResponse)>(
+                ReadTestClusterLongCharString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterEpochUs::OnAttributeResponse)> * onReportTestClusterEpochUsCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterEpochUs::OnAttributeResponse)>(
+            ReadTestClusterEpochUs::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterEpochS::OnAttributeResponse)> * onReportTestClusterEpochSCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterEpochS::OnAttributeResponse)>(
+            ReadTestClusterEpochS::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterVendorId::OnAttributeResponse)> * onReportTestClusterVendorIdCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterVendorId::OnAttributeResponse)>(
+            ReadTestClusterVendorId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt8u::OnAttributeResponse)> *
+        onReportTestClusterRangeRestrictedInt8uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt8u::OnAttributeResponse)>(
+                ReadTestClusterRangeRestrictedInt8u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt8s::OnAttributeResponse)> *
+        onReportTestClusterRangeRestrictedInt8sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt8s::OnAttributeResponse)>(
+                ReadTestClusterRangeRestrictedInt8s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt16u::OnAttributeResponse)> *
+        onReportTestClusterRangeRestrictedInt16uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt16u::OnAttributeResponse)>(
+                ReadTestClusterRangeRestrictedInt16u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt16s::OnAttributeResponse)> *
+        onReportTestClusterRangeRestrictedInt16sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterRangeRestrictedInt16s::OnAttributeResponse)>(
+                ReadTestClusterRangeRestrictedInt16s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterUnsupported::OnAttributeResponse)> * onReportTestClusterUnsupportedCallback =
+        new chip::Callback::Callback<decltype(&ReadTestClusterUnsupported::OnAttributeResponse)>(
+            ReadTestClusterUnsupported::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableBoolean::OnAttributeResponse)> *
+        onReportTestClusterNullableBooleanCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableBoolean::OnAttributeResponse)>(
+                ReadTestClusterNullableBoolean::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap8::OnAttributeResponse)> *
+        onReportTestClusterNullableBitmap8Callback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap8::OnAttributeResponse)>(
+                ReadTestClusterNullableBitmap8::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap16::OnAttributeResponse)> *
+        onReportTestClusterNullableBitmap16Callback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap16::OnAttributeResponse)>(
+                ReadTestClusterNullableBitmap16::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap32::OnAttributeResponse)> *
+        onReportTestClusterNullableBitmap32Callback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap32::OnAttributeResponse)>(
+                ReadTestClusterNullableBitmap32::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap64::OnAttributeResponse)> *
+        onReportTestClusterNullableBitmap64Callback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableBitmap64::OnAttributeResponse)>(
+                ReadTestClusterNullableBitmap64::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt8u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt8uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt8u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt8u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt16u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt16uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt16u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt16u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt24u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt24uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt24u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt24u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt32u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt32uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt32u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt32u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt40u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt40uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt40u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt40u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt48u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt48uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt48u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt48u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt56u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt56uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt56u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt56u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt64u::OnAttributeResponse)> *
+        onReportTestClusterNullableInt64uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt64u::OnAttributeResponse)>(
+                ReadTestClusterNullableInt64u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt8s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt8sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt8s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt8s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt16s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt16sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt16s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt16s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt24s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt24sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt24s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt24s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt32s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt32sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt32s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt32s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt40s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt40sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt40s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt40s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt48s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt48sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt48s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt48s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt56s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt56sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt56s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt56s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableInt64s::OnAttributeResponse)> *
+        onReportTestClusterNullableInt64sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableInt64s::OnAttributeResponse)>(
+                ReadTestClusterNullableInt64s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableEnum8::OnAttributeResponse)> *
+        onReportTestClusterNullableEnum8Callback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableEnum8::OnAttributeResponse)>(
+                ReadTestClusterNullableEnum8::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableEnum16::OnAttributeResponse)> *
+        onReportTestClusterNullableEnum16Callback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableEnum16::OnAttributeResponse)>(
+                ReadTestClusterNullableEnum16::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableFloatSingle::OnAttributeResponse)> *
+        onReportTestClusterNullableFloatSingleCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableFloatSingle::OnAttributeResponse)>(
+                ReadTestClusterNullableFloatSingle::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableFloatDouble::OnAttributeResponse)> *
+        onReportTestClusterNullableFloatDoubleCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableFloatDouble::OnAttributeResponse)>(
+                ReadTestClusterNullableFloatDouble::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableOctetString::OnAttributeResponse)> *
+        onReportTestClusterNullableOctetStringCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableOctetString::OnAttributeResponse)>(
+                ReadTestClusterNullableOctetString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableCharString::OnAttributeResponse)> *
+        onReportTestClusterNullableCharStringCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableCharString::OnAttributeResponse)>(
+                ReadTestClusterNullableCharString::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt8u::OnAttributeResponse)> *
+        onReportTestClusterNullableRangeRestrictedInt8uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt8u::OnAttributeResponse)>(
+                ReadTestClusterNullableRangeRestrictedInt8u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt8s::OnAttributeResponse)> *
+        onReportTestClusterNullableRangeRestrictedInt8sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt8s::OnAttributeResponse)>(
+                ReadTestClusterNullableRangeRestrictedInt8s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt16u::OnAttributeResponse)> *
+        onReportTestClusterNullableRangeRestrictedInt16uCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt16u::OnAttributeResponse)>(
+                ReadTestClusterNullableRangeRestrictedInt16u::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt16s::OnAttributeResponse)> *
+        onReportTestClusterNullableRangeRestrictedInt16sCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterNullableRangeRestrictedInt16s::OnAttributeResponse)>(
+                ReadTestClusterNullableRangeRestrictedInt16s::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadTestClusterClusterRevision::OnAttributeResponse)> *
+        onReportTestClusterClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadTestClusterClusterRevision::OnAttributeResponse)>(
+                ReadTestClusterClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatLocalTemperature::OnAttributeResponse)> *
+        onReportThermostatLocalTemperatureCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatLocalTemperature::OnAttributeResponse)>(
+                ReadThermostatLocalTemperature::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatAbsMinHeatSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatAbsMinHeatSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatAbsMinHeatSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatAbsMinHeatSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatAbsMaxHeatSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatAbsMaxHeatSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatAbsMaxHeatSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatAbsMaxHeatSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatAbsMinCoolSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatAbsMinCoolSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatAbsMinCoolSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatAbsMinCoolSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatAbsMaxCoolSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatAbsMaxCoolSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatAbsMaxCoolSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatAbsMaxCoolSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatOccupiedCoolingSetpoint::OnAttributeResponse)> *
+        onReportThermostatOccupiedCoolingSetpointCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatOccupiedCoolingSetpoint::OnAttributeResponse)>(
+                ReadThermostatOccupiedCoolingSetpoint::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatOccupiedHeatingSetpoint::OnAttributeResponse)> *
+        onReportThermostatOccupiedHeatingSetpointCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatOccupiedHeatingSetpoint::OnAttributeResponse)>(
+                ReadThermostatOccupiedHeatingSetpoint::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatMinHeatSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatMinHeatSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatMinHeatSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatMinHeatSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatMaxHeatSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatMaxHeatSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatMaxHeatSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatMaxHeatSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatMinCoolSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatMinCoolSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatMinCoolSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatMinCoolSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatMaxCoolSetpointLimit::OnAttributeResponse)> *
+        onReportThermostatMaxCoolSetpointLimitCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatMaxCoolSetpointLimit::OnAttributeResponse)>(
+                ReadThermostatMaxCoolSetpointLimit::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatMinSetpointDeadBand::OnAttributeResponse)> *
+        onReportThermostatMinSetpointDeadBandCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatMinSetpointDeadBand::OnAttributeResponse)>(
+                ReadThermostatMinSetpointDeadBand::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatControlSequenceOfOperation::OnAttributeResponse)> *
+        onReportThermostatControlSequenceOfOperationCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatControlSequenceOfOperation::OnAttributeResponse)>(
+                ReadThermostatControlSequenceOfOperation::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatSystemMode::OnAttributeResponse)> * onReportThermostatSystemModeCallback =
+        new chip::Callback::Callback<decltype(&ReadThermostatSystemMode::OnAttributeResponse)>(
+            ReadThermostatSystemMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatStartOfWeek::OnAttributeResponse)> * onReportThermostatStartOfWeekCallback =
+        new chip::Callback::Callback<decltype(&ReadThermostatStartOfWeek::OnAttributeResponse)>(
+            ReadThermostatStartOfWeek::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatNumberOfWeeklyTransitions::OnAttributeResponse)> *
+        onReportThermostatNumberOfWeeklyTransitionsCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatNumberOfWeeklyTransitions::OnAttributeResponse)>(
+                ReadThermostatNumberOfWeeklyTransitions::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatNumberOfDailyTransitions::OnAttributeResponse)> *
+        onReportThermostatNumberOfDailyTransitionsCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatNumberOfDailyTransitions::OnAttributeResponse)>(
+                ReadThermostatNumberOfDailyTransitions::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatFeatureMap::OnAttributeResponse)> * onReportThermostatFeatureMapCallback =
+        new chip::Callback::Callback<decltype(&ReadThermostatFeatureMap::OnAttributeResponse)>(
+            ReadThermostatFeatureMap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatClusterRevision::OnAttributeResponse)> *
+        onReportThermostatClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatClusterRevision::OnAttributeResponse)>(
+                ReadThermostatClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse)> *
+        onReportThermostatUserInterfaceConfigurationTemperatureDisplayModeCallback = new chip::Callback::Callback<decltype(
+            &ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse)>(
+            ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse)> *
+        onReportThermostatUserInterfaceConfigurationKeypadLockoutCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse)>(
+                ReadThermostatUserInterfaceConfigurationKeypadLockout::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(
+        &ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)> *
+        onReportThermostatUserInterfaceConfigurationScheduleProgrammingVisibilityCallback = new chip::Callback::Callback<decltype(
+            &ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse)>(
+            ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationClusterRevision::OnAttributeResponse)> *
+        onReportThermostatUserInterfaceConfigurationClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadThermostatUserInterfaceConfigurationClusterRevision::OnAttributeResponse)>(
+                ReadThermostatUserInterfaceConfigurationClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsChannel::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsChannelCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsChannel::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsChannel::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRoutingRole::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRoutingRoleCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRoutingRole::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRoutingRole::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsNetworkName::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsNetworkNameCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsNetworkName::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsNetworkName::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPanId::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsPanIdCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPanId::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsPanId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsExtendedPanId::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsExtendedPanIdCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsExtendedPanId::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsExtendedPanId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsMeshLocalPrefix::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsMeshLocalPrefixCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsMeshLocalPrefix::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsMeshLocalPrefix::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsOverrunCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsOverrunCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsOverrunCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsOverrunCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPartitionId::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsPartitionIdCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPartitionId::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsPartitionId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsWeighting::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsWeightingCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsWeighting::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsWeighting::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsDataVersion::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsDataVersionCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsDataVersion::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsDataVersion::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsStableDataVersion::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsStableDataVersionCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsStableDataVersion::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsStableDataVersion::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsLeaderRouterId::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsLeaderRouterIdCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsLeaderRouterId::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsLeaderRouterId::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsDetachedRoleCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsDetachedRoleCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsDetachedRoleCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsDetachedRoleCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsChildRoleCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsChildRoleCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsChildRoleCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsChildRoleCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRouterRoleCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRouterRoleCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRouterRoleCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRouterRoleCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsLeaderRoleCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsLeaderRoleCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsLeaderRoleCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsLeaderRoleCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsAttachAttemptCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsAttachAttemptCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsAttachAttemptCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsAttachAttemptCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPartitionIdChangeCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsPartitionIdChangeCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPartitionIdChangeCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsPartitionIdChangeCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCountCallback = new chip::Callback::Callback<decltype(
+            &ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse)>(
+            ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsParentChangeCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsParentChangeCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsParentChangeCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsParentChangeCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxTotalCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxTotalCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxTotalCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxTotalCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxUnicastCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxUnicastCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxUnicastCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxUnicastCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxBroadcastCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxBroadcastCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxBroadcastCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxBroadcastCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxAckRequestedCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxAckRequestedCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxAckRequestedCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxAckRequestedCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxAckedCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxAckedCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxAckedCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxAckedCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxNoAckRequestedCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxNoAckRequestedCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxNoAckRequestedCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxNoAckRequestedCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxDataCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxDataCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxDataCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxDataCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxDataPollCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxDataPollCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxDataPollCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxDataPollCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxBeaconCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxBeaconCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxBeaconCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxBeaconCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxBeaconRequestCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxBeaconRequestCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxBeaconRequestCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxBeaconRequestCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxOtherCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxOtherCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxOtherCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxOtherCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxRetryCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxRetryCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxRetryCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxRetryCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxErrCcaCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxErrCcaCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxErrCcaCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxErrCcaCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxErrAbortCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxErrAbortCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxErrAbortCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxErrAbortCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxErrBusyChannelCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsTxErrBusyChannelCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsTxErrBusyChannelCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsTxErrBusyChannelCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxTotalCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxTotalCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxTotalCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxTotalCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxUnicastCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxUnicastCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxUnicastCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxUnicastCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxBroadcastCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxBroadcastCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxBroadcastCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxBroadcastCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDataCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxDataCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDataCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxDataCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDataPollCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxDataPollCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDataPollCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxDataPollCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxBeaconCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxBeaconCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxBeaconCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxBeaconCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxBeaconRequestCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxBeaconRequestCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxBeaconRequestCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxBeaconRequestCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxOtherCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxOtherCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxOtherCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxOtherCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxAddressFilteredCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxAddressFilteredCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxAddressFilteredCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxAddressFilteredCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxDestAddrFilteredCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDuplicatedCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxDuplicatedCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxDuplicatedCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxDuplicatedCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrNoFrameCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxErrNoFrameCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrNoFrameCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxErrNoFrameCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxErrUnknownNeighborCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxErrInvalidSrcAddrCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrSecCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxErrSecCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrSecCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxErrSecCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrFcsCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxErrFcsCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrFcsCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxErrFcsCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrOtherCount::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsRxErrOtherCountCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsRxErrOtherCount::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsRxErrOtherCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsActiveTimestamp::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsActiveTimestampCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsActiveTimestamp::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsActiveTimestamp::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPendingTimestamp::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsPendingTimestampCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsPendingTimestamp::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsPendingTimestamp::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsDelay::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsDelayCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsDelay::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsDelay::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsChannelMask::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsChannelMaskCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsChannelMask::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsChannelMask::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsClusterRevision::OnAttributeResponse)> *
+        onReportThreadNetworkDiagnosticsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadThreadNetworkDiagnosticsClusterRevision::OnAttributeResponse)>(
+                ReadThreadNetworkDiagnosticsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWakeOnLanWakeOnLanMacAddress::OnAttributeResponse)> *
+        onReportWakeOnLanWakeOnLanMacAddressCallback =
+            new chip::Callback::Callback<decltype(&ReadWakeOnLanWakeOnLanMacAddress::OnAttributeResponse)>(
+                ReadWakeOnLanWakeOnLanMacAddress::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWakeOnLanClusterRevision::OnAttributeResponse)> *
+        onReportWakeOnLanClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadWakeOnLanClusterRevision::OnAttributeResponse)>(
+                ReadWakeOnLanClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsBssid::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsBssidCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsBssid::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsBssid::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsSecurityType::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsSecurityTypeCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsSecurityType::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsSecurityType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsWiFiVersion::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsWiFiVersionCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsWiFiVersion::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsWiFiVersion::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsChannelNumber::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsChannelNumberCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsChannelNumber::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsChannelNumber::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsRssi::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsRssiCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsRssi::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsRssi::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsBeaconLostCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsBeaconLostCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsBeaconLostCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsBeaconLostCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsBeaconRxCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsBeaconRxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsBeaconRxCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsBeaconRxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketMulticastRxCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsPacketMulticastRxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketMulticastRxCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsPacketMulticastRxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketMulticastTxCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsPacketMulticastTxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketMulticastTxCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsPacketMulticastTxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketUnicastRxCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsPacketUnicastRxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketUnicastRxCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsPacketUnicastRxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketUnicastTxCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsPacketUnicastTxCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsPacketUnicastTxCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsPacketUnicastTxCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsCurrentMaxRate::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsCurrentMaxRateCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsCurrentMaxRate::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsCurrentMaxRate::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsOverrunCount::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsOverrunCountCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsOverrunCount::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsOverrunCount::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsClusterRevision::OnAttributeResponse)> *
+        onReportWiFiNetworkDiagnosticsClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadWiFiNetworkDiagnosticsClusterRevision::OnAttributeResponse)>(
+                ReadWiFiNetworkDiagnosticsClusterRevision::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringType::OnAttributeResponse)> * onReportWindowCoveringTypeCallback =
+        new chip::Callback::Callback<decltype(&ReadWindowCoveringType::OnAttributeResponse)>(
+            ReadWindowCoveringType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionLift::OnAttributeResponse)> *
+        onReportWindowCoveringCurrentPositionLiftCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionLift::OnAttributeResponse)>(
+                ReadWindowCoveringCurrentPositionLift::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionTilt::OnAttributeResponse)> *
+        onReportWindowCoveringCurrentPositionTiltCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionTilt::OnAttributeResponse)>(
+                ReadWindowCoveringCurrentPositionTilt::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringConfigStatus::OnAttributeResponse)> *
+        onReportWindowCoveringConfigStatusCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringConfigStatus::OnAttributeResponse)>(
+                ReadWindowCoveringConfigStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionLiftPercentage::OnAttributeResponse)> *
+        onReportWindowCoveringCurrentPositionLiftPercentageCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionLiftPercentage::OnAttributeResponse)>(
+                ReadWindowCoveringCurrentPositionLiftPercentage::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionTiltPercentage::OnAttributeResponse)> *
+        onReportWindowCoveringCurrentPositionTiltPercentageCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionTiltPercentage::OnAttributeResponse)>(
+                ReadWindowCoveringCurrentPositionTiltPercentage::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringOperationalStatus::OnAttributeResponse)> *
+        onReportWindowCoveringOperationalStatusCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringOperationalStatus::OnAttributeResponse)>(
+                ReadWindowCoveringOperationalStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringTargetPositionLiftPercent100ths::OnAttributeResponse)> *
+        onReportWindowCoveringTargetPositionLiftPercent100thsCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringTargetPositionLiftPercent100ths::OnAttributeResponse)>(
+                ReadWindowCoveringTargetPositionLiftPercent100ths::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringTargetPositionTiltPercent100ths::OnAttributeResponse)> *
+        onReportWindowCoveringTargetPositionTiltPercent100thsCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringTargetPositionTiltPercent100ths::OnAttributeResponse)>(
+                ReadWindowCoveringTargetPositionTiltPercent100ths::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringEndProductType::OnAttributeResponse)> *
+        onReportWindowCoveringEndProductTypeCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringEndProductType::OnAttributeResponse)>(
+                ReadWindowCoveringEndProductType::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionLiftPercent100ths::OnAttributeResponse)> *
+        onReportWindowCoveringCurrentPositionLiftPercent100thsCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionLiftPercent100ths::OnAttributeResponse)>(
+                ReadWindowCoveringCurrentPositionLiftPercent100ths::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionTiltPercent100ths::OnAttributeResponse)> *
+        onReportWindowCoveringCurrentPositionTiltPercent100thsCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringCurrentPositionTiltPercent100ths::OnAttributeResponse)>(
+                ReadWindowCoveringCurrentPositionTiltPercent100ths::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledOpenLimitLift::OnAttributeResponse)> *
+        onReportWindowCoveringInstalledOpenLimitLiftCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledOpenLimitLift::OnAttributeResponse)>(
+                ReadWindowCoveringInstalledOpenLimitLift::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledClosedLimitLift::OnAttributeResponse)> *
+        onReportWindowCoveringInstalledClosedLimitLiftCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledClosedLimitLift::OnAttributeResponse)>(
+                ReadWindowCoveringInstalledClosedLimitLift::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledOpenLimitTilt::OnAttributeResponse)> *
+        onReportWindowCoveringInstalledOpenLimitTiltCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledOpenLimitTilt::OnAttributeResponse)>(
+                ReadWindowCoveringInstalledOpenLimitTilt::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledClosedLimitTilt::OnAttributeResponse)> *
+        onReportWindowCoveringInstalledClosedLimitTiltCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringInstalledClosedLimitTilt::OnAttributeResponse)>(
+                ReadWindowCoveringInstalledClosedLimitTilt::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringMode::OnAttributeResponse)> * onReportWindowCoveringModeCallback =
+        new chip::Callback::Callback<decltype(&ReadWindowCoveringMode::OnAttributeResponse)>(
+            ReadWindowCoveringMode::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringSafetyStatus::OnAttributeResponse)> *
+        onReportWindowCoveringSafetyStatusCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringSafetyStatus::OnAttributeResponse)>(
+                ReadWindowCoveringSafetyStatus::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringFeatureMap::OnAttributeResponse)> *
+        onReportWindowCoveringFeatureMapCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringFeatureMap::OnAttributeResponse)>(
+                ReadWindowCoveringFeatureMap::OnAttributeResponse, this);
+    chip::Callback::Callback<decltype(&ReadWindowCoveringClusterRevision::OnAttributeResponse)> *
+        onReportWindowCoveringClusterRevisionCallback =
+            new chip::Callback::Callback<decltype(&ReadWindowCoveringClusterRevision::OnAttributeResponse)>(
+                ReadWindowCoveringClusterRevision::OnAttributeResponse, this);
 };
 
 void registerCommandsReporting(Commands & commands)

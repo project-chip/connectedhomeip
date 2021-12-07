@@ -19,15 +19,15 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConnectivityManager.h>
+#include <platform/DiagnosticDataProvider.h>
 #include <platform/Linux/ConnectivityUtils.h>
+#include <platform/Linux/DiagnosticDataProviderImpl.h>
 #include <platform/internal/BLEManager.h>
 
 #include <cstdlib>
 #include <new>
 
 #include <ifaddrs.h>
-#include <linux/ethtool.h>
-#include <linux/if_link.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -58,163 +58,6 @@ using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::app::Clusters::GeneralDiagnostics;
 
-namespace {
-
-enum class EthernetStatsCountType
-{
-    kEthPacketRxCount,
-    kEthPacketTxCount,
-    kEthTxErrCount,
-    kEthCollisionCount,
-    kEthOverrunCount
-};
-
-enum class WiFiStatsCountType
-{
-    kWiFiUnicastPacketRxCount,
-    kWiFiUnicastPacketTxCount,
-    kWiFiMulticastPacketRxCount,
-    kWiFiMulticastPacketTxCount,
-    kWiFiOverrunCount
-};
-
-CHIP_ERROR GetEthernetStatsCount(EthernetStatsCountType type, uint64_t & count)
-{
-    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
-    struct ifaddrs * ifaddr = nullptr;
-
-    if (getifaddrs(&ifaddr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-    }
-    else
-    {
-        struct ifaddrs * ifa = nullptr;
-
-        /* Walk through linked list, maintaining head pointer so we
-          can free list later */
-        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
-        {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
-            {
-                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
-                break;
-            }
-        }
-
-        if (ifa != nullptr)
-        {
-            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
-            {
-                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
-                switch (type)
-                {
-                case EthernetStatsCountType::kEthPacketRxCount:
-                    count = stats->rx_packets;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case EthernetStatsCountType::kEthPacketTxCount:
-                    count = stats->tx_packets;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case EthernetStatsCountType::kEthTxErrCount:
-                    count = stats->tx_errors;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case EthernetStatsCountType::kEthCollisionCount:
-                    count = stats->collisions;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case EthernetStatsCountType::kEthOverrunCount:
-                    count = stats->rx_over_errors;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                default:
-                    ChipLogError(DeviceLayer, "Unknown Ethernet statistic metric type");
-                    break;
-                }
-            }
-        }
-
-        freeifaddrs(ifaddr);
-    }
-
-    return err;
-}
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-CHIP_ERROR GetWiFiStatsCount(WiFiStatsCountType type, uint64_t & count)
-{
-    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
-    struct ifaddrs * ifaddr = nullptr;
-
-    if (getifaddrs(&ifaddr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-    }
-    else
-    {
-        struct ifaddrs * ifa = nullptr;
-
-        /* Walk through linked list, maintaining head pointer so we
-          can free list later */
-        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
-        {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
-            {
-                ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", ifa->ifa_name);
-                break;
-            }
-        }
-
-        if (ifa != nullptr)
-        {
-            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
-            {
-                // The usecase of this function is embedded devices,on which we can interact with the WiFi
-                // driver to get the accurate number of muticast and unicast packets accurately.
-                // On Linux simulation, we can only get the total packets received, the total bytes transmitted,
-                // the multicast packets received and receiver ring buff overflow.
-
-                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
-                switch (type)
-                {
-                case WiFiStatsCountType::kWiFiUnicastPacketRxCount:
-                    count = stats->rx_packets;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case WiFiStatsCountType::kWiFiUnicastPacketTxCount:
-                    count = stats->tx_packets;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case WiFiStatsCountType::kWiFiMulticastPacketRxCount:
-                    count = stats->multicast;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case WiFiStatsCountType::kWiFiMulticastPacketTxCount:
-                    count = 0;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                case WiFiStatsCountType::kWiFiOverrunCount:
-                    count = stats->rx_over_errors;
-                    err   = CHIP_NO_ERROR;
-                    break;
-                default:
-                    ChipLogError(DeviceLayer, "Unknown WiFi statistic metric type");
-                    break;
-                }
-            }
-        }
-
-        freeifaddrs(ifaddr);
-    }
-
-    return err;
-}
-#endif // #if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-
-} // namespace
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -241,7 +84,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
         mEthIfName[0] = '\0';
     }
 
-    if (ResetEthernetStatsCount() != CHIP_NO_ERROR)
+    if (GetDiagnosticDataProvider().ResetEthNetworkDiagnosticsCounts() != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to reset Ethernet statistic counts");
     }
@@ -262,7 +105,7 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
         sWiFiIfName[0] = '\0';
     }
 
-    if (ResetWiFiStatsCount() != CHIP_NO_ERROR)
+    if (GetDiagnosticDataProvider().ResetWiFiNetworkDiagnosticsCounts() != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "Failed to reset WiFi statistic counts");
     }
@@ -1080,66 +923,40 @@ exit:
 
     return ret;
 }
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
-void ConnectivityManagerImpl::_ReleaseNetworkInterfaces(NetworkInterface * netifp)
-{
-    while (netifp)
-    {
-        NetworkInterface * del = netifp;
-        netifp                 = netifp->Next;
-        delete del;
-    }
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** netifpp)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiBssId(ByteSpan & value)
 {
     CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
     struct ifaddrs * ifaddr = nullptr;
 
+    // On Linux simulation, we don't have the DBus API to get the BSSID of connected AP. Use mac address
+    // of local WiFi network card instead.
     if (getifaddrs(&ifaddr) == -1)
     {
         ChipLogError(DeviceLayer, "Failed to get network interfaces");
     }
     else
     {
-        NetworkInterface * head = nullptr;
+        uint8_t macAddress[kMaxHardwareAddrSize];
 
-        /* Walk through linked list, maintaining head pointer so we
-          can free list later */
+        // Walk through linked list, maintaining head pointer so we can free list later.
         for (struct ifaddrs * ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
         {
-            if (ifa->ifa_addr && ifa->ifa_addr->sa_family == AF_PACKET)
+            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
             {
-                NetworkInterface * ifp = new NetworkInterface();
-
-                strncpy(ifp->Name, ifa->ifa_name, Inet::InterfaceId::kMaxIfNameLength);
-                ifp->Name[Inet::InterfaceId::kMaxIfNameLength - 1] = '\0';
-
-                ifp->name                            = CharSpan(ifp->Name, strlen(ifp->Name));
-                ifp->fabricConnected                 = ifa->ifa_flags & IFF_RUNNING;
-                ifp->type                            = ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name);
-                ifp->offPremiseServicesReachableIPv4 = false;
-                ifp->offPremiseServicesReachableIPv6 = false;
-
-                if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, ifp->MacAddress, kMaxHardwareAddrSize) !=
-                    CHIP_NO_ERROR)
+                if (ConnectivityUtils::GetInterfaceHardwareAddrs(ifa->ifa_name, macAddress, kMaxHardwareAddrSize) != CHIP_NO_ERROR)
                 {
-                    ChipLogError(DeviceLayer, "Failed to get network hardware address");
+                    ChipLogError(DeviceLayer, "Failed to get WiFi network hardware address");
                 }
                 else
                 {
                     // Set 48-bit IEEE MAC Address
-                    ifp->hardwareAddress = ByteSpan(ifp->MacAddress, 6);
+                    value = ByteSpan(macAddress, 6);
+                    err   = CHIP_NO_ERROR;
+                    break;
                 }
-
-                ifp->Next = head;
-                head      = ifp;
             }
         }
-
-        *netifpp = head;
-        err      = CHIP_NO_ERROR;
 
         freeifaddrs(ifaddr);
     }
@@ -1147,314 +964,66 @@ CHIP_ERROR ConnectivityManagerImpl::_GetNetworkInterfaces(NetworkInterface ** ne
     return err;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetEthPHYRate(uint8_t & pHYRate)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiSecurityType(uint8_t & securityType)
 {
-    if (mEthIfName[0] == '\0')
+    const gchar * mode = nullptr;
+
+    std::lock_guard<std::mutex> lock(mWpaSupplicantMutex);
+
+    if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
-        return CHIP_ERROR_READ_FAILED;
+        ChipLogError(DeviceLayer, "wpa_supplicant: _GetWiFiSecurityType: interface proxy not connected");
+        return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    return ConnectivityUtils::GetEthPHYRate(mEthIfName, pHYRate);
-}
+    mode = wpa_fi_w1_wpa_supplicant1_interface_get_current_auth_mode(mWpaSupplicant.iface);
+    ChipLogProgress(DeviceLayer, "wpa_supplicant: current Wi-Fi security type: %s", mode);
 
-CHIP_ERROR ConnectivityManagerImpl::_GetEthFullDuplex(bool & fullDuplex)
-{
-    if (mEthIfName[0] == '\0')
+    if (strncmp(mode, "WPA-PSK", 7) == 0)
     {
-        return CHIP_ERROR_READ_FAILED;
+        securityType = EMBER_ZCL_SECURITY_TYPE_WPA;
     }
-
-    return ConnectivityUtils::GetEthFullDuplex(mEthIfName, fullDuplex);
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetEthTimeSinceReset(uint64_t & timeSinceReset)
-{
-    return PlatformMgr().GetUpTime(timeSinceReset);
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetEthPacketRxCount(uint64_t & packetRxCount)
-{
-    uint64_t count;
-
-    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthPacketRxCount, count));
-    VerifyOrReturnError(count >= mEthPacketRxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    packetRxCount = count - mEthPacketRxCount;
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetEthPacketTxCount(uint64_t & packetTxCount)
-{
-    uint64_t count;
-
-    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthPacketTxCount, count));
-    VerifyOrReturnError(count >= mEthPacketTxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    packetTxCount = count - mEthPacketTxCount;
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetEthTxErrCount(uint64_t & txErrCount)
-{
-    uint64_t count;
-
-    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthTxErrCount, count));
-    VerifyOrReturnError(count >= mEthTxErrCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    txErrCount = count - mEthTxErrCount;
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetEthCollisionCount(uint64_t & collisionCount)
-{
-    uint64_t count;
-
-    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthCollisionCount, count));
-    VerifyOrReturnError(count >= mEthCollisionCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    collisionCount = count - mEthCollisionCount;
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetEthOverrunCount(uint64_t & overrunCount)
-{
-    uint64_t count;
-
-    ReturnErrorOnFailure(GetEthernetStatsCount(EthernetStatsCountType::kEthOverrunCount, count));
-    VerifyOrReturnError(count >= mEthOverrunCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    overrunCount = count - mEthOverrunCount;
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_ResetEthNetworkDiagnosticsCounts()
-{
-    return ResetEthernetStatsCount();
-}
-
-CHIP_ERROR ConnectivityManagerImpl::ResetEthernetStatsCount()
-{
-    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
-    struct ifaddrs * ifaddr = nullptr;
-
-    if (getifaddrs(&ifaddr) == -1)
+    else if (strncmp(mode, "WPA2-PSK", 8) == 0)
     {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
+        securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+    }
+    else if (strncmp(mode, "WPA2-EAP", 8) == 0)
+    {
+        securityType = EMBER_ZCL_SECURITY_TYPE_WPA2;
+    }
+    else if (strncmp(mode, "WPA3-PSK", 8) == 0)
+    {
+        securityType = EMBER_ZCL_SECURITY_TYPE_WPA3;
+    }
+    else if (strncmp(mode, "WEP", 3) == 0)
+    {
+        securityType = EMBER_ZCL_SECURITY_TYPE_WEP;
+    }
+    else if (strncmp(mode, "NONE", 4) == 0)
+    {
+        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
+    }
+    else if (strncmp(mode, "WPA-NONE", 8) == 0)
+    {
+        securityType = EMBER_ZCL_SECURITY_TYPE_NONE;
     }
     else
     {
-        struct ifaddrs * ifa = nullptr;
-
-        /* Walk through linked list, maintaining head pointer so we
-          can free list later */
-        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
-        {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_ETHERNET)
-            {
-                ChipLogProgress(DeviceLayer, "Found the primary Ethernet interface:%s", ifa->ifa_name);
-                break;
-            }
-        }
-
-        if (ifa != nullptr)
-        {
-            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
-            {
-                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
-
-                mEthPacketRxCount  = stats->rx_packets;
-                mEthPacketTxCount  = stats->tx_packets;
-                mEthTxErrCount     = stats->tx_errors;
-                mEthCollisionCount = stats->collisions;
-                mEthOverrunCount   = stats->rx_over_errors;
-                err                = CHIP_NO_ERROR;
-            }
-        }
-
-        freeifaddrs(ifaddr);
+        securityType = EMBER_ZCL_SECURITY_TYPE_UNSPECIFIED;
     }
-
-    return err;
-}
-
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiChannelNumber(uint16_t & channelNumber)
-{
-    if (sWiFiIfName[0] == '\0')
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
-
-    return ConnectivityUtils::GetWiFiChannelNumber(sWiFiIfName, channelNumber);
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiRssi(int8_t & rssi)
-{
-    if (sWiFiIfName[0] == '\0')
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
-
-    return ConnectivityUtils::GetWiFiRssi(sWiFiIfName, rssi);
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
-{
-    uint32_t count;
-
-    if (sWiFiIfName[0] == '\0')
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
-
-    ReturnErrorOnFailure(ConnectivityUtils::GetWiFiBeaconLostCount(sWiFiIfName, count));
-    VerifyOrReturnError(count >= mBeaconLostCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
-    beaconLostCount = count - mBeaconLostCount;
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
+CHIP_ERROR ConnectivityManagerImpl::GetWiFiVersion(uint8_t & wiFiVersion)
 {
-    if (sWiFiIfName[0] == '\0')
-    {
-        return CHIP_ERROR_READ_FAILED;
-    }
-
-    return ConnectivityUtils::GetWiFiCurrentMaxRate(sWiFiIfName, currentMaxRate);
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
-{
-    uint64_t count;
-
-    ReturnErrorOnFailure(GetWiFiStatsCount(WiFiStatsCountType::kWiFiMulticastPacketRxCount, count));
-    VerifyOrReturnError(count >= mPacketMulticastRxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    count -= mPacketMulticastRxCount;
-    VerifyOrReturnError(count <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    packetMulticastRxCount = static_cast<uint32_t>(count);
+    // We don't have driect API to get the WiFi version yet, retrun 802.11n on Linux simulation.
+    wiFiVersion = EMBER_ZCL_WI_FI_VERSION_TYPE_802__11N;
 
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
-{
-    uint64_t count;
-
-    ReturnErrorOnFailure(GetWiFiStatsCount(WiFiStatsCountType::kWiFiMulticastPacketTxCount, count));
-    VerifyOrReturnError(count >= mPacketMulticastTxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    count -= mPacketMulticastTxCount;
-    VerifyOrReturnError(count <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    packetMulticastTxCount = static_cast<uint32_t>(count);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
-{
-    uint64_t count;
-
-    ReturnErrorOnFailure(GetWiFiStatsCount(WiFiStatsCountType::kWiFiUnicastPacketRxCount, count));
-    VerifyOrReturnError(count >= mPacketUnicastRxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    count -= mPacketUnicastRxCount;
-    VerifyOrReturnError(count <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    packetUnicastRxCount = static_cast<uint32_t>(count);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
-{
-    uint64_t count;
-
-    ReturnErrorOnFailure(GetWiFiStatsCount(WiFiStatsCountType::kWiFiUnicastPacketTxCount, count));
-    VerifyOrReturnError(count >= mPacketUnicastTxCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    count -= mPacketUnicastTxCount;
-    VerifyOrReturnError(count <= UINT32_MAX, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    packetUnicastTxCount = static_cast<uint32_t>(count);
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_GetWiFiOverrunCount(uint64_t & overrunCount)
-{
-    uint64_t count;
-
-    ReturnErrorOnFailure(GetWiFiStatsCount(WiFiStatsCountType::kWiFiOverrunCount, count));
-    VerifyOrReturnError(count >= mOverrunCount, CHIP_ERROR_INVALID_INTEGER_VALUE);
-
-    overrunCount = count - mOverrunCount;
-
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ConnectivityManagerImpl::_ResetWiFiNetworkDiagnosticsCounts()
-{
-    return ResetWiFiStatsCount();
-}
-
-CHIP_ERROR ConnectivityManagerImpl::ResetWiFiStatsCount()
-{
-    CHIP_ERROR err          = CHIP_ERROR_READ_FAILED;
-    struct ifaddrs * ifaddr = nullptr;
-
-    ReturnErrorOnFailure(_GetWiFiBeaconLostCount(mBeaconLostCount));
-
-    if (getifaddrs(&ifaddr) == -1)
-    {
-        ChipLogError(DeviceLayer, "Failed to get network interfaces");
-    }
-    else
-    {
-        struct ifaddrs * ifa = nullptr;
-
-        /* Walk through linked list, maintaining head pointer so we
-          can free list later */
-        for (ifa = ifaddr; ifa != nullptr; ifa = ifa->ifa_next)
-        {
-            if (ConnectivityUtils::GetInterfaceConnectionType(ifa->ifa_name) == InterfaceType::EMBER_ZCL_INTERFACE_TYPE_WI_FI)
-            {
-                ChipLogProgress(DeviceLayer, "Found the primary WiFi interface:%s", ifa->ifa_name);
-                break;
-            }
-        }
-
-        if (ifa != nullptr)
-        {
-            if (ifa->ifa_addr->sa_family == AF_PACKET && ifa->ifa_data != nullptr)
-            {
-                struct rtnl_link_stats * stats = (struct rtnl_link_stats *) ifa->ifa_data;
-
-                mPacketMulticastRxCount = stats->multicast;
-                mPacketMulticastTxCount = 0;
-                mPacketUnicastRxCount   = stats->rx_packets;
-                mPacketUnicastTxCount   = stats->tx_packets;
-                mOverrunCount           = stats->rx_over_errors;
-
-                err = CHIP_NO_ERROR;
-            }
-        }
-
-        freeifaddrs(ifaddr);
-    }
-
-    return err;
-}
-
-#endif // CHIP_DEVICE_CONFIG_ENABLE_WIFI
+#endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 } // namespace DeviceLayer
 } // namespace chip

@@ -38,5 +38,4 @@ struct ChipDeviceEvent;
 #define CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE const struct ::chip::DeviceLayer::ChipDeviceEvent *
 
 // ========== Platform-specific Configuration Overrides =========
-
-/* none yet */
+#define CHIP_CONFIG_MDNS_CACHE_SIZE 4

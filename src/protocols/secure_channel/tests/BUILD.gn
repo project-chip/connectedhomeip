@@ -10,6 +10,7 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestCASESession.cpp",
+    "TestCASESessionCache.cpp",
 
     # TODO - Fix Message Counter Sync to use group key
     #    "TestMessageCounterManager.cpp",

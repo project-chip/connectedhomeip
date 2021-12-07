@@ -20,24 +20,33 @@
 
 #include <app/util/basic-types.h>
 
+#include <app/ClusterInfo.h>
+
 namespace chip {
 namespace app {
 struct EventPathParams
 {
-    EventPathParams(NodeId aNodeId, EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId, bool aIsUrgent) :
-        mNodeId(aNodeId), mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId), mIsUrgent(aIsUrgent)
+    EventPathParams(EndpointId aEndpointId, ClusterId aClusterId, EventId aEventId) :
+        mEndpointId(aEndpointId), mClusterId(aClusterId), mEventId(aEventId)
     {}
     EventPathParams() {}
     bool IsSamePath(const EventPathParams & other) const
     {
-        return other.mNodeId == mNodeId && other.mEndpointId == mEndpointId && other.mClusterId == mClusterId &&
-            other.mEventId == mEventId;
+        return other.mEndpointId == mEndpointId && other.mClusterId == mClusterId && other.mEventId == mEventId;
     }
-    NodeId mNodeId         = 0;
-    EndpointId mEndpointId = 0;
-    ClusterId mClusterId   = 0;
-    EventId mEventId       = 0;
-    bool mIsUrgent         = false;
+
+    bool HasEventWildcard() const { return HasWildcardEndpointId() || HasWildcardClusterId() || HasWildcardEventId(); }
+
+    // For event, an event id can only be interpreted if the cluster id is known.
+    bool IsValidEventPath() const { return !(HasWildcardClusterId() && !HasWildcardEventId()); }
+
+    inline bool HasWildcardEndpointId() const { return mEndpointId == kInvalidEndpointId; }
+    inline bool HasWildcardClusterId() const { return mClusterId == ClusterInfo::kInvalidClusterId; }
+    inline bool HasWildcardEventId() const { return mEventId == ClusterInfo::kInvalidEventId; }
+
+    EndpointId mEndpointId = kInvalidEndpointId;
+    ClusterId mClusterId   = ClusterInfo::kInvalidClusterId;
+    EventId mEventId       = ClusterInfo::kInvalidEventId;
 };
 } // namespace app
 } // namespace chip

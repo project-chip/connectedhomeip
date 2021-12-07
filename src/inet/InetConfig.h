@@ -114,33 +114,6 @@
 #endif // INET_CONFIG_WILL_OVERRIDE_LWIP_ERROR_FUNCS
 
 /**
- *  @def INET_CONFIG_MAX_DROPPABLE_EVENTS
- *
- *  @brief
- *    This is the maximum number of UDP or raw network transport
- *    packet events / messages that may be dropped due to packet
- *    buffer starvation.
- *
- *    In some implementations, there may be a shared event / message
- *    queue for the InetLayer used by other system events / messages.
- *
- *    If the length of that queue is considerably longer than the
- *    number of packet buffers available, it may lead to buffer
- *    exhaustion. As a result, using the queue itself to implement
- *    backpressure is insufficient, and we need an external mechanism
- *    to prevent buffer starvation in the rest of the system and
- *    getting into deadlock situations.
- *
- *    For both UDP and raw network transport traffic we can easily
- *    drop incoming packets without impacting the correctness of
- *    higher level protocols.
- *
- */
-#ifndef INET_CONFIG_MAX_DROPPABLE_EVENTS
-#define INET_CONFIG_MAX_DROPPABLE_EVENTS                    0
-#endif // INET_CONFIG_MAX_DROPPABLE_EVENTS
-
-/**
  *  @def INET_CONFIG_NUM_TCP_ENDPOINTS
  *
  *  @brief

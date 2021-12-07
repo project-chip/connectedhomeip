@@ -30,9 +30,24 @@ const WaitForMs = {
   response : { arguments : [] }
 };
 
+const WaitForCommissioning = {
+  name : 'WaitForCommissioning',
+  arguments : [],
+  response : { arguments : [] }
+};
+
+const WaitForCommissionee = {
+  name : 'WaitForCommissionee',
+  arguments : [],
+  response : { arguments : [] }
+};
+
+const name     = 'DelayCommands';
+const commands = [ WaitForMs, WaitForCommissioning, WaitForCommissionee ];
+
 const DelayCommands = {
-  name : 'DelayCommands',
-  commands : [ WaitForMs ],
+  name,
+  commands
 };
 
 //

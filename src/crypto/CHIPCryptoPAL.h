@@ -46,6 +46,8 @@ constexpr size_t kP256_ECDSA_Signature_Length_Raw = (2 * kP256_FE_Length);
 constexpr size_t kP256_Point_Length               = (2 * kP256_FE_Length + 1);
 constexpr size_t kSHA256_Hash_Length              = 32;
 constexpr size_t kSHA1_Hash_Length                = 20;
+constexpr size_t kSubjectKeyIdentifierLength      = kSHA1_Hash_Length;
+constexpr size_t kAuthorityKeyIdentifierLength    = kSHA1_Hash_Length;
 
 constexpr size_t CHIP_CRYPTO_GROUP_SIZE_BYTES      = kP256_FE_Length;
 constexpr size_t CHIP_CRYPTO_PUBLIC_KEY_SIZE_BYTES = kP256_Point_Length;
@@ -58,7 +60,10 @@ constexpr size_t kMax_ECDSA_Signature_Length = kP256_ECDSA_Signature_Length_Raw;
 constexpr size_t kMAX_FE_Length              = kP256_FE_Length;
 constexpr size_t kMAX_Point_Length           = kP256_Point_Length;
 constexpr size_t kMAX_Hash_Length            = kSHA256_Hash_Length;
-constexpr size_t kMAX_CSR_Length             = 512;
+
+// Max CSR length should be relatively small since it's a single P256 key and
+// no metadata is expected to be honored by the CA.
+constexpr size_t kMAX_CSR_Length = 255;
 
 constexpr size_t CHIP_CRYPTO_HASH_LEN_BYTES = kSHA256_Hash_Length;
 
@@ -420,12 +425,13 @@ public:
      **/
     const P256PublicKey & Pubkey() const override { return mPublicKey; }
 
+    /** Release resources associated with this key pair */
+    void Clear();
+
 private:
     P256PublicKey mPublicKey;
     P256KeypairContext mKeypair;
     bool mInitialized = false;
-
-    void Clear();
 };
 
 /**
@@ -1205,6 +1211,36 @@ CHIP_ERROR GetNumberOfCertsFromPKCS7(const char * pkcs7, uint32_t * n_certs);
 CHIP_ERROR ValidateCertificateChain(const uint8_t * rootCertificate, size_t rootCertificateLen, const uint8_t * caCertificate,
                                     size_t caCertificateLen, const uint8_t * leafCertificate, size_t leafCertificateLen);
 
+/**
+ * @brief Validate timestamp of a certificate (toBeEvaluatedCertificate) in comparison with other certificate's
+ *        (referenceCertificate) issuing timestamp.
+ *
+ * Errors are:
+ *   - CHIP_ERROR_CERT_EXPIRED if the certificate timestamp does not satisfy the reference certificate's issuing timestamp.
+ *   - CHIP_ERROR_INVALID_ARGUMENT when passing an invalid argument.
+ *   - CHIP_ERROR_INTERNAL on any unexpected crypto or data conversion errors.
+ *
+ *  @param referenceCertificate     A DER Certificate ByteSpan used as the issuing timestamp reference.
+ *  @param toBeEvaluatedCertificate A DER Certificate ByteSpan used to evaluate issuance against the referenceCertificate.
+ *
+ *  @returns a CHIP_ERROR (see above) on failure or CHIP_NO_ERROR otherwise.
+ **/
+CHIP_ERROR IsCertificateValidAtIssuance(const ByteSpan & referenceCertificate, const ByteSpan & toBeEvaluatedCertificate);
+
+/**
+ * @brief Validate a certificate's validity date against current time.
+ *
+ * Errors are:
+ *   - CHIP_ERROR_CERT_EXPIRED if the certificate has expired.
+ *   - CHIP_ERROR_INVALID_ARGUMENT when passing an invalid argument.
+ *   - CHIP_ERROR_INTERNAL on any unexpected crypto or data conversion errors.
+ *
+ *  @param certificate A DER Certificate ByteSpan used as the validity reference to be checked against current time.
+ *
+ *  @returns a CHIP_ERROR (see above) on failure or CHIP_NO_ERROR otherwise.
+ **/
+CHIP_ERROR IsCertificateValidAtCurrentTime(const ByteSpan & certificate);
+
 CHIP_ERROR ExtractPubkeyFromX509Cert(const ByteSpan & certificate, Crypto::P256PublicKey & pubkey);
 
 /**
@@ -1217,10 +1253,16 @@ CHIP_ERROR ExtractSKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan
  **/
 CHIP_ERROR ExtractAKIDFromX509Cert(const ByteSpan & certificate, MutableByteSpan & akid);
 
+enum class MatterOid
+{
+    kVendorId,
+    kProductId,
+};
+
 /**
- * @brief Extracts the Vendor ID from an X509 Certificate.
+ * @brief Extracts one of the IDs listed in MatterOid enum from an X509 Certificate.
  **/
-CHIP_ERROR ExtractVIDFromX509Cert(const ByteSpan & certificate, VendorId & vid);
+CHIP_ERROR ExtractDNAttributeFromX509Cert(MatterOid matterOid, const ByteSpan & certificate, uint16_t & id);
 
 } // namespace Crypto
 } // namespace chip

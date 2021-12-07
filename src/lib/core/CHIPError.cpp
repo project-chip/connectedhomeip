@@ -663,10 +663,34 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, CHIP_ERROR err)
         desc = "Malformed Interaction Model Invoke Response Message";
         break;
     case CHIP_ERROR_IM_MALFORMED_INVOKE_RESPONSE_MESSAGE.AsInteger():
-        desc = "Malformed Interaction Model Invoke Response MESSAGE";
+        desc = "Malformed Interaction Model Invoke Response Message";
         break;
     case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE.AsInteger():
-        desc = "Malformed Interaction Model Attribute Report MESSAGE";
+        desc = "Malformed Interaction Model Attribute Report Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Write Request Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Write Response Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Read Request Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Subscribe Request Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE.AsInteger():
+        desc = "Malformed Interaction Model Subscribe Response Message";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB.AsInteger():
+        desc = "Malformed Interaction Model Event Report IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB.AsInteger():
+        desc = "Malformed Interaction Model Cluster Path IB";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB.AsInteger():
+        desc = "Malformed Interaction Model Data Version Filter IB";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR

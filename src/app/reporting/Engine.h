@@ -62,6 +62,10 @@ public:
 
     void Shutdown();
 
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    void SetWriterReserved(uint32_t aReservedSize) { mReservedSize = aReservedSize; }
+#endif
+
     /**
      * Main work-horse function that executes the run-loop.
      */
@@ -84,6 +88,13 @@ public:
      */
     CHIP_ERROR SetDirty(ClusterInfo & aClusterInfo);
 
+    /**
+     * @brief
+     *  Schedule the urgent event delivery
+     *
+     */
+    CHIP_ERROR ScheduleUrgentEventDelivery(ConcreteEventPath & aPath);
+
 private:
     friend class TestReportingEngine;
     /**
@@ -92,10 +103,13 @@ private:
      */
     CHIP_ERROR BuildAndSendSingleReportData(ReadHandler * apReadHandler);
 
-    CHIP_ERROR BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler);
-    CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler);
+    CHIP_ERROR BuildSingleReportDataAttributeReportIBs(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
+                                                       bool * apHasMoreChunks, bool * apHasEncodedData);
+    CHIP_ERROR BuildSingleReportDataEventReports(ReportDataMessage::Builder & reportDataBuilder, ReadHandler * apReadHandler,
+                                                 bool * apHasMoreChunks, bool * apHasEncodedData);
     CHIP_ERROR RetrieveClusterData(FabricIndex aAccessingFabricIndex, AttributeReportIBs::Builder & aAttributeReportIBs,
-                                   ClusterInfo & aClusterInfo);
+                                   const ConcreteReadAttributePath & aClusterInfo,
+                                   AttributeValueEncoder::AttributeEncodeState * apEncoderState);
     EventNumber CountEvents(ReadHandler * apReadHandler, EventNumber * apInitialEvents);
 
     /**
@@ -108,19 +122,13 @@ private:
      * Send Report via ReadHandler
      *
      */
-    CHIP_ERROR SendReport(ReadHandler * apReadHandler, System::PacketBufferHandle && aPayload);
+    CHIP_ERROR SendReport(ReadHandler * apReadHandler, System::PacketBufferHandle && aPayload, bool aHasMoreChunks);
 
     /**
      * Generate and send the report data request when there exists subscription or read request
      *
      */
     static void Run(System::Layer * aSystemLayer, void * apAppState);
-
-    /**
-     * Boolean to show if more chunk message on the way
-     *
-     */
-    bool mMoreChunkedMessages = false;
 
     /**
      * Boolean to indicate if ScheduleRun is pending. This flag is used to prevent calling ScheduleRun multiple times
@@ -149,6 +157,10 @@ private:
      *
      */
     ClusterInfo * mpGlobalDirtySet = nullptr;
+
+#if CONFIG_IM_BUILD_FOR_UNIT_TEST
+    uint32_t mReservedSize = 0;
+#endif
 };
 
 }; // namespace reporting

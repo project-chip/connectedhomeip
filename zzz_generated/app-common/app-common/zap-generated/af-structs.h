@@ -37,6 +37,8 @@ typedef struct _SimpleStruct
     chip::ByteSpan d;
     chip::CharSpan e;
     uint8_t f;
+    float g;
+    double h;
 } SimpleStruct;
 
 // Struct for NullablesAndOptionalsStruct
@@ -96,6 +98,24 @@ typedef struct _ContentLaunchParamater
     chip::CharSpan Value;
     /* TYPE WARNING: array array defaults to */ uint8_t * ExternalIDList;
 } ContentLaunchParamater;
+
+// Struct for Target
+typedef struct _Target
+{
+    uint32_t Cluster;
+    uint16_t Endpoint;
+    uint32_t DeviceType;
+} Target;
+
+// Struct for AccessControlEntry
+typedef struct _AccessControlEntry
+{
+    chip::FabricIndex FabricIndex;
+    uint8_t Privilege;
+    uint8_t AuthMode;
+    /* TYPE WARNING: array array defaults to */ uint8_t * Subjects;
+    /* TYPE WARNING: array array defaults to */ uint8_t * Targets;
+} AccessControlEntry;
 
 // Struct for ActionStruct
 typedef struct _ActionStruct
@@ -177,14 +197,28 @@ typedef struct _DeviceType
     uint16_t revision;
 } DeviceType;
 
+// Struct for DlCredential
+typedef struct _DlCredential
+{
+    uint8_t CredentialType;
+    uint16_t CredentialIndex;
+} DlCredential;
+
 // Struct for EndpointListStruct
 typedef struct _EndpointListStruct
 {
     uint16_t EndpointListID;
     chip::CharSpan Name;
     uint8_t Type;
-    chip::ByteSpan Endpoints;
+    /* TYPE WARNING: array array defaults to */ uint8_t * Endpoints;
 } EndpointListStruct;
+
+// Struct for ExtensionEntry
+typedef struct _ExtensionEntry
+{
+    chip::FabricIndex FabricIndex;
+    chip::ByteSpan Data;
+} ExtensionEntry;
 
 // Struct for FabricDescriptor
 typedef struct _FabricDescriptor
@@ -397,6 +431,14 @@ typedef struct _SemanticTag
     uint16_t MfgCode;
     uint16_t Value;
 } SemanticTag;
+
+// Struct for SoftwareFault
+typedef struct _SoftwareFault
+{
+    uint64_t Id;
+    chip::CharSpan Name;
+    chip::ByteSpan FaultRecording;
+} SoftwareFault;
 
 // Struct for TestListStructOctet
 typedef struct _TestListStructOctet

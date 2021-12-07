@@ -1,5 +1,5 @@
 {
-  "featureLevel": 63,
+  "featureLevel": 67,
   "creator": "zap",
   "keyValuePairs": [
     {
@@ -31,10 +31,10 @@
   ],
   "endpointTypes": [
     {
-      "name": "Anonymous Endpoint Type",
-      "deviceTypeName": null,
-      "deviceTypeCode": null,
-      "deviceTypeProfileId": null,
+      "name": "MA-rootdevice",
+      "deviceTypeName": "MA-rootdevice",
+      "deviceTypeCode": 22,
+      "deviceTypeProfileId": 259,
       "clusters": [
         {
           "name": "Power Configuration",
@@ -55,7 +55,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "2",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -111,7 +111,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "2",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -154,7 +154,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "2",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -189,7 +189,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -204,7 +204,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "2",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -279,7 +279,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "3",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -338,7 +338,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -353,7 +353,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "3",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -396,7 +396,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -431,7 +431,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -457,7 +457,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -483,7 +483,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -498,7 +498,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -513,7 +513,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -528,7 +528,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -543,7 +543,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -569,7 +569,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "3",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -620,7 +620,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -635,7 +635,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -650,7 +650,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -665,7 +665,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -680,13 +680,13 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
             },
             {
-              "name": "UserLabel",
+              "name": "NodeLabel",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -695,7 +695,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -710,7 +710,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -725,7 +725,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "0x00",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -740,7 +740,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -755,7 +755,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "0x00",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -770,7 +770,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -785,7 +785,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "3",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -836,7 +836,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -887,7 +887,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -902,9 +902,54 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "RegulatoryConfig",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "LocationCapability",
+              "code": 3,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "2",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -917,7 +962,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -992,7 +1037,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1058,6 +1103,21 @@
           ],
           "attributes": [
             {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
@@ -1067,7 +1127,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1112,7 +1172,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1138,7 +1198,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1153,7 +1213,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1168,7 +1228,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1183,7 +1243,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1198,7 +1258,52 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ActiveHardwareFaults",
+              "code": 5,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ActiveRadioFaults",
+              "code": 6,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "ActiveNetworkFaults",
+              "code": 7,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "",
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1213,7 +1318,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1248,7 +1353,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1274,9 +1379,24 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
               "reportableChange": 0
             },
             {
@@ -1289,7 +1409,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1315,7 +1435,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1341,7 +1461,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1356,7 +1476,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1371,7 +1491,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1386,7 +1506,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1401,7 +1521,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1416,7 +1536,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1431,7 +1551,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1446,7 +1566,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1461,7 +1581,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1476,7 +1596,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1491,7 +1611,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1506,7 +1626,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1521,6 +1641,21 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
               "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -1536,7 +1671,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1571,7 +1706,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1597,7 +1732,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1612,7 +1747,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1627,7 +1762,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1642,7 +1777,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1657,7 +1792,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1672,7 +1807,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1687,7 +1822,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1702,7 +1837,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x00",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -1717,6 +1852,21 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000000000000000",
+              "reportable": 1,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "FeatureMap",
+              "code": 65532,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "RAM",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "3",
               "reportable": 0,
               "minInterval": 1,
               "maxInterval": 65534,
@@ -1732,7 +1882,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1783,7 +1933,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1800,6 +1950,51 @@
           "commands": [],
           "attributes": [
             {
+              "name": "WindowStatus",
+              "code": 0,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AdminFabricIndex",
+              "code": 1,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "1",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
+              "name": "AdminVendorId",
+              "code": 2,
+              "mfgCode": null,
+              "side": "server",
+              "included": 1,
+              "storageOption": "External",
+              "singleton": 0,
+              "bounded": 0,
+              "defaultValue": "0",
+              "reportable": 0,
+              "minInterval": 1,
+              "maxInterval": 65534,
+              "reportableChange": 0
+            },
+            {
               "name": "ClusterRevision",
               "code": 65533,
               "mfgCode": null,
@@ -1809,7 +2004,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1908,7 +2103,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1967,7 +2162,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1982,7 +2177,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -1997,7 +2192,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2012,7 +2207,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2027,7 +2222,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -2042,7 +2237,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2052,10 +2247,10 @@
       ]
     },
     {
-      "name": "Anonymous Endpoint Type",
-      "deviceTypeName": null,
-      "deviceTypeCode": null,
-      "deviceTypeProfileId": null,
+      "name": "MA-rootdevice",
+      "deviceTypeName": "MA-rootdevice",
+      "deviceTypeCode": 22,
+      "deviceTypeProfileId": 259,
       "clusters": [
         {
           "name": "Power Configuration",
@@ -2076,7 +2271,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "2",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2132,7 +2327,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "2",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2158,7 +2353,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2184,7 +2379,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2199,7 +2394,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2242,7 +2437,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "2",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2277,7 +2472,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2292,7 +2487,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "2",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2367,7 +2562,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "3",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2426,7 +2621,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2441,7 +2636,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "3",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2484,7 +2679,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2519,7 +2714,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x0001",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2545,7 +2740,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -2571,7 +2766,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -2586,7 +2781,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -2601,7 +2796,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -2616,7 +2811,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -2631,7 +2826,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "1",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 1,
               "maxInterval": 65534,
               "reportableChange": 0
@@ -2657,7 +2852,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "3",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2708,7 +2903,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2723,7 +2918,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2738,7 +2933,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2753,7 +2948,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2768,13 +2963,13 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
             },
             {
-              "name": "UserLabel",
+              "name": "NodeLabel",
               "code": 5,
               "mfgCode": null,
               "side": "server",
@@ -2783,7 +2978,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2798,7 +2993,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2813,7 +3008,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "0x00",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2828,7 +3023,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2843,7 +3038,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "0x00",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2858,7 +3053,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2873,7 +3068,7 @@
               "singleton": 1,
               "bounded": 0,
               "defaultValue": "3",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2899,7 +3094,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "3",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2940,7 +3135,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x8000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2955,7 +3150,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "0x8000",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2985,7 +3180,7 @@
               "singleton": 0,
               "bounded": 0,
               "defaultValue": "3",
-              "reportable": 0,
+              "reportable": 1,
               "minInterval": 0,
               "maxInterval": 65344,
               "reportableChange": 0
@@ -2997,23 +3192,22 @@
   ],
   "endpoints": [
     {
-      "endpointTypeName": "Anonymous Endpoint Type",
+      "endpointTypeName": "MA-rootdevice",
       "endpointTypeIndex": 0,
-      "profileId": 261,
+      "profileId": 259,
       "endpointId": 0,
       "networkId": 0,
-      "endpointVersion": null,
-      "deviceIdentifier": null
+      "endpointVersion": 1,
+      "deviceIdentifier": 22
     },
     {
-      "endpointTypeName": "Anonymous Endpoint Type",
+      "endpointTypeName": "MA-rootdevice",
       "endpointTypeIndex": 1,
-      "profileId": "0x105",
+      "profileId": 259,
       "endpointId": 1,
       "networkId": 0,
-      "endpointVersion": null,
-      "deviceIdentifier": null
+      "endpointVersion": 1,
+      "deviceIdentifier": 22
     }
-  ],
-  "log": []
+  ]
 }

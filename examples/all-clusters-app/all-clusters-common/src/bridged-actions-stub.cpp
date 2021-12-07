@@ -37,7 +37,7 @@ public:
     // Register for the Bridged Actions cluster on all endpoints.
     BridgedActionsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), BridgedActions::Id) {}
 
-    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
     static constexpr uint16_t ClusterRevision = 1;
@@ -47,6 +47,8 @@ private:
     CHIP_ERROR ReadSetupUrlAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder);
     CHIP_ERROR ReadClusterRevision(EndpointId endpoint, AttributeValueEncoder & aEncoder);
 };
+
+constexpr uint16_t BridgedActionsAttrAccess::ClusterRevision;
 
 CHIP_ERROR BridgedActionsAttrAccess::ReadActionListAttribute(EndpointId endpoint, AttributeValueEncoder & aEncoder)
 {
@@ -73,7 +75,7 @@ CHIP_ERROR BridgedActionsAttrAccess::ReadClusterRevision(EndpointId endpoint, At
 
 BridgedActionsAttrAccess gAttrAccess;
 
-CHIP_ERROR BridgedActionsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR BridgedActionsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     VerifyOrDie(aPath.mClusterId == BridgedActions::Id);
 

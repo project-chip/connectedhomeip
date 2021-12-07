@@ -140,11 +140,10 @@ bool emberAfDoorLockClusterGetLogRecordCallback(app::CommandHandler * commandObj
     else
     {
         {
-            app::CommandPathParams cmdParams = { emberAfCurrentEndpoint(), /* group id */ 0, ZCL_DOOR_LOCK_CLUSTER_ID,
-                                                 ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID,
-                                                 (app::CommandPathFlags::kEndpointIdValid) };
-            TLV::TLVWriter * writer          = nullptr;
-            SuccessOrExit(err = commandObj->PrepareCommand(cmdParams));
+            app::ConcreteCommandPath path = { emberAfCurrentEndpoint(), ZCL_DOOR_LOCK_CLUSTER_ID,
+                                              ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID };
+            TLV::TLVWriter * writer       = nullptr;
+            SuccessOrExit(err = commandObj->PrepareCommand(path));
             VerifyOrExit((writer = commandObj->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
             SuccessOrExit(err = writer->Put(TLV::ContextTag(0), entry.logEntryId));
             SuccessOrExit(err = writer->Put(TLV::ContextTag(1), entry.timestamp));

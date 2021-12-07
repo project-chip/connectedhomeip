@@ -59,7 +59,7 @@ namespace Messaging {
  *    prior to use.
  *
  */
-ExchangeManager::ExchangeManager() : mDelegate(nullptr), mReliableMessageMgr(mContextPool)
+ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
 {
     mState = State::kState_NotInitialized;
 }
@@ -83,9 +83,10 @@ CHIP_ERROR ExchangeManager::Init(SessionManager * sessionManager)
         handler.Reset();
     }
 
-    sessionManager->SetDelegate(this);
+    sessionManager->RegisterReleaseDelegate(*this);
+    sessionManager->SetMessageDelegate(this);
 
-    mReliableMessageMgr.Init(sessionManager->SystemLayer(), sessionManager);
+    mReliableMessageMgr.Init(sessionManager->SystemLayer());
     ReturnErrorOnFailure(mDefaultExchangeDispatch.Init(mSessionManager));
 
     mState = State::kState_Initialized;
@@ -99,13 +100,14 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
     mContextPool.ForEachActiveObject([](auto * ec) {
         // There should be no active object in the pool
-        assert(false);
-        return true;
+        VerifyOrDie(false);
+        return Loop::Continue;
     });
 
     if (mSessionManager != nullptr)
     {
-        mSessionManager->SetDelegate(nullptr);
+        mSessionManager->SetMessageDelegate(nullptr);
+        mSessionManager->UnregisterReleaseDelegate(*this);
         mSessionManager = nullptr;
     }
 
@@ -116,19 +118,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
 ExchangeContext * ExchangeManager::NewContext(SessionHandle session, ExchangeDelegate * delegate)
 {
-    ExchangeContext * context = mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
-
-    uint32_t mrpIdleInterval   = CHIP_CONFIG_MRP_DEFAULT_IDLE_RETRY_INTERVAL;
-    uint32_t mrpActiveInterval = CHIP_CONFIG_MRP_DEFAULT_ACTIVE_RETRY_INTERVAL;
-
-    session.GetMRPIntervals(GetSessionManager(), mrpIdleInterval, mrpActiveInterval);
-
-    ReliableMessageProtocolConfig mrpConfig;
-    mrpConfig.mIdleRetransTimeoutTick   = mrpIdleInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
-    mrpConfig.mActiveRetransTimeoutTick = mrpActiveInterval >> CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT;
-    context->GetReliableMessageContext()->SetConfig(mrpConfig);
-
-    return context;
+    return mContextPool.CreateObject(this, mNextExchangeId++, session, true, delegate);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandlerForProtocol(Protocols::Id protocolId, ExchangeDelegate * delegate)
@@ -150,16 +140,6 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForProtocol(Proto
 CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandlerForType(Protocols::Id protocolId, uint8_t msgType)
 {
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
-}
-
-void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source)
-{
-#if CHIP_ERROR_LOGGING
-    char srcAddressStr[Transport::PeerAddress::kMaxToStringSize];
-    source.ToString(srcAddressStr);
-
-    ChipLogError(ExchangeManager, "Error receiving message from %s: %s", srcAddressStr, ErrorStr(error));
-#endif // CHIP_ERROR_LOGGING
 }
 
 CHIP_ERROR ExchangeManager::RegisterUMH(Protocols::Id protocolId, int16_t msgType, ExchangeDelegate * delegate)
@@ -241,18 +221,26 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                     ec->SetMsgRcvdFromPeer(true);
                 }
 
+                ChipLogDetail(ExchangeManager, "Found matching exchange: " ChipLogFormatExchange ", Delegate: %p",
+                              ChipLogValueExchange(ec), ec->GetDelegate());
+
                 // Matched ExchangeContext; send to message handler.
                 ec->HandleMessage(packetHeader.GetMessageCounter(), payloadHeader, source, msgFlags, std::move(msgBuf));
                 found = true;
-                return false;
+                return Loop::Break;
             }
-            return true;
+            return Loop::Continue;
         });
 
         if (found)
         {
             return;
         }
+    }
+    else
+    {
+        ChipLogProgress(ExchangeManager, "Received Groupcast Message with GroupId of %d",
+                        packetHeader.GetDestinationGroupId().Value());
     }
 
     // If it's not a duplicate message, search for an unsolicited message handler if it is marked as being sent by an initiator.
@@ -307,7 +295,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
             return;
         }
 
-        ChipLogDetail(ExchangeManager, "Handling via exchange: " ChipLogFormatExchange ", Delegate: 0x%p", ChipLogValueExchange(ec),
+        ChipLogDetail(ExchangeManager, "Handling via exchange: " ChipLogFormatExchange ", Delegate: %p", ChipLogValueExchange(ec),
                       ec->GetDelegate());
 
         if (ec->IsEncryptionRequired() != packetHeader.IsEncrypted())
@@ -326,21 +314,13 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     }
 }
 
-void ExchangeManager::OnNewConnection(SessionHandle session)
+void ExchangeManager::OnSessionReleased(SessionHandle session)
 {
-    if (mDelegate != nullptr)
-    {
-        mDelegate->OnNewConnection(session, this);
-    }
+    ExpireExchangesForSession(session);
 }
 
-void ExchangeManager::OnConnectionExpired(SessionHandle session)
+void ExchangeManager::ExpireExchangesForSession(SessionHandle session)
 {
-    if (mDelegate != nullptr)
-    {
-        mDelegate->OnConnectionExpired(session, this);
-    }
-
     mContextPool.ForEachActiveObject([&](auto * ec) {
         if (ec->mSession.HasValue() && ec->mSession.Value() == session)
         {
@@ -348,7 +328,7 @@ void ExchangeManager::OnConnectionExpired(SessionHandle session)
             // Continue to iterate because there can be multiple exchanges
             // associated with the connection.
         }
-        return true;
+        return Loop::Continue;
     });
 }
 
@@ -364,7 +344,7 @@ void ExchangeManager::CloseAllContextsForDelegate(const ExchangeDelegate * deleg
             ec->SetDelegate(nullptr);
             ec->Close();
         }
-        return true;
+        return Loop::Continue;
     });
 }
 

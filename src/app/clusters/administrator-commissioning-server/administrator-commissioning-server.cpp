@@ -21,19 +21,70 @@
  ***************************************************************************/
 
 #include <app-common/zap-generated/cluster-objects.h>
+#include <app/AttributeAccessInterface.h>
 #include <app/CommandHandler.h>
 #include <app/ConcreteCommandPath.h>
 #include <app/server/Server.h>
 #include <app/util/af.h>
+#include <app/util/attribute-storage.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 #include <setup_payload/SetupPayload.h>
 
 using namespace chip;
+using namespace chip::app;
+using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::AdministratorCommissioning;
 
 // Specifications section 5.4.2.3. Announcement Duration
 constexpr uint32_t kMaxCommissionioningTimeoutSeconds = 15 * 60;
+
+class AdministratorCommissioningAttrAccess : public AttributeAccessInterface
+{
+public:
+    // Register for the OperationalCredentials cluster on all endpoints.
+    AdministratorCommissioningAttrAccess() :
+        AttributeAccessInterface(Optional<EndpointId>::Missing(), Clusters::AdministratorCommissioning::Id)
+    {}
+
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+
+    // Vendor ID and Fabric Index of the admin that has opened the commissioning window
+    uint16_t mVendorId;
+    FabricIndex mFabricIndex;
+};
+
+AdministratorCommissioningAttrAccess gAdminCommissioningAttrAccess;
+
+CHIP_ERROR AdministratorCommissioningAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
+{
+    VerifyOrDie(aPath.mClusterId == Clusters::AdministratorCommissioning::Id);
+
+    switch (aPath.mAttributeId)
+    {
+    case Attributes::WindowStatus::Id: {
+        return aEncoder.Encode(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus());
+    }
+    case Attributes::AdminFabricIndex::Id: {
+        FabricIndex fabricIndex = (Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() ==
+                                   CommissioningWindowStatus::kWindowNotOpen)
+            ? 0
+            : mFabricIndex;
+        return aEncoder.Encode(fabricIndex);
+    }
+    case Attributes::AdminVendorId::Id: {
+        uint16_t vendorId = (Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() ==
+                             CommissioningWindowStatus::kWindowNotOpen)
+            ? 0
+            : mVendorId;
+        return aEncoder.Encode(vendorId);
+    }
+    default:
+        break;
+    }
+
+    return CHIP_NO_ERROR;
+}
 
 bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     app::CommandHandler * commandObj, const app::ConcreteCommandPath & commandPath,
@@ -46,36 +97,49 @@ bool emberAfAdministratorCommissioningClusterOpenCommissioningWindowCallback(
     auto & salt                 = commandData.salt;
     auto & passcodeID           = commandData.passcodeID;
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Optional<StatusCode> status = Optional<StatusCode>::Missing();
     PASEVerifier verifier;
     const uint8_t * verifierData = pakeVerifier.data();
 
     ChipLogProgress(Zcl, "Received command to open commissioning window");
 
-    VerifyOrExit(!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen(),
-                 status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(sizeof(verifier) == pakeVerifier.size(), status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(iterations >= kPBKDFMinimumIterations, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(iterations <= kPBKDFMaximumIterations, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(salt.size() >= kPBKDFMinimumSaltLen, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(salt.size() <= kPBKDFMaximumSaltLen, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(discriminator <= kMaxDiscriminatorValue, status = EMBER_ZCL_STATUS_FAILURE);
+    FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
+    FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+
+    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() ==
+                     CommissioningWindowStatus::kWindowNotOpen,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
+    VerifyOrExit(sizeof(verifier) == pakeVerifier.size(), status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(iterations >= kPBKDFMinimumIterations, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(iterations <= kPBKDFMaximumIterations, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(salt.size() >= kPBKDFMinimumSaltLen, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(salt.size() <= kPBKDFMaximumSaltLen, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(discriminator <= kMaxDiscriminatorValue, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
 
     memcpy(verifier.mW0, &verifierData[0], kSpake2p_WS_Length);
     memcpy(verifier.mL, &verifierData[kSpake2p_WS_Length], kSpake2p_WS_Length);
 
     VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenEnhancedCommissioningWindow(
                      commissioningTimeout, discriminator, verifier, iterations, salt, passcodeID) == CHIP_NO_ERROR,
-                 status = EMBER_ZCL_STATUS_FAILURE);
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     ChipLogProgress(Zcl, "Commissioning window is now open");
 
+    gAdminCommissioningAttrAccess.mFabricIndex = fabricIndex;
+    gAdminCommissioningAttrAccess.mVendorId    = fabricInfo->GetVendorId();
+
 exit:
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status.HasValue())
     {
-        ChipLogError(Zcl, "Failed to open commissioning window. Status %d", status);
+        ChipLogError(Zcl, "Failed to open commissioning window. Status %d", status.Value());
+        commandObj->AddClusterSpecificFailure(commandPath, status.Value());
     }
-    emberAfSendImmediateDefaultResponse(status);
+    else
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    }
     return true;
 }
 
@@ -85,22 +149,36 @@ bool emberAfAdministratorCommissioningClusterOpenBasicCommissioningWindowCallbac
 {
     auto & commissioningTimeout = commandData.commissioningTimeout;
 
-    EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
+    Optional<StatusCode> status = Optional<StatusCode>::Missing();
     ChipLogProgress(Zcl, "Received command to open basic commissioning window");
-    VerifyOrExit(!Server::GetInstance().GetCommissioningWindowManager().IsCommissioningWindowOpen(),
-                 status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds, status = EMBER_ZCL_STATUS_FAILURE);
-    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(commissioningTimeout) ==
-                     CHIP_NO_ERROR,
-                 status = EMBER_ZCL_STATUS_FAILURE);
+
+    FabricIndex fabricIndex = commandObj->GetAccessingFabricIndex();
+    FabricInfo * fabricInfo = Server::GetInstance().GetFabricTable().FindFabricWithIndex(fabricIndex);
+    VerifyOrExit(fabricInfo != nullptr, status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+
+    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() ==
+                     CommissioningWindowStatus::kWindowNotOpen,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_BUSY));
+    VerifyOrExit(commissioningTimeout <= kMaxCommissionioningTimeoutSeconds,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
+    VerifyOrExit(Server::GetInstance().GetCommissioningWindowManager().OpenBasicCommissioningWindow(
+                     commissioningTimeout, CommissioningWindowAdvertisement::kDnssdOnly) == CHIP_NO_ERROR,
+                 status.Emplace(StatusCode::EMBER_ZCL_STATUS_CODE_PAKE_PARAMETER_ERROR));
     ChipLogProgress(Zcl, "Commissioning window is now open");
 
+    gAdminCommissioningAttrAccess.mFabricIndex = fabricIndex;
+    gAdminCommissioningAttrAccess.mVendorId    = fabricInfo->GetVendorId();
+
 exit:
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    if (status.HasValue())
     {
-        ChipLogError(Zcl, "Failed to open commissioning window. Status %d", status);
+        ChipLogError(Zcl, "Failed to open commissioning window. Status %d", status.Value());
+        commandObj->AddClusterSpecificFailure(commandPath, status.Value());
     }
-    emberAfSendImmediateDefaultResponse(status);
+    else
+    {
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    }
     return true;
 }
 
@@ -109,10 +187,24 @@ bool emberAfAdministratorCommissioningClusterRevokeCommissioningCallback(
     const Commands::RevokeCommissioning::DecodableType & commandData)
 {
     ChipLogProgress(Zcl, "Received command to close commissioning window");
-    Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
-    ChipLogProgress(Zcl, "Commissioning window is now closed");
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+
+    if (Server::GetInstance().GetCommissioningWindowManager().CommissioningWindowStatus() ==
+        CommissioningWindowStatus::kWindowNotOpen)
+    {
+        ChipLogError(Zcl, "Commissioning window is currently not open");
+        commandObj->AddClusterSpecificFailure(commandPath, StatusCode::EMBER_ZCL_STATUS_CODE_WINDOW_NOT_OPEN);
+    }
+    else
+    {
+        Server::GetInstance().GetCommissioningWindowManager().CloseCommissioningWindow();
+        ChipLogProgress(Zcl, "Commissioning window is now closed");
+        emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    }
     return true;
 }
 
-void MatterAdministratorCommissioningPluginServerInitCallback() {}
+void MatterAdministratorCommissioningPluginServerInitCallback()
+{
+    emberAfPrintln(EMBER_AF_PRINT_DEBUG, "Initiating Admin Commissioning cluster.");
+    registerAttributeAccessOverride(&gAdminCommissioningAttrAccess);
+}

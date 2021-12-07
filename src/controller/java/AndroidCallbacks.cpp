@@ -44,7 +44,7 @@ GetConnectedDeviceCallback::~GetConnectedDeviceCallback()
     env->DeleteGlobalRef(mJavaCallbackRef);
 }
 
-void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, Device * device)
+void GetConnectedDeviceCallback::OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device)
 {
     JNIEnv * env         = JniReferences::GetInstance().GetEnvForCurrentThread();
     auto * self          = static_cast<GetConnectedDeviceCallback *>(context);

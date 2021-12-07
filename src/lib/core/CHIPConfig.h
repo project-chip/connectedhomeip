@@ -1403,6 +1403,8 @@
  *  @note
  *    WARNING: This option makes it possible to circumvent basic chip security functionality,
  *    including message encryption. Because of this it SHOULD NEVER BE ENABLED IN PRODUCTION BUILDS.
+ *
+ *    To build with this flag, pass 'treat_warnings_as_errors=false' to gn/ninja.
  */
 #ifndef CHIP_CONFIG_SECURITY_TEST_MODE
 #define CHIP_CONFIG_SECURITY_TEST_MODE 0
@@ -1831,6 +1833,18 @@
 #ifndef CHIP_DETAIL_LOGGING
 #define CHIP_DETAIL_LOGGING 1
 #endif // CHIP_DETAIL_LOGGING
+
+/**
+ *  @def CHIP_AUTOMATION_LOGGING
+ *
+ *  @brief
+ *    If asserted (1), enable logging of all messages in the
+ *    chip::Logging::kLogCategory_Automation category.
+ *
+ */
+#ifndef CHIP_AUTOMATION_LOGGING
+#define CHIP_AUTOMATION_LOGGING 1
+#endif // CHIP_AUTOMATION_LOGGING
 
 /**
  * CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE
@@ -2407,13 +2421,13 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  *    The following definitions sets the maximum number of corresponding interaction model object pool size.
  *
  *      * #CHIP_IM_MAX_NUM_COMMAND_HANDLER
- *      * #CHIP_IM_MAX_NUM_COMMAND_SENDER
  *      * #CHIP_IM_MAX_NUM_READ_HANDLER
  *      * #CHIP_IM_MAX_NUM_READ_CLIENT
  *      * #CHIP_IM_MAX_REPORTS_IN_FLIGHT
  *      * #CHIP_IM_SERVER_MAX_NUM_PATH_GROUPS
  *      * #CHIP_IM_MAX_NUM_WRITE_HANDLER
  *      * #CHIP_IM_MAX_NUM_WRITE_CLIENT
+ *      * #CHIP_IM_MAX_NUM_TIMED_HANDLER
  *
  *  @{
  */
@@ -2425,15 +2439,6 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_COMMAND_HANDLER
 #define CHIP_IM_MAX_NUM_COMMAND_HANDLER 4
-#endif
-
-/**
- * @def CHIP_IM_MAX_NUM_COMMAND_SENDER
- *
- * @brief Defines the maximum number of CommandSender, limits the number of active command transactions on client.
- */
-#ifndef CHIP_IM_MAX_NUM_COMMAND_SENDER
-#define CHIP_IM_MAX_NUM_COMMAND_SENDER 4
 #endif
 
 /**
@@ -2488,6 +2493,26 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
  */
 #ifndef CHIP_IM_MAX_NUM_WRITE_CLIENT
 #define CHIP_IM_MAX_NUM_WRITE_CLIENT 4
+#endif
+
+/**
+ * @def CHIP_IM_MAX_NUM_TIMED_HANDLER
+ *
+ * @brief Defines the maximum number of TimedHandler, limits the number of
+ *        active timed interactions waiting for the Invoke or Write.
+ */
+#ifndef CHIP_IM_MAX_NUM_TIMED_HANDLER
+#define CHIP_IM_MAX_NUM_TIMED_HANDLER 8
+#endif
+
+/**
+ * @def CONFIG_IM_BUILD_FOR_UNIT_TEST
+ *
+ * @brief Defines whether we're currently building the IM for unit testing, which enables a set of features
+ *        that are only utilized in those tests.
+ */
+#ifndef CONFIG_IM_BUILD_FOR_UNIT_TEST
+#define CONFIG_IM_BUILD_FOR_UNIT_TEST 0
 #endif
 
 /**
@@ -2572,13 +2597,139 @@ extern const char CHIP_NON_PRODUCTION_MARKER[];
 #endif
 
 /**
- * @def CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
+ * @def CHIP_CONFIG_MAX_GROUP_NAME_LENGTH
  *
- * @brief Enable or disable attribute read with complex type.
- *
+ * @brief Defines the maximum length of the group names
  */
-#ifndef CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ
-#define CHIP_CLUSTER_CONFIG_ENABLE_COMPLEX_ATTRIBUTE_READ 1
+#ifndef CHIP_CONFIG_MAX_GROUP_NAME_LENGTH
+#define CHIP_CONFIG_MAX_GROUP_NAME_LENGTH 16
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC
+ *
+ * Defines the number of access control entries supported per fabric in the
+ * example access control code.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_ENTRIES_PER_FABRIC 3
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY
+ *
+ * Defines the number of access control subjects supported per entry in the
+ * example access control code.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_SUBJECTS_PER_ENTRY 4
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY
+ *
+ * Defines the number of access control targets supported per entry in the
+ * example access control code.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_MAX_TARGETS_PER_ENTRY 3
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORAGE_POOL_SIZE
+ *
+ * Defines the entry storage pool size in the example access control code.
+ * It's possible to get by with only one.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORAGE_POOL_SIZE
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_STORAGE_POOL_SIZE 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_DELEGATE_POOL_SIZE
+ *
+ * Defines the entry delegate pool size in the example access control code.
+ * It's possible to get by with only one.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_DELEGATE_POOL_SIZE
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_DELEGATE_POOL_SIZE 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_ITERATOR_DELEGATE_POOL_SIZE
+ *
+ * Defines the entry iterator delegate pool size in the example access control code.
+ * It's possible to get by with only one.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_ITERATOR_DELEGATE_POOL_SIZE
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_ENTRY_ITERATOR_DELEGATE_POOL_SIZE 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT
+ *
+ * Support fast copy in the example access control implementation.
+ *
+ * At least one of "fast" or "flexible" copy support must be enabled.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT 1
+#endif
+
+/**
+ * @def CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
+ *
+ * Support flexible copy in the example access control implementation.
+ *
+ * Only needed if mixing the example access control implementation with other
+ * non-example access control delegate implementations; omitting it saves space.
+ *
+ * At least one of "fast" or "flexible" copy support must be enabled.
+ */
+#ifndef CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
+#define CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT 0
+#endif
+
+#if !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT && !CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT
+#error                                                                                                                             \
+    "Please enable at least one of CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FAST_COPY_SUPPORT or CHIP_CONFIG_EXAMPLE_ACCESS_CONTROL_FLEXIBLE_COPY_SUPPORT"
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES
+ *
+ * @brief Defines the max number of SessionCreationDelegates
+ */
+#ifndef CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES
+#define CHIP_CONFIG_MAX_SESSION_CREATION_DELEGATES 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
+ *
+ * @brief Defines the max number of SessionReleaseDelegate
+ */
+#ifndef CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES
+#define CHIP_CONFIG_MAX_SESSION_RELEASE_DELEGATES 2
+#endif
+
+/**
+ * @def CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
+ *
+ * @brief Defines the max number of SessionRecoveryDelegate
+ */
+#ifndef CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES
+#define CHIP_CONFIG_MAX_SESSION_RECOVERY_DELEGATES 3
+#endif
+
+/**
+ * @def CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
+ *
+ * @brief
+ *   Maximum number of CASE sessions that a device caches, that can be resumed
+ */
+#ifndef CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE
+#define CHIP_CONFIG_CASE_SESSION_RESUME_CACHE_SIZE 4
 #endif
 
 /**

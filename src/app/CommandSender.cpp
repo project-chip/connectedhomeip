@@ -26,14 +26,16 @@
 #include "Command.h"
 #include "CommandHandler.h"
 #include "InteractionModelEngine.h"
+#include "StatusResponse.h"
+#include <app/TimedRequest.h>
 #include <protocols/Protocols.h>
 #include <protocols/interaction_model/Constants.h>
 
 namespace chip {
 namespace app {
 
-CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr) :
-    mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(false), mTimedRequest(false)
+CommandSender::CommandSender(Callback * apCallback, Messaging::ExchangeManager * apExchangeMgr, bool aIsTimedRequest) :
+    mpCallback(apCallback), mpExchangeMgr(apExchangeMgr), mSuppressResponse(false), mTimedRequest(aIsTimedRequest)
 {}
 
 CHIP_ERROR CommandSender::AllocateBuffer()
@@ -63,53 +65,88 @@ CHIP_ERROR CommandSender::AllocateBuffer()
 
 CHIP_ERROR CommandSender::SendCommandRequest(SessionHandle session, System::Clock::Timeout timeout)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferHandle commandPacket;
+    VerifyOrReturnError(mState == CommandState::AddedCommand, CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(mState == CommandState::AddedCommand, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err = Finalize(commandPacket);
-    SuccessOrExit(err);
+    ReturnErrorOnFailure(Finalize(mPendingInvokeData));
 
     // Create a new exchange context.
     mpExchangeCtx = mpExchangeMgr->NewContext(session, this);
-    VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(mpExchangeCtx != nullptr, CHIP_ERROR_NO_MEMORY);
 
     mpExchangeCtx->SetResponseTimeout(timeout);
 
-    err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::InvokeCommandRequest, std::move(commandPacket),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
-    SuccessOrExit(err);
+    if (mTimedInvokeTimeoutMs.HasValue())
+    {
+        ReturnErrorOnFailure(TimedRequest::Send(mpExchangeCtx, mTimedInvokeTimeoutMs.Value()));
+        MoveToState(CommandState::AwaitingTimedStatus);
+        return CHIP_NO_ERROR;
+    }
 
+    return SendInvokeRequest();
+}
+
+CHIP_ERROR CommandSender::SendInvokeRequest()
+{
+    using namespace Protocols::InteractionModel;
+    using namespace Messaging;
+
+    ReturnErrorOnFailure(mpExchangeCtx->SendMessage(MsgType::InvokeCommandRequest, std::move(mPendingInvokeData),
+                                                    SendMessageFlags::kExpectResponse));
     MoveToState(CommandState::CommandSent);
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR CommandSender::OnMessageReceived(Messaging::ExchangeContext * apExchangeContext, const PayloadHeader & aPayloadHeader,
                                             System::PacketBufferHandle && aPayload)
 {
+    if (mState == CommandState::CommandSent)
+    {
+        MoveToState(CommandState::ResponseReceived);
+    }
+
     CHIP_ERROR err = CHIP_NO_ERROR;
-
+    StatusIB status(Protocols::InteractionModel::Status::Failure);
     VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse),
-                 err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
-    err = ProcessInvokeResponse(std::move(aPayload));
+    if (mState == CommandState::AwaitingTimedStatus)
+    {
+        err = HandleTimedStatus(aPayloadHeader, std::move(aPayload), status);
+        // Skip all other processing here (which is for the response to the
+        // invoke request), no matter whether err is success or not.
+        goto exit;
+    }
+
+    if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::InvokeCommandResponse))
+    {
+        err = ProcessInvokeResponse(std::move(aPayload));
+        SuccessOrExit(err);
+        status.mStatus = Protocols::InteractionModel::Status::Success;
+    }
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+    {
+        err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
+    }
 
 exit:
     if (mpCallback != nullptr)
     {
         if (err != CHIP_NO_ERROR)
         {
-            StatusIB status;
-            status.mStatus = Protocols::InteractionModel::Status::Failure;
             mpCallback->OnError(this, status, err);
         }
     }
 
-    Close();
+    if (mState != CommandState::CommandSent)
+    {
+        Close();
+    }
+    // Else we got a response to a Timed Request and just sent the invoke.
 
     return err;
 }
@@ -120,7 +157,7 @@ CHIP_ERROR CommandSender::ProcessInvokeResponse(System::PacketBufferHandle && pa
     System::PacketBufferTLVReader reader;
     TLV::TLVReader invokeResponsesReader;
     InvokeResponseMessage::Parser invokeResponseMessage;
-    InvokeResponses::Parser invokeResponses;
+    InvokeResponseIBs::Parser invokeResponses;
     bool suppressResponse = false;
 
     reader.Init(std::move(payload));
@@ -263,23 +300,23 @@ CHIP_ERROR CommandSender::ProcessInvokeResponseIB(InvokeResponseIB::Parser & aIn
 
 CHIP_ERROR CommandSender::PrepareCommand(const CommandPathParams & aCommandPathParams, bool aStartDataStruct)
 {
-    CommandDataIB::Builder commandData;
     ReturnLogErrorOnFailure(AllocateBuffer());
 
     //
     // We must not be in the middle of preparing a command, or having prepared or sent one.
     //
     VerifyOrReturnError(mState == CommandState::Idle, CHIP_ERROR_INCORRECT_STATE);
-
-    commandData = mInvokeRequestBuilder.GetInvokeRequests().CreateCommandData();
-    ReturnLogErrorOnFailure(commandData.GetError());
-
-    ReturnLogErrorOnFailure(ConstructCommandPath(aCommandPathParams, commandData.CreatePath()));
+    InvokeRequests::Builder & invokeRequests = mInvokeRequestBuilder.GetInvokeRequests();
+    CommandDataIB::Builder & invokeRequest   = invokeRequests.CreateCommandData();
+    ReturnErrorOnFailure(invokeRequests.GetError());
+    CommandPathIB::Builder & path = invokeRequest.CreatePath();
+    ReturnErrorOnFailure(invokeRequest.GetError());
+    ReturnErrorOnFailure(path.Encode(aCommandPathParams));
 
     if (aStartDataStruct)
     {
-        ReturnLogErrorOnFailure(commandData.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)),
-                                                                        TLV::kTLVType_Structure, mDataElementContainerType));
+        ReturnLogErrorOnFailure(invokeRequest.GetWriter()->StartContainer(TLV::ContextTag(to_underlying(CommandDataIB::Tag::kData)),
+                                                                          TLV::kTLVType_Structure, mDataElementContainerType));
     }
 
     MoveToState(CommandState::AddingCommand);
@@ -318,6 +355,29 @@ TLV::TLVWriter * CommandSender::GetCommandDataIBTLVWriter()
     {
         return mInvokeRequestBuilder.GetInvokeRequests().GetCommandData().GetWriter();
     }
+}
+
+CHIP_ERROR CommandSender::HandleTimedStatus(const PayloadHeader & aPayloadHeader, System::PacketBufferHandle && aPayload,
+                                            StatusIB & aStatusIB)
+{
+    ReturnErrorOnFailure(TimedRequest::HandleResponse(aPayloadHeader, std::move(aPayload), aStatusIB));
+
+    return SendInvokeRequest();
+}
+
+CHIP_ERROR CommandSender::FinishCommand(const Optional<uint16_t> & aTimedInvokeTimeoutMs)
+{
+    ReturnErrorOnFailure(FinishCommand(/* aEndDataStruct = */ false));
+    if (!mTimedInvokeTimeoutMs.HasValue())
+    {
+        mTimedInvokeTimeoutMs = aTimedInvokeTimeoutMs;
+    }
+    else if (aTimedInvokeTimeoutMs.HasValue())
+    {
+        uint16_t newValue = std::min(mTimedInvokeTimeoutMs.Value(), aTimedInvokeTimeoutMs.Value());
+        mTimedInvokeTimeoutMs.SetValue(newValue);
+    }
+    return CHIP_NO_ERROR;
 }
 
 } // namespace app

@@ -28,6 +28,7 @@
 #include <utility>
 
 #include <inet/IPAddress.h>
+#include <inet/IPPacketInfo.h>
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <lib/core/CHIPCore.h>
@@ -40,11 +41,11 @@ namespace Transport {
 class UdpListenParameters
 {
 public:
-    explicit UdpListenParameters(Inet::InetLayer * layer) : mLayer(layer) {}
+    explicit UdpListenParameters(Inet::InetLayer * inetLayer) : mEndPointManager(inetLayer->GetUDPEndPointManager()) {}
     UdpListenParameters(const UdpListenParameters &) = default;
     UdpListenParameters(UdpListenParameters &&)      = default;
 
-    Inet::InetLayer * GetInetLayer() { return mLayer; }
+    Inet::EndPointManager<Inet::UDPEndPoint> * GetEndPointManager() { return mEndPointManager; }
 
     Inet::IPAddressType GetAddressType() const { return mAddressType; }
     UdpListenParameters & SetAddressType(Inet::IPAddressType type)
@@ -71,7 +72,7 @@ public:
     }
 
 private:
-    Inet::InetLayer * mLayer         = nullptr;                    ///< Associated inet layer
+    Inet::EndPointManager<Inet::UDPEndPoint> * mEndPointManager;   ///< Associated endpoint factory
     Inet::IPAddressType mAddressType = Inet::IPAddressType::kIPv6; ///< type of listening socket
     uint16_t mListenPort             = CHIP_PORT;                  ///< UDP listen port
     Inet::InterfaceId mInterfaceId   = Inet::InterfaceId::Null();  ///< Interface to listen on
@@ -113,6 +114,13 @@ public:
     void Close() override;
 
     CHIP_ERROR SendMessage(const Transport::PeerAddress & address, System::PacketBufferHandle && msgBuf) override;
+
+    CHIP_ERROR MulticastGroupJoinLeave(const Transport::PeerAddress & address, bool join) override;
+
+    bool CanListenMulticast() override
+    {
+        return (mState == State::kInitialized) && (mUDPEndpointType == Inet::IPAddressType::kIPv6);
+    }
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override
     {

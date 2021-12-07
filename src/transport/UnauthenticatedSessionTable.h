@@ -22,6 +22,7 @@
 #include <lib/support/Pool.h>
 #include <lib/support/ReferenceCountedHandle.h>
 #include <lib/support/logging/CHIPLogging.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 #include <system/TimeSource.h>
 #include <transport/MessageCounter.h>
 #include <transport/PeerMessageCounter.h>
@@ -47,7 +48,9 @@ public:
 class UnauthenticatedSession : public ReferenceCounted<UnauthenticatedSession, UnauthenticatedSessionDeleter, 0>
 {
 public:
-    UnauthenticatedSession(const PeerAddress & address) : mPeerAddress(address) {}
+    UnauthenticatedSession(const PeerAddress & address, const ReliableMessageProtocolConfig & config) :
+        mPeerAddress(address), mMRPConfig(config)
+    {}
 
     UnauthenticatedSession(const UnauthenticatedSession &) = delete;
     UnauthenticatedSession & operator=(const UnauthenticatedSession &) = delete;
@@ -59,17 +62,9 @@ public:
 
     const PeerAddress & GetPeerAddress() const { return mPeerAddress; }
 
-    void GetMRPIntervals(uint32_t & idleInterval, uint32_t & activeInterval)
-    {
-        idleInterval   = mMRPIdleInterval;
-        activeInterval = mMRPActiveInterval;
-    }
+    void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
-    void SetMRPIntervals(uint32_t idleInterval, uint32_t activeInterval)
-    {
-        mMRPIdleInterval   = idleInterval;
-        mMRPActiveInterval = activeInterval;
-    }
+    const ReliableMessageProtocolConfig & GetMRPConfig() const { return mMRPConfig; }
 
     PeerMessageCounter & GetPeerMessageCounter() { return mPeerMessageCounter; }
 
@@ -77,8 +72,7 @@ private:
     System::Clock::Timestamp mLastActivityTime = System::Clock::kZero;
 
     const PeerAddress mPeerAddress;
-    uint32_t mMRPIdleInterval   = 0;
-    uint32_t mMRPActiveInterval = 0;
+    ReliableMessageProtocolConfig mMRPConfig;
     PeerMessageCounter mPeerMessageCounter;
 };
 
@@ -100,13 +94,14 @@ public:
      * @return the session found or allocated, nullptr if not found and allocation failed.
      */
     CHECK_RETURN_VALUE
-    Optional<UnauthenticatedSessionHandle> FindOrAllocateEntry(const PeerAddress & address)
+    Optional<UnauthenticatedSessionHandle> FindOrAllocateEntry(const PeerAddress & address,
+                                                               const ReliableMessageProtocolConfig & config)
     {
         UnauthenticatedSession * result = FindEntry(address);
         if (result != nullptr)
             return MakeOptional<UnauthenticatedSessionHandle>(*result);
 
-        CHIP_ERROR err = AllocEntry(address, result);
+        CHIP_ERROR err = AllocEntry(address, config, result);
         if (err == CHIP_NO_ERROR)
         {
             return MakeOptional<UnauthenticatedSessionHandle>(*result);
@@ -134,9 +129,10 @@ private:
      * CHIP_ERROR_NO_MEMORY).
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR AllocEntry(const PeerAddress & address, UnauthenticatedSession *& entry)
+    CHIP_ERROR AllocEntry(const PeerAddress & address, const ReliableMessageProtocolConfig & config,
+                          UnauthenticatedSession *& entry)
     {
-        entry = mEntries.CreateObject(address);
+        entry = mEntries.CreateObject(address, config);
         if (entry != nullptr)
             return CHIP_NO_ERROR;
 
@@ -146,7 +142,7 @@ private:
             return CHIP_ERROR_NO_MEMORY;
         }
 
-        mEntries.ResetObject(entry, address);
+        mEntries.ResetObject(entry, address, config);
         return CHIP_NO_ERROR;
     }
 
@@ -163,9 +159,9 @@ private:
             if (MatchPeerAddress(entry->GetPeerAddress(), address))
             {
                 result = entry;
-                return false;
+                return Loop::Break;
             }
-            return true;
+            return Loop::Continue;
         });
         return result;
     }
@@ -181,7 +177,7 @@ private:
                 result     = entry;
                 oldestTime = entry->GetLastActivityTime();
             }
-            return true;
+            return Loop::Continue;
         });
 
         return result;
@@ -227,7 +223,7 @@ private:
     }
 
     Time::TimeSource<Time::Source::kSystem> mTimeSource;
-    BitMapObjectPool<UnauthenticatedSession, kMaxSessionCount> mEntries;
+    BitMapObjectPool<UnauthenticatedSession, kMaxSessionCount, OnObjectPoolDestruction::IgnoreUnsafeDoNotUseInNewCode> mEntries;
 };
 
 } // namespace Transport

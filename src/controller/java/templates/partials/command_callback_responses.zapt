@@ -1,0 +1,27 @@
+{{#chip_cluster_response_arguments}}
+{{#if isNullable}}
+  {{#unless isArray}}
+  {{#unless isOptional}}
+  {{#if_is_struct type}}
+  {{else}}
+  @Nullable
+  {{/if_is_struct}}
+  {{/unless}}
+  {{/unless}}
+{{/if}}
+{{#if isArray}}
+  // {{asSymbol label}}: {{asUnderlyingZclType type}}
+  // Conversion from this type to Java is not properly implemented yet
+{{else}}
+{{#if_is_struct type}}
+  // {{asSymbol label}}: Struct {{type}}
+  // Conversion from this type to Java is not properly implemented yet
+{{else if (isOctetString type)}}
+  {{#if isOptional}}Optional<{{/if}}byte[]{{#if isOptional}}>{{/if}} {{asSymbol label}}{{#notLastSupportedCommandResponseType parent.arguments}},{{/notLastSupportedCommandResponseType}}
+{{else if (isShortString type)}}
+  {{#if isOptional}}Optional<{{/if}}String{{#if isOptional}}>{{/if}} {{asSymbol label}}{{#notLastSupportedCommandResponseType parent.arguments}},{{/notLastSupportedCommandResponseType}}
+{{else}}
+  {{#if isOptional}}Optional<{{/if}}{{asJavaBasicTypeForZclType type true}}{{#if isOptional}}>{{/if}} {{asSymbol label}}{{#notLastSupportedCommandResponseType parent.arguments}},{{/notLastSupportedCommandResponseType}}
+{{/if_is_struct}}
+{{/if}}
+{{/chip_cluster_response_arguments}}

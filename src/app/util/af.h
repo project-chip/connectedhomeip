@@ -72,6 +72,7 @@
 #include <app/util/debug-printing.h>
 #include <app/util/ember-print.h>
 
+#include <lib/support/Iterators.h>
 #include <lib/support/SafeInt.h>
 
 /** @name Attribute Storage */
@@ -146,6 +147,35 @@ bool emberAfContainsServerWithMfgCode(chip::EndpointId endpoint, chip::ClusterId
  * and will not return any other clusters that share that id.
  */
 bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId);
+
+/**
+ * @brief Returns true if endpoint of given index contains the ZCL server with specified id.
+ *
+ * This function returns true if
+ * the endpoint of given index contains server of a given cluster.
+ * If this function is used with a manufacturer specific clusterId
+ * then this will return the first cluster that it finds in the Cluster table.
+ * and will not return any other clusters that share that id.
+ */
+bool emberAfContainsServerFromIndex(uint16_t index, chip::ClusterId clusterId);
+
+namespace chip {
+namespace app {
+
+using EndpointCallback = Loop (*)(EndpointId endpoint, intptr_t context);
+
+/**
+ * @brief calls user-supplied function for every endpoint that has the given
+ * server cluster, until either the function returns Loop::Break or we run out
+ * of endpoints.
+ *
+ * Returns Loop::Break if the callee did, or Loop::Finished if we ran out of
+ * endpoints.
+ */
+Loop ForAllEndpointsWithServerCluster(ClusterId clusterId, EndpointCallback callback, intptr_t context = 0);
+
+} // namespace app
+} // namespace chip
 
 /**
  * @brief Returns true if endpoint contains cluster client.
@@ -363,13 +393,6 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
 #define emberAfClusterIsManufacturerSpecific(cluster) ((cluster)->clusterId >= 0xFC00)
 
 /**
- * @brief macro that returns true if attribute is read only.
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsReadOnly(metadata) (((metadata)->mask & ATTRIBUTE_MASK_WRITABLE) == 0)
-
-/**
  * @brief macro that returns true if client attribute, and false if server.
  *
  * @param metadata EmberAfAttributeMetadata* to consider.
@@ -396,13 +419,6 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
  * @param metadata EmberAfAttributeMetadata* to consider.
  */
 #define emberAfAttributeIsSingleton(metadata) (((metadata)->mask & ATTRIBUTE_MASK_SINGLETON) != 0)
-
-/**
- * @brief macro that returns true if attribute is manufacturer specific
- *
- * @param metadata EmberAfAttributeMetadata* to consider.
- */
-#define emberAfAttributeIsManufacturerSpecific(metadata) (((metadata)->mask & ATTRIBUTE_MASK_MANUFACTURER_SPECIFIC) != 0)
 
 /**
  * @brief macro that returns size of attribute in bytes.
@@ -728,7 +744,7 @@ uint8_t emberAfGetLastSequenceNumber(void);
  *          greater than 4 is being compared
  *          1, if val2 is smaller.
  */
-int8_t emberAfCompareValues(uint8_t * val1, uint8_t * val2, uint16_t len, bool signedNumber);
+int8_t emberAfCompareValues(const uint8_t * val1, const uint8_t * val2, uint16_t len, bool signedNumber);
 
 /**
  * @brief populates the passed EUI64 with the local EUI64 MAC address.

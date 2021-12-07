@@ -84,9 +84,21 @@ CHIP_ERROR EventReportIB::Parser::CheckSchemaValidity() const
 
     if (CHIP_END_OF_TLV == err)
     {
-        const int RequiredFields = (1 << to_underlying(Tag::kEventData)) | (1 << to_underlying(Tag::kEventStatus));
+        // check for at most field:
+        const int CheckDataField   = 1 << to_underlying(Tag::kEventData);
+        const int CheckStatusField = (1 << to_underlying(Tag::kEventStatus));
 
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
+        if ((TagPresenceMask & CheckDataField) == CheckDataField && (TagPresenceMask & CheckStatusField) == CheckStatusField)
+        {
+            // kEventData and kEventStatus both exist
+            err = CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB;
+        }
+        else if ((TagPresenceMask & CheckDataField) != CheckDataField && (TagPresenceMask & CheckStatusField) != CheckStatusField)
+        {
+            // kEventData and kErrorStatus not exist
+            err = CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB;
+        }
+        else
         {
             err = CHIP_NO_ERROR;
         }

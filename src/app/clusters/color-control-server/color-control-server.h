@@ -140,7 +140,7 @@ public:
      * Functions Definitions
      *********************************************************/
     static ColorControlServer & Instance();
-    void stopAllColorTransitions(chip::EndpointId endpoint);
+    EmberAfStatus stopAllColorTransitions(chip::EndpointId endpoint);
     bool stopMoveStepCommand(uint8_t optionsMask, uint8_t optionsOverride);
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
@@ -220,7 +220,7 @@ private:
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     Color16uTransitionState * getTempTransitionState(chip::EndpointId endpoint);
-    void moveToColorTemp(chip::EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime);
+    EmberAfStatus moveToColorTemp(chip::EndpointId aEndpoint, uint16_t colorTemperature, uint16_t transitionTime);
     uint16_t getTemperatureCoupleToLevelMin(chip::EndpointId endpoint);
     EmberEventControl * configureTempEventControl(chip::EndpointId);
 #endif // EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP

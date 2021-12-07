@@ -19,13 +19,9 @@
 #include <lib/support/CHIPJNIError.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/JniReferences.h>
+#include <lib/support/JniTypeWrappers.h>
 
 namespace chip {
-
-pthread_mutex_t * JniReferences::GetStackLock()
-{
-    return &mStackLock;
-}
 
 void JniReferences::SetJavaVm(JavaVM * jvm, const char * clsType)
 {
@@ -181,6 +177,102 @@ void JniReferences::ThrowError(JNIEnv * env, jclass exceptionCls, CHIP_ERROR err
     jthrowable outEx = (jthrowable) env->NewObject(exceptionCls, constructor, static_cast<jint>(errToThrow.AsInteger()), jerrStr);
     VerifyOrReturn(!env->ExceptionCheck());
     env->Throw(outEx);
+}
+
+CHIP_ERROR JniReferences::CreateOptional(jobject objectToWrap, jobject & outOptional)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass optionalCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/util/Optional", optionalCls);
+    VerifyOrReturnError(optionalCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    chip::JniClass jniClass(optionalCls);
+
+    jmethodID ofMethod = env->GetStaticMethodID(optionalCls, "ofNullable", "(Ljava/lang/Object;)Ljava/util/Optional;");
+    VerifyOrReturnError(ofMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+    outOptional = env->CallStaticObjectMethod(optionalCls, ofMethod, objectToWrap);
+
+    VerifyOrReturnError(!env->ExceptionCheck(), CHIP_JNI_ERROR_EXCEPTION_THROWN);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR JniReferences::GetOptionalValue(jobject optionalObj, jobject & optionalValue)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass optionalCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/util/Optional", optionalCls);
+    VerifyOrReturnError(optionalCls != nullptr, CHIP_JNI_ERROR_TYPE_NOT_FOUND);
+    chip::JniClass jniClass(optionalCls);
+
+    jmethodID isPresentMethod = env->GetMethodID(optionalCls, "isPresent", "()Z");
+    VerifyOrReturnError(isPresentMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+    jboolean isPresent = env->CallBooleanMethod(optionalObj, isPresentMethod);
+
+    if (!isPresent)
+    {
+        optionalValue = nullptr;
+        return CHIP_NO_ERROR;
+    }
+
+    jmethodID getMethod = env->GetMethodID(optionalCls, "get", "()Ljava/lang/Object;");
+    VerifyOrReturnError(getMethod != nullptr, CHIP_JNI_ERROR_METHOD_NOT_FOUND);
+    optionalValue = env->CallObjectMethod(optionalObj, getMethod);
+    return CHIP_NO_ERROR;
+}
+
+jint JniReferences::IntegerToPrimitive(jobject boxedInteger)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass boxedTypeCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Integer", boxedTypeCls);
+    chip::JniClass jniClass(boxedTypeCls);
+
+    jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "intValue", "()I");
+    return env->CallIntMethod(boxedInteger, valueMethod);
+}
+
+jlong JniReferences::LongToPrimitive(jobject boxedLong)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass boxedTypeCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Long", boxedTypeCls);
+    chip::JniClass jniClass(boxedTypeCls);
+
+    jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "longValue", "()J");
+    return env->CallLongMethod(boxedLong, valueMethod);
+}
+
+jboolean JniReferences::BooleanToPrimitive(jobject boxedBoolean)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass boxedTypeCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Boolean", boxedTypeCls);
+    chip::JniClass jniClass(boxedTypeCls);
+
+    jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "booleanValue", "()Z");
+    return env->CallBooleanMethod(boxedBoolean, valueMethod);
+}
+
+jfloat JniReferences::FloatToPrimitive(jobject boxedFloat)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass boxedTypeCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Float", boxedTypeCls);
+    chip::JniClass jniClass(boxedTypeCls);
+
+    jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "floatValue", "()F");
+    return env->CallFloatMethod(boxedFloat, valueMethod);
+}
+
+jdouble JniReferences::DoubleToPrimitive(jobject boxedDouble)
+{
+    JNIEnv * env = GetEnvForCurrentThread();
+    jclass boxedTypeCls;
+    chip::JniReferences::GetInstance().GetClassRef(env, "java/lang/Double", boxedTypeCls);
+    chip::JniClass jniClass(boxedTypeCls);
+
+    jmethodID valueMethod = env->GetMethodID(boxedTypeCls, "doubleValue", "()D");
+    return env->CallDoubleMethod(boxedDouble, valueMethod);
 }
 
 } // namespace chip

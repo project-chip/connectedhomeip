@@ -62,15 +62,6 @@ CHIP_ERROR SetUpCodePairer::Connect(RendezvousInformationFlag rendezvousInformat
         VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err, err);
     }
 
-    if (searchOverAll || rendezvousInformation == RendezvousInformationFlag::kOnNetwork)
-    {
-        if (CHIP_NO_ERROR == (err = StartDiscoverOverIP(discriminator, isShort)))
-        {
-            isRunning = true;
-        }
-        VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err, err);
-    }
-
     if (searchOverAll || rendezvousInformation == RendezvousInformationFlag::kSoftAP)
     {
         if (CHIP_NO_ERROR == (err = StartDiscoverOverSoftAP(discriminator, isShort)))
@@ -79,6 +70,15 @@ CHIP_ERROR SetUpCodePairer::Connect(RendezvousInformationFlag rendezvousInformat
         }
         VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err, err);
     }
+
+    // We always want to search on network because any node that has already been commissioned will use on-network regardless of the
+    // QR code flag.
+    if (CHIP_NO_ERROR ==
+        (err = StartDiscoverOverIP(isShort ? static_cast<uint16_t>((discriminator >> 8) & 0x0F) : discriminator, isShort)))
+    {
+        isRunning = true;
+    }
+    VerifyOrReturnError(searchOverAll || CHIP_NO_ERROR == err, err);
 
     return isRunning ? CHIP_NO_ERROR : CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
@@ -107,9 +107,9 @@ CHIP_ERROR SetUpCodePairer::StopConnectOverBle()
 CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(uint16_t discriminator, bool isShort)
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    mCommissioner->RegisterDeviceDiscoveryDelegate(this);
-    Dnssd::DiscoveryFilter filter(isShort ? Dnssd::DiscoveryFilterType::kShort : Dnssd::DiscoveryFilterType::kLong, discriminator);
-    return mCommissioner->DiscoverCommissionableNodes(filter);
+    currentFilter.type = isShort ? Dnssd::DiscoveryFilterType::kShort : Dnssd::DiscoveryFilterType::kLong;
+    currentFilter.code = discriminator;
+    return mCommissioner->DiscoverCommissionableNodes(currentFilter);
 #else
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
@@ -118,7 +118,7 @@ CHIP_ERROR SetUpCodePairer::StartDiscoverOverIP(uint16_t discriminator, bool isS
 CHIP_ERROR SetUpCodePairer::StopConnectOverIP()
 {
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-    mCommissioner->RegisterDeviceDiscoveryDelegate(nullptr);
+    currentFilter.type = Dnssd::DiscoveryFilterType::kNone;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_DNSSD
     return CHIP_NO_ERROR;
 }
@@ -161,8 +161,27 @@ void SetUpCodePairer::OnDiscoveredDeviceOverBleError(void * appState, CHIP_ERROR
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 #if CHIP_DEVICE_CONFIG_ENABLE_DNSSD
-void SetUpCodePairer::OnDiscoveredDevice(const Dnssd::DiscoveredNodeData & nodeData)
+
+bool SetUpCodePairer::NodeMatchesCurrentFilter(const Dnssd::DiscoveredNodeData & nodeData)
 {
+    switch (currentFilter.type)
+    {
+    case Dnssd::DiscoveryFilterType::kShort:
+        return ((nodeData.longDiscriminator >> 8) & 0x0F) == currentFilter.code;
+    case Dnssd::DiscoveryFilterType::kLong:
+        return nodeData.longDiscriminator == currentFilter.code;
+    default:
+        return false;
+    }
+    return false;
+}
+
+void SetUpCodePairer::NotifyCommissionableDeviceDiscovered(const Dnssd::DiscoveredNodeData & nodeData)
+{
+    if (!NodeMatchesCurrentFilter(nodeData))
+    {
+        return;
+    }
     LogErrorOnFailure(StopConnectOverBle());
     LogErrorOnFailure(StopConnectOverIP());
     LogErrorOnFailure(StopConnectOverSoftAP());

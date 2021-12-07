@@ -27,10 +27,9 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "InetInterface.h"
+#include <inet/InetInterface.h>
 
-#include "InetLayer.h"
-
+#include <inet/IPPrefix.h>
 #include <lib/support/CHIPMemString.h>
 #include <lib/support/CodeUtils.h>
 #include <lib/support/DLLUtil.h>
@@ -49,13 +48,9 @@
 #ifdef HAVE_SYS_SOCKIO_H
 #include <sys/sockio.h>
 #endif /* HAVE_SYS_SOCKIO_H */
+#include <ifaddrs.h>
 #include <net/if.h>
 #include <sys/ioctl.h>
-#ifdef __ANDROID__
-#include "ifaddrs-android.h"
-#else // !defined(__ANDROID__)
-#include <ifaddrs.h>
-#endif // !defined(__ANDROID__)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
@@ -170,6 +165,16 @@ bool InterfaceIterator::HasBroadcastAddress()
     return HasCurrent() && (mCurNetif->flags & NETIF_FLAG_BROADCAST) != 0;
 }
 
+CHIP_ERROR InterfaceIterator::GetInterfaceType(InterfaceType & type)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR InterfaceIterator::GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
 bool InterfaceAddressIterator::HasCurrent()
 {
     return mIntfIter.HasCurrent() && ((mCurAddrIndex != kBeforeStartIndex) || Next());
@@ -273,6 +278,35 @@ bool InterfaceAddressIterator::SupportsMulticast()
 bool InterfaceAddressIterator::HasBroadcastAddress()
 {
     return HasCurrent() && mIntfIter.HasBroadcastAddress();
+}
+
+CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr)
+{
+    VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+#if !LWIP_IPV6
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif //! LWIP_IPV6
+
+    for (struct netif * intf = netif_list; intf != nullptr; intf = intf->next)
+    {
+        if ((mPlatformInterface != nullptr) && (mPlatformInterface != intf))
+            continue;
+        for (int j = 0; j < LWIP_IPV6_NUM_ADDRESSES; ++j)
+        {
+            if (ip6_addr_isvalid(netif_ip6_addr_state(intf, j)) && ip6_addr_islinklocal(netif_ip6_addr(intf, j)))
+            {
+                (*llAddr) = IPAddress(*netif_ip6_addr(intf, j));
+                return CHIP_NO_ERROR;
+            }
+        }
+        if (mPlatformInterface != nullptr)
+        {
+            return INET_ERROR_ADDRESS_NOT_FOUND;
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -587,9 +621,22 @@ short InterfaceIterator::GetFlags()
             mIntfFlags       = intfData.ifr_flags;
             mIntfFlagsCached = true;
         }
+#if __MBED__
+        CloseIOCTLSocket();
+#endif
     }
 
     return mIntfFlags;
+}
+
+CHIP_ERROR InterfaceIterator::GetInterfaceType(InterfaceType & type)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR InterfaceIterator::GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 InterfaceAddressIterator::InterfaceAddressIterator()
@@ -704,6 +751,38 @@ bool InterfaceAddressIterator::HasBroadcastAddress()
     return HasCurrent() && (mCurAddr->ifa_flags & IFF_BROADCAST) != 0;
 }
 
+CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr)
+{
+    VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    struct ifaddrs * ifaddr;
+    const int rv = getifaddrs(&ifaddr);
+    if (rv == -1)
+    {
+        return INET_ERROR_ADDRESS_NOT_FOUND;
+    }
+
+    for (struct ifaddrs * ifaddr_iter = ifaddr; ifaddr_iter != nullptr; ifaddr_iter = ifaddr_iter->ifa_next)
+    {
+        if (ifaddr_iter->ifa_addr != nullptr)
+        {
+            if ((ifaddr_iter->ifa_addr->sa_family == AF_INET6) &&
+                ((mPlatformInterface == 0) || (mPlatformInterface == if_nametoindex(ifaddr_iter->ifa_name))))
+            {
+                struct in6_addr * sin6_addr = &(reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr;
+                if (sin6_addr->s6_addr[0] == 0xfe && (sin6_addr->s6_addr[1] & 0xc0) == 0x80) // Link Local Address
+                {
+                    (*llAddr) = IPAddress((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
+                    break;
+                }
+            }
+        }
+    }
+    freeifaddrs(ifaddr);
+
+    return CHIP_NO_ERROR;
+}
+
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
 #if CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
@@ -746,9 +825,6 @@ CHIP_ERROR InterfaceId::InterfaceNameToId(const char * intfName, InterfaceId & i
             interface = InterfaceId(currentId);
             return CHIP_NO_ERROR;
         }
-#if __MBED__
-        CloseIOCTLSocket();
-#endif
     }
     interface = InterfaceId::Null();
     return INET_ERROR_UNKNOWN_INTERFACE;
@@ -792,6 +868,52 @@ bool InterfaceIterator::HasBroadcastAddress()
 {
     // Zephyr seems to handle broadcast address for IPv4 implicitly
     return HasCurrent() && INET_CONFIG_ENABLE_IPV4;
+}
+
+CHIP_ERROR InterfaceIterator::GetInterfaceType(InterfaceType & type)
+{
+    VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
+
+    const net_linkaddr * linkAddr = net_if_get_link_addr(mCurrentInterface);
+    if (!linkAddr)
+        return CHIP_ERROR_INCORRECT_STATE;
+
+    // Do not consider other than WiFi and Thread for now.
+    if (linkAddr->type == NET_LINK_IEEE802154)
+    {
+        type = InterfaceType::Thread;
+    }
+    // Zephyr doesn't define WiFi address type, so it shares the same type as Ethernet.
+    else if (linkAddr->type == NET_LINK_ETHERNET)
+    {
+        type = InterfaceType::WiFi;
+    }
+    else
+    {
+        type = InterfaceType::Unknown;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR InterfaceIterator::GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize)
+{
+    VerifyOrReturnError(HasCurrent(), CHIP_ERROR_INCORRECT_STATE);
+
+    if (!addressBuffer)
+        return CHIP_ERROR_INVALID_ARGUMENT;
+
+    const net_linkaddr * linkAddr = net_if_get_link_addr(mCurrentInterface);
+    if (!linkAddr)
+        return CHIP_ERROR_INCORRECT_STATE;
+
+    if (linkAddr->len > addressBufferSize)
+        return CHIP_ERROR_BUFFER_TOO_SMALL;
+
+    addressSize = linkAddr->len;
+    memcpy(addressBuffer, linkAddr->addr, linkAddr->len);
+
+    return CHIP_NO_ERROR;
 }
 
 InterfaceAddressIterator::InterfaceAddressIterator() = default;
@@ -865,7 +987,64 @@ bool InterfaceAddressIterator::HasBroadcastAddress()
     return HasCurrent() && mIntfIter.HasBroadcastAddress();
 }
 
+CHIP_ERROR InterfaceId::GetLinkLocalAddr(IPAddress * llAddr)
+{
+    VerifyOrReturnError(llAddr != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
+    net_if * const iface = mPlatformInterface ? net_if_get_by_index(mPlatformInterface) : net_if_get_default();
+    VerifyOrReturnError(iface != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
+
+    in6_addr * const ip6_addr = net_if_ipv6_get_ll(iface, NET_ADDR_PREFERRED);
+    VerifyOrReturnError(ip6_addr != nullptr, INET_ERROR_ADDRESS_NOT_FOUND);
+
+    *llAddr = IPAddress(*ip6_addr);
+
+    return CHIP_NO_ERROR;
+}
+
 #endif // CHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF
+
+// static
+InterfaceId InterfaceId::FromIPAddress(const IPAddress & addr)
+{
+    InterfaceAddressIterator addrIter;
+
+    for (; addrIter.HasCurrent(); addrIter.Next())
+    {
+        IPAddress curAddr = addrIter.GetAddress();
+        if (addr == curAddr)
+        {
+            return addrIter.GetInterfaceId();
+        }
+    }
+
+    return InterfaceId::Null();
+}
+
+// static
+bool InterfaceId::MatchLocalIPv6Subnet(const IPAddress & addr)
+{
+    if (addr.IsIPv6LinkLocal())
+        return true;
+
+    InterfaceAddressIterator ifAddrIter;
+    for (; ifAddrIter.HasCurrent(); ifAddrIter.Next())
+    {
+        IPPrefix addrPrefix;
+        addrPrefix.IPAddr = ifAddrIter.GetAddress();
+#if INET_CONFIG_ENABLE_IPV4
+        if (addrPrefix.IPAddr.IsIPv4())
+            continue;
+#endif // INET_CONFIG_ENABLE_IPV4
+        if (addrPrefix.IPAddr.IsIPv6LinkLocal())
+            continue;
+        addrPrefix.Length = ifAddrIter.GetPrefixLength();
+        if (addrPrefix.MatchAddress(addr))
+            return true;
+    }
+
+    return false;
+}
 
 void InterfaceAddressIterator::GetAddressWithPrefix(IPPrefix & addrWithPrefix)
 {

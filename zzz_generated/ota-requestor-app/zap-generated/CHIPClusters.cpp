@@ -164,7 +164,7 @@ CHIP_ERROR OtaSoftwareUpdateProviderCluster::QueryImage(Callback::Cancelable * o
     // hardwareVersion: int16u
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), hardwareVersion));
     // location: charString
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), location.data()));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), location));
     // requestorCanConsent: boolean
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), requestorCanConsent));
     // metadataForProvider: octetString
@@ -185,15 +185,21 @@ exit:
 }
 
 // OtaSoftwareUpdateProvider Cluster Attributes
-CHIP_ERROR OtaSoftwareUpdateProviderCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                          Callback::Cancelable * onFailureCallback)
+CHIP_ERROR OtaSoftwareUpdateProviderCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                               Callback::Cancelable * onFailureCallback,
+                                                                               uint16_t minInterval, uint16_t maxInterval)
 {
-    app::AttributePathParams attributePath;
+    chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId  = mEndpoint;
     attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x0000FFFD;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
+    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR OtaSoftwareUpdateProviderCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
+                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 } // namespace Controller

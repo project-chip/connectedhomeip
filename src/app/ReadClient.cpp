@@ -22,9 +22,11 @@
  *
  */
 
+#include "lib/core/CHIPTLVTypes.h"
 #include <app/AppBuildConfig.h>
 #include <app/InteractionModelEngine.h>
 #include <app/ReadClient.h>
+#include <app/StatusResponse.h>
 
 namespace chip {
 namespace app {
@@ -42,7 +44,8 @@ CHIP_ERROR ReadClient::Init(Messaging::ExchangeManager * apExchangeMgr, Callback
     mMinIntervalFloorSeconds   = 0;
     mMaxIntervalCeilingSeconds = 0;
     mSubscriptionId            = 0;
-    mInitialReport             = true;
+    mIsInitialReport           = true;
+    mIsPrimingReports          = true;
     mInteractionType           = aInteractionType;
     AbortExistingExchangeContext();
 
@@ -77,7 +80,8 @@ void ReadClient::ShutdownInternal(CHIP_ERROR aError)
     mInteractionType           = InteractionType::Read;
     mpExchangeMgr              = nullptr;
     mpExchangeCtx              = nullptr;
-    mInitialReport             = true;
+    mIsInitialReport           = true;
+    mIsPrimingReports          = true;
     mPeerNodeId                = kUndefinedNodeId;
     mFabricIndex               = kUndefinedFabricIndex;
     MoveToState(ClientState::Uninitialized);
@@ -136,30 +140,37 @@ CHIP_ERROR ReadClient::SendReadRequest(ReadPrepareParams & aReadPrepareParams)
         err = request.Init(&writer);
         SuccessOrExit(err);
 
-        if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
-        {
-            EventPaths::Builder & eventPathListBuilder = request.CreateEventPathsBuilder();
-            SuccessOrExit(err = eventPathListBuilder.GetError());
-            err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
-                                     aReadPrepareParams.mEventPathParamsListSize);
-            SuccessOrExit(err);
-            if (aReadPrepareParams.mEventNumber != 0)
-            {
-                // EventNumber is optional
-                request.EventNumber(aReadPrepareParams.mEventNumber);
-            }
-        }
-
         if (aReadPrepareParams.mAttributePathParamsListSize != 0 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
         {
-            AttributePathIBs::Builder attributePathListBuilder = request.CreateAttributePathListBuilder();
-            SuccessOrExit(err = attributePathListBuilder.GetError());
+            AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
+            SuccessOrExit(err = request.GetError());
             err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
                                             aReadPrepareParams.mAttributePathParamsListSize);
             SuccessOrExit(err);
         }
 
-        request.EndOfReadRequestMessage();
+        if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
+        {
+            EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
+            SuccessOrExit(err = request.GetError());
+            err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
+                                     aReadPrepareParams.mEventPathParamsListSize);
+            SuccessOrExit(err);
+            if (aReadPrepareParams.mEventNumber != 0)
+            {
+                // EventFilter is optional
+                EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
+                SuccessOrExit(err = request.GetError());
+                EventFilterIB::Builder & eventFilter = eventFilters.CreateEventFilter();
+                SuccessOrExit(err = eventFilters.GetError());
+                eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB();
+                SuccessOrExit(err = eventFilter.GetError());
+                eventFilters.EndOfEventFilters();
+                SuccessOrExit(err = eventFilters.GetError());
+            }
+        }
+
+        request.IsFabricFiltered(false).EndOfReadRequestMessage();
         SuccessOrExit(err = request.GetError());
 
         err = writer.Finalize(&msgBuf);
@@ -189,68 +200,19 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReadClient::SendStatusResponse(CHIP_ERROR aError)
-{
-    using Protocols::InteractionModel::Status;
-
-    System::PacketBufferHandle msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
-    VerifyOrReturnLogError(!msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
-
-    System::PacketBufferTLVWriter writer;
-    writer.Init(std::move(msgBuf));
-
-    StatusResponseMessage::Builder response;
-    ReturnLogErrorOnFailure(response.Init(&writer));
-    Status statusCode = Status::Success;
-    if (aError != CHIP_NO_ERROR)
-    {
-        statusCode = Status::InvalidSubscription;
-    }
-    response.Status(statusCode);
-    ReturnLogErrorOnFailure(response.GetError());
-    ReturnLogErrorOnFailure(writer.Finalize(&msgBuf));
-    VerifyOrReturnLogError(mpExchangeCtx != nullptr, CHIP_ERROR_INCORRECT_STATE);
-
-    if (IsSubscriptionType())
-    {
-        if (IsAwaitingInitialReport())
-        {
-            MoveToState(ClientState::AwaitingSubscribeResponse);
-        }
-        else
-        {
-            RefreshLivenessCheckTimer();
-        }
-    }
-    ReturnLogErrorOnFailure(
-        mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::StatusResponse, std::move(msgBuf),
-                                   Messaging::SendFlags(IsAwaitingSubscribeResponse() ? Messaging::SendMessageFlags::kExpectResponse
-                                                                                      : Messaging::SendMessageFlags::kNone)));
-    return CHIP_NO_ERROR;
-}
-
-CHIP_ERROR ReadClient::GenerateEventPaths(EventPaths::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
+CHIP_ERROR ReadClient::GenerateEventPaths(EventPathIBs::Builder & aEventPathsBuilder, EventPathParams * apEventPathParamsList,
                                           size_t aEventPathParamsListSize)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    for (size_t eventIndex = 0; eventIndex < aEventPathParamsListSize; ++eventIndex)
+    for (size_t index = 0; index < aEventPathParamsListSize; ++index)
     {
-        EventPathIB::Builder eventPathBuilder = aEventPathsBuilder.CreatePath();
-        EventPathParams eventPath             = apEventPathParamsList[eventIndex];
-        eventPathBuilder.Node(eventPath.mNodeId)
-            .Event(eventPath.mEventId)
-            .Endpoint(eventPath.mEndpointId)
-            .Cluster(eventPath.mClusterId)
-            .EndOfEventPathIB();
-        SuccessOrExit(err = eventPathBuilder.GetError());
+        VerifyOrReturnError(apEventPathParamsList[index].IsValidEventPath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+        EventPathIB::Builder & path = aEventPathsBuilder.CreatePath();
+        ReturnErrorOnFailure(aEventPathsBuilder.GetError());
+        ReturnErrorOnFailure(path.Encode(apEventPathParamsList[index]));
     }
 
     aEventPathsBuilder.EndOfEventPaths();
-    SuccessOrExit(err = aEventPathsBuilder.GetError());
-
-exit:
-    return err;
+    return aEventPathsBuilder.GetError();
 }
 
 CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAttributePathIBsBuilder,
@@ -260,7 +222,9 @@ CHIP_ERROR ReadClient::GenerateAttributePathList(AttributePathIBs::Builder & aAt
     for (size_t index = 0; index < aAttributePathParamsListSize; index++)
     {
         VerifyOrReturnError(apAttributePathParamsList[index].IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-        ReturnErrorOnFailure(apAttributePathParamsList[index].BuildAttributePath(aAttributePathIBsBuilder.CreateAttributePath()));
+        AttributePathIB::Builder path = aAttributePathIBsBuilder.CreatePath();
+        ReturnErrorOnFailure(aAttributePathIBsBuilder.GetError());
+        ReturnErrorOnFailure(path.Encode(apAttributePathParamsList[index]));
     }
     aAttributePathIBsBuilder.EndOfAttributePathIBs();
     return aAttributePathIBsBuilder.GetError();
@@ -287,13 +251,20 @@ CHIP_ERROR ReadClient::OnMessageReceived(Messaging::ExchangeContext * apExchange
         mpExchangeCtx = nullptr;
         SuccessOrExit(err);
     }
+    else if (aPayloadHeader.HasMessageType(Protocols::InteractionModel::MsgType::StatusResponse))
+    {
+        StatusIB status;
+        VerifyOrExit(apExchangeContext == mpExchangeCtx, err = CHIP_ERROR_INCORRECT_STATE);
+        err = StatusResponse::ProcessStatusResponse(std::move(aPayload), status);
+        SuccessOrExit(err);
+    }
     else
     {
         err = CHIP_ERROR_INVALID_MESSAGE_TYPE;
     }
 
 exit:
-    if (!IsSubscriptionType() || err != CHIP_NO_ERROR)
+    if ((!IsSubscriptionType() && !mPendingMoreChunks) || err != CHIP_NO_ERROR)
     {
         ShutdownInternal(err);
     }
@@ -316,7 +287,6 @@ CHIP_ERROR ReadClient::OnUnsolicitedReportData(Messaging::ExchangeContext * apEx
 {
     mpExchangeCtx  = apExchangeContext;
     CHIP_ERROR err = ProcessReportData(std::move(aPayload));
-    mpExchangeCtx  = nullptr;
     if (err != CHIP_NO_ERROR)
     {
         ShutdownInternal(err);
@@ -331,10 +301,9 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
 
     bool isEventReportsPresent       = false;
     bool isAttributeReportIBsPresent = false;
-    bool suppressResponse            = false;
-    bool moreChunkedMessages         = false;
+    bool suppressResponse            = true;
     uint64_t subscriptionId          = 0;
-    EventReports::Parser EventReports;
+    EventReportIBs::Parser eventReportIBs;
     AttributeReportIBs::Parser attributeReportIBs;
     System::PacketBufferTLVReader reader;
 
@@ -352,14 +321,15 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     err = report.GetSuppressResponse(&suppressResponse);
     if (CHIP_END_OF_TLV == err)
     {
-        err = CHIP_NO_ERROR;
+        suppressResponse = false;
+        err              = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
     err = report.GetSubscriptionId(&subscriptionId);
     if (CHIP_NO_ERROR == err)
     {
-        if (IsInitialReport())
+        if (mIsPrimingReports)
         {
             mSubscriptionId = subscriptionId;
         }
@@ -381,14 +351,15 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     }
     SuccessOrExit(err);
 
-    err = report.GetMoreChunkedMessages(&moreChunkedMessages);
+    err = report.GetMoreChunkedMessages(&mPendingMoreChunks);
     if (CHIP_END_OF_TLV == err)
     {
-        err = CHIP_NO_ERROR;
+        mPendingMoreChunks = false;
+        err                = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
 
-    err                   = report.GetEventReports(&EventReports);
+    err                   = report.GetEventReports(&eventReportIBs);
     isEventReportsPresent = (err == CHIP_NO_ERROR);
     if (err == CHIP_END_OF_TLV)
     {
@@ -399,8 +370,9 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
     if (isEventReportsPresent && nullptr != mpCallback)
     {
         chip::TLV::TLVReader EventReportsReader;
-        EventReports.GetReader(&EventReportsReader);
-        mpCallback->OnEventData(this, EventReportsReader);
+        eventReportIBs.GetReader(&EventReportsReader);
+        err = ProcessEventReportIBs(EventReportsReader);
+        SuccessOrExit(err);
     }
 
     err                         = report.GetAttributeReportIBs(&attributeReportIBs);
@@ -410,27 +382,54 @@ CHIP_ERROR ReadClient::ProcessReportData(System::PacketBufferHandle && aPayload)
         err = CHIP_NO_ERROR;
     }
     SuccessOrExit(err);
-    if (isAttributeReportIBsPresent && nullptr != mpCallback && !moreChunkedMessages)
+    if (isAttributeReportIBsPresent && nullptr != mpCallback)
     {
         TLV::TLVReader attributeReportIBsReader;
         attributeReportIBs.GetReader(&attributeReportIBsReader);
+
+        if (mIsInitialReport)
+        {
+            mpCallback->OnReportBegin(this);
+            mIsInitialReport = false;
+        }
+
         err = ProcessAttributeReportIBs(attributeReportIBsReader);
         SuccessOrExit(err);
+
+        if (!mPendingMoreChunks)
+        {
+            mpCallback->OnReportEnd(this);
+            mIsInitialReport = true;
+        }
+    }
+
+exit:
+    if (IsSubscriptionType())
+    {
+        if (IsAwaitingInitialReport())
+        {
+            MoveToState(ClientState::AwaitingSubscribeResponse);
+        }
+        else
+        {
+            RefreshLivenessCheckTimer();
+        }
     }
 
     if (!suppressResponse)
     {
-        // TODO: Add status report support and correspond handler in ReadHandler, particular for situation when there
-        // are multiple reports
+        bool noResponseExpected = IsSubscriptionIdle() && !mPendingMoreChunks;
+        err                     = StatusResponse::Send(err == CHIP_NO_ERROR ? Protocols::InteractionModel::Status::Success
+                                                        : Protocols::InteractionModel::Status::InvalidSubscription,
+                                   mpExchangeCtx, !noResponseExpected);
+
+        if (noResponseExpected || (err != CHIP_NO_ERROR))
+        {
+            mpExchangeCtx = nullptr;
+        }
     }
 
-exit:
-    SendStatusResponse(err);
-    if (!mInitialReport)
-    {
-        mpExchangeCtx = nullptr;
-    }
-    mInitialReport = false;
+    mIsPrimingReports = false;
     return err;
 }
 
@@ -441,32 +440,34 @@ void ReadClient::OnResponseTimeout(Messaging::ExchangeContext * apExchangeContex
     ShutdownInternal(CHIP_ERROR_TIMEOUT);
 }
 
-CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttributePath, ClusterInfo & aClusterInfo)
+CHIP_ERROR ReadClient::ProcessAttributePath(AttributePathIB::Parser & aAttributePathParser,
+                                            ConcreteDataAttributePath & aAttributePath)
 {
-    CHIP_ERROR err = aAttributePath.GetNode(&(aClusterInfo.mNodeId));
-    if (err == CHIP_END_OF_TLV)
-    {
-        err = CHIP_NO_ERROR;
-    }
-    VerifyOrReturnError(err == CHIP_NO_ERROR, err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-
+    CHIP_ERROR err = CHIP_NO_ERROR;
     // The ReportData must contain a concrete attribute path
-    err = aAttributePath.GetEndpoint(&(aClusterInfo.mEndpointId));
+    err = aAttributePathParser.GetEndpoint(&(aAttributePath.mEndpointId));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+    err = aAttributePathParser.GetCluster(&(aAttributePath.mClusterId));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
+    err = aAttributePathParser.GetAttribute(&(aAttributePath.mAttributeId));
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
 
-    err = aAttributePath.GetCluster(&(aClusterInfo.mClusterId));
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-
-    err = aAttributePath.GetAttribute(&(aClusterInfo.mAttributeId));
-    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-
-    err = aAttributePath.GetListIndex(&(aClusterInfo.mListIndex));
+    DataModel::Nullable<ListIndex> listIndex;
+    err = aAttributePathParser.GetListIndex(&(listIndex));
     if (CHIP_END_OF_TLV == err)
     {
         err = CHIP_NO_ERROR;
     }
+    else if (listIndex.IsNull())
+    {
+        aAttributePath.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
+    }
+    else
+    {
+        // TODO: Add ListOperation::ReplaceItem support. (Attribute path with valid list index)
+        err = CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH;
+    }
     VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
-    VerifyOrReturnError(aClusterInfo.IsValidAttributePath(), CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH);
     return CHIP_NO_ERROR;
 }
 
@@ -480,7 +481,7 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
         AttributeDataIB::Parser data;
         AttributeStatusIB::Parser status;
         AttributePathIB::Parser path;
-        ClusterInfo clusterInfo;
+        ConcreteDataAttributePath attributePath;
         StatusIB statusIB;
 
         TLV::TLVReader reader = aAttributeReportIBsReader;
@@ -491,23 +492,58 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
         {
             StatusIB::Parser errorStatus;
             ReturnErrorOnFailure(status.GetPath(&path));
-            ReturnErrorOnFailure(ProcessAttributePath(path, clusterInfo));
+            ReturnErrorOnFailure(ProcessAttributePath(path, attributePath));
             ReturnErrorOnFailure(status.GetErrorStatus(&errorStatus));
             ReturnErrorOnFailure(errorStatus.DecodeStatusIB(statusIB));
-            mpCallback->OnAttributeData(
-                this, ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId), nullptr,
-                statusIB);
+            mpCallback->OnAttributeData(this, attributePath, nullptr, statusIB);
         }
         else if (CHIP_END_OF_TLV == err)
         {
             ReturnErrorOnFailure(report.GetAttributeData(&data));
             ReturnErrorOnFailure(data.GetPath(&path));
-            ReturnErrorOnFailure(ProcessAttributePath(path, clusterInfo));
+            ReturnErrorOnFailure(ProcessAttributePath(path, attributePath));
             ReturnErrorOnFailure(data.GetData(&dataReader));
-            mpCallback->OnAttributeData(
-                this, ConcreteAttributePath(clusterInfo.mEndpointId, clusterInfo.mClusterId, clusterInfo.mAttributeId), &dataReader,
-                statusIB);
+
+            // The element in an array may be another array -- so we should only set the list operation when we are handling the
+            // whole list.
+            if (!attributePath.IsListOperation() && dataReader.GetType() == TLV::kTLVType_Array)
+            {
+                attributePath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
+            }
+
+            mpCallback->OnAttributeData(this, attributePath, &dataReader, statusIB);
         }
+    }
+
+    if (CHIP_END_OF_TLV == err)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    return err;
+}
+
+CHIP_ERROR ReadClient::ProcessEventReportIBs(TLV::TLVReader & aEventReportIBsReader)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    while (CHIP_NO_ERROR == (err = aEventReportIBsReader.Next()))
+    {
+        TLV::TLVReader dataReader;
+        EventReportIB::Parser report;
+        EventDataIB::Parser data;
+        EventHeader header;
+
+        TLV::TLVReader reader = aEventReportIBsReader;
+        ReturnErrorOnFailure(report.Init(reader));
+
+        ReturnErrorOnFailure(report.GetEventData(&data));
+
+        header.mTimestamp = mEventTimestamp;
+        ReturnErrorOnFailure(data.DecodeEventHeader(header));
+        mEventTimestamp = header.mTimestamp;
+
+        ReturnErrorOnFailure(data.GetData(&dataReader));
+
+        mpCallback->OnEventData(this, header, &dataReader, nullptr);
     }
 
     if (CHIP_END_OF_TLV == err)
@@ -519,10 +555,15 @@ CHIP_ERROR ReadClient::ProcessAttributeReportIBs(TLV::TLVReader & aAttributeRepo
 
 CHIP_ERROR ReadClient::RefreshLivenessCheckTimer()
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     CancelLivenessCheckTimer();
-    ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %d seconds", mMaxIntervalCeilingSeconds);
-    CHIP_ERROR err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
-        System::Clock::Seconds16(mMaxIntervalCeilingSeconds), OnLivenessTimeoutCallback, this);
+    VerifyOrReturnError(mpExchangeCtx != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
+    System::Clock::Timeout timeout = System::Clock::Seconds16(mMaxIntervalCeilingSeconds) + mpExchangeCtx->GetAckTimeout();
+    // EFR32/MBED/INFINION/K32W's chrono count return long unsinged, but other platform returns unsigned
+    ChipLogProgress(DataManagement, "Refresh LivenessCheckTime with %lu milliseconds", static_cast<long unsigned>(timeout.count()));
+    err = InteractionModelEngine::GetInstance()->GetExchangeManager()->GetSessionManager()->SystemLayer()->StartTimer(
+        timeout, OnLivenessTimeoutCallback, this);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -594,15 +635,30 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     VerifyOrExit(mpCallback != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     msgBuf = System::PacketBufferHandle::New(kMaxSecureSduLengthBytes);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(aReadPrepareParams.mMinIntervalFloorSeconds < aReadPrepareParams.mMaxIntervalCeilingSeconds,
+                 err = CHIP_ERROR_INVALID_ARGUMENT);
 
     writer.Init(std::move(msgBuf));
 
     err = request.Init(&writer);
     SuccessOrExit(err);
 
+    request.KeepSubscriptions(aReadPrepareParams.mKeepSubscriptions)
+        .MinIntervalFloorSeconds(aReadPrepareParams.mMinIntervalFloorSeconds)
+        .MaxIntervalCeilingSeconds(aReadPrepareParams.mMaxIntervalCeilingSeconds);
+
+    if (aReadPrepareParams.mAttributePathParamsListSize != 0 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
+    {
+        AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributeRequests();
+        SuccessOrExit(err = attributePathListBuilder.GetError());
+        err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
+                                        aReadPrepareParams.mAttributePathParamsListSize);
+        SuccessOrExit(err);
+    }
+
     if (aReadPrepareParams.mEventPathParamsListSize != 0 && aReadPrepareParams.mpEventPathParamsList != nullptr)
     {
-        EventPaths::Builder & eventPathListBuilder = request.CreateEventPathsBuilder();
+        EventPathIBs::Builder & eventPathListBuilder = request.CreateEventRequests();
         SuccessOrExit(err = eventPathListBuilder.GetError());
         err = GenerateEventPaths(eventPathListBuilder, aReadPrepareParams.mpEventPathParamsList,
                                  aReadPrepareParams.mEventPathParamsListSize);
@@ -611,23 +667,18 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
         if (aReadPrepareParams.mEventNumber != 0)
         {
             // EventNumber is optional
-            request.EventNumber(aReadPrepareParams.mEventNumber);
+            EventFilterIBs::Builder & eventFilters = request.CreateEventFilters();
+            SuccessOrExit(err = request.GetError());
+            EventFilterIB::Builder & eventFilter = eventFilters.CreateEventFilter();
+            SuccessOrExit(err = eventFilters.GetError());
+            eventFilter.EventMin(aReadPrepareParams.mEventNumber).EndOfEventFilterIB();
+            SuccessOrExit(err = eventFilter.GetError());
+            eventFilters.EndOfEventFilters();
+            SuccessOrExit(err = eventFilters.GetError());
         }
     }
 
-    if (aReadPrepareParams.mAttributePathParamsListSize != 0 && aReadPrepareParams.mpAttributePathParamsList != nullptr)
-    {
-        AttributePathIBs::Builder & attributePathListBuilder = request.CreateAttributePathListBuilder();
-        SuccessOrExit(err = attributePathListBuilder.GetError());
-        err = GenerateAttributePathList(attributePathListBuilder, aReadPrepareParams.mpAttributePathParamsList,
-                                        aReadPrepareParams.mAttributePathParamsListSize);
-        SuccessOrExit(err);
-    }
-
-    request.MinIntervalSeconds(aReadPrepareParams.mMinIntervalFloorSeconds)
-        .MaxIntervalSeconds(aReadPrepareParams.mMaxIntervalCeilingSeconds)
-        .KeepSubscriptions(aReadPrepareParams.mKeepSubscriptions)
-        .EndOfSubscribeRequestMessage();
+    request.IsFabricFiltered(false).EndOfSubscribeRequestMessage();
     SuccessOrExit(err = request.GetError());
 
     err = writer.Finalize(&msgBuf);
@@ -636,6 +687,11 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
     mpExchangeCtx = mpExchangeMgr->NewContext(aReadPrepareParams.mSessionHandle, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(kImMessageTimeout);
+    if (mpExchangeCtx->IsBLETransport())
+    {
+        ChipLogError(DataManagement, "IM Subscribe cannot work with BLE");
+        SuccessOrExit(err = CHIP_ERROR_INCORRECT_STATE);
+    }
 
     err = mpExchangeCtx->SendMessage(Protocols::InteractionModel::MsgType::SubscribeRequest, std::move(msgBuf),
                                      Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
@@ -648,10 +704,7 @@ CHIP_ERROR ReadClient::SendSubscribeRequest(ReadPrepareParams & aReadPreparePara
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        AbortExistingExchangeContext();
-    }
-    if (err != CHIP_NO_ERROR)
-    {
+        ChipLogError(DataManagement, "Failed to send subscribe request: %" CHIP_ERROR_FORMAT, err.Format());
         Shutdown();
     }
     return err;

@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include "DeviceAttestationConstructor.h"
+#include "DeviceAttestationVendorReserved.h"
 
 #include <lib/core/CHIPTLV.h>
 #include <lib/support/CodeUtils.h>
@@ -34,17 +35,42 @@ enum : uint32_t
     kFirmwareInfoTagId             = 4,
 };
 
+// utility to determine number of Vendor Reserved elements in a bytespan
+CHIP_ERROR CountVendorReservedElementsInDA(const ByteSpan & attestationElements, size_t & numOfElements)
+{
+    TLV::ContiguousBufferTLVReader tlvReader;
+    TLV::TLVType containerType = TLV::kTLVType_Structure;
+
+    tlvReader.Init(attestationElements);
+    ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
+    ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
+
+    size_t count = 0;
+    CHIP_ERROR error;
+    while ((error = tlvReader.Next()) == CHIP_NO_ERROR)
+    {
+        uint64_t tag = tlvReader.GetTag();
+        if (TLV::IsProfileTag(tag))
+        {
+            count++;
+        }
+    }
+    VerifyOrReturnError(error == CHIP_NO_ERROR || error == CHIP_END_OF_TLV, error);
+
+    numOfElements = count;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, ByteSpan & certificationDeclaration,
                                           ByteSpan & attestationNonce, uint32_t & timestamp, ByteSpan & firmwareInfo,
-                                          ByteSpan * vendorReservedArray, size_t & vendorReservedArraySize, uint16_t & vendorId,
-                                          uint16_t & profileNum)
+                                          DeviceAttestationVendorReservedDeconstructor & vendorReserved)
 {
     bool certificationDeclarationExists = false;
     bool attestationNonceExists         = false;
     bool timestampExists                = false;
-    bool firmwareInfoExists             = false;
-    size_t vendorReservedIdx            = 0;
-    uint32_t lastContextTagId           = UINT32_MAX;
+    bool gotFirstContextTag             = false;
+    uint32_t lastContextTagId           = 0;
+
     TLV::ContiguousBufferTLVReader tlvReader;
     TLV::TLVType containerType = TLV::kTLVType_Structure;
 
@@ -54,110 +80,79 @@ CHIP_ERROR DeconstructAttestationElements(const ByteSpan & attestationElements, 
     ReturnErrorOnFailure(tlvReader.Next(containerType, TLV::AnonymousTag));
     ReturnErrorOnFailure(tlvReader.EnterContainer(containerType));
 
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error;
 
-    // TODO: per conversation with Tennessee, shold be two consecutive loops (rather than one big
-    // loop, since the contextTags come before the profileTags)
+    // process context tags first (should be in sorted order)
     while ((error = tlvReader.Next()) == CHIP_NO_ERROR)
     {
         TLV::Tag tag = tlvReader.GetTag();
-
-        if (TLV::IsContextTag(tag))
+        if (!TLV::IsContextTag(tag))
         {
-            switch (TLV::TagNumFromTag(tag))
-            {
-            case kCertificationDeclarationTagId:
-                VerifyOrReturnError(lastContextTagId == UINT32_MAX, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-                VerifyOrReturnError(certificationDeclarationExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-                ReturnErrorOnFailure(tlvReader.GetByteView(certificationDeclaration));
-                certificationDeclarationExists = true;
-                break;
-            case kAttestationNonceTagId:
-                VerifyOrReturnError(lastContextTagId == kCertificationDeclarationTagId,
-                                    CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-                VerifyOrReturnError(attestationNonceExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-                ReturnErrorOnFailure(tlvReader.GetByteView(attestationNonce));
-                attestationNonceExists = true;
-                break;
-            case kTimestampTagId:
-                VerifyOrReturnError(lastContextTagId == kAttestationNonceTagId, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-                VerifyOrReturnError(timestampExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-                ReturnErrorOnFailure(tlvReader.Get(timestamp));
-                timestampExists = true;
-                break;
-            case kFirmwareInfoTagId:
-                VerifyOrReturnError(lastContextTagId == kTimestampTagId, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-                VerifyOrReturnError(firmwareInfoExists == false, CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-                ReturnErrorOnFailure(tlvReader.GetByteView(firmwareInfo));
-                firmwareInfoExists = true;
-                break;
-            default:
-                return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
-            }
-
-            lastContextTagId = TLV::TagNumFromTag(tag);
+            break;
         }
-        else if (TLV::IsProfileTag(tag))
+
+        // Ensure tag-order and correct first expected tag
+        uint32_t contextTagId = TLV::TagNumFromTag(tag);
+        if (!gotFirstContextTag)
         {
-            // vendor fields
-            bool seenProfile = false;
-            uint16_t currentVendorId;
-            uint16_t currentProfileNum;
-
-            currentVendorId   = TLV::VendorIdFromTag(tag);
-            currentProfileNum = TLV::ProfileNumFromTag(tag);
-            if (!seenProfile)
-            {
-                seenProfile = true;
-                vendorId    = currentVendorId;
-                profileNum  = currentProfileNum;
-            }
-            else
-            {
-                // TODO: do not check for this - map vendorId and profileNum to each Vendor Reserved entry
-                // check that vendorId and profileNum match in every Vendor Reserved entry
-                VerifyOrReturnError(currentVendorId == vendorId && currentProfileNum == profileNum,
-                                    CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT);
-            }
-
-            ByteSpan vendorReservedEntry;
-            ReturnErrorOnFailure(tlvReader.GetByteView(vendorReservedEntry));
-            VerifyOrReturnError(vendorReservedIdx < vendorReservedArraySize, CHIP_ERROR_NO_MEMORY);
-            vendorReservedArray[vendorReservedIdx++] = vendorReservedEntry;
+            // First tag must always be Certification Declaration
+            VerifyOrReturnError(contextTagId == kCertificationDeclarationTagId, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+            gotFirstContextTag = true;
         }
         else
         {
-            return CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;
+            // Subsequent tags must always be in order
+            VerifyOrReturnError(contextTagId > lastContextTagId, CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+        }
+        lastContextTagId = contextTagId;
+
+        switch (contextTagId)
+        {
+        case kCertificationDeclarationTagId:
+            ReturnErrorOnFailure(tlvReader.GetByteView(certificationDeclaration));
+            certificationDeclarationExists = true;
+            break;
+        case kAttestationNonceTagId:
+            ReturnErrorOnFailure(tlvReader.GetByteView(attestationNonce));
+            attestationNonceExists = true;
+            break;
+        case kTimestampTagId:
+            ReturnErrorOnFailure(tlvReader.Get(timestamp));
+            timestampExists = true;
+            break;
+        case kFirmwareInfoTagId:
+            ReturnErrorOnFailure(tlvReader.GetByteView(firmwareInfo));
+            break;
+        default:
+            // It's OK to have future context tags before vendor specific tags.
+            // We already checked that the tags are in order.
+            break;
         }
     }
 
-    vendorReservedArraySize = vendorReservedIdx;
+    VerifyOrReturnError(error == CHIP_NO_ERROR || error == CHIP_END_OF_TLV, error);
 
-    VerifyOrReturnError(error == CHIP_END_OF_TLV, error);
-    VerifyOrReturnError(lastContextTagId != UINT32_MAX, CHIP_ERROR_MISSING_TLV_ELEMENT);
-    VerifyOrReturnError(certificationDeclarationExists && attestationNonceExists && timestampExists,
-                        CHIP_ERROR_MISSING_TLV_ELEMENT);
+    const bool allTagsNeededPresent = certificationDeclarationExists && attestationNonceExists && timestampExists;
+    VerifyOrReturnError(allTagsNeededPresent, CHIP_ERROR_MISSING_TLV_ELEMENT);
 
+    size_t count = 0;
+    ReturnErrorOnFailure(CountVendorReservedElementsInDA(attestationElements, count));
+    ReturnErrorOnFailure(vendorReserved.PrepareToReadVendorReservedElements(attestationElements, count));
     return CHIP_NO_ERROR;
 }
 
-// TODO: have independent vendorId and profileNum entries map to each vendor Reserved entry
 // Have a class for vendor reserved data, discussed in:
 // https://github.com/project-chip/connectedhomeip/issues/9825
 CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaration, const ByteSpan & attestationNonce,
-                                        uint32_t timestamp, const ByteSpan & firmwareInfo, ByteSpan * vendorReservedArray,
-                                        size_t vendorReservedArraySize, uint16_t vendorId, uint16_t profileNum,
+                                        uint32_t timestamp, const ByteSpan & firmwareInfo,
+                                        DeviceAttestationVendorReservedConstructor & vendorReserved,
                                         MutableByteSpan & attestationElements)
 {
     TLV::TLVWriter tlvWriter;
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
 
     VerifyOrReturnError(!certificationDeclaration.empty() && !attestationNonce.empty(), CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrReturnError(attestationNonce.size() == 32, CHIP_ERROR_INVALID_ARGUMENT);
-    if (vendorReservedArraySize != 0)
-    {
-        VerifyOrReturnError(vendorReservedArray != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
-    }
+    VerifyOrReturnError(attestationNonce.size() == kExpectedAttestationNonceSize, CHIP_ERROR_INVALID_ARGUMENT);
 
     tlvWriter.Init(attestationElements.data(), static_cast<uint32_t>(attestationElements.size()));
     outerContainerType = TLV::kTLVType_NotSpecified;
@@ -170,20 +165,51 @@ CHIP_ERROR ConstructAttestationElements(const ByteSpan & certificationDeclaratio
         ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(4), firmwareInfo));
     }
 
-    uint8_t vendorTagNum = 1;
-    for (size_t vendorReservedIdx = 0; vendorReservedIdx < vendorReservedArraySize; ++vendorReservedIdx)
+    const VendorReservedElement * element = vendorReserved.cbegin();
+    while ((element = vendorReserved.Next()) != nullptr)
     {
-        if (!vendorReservedArray[vendorReservedIdx].empty())
-        {
-            ReturnErrorOnFailure(
-                tlvWriter.Put(TLV::ProfileTag(vendorId, profileNum, vendorTagNum), vendorReservedArray[vendorReservedIdx]));
-        }
-        vendorTagNum++;
+        ReturnErrorOnFailure(
+            tlvWriter.Put(TLV::ProfileTag(element->vendorId, element->profileNum, element->tagNum), element->vendorReservedData));
     }
 
     ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
     ReturnErrorOnFailure(tlvWriter.Finalize());
     attestationElements = attestationElements.SubSpan(0, tlvWriter.GetLengthWritten());
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ConstructNOCSRElements(const ByteSpan & csr, const ByteSpan & csrNonce, const ByteSpan & vendor_reserved1,
+                                  const ByteSpan & vendor_reserved2, const ByteSpan & vendor_reserved3,
+                                  MutableByteSpan & nocsrElements)
+{
+    TLV::TLVWriter tlvWriter;
+    TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
+
+    VerifyOrReturnError(!csr.empty() && !csrNonce.empty(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(csrNonce.size() == kExpectedAttestationNonceSize, CHIP_ERROR_INVALID_ARGUMENT);
+
+    tlvWriter.Init(nocsrElements.data(), static_cast<uint32_t>(nocsrElements.size()));
+    outerContainerType = TLV::kTLVType_NotSpecified;
+    ReturnErrorOnFailure(tlvWriter.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(1), csr));
+    ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(2), csrNonce));
+    if (!vendor_reserved1.empty())
+    {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(3), vendor_reserved1));
+    }
+    if (!vendor_reserved2.empty())
+    {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(4), vendor_reserved2));
+    }
+    if (!vendor_reserved3.empty())
+    {
+        ReturnErrorOnFailure(tlvWriter.Put(TLV::ContextTag(5), vendor_reserved3));
+    }
+
+    ReturnErrorOnFailure(tlvWriter.EndContainer(outerContainerType));
+    ReturnErrorOnFailure(tlvWriter.Finalize());
+    nocsrElements = nocsrElements.SubSpan(0, tlvWriter.GetLengthWritten());
 
     return CHIP_NO_ERROR;
 }

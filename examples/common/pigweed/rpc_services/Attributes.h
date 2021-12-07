@@ -32,7 +32,7 @@ namespace rpc {
 class Attributes : public generated::Attributes<Attributes>
 {
 public:
-    ::pw::Status Write(ServerContext &, const chip_rpc_AttributeWrite & request, pw_protobuf_Empty & response)
+    ::pw::Status Write(const chip_rpc_AttributeWrite & request, pw_protobuf_Empty & response)
     {
         const void * data;
         switch (request.data.which_data)
@@ -49,6 +49,15 @@ public:
         case chip_rpc_AttributeData_data_uint32_tag:
             data = &request.data.data.data_uint32;
             break;
+        case chip_rpc_AttributeData_data_int8_tag:
+            data = &request.data.data.data_int8;
+            break;
+        case chip_rpc_AttributeData_data_int16_tag:
+            data = &request.data.data.data_int16;
+            break;
+        case chip_rpc_AttributeData_data_int32_tag:
+            data = &request.data.data.data_int32;
+            break;
         case chip_rpc_AttributeData_data_bytes_tag:
             data = &request.data.data.data_bytes;
             break;
@@ -61,7 +70,7 @@ public:
         return pw::OkStatus();
     }
 
-    ::pw::Status Read(ServerContext &, const chip_rpc_AttributeMetadata & request, chip_rpc_AttributeData & response)
+    ::pw::Status Read(const chip_rpc_AttributeMetadata & request, chip_rpc_AttributeData & response)
     {
         void * data;
         size_t size = 0;
@@ -108,9 +117,21 @@ public:
         case chip_rpc_AttributeType_ZCL_INT56U_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_INT64U_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_INT8S_ATTRIBUTE_TYPE:
+            data                = &response.data.data_int8;
+            size                = sizeof(response.data.data_int8);
+            response.which_data = chip_rpc_AttributeData_data_int8_tag;
+            break;
         case chip_rpc_AttributeType_ZCL_INT16S_ATTRIBUTE_TYPE:
+            data                = &response.data.data_int16;
+            size                = sizeof(response.data.data_int16);
+            response.which_data = chip_rpc_AttributeData_data_int16_tag;
+            break;
         case chip_rpc_AttributeType_ZCL_INT24S_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_INT32S_ATTRIBUTE_TYPE:
+            data                = &response.data.data_int32;
+            size                = sizeof(response.data.data_int32);
+            response.which_data = chip_rpc_AttributeData_data_int32_tag;
+            break;
         case chip_rpc_AttributeType_ZCL_INT40S_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_INT48S_ATTRIBUTE_TYPE:
         case chip_rpc_AttributeType_ZCL_INT56S_ATTRIBUTE_TYPE:

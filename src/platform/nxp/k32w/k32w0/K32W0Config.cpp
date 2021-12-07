@@ -468,6 +468,8 @@ exit:
     return err;
 }
 
+void K32WConfig::RunConfigUnitTest() {}
+
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip

@@ -25,14 +25,15 @@
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
 #include <lib/core/Optional.h>
-#include <platform/PlatformManager.h>
+#include <platform/DiagnosticDataProvider.h>
 
 using namespace chip;
 using namespace chip::app;
 using namespace chip::app::Clusters;
 using namespace chip::app::Clusters::SoftwareDiagnostics;
 using namespace chip::app::Clusters::SoftwareDiagnostics::Attributes;
-using chip::DeviceLayer::PlatformManager;
+using chip::DeviceLayer::DiagnosticDataProvider;
+using chip::DeviceLayer::GetDiagnosticDataProvider;
 
 namespace {
 
@@ -42,15 +43,16 @@ public:
     // Register for the SoftwareDiagnostics cluster on all endpoints.
     SoftwareDiagosticsAttrAccess() : AttributeAccessInterface(Optional<EndpointId>::Missing(), SoftwareDiagnostics::Id) {}
 
-    CHIP_ERROR Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
+    CHIP_ERROR Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder) override;
 
 private:
-    CHIP_ERROR ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &), AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(uint64_t &), AttributeValueEncoder & aEncoder);
+    CHIP_ERROR ReadThreadMetrics(AttributeValueEncoder & aEncoder);
 };
 
 SoftwareDiagosticsAttrAccess gAttrAccess;
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPath, AttributeValueEncoder & aEncoder)
+CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteReadAttributePath & aPath, AttributeValueEncoder & aEncoder)
 {
     if (aPath.mClusterId != SoftwareDiagnostics::Id)
     {
@@ -61,13 +63,16 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPat
     switch (aPath.mAttributeId)
     {
     case CurrentHeapFree::Id: {
-        return ReadIfSupported(&PlatformManager::GetCurrentHeapFree, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetCurrentHeapFree, aEncoder);
     }
     case CurrentHeapUsed::Id: {
-        return ReadIfSupported(&PlatformManager::GetCurrentHeapUsed, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetCurrentHeapUsed, aEncoder);
     }
     case CurrentHeapHighWatermark::Id: {
-        return ReadIfSupported(&PlatformManager::GetCurrentHeapHighWatermark, aEncoder);
+        return ReadIfSupported(&DiagnosticDataProvider::GetCurrentHeapHighWatermark, aEncoder);
+    }
+    case ThreadMetrics::Id: {
+        return ReadThreadMetrics(aEncoder);
     }
     default: {
         break;
@@ -76,11 +81,11 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::Read(const ConcreteAttributePath & aPat
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformManager::*getter)(uint64_t &),
+CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (DiagnosticDataProvider::*getter)(uint64_t &),
                                                          AttributeValueEncoder & aEncoder)
 {
     uint64_t data;
-    CHIP_ERROR err = (DeviceLayer::PlatformMgr().*getter)(data);
+    CHIP_ERROR err = (DeviceLayer::GetDiagnosticDataProvider().*getter)(data);
     if (err == CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE)
     {
         data = 0;
@@ -92,6 +97,49 @@ CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadIfSupported(CHIP_ERROR (PlatformMan
 
     return aEncoder.Encode(data);
 }
+
+CHIP_ERROR SoftwareDiagosticsAttrAccess::ReadThreadMetrics(AttributeValueEncoder & aEncoder)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    DeviceLayer::ThreadMetrics * threadMetrics;
+
+    if (DeviceLayer::GetDiagnosticDataProvider().GetThreadMetrics(&threadMetrics) == CHIP_NO_ERROR)
+    {
+        err = aEncoder.EncodeList([&threadMetrics](const auto & encoder) -> CHIP_ERROR {
+            for (DeviceLayer::ThreadMetrics * thread = threadMetrics; thread != nullptr; thread = thread->Next)
+            {
+                ReturnErrorOnFailure(encoder.Encode(*thread));
+            }
+
+            return CHIP_NO_ERROR;
+        });
+
+        DeviceLayer::GetDiagnosticDataProvider().ReleaseThreadMetrics(threadMetrics);
+    }
+    else
+    {
+        err = aEncoder.Encode(DataModel::List<EndpointId>());
+    }
+
+    return err;
+}
+
+class SoftwareDiagnosticsDelegate : public DeviceLayer::SoftwareDiagnosticsDelegate
+{
+    // Gets called when a software fault that has taken place on the Node.
+    void OnSoftwareFaultDetected(SoftwareDiagnostics::Structs::SoftwareFault::Type & softwareFault) override
+    {
+        ChipLogProgress(Zcl, "SoftwareDiagnosticsDelegate: OnSoftwareFaultDetected");
+
+        ForAllEndpointsWithServerCluster(SoftwareDiagnostics::Id, [](EndpointId endpoint, intptr_t) -> Loop {
+            // TODO: Log SoftwareFault event and walk them all.
+            return Loop::Break;
+        });
+    }
+};
+
+SoftwareDiagnosticsDelegate gDiagnosticDelegate;
+
 } // anonymous namespace
 
 bool emberAfSoftwareDiagnosticsClusterResetWatermarksCallback(app::CommandHandler * commandObj,
@@ -121,4 +169,5 @@ exit:
 void MatterSoftwareDiagnosticsPluginServerInitCallback()
 {
     registerAttributeAccessOverride(&gAttrAccess);
+    GetDiagnosticDataProvider().SetSoftwareDiagnosticsDelegate(&gDiagnosticDelegate);
 }

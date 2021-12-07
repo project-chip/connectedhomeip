@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include <controller/ExampleOperationalCredentialsIssuer.h>
+
 #include "../../config/PersistentStorage.h"
 #include "Command.h"
 
@@ -25,18 +27,21 @@
 
 class PersistentStorage;
 
+constexpr const char kIdentityAlpha[] = "alpha";
+constexpr const char kIdentityBeta[]  = "beta";
+constexpr const char kIdentityGamma[] = "gamma";
+
 class CHIPCommand : public Command
 {
 public:
-    using ChipDevice             = ::chip::Controller::Device;
+    using ChipDevice             = ::chip::DeviceProxy;
     using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
     using ChipDeviceController   = ::chip::Controller::DeviceController;
-    using ChipSerializedDevice   = ::chip::Controller::SerializedDevice;
     using IPAddress              = ::chip::Inet::IPAddress;
     using NodeId                 = ::chip::NodeId;
     using PeerAddress            = ::chip::Transport::PeerAddress;
 
-    CHIPCommand(const char * commandName) : Command(commandName) {}
+    CHIPCommand(const char * commandName) : Command(commandName) { AddArgument("commissioner-name", &mCommissionerName); }
 
     /////////// Command Interface /////////
     CHIP_ERROR Run() override;
@@ -63,15 +68,29 @@ protected:
     // loop has been stopped.
     virtual void Shutdown() {}
 
-    ChipDeviceCommissioner mController;
-    PersistentStorage mStorage;
+    PersistentStorage mDefaultStorage;
+    PersistentStorage mCommissionerStorage;
     chip::SimpleFabricStorage mFabricStorage;
+    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
+
+    std::string GetIdentity();
+    void SetIdentity(const char * name);
+
+    // This method returns the commissioner instance to be used for running the command.
+    // The default commissioner instance name is "alpha", but it can be overriden by passing
+    // --identity "instance name" when running a command.
+    ChipDeviceCommissioner & CurrentCommissioner();
 
 private:
+    CHIP_ERROR InitializeCommissioner(std::string key, chip::FabricId fabricId);
+    CHIP_ERROR ShutdownCommissioner(std::string key);
+    uint16_t CurrentCommissionerIndex();
+    std::map<std::string, std::unique_ptr<ChipDeviceCommissioner>> mCommissioners;
+    chip::Optional<char *> mCommissionerName;
+
     static void RunQueuedCommand(intptr_t commandArg);
 
     CHIP_ERROR mCommandExitStatus = CHIP_ERROR_INTERNAL;
-    chip::Controller::ExampleOperationalCredentialsIssuer mOpCredsIssuer;
 
     CHIP_ERROR StartWaiting(chip::System::Clock::Timeout seconds);
     void StopWaiting();

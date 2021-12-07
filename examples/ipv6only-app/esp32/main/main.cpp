@@ -50,7 +50,7 @@ void UdpReceiver(void * pvParameters)
     int optval;                     // flag value for setsockopt
     int n;                          // message byte size
     int sockfd = 0;
-    unsigned int clientlen;         // byte size of client's address
+    socklen_t clientlen;            // byte size of client's address
     struct sockaddr_in6 clientaddr; // client addr
 
     while (1)

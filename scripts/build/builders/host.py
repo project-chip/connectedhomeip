@@ -25,6 +25,8 @@ class HostApp(Enum):
     CHIP_TOOL = auto()
     THERMOSTAT = auto()
     RPC_CONSOLE = auto()
+    MIN_MDNS = auto()
+    TV_APP = auto()
 
     def ExamplePath(self):
         if self == HostApp.ALL_CLUSTERS:
@@ -35,18 +37,35 @@ class HostApp(Enum):
             return 'thermostat/linux'
         elif self == HostApp.RPC_CONSOLE:
             return 'common/pigweed/rpc_console'
+        if self == HostApp.MIN_MDNS:
+            return 'minimal-mdns'
+        if self == HostApp.TV_APP:
+            return 'tv-app/linux'
         else:
             raise Exception('Unknown app type: %r' % self)
 
-    def BinaryName(self):
+    def OutputNames(self):
         if self == HostApp.ALL_CLUSTERS:
-            return 'chip-all-clusters-app'
+            yield 'chip-all-clusters-app'
+            yield 'chip-all-clusters-app.map'
         elif self == HostApp.CHIP_TOOL:
-            return 'chip-tool'
+            yield 'chip-tool'
+            yield 'chip-tool.map'
         elif self == HostApp.THERMOSTAT:
-            return 'thermostat-app'
+            yield 'thermostat-app'
+            yield 'thermostat-app.map'
         elif self == HostApp.RPC_CONSOLE:
-            return 'rpc-console'
+            yield 'chip_rpc_console_wheels'
+        elif self == HostApp.MIN_MDNS:
+            yield 'mdns-advertiser'
+            yield 'mdns-advertiser.map'
+            yield 'minimal-mdns-client'
+            yield 'minimal-mdns-client.map'
+            yield 'minimal-mdns-server'
+            yield 'minimal-mdns-server.map'
+        elif self == HostApp.TV_APP:
+            yield 'chip-tv-app'
+            yield 'chip-tv-app.map'
         else:
             raise Exception('Unknown app type: %r' % self)
 
@@ -86,18 +105,35 @@ class HostBoard(Enum):
 
 class HostBuilder(GnBuilder):
 
-    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True):
+    def __init__(self, root, runner, app: HostApp, board=HostBoard.NATIVE, enable_ipv4=True,
+                 enable_ble=True, use_tsan=False,  use_asan=False, separate_event_loop=True,
+                 test_group=False):
         super(HostBuilder, self).__init__(
             root=os.path.join(root, 'examples', app.ExamplePath()),
             runner=runner)
 
-        self.app_name = app.BinaryName()
-        self.map_name = self.app_name + '.map'
+        self.app = app
         self.board = board
         self.extra_gn_options = []
 
-        if 'rpc-console' not in self.app_name and not enable_ipv4:
+        if not enable_ipv4:
             self.extra_gn_options.append('chip_inet_config_enable_ipv4=false')
+
+        if not enable_ble:
+            self.extra_gn_options.append('chip_config_network_layer_ble=false')
+
+        if use_tsan:
+            self.extra_gn_options.append('is_tsan=true')
+
+        if use_asan:
+            self.extra_gn_options.append('is_asan=true')
+
+        if not separate_event_loop:
+            self.extra_gn_options.append('config_use_separate_eventloop=false')
+
+        if test_group:
+            self.extra_gn_options.append(
+                'chip_enable_group_messaging_tests=true')
 
     def GnBuildArgs(self):
         if self.board == HostBoard.NATIVE:
@@ -106,17 +142,11 @@ class HostBuilder(GnBuilder):
             self.extra_gn_options.extend(
                 [
                     'target_cpu="arm64"',
-                    'is_clang=true'
+                    'is_clang=true',
+                    'chip_crypto="mbedtls"',
+                    'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
                 ]
             )
-
-            if 'rpc-console' not in self.app_name:
-                self.extra_gn_options.extend(
-                    [
-                        'chip_crypto="mbedtls"',
-                        'sysroot="%s"' % self.SysRootPath('SYSROOT_AARCH64')
-                    ]
-                )
 
             return self.extra_gn_options
         else:
@@ -139,19 +169,18 @@ class HostBuilder(GnBuilder):
 
     def build_outputs(self):
         outputs = {}
-        if 'rpc-console' not in self.app_name:
-            outputs.update(
-                {
-                    self.app_name: os.path.join(self.output_dir, self.app_name),
-                    self.map_name: os.path.join(self.output_dir, self.map_name)
-                }
-            )
-        else:
-            outputs.update(
-                {
-                    self.app_name: os.path.join(
-                        self.output_dir, "chip_rpc_console_wheels")
-                }
-            )
+
+        for name in self.app.OutputNames():
+            path = os.path.join(self.output_dir, name)
+            if os.path.isdir(path):
+                for root, dirs, files in os.walk(path):
+                    for file in files:
+                        outputs.update({
+                            file: os.path.join(root, file)
+                        })
+            else:
+                outputs.update({
+                    name: os.path.join(self.output_dir, name)
+                })
 
         return outputs

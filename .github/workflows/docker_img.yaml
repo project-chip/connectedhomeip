@@ -32,7 +32,7 @@ jobs:
             fail-fast: false
             matrix:
                 # TODO: Enables "-crosscompile" and "-vscode" images
-                img: ["", "-android", "-cirque", "-efr32", "-esp32", "-esp32-qemu", "-infineon", "-k32w", "-mbed-os", "-nrf-platform", "-telink", "-tizen"]
+                img: ["", "-android", "-cirque", "-doxygen", "-efr32", "-esp32", "-esp32-qemu", "-infineon", "-k32w", "-mbed-os", "-nrf-platform", "-telink", "-tizen"]
         steps:
             - name: Checkout
               uses: actions/checkout@v2
@@ -43,6 +43,6 @@ jobs:
             - name: Scan for vulnerabilities
               uses: crazy-max/docker-scan-action@master
               with:
-                  image: connectedhomeip/chip-build${{ matrix.img }}:0.5.25
+                  image: connectedhomeip/chip-build${{ matrix.img }}:0.5.33
                   annotations: true
 

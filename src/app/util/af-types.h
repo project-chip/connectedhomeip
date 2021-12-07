@@ -101,7 +101,7 @@ typedef void (*EmberAfGenericClusterFunction)(void);
  */
 union EmberAfDefaultAttributeValue
 {
-    constexpr EmberAfDefaultAttributeValue(uint8_t * ptr) : ptrToDefaultValue(ptr) {}
+    constexpr EmberAfDefaultAttributeValue(const uint8_t * ptr) : ptrToDefaultValue(ptr) {}
     constexpr EmberAfDefaultAttributeValue(uint16_t val) : defaultValue(val) {}
 
     /**
@@ -109,7 +109,7 @@ union EmberAfDefaultAttributeValue
      * If size is more than 2 bytes, and this value is NULL,
      * then the default value is all zeroes.
      */
-    uint8_t * ptrToDefaultValue;
+    const uint8_t * ptrToDefaultValue;
 
     /**
      * Actual default value if the attribute size is 2 bytes or less.
@@ -144,15 +144,16 @@ typedef struct
  */
 union EmberAfDefaultOrMinMaxAttributeValue
 {
-    constexpr EmberAfDefaultOrMinMaxAttributeValue(uint8_t * ptr) : ptrToDefaultValue(ptr) {}
+    constexpr EmberAfDefaultOrMinMaxAttributeValue(const uint8_t * ptr) : ptrToDefaultValue(ptr) {}
     constexpr EmberAfDefaultOrMinMaxAttributeValue(uint16_t val) : defaultValue(val) {}
+    constexpr EmberAfDefaultOrMinMaxAttributeValue(const EmberAfAttributeMinMaxValue * ptr) : ptrToMinMaxValue(ptr) {}
 
     /**
      * Points to data if size is more than 2 bytes.
      * If size is more than 2 bytes, and this value is NULL,
      * then the default value is all zeroes.
      */
-    uint8_t * ptrToDefaultValue;
+    const uint8_t * ptrToDefaultValue;
     /**
      * Actual default value if the attribute size is 2 bytes or less.
      */
@@ -161,15 +162,34 @@ union EmberAfDefaultOrMinMaxAttributeValue
      * Points to the min max attribute value structure, if min/max is
      * supported for this attribute.
      */
-    EmberAfAttributeMinMaxValue * ptrToMinMaxValue;
+    const EmberAfAttributeMinMaxValue * ptrToMinMaxValue;
 };
+
+// Attribute masks modify how attributes are used by the framework
+//
+// Attribute that has this mask is NOT read-only
+#define ATTRIBUTE_MASK_WRITABLE (0x01)
+// Attribute that has this mask is saved to a token
+#define ATTRIBUTE_MASK_TOKENIZE (0x02)
+// Attribute that has this mask has a min/max values
+#define ATTRIBUTE_MASK_MIN_MAX (0x04)
+// Attribute requires a timed interaction to write
+#define ATTRIBUTE_MASK_MUST_USE_TIMED_WRITE (0x08)
+// Attribute deferred to external storage
+#define ATTRIBUTE_MASK_EXTERNAL_STORAGE (0x10)
+// Attribute is singleton
+#define ATTRIBUTE_MASK_SINGLETON (0x20)
+// Attribute is a client attribute
+#define ATTRIBUTE_MASK_CLIENT (0x40)
+// Attribute is nullable
+#define ATTRIBUTE_MASK_NULLABLE (0x80)
 
 /**
  * @brief Each attribute has it's metadata stored in such struct.
  *
  * There is only one of these per attribute across all endpoints.
  */
-typedef struct
+struct EmberAfAttributeMetadata
 {
     /**
      * Attribute ID, according to ZCL specs.
@@ -185,8 +205,7 @@ typedef struct
     uint16_t size;
     /**
      * Attribute mask, tagging attribute with specific
-     * functionality. See ATTRIBUTE_MASK_ macros defined
-     * in att-storage.h.
+     * functionality.
      */
     EmberAfAttributeMask mask;
     /**
@@ -194,7 +213,22 @@ typedef struct
      * depends on the mask.
      */
     EmberAfDefaultOrMinMaxAttributeValue defaultValue;
-} EmberAfAttributeMetadata;
+
+    /**
+     * Check whether this attribute is nullable.
+     */
+    bool IsNullable() const { return mask & ATTRIBUTE_MASK_NULLABLE; }
+
+    /**
+     * Check whether this attribute is readonly.
+     */
+    bool IsReadOnly() const { return !(mask & ATTRIBUTE_MASK_WRITABLE); }
+
+    /**
+     * Check whether this attribute requires a timed write.
+     */
+    bool MustUseTimedWrite() const { return mask & ATTRIBUTE_MASK_MUST_USE_TIMED_WRITE; }
+};
 
 /**
  * @brief Struct describing cluster

@@ -29,14 +29,16 @@ if(NOT CHIP_ROOT)
     get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../.. REALPATH)
 endif()
 
-set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs)
+set(CHIP_REQURIE_COMPONENTS freertos lwip bt mdns mbedtls fatfs app_update console openthread)
 
-if (CONFIG_ENABLE_CHIP_SHELL)
-    list(APPEND CHIP_REQURIE_COMPONENTS console)
-endif()
-
-if (CONFIG_OPENTHREAD_ENABLED)
-    list(APPEND CHIP_REQURIE_COMPONENTS openthread)
+if (NOT CMAKE_BUILD_EARLY_EXPANSION)
+    if (CONFIG_COMPILER_OPTIMIZATION_DEFAULT OR CONFIG_COMPILER_OPTIMIZATION_NONE)
+        set(is_debug TRUE)
+    else()
+        if (NOT CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE)
+            message(FATAL_ERROR "CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_DISABLE shall be set")
+        endif()
+    endif()
 endif()
 
 idf_component_register(SRCS chip.c chip.cpp
@@ -62,7 +64,7 @@ chip_gn_arg_append("esp32_ar"              "\"${CMAKE_AR}\"")
 chip_gn_arg_append("esp32_cc"              "\"${CMAKE_C_COMPILER}\"")
 chip_gn_arg_append("esp32_cxx"             "\"${CMAKE_CXX_COMPILER}\"")
 chip_gn_arg_append("esp32_cpu"             "\"esp32\"")
-chip_gn_arg_bool("is_debug"                is_debug)
+chip_gn_arg_bool("is_debug"                ${is_debug})
 
 if(CONFIG_BT_ENABLED)
 chip_gn_arg_append("chip_config_network_layer_ble"           "true")
@@ -95,6 +97,10 @@ endif()
 
 if (CONFIG_OPENTHREAD_ENABLED)
     chip_gn_arg_append("chip_enable_openthread"                 "true")
+endif()
+
+if (CONFIG_ENABLE_OTA_REQUESTOR)
+    chip_gn_arg_append("chip_enable_ota_requestor"                 "true")
 endif()
 
 set(args_gn_input "${CMAKE_CURRENT_BINARY_DIR}/args.gn.in")
@@ -224,3 +230,8 @@ target_link_libraries(${COMPONENT_LIB} INTERFACE -Wl,--start-group
 
 # Make the component dependent on our CHIP build
 add_dependencies(${COMPONENT_LIB} chip_gn)
+
+if(CONFIG_ENABLE_PW_RPC)
+    set(WRAP_FUNCTIONS esp_log_write)
+    target_link_libraries(${COMPONENT_LIB} INTERFACE "-Wl,--wrap=${WRAP_FUNCTIONS}")
+endif()

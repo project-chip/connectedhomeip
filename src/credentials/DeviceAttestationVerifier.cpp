@@ -33,14 +33,14 @@ public:
     AttestationVerificationResult VerifyAttestationInformation(const ByteSpan & attestationInfoBuffer,
                                                                const ByteSpan & attestationChallengeBuffer,
                                                                const ByteSpan & attestationSignatureBuffer,
-                                                               const ByteSpan & paiCertDerBuffer, const ByteSpan & dacCertDerBuffer,
+                                                               const ByteSpan & paiDerBuffer, const ByteSpan & dacDerBuffer,
                                                                const ByteSpan & attestationNonce) override
     {
         (void) attestationInfoBuffer;
         (void) attestationChallengeBuffer;
         (void) attestationSignatureBuffer;
-        (void) paiCertDerBuffer;
-        (void) dacCertDerBuffer;
+        (void) paiDerBuffer;
+        (void) dacDerBuffer;
         (void) attestationNonce;
         return AttestationVerificationResult::kNotImplemented;
     }
@@ -50,6 +50,16 @@ public:
     {
         (void) cmsEnvelopeBuffer;
         (void) certDeclBuffer;
+        return AttestationVerificationResult::kNotImplemented;
+    }
+
+    AttestationVerificationResult ValidateCertificateDeclarationPayload(const ByteSpan & certDeclBuffer,
+                                                                        const ByteSpan & firmwareInfo,
+                                                                        const DeviceInfoForAttestation & deviceInfo) override
+    {
+        (void) certDeclBuffer;
+        (void) firmwareInfo;
+        (void) deviceInfo;
         return AttestationVerificationResult::kNotImplemented;
     }
 };

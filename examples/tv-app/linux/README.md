@@ -38,16 +38,6 @@ Desktop 20.10 (aarch64)**
 
 ## Running the Complete Example on Raspberry Pi 4
 
-> If you want to test ZCL, please disable Rendezvous
->
->     gn gen out/debug --args='bypass_rendezvous=true'
->     ninja -C out/debug
->
-> Note that GN will set bypass_rendezvous for future builds, to enable
-> rendezvous, re-generate using
->
->     gn gen out/debug --args='chip_bypass_rendezvous=false'
-
 -   Prerequisites
 
     1. A Raspberry Pi 4 board

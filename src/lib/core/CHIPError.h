@@ -2207,15 +2207,6 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_IM_STATUS_CODE_RECEIVED                     CHIP_CORE_ERROR(0xca)
 
-/*
- * @def CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS
- *
- * @brief
- *   Indicates that the commissioning window on the device is already open, and another
- *   commissioning is in progress
- */
-#define CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS           CHIP_CORE_ERROR(0xcb)
-
 /**
  * @def CHIP_ERROR_IM_MALFORMED_COMMAND_STATUS_IB
  *
@@ -2261,6 +2252,86 @@ using CHIP_ERROR = ::chip::ChipError;
  */
 #define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_REPORT_MESSAGE    CHIP_CORE_ERROR(0xcf)
 
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE
+ *
+ * @brief
+ *   The WriteRequestMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_WRITE_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xd0)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The WriteResponseMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_WRITE_RESPONSE_MESSAGE    CHIP_CORE_ERROR(0xd1)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE
+ *
+ * @brief
+ *   The ReadRequestMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_READ_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xd2)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE
+ *
+ * @brief
+ *   The SubscribeRequestMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE    CHIP_CORE_ERROR(0xd3)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE
+ *
+ * @brief
+ *   The SubscribeResponseMessage is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_RESPONSE_MESSAGE    CHIP_CORE_ERROR(0xd4)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB
+ *
+ * @brief
+ *   The EventReportIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_EVENT_REPORT_IB             CHIP_CORE_ERROR(0xd5)
+
+/*
+ * @def CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS
+ *
+ * @brief
+ *   Indicates that the commissioning window on the device is already open, and another
+ *   commissioning is in progress
+ */
+#define CHIP_ERROR_ANOTHER_COMMISSIONING_IN_PROGRESS           CHIP_CORE_ERROR(0xd6)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB
+ *
+ * @brief
+ *   The ClusterPathIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_CLUSTER_PATH_IB             CHIP_CORE_ERROR(0xd6)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB
+ *
+ * @brief
+ *   The DataVersionFilterIB is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_DATA_VERSION_FILTER_IB             CHIP_CORE_ERROR(0xd7)
 /**
  *  @}
  */

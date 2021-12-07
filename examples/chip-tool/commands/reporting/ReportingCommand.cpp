@@ -26,7 +26,8 @@ using namespace ::chip;
 
 CHIP_ERROR ReportingCommand::RunCommand()
 {
-    CHIP_ERROR err = mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    CHIP_ERROR err =
+        CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
     VerifyOrExit(
         err == CHIP_NO_ERROR,
         ChipLogError(chipTool, "Failed in initiating connection to the device: %" PRIu64 ", error %s", mNodeId, ErrorStr(err)));
@@ -35,7 +36,7 @@ exit:
     return err;
 }
 
-void ReportingCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+void ReportingCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
 {
     ReportingCommand * command = reinterpret_cast<ReportingCommand *>(context);
     VerifyOrReturn(command != nullptr,

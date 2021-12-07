@@ -28,6 +28,7 @@ namespace chip {
 
 typedef uint8_t ActionId;
 typedef uint32_t AttributeId;
+typedef uint32_t CASEAuthTag;
 typedef uint32_t ClusterId;
 typedef uint8_t ClusterStatus;
 typedef uint32_t CommandId;
@@ -43,5 +44,7 @@ typedef uint16_t ListIndex;
 typedef uint32_t TransactionId;
 
 static constexpr FabricIndex kUndefinedFabricIndex = 0;
+static constexpr EndpointId kInvalidEndpointId     = 0xFFFF;
+static constexpr ListIndex kInvalidListIndex       = 0xFFFF; // List index is a uint16 thus 0xFFFF is a invalid list index.
 
 } // namespace chip

@@ -19,13 +19,17 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Send Test Command"
       command: "test"
 
     - label: "Send Test Not Handled Command"
       command: "testNotHandled"
       response:
-          error: 1
+          error: INVALID_COMMAND
 
     - label: "Send Test Specific Command"
       command: "testSpecific"
@@ -56,7 +60,7 @@ tests:
               - name: "arg2"
                 value: 6
       response:
-          error: 1
+          error: INVALID_COMMAND
 
     # Tests for Boolean attribute
 
@@ -522,6 +526,118 @@ tests:
       response:
           value: 0
 
+    # Tests for float attribute
+
+    - label: "Read attribute SINGLE Default Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 0
+
+    - label: "Write attribute SINGLE medium Value"
+      command: "writeAttribute"
+      attribute: "float_single"
+      arguments:
+          value: 0.1
+
+    - label: "Read attribute SINGLE medium Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 0.1
+
+    - label: "Write attribute SINGLE large Value"
+      command: "writeAttribute"
+      attribute: "float_single"
+      arguments:
+          value: 1.7e10
+
+    - label: "Read attribute SINGLE large Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 1.7e10
+
+    - label: "Write attribute SINGLE small Value"
+      command: "writeAttribute"
+      attribute: "float_single"
+      arguments:
+          value: 1.7e-10
+
+    - label: "Read attribute SINGLE small Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 1.7e-10
+
+    - label: "Write attribute SINGLE Default Value"
+      command: "writeAttribute"
+      attribute: "float_single"
+      arguments:
+          value: 0
+
+    - label: "Read attribute SINGLE Default Value"
+      command: "readAttribute"
+      attribute: "float_single"
+      response:
+          value: 0
+
+    # Tests for double attribute
+
+    - label: "Read attribute DOUBLE Default Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 0
+
+    - label: "Write attribute DOUBLE medium Value"
+      command: "writeAttribute"
+      attribute: "float_double"
+      arguments:
+          value: 0.1234567890123
+
+    - label: "Read attribute DOUBLE medium Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 0.1234567890123
+
+    - label: "Write attribute DOUBLE large Value"
+      command: "writeAttribute"
+      attribute: "float_double"
+      arguments:
+          value: 1.7e200
+
+    - label: "Read attribute DOUBLE large Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 1.7e200
+
+    - label: "Write attribute DOUBLE small Value"
+      command: "writeAttribute"
+      attribute: "float_double"
+      arguments:
+          value: 1.7e-200
+
+    - label: "Read attribute DOUBLE small Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 1.7e-200
+
+    - label: "Write attribute DOUBLE Default Value"
+      command: "writeAttribute"
+      attribute: "float_double"
+      arguments:
+          value: 0
+
+    - label: "Read attribute DOUBLE Default Value"
+      command: "readAttribute"
+      attribute: "float_double"
+      response:
+          value: 0
+
     # Tests for Enum8 attribute
 
     - label: "Read attribute ENUM8 Default Value"
@@ -594,6 +710,18 @@ tests:
       response:
           value: ""
 
+    - label: "Write attribute OCTET_STRING with embedded null"
+      command: "writeAttribute"
+      attribute: "octet_string"
+      arguments:
+          value: "Tes\x00ti\x00ng"
+
+    - label: "Read attribute OCTET_STRING with embedded null"
+      command: "readAttribute"
+      attribute: "octet_string"
+      response:
+          value: "Tes\x00ti\x00ng"
+
     - label: "Write attribute OCTET_STRING"
       command: "writeAttribute"
       attribute: "octet_string"
@@ -612,7 +740,7 @@ tests:
       arguments:
           value: "TestValueLongerThan10"
       response:
-          error: true
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute OCTET_STRING"
       command: "readAttribute"
@@ -669,7 +797,6 @@ tests:
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
       attribute: "char_string"
-      disabled: true
       response:
           value: "☉T☉"
 
@@ -679,14 +806,13 @@ tests:
       arguments:
           value: "☉TestValueLongerThan10☉"
       response:
-          error: true
+          error: CONSTRAINT_ERROR
 
     - label: "Read attribute CHAR_STRING"
       command: "readAttribute"
       attribute: "char_string"
-      disabled: true
       response:
-          value: "☉TestVal"
+          value: "☉T☉"
 
     - label: "Write attribute CHAR_STRING - Empty"
       command: "writeAttribute"
@@ -720,34 +846,16 @@ tests:
       arguments:
           value: ""
 
-    # Tests for List attribute
-
-    - label: "Read attribute LIST"
+    - label: "Read attribute LIST_LONG_OCTET_STRING"
       command: "readAttribute"
-      attribute: "list_int8u"
-      response:
-          value: [1, 2, 3, 4]
-
-    # Tests for List Octet String attribute
-
-    - label: "Read attribute LIST_OCTET_STRING"
-      command: "readAttribute"
-      attribute: "list_octet_string"
-      response:
-          value: ["Test0", "Test1", "Test2", "Test3"]
-
-    # Tests for List Struct Octet String attribute
-
-    - label: "Read attribute LIST_STRUCT_OCTET_STRING"
-      command: "readAttribute"
-      attribute: "list_struct_octet_string"
+      attribute: "list_long_octet_string"
       response:
           value:
               [
-                  { fabricIndex: 0, operationalCert: "Test0" },
-                  { fabricIndex: 1, operationalCert: "Test1" },
-                  { fabricIndex: 2, operationalCert: "Test2" },
-                  { fabricIndex: 3, operationalCert: "Test3" },
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+                  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
               ]
 
     # Tests for Epoch Microseconds
@@ -834,8 +942,17 @@ tests:
       command: "test"
       endpoint: 200
       response:
-          # No cluster on that endpoint, so expect an error.
-          error: 1
+          # No such endpoint, so expect an error.
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_ENDPOINT
+
+    - label: "Send Test Command to unsupported cluster"
+      command: "test"
+      endpoint: 0
+      response:
+          # No TestCluster on that, so expect an error.
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_CLUSTER
 
     # Tests for vendor id
 
@@ -877,3 +994,1397 @@ tests:
                 value: 20003
               - name: "arg2"
                 value: 101
+
+    # Tests for Struct
+
+    - label: "Send Test Command With Struct Argument and arg1.b is true"
+      command: "testStructArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 0,
+                        b: true,
+                        c: 2,
+                        d: "octet_string",
+                        e: "char_string",
+                        f: 1,
+                        g: 0,
+                        h: 0,
+                    }
+      response:
+          values:
+              - name: "value"
+                value: true
+
+    - label: "Send Test Command With Struct Argument and arg1.b is false"
+      command: "testStructArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 0,
+                        b: false,
+                        c: 2,
+                        d: "octet_string",
+                        e: "char_string",
+                        f: 1,
+                        g: 0,
+                        h: 0,
+                    }
+      response:
+          values:
+              - name: "value"
+                value: false
+
+    - label:
+          "Send Test Command With Nested Struct Argument and arg1.c.b is true"
+      command: "testNestedStructArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 0,
+                        b: true,
+                        c:
+                            {
+                                a: 0,
+                                b: true,
+                                c: 2,
+                                d: "octet_string",
+                                e: "char_string",
+                                f: 1,
+                                g: 0,
+                                h: 0,
+                            },
+                    }
+      response:
+          values:
+              - name: "value"
+                value: true
+
+    - label: "Send Test Command With Nested Struct Argument arg1.c.b is false"
+      command: "testNestedStructArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 0,
+                        b: true,
+                        c:
+                            {
+                                a: 0,
+                                b: false,
+                                c: 2,
+                                d: "octet_string",
+                                e: "char_string",
+                                f: 1,
+                                g: 0,
+                                h: 0,
+                            },
+                    }
+      response:
+          values:
+              - name: "value"
+                value: false
+
+    - label:
+          "Send Test Command With Nested Struct List Argument and all fields b
+          of arg1.d are true"
+      command: "testNestedStructListArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 0,
+                        b: true,
+                        c:
+                            {
+                                a: 0,
+                                b: true,
+                                c: 2,
+                                d: "octet_string",
+                                e: "char_string",
+                                f: 1,
+                                g: 0,
+                                h: 0,
+                            },
+                        d:
+                            [
+                                {
+                                    a: 1,
+                                    b: true,
+                                    c: 3,
+                                    d: "nested_octet_string",
+                                    e: "nested_char_string",
+                                    f: 1,
+                                    g: 0,
+                                    h: 0,
+                                },
+                                {
+                                    a: 2,
+                                    b: true,
+                                    c: 3,
+                                    d: "nested_octet_string",
+                                    e: "nested_char_string",
+                                    f: 1,
+                                    g: 0,
+                                    h: 0,
+                                },
+                            ],
+                        e: [1, 2, 3],
+                        f:
+                            [
+                                "octet_string_1",
+                                "octect_string_2",
+                                "octet_string_3",
+                            ],
+                        g: [0, 255],
+                    }
+      response:
+          values:
+              - name: "value"
+                value: true
+
+    - label:
+          "Send Test Command With Nested Struct List Argument and some fields b
+          of arg1.d are false"
+      command: "testNestedStructListArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 0,
+                        b: true,
+                        c:
+                            {
+                                a: 0,
+                                b: true,
+                                c: 2,
+                                d: "octet_string",
+                                e: "char_string",
+                                f: 1,
+                                g: 0,
+                                h: 0,
+                            },
+                        d:
+                            [
+                                {
+                                    a: 1,
+                                    b: true,
+                                    c: 3,
+                                    d: "nested_octet_string",
+                                    e: "nested_char_string",
+                                    f: 1,
+                                    g: 0,
+                                    h: 0,
+                                },
+                                {
+                                    a: 2,
+                                    b: false,
+                                    c: 3,
+                                    d: "nested_octet_string",
+                                    e: "nested_char_string",
+                                    f: 1,
+                                    g: 0,
+                                    h: 0,
+                                },
+                            ],
+                        e: [1, 2, 3],
+                        f:
+                            [
+                                "octet_string_1",
+                                "octect_string_2",
+                                "octet_string_3",
+                            ],
+                        g: [0, 255],
+                    }
+      response:
+          values:
+              - name: "value"
+                value: false
+
+    - label: "Send Test Command With Struct Argument and see what we get back"
+      command: "SimpleStructEchoRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 17,
+                        b: false,
+                        c: 2,
+                        d: "octet_string",
+                        e: "char_string",
+                        f: 1,
+                        g: 0.1,
+                        h: 0.1,
+                    }
+      response:
+          values:
+              - name: "arg1"
+                value:
+                    {
+                        a: 17,
+                        b: false,
+                        c: 2,
+                        d: "octet_string",
+                        e: "char_string",
+                        f: 1,
+                        g: 0.1,
+                        h: 0.1,
+                    }
+
+    # Tests for List
+
+    - label: "Send Test Command With List of INT8U and none of them is set to 0"
+      command: "testListInt8UArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      response:
+          values:
+              - name: "value"
+                value: true
+
+    - label: "Send Test Command With List of INT8U and one of them is set to 0"
+      command: "testListInt8UArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+      response:
+          values:
+              - name: "value"
+                value: false
+
+    - label: "Send Test Command With List of INT8U and get it reversed"
+      command: "testListInt8UReverseRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      response:
+          values:
+              - name: "arg1"
+                value: [9, 8, 7, 6, 5, 4, 3, 2, 1]
+
+    - label:
+          "Send Test Command With empty List of INT8U and get an empty list back"
+      command: "testListInt8UReverseRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: []
+      response:
+          values:
+              - name: "arg1"
+                value: []
+
+    - label:
+          "Send Test Command With List of Struct Argument and arg1.b of first
+          item is true"
+      command: "testListStructArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    [
+                        {
+                            a: 0,
+                            b: true,
+                            c: 2,
+                            d: "first_octet_string",
+                            e: "first_char_string",
+                            f: 1,
+                            g: 0,
+                            h: 0,
+                        },
+                        {
+                            a: 1,
+                            b: true,
+                            c: 3,
+                            d: "second_octet_string",
+                            e: "second_char_string",
+                            f: 1,
+                            g: 0,
+                            h: 0,
+                        },
+                    ]
+      response:
+          values:
+              - name: "value"
+                value: true
+
+    - label:
+          "Send Test Command With List of Struct Argument and arg1.b of first
+          item is false"
+      command: "testListStructArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    [
+                        {
+                            a: 1,
+                            b: true,
+                            c: 3,
+                            d: "second_octet_string",
+                            e: "second_char_string",
+                            f: 1,
+                            g: 0,
+                            h: 0,
+                        },
+                        {
+                            a: 0,
+                            b: false,
+                            c: 2,
+                            d: "first_octet_string",
+                            e: "first_char_string",
+                            f: 1,
+                            g: 0,
+                            h: 0,
+                        },
+                    ]
+      response:
+          values:
+              - name: "value"
+                value: false
+
+    - label:
+          "Send Test Command With List of Nested Struct List Argument and all
+          fields b of elements of arg1.d are true"
+      command: "testListNestedStructListArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    [
+                        {
+                            a: 0,
+                            b: true,
+                            c:
+                                {
+                                    a: 0,
+                                    b: true,
+                                    c: 2,
+                                    d: "octet_string",
+                                    e: "char_string",
+                                    f: 1,
+                                    g: 0,
+                                    h: 0,
+                                },
+                            d:
+                                [
+                                    {
+                                        a: 1,
+                                        b: true,
+                                        c: 3,
+                                        d: "nested_octet_string",
+                                        e: "nested_char_string",
+                                        f: 1,
+                                        g: 0,
+                                        h: 0,
+                                    },
+                                    {
+                                        a: 2,
+                                        b: true,
+                                        c: 3,
+                                        d: "nested_octet_string",
+                                        e: "nested_char_string",
+                                        f: 1,
+                                        g: 0,
+                                        h: 0,
+                                    },
+                                ],
+                            e: [1, 2, 3],
+                            f:
+                                [
+                                    "octet_string_1",
+                                    "octect_string_2",
+                                    "octet_string_3",
+                                ],
+                            g: [0, 255],
+                        },
+                    ]
+      response:
+          values:
+              - name: "value"
+                value: true
+
+    - label:
+          "Send Test Command With Nested Struct List Argument and some fields b
+          of elements of arg1.d are false"
+      command: "testListNestedStructListArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value:
+                    [
+                        {
+                            a: 0,
+                            b: true,
+                            c:
+                                {
+                                    a: 0,
+                                    b: true,
+                                    c: 2,
+                                    d: "octet_string",
+                                    e: "char_string",
+                                    f: 1,
+                                    g: 0,
+                                    h: 0,
+                                },
+                            d:
+                                [
+                                    {
+                                        a: 1,
+                                        b: true,
+                                        c: 3,
+                                        d: "nested_octet_string",
+                                        e: "nested_char_string",
+                                        f: 1,
+                                        g: 0,
+                                        h: 0,
+                                    },
+                                    {
+                                        a: 2,
+                                        b: false,
+                                        c: 3,
+                                        d: "nested_octet_string",
+                                        e: "nested_char_string",
+                                        f: 1,
+                                        g: 0,
+                                        h: 0,
+                                    },
+                                ],
+                            e: [1, 2, 3],
+                            f:
+                                [
+                                    "octet_string_1",
+                                    "octect_string_2",
+                                    "octet_string_3",
+                                ],
+                            g: [0, 255],
+                        },
+                    ]
+      response:
+          values:
+              - name: "value"
+                value: false
+
+    - label:
+          "Write attribute LIST With List of INT8U and none of them is set to 0"
+      command: "writeAttribute"
+      attribute: "list_int8u"
+      arguments:
+          value: [1, 2, 3, 4]
+
+    - label: "Read attribute LIST With List of INT8U"
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          value: [1, 2, 3, 4]
+
+    - label: "Write attribute LIST With List of OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "list_octet_string"
+      arguments:
+          value: ["Test0", "Test1", "Test2", "Test3"]
+
+    - label: "Read attribute LIST With List of OCTET_STRING"
+      command: "readAttribute"
+      attribute: "list_octet_string"
+      response:
+          value: ["Test0", "Test1", "Test2", "Test3"]
+
+    - label: "Write attribute LIST With List of LIST_STRUCT_OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "list_struct_octet_string"
+      arguments:
+          value:
+              [
+                  { fabricIndex: 0, operationalCert: "Test0" },
+                  { fabricIndex: 1, operationalCert: "Test1" },
+                  { fabricIndex: 2, operationalCert: "Test2" },
+                  { fabricIndex: 3, operationalCert: "Test3" },
+              ]
+
+    - label: "Read attribute LIST With List of LIST_STRUCT_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "list_struct_octet_string"
+      response:
+          value:
+              [
+                  { fabricIndex: 0, operationalCert: "Test0" },
+                  { fabricIndex: 1, operationalCert: "Test1" },
+                  { fabricIndex: 2, operationalCert: "Test2" },
+                  { fabricIndex: 3, operationalCert: "Test3" },
+              ]
+
+    # Tests for Nullables and Optionals
+
+    - label: "Send Test Command with optional arg set."
+      command: "testNullableOptionalRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 5
+      response:
+          values:
+              - name: "wasPresent"
+                value: true
+              - name: "wasNull"
+                value: false
+              - name: "value"
+                value: 5
+              - name: "originalValue"
+                value: 5
+
+    - label: "Send Test Command without its optional arg."
+      command: "testNullableOptionalRequest"
+      response:
+          values:
+              - name: "wasPresent"
+                value: false
+
+    # Nullable attributes
+
+    # Tests for nullable Boolean attribute
+
+    - label: "Write attribute NULLABLE_BOOLEAN null"
+      command: "writeAttribute"
+      attribute: "nullable_boolean"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_BOOLEAN null"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          value: null
+
+    - label: "Write attribute NULLABLE_BOOLEAN True"
+      command: "writeAttribute"
+      attribute: "nullable_boolean"
+      arguments:
+          value: true
+
+    - label: "Read attribute NULLABLE_BOOLEAN True"
+      command: "readAttribute"
+      attribute: "nullable_boolean"
+      response:
+          value: true
+
+    # Tests for nullable Bitmap8 attribute
+
+    - label: "Write attribute NULLABLE_BITMAP8 Max Value"
+      command: "writeAttribute"
+      attribute: "nullable_bitmap8"
+      arguments:
+          value: 254
+
+    - label: "Read attribute NULLABLE_BITMAP8 Max Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap8"
+      response:
+          value: 254
+
+    - label: "Write attribute NULLABLE_BITMAP8 Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_bitmap8"
+      arguments:
+          value: 255
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_BITMAP8 unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap8"
+      response:
+          value: 254
+
+    - label: "Write attribute NULLABLE_BITMAP8 null Value"
+      command: "writeAttribute"
+      attribute: "nullable_bitmap8"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_BITMAP8 null Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap8"
+      response:
+          value: null
+
+    # Tests for nullable Bitmap16 attribute
+
+    - label: "Write attribute NULLABLE_BITMAP16 Max Value"
+      command: "writeAttribute"
+      attribute: "nullable_bitmap16"
+      arguments:
+          value: 65534
+
+    - label: "Read attribute NULLABLE_BITMAP16 Max Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap16"
+      response:
+          value: 65534
+
+    - label: "Write attribute NULLABLE_BITMAP16 Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_bitmap16"
+      arguments:
+          value: 65535
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_BITMAP16 unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap16"
+      response:
+          value: 65534
+
+    - label: "Write attribute NULLABLE_BITMAP16 null Value"
+      command: "writeAttribute"
+      attribute: "nullable_bitmap16"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_BITMAP16 null Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap16"
+      response:
+          value: null
+
+    # Tests for nullable Bitmap32 attribute
+
+    - label: "Write attribute NULLABLE_BITMAP32 Max Value"
+      command: "writeAttribute"
+      attribute: "nullable_bitmap32"
+      arguments:
+          value: 4294967294
+
+    - label: "Read attribute NULLABLE_BITMAP32 Max Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap32"
+      response:
+          value: 4294967294
+
+    - label: "Write attribute NULLABLE_BITMAP32 Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_bitmap32"
+      arguments:
+          value: 4294967295
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_BITMAP32 unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap32"
+      response:
+          value: 4294967294
+
+    - label: "Write attribute NULLABLE_BITMAP32 null Value"
+      command: "writeAttribute"
+      attribute: "nullable_bitmap32"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_BITMAP32 null Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap32"
+      response:
+          value: null
+
+    # Tests for nullable Bitmap64 attribute
+
+    - label: "Write attribute NULLABLE_BITMAP64 Max Value"
+      command: "writeAttribute"
+      attribute: "nullable_bitmap64"
+      arguments:
+          value: "18446744073709551614"
+
+    - label: "Read attribute NULLABLE_BITMAP64 Max Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap64"
+      response:
+          value: "18446744073709551614"
+
+    - label: "Write attribute NULLABLE_BITMAP64 Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_bitmap64"
+      arguments:
+          value: "18446744073709551615"
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_BITMAP64 unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap64"
+      response:
+          value: "18446744073709551614"
+
+    - label: "Write attribute NULLABLE_BITMAP64 null Value"
+      command: "writeAttribute"
+      attribute: "nullable_bitmap64"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_BITMAP64 null Value"
+      command: "readAttribute"
+      attribute: "nullable_bitmap64"
+      response:
+          value: null
+
+    # Tests for UInt8 attribute
+
+    - label: "Write attribute NULLABLE_INT8U Max Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: 254
+
+    - label: "Read attribute NULLABLE_INT8U Max Value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          value: 254
+
+    - label: "Write attribute NULLABLE_INT8U Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: 255
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_INT8U unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          value: 254
+
+    - label: "Write attribute NULLABLE_INT8U null Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8u"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_INT8U null Value"
+      command: "readAttribute"
+      attribute: "nullable_int8u"
+      response:
+          value: null
+
+    # Tests for UInt16 attribute
+
+    - label: "Write attribute NULLABLE_INT16U Max Value"
+      command: "writeAttribute"
+      attribute: "nullable_int16u"
+      arguments:
+          value: 65534
+
+    - label: "Read attribute NULLABLE_INT16U Max Value"
+      command: "readAttribute"
+      attribute: "nullable_int16u"
+      response:
+          value: 65534
+
+    - label: "Write attribute NULLABLE_INT16U Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_int16u"
+      arguments:
+          value: 65535
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_INT16U unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_int16u"
+      response:
+          value: 65534
+
+    - label: "Write attribute NULLABLE_INT16U null Value"
+      command: "writeAttribute"
+      attribute: "nullable_int16u"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_INT16U null Value"
+      command: "readAttribute"
+      attribute: "nullable_int16u"
+      response:
+          value: null
+
+    # Tests for UInt32 attribute
+
+    - label: "Write attribute NULLABLE_INT32U Max Value"
+      command: "writeAttribute"
+      attribute: "nullable_int32u"
+      arguments:
+          value: 4294967294
+
+    - label: "Read attribute NULLABLE_INT32U Max Value"
+      command: "readAttribute"
+      attribute: "nullable_int32u"
+      response:
+          value: 4294967294
+
+    - label: "Write attribute NULLABLE_INT32U Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_int32u"
+      arguments:
+          value: 4294967295
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_INT32U unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_int32u"
+      response:
+          value: 4294967294
+
+    - label: "Write attribute NULLABLE_INT32U null Value"
+      command: "writeAttribute"
+      attribute: "nullable_int32u"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_INT32U null Value"
+      command: "readAttribute"
+      attribute: "nullable_int32u"
+      response:
+          value: null
+
+    # Tests for UInt64 attribute
+
+    - label: "Write attribute NULLABLE_INT64U Max Value"
+      command: "writeAttribute"
+      attribute: "nullable_int64u"
+      arguments:
+          value: "18446744073709551614"
+
+    - label: "Read attribute NULLABLE_INT64U Max Value"
+      command: "readAttribute"
+      attribute: "nullable_int64u"
+      response:
+          value: "18446744073709551614"
+
+    - label: "Write attribute NULLABLE_INT64U Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_int64u"
+      arguments:
+          value: "18446744073709551615"
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_INT64U unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_int64u"
+      response:
+          value: "18446744073709551614"
+
+    - label: "Write attribute NULLABLE_INT64U null Value"
+      command: "writeAttribute"
+      attribute: "nullable_int64u"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_INT64U null Value"
+      command: "readAttribute"
+      attribute: "nullable_int64u"
+      response:
+          value: null
+
+    # Tests for Int8 attribute
+
+    - label: "Write attribute NULLABLE_INT8S Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8s"
+      arguments:
+          value: -127
+
+    - label: "Read attribute NULLABLE_INT8S Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int8s"
+      response:
+          value: -127
+
+    - label: "Write attribute NULLABLE_INT8S Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8s"
+      arguments:
+          value: -128
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_INT8S unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_int8s"
+      response:
+          value: -127
+
+    - label: "Write attribute NULLABLE_INT8S null Value"
+      command: "writeAttribute"
+      attribute: "nullable_int8s"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_INT8S null Value"
+      command: "readAttribute"
+      attribute: "nullable_int8s"
+      response:
+          value: null
+
+    # Tests for Int16 attribute
+
+    - label: "Write attribute NULLABLE_INT16S Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int16s"
+      arguments:
+          value: -32767
+
+    - label: "Read attribute NULLABLE_INT16S Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int16s"
+      response:
+          value: -32767
+
+    - label: "Write attribute NULLABLE_INT16S Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_int16s"
+      arguments:
+          value: -32768
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_INT16S unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_int16s"
+      response:
+          value: -32767
+
+    - label: "Write attribute NULLABLE_INT16S null Value"
+      command: "writeAttribute"
+      attribute: "nullable_int16s"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_INT16S null Value"
+      command: "readAttribute"
+      attribute: "nullable_int16s"
+      response:
+          value: null
+
+    # Tests for Int32 attribute
+
+    - label: "Write attribute NULLABLE_INT32S Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int32s"
+      arguments:
+          value: -2147483647
+
+    - label: "Read attribute NULLABLE_INT32S Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int32s"
+      response:
+          value: -2147483647
+
+    - label: "Write attribute NULLABLE_INT32S Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_int32s"
+      arguments:
+          value: -2147483648
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_INT32S unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_int32s"
+      response:
+          value: -2147483647
+
+    - label: "Write attribute NULLABLE_INT32S null Value"
+      command: "writeAttribute"
+      attribute: "nullable_int32s"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_INT32S null Value"
+      command: "readAttribute"
+      attribute: "nullable_int32s"
+      response:
+          value: null
+
+    # Tests for Int64 attribute
+
+    - label: "Write attribute NULLABLE_INT64S Min Value"
+      command: "writeAttribute"
+      attribute: "nullable_int64s"
+      arguments:
+          value: "-9223372036854775807"
+
+    - label: "Read attribute NULLABLE_INT64S Min Value"
+      command: "readAttribute"
+      attribute: "nullable_int64s"
+      response:
+          value: "-9223372036854775807"
+
+    - label: "Write attribute NULLABLE_INT64S Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_int64s"
+      arguments:
+          # This is a nasty hack: -9223372036854775808 is not a valid way to
+          # write a long long in C++, leading to warnings.  So this tries to
+          # work around that.
+          value: "-9223372036854775807LL - 1"
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_INT64S unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_int64s"
+      response:
+          value: "-9223372036854775807"
+
+    - label: "Write attribute NULLABLE_INT64S null Value"
+      command: "writeAttribute"
+      attribute: "nullable_int64s"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_INT64S null Value"
+      command: "readAttribute"
+      attribute: "nullable_int64s"
+      response:
+          value: null
+
+    # Tests for float attribute
+
+    - label: "Write attribute NULLABLE_SINGLE medium Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: 0.1
+
+    - label: "Read attribute NULLABLE_SINGLE medium Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: 0.1
+
+    - label: "Write attribute NULLABLE_SINGLE largest Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: Infinity
+
+    - label: "Read attribute NULLABLE_SINGLE largest Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: Infinity
+
+    - label: "Write attribute NULLABLE_SINGLE smallest Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: -Infinity
+
+    - label: "Read attribute NULLABLE_SINGLE smallest Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: -Infinity
+
+    - label: "Write attribute NULLABLE_SINGLE null Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_SINGLE null Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: null
+
+    - label: "Write attribute NULLABLE_SINGLE 0 Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_single"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_SINGLE 0 Value"
+      command: "readAttribute"
+      attribute: "nullable_float_single"
+      response:
+          value: 0
+
+    # Tests for double attribute
+
+    - label: "Write attribute NULLABLE_DOUBLE medium Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: 0.1234567890123
+
+    - label: "Read attribute NULLABLE_DOUBLE medium Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: 0.1234567890123
+
+    - label: "Write attribute NULLABLE_DOUBLE largest Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: Infinity
+
+    - label: "Read attribute NULLABLE_DOUBLE largest Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: Infinity
+
+    - label: "Write attribute NULLABLE_DOUBLE smallest Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: -Infinity
+
+    - label: "Read attribute NULLABLE_DOUBLE smallest Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: -Infinity
+
+    - label: "Write attribute NULLABLE_DOUBLE null Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_DOUBLE null Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: null
+
+    - label: "Write attribute NULLABLE_DOUBLE 0 Value"
+      command: "writeAttribute"
+      attribute: "nullable_float_double"
+      arguments:
+          value: 0
+
+    - label: "Read attribute NULLABLE_DOUBLE 0 Value"
+      command: "readAttribute"
+      attribute: "nullable_float_double"
+      response:
+          value: 0
+
+    # Tests for Enum8 attribute
+
+    - label: "Write attribute NULLABLE_ENUM8 Max Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum8"
+      arguments:
+          value: 254
+
+    - label: "Read attribute NULLABLE_ENUM8 Max Value"
+      command: "readAttribute"
+      attribute: "nullable_enum8"
+      response:
+          value: 254
+
+    - label: "Write attribute NULLABLE_ENUM8 Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum8"
+      arguments:
+          value: 255
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_ENUM8 unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_enum8"
+      response:
+          value: 254
+
+    - label: "Write attribute NULLABLE_ENUM8 null Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum8"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_ENUM8 null Value"
+      command: "readAttribute"
+      attribute: "nullable_enum8"
+      response:
+          value: null
+
+    # Tests for Enum16 attribute
+
+    - label: "Write attribute NULLABLE_ENUM16 Max Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum16"
+      arguments:
+          value: 65534
+
+    - label: "Read attribute NULLABLE_ENUM16 Max Value"
+      command: "readAttribute"
+      attribute: "nullable_enum16"
+      response:
+          value: 65534
+
+    - label: "Write attribute NULLABLE_ENUM16 Invalid Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum16"
+      arguments:
+          value: 65535
+      response:
+          error: CONSTRAINT_ERROR
+
+    - label: "Read attribute NULLABLE_ENUM16 unchanged Value"
+      command: "readAttribute"
+      attribute: "nullable_enum16"
+      response:
+          value: 65534
+
+    - label: "Write attribute NULLABLE_ENUM16 null Value"
+      command: "writeAttribute"
+      attribute: "nullable_enum16"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_ENUM16 null Value"
+      command: "readAttribute"
+      attribute: "nullable_enum16"
+      response:
+          value: null
+
+    # Tests for Octet String attribute
+
+    - label: "Read attribute NULLABLE_OCTET_STRING Default Value"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          value: ""
+
+    - label: "Write attribute NULLABLE_OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "nullable_octet_string"
+      arguments:
+          value: "TestValue"
+
+    - label: "Read attribute NULLABLE_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          value: "TestValue"
+
+    - label: "Write attribute NULLABLE_OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "nullable_octet_string"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          value: null
+
+    - label: "Write attribute NULLABLE_OCTET_STRING"
+      command: "writeAttribute"
+      attribute: "nullable_octet_string"
+      arguments:
+          value: ""
+
+    - label: "Read attribute NULLABLE_OCTET_STRING"
+      command: "readAttribute"
+      attribute: "nullable_octet_string"
+      response:
+          value: ""
+
+    # Tests for Char String attribute
+
+    - label: "Read attribute NULLABLE_CHAR_STRING Default Value"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          value: ""
+
+    - label: "Write attribute NULLABLE_CHAR_STRING"
+      command: "writeAttribute"
+      attribute: "nullable_char_string"
+      arguments:
+          value: "☉T☉"
+
+    - label: "Read attribute NULLABLE_CHAR_STRING"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          value: "☉T☉"
+
+    - label: "Write attribute NULLABLE_CHAR_STRING - Value too long"
+      command: "writeAttribute"
+      attribute: "nullable_char_string"
+      arguments:
+          value: null
+
+    - label: "Read attribute NULLABLE_CHAR_STRING"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          value: null
+
+    - label: "Write attribute NULLABLE_CHAR_STRING - Empty"
+      command: "writeAttribute"
+      attribute: "nullable_char_string"
+      arguments:
+          value: ""
+
+    - label: "Read attribute NULLABLE_CHAR_STRING"
+      command: "readAttribute"
+      attribute: "nullable_char_string"
+      response:
+          value: ""
+
+    - label: "Read attribute from nonexistent endpoint."
+      endpoint: 200
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_ENDPOINT
+
+    - label: "Read attribute from nonexistent cluster."
+      endpoint: 0
+      command: "readAttribute"
+      attribute: "list_int8u"
+      response:
+          # SDK returning wrong error code here so far.
+          errorWrongValue: UNSUPPORTED_CLUSTER
+
+    # Tests for command with optional arguments
+    - label:
+          "Send a command that takes an optional parameter but do not set it."
+      command: "TestSimpleOptionalArgumentRequest"
+      response:
+          error: INVALID_VALUE
+
+    - label:
+          "Send a command that takes an optional parameter but do not set it."
+      command: "TestSimpleOptionalArgumentRequest"
+      arguments:
+          values:
+              - name: "arg1"
+                value: 1

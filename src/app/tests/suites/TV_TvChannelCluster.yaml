@@ -19,6 +19,10 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Read attribute TV Channel list"
       command: "readAttribute"
       attribute: "TV Channel list"
@@ -28,16 +32,16 @@ tests:
                   {
                       majorNumber: 1,
                       minorNumber: 2,
-                      name: 12,
-                      callSign: 13,
-                      affiliateCallSign: 13,
+                      name: "exampleName",
+                      callSign: "exampleCSign",
+                      affiliateCallSign: "exampleASign",
                   },
                   {
                       majorNumber: 2,
                       minorNumber: 3,
-                      name: 12,
-                      callSign: 13,
-                      affiliateCallSign: 13,
+                      name: "exampleName",
+                      callSign: "exampleCSign",
+                      affiliateCallSign: "exampleASign",
                   },
               ]
     # TODO: Enable the test once struct response is supported

@@ -13,22 +13,6 @@ include(${prj_root}/GCC-RELEASE/project_hp/asdk/includepath.cmake)
 list(
     APPEND ${list_chip_main_sources}
 
-    #chip app
-    ${chip_dir}/src/app/Command.cpp
-    ${chip_dir}/src/app/CommandHandler.cpp
-    ${chip_dir}/src/app/InteractionModelEngine.cpp
-    ${chip_dir}/src/app/CommandSender.cpp
-    ${chip_dir}/src/app/decoder.cpp
-    ${chip_dir}/src/app/encoder-common.cpp
-    ${chip_dir}/src/app/EventManagement.cpp
-    ${chip_dir}/src/app/ReadClient.cpp
-    ${chip_dir}/src/app/ReadHandler.cpp
-    ${chip_dir}/src/app/WriteClient.cpp
-    ${chip_dir}/src/app/WriteHandler.cpp
-    ${chip_dir}/src/app/util/CHIPDeviceCallbacksMgr.cpp
-    ${chip_dir}/src/app/util/esi-management.cpp
-    ${chip_dir}/src/app/reporting/Engine.cpp
-
     ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/attribute-size.cpp
     ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/CHIPClientCallbacks.cpp
     ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/callback-stub.cpp
@@ -36,6 +20,7 @@ list(
     ${chip_dir}/zzz_generated/all-clusters-app/zap-generated/CHIPClusters.cpp
 
     ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
     ${chip_dir}/examples/all-clusters-app/ameba/main/chipinterface.cpp
     ${chip_dir}/examples/all-clusters-app/ameba/main/DeviceCallbacks.cpp
@@ -63,6 +48,7 @@ target_include_directories(
     ${chip_dir}/zzz_generated/all-clusters-app/zap-generated
     ${chip_dir}/zzz_generated/app-common
     ${chip_dir}/examples/all-clusters-app/all-clusters-common
+    ${chip_dir}/examples/all-clusters-app/all-clusters-common/include
     ${chip_dir}/examples/all-clusters-app/ameba/main/include
     ${chip_dir_output}/gen/include
     ${chip_dir}/src/include/

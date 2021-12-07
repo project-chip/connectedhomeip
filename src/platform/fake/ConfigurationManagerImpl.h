@@ -25,9 +25,13 @@ namespace DeviceLayer {
 /**
  * Concrete implementation of the ConfigurationManager singleton object for the fake platform.
  */
-class ConfigurationManagerImpl final : public ConfigurationManager
+class ConfigurationManagerImpl : public ConfigurationManager
 {
+public:
     virtual ~ConfigurationManagerImpl() = default;
+    // NOTE: This method is required by the tests.
+    // This returns an instance of this class.
+    static ConfigurationManagerImpl & GetDefaultInstance();
 
 private:
     CHIP_ERROR Init() override { return CHIP_NO_ERROR; }
@@ -35,11 +39,11 @@ private:
     CHIP_ERROR GetVendorId(uint16_t & vendorId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetProductName(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetProductId(uint16_t & productId) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetProductRevisionString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetProductRevision(uint16_t & productRev) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR StoreProductRevision(uint16_t productRev) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetFirmwareRevisionString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR GetFirmwareRevision(uint16_t & firmwareRev) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetHardwareVersionString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetHardwareVersion(uint16_t & hardwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreHardwareVersion(uint16_t hardwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSoftwareVersionString(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetSoftwareVersion(uint16_t & softwareVer) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetPrimaryMACAddress(MutableByteSpan buf) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -56,9 +60,7 @@ private:
     CHIP_ERROR StoreSetupPinCode(uint32_t setupPinCode) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetSetupDiscriminator(uint16_t & setupDiscriminator) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreSetupDiscriminator(uint16_t setupDiscriminator) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-#if CHIP_ENABLE_ROTATING_DEVICE_ID
     CHIP_ERROR GetLifetimeCounter(uint16_t & lifetimeCounter) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-#endif
     CHIP_ERROR GetFailSafeArmed(bool & val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR SetFailSafeArmed(bool val) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo) override
@@ -79,6 +81,12 @@ private:
     CHIP_ERROR StoreCountryCode(const char * code, size_t codeLen) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR GetBreadcrumb(uint64_t & breadcrumb) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
     CHIP_ERROR StoreBreadcrumb(uint64_t breadcrumb) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetRebootCount(uint32_t & rebootCount) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreRebootCount(uint32_t rebootCount) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetTotalOperationalHours(uint32_t & totalOperationalHours) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreTotalOperationalHours(uint32_t totalOperationalHours) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR GetBootReason(uint32_t & bootReason) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR StoreBootReason(uint32_t bootReason) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #if !defined(NDEBUG)
     CHIP_ERROR RunUnitTests(void) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
 #endif
@@ -96,35 +104,7 @@ private:
     }
 
     // NOTE: Other public interface methods are implemented by GenericConfigurationManagerImpl<>.
-    // ===== Members for internal use by the following friends.
-
-    friend ConfigurationManager & ConfigurationMgr(void);
-    friend ConfigurationManagerImpl & ConfigurationMgrImpl(void);
-
-    static ConfigurationManagerImpl sInstance;
 };
-
-/**
- * Returns the public interface of the ConfigurationManager singleton object.
- *
- * Chip applications should use this to access features of the ConfigurationManager object
- * that are common to all platforms.
- */
-inline ConfigurationManager & ConfigurationMgr(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
-
-/**
- * Returns the platform-specific implementation of the ConfigurationManager singleton object.
- *
- * Chip applications can use this to gain access to features of the ConfigurationManager
- * that are specific to the ESP32 platform.
- */
-inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
-{
-    return ConfigurationManagerImpl::sInstance;
-}
 
 } // namespace DeviceLayer
 } // namespace chip

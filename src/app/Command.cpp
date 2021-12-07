@@ -37,17 +37,6 @@ CHIP_ERROR Command::Finalize(System::PacketBufferHandle & commandPacket)
     return mCommandMessageWriter.Finalize(&commandPacket);
 }
 
-CHIP_ERROR Command::ConstructCommandPath(const CommandPathParams & aCommandPathParams, CommandPathIB::Builder & aCommandPath)
-{
-    if (aCommandPathParams.mFlags.Has(CommandPathFlags::kEndpointIdValid))
-    {
-        aCommandPath.EndpointId(aCommandPathParams.mEndpointId);
-    }
-
-    aCommandPath.ClusterId(aCommandPathParams.mClusterId).CommandId(aCommandPathParams.mCommandId).EndOfCommandPathIB();
-    return aCommandPath.GetError();
-}
-
 void Command::Abort()
 {
     //
@@ -106,8 +95,14 @@ const char * Command::GetStateStr() const
     case CommandState::AddedCommand:
         return "AddedCommand";
 
+    case CommandState::AwaitingTimedStatus:
+        return "AwaitingTimedStatus";
+
     case CommandState::CommandSent:
         return "CommandSent";
+
+    case CommandState::ResponseReceived:
+        return "ResponseReceived";
 
     case CommandState::AwaitingDestruction:
         return "AwaitingDestruction";

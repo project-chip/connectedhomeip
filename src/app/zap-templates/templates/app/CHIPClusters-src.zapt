@@ -22,7 +22,7 @@ namespace Controller {
 
 // {{asUpperCamelCase name}} Cluster Commands
 {{#chip_cluster_commands}}
-CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments_with_structs_expanded}}, {{chipType}} {{asLowerCamelCase label}}{{/chip_cluster_command_arguments_with_structs_expanded}})
+CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback{{#chip_cluster_command_arguments_with_structs_expanded}}{{#if_is_struct type}}{{else}}, {{chipType}} {{asLowerCamelCase label}}{{/if_is_struct}}{{/chip_cluster_command_arguments_with_structs_expanded}})
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLV::TLVWriter * writer     = nullptr;
@@ -44,15 +44,18 @@ CHIP_ERROR {{asUpperCamelCase clusterName}}Cluster::{{asUpperCamelCase name}}(Ca
     SuccessOrExit(err = sender->PrepareCommand(cmdParams));
 
 {{#chip_cluster_command_arguments_with_structs_expanded}}
+{{#if_is_struct type}}
+{{else}}
 {{#first}}
     VerifyOrExit((writer = sender->GetCommandDataIBTLVWriter()) != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 {{/first}}
     // {{asLowerCamelCase label}}: {{asLowerCamelCase type}}
 {{#if (isCharString type)}}
-    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}.data()));
+    SuccessOrExit(err = writer->PutString(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}));
 {{else}}
     SuccessOrExit(err = writer->Put(TLV::ContextTag(argSeqNumber++), {{asLowerCamelCase label}}));
 {{/if}}
+{{/if_is_struct}}
 {{else}}
     // Command takes no arguments.
 {{/chip_cluster_command_arguments_with_structs_expanded}}
@@ -73,26 +76,9 @@ exit:
 {{/chip_cluster_commands}}
 // {{asUpperCamelCase name}} Cluster Attributes
 {{#chip_server_cluster_attributes}}
-CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReadAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId = mEndpoint;
-    attributePath.mClusterId  = mClusterId;
-    attributePath.mAttributeId    = {{asHex code 8}};
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,{{#if isList}}{{asUpperCamelCase parent.name}}Cluster{{asUpperCamelCase name}}ListAttributeFilter{{else}}BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>{{/if}});
-}
-
-{{#if isWritableAttribute}}
-CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::WriteAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, {{chipType}} value)
-{
-    app::WriteClientHandle handle;
-    ReturnErrorOnFailure(app::InteractionModelEngine::GetInstance()->NewWriteClient(handle, mDevice->GetInteractionModelDelegate()));
-    ReturnErrorOnFailure(handle.EncodeAttributeWritePayload(chip::app::AttributePathParams(mEndpoint, mClusterId, {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::Id), value));
-    return mDevice->SendWriteAttributeRequest(std::move(handle), onSuccessCallback, onFailureCallback);
-}
-
-{{/if}}
+{{#unless (isStrEqual chipCallback.name "Unsupported")}}
 {{#if isReportableAttribute}}
+{{#unless isList}}
 CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::SubscribeAttribute{{asUpperCamelCase name}}(Callback::Cancelable * onSuccessCallback, Callback::Cancelable * onFailureCallback, uint16_t minInterval, uint16_t maxInterval)
 {
     chip::app::AttributePathParams attributePath;
@@ -107,7 +93,9 @@ CHIP_ERROR {{asUpperCamelCase parent.name}}Cluster::ReportAttribute{{asUpperCame
     return RequestAttributeReporting({{#if isGlobalAttribute}}Globals{{else}}{{asUpperCamelCase parent.name}}{{/if}}::Attributes::{{asUpperCamelCase name}}::Id, onReportCallback, BasicAttributeFilter<{{chipCallback.name}}AttributeCallback>);
 }
 
+{{/unless}}
 {{/if}}
+{{/unless}}
 {{/chip_server_cluster_attributes}}
 
 {{/chip_client_clusters}}

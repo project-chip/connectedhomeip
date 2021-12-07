@@ -20,6 +20,7 @@
 
 #include <controller/CommandSenderAllocator.h>
 #include <controller/TypedCommandCallback.h>
+#include <lib/core/Optional.h>
 
 namespace chip {
 namespace Controller {
@@ -30,21 +31,24 @@ namespace Controller {
  * the provided success callback or calls the provided failure callback.
  *
  * The RequestObjectT is generally expected to be a ClusterName::Commands::CommandName::Type struct, but any object
- * that can be encoded using the DataModel::Encode machinery and exposes the GetClusterId() and GetCommandId() functions
+ * that can be encoded using the DataModel::Encode machinery and exposes the
+ * GetClusterId() and GetCommandId() functions and a ResponseType type
  * is expected to work.
  *
- * The ResponseObjectT is expected to be one of two things:
+ * The ResponseType is expected to be one of two things:
  *
  *    - If a data response is expected on success, a struct type decodable via DataModel::Decode which has GetClusterId() and
  * GetCommandId() methods.  A ClusterName::Commands::ResponseCommandName::DecodableType is typically used.
- *    - If a status response is expected on success, a DataModel::NullObjectType.
+ *    - If a status response is expected on success, DataModel::NullObjectType.
  *
  */
-template <typename ResponseObjectT = app::DataModel::NullObjectType, typename RequestObjectT>
-CHIP_ERROR InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
-                                const RequestObjectT & requestCommandData,
-                                typename TypedCommandCallback<ResponseObjectT>::OnSuccessCallbackType onSuccessCb,
-                                typename TypedCommandCallback<ResponseObjectT>::OnErrorCallbackType onErrorCb)
+template <typename RequestObjectT>
+CHIP_ERROR
+InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
+                     const RequestObjectT & requestCommandData,
+                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
+                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
+                     const Optional<uint16_t> & timedInvokeTimeoutMs)
 {
     app::CommandPathParams commandPath = { endpointId, 0, RequestObjectT::GetClusterId(), RequestObjectT::GetCommandId(),
                                            (app::CommandPathFlags::kEndpointIdValid) };
@@ -52,7 +56,7 @@ CHIP_ERROR InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, Sessi
     //
     // Let's create a handle version of the decoder to ensure we do correct clean-up of it if things go south at any point below
     //
-    auto decoder = chip::Platform::MakeUnique<TypedCommandCallback<ResponseObjectT>>(onSuccessCb, onErrorCb);
+    auto decoder = chip::Platform::MakeUnique<TypedCommandCallback<typename RequestObjectT::ResponseType>>(onSuccessCb, onErrorCb);
     VerifyOrReturnError(decoder != nullptr, CHIP_ERROR_NO_MEMORY);
 
     //
@@ -66,10 +70,11 @@ CHIP_ERROR InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, Sessi
 
     decoder->SetOnDoneCallback(onDone);
 
-    auto commandSender = chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), aExchangeMgr);
+    auto commandSender =
+        chip::Platform::MakeUnique<app::CommandSender>(decoder.get(), aExchangeMgr, timedInvokeTimeoutMs.HasValue());
     VerifyOrReturnError(commandSender != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData));
+    ReturnErrorOnFailure(commandSender->AddRequestData(commandPath, requestCommandData, timedInvokeTimeoutMs));
     ReturnErrorOnFailure(commandSender->SendCommandRequest(sessionHandle));
 
     //
@@ -82,6 +87,28 @@ CHIP_ERROR InvokeCommandRequest(Messaging::ExchangeManager * aExchangeMgr, Sessi
     commandSender.release();
 
     return CHIP_NO_ERROR;
+}
+
+template <typename RequestObjectT>
+CHIP_ERROR
+InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
+                     const RequestObjectT & requestCommandData,
+                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
+                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb,
+                     uint16_t timedInvokeTimeoutMs)
+{
+    return InvokeCommandRequest(exchangeMgr, sessionHandle, endpointId, requestCommandData, onSuccessCb, onErrorCb,
+                                timedInvokeTimeoutMs);
+}
+
+template <typename RequestObjectT, typename std::enable_if_t<!RequestObjectT::MustUseTimedInvoke(), int> = 0>
+CHIP_ERROR
+InvokeCommandRequest(Messaging::ExchangeManager * exchangeMgr, SessionHandle sessionHandle, chip::EndpointId endpointId,
+                     const RequestObjectT & requestCommandData,
+                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnSuccessCallbackType onSuccessCb,
+                     typename TypedCommandCallback<typename RequestObjectT::ResponseType>::OnErrorCallbackType onErrorCb)
+{
+    return InvokeCommandRequest(exchangeMgr, sessionHandle, endpointId, requestCommandData, onSuccessCb, onErrorCb, NullOptional);
 }
 
 } // namespace Controller

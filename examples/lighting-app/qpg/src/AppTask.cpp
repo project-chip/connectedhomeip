@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "qvCHIP.h"
+#include "qvIO.h"
 
 #include "AppConfig.h"
 #include "AppEvent.h"
@@ -27,6 +27,7 @@
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/attribute-type.h>
 #include <app-common/zap-generated/cluster-id.h>
+#include <app/server/Dnssd.h>
 #include <app/server/Server.h>
 #include <app/util/attribute-storage.h>
 
@@ -54,18 +55,32 @@ using namespace chip::DeviceLayer;
 #define APP_TASK_PRIORITY 2
 #define APP_EVENT_QUEUE_SIZE 10
 
-static TaskHandle_t sAppTaskHandle;
-static QueueHandle_t sAppEventQueue;
+namespace {
+TaskHandle_t sAppTaskHandle;
+QueueHandle_t sAppEventQueue;
 
-static bool sIsThreadProvisioned = false;
-static bool sIsThreadEnabled     = false;
-static bool sHaveBLEConnections  = false;
+bool sIsThreadProvisioned     = false;
+bool sIsThreadEnabled         = false;
+bool sHaveBLEConnections      = false;
+bool sHaveServiceConnectivity = false;
+
+uint8_t sAppEventQueueBuffer[APP_EVENT_QUEUE_SIZE * sizeof(AppEvent)];
+
+StaticQueue_t sAppEventQueueStruct;
+
+StackType_t appStack[APP_TASK_STACK_SIZE / sizeof(StackType_t)];
+StaticTask_t appTaskStruct;
+} // namespace
 
 AppTask AppTask::sAppTask;
 
+namespace {
+constexpr int extDiscTimeoutSecs = 20;
+}
+
 CHIP_ERROR AppTask::StartAppTask()
 {
-    sAppEventQueue = xQueueCreate(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent));
+    sAppEventQueue = xQueueCreateStatic(APP_EVENT_QUEUE_SIZE, sizeof(AppEvent), sAppEventQueueBuffer, &sAppEventQueueStruct);
     if (sAppEventQueue == NULL)
     {
         ChipLogError(NotSpecified, "Failed to allocate app event queue");
@@ -73,9 +88,10 @@ CHIP_ERROR AppTask::StartAppTask()
     }
 
     // Start App task.
-    if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, 1, &sAppTaskHandle) != pdPASS)
+    sAppTaskHandle = xTaskCreateStatic(AppTaskMain, APP_TASK_NAME, ArraySize(appStack), NULL, 1, appStack, &appTaskStruct);
+    if (sAppTaskHandle != NULL)
     {
-        return CHIP_ERROR_NO_MEMORY;
+        return CHIP_NO_ERROR;
     }
 
     return CHIP_NO_ERROR;
@@ -85,7 +101,7 @@ CHIP_ERROR AppTask::Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(NotSpecified, "Current Firmware Version: %s", CHIP_DEVICE_CONFIG_DEVICE_FIRMWARE_REVISION_STRING);
+    ChipLogProgress(NotSpecified, "Current Software Version: %s", CHIP_DEVICE_CONFIG_DEVICE_SOFTWARE_VERSION_STRING);
 
     err = LightingMgr().Init();
     if (err != CHIP_NO_ERROR)
@@ -96,7 +112,11 @@ CHIP_ERROR AppTask::Init()
     LightingMgr().SetCallbacks(ActionInitiated, ActionCompleted);
 
     // Subscribe with our button callback to the qvCHIP button handler.
-    qvCHIP_SetBtnCallback(ButtonEventHandler);
+    qvIO_SetBtnCallback(ButtonEventHandler);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_EXTENDED_DISCOVERY
+    chip::app::DnssdServer::Instance().SetExtendedDiscoveryTimeoutSecs(extDiscTimeoutSecs);
+#endif
 
     // Init ZCL Data Model
     chip::Server::GetInstance().Init();
@@ -167,15 +187,15 @@ void AppTask::AppTaskMain(void * pvParameter)
         {
             if (sIsThreadProvisioned && sIsThreadEnabled)
             {
-                qvCHIP_LedBlink(SYSTEM_STATE_LED, 950, 50);
+                qvIO_LedBlink(SYSTEM_STATE_LED, 950, 50);
             }
             else if (sHaveBLEConnections)
             {
-                qvCHIP_LedBlink(SYSTEM_STATE_LED, 100, 100);
+                qvIO_LedBlink(SYSTEM_STATE_LED, 100, 100);
             }
             else
             {
-                qvCHIP_LedBlink(SYSTEM_STATE_LED, 50, 950);
+                qvIO_LedBlink(SYSTEM_STATE_LED, 50, 950);
             }
         }
     }
@@ -290,9 +310,9 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
         // Turn off all LEDs before starting blink to make sure blink is
         // co-ordinated.
-        qvCHIP_LedSet(SYSTEM_STATE_LED, false);
+        qvIO_LedSet(SYSTEM_STATE_LED, false);
 
-        qvCHIP_LedBlink(SYSTEM_STATE_LED, 500, 500);
+        qvIO_LedBlink(SYSTEM_STATE_LED, 500, 500);
     }
     else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
     {
@@ -425,6 +445,10 @@ void AppTask::PostEvent(const AppEvent * aEvent)
         {
             ChipLogError(NotSpecified, "Failed to post event to app task event queue");
         }
+    }
+    else
+    {
+        ChipLogError(NotSpecified, "Event Queue is NULL should never happen");
     }
 }
 

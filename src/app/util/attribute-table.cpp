@@ -263,7 +263,6 @@ void emberAfPrintAttributeTable(void)
     decltype(EmberAfEndpointType::clusterCount) clusterIndex;
     uint16_t attributeIndex;
     EmberAfStatus status;
-    uint16_t mfgCode;
     for (endpointIndex = 0; endpointIndex < emberAfEndpointCount(); endpointIndex++)
     {
         EmberAfDefinedEndpoint * ep = &(emAfEndpoints[endpointIndex]);
@@ -286,24 +285,16 @@ void emberAfPrintAttributeTable(void)
                 emberAfAttributesPrint(ChipLogFormatMEI " / %p / " ChipLogFormatMEI " / ", ChipLogValueMEI(cluster->clusterId),
                                        (emberAfAttributeIsClient(metaData) ? "clnt" : "srvr"),
                                        ChipLogValueMEI(metaData->attributeId));
-                mfgCode = emAfGetManufacturerCodeForAttribute(cluster, metaData);
-                if (mfgCode == EMBER_AF_NULL_MANUFACTURER_CODE)
-                {
-                    emberAfAttributesPrint("----");
-                }
-                else
-                {
-                    emberAfAttributesPrint("%2x", mfgCode);
-                }
+                emberAfAttributesPrint("----");
                 emberAfAttributesPrint(" / %x (%x) / %p / %p / ", metaData->attributeType, emberAfAttributeSize(metaData),
-                                       (emberAfAttributeIsReadOnly(metaData) ? "RO" : "RW"),
+                                       (metaData->IsReadOnly() ? "RO" : "RW"),
                                        (emberAfAttributeIsTokenized(metaData)
                                             ? " token "
                                             : (emberAfAttributeIsExternal(metaData) ? "extern " : "  RAM  ")));
                 emberAfAttributesFlush();
                 status = emAfReadAttribute(ep->endpoint, cluster->clusterId, metaData->attributeId,
                                            (emberAfAttributeIsClient(metaData) ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER),
-                                           mfgCode, data, ATTRIBUTE_LARGEST, NULL);
+                                           EMBER_AF_NULL_MANUFACTURER_CODE, data, ATTRIBUTE_LARGEST, NULL);
                 if (status == EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE)
                 {
                     emberAfAttributesPrintln("Unsupported");
@@ -326,7 +317,7 @@ void emberAfPrintAttributeTable(void)
                     UNUSED_VAR(length);
                     emberAfAttributesPrintBuffer(data, length, true);
                     emberAfAttributesFlush();
-                    emberAfAttributeDecodeAndPrintCluster(cluster->clusterId, mfgCode);
+                    emberAfAttributeDecodeAndPrintCluster(cluster->clusterId, EMBER_AF_NULL_MANUFACTURER_CODE);
                 }
             }
         }
@@ -524,7 +515,7 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
             return EMBER_ZCL_STATUS_INVALID_DATA_TYPE;
         }
 
-        if (emberAfAttributeIsReadOnly(metadata))
+        if (metadata->IsReadOnly())
         {
             emberAfAttributesPrintln("%pattr not writable", "WRITE ERR: ");
             emberAfAttributesFlush();

@@ -6,6 +6,7 @@
 #include <app/data-model/Decode.h>
 #include <app/data-model/Encode.h>
 #include <app/data-model/List.h>
+#include <app/data-model/NullObject.h>
 #include <app/EventLoggingTypes.h>
 #include <app/util/basic-types.h>
 #include <lib/support/BitFlags.h>
@@ -22,18 +23,22 @@ namespace Clusters {
 {{#zcl_clusters}}
 namespace {{asUpperCamelCase name}} {
 {{#zcl_enums}}
+{{#if (isWeaklyTypedEnum label)}}
 // Need to convert consumers to using the new enum classes, so we
 // don't just have casts all over.
 #ifdef CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
+{{/if}}
 // Enum for {{label}}
 enum class {{asType label}} : {{asUnderlyingZclType type}} {
 {{#zcl_enum_items}}
 k{{asUpperCamelCase label}} = {{asHex value 2}},
 {{/zcl_enum_items}}
 };
+{{#if (isWeaklyTypedEnum label)}}
 #else // CHIP_USE_ENUM_CLASS_FOR_IM_ENUM
 using {{asType label}} = EmberAf{{asType label}};
 #endif
+{{/if}}
 {{/zcl_enums}}
 
 {{#zcl_bitmaps}}
@@ -41,7 +46,7 @@ using {{asType label}} = EmberAf{{asType label}};
 // Bitmap for {{label}}
 enum class {{asType label}} : {{asUnderlyingZclType type}} {
 {{#zcl_bitmap_items}}
-k{{asUpperCamelCase label}} = {{asOffset mask}},
+k{{asUpperCamelCase label}} = {{asHex mask}},
 {{/zcl_bitmap_items}}
 };
 {{/zcl_bitmaps}}
@@ -53,7 +58,7 @@ namespace Structs {
 namespace {{asUpperCamelCase name}} {
     enum class Fields {
     {{#zcl_struct_items}}
-    k{{asUpperCamelCase label}} = {{index}},
+    k{{asUpperCamelCase label}} = {{fieldIdentifier}},
     {{/zcl_struct_items}}
     };
 
@@ -90,6 +95,22 @@ namespace {{asUpperCamelCase name}} {
 {{#zcl_commands}}
 {{#first}}
 namespace Commands {
+ // Forward-declarations so we can reference these later.
+{{/first}}
+
+namespace {{asUpperCamelCase name}} {
+ struct Type;
+ struct DecodableType;
+} // namespace {{asUpperCamelCase name}}
+{{#last}}
+
+} // namespace Commands
+{{/last}}
+{{/zcl_commands}}
+
+{{#zcl_commands}}
+{{#first}}
+namespace Commands {
 {{/first}}
 namespace {{asUpperCamelCase name}} {
 enum class Fields {
@@ -110,6 +131,15 @@ public:
     {{/zcl_command_arguments}}
 
     CHIP_ERROR Encode(TLV::TLVWriter &writer, TLV::Tag tag) const;
+
+    using ResponseType =
+    {{~#if responseRef}}
+      Clusters::{{asUpperCamelCase parent.name}}::Commands::{{getResponseCommandName responseRef}}::DecodableType;
+    {{else}}
+      DataModel::NullObjectType;
+    {{/if}}
+
+    static constexpr bool MustUseTimedInvoke() { return {{mustUseTimedInvoke}}; }
 };
 
 struct DecodableType {
@@ -139,13 +169,16 @@ namespace {{asUpperCamelCase label}} {
     {{#if entryType}}
         using Type = {{zapTypeToEncodableClusterObjectType entryType forceNotOptional=true}};
         using DecodableType = {{zapTypeToDecodableClusterObjectType entryType forceNotOptional=true}};
+        using DecodableArgType = {{zapTypeToDecodableClusterObjectType entryType forceNotOptional=true isArgument=true}};
     {{else}}
         using Type = {{zapTypeToEncodableClusterObjectType type forceNotOptional=true}};
         using DecodableType = {{zapTypeToDecodableClusterObjectType type forceNotOptional=true}};
+        using DecodableArgType = {{zapTypeToDecodableClusterObjectType type forceNotOptional=true isArgument=true}};
     {{/if}}
 
         static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
         static constexpr AttributeId GetAttributeId() { return Attributes::{{asUpperCamelCase label}}::Id; }
+        static constexpr bool MustUseTimedWrite() { return {{mustUseTimedWrite}}; }
     };
 } // namespace {{asUpperCamelCase label}}
 {{#last}}
@@ -169,8 +202,8 @@ enum class Fields {
 struct Type
 {
 public:
-    static constexpr PriorityLevel priorityLevel = PriorityLevel::{{asUpperCamelCase priority}};
-    static constexpr EventId eventId = {{asMEI manufacturerCode code}};
+    static constexpr PriorityLevel GetPriorityLevel() { return kPriorityLevel; }
+    static constexpr EventId GetEventId() { return kEventId; }
     static constexpr ClusterId GetClusterId() { return Clusters::{{asUpperCamelCase parent.name}}::Id; }
 
     {{#zcl_event_fields}}

@@ -44,6 +44,7 @@ class TestWriteInteraction
 {
 public:
     static void TestWriteClient(nlTestSuite * apSuite, void * apContext);
+    static void TestWriteClientGroup(nlTestSuite * apSuite, void * apContext);
     static void TestWriteHandler(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtrip(nlTestSuite * apSuite, void * apContext);
     static void TestWriteRoundtripWithClusterObjects(nlTestSuite * apSuite, void * apContext);
@@ -51,7 +52,8 @@ public:
 private:
     static void AddAttributeDataIB(nlTestSuite * apSuite, void * apContext, WriteClientHandle & aWriteClient);
     static void AddAttributeStatus(nlTestSuite * apSuite, void * apContext, WriteHandler & aWriteHandler);
-    static void GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
+    static void GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, bool aIsTimedWrite,
+                                     System::PacketBufferHandle & aPayload);
     static void GenerateWriteResponse(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload);
 };
 
@@ -74,7 +76,7 @@ public:
     {
         mOnSuccessCalled++;
     }
-    void OnError(const WriteClient * apWriteClient, CHIP_ERROR chipError) override { mOnErrorCalled++; }
+    void OnError(const WriteClient * apWriteClient, const StatusIB &, CHIP_ERROR chipError) override { mOnErrorCalled++; }
     void OnDone(WriteClient * apWriteClient) override { mOnDoneCalled++; }
 
     int mOnSuccessCalled = 0;
@@ -114,7 +116,8 @@ void TestWriteInteraction::AddAttributeStatus(nlTestSuite * apSuite, void * apCo
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, System::PacketBufferHandle & aPayload)
+void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * apContext, bool aIsTimedWrite,
+                                                System::PacketBufferHandle & aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
@@ -123,12 +126,16 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
     WriteRequestMessage::Builder writeRequestBuilder;
     err = writeRequestBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    AttributeDataIBs::Builder attributeDataIBsBuilder = writeRequestBuilder.CreateAttributeDataIBsBuilder();
+    writeRequestBuilder.TimedRequest(aIsTimedWrite);
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
-    AttributeDataIB::Builder attributeDataIBBuilder = attributeDataIBsBuilder.CreateAttributeDataIBBuilder();
+    AttributeDataIBs::Builder & attributeDataIBsBuilder = writeRequestBuilder.CreateWriteRequests();
+    NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
+    AttributeDataIB::Builder & attributeDataIBBuilder = attributeDataIBsBuilder.CreateAttributeDataIBBuilder();
     NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder attributePathBuilder = attributeDataIBBuilder.CreatePath();
+    attributeDataIBBuilder.DataVersion(0);
+    NL_TEST_ASSERT(apSuite, attributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
+    AttributePathIB::Builder & attributePathBuilder = attributeDataIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
     attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
@@ -149,12 +156,12 @@ void TestWriteInteraction::GenerateWriteRequest(nlTestSuite * apSuite, void * ap
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     }
 
-    attributeDataIBBuilder.DataVersion(0).EndOfAttributeDataIB();
+    attributeDataIBBuilder.EndOfAttributeDataIB();
     NL_TEST_ASSERT(apSuite, attributeDataIBBuilder.GetError() == CHIP_NO_ERROR);
 
     attributeDataIBsBuilder.EndOfAttributeDataIBs();
     NL_TEST_ASSERT(apSuite, attributeDataIBsBuilder.GetError() == CHIP_NO_ERROR);
-    writeRequestBuilder.EndOfWriteRequestMessage();
+    writeRequestBuilder.IsFabricFiltered(false).EndOfWriteRequestMessage();
     NL_TEST_ASSERT(apSuite, writeRequestBuilder.GetError() == CHIP_NO_ERROR);
 
     err = writer.Finalize(&aPayload);
@@ -170,18 +177,18 @@ void TestWriteInteraction::GenerateWriteResponse(nlTestSuite * apSuite, void * a
     WriteResponseMessage::Builder writeResponseBuilder;
     err = writeResponseBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
-    AttributeStatuses::Builder attributeStatusesBuilder = writeResponseBuilder.CreateWriteResponses();
+    AttributeStatusIBs::Builder & attributeStatusesBuilder = writeResponseBuilder.CreateWriteResponses();
     NL_TEST_ASSERT(apSuite, attributeStatusesBuilder.GetError() == CHIP_NO_ERROR);
-    AttributeStatusIB::Builder attributeStatusIBBuilder = attributeStatusesBuilder.CreateAttributeStatus();
+    AttributeStatusIB::Builder & attributeStatusIBBuilder = attributeStatusesBuilder.CreateAttributeStatus();
     NL_TEST_ASSERT(apSuite, attributeStatusIBBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributePathIB::Builder attributePathBuilder = attributeStatusIBBuilder.CreatePath();
+    AttributePathIB::Builder & attributePathBuilder = attributeStatusIBBuilder.CreatePath();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
     attributePathBuilder.Node(1).Endpoint(2).Cluster(3).Attribute(4).ListIndex(5).EndOfAttributePathIB();
     err = attributePathBuilder.GetError();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    StatusIB::Builder statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
+    StatusIB::Builder & statusIBBuilder = attributeStatusIBBuilder.CreateErrorStatus();
     StatusIB statusIB;
     statusIB.mStatus = chip::Protocols::InteractionModel::Status::InvalidSubscription;
     NL_TEST_ASSERT(apSuite, statusIBBuilder.GetError() == CHIP_NO_ERROR);
@@ -213,7 +220,7 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
 
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
     TestWriteClientCallback callback;
-    err = writeClient.Init(&ctx.GetExchangeManager(), &callback);
+    err = writeClient.Init(&ctx.GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     AddAttributeDataIB(apSuite, apContext, writeClientHandle);
 
@@ -233,27 +240,76 @@ void TestWriteInteraction::TestWriteClient(nlTestSuite * apSuite, void * apConte
     NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
 }
 
-void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apContext)
+void TestWriteInteraction::TestWriteClientGroup(nlTestSuite * apSuite, void * apContext)
 {
     TestContext & ctx = *static_cast<TestContext *>(apContext);
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    app::WriteHandler writeHandler;
+    app::WriteClient writeClient;
+    app::WriteClientHandle writeClientHandle;
+    writeClientHandle.SetWriteClient(&writeClient);
 
-    chip::app::InteractionModelDelegate IMdelegate;
     System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
-    err                            = writeHandler.Init(&IMdelegate);
-
-    GenerateWriteRequest(apSuite, apContext, buf);
-
-    TestExchangeDelegate delegate;
-    Messaging::ExchangeContext * exchange = ctx.NewExchangeToBob(&delegate);
-    err                                   = writeHandler.OnWriteRequest(exchange, std::move(buf));
+    TestWriteClientCallback callback;
+    err = writeClient.Init(&ctx.GetExchangeManager(), &callback, /* aTimedWriteTimeoutMs = */ NullOptional);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    AddAttributeDataIB(apSuite, apContext, writeClientHandle);
 
-    Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
-    NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+    SessionHandle groupSession = ctx.GetSessionBobToFriends();
+    NL_TEST_ASSERT(apSuite, groupSession.IsGroupSession());
+
+    err = writeClientHandle.SendWriteRequest(groupSession);
+
+    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
+    // The internal WriteClient should be shutdown once we SendWriteRequest for group.
+    NL_TEST_ASSERT(apSuite, nullptr == writeClientHandle.mpWriteClient);
+}
+
+void TestWriteInteraction::TestWriteHandler(nlTestSuite * apSuite, void * apContext)
+{
+    using namespace Protocols::InteractionModel;
+
+    TestContext & ctx = *static_cast<TestContext *>(apContext);
+
+    constexpr bool allBooleans[] = { true, false };
+    for (auto messageIsTimed : allBooleans)
+    {
+        for (auto transactionIsTimed : allBooleans)
+        {
+            CHIP_ERROR err = CHIP_NO_ERROR;
+
+            app::WriteHandler writeHandler;
+
+            chip::app::InteractionModelDelegate IMdelegate;
+            System::PacketBufferHandle buf = System::PacketBufferHandle::New(System::PacketBuffer::kMaxSize);
+            err                            = writeHandler.Init(&IMdelegate);
+
+            GenerateWriteRequest(apSuite, apContext, messageIsTimed, buf);
+
+            TestExchangeDelegate delegate;
+            Messaging::ExchangeContext * exchange = ctx.NewExchangeToBob(&delegate);
+            Status status                         = writeHandler.OnWriteRequest(exchange, std::move(buf), transactionIsTimed);
+            if (messageIsTimed == transactionIsTimed)
+            {
+                NL_TEST_ASSERT(apSuite, status == Status::Success);
+            }
+            else
+            {
+                NL_TEST_ASSERT(apSuite, status == Status::UnsupportedAccess);
+                // In the normal code flow, the exchange would now get closed
+                // when we send the error status on it (of if that fails when
+                // the stack unwinds).  In the success case it's been closed
+                // already by the WriteHandler sending the response on it, but
+                // if we are in the error case we need to make sure it gets
+                // closed.
+                exchange->Close();
+            }
+
+            Messaging::ReliableMessageMgr * rm = ctx.GetExchangeManager().GetReliableMessageMgr();
+            NL_TEST_ASSERT(apSuite, rm->TestGetCountRetransTable() == 0);
+        }
+    }
 }
 
 CHIP_ERROR WriteSingleClusterData(ClusterInfo & aClusterInfo, TLV::TLVReader & aReader, WriteHandler * aWriteHandler)
@@ -384,6 +440,7 @@ namespace {
 const nlTest sTests[] =
 {
         NL_TEST_DEF("CheckWriteClient", chip::app::TestWriteInteraction::TestWriteClient),
+        NL_TEST_DEF("CheckWriteClientGroup", chip::app::TestWriteInteraction::TestWriteClientGroup),
         NL_TEST_DEF("CheckWriteHandler", chip::app::TestWriteInteraction::TestWriteHandler),
         NL_TEST_DEF("CheckWriteRoundtrip", chip::app::TestWriteInteraction::TestWriteRoundtrip),
         NL_TEST_DEF("TestWriteRoundtripWithClusterObjects", chip::app::TestWriteInteraction::TestWriteRoundtripWithClusterObjects),

@@ -883,26 +883,70 @@ CHIP_ERROR ExtractFabricIdFromCert(const ChipCertificateData & cert, FabricId * 
     return CHIP_ERROR_INVALID_ARGUMENT;
 }
 
-CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nodeId, FabricId * fabricId)
+CHIP_ERROR ExtractCATsFromOpCert(const ByteSpan & opcert, CATValues & cats)
 {
     ChipCertificateSet certSet;
+    ChipCertificateData certData;
 
-    ReturnErrorOnFailure(certSet.Init(1));
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
 
     ReturnErrorOnFailure(certSet.LoadCert(opcert, BitFlags<CertDecodeFlags>()));
 
-    return ExtractNodeIdFabricIdFromOpCert(certSet.GetCertSet()[0], nodeId, fabricId);
+    return ExtractCATsFromOpCert(certData, cats);
+}
+
+CHIP_ERROR ExtractCATsFromOpCert(const ChipCertificateData & opcert, CATValues & cats)
+{
+    uint8_t catCount = 0;
+    uint8_t certType;
+
+    ReturnErrorOnFailure(opcert.mSubjectDN.GetCertType(certType));
+    VerifyOrReturnError(certType == kCertType_Node, CHIP_ERROR_INVALID_ARGUMENT);
+
+    const ChipDN & subjectDN = opcert.mSubjectDN;
+    for (uint8_t i = 0; i < subjectDN.RDNCount(); ++i)
+    {
+        const auto & rdn = subjectDN.rdn[i];
+        if (rdn.mAttrOID == ASN1::kOID_AttributeType_ChipCASEAuthenticatedTag)
+        {
+            // This error should never happen in practice because valid NOC cannot have more
+            // than kMaxSubjectCATAttributeCount CATs in its subject. The check that it is
+            // valid NOC was done above.
+            ReturnErrorCodeIf(catCount == cats.size(), CHIP_ERROR_BUFFER_TOO_SMALL);
+            VerifyOrReturnError(CanCastTo<CASEAuthTag>(rdn.mChipVal), CHIP_ERROR_INVALID_ARGUMENT);
+            cats.val[catCount++] = static_cast<CASEAuthTag>(rdn.mChipVal);
+        }
+    }
+    for (uint8_t i = catCount; i < cats.size(); ++i)
+    {
+        cats.val[i] = kUndefinedCAT;
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ExtractNodeIdFabricIdFromOpCert(const ByteSpan & opcert, NodeId * nodeId, FabricId * fabricId)
+{
+    ChipCertificateSet certSet;
+    ChipCertificateData certData;
+
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
+
+    ReturnErrorOnFailure(certSet.LoadCert(opcert, BitFlags<CertDecodeFlags>()));
+
+    return ExtractNodeIdFabricIdFromOpCert(certData, nodeId, fabricId);
 }
 
 CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKeySpan & publicKey)
 {
     ChipCertificateSet certSet;
+    ChipCertificateData certData;
 
-    ReturnErrorOnFailure(certSet.Init(1));
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
 
     ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
 
-    publicKey = certSet.GetLastCert()->mPublicKey;
+    publicKey = certData.mPublicKey;
 
     return CHIP_NO_ERROR;
 }
@@ -910,12 +954,13 @@ CHIP_ERROR ExtractPublicKeyFromChipCert(const ByteSpan & chipCert, P256PublicKey
 CHIP_ERROR ExtractSKIDFromChipCert(const ByteSpan & chipCert, CertificateKeyId & skid)
 {
     ChipCertificateSet certSet;
+    ChipCertificateData certData;
 
-    ReturnErrorOnFailure(certSet.Init(1));
+    ReturnErrorOnFailure(certSet.Init(&certData, 1));
 
     ReturnErrorOnFailure(certSet.LoadCert(chipCert, BitFlags<CertDecodeFlags>()));
 
-    skid = certSet.GetLastCert()->mSubjectKeyId;
+    skid = certData.mSubjectKeyId;
 
     return CHIP_NO_ERROR;
 }

@@ -36,17 +36,6 @@ namespace Controller {
 
 // FlowMeasurement Cluster Commands
 // FlowMeasurement Cluster Attributes
-CHIP_ERROR FlowMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                              Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000000;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
 CHIP_ERROR FlowMeasurementCluster::SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                    Callback::Cancelable * onFailureCallback, uint16_t minInterval,
                                                                    uint16_t maxInterval)
@@ -64,52 +53,59 @@ CHIP_ERROR FlowMeasurementCluster::ReportAttributeMeasuredValue(Callback::Cancel
                                      BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR FlowMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
+CHIP_ERROR FlowMeasurementCluster::SubscribeAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                      Callback::Cancelable * onFailureCallback,
+                                                                      uint16_t minInterval, uint16_t maxInterval)
 {
-    app::AttributePathParams attributePath;
+    chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId  = mEndpoint;
     attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000001;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
+    attributePath.mAttributeId = FlowMeasurement::Attributes::MinMeasuredValue::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR FlowMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                 Callback::Cancelable * onFailureCallback)
+CHIP_ERROR FlowMeasurementCluster::ReportAttributeMinMeasuredValue(Callback::Cancelable * onReportCallback)
 {
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000002;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
+    return RequestAttributeReporting(FlowMeasurement::Attributes::MinMeasuredValue::Id, onReportCallback,
+                                     BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR FlowMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                Callback::Cancelable * onFailureCallback)
+CHIP_ERROR FlowMeasurementCluster::SubscribeAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                      Callback::Cancelable * onFailureCallback,
+                                                                      uint16_t minInterval, uint16_t maxInterval)
 {
-    app::AttributePathParams attributePath;
+    chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId  = mEndpoint;
     attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x0000FFFD;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
+    attributePath.mAttributeId = FlowMeasurement::Attributes::MaxMeasuredValue::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR FlowMeasurementCluster::ReportAttributeMaxMeasuredValue(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(FlowMeasurement::Attributes::MaxMeasuredValue::Id, onReportCallback,
+                                     BasicAttributeFilter<Int16sAttributeCallback>);
+}
+
+CHIP_ERROR FlowMeasurementCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                     Callback::Cancelable * onFailureCallback, uint16_t minInterval,
+                                                                     uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR FlowMeasurementCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
+                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 // PressureMeasurement Cluster Commands
 // PressureMeasurement Cluster Attributes
-CHIP_ERROR PressureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                  Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000000;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
 CHIP_ERROR PressureMeasurementCluster::SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                        Callback::Cancelable * onFailureCallback,
                                                                        uint16_t minInterval, uint16_t maxInterval)
@@ -127,52 +123,59 @@ CHIP_ERROR PressureMeasurementCluster::ReportAttributeMeasuredValue(Callback::Ca
                                      BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR PressureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PressureMeasurementCluster::SubscribeAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback,
+                                                                          uint16_t minInterval, uint16_t maxInterval)
 {
-    app::AttributePathParams attributePath;
+    chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId  = mEndpoint;
     attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000001;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
+    attributePath.mAttributeId = PressureMeasurement::Attributes::MinMeasuredValue::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR PressureMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PressureMeasurementCluster::ReportAttributeMinMeasuredValue(Callback::Cancelable * onReportCallback)
 {
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000002;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
+    return RequestAttributeReporting(PressureMeasurement::Attributes::MinMeasuredValue::Id, onReportCallback,
+                                     BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR PressureMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                    Callback::Cancelable * onFailureCallback)
+CHIP_ERROR PressureMeasurementCluster::SubscribeAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                          Callback::Cancelable * onFailureCallback,
+                                                                          uint16_t minInterval, uint16_t maxInterval)
 {
-    app::AttributePathParams attributePath;
+    chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId  = mEndpoint;
     attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x0000FFFD;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
+    attributePath.mAttributeId = PressureMeasurement::Attributes::MaxMeasuredValue::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PressureMeasurementCluster::ReportAttributeMaxMeasuredValue(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(PressureMeasurement::Attributes::MaxMeasuredValue::Id, onReportCallback,
+                                     BasicAttributeFilter<Int16sAttributeCallback>);
+}
+
+CHIP_ERROR PressureMeasurementCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                         Callback::Cancelable * onFailureCallback,
+                                                                         uint16_t minInterval, uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR PressureMeasurementCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
+                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 // TemperatureMeasurement Cluster Commands
 // TemperatureMeasurement Cluster Attributes
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                     Callback::Cancelable * onFailureCallback)
-{
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000000;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
-}
-
 CHIP_ERROR TemperatureMeasurementCluster::SubscribeAttributeMeasuredValue(Callback::Cancelable * onSuccessCallback,
                                                                           Callback::Cancelable * onFailureCallback,
                                                                           uint16_t minInterval, uint16_t maxInterval)
@@ -190,37 +193,55 @@ CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMeasuredValue(Callback:
                                      BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
+CHIP_ERROR TemperatureMeasurementCluster::SubscribeAttributeMinMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                             Callback::Cancelable * onFailureCallback,
+                                                                             uint16_t minInterval, uint16_t maxInterval)
 {
-    app::AttributePathParams attributePath;
+    chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId  = mEndpoint;
     attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000001;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
+    attributePath.mAttributeId = TemperatureMeasurement::Attributes::MinMeasuredValue::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
 }
 
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
-                                                                        Callback::Cancelable * onFailureCallback)
+CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMinMeasuredValue(Callback::Cancelable * onReportCallback)
 {
-    app::AttributePathParams attributePath;
-    attributePath.mEndpointId  = mEndpoint;
-    attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x00000002;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16sAttributeCallback>);
+    return RequestAttributeReporting(TemperatureMeasurement::Attributes::MinMeasuredValue::Id, onReportCallback,
+                                     BasicAttributeFilter<Int16sAttributeCallback>);
 }
 
-CHIP_ERROR TemperatureMeasurementCluster::ReadAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
-                                                                       Callback::Cancelable * onFailureCallback)
+CHIP_ERROR TemperatureMeasurementCluster::SubscribeAttributeMaxMeasuredValue(Callback::Cancelable * onSuccessCallback,
+                                                                             Callback::Cancelable * onFailureCallback,
+                                                                             uint16_t minInterval, uint16_t maxInterval)
 {
-    app::AttributePathParams attributePath;
+    chip::app::AttributePathParams attributePath;
     attributePath.mEndpointId  = mEndpoint;
     attributePath.mClusterId   = mClusterId;
-    attributePath.mAttributeId = 0x0000FFFD;
-    return mDevice->SendReadAttributeRequest(attributePath, onSuccessCallback, onFailureCallback,
-                                             BasicAttributeFilter<Int16uAttributeCallback>);
+    attributePath.mAttributeId = TemperatureMeasurement::Attributes::MaxMeasuredValue::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeMaxMeasuredValue(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(TemperatureMeasurement::Attributes::MaxMeasuredValue::Id, onReportCallback,
+                                     BasicAttributeFilter<Int16sAttributeCallback>);
+}
+
+CHIP_ERROR TemperatureMeasurementCluster::SubscribeAttributeClusterRevision(Callback::Cancelable * onSuccessCallback,
+                                                                            Callback::Cancelable * onFailureCallback,
+                                                                            uint16_t minInterval, uint16_t maxInterval)
+{
+    chip::app::AttributePathParams attributePath;
+    attributePath.mEndpointId  = mEndpoint;
+    attributePath.mClusterId   = mClusterId;
+    attributePath.mAttributeId = Globals::Attributes::ClusterRevision::Id;
+    return mDevice->SendSubscribeAttributeRequest(attributePath, minInterval, maxInterval, onSuccessCallback, onFailureCallback);
+}
+
+CHIP_ERROR TemperatureMeasurementCluster::ReportAttributeClusterRevision(Callback::Cancelable * onReportCallback)
+{
+    return RequestAttributeReporting(Globals::Attributes::ClusterRevision::Id, onReportCallback,
+                                     BasicAttributeFilter<Int16uAttributeCallback>);
 }
 
 } // namespace Controller

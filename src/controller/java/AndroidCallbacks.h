@@ -28,7 +28,7 @@ struct GetConnectedDeviceCallback
     GetConnectedDeviceCallback(jobject javaCallback);
     ~GetConnectedDeviceCallback();
 
-    static void OnDeviceConnectedFn(void * context, Device * device);
+    static void OnDeviceConnectedFn(void * context, OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId nodeId, CHIP_ERROR error);
 
     Callback::Callback<OnDeviceConnected> mOnSuccess;

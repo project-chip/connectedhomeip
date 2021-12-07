@@ -380,6 +380,101 @@ CHIP_ERROR EventDataIB::Parser::GetData(TLV::TLVReader * const apReader) const
     return mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kData)), *apReader);
 }
 
+CHIP_ERROR EventDataIB::Parser::ProcessEventPath(EventPathIB::Parser & aEventPath, ConcreteEventPath & aConcreteEventPath)
+{
+    // The ReportData must contain a concrete event path
+    CHIP_ERROR err = aEventPath.GetEndpoint(&(aConcreteEventPath.mEndpointId));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+
+    err = aEventPath.GetCluster(&(aConcreteEventPath.mClusterId));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+
+    err = aEventPath.GetEvent(&(aConcreteEventPath.mEventId));
+    VerifyOrReturnError(err == CHIP_NO_ERROR, CHIP_ERROR_IM_MALFORMED_EVENT_PATH);
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR EventDataIB::Parser::ProcessEventTimestamp(EventHeader & aEventHeader)
+{
+    CHIP_ERROR err               = CHIP_NO_ERROR;
+    uint64_t timeStampVal        = 0;
+    bool hasSystemTimestamp      = false;
+    bool hasEpochTimestamp       = false;
+    bool hasDeltaSystemTimestamp = false;
+    bool hasDeltaEpochTimestamp  = false;
+
+    err = GetDeltaSystemTimestamp(&timeStampVal);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(aEventHeader.mTimestamp.IsSystem(), CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT);
+        aEventHeader.mTimestamp.mValue += timeStampVal;
+        hasDeltaSystemTimestamp = true;
+    }
+    ReturnErrorOnFailure(err);
+
+    err = GetDeltaEpochTimestamp(&timeStampVal);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else if (err == CHIP_NO_ERROR)
+    {
+        VerifyOrReturnError(aEventHeader.mTimestamp.IsEpoch(), CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT);
+        aEventHeader.mTimestamp.mValue += timeStampVal;
+        hasDeltaEpochTimestamp = true;
+    }
+    ReturnErrorOnFailure(err);
+
+    err = GetSystemTimestamp(&timeStampVal);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else if (err == CHIP_NO_ERROR)
+    {
+        aEventHeader.mTimestamp.mType  = Timestamp::Type::kSystem;
+        aEventHeader.mTimestamp.mValue = timeStampVal;
+        hasSystemTimestamp             = true;
+    }
+    ReturnErrorOnFailure(err);
+
+    err = GetEpochTimestamp(&timeStampVal);
+    if (err == CHIP_END_OF_TLV)
+    {
+        err = CHIP_NO_ERROR;
+    }
+    else if (err == CHIP_NO_ERROR)
+    {
+        aEventHeader.mTimestamp.mType  = Timestamp::Type::kEpoch;
+        aEventHeader.mTimestamp.mValue = timeStampVal;
+        hasEpochTimestamp              = true;
+    }
+
+    if (hasSystemTimestamp + hasEpochTimestamp + hasDeltaSystemTimestamp + hasDeltaEpochTimestamp == 1)
+    {
+        return CHIP_NO_ERROR;
+    }
+    return CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT;
+}
+
+CHIP_ERROR EventDataIB::Parser::DecodeEventHeader(EventHeader & aEventHeader)
+{
+    uint8_t priorityLevel = 0;
+    EventPathIB::Parser path;
+    ReturnErrorOnFailure(GetPath(&path));
+    ReturnErrorOnFailure(ProcessEventPath(path, aEventHeader.mPath));
+    ReturnErrorOnFailure(GetEventNumber(&(aEventHeader.mEventNumber)));
+    ReturnErrorOnFailure(GetPriority(&priorityLevel));
+    aEventHeader.mPriorityLevel = static_cast<PriorityLevel>(priorityLevel);
+    ReturnErrorOnFailure(ProcessEventTimestamp(aEventHeader));
+    return CHIP_NO_ERROR;
+}
+
 EventPathIB::Builder & EventDataIB::Builder::CreatePath()
 {
     // skip if error has already been set

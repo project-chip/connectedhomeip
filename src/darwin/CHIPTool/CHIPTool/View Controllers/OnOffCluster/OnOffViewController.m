@@ -242,7 +242,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
                     CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice
                                                                  endpoint:endpoint
                                                                     queue:dispatch_get_main_queue()];
-                    [onOff on:^(NSError * error, NSDictionary * values) {
+                    [onOff onWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
                             ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
                             : @"On command success";
@@ -271,7 +271,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
                     CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice
                                                                  endpoint:endpoint
                                                                     queue:dispatch_get_main_queue()];
-                    [onOff off:^(NSError * error, NSDictionary * values) {
+                    [onOff offWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
                             ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
                             : @"Off command success";
@@ -300,7 +300,7 @@ NSString * const kCHIPNumLightOnOffCluster = @"OnOffViewController_NumLights";
                     CHIPOnOff * onOff = [[CHIPOnOff alloc] initWithDevice:chipDevice
                                                                  endpoint:endpoint
                                                                     queue:dispatch_get_main_queue()];
-                    [onOff toggle:^(NSError * error, NSDictionary * values) {
+                    [onOff toggleWithCompletionHandler:^(NSError * error) {
                         NSString * resultString = (error != nil)
                             ? [NSString stringWithFormat:@"An error occured: 0x%02lx", error.code]
                             : @"Toggle command success";

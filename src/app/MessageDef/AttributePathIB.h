@@ -22,6 +22,8 @@
 #include "ListParser.h"
 
 #include <app/AppBuildConfig.h>
+#include <app/AttributePathParams.h>
+#include <app/data-model/Nullable.h>
 #include <app/util/basic-types.h>
 #include <lib/core/CHIPCore.h>
 #include <lib/core/CHIPTLV.h>
@@ -63,7 +65,7 @@ public:
     /**
      *  @brief Get the EnableTagCompression
      *
-     *  @param [in] apNodeId    A pointer to apNodeId
+     *  @param [in] apEnableTagCompression    A pointer to apEnableTagCompression
      *
      *  @return #CHIP_NO_ERROR on success
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not boolean types
@@ -80,7 +82,7 @@ public:
      *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
      *          #CHIP_END_OF_TLV if there is no such element
      */
-    CHIP_ERROR GetNode(NodeId * const apNode) const;
+    CHIP_ERROR GetNode(NodeId * const apNodeId) const;
 
     /**
      *  @brief Get the Endpoint.
@@ -116,7 +118,7 @@ public:
     CHIP_ERROR GetAttribute(AttributeId * const apAttribute) const;
 
     /**
-     *  @brief Get the ListIndex.
+     *  @brief Get the ListIndex, the list index should not be a null value.
      *
      *  @param [in] apListIndex    A pointer to apListIndex
      *
@@ -125,6 +127,18 @@ public:
      *          #CHIP_END_OF_TLV if there is no such element
      */
     CHIP_ERROR GetListIndex(ListIndex * const apListIndex) const;
+
+    /**
+     *  @brief Get the ListIndex, the list index can be a null value.
+     *
+     *  @param [in] apListIndex    A pointer to apListIndex
+     *
+     *  @return #CHIP_NO_ERROR on success
+     *          #CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types or null
+     *                                     type.
+     *          #CHIP_END_OF_TLV if there is no such element
+     */
+    CHIP_ERROR GetListIndex(DataModel::Nullable<ListIndex> * const apListIndex) const;
 };
 
 class Builder : public ListBuilder
@@ -185,6 +199,7 @@ public:
      *  @return A reference to *this
      */
     AttributePathIB::Builder & ListIndex(const chip::ListIndex aListIndex);
+    AttributePathIB::Builder & ListIndex(const DataModel::Nullable<chip::ListIndex> & aListIndex);
 
     /**
      *  @brief Mark the end of this AttributePathIB
@@ -192,7 +207,9 @@ public:
      *  @return A reference to *this
      */
     AttributePathIB::Builder & EndOfAttributePathIB();
+
+    CHIP_ERROR Encode(const AttributePathParams & aAttributePathParams);
 };
-}; // namespace AttributePathIB
+} // namespace AttributePathIB
 } // namespace app
 } // namespace chip

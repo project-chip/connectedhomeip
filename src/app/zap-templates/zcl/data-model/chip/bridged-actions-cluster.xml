@@ -81,7 +81,7 @@ limitations under the License.
     <item name="Name"           type="CHAR_STRING" length="32"/>
     <item name="Type"           type="EndpointListTypeEnum"/>
     <!-- TODO: Change Endpoints to INT16U array once it is supported -->
-    <item name="Endpoints"      type="OCTET_STRING" length="256"/>
+    <item name="Endpoints"      type="ENDPOINT_NO" array="true" length="256"/>
   </struct>
 
   <cluster>
@@ -93,7 +93,7 @@ limitations under the License.
 
     <attribute side="server" code="0x0000" define="ACTION_LIST" type="ARRAY" entryType="ActionStruct" length="256" writable="false" optional="false">action list</attribute>
     <attribute side="server" code="0x0001" define="ENDPOINT_LIST" type="ARRAY" entryType="EndpointListStruct" length="256" writable="false" optional="false">endpoint list</attribute>
-    <attribute side="server" code="0x0002" define="SETUP_URL" type="CHAR_STRING" length="512" writable="false" optional="true">setup url</attribute>
+    <attribute side="server" code="0x0002" define="SETUP_URL" type="LONG_CHAR_STRING" length="512" writable="false" optional="true">setup url</attribute>
 
     <command source="client" code="0x00" name="InstantAction" optional="true">
       <description>This command triggers an action (state change) on the involved endpoints.</description>
@@ -171,6 +171,21 @@ limitations under the License.
       <arg name="InvokeID" type="INT32U" optional="true"/>
       <arg name="Duration" type="INT32U"/>
     </command>
+
+    <event side="server" code="0x00" priority="info" name="StateChanged" optional="false">
+      <description>This event SHALL be generated when there is a change in the Status of an ActionID.</description>
+      <field id="0" name="ActionID" type="INT16U" />
+      <field id="1" name="InvokeID" type="INT32U" />
+      <field id="2" name="NewState" type="ActionStatusEnum" />
+    </event>
+
+    <event side="server" code="0x01" priority="info" name="ActionFailed" optional="false">
+      <description>This event SHALL be generated when there is some error which prevents the action from its normal planned execution.</description>
+      <field id="0" name="ActionID" type="INT16U" />
+      <field id="1" name="InvokeID" type="INT32U" />
+      <field id="2" name="NewState" type="ActionStatusEnum" />
+      <field id="3" name="Error"    type="ActionErrorEnum" />
+    </event>
 
   </cluster>
 </configurator>

@@ -19,25 +19,13 @@
 
 namespace chip {
 namespace app {
-CHIP_ERROR SubscribeRequestMessage::Parser::Init(const chip::TLV::TLVReader & aReader)
-{
-    // make a copy of the reader here
-    mReader.Init(aReader);
-
-    VerifyOrReturnLogError(chip::TLV::kTLVType_Structure == mReader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    ReturnLogErrorOnFailure(mReader.EnterContainer(mOuterContainerType));
-    return CHIP_NO_ERROR;
-}
-
 #if CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
-    uint16_t TagPresenceMask = 0;
-    chip::TLV::TLVReader reader;
-    AttributePathIBs::Parser AttributePathIBs;
-    EventPaths::Parser eventPathList;
-    AttributeDataVersionList::Parser attributeDataVersionList;
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    int tagPresenceMask = 0;
+    TLV::TLVReader reader;
+
     PRETTY_PRINT("SubscribeRequestMessage =");
     PRETTY_PRINT("{");
 
@@ -46,252 +34,287 @@ CHIP_ERROR SubscribeRequestMessage::Parser::CheckSchemaValidity() const
 
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
-        VerifyOrReturnLogError(chip::TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
-        switch (chip::TLV::TagNumFromTag(reader.GetTag()))
+        VerifyOrReturnError(TLV::IsContextTag(reader.GetTag()), CHIP_ERROR_INVALID_TLV_TAG);
+        uint32_t tagNum = TLV::TagNumFromTag(reader.GetTag());
+        switch (tagNum)
         {
-        case kCsTag_AttributePathList:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_AttributePathList)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_AttributePathList);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-
-            AttributePathIBs.Init(reader);
-
-            PRETTY_PRINT_INCDEPTH();
-            ReturnLogErrorOnFailure(AttributePathIBs.CheckSchemaValidity());
-            PRETTY_PRINT_DECDEPTH();
-            break;
-        case kCsTag_EventPaths:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_EventPaths)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_EventPaths);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-
-            eventPathList.Init(reader);
-
-            PRETTY_PRINT_INCDEPTH();
-
-            ReturnLogErrorOnFailure(eventPathList.CheckSchemaValidity());
-
-            PRETTY_PRINT_DECDEPTH();
-            break;
-        case kCsTag_AttributeDataVersionList:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_AttributeDataVersionList)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_AttributeDataVersionList);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-
-            attributeDataVersionList.Init(reader);
-
-            PRETTY_PRINT_INCDEPTH();
-            ReturnLogErrorOnFailure(attributeDataVersionList.CheckSchemaValidity());
-            PRETTY_PRINT_DECDEPTH();
-            break;
-        case kCsTag_EventNumber:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_EventNumber)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_EventNumber);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-#if CHIP_DETAIL_LOGGING
-            {
-                uint64_t eventNumber;
-                ReturnLogErrorOnFailure(reader.Get(eventNumber));
-                PRETTY_PRINT("\tEventNumber = 0x%" PRIx64 ",", eventNumber);
-            }
-#endif // CHIP_DETAIL_LOGGING
-            break;
-        case kCsTag_MinIntervalSeconds:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_MinIntervalSeconds)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_MinIntervalSeconds);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-#if CHIP_DETAIL_LOGGING
-            {
-                uint16_t minIntervalSeconds;
-                ReturnLogErrorOnFailure(reader.Get(minIntervalSeconds));
-                PRETTY_PRINT("\tMinIntervalSeconds = 0x%" PRIx16 ",", minIntervalSeconds);
-            }
-#endif // CHIP_DETAIL_LOGGING
-            break;
-        case kCsTag_MaxIntervalSeconds:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_MaxIntervalSeconds)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_MaxIntervalSeconds);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-#if CHIP_DETAIL_LOGGING
-            {
-                uint16_t maxIntervalSeconds;
-                ReturnLogErrorOnFailure(reader.Get(maxIntervalSeconds));
-                PRETTY_PRINT("\tkMaxInterval = 0x%" PRIx16 ",", maxIntervalSeconds);
-            }
-#endif // CHIP_DETAIL_LOGGING
-            break;
-        case kCsTag_KeepSubscriptions:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_KeepSubscriptions)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_KeepSubscriptions);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+        case to_underlying(Tag::kKeepSubscriptions):
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kKeepSubscriptions))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kKeepSubscriptions));
+            VerifyOrReturnError(TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 bool keepSubscriptions;
-                ReturnLogErrorOnFailure(reader.Get(keepSubscriptions));
+                ReturnErrorOnFailure(reader.Get(keepSubscriptions));
                 PRETTY_PRINT("\tKeepSubscriptions = %s, ", keepSubscriptions ? "true" : "false");
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
-        case kCsTag_IsProxy:
-            VerifyOrReturnLogError(!(TagPresenceMask & (1 << kCsTag_IsProxy)), CHIP_ERROR_INVALID_TLV_TAG);
-            TagPresenceMask |= (1 << kCsTag_IsProxy);
-            VerifyOrReturnLogError(chip::TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+        case to_underlying(Tag::kMinIntervalFloorSeconds):
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kMinIntervalFloorSeconds))),
+                                CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kMinIntervalFloorSeconds));
+            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+#if CHIP_DETAIL_LOGGING
+            {
+                uint16_t MinIntervalFloorSeconds;
+                ReturnErrorOnFailure(reader.Get(MinIntervalFloorSeconds));
+                PRETTY_PRINT("\tMinIntervalFloorSeconds = 0x%" PRIx16 ",", MinIntervalFloorSeconds);
+            }
+#endif // CHIP_DETAIL_LOGGING
+            break;
+        case to_underlying(Tag::kMaxIntervalCeilingSeconds):
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds))),
+                                CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds));
+            VerifyOrReturnError(TLV::kTLVType_UnsignedInteger == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
+#if CHIP_DETAIL_LOGGING
+            {
+                uint16_t MaxIntervalCeilingSeconds;
+                ReturnErrorOnFailure(reader.Get(MaxIntervalCeilingSeconds));
+                PRETTY_PRINT("\tMaxIntervalCeilingSeconds = 0x%" PRIx16 ",", MaxIntervalCeilingSeconds);
+            }
+#endif // CHIP_DETAIL_LOGGING
+            break;
+        case to_underlying(Tag::kAttributeRequests):
+            // check if this tag has appeared before
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kAttributeRequests))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kAttributeRequests));
+            {
+                AttributePathIBs::Parser attributeRequests;
+                ReturnErrorOnFailure(attributeRequests.Init(reader));
+
+                PRETTY_PRINT_INCDEPTH();
+                ReturnErrorOnFailure(attributeRequests.CheckSchemaValidity());
+                PRETTY_PRINT_DECDEPTH();
+            }
+            break;
+        case to_underlying(Tag::kDataVersionFilters):
+            // check if this tag has appeared before
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventFilters))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kDataVersionFilters));
+            {
+                DataVersionFilterIBs::Parser dataVersionFilters;
+                ReturnErrorOnFailure(dataVersionFilters.Init(reader));
+
+                PRETTY_PRINT_INCDEPTH();
+                ReturnErrorOnFailure(dataVersionFilters.CheckSchemaValidity());
+                PRETTY_PRINT_DECDEPTH();
+            }
+            break;
+        case to_underlying(Tag::kEventRequests):
+            // check if this tag has appeared before
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventRequests))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kEventRequests));
+            {
+                EventPathIBs::Parser eventRequests;
+                ReturnErrorOnFailure(eventRequests.Init(reader));
+
+                PRETTY_PRINT_INCDEPTH();
+                ReturnErrorOnFailure(eventRequests.CheckSchemaValidity());
+                PRETTY_PRINT_DECDEPTH();
+            }
+            break;
+        case to_underlying(Tag::kEventFilters):
+            // check if this tag has appeared before
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kEventFilters))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kEventFilters));
+            {
+                EventFilterIBs::Parser eventFilters;
+                ReturnErrorOnFailure(eventFilters.Init(reader));
+
+                PRETTY_PRINT_INCDEPTH();
+                ReturnErrorOnFailure(eventFilters.CheckSchemaValidity());
+                PRETTY_PRINT_DECDEPTH();
+            }
+            break;
+        case to_underlying(Tag::kIsProxy):
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kIsProxy))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kIsProxy));
+            VerifyOrReturnError(TLV::kTLVType_Boolean == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
             {
                 bool isProxy;
-                ReturnLogErrorOnFailure(reader.Get(isProxy));
+                ReturnErrorOnFailure(reader.Get(isProxy));
                 PRETTY_PRINT("\tIsProxy = %s, ", isProxy ? "true" : "false");
             }
 #endif // CHIP_DETAIL_LOGGING
             break;
+        case to_underlying(Tag::kIsFabricFiltered):
+            // check if this tag has appeared before
+            VerifyOrReturnError(!(tagPresenceMask & (1 << to_underlying(Tag::kIsFabricFiltered))), CHIP_ERROR_INVALID_TLV_TAG);
+            tagPresenceMask |= (1 << to_underlying(Tag::kIsFabricFiltered));
+#if CHIP_DETAIL_LOGGING
+            {
+                bool isFabricFiltered;
+                ReturnErrorOnFailure(reader.Get(isFabricFiltered));
+                PRETTY_PRINT("\tisFabricFiltered = %s, ", isFabricFiltered ? "true" : "false");
+            }
+#endif // CHIP_DETAIL_LOGGING
+            break;
         default:
-            ReturnLogErrorOnFailure(CHIP_ERROR_INVALID_TLV_TAG);
+            PRETTY_PRINT("Unknown tag num %" PRIu32, tagNum);
+            break;
         }
     }
 
-    PRETTY_PRINT("}");
+    PRETTY_PRINT("},");
     PRETTY_PRINT("");
+
     if (CHIP_END_OF_TLV == err)
     {
-        const uint16_t RequiredFields = (1 << kCsTag_MinIntervalSeconds) | (1 << kCsTag_MaxIntervalSeconds);
+        const int RequiredFields = (1 << to_underlying(Tag::kIsFabricFiltered)) |
+            (1 << to_underlying(Tag::kMinIntervalFloorSeconds)) | (1 << to_underlying(Tag::kMaxIntervalCeilingSeconds));
 
-        if ((TagPresenceMask & RequiredFields) == RequiredFields)
+        if ((tagPresenceMask & RequiredFields) == RequiredFields)
         {
             err = CHIP_NO_ERROR;
         }
+        else
+        {
+            err = CHIP_ERROR_IM_MALFORMED_SUBSCRIBE_REQUEST_MESSAGE;
+        }
     }
-    ReturnLogErrorOnFailure(err);
+
+    ReturnErrorOnFailure(err);
     return reader.ExitContainer(mOuterContainerType);
 }
 #endif // CHIP_CONFIG_IM_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR SubscribeRequestMessage::Parser::GetPathList(AttributePathIBs::Parser * const apAttributePathList) const
-{
-    TLV::TLVReader reader;
-    ReturnLogErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributePathList), reader));
-    VerifyOrReturnLogError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    return apAttributePathList->Init(reader);
-}
-
-CHIP_ERROR SubscribeRequestMessage::Parser::GetEventPaths(EventPaths::Parser * const apEventPaths) const
-{
-    TLV::TLVReader reader;
-    ReturnLogErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_EventPaths), reader));
-    VerifyOrReturnLogError(chip::TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    return apEventPaths->Init(reader);
-}
-
-CHIP_ERROR
-SubscribeRequestMessage::Parser::GetAttributeDataVersionList(
-    AttributeDataVersionList::Parser * const apAttributeDataVersionList) const
-{
-    TLV::TLVReader reader;
-    ReturnLogErrorOnFailure(mReader.FindElementWithTag(chip::TLV::ContextTag(kCsTag_AttributeDataVersionList), reader));
-    VerifyOrReturnLogError(TLV::kTLVType_Array == reader.GetType(), CHIP_ERROR_WRONG_TLV_TYPE);
-    return apAttributeDataVersionList->Init(reader);
-}
-
-CHIP_ERROR SubscribeRequestMessage::Parser::GetEventNumber(uint64_t * const apEventNumber) const
-{
-    return GetUnsignedInteger(kCsTag_EventNumber, apEventNumber);
-}
-
-CHIP_ERROR SubscribeRequestMessage::Parser::GetMinIntervalSeconds(uint16_t * const apMinIntervalSeconds) const
-{
-    return GetUnsignedInteger(kCsTag_MinIntervalSeconds, apMinIntervalSeconds);
-}
-
-CHIP_ERROR SubscribeRequestMessage::Parser::GetMaxIntervalSeconds(uint16_t * const apMaxIntervalSeconds) const
-{
-    return GetUnsignedInteger(kCsTag_MaxIntervalSeconds, apMaxIntervalSeconds);
-}
-
 CHIP_ERROR SubscribeRequestMessage::Parser::GetKeepSubscriptions(bool * const apKeepExistingSubscription) const
 {
-    return GetSimpleValue(kCsTag_KeepSubscriptions, chip::TLV::kTLVType_Boolean, apKeepExistingSubscription);
+    return GetSimpleValue(to_underlying(Tag::kKeepSubscriptions), TLV::kTLVType_Boolean, apKeepExistingSubscription);
+}
+
+CHIP_ERROR SubscribeRequestMessage::Parser::GetMinIntervalFloorSeconds(uint16_t * const apMinIntervalFloorSeconds) const
+{
+    return GetUnsignedInteger(to_underlying(Tag::kMinIntervalFloorSeconds), apMinIntervalFloorSeconds);
+}
+
+CHIP_ERROR SubscribeRequestMessage::Parser::GetMaxIntervalCeilingSeconds(uint16_t * const apMaxIntervalCeilingSeconds) const
+{
+    return GetUnsignedInteger(to_underlying(Tag::kMaxIntervalCeilingSeconds), apMaxIntervalCeilingSeconds);
+}
+
+CHIP_ERROR SubscribeRequestMessage::Parser::GetAttributeRequests(AttributePathIBs::Parser * const apAttributeRequests) const
+{
+    TLV::TLVReader reader;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kAttributeRequests)), reader));
+    return apAttributeRequests->Init(reader);
+}
+
+CHIP_ERROR SubscribeRequestMessage::Parser::GetDataVersionFilters(DataVersionFilterIBs::Parser * const apDataVersionFilters) const
+{
+    TLV::TLVReader reader;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kDataVersionFilters)), reader));
+    return apDataVersionFilters->Init(reader);
+}
+
+CHIP_ERROR SubscribeRequestMessage::Parser::GetEventRequests(EventPathIBs::Parser * const apEventRequests) const
+{
+    TLV::TLVReader reader;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventRequests)), reader));
+    return apEventRequests->Init(reader);
+}
+
+CHIP_ERROR SubscribeRequestMessage::Parser::GetEventFilters(EventFilterIBs::Parser * const apEventFilters) const
+{
+    TLV::TLVReader reader;
+    ReturnErrorOnFailure(mReader.FindElementWithTag(TLV::ContextTag(to_underlying(Tag::kEventFilters)), reader));
+    return apEventFilters->Init(reader);
 }
 
 CHIP_ERROR SubscribeRequestMessage::Parser::GetIsProxy(bool * const apIsProxy) const
 {
-    return GetSimpleValue(kCsTag_IsProxy, chip::TLV::kTLVType_Boolean, apIsProxy);
+    return GetSimpleValue(to_underlying(Tag::kIsProxy), TLV::kTLVType_Boolean, apIsProxy);
 }
 
-CHIP_ERROR SubscribeRequestMessage::Builder::Init(chip::TLV::TLVWriter * const apWriter)
+CHIP_ERROR SubscribeRequestMessage::Parser::GetIsFabricFiltered(bool * const apIsFabricFiltered) const
 {
-    return InitAnonymousStructure(apWriter);
-}
-
-AttributePathIBs::Builder & SubscribeRequestMessage::Builder::CreateAttributePathListBuilder()
-{
-    if (mError == CHIP_NO_ERROR)
-    {
-        mError = mAttributePathListBuilder.Init(mpWriter, kCsTag_AttributePathList);
-    }
-
-    return mAttributePathListBuilder;
-}
-
-EventPaths::Builder & SubscribeRequestMessage::Builder::CreateEventPathsBuilder()
-{
-    if (mError == CHIP_NO_ERROR)
-    {
-        mError = mEventPathsBuilder.Init(mpWriter, kCsTag_EventPaths);
-    }
-
-    return mEventPathsBuilder;
-}
-
-AttributeDataVersionList::Builder & SubscribeRequestMessage::Builder::CreateAttributeDataVersionListBuilder()
-{
-    if (mError == CHIP_NO_ERROR)
-    {
-        mError = mAttributeDataVersionListBuilder.Init(mpWriter, kCsTag_AttributeDataVersionList);
-    }
-
-    return mAttributeDataVersionListBuilder;
-}
-
-SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::EventNumber(const uint64_t aEventNumber)
-{
-    if (mError == CHIP_NO_ERROR)
-    {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventNumber), aEventNumber);
-    }
-    return *this;
-}
-
-SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::MinIntervalSeconds(const uint16_t aMinIntervalSeconds)
-{
-    if (mError == CHIP_NO_ERROR)
-    {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MinIntervalSeconds), aMinIntervalSeconds);
-    }
-    return *this;
-}
-
-SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::MaxIntervalSeconds(const uint16_t aMaxIntervalSeconds)
-{
-    if (mError == CHIP_NO_ERROR)
-    {
-        mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_MaxIntervalSeconds), aMaxIntervalSeconds);
-    }
-    return *this;
+    return GetSimpleValue(to_underlying(Tag::kIsFabricFiltered), TLV::kTLVType_Boolean, apIsFabricFiltered);
 }
 
 SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::KeepSubscriptions(const bool aKeepSubscriptions)
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_KeepSubscriptions), aKeepSubscriptions);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kKeepSubscriptions)), aKeepSubscriptions);
     }
     return *this;
+}
+
+SubscribeRequestMessage::Builder &
+SubscribeRequestMessage::Builder::MinIntervalFloorSeconds(const uint16_t aMinIntervalFloorSeconds)
+{
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kMinIntervalFloorSeconds)), aMinIntervalFloorSeconds);
+    }
+    return *this;
+}
+
+SubscribeRequestMessage::Builder &
+SubscribeRequestMessage::Builder::MaxIntervalCeilingSeconds(const uint16_t aMaxIntervalCeilingSeconds)
+{
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->Put(TLV::ContextTag(to_underlying(Tag::kMaxIntervalCeilingSeconds)), aMaxIntervalCeilingSeconds);
+    }
+    return *this;
+}
+
+AttributePathIBs::Builder & SubscribeRequestMessage::Builder::CreateAttributeRequests()
+{
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mAttributeRequests.Init(mpWriter, to_underlying(Tag::kAttributeRequests));
+    }
+    return mAttributeRequests;
+}
+
+DataVersionFilterIBs::Builder & SubscribeRequestMessage::Builder::CreateDataVersionFilters()
+{
+    // skip if error has already been set
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mDataVersionFilters.Init(mpWriter, to_underlying(Tag::kDataVersionFilters));
+    }
+    return mDataVersionFilters;
+}
+
+EventPathIBs::Builder & SubscribeRequestMessage::Builder::CreateEventRequests()
+{
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mEventRequests.Init(mpWriter, to_underlying(Tag::kEventRequests));
+    }
+    return mEventRequests;
+}
+
+EventFilterIBs::Builder & SubscribeRequestMessage::Builder::CreateEventFilters()
+{
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mEventFilters.Init(mpWriter, to_underlying(Tag::kEventFilters));
+    }
+    return mEventFilters;
 }
 
 SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::IsProxy(const bool aIsProxy)
 {
     if (mError == CHIP_NO_ERROR)
     {
-        mError = mpWriter->PutBoolean(chip::TLV::ContextTag(kCsTag_IsProxy), aIsProxy);
+        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kIsProxy)), aIsProxy);
+    }
+    return *this;
+}
+
+SubscribeRequestMessage::Builder & SubscribeRequestMessage::Builder::IsFabricFiltered(const bool aIsFabricFiltered)
+{
+    // skip if error has already been set
+    if (mError == CHIP_NO_ERROR)
+    {
+        mError = mpWriter->PutBoolean(TLV::ContextTag(to_underlying(Tag::kIsFabricFiltered)), aIsFabricFiltered);
     }
     return *this;
 }

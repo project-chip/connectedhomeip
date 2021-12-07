@@ -19,11 +19,7 @@
 #include "application-basic/ApplicationBasicManager.h"
 #include "application-launcher/ApplicationLauncherManager.h"
 #include "audio-output/AudioOutputManager.h"
-#include "content-launcher/ContentLauncherManager.h"
-#include "media-input/MediaInputManager.h"
 #include "target-navigator/TargetNavigatorManager.h"
-#include "tv-channel/TvChannelManager.h"
-#include "wake-on-lan/WakeOnLanManager.h"
 
 #include <app-common/zap-generated/attribute-id.h>
 #include <app-common/zap-generated/cluster-id.h>
@@ -42,7 +38,7 @@ class TvAttrAccess : public app::AttributeAccessInterface
 public:
     TvAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), AttrTypeInfo::GetClusterId()) {}
 
-    CHIP_ERROR Read(const app::ConcreteAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
+    CHIP_ERROR Read(const app::ConcreteReadAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
     {
         if (aPath.mAttributeId == AttrTypeInfo::GetAttributeId())
         {
@@ -77,59 +73,6 @@ void emberAfApplicationBasicClusterInitCallback(chip::EndpointId endpoint)
     else
     {
         ChipLogError(Zcl, "Failed to store application for endpoint: %d. Error:%s", endpoint, chip::ErrorStr(err));
-    }
-}
-
-/** @brief Wake On LAN Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfWakeOnLanClusterInitCallback(chip::EndpointId endpoint)
-{
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    WakeOnLanManager & wolManager = WakeOnLanManager::GetInstance();
-    err                           = wolManager.Init();
-    if (CHIP_NO_ERROR == err)
-    {
-        char macAddress[32] = "";
-        wolManager.setMacAddress(endpoint, macAddress);
-        wolManager.store(endpoint, macAddress);
-    }
-    else
-    {
-        ChipLogError(Zcl, "Failed to store mac address for endpoint: %d. Error:%s", endpoint, chip::ErrorStr(err));
-    }
-}
-
-namespace {
-
-TvAttrAccess<TvChannelManager, app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo,
-             &TvChannelManager::proxyGetTvChannelList>
-    gTvChannelAttrAccess;
-
-} // anonymous namespace
-
-/** @brief Tv Channel  Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfTvChannelClusterInitCallback(EndpointId endpoint)
-{
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gTvChannelAttrAccess);
-        attrAccessRegistered = true;
     }
 }
 
@@ -183,80 +126,6 @@ void emberAfAudioOutputClusterInitCallback(EndpointId endpoint)
     if (!attrAccessRegistered)
     {
         registerAttributeAccessOverride(&gAudioOutputAttrAccess);
-        attrAccessRegistered = true;
-    }
-}
-
-namespace {
-
-class ContentLauncherAttrAccess : public app::AttributeAccessInterface
-{
-public:
-    ContentLauncherAttrAccess() : app::AttributeAccessInterface(Optional<EndpointId>::Missing(), app::Clusters::ContentLauncher::Id)
-    {}
-
-    CHIP_ERROR Read(const app::ConcreteAttributePath & aPath, app::AttributeValueEncoder & aEncoder) override
-    {
-        if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::Id)
-        {
-            return ContentLauncherManager().proxyGetAcceptsHeader(aEncoder);
-        }
-
-        if (aPath.mAttributeId == app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::Id)
-        {
-            return ContentLauncherManager().proxyGetSupportedStreamingTypes(aEncoder);
-        }
-
-        return CHIP_NO_ERROR;
-    }
-};
-
-ContentLauncherAttrAccess gContentLauncherAttrAccess;
-
-} // anonymous namespace
-
-/** @brief Content Launch Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfContentLauncherClusterInitCallback(EndpointId endpoint)
-{
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gContentLauncherAttrAccess);
-        attrAccessRegistered = true;
-    }
-}
-
-namespace {
-
-TvAttrAccess<MediaInputManager, app::Clusters::MediaInput::Attributes::MediaInputList::TypeInfo,
-             &MediaInputManager::proxyGetInputList>
-    gMediaInputAttrAccess;
-
-} // anonymous namespace
-
-/** @brief Media Input Cluster Init
- *
- * This function is called when a specific cluster is initialized. It gives the
- * application an opportunity to take care of cluster initialization procedures.
- * It is called exactly once for each endpoint where cluster is present.
- *
- * @param endpoint   Ver.: always
- *
- */
-void emberAfMediaInputClusterInitCallback(EndpointId endpoint)
-{
-    static bool attrAccessRegistered = false;
-    if (!attrAccessRegistered)
-    {
-        registerAttributeAccessOverride(&gMediaInputAttrAccess);
         attrAccessRegistered = true;
     }
 }

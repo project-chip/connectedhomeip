@@ -21,12 +21,6 @@
 #include "../../config/PersistentStorage.h"
 #include "../common/CHIPCommand.h"
 
-#include <controller/ExampleOperationalCredentialsIssuer.h>
-
-// Limits on endpoint values.
-#define CHIP_ZCL_ENDPOINT_MIN 0x00
-#define CHIP_ZCL_ENDPOINT_MAX 0xF0
-
 class ReportingCommand : public CHIPCommand
 {
 public:
@@ -48,9 +42,9 @@ private:
     NodeId mNodeId;
     uint8_t mEndPointId;
 
-    static void OnDeviceConnectedFn(void * context, chip::Controller::Device * device);
+    static void OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device);
     static void OnDeviceConnectionFailureFn(void * context, NodeId deviceId, CHIP_ERROR error);
 
-    chip::Callback::Callback<chip::Controller::OnDeviceConnected> mOnDeviceConnectedCallback;
-    chip::Callback::Callback<chip::Controller::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
+    chip::Callback::Callback<chip::OnDeviceConnected> mOnDeviceConnectedCallback;
+    chip::Callback::Callback<chip::OnDeviceConnectionFailure> mOnDeviceConnectionFailureCallback;
 };

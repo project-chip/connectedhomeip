@@ -37,6 +37,8 @@ target_include_directories(${APP_TARGET} PRIVATE
                            ${CMAKE_CURRENT_SOURCE_DIR}
                            ${CMAKE_CURRENT_SOURCE_DIR}/main/include/
                            ${APP_ROOT}/all-clusters-common
+                           ${APP_ROOT}/all-clusters-common/include
+                           ${APP_CLUSTERS}
                            ${MBED_COMMON}/util/include
                            ${CHIP_ROOT}/src/app
                            ${CHIP_ROOT}/third_party/nlio/repo/include
@@ -67,6 +69,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${CHIP_ROOT}/src/app/server/CommissioningWindowManager.cpp
 
                ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/bridged-actions-stub.cpp
+               ${CHIP_ROOT}/examples/all-clusters-app/all-clusters-common/src/static-supported-modes-manager.cpp
 
                ${APP_UTIL}/DataModelHandler.cpp
                ${APP_UTIL}/af-event.cpp
@@ -90,6 +93,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/basic/basic.cpp
                ${APP_CLUSTERS}/bindings/bindings.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
+               ${APP_CLUSTERS}/access-control-server/access-control-server.cpp
                ${APP_CLUSTERS}/account-login-server/account-login-server.cpp
                ${APP_CLUSTERS}/application-launcher-server/application-launcher-server.cpp
                ${APP_CLUSTERS}/audio-output-server/audio-output-server.cpp   
@@ -112,7 +116,6 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/media-input-server/media-input-server.cpp
                ${APP_CLUSTERS}/media-playback-server/media-playback-server.cpp
                ${APP_CLUSTERS}/mode-select-server/mode-select-server.cpp
-               ${APP_CLUSTERS}/mode-select-server/static-supported-modes-manager.cpp
                ${APP_CLUSTERS}/network-commissioning/network-commissioning-ember.cpp
                ${APP_CLUSTERS}/network-commissioning/network-commissioning.cpp
                ${APP_CLUSTERS}/on-off-server/on-off-server.cpp
@@ -120,6 +123,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/scenes/scenes.cpp
                ${APP_CLUSTERS}/target-navigator-server/target-navigator-server.cpp
                ${APP_CLUSTERS}/thermostat-server/thermostat-server.cpp
+               ${APP_CLUSTERS}/thermostat-user-interface-configuration-server/thermostat-user-interface-configuration-server.cpp
                ${APP_CLUSTERS}/tv-channel-server/tv-channel-server.cpp
                ${APP_CLUSTERS}/operational-credentials-server/operational-credentials-server.cpp
                ${APP_CLUSTERS}/test-cluster-server/test-cluster-server.cpp
@@ -134,6 +138,7 @@ target_sources(${APP_TARGET} PRIVATE
                ${APP_CLUSTERS}/identify-server/identify-server.cpp
                ${APP_CLUSTERS}/window-covering-server/window-covering-server.cpp
                ${APP_CLUSTERS}/general_diagnostics_server/general_diagnostics_server.cpp
+               ${APP_CLUSTERS}/power-source-configuration-server/power-source-configuration-server.cpp
 )
 
 target_link_libraries(${APP_TARGET} mbed-os-posix-socket mbed-os mbed-ble mbed-events mbed-netsocket mbed-storage mbed-storage-kv-global-api mbed-mbedtls mbed-emac chip)

@@ -27,4 +27,4 @@ env
 cd "$CHIP_ROOT/src/test_driver/nrfconnect" &&
     west build -b "$BOARD" &&
     cd build &&
-    timeout 5m ctest -V
+    timeout 5m ctest -V --output-on-failure

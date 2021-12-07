@@ -18,8 +18,13 @@
 
 #pragma once
 
+#include <atomic>
+
 #include <app/ConcreteAttributePath.h>
 #include <app/ConcreteCommandPath.h>
+
+#include <app/tests/suites/pics/PICSBooleanExpressionParser.h>
+#include <app/tests/suites/pics/PICSBooleanReader.h>
 
 #include <app-common/zap-generated/ids/Attributes.h>
 #include <app-common/zap-generated/ids/Clusters.h>
@@ -44,6 +49,34 @@ public:
         ChipLogProgress(chipTool, "%s", message);
         NextTest();
         return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR UserPrompt(const char * message)
+    {
+        ChipLogProgress(chipTool, "USER_PROMPT: %s", message);
+        NextTest();
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR WaitForCommissioning()
+    {
+        isRunning = false;
+        return chip::DeviceLayer::PlatformMgr().AddEventHandler(OnPlatformEvent, reinterpret_cast<intptr_t>(this));
+    }
+
+    static void OnPlatformEvent(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
+    {
+        switch (event->Type)
+        {
+        case chip::DeviceLayer::DeviceEventType::kCommissioningComplete:
+            ChipLogProgress(chipTool, "Commissioning complete");
+            chip::DeviceLayer::PlatformMgr().RemoveEventHandler(OnPlatformEvent, arg);
+
+            TestCommand * command = reinterpret_cast<TestCommand *>(arg);
+            command->isRunning    = true;
+            command->NextTest();
+            break;
+        }
     }
 
     void CheckCommandPath(const chip::app::ConcreteCommandPath & commandPath)
@@ -76,7 +109,30 @@ public:
         mAttributePath = chip::app::ConcreteAttributePath(0, 0, 0);
     }
 
+    bool ShouldSkip(const char * expression)
+    {
+        // If there is no PICS configuration file, considers that nothing should be skipped.
+        if (!PICS.HasValue())
+        {
+            return false;
+        }
+
+        std::map<std::string, bool> pics(PICS.Value());
+        bool shouldSkip = !PICSBooleanExpressionParser::Eval(expression, pics);
+        if (shouldSkip)
+        {
+            ChipLogProgress(chipTool, " **** Skipping: %s == false\n", expression);
+            NextTest();
+        }
+        return shouldSkip;
+    }
+
+    chip::Optional<std::map<std::string, bool>> PICS;
+
+    std::atomic_bool isRunning{ true };
+
 protected:
     chip::app::ConcreteCommandPath mCommandPath;
     chip::app::ConcreteAttributePath mAttributePath;
+    chip::Optional<chip::EndpointId> mEndpointId;
 };

@@ -311,10 +311,46 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                            sizeof(entry->Type)); // InterfaceType
             break;
         }
+        case 0x0005: // ActiveHardwareFaults
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // ENUM8
+            break;
+        }
+        case 0x0006: // ActiveRadioFaults
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // ENUM8
+            break;
+        }
+        case 0x0007: // ActiveNetworkFaults
+        {
+            entryLength = 1;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            copyListMember(dest, src, write, &entryOffset, entryLength); // ENUM8
+            break;
+        }
         }
         break;
     }
-    case 0xF004: // Group Key Management Cluster
+    case 0x003F: // Group Key Management Cluster
     {
         uint16_t entryOffset = kSizeLengthInBytes;
         switch (am->attributeId)
@@ -487,6 +523,44 @@ uint16_t emberAfCopyList(ClusterId clusterId, EmberAfAttributeMetadata * am, boo
                 return 0;
             }
             entryLength = static_cast<uint16_t>(trustedRootCertificatesSpan->size());
+            break;
+        }
+        }
+        break;
+    }
+    case 0x0034: // Software Diagnostics Cluster
+    {
+        uint16_t entryOffset = kSizeLengthInBytes;
+        switch (am->attributeId)
+        {
+        case 0x0000: // ThreadMetrics
+        {
+            entryLength = 30;
+            if (((index - 1) * entryLength) > (am->size - entryLength))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid.", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + ((index - 1) * entryLength));
+            // Struct _ThreadMetrics
+            _ThreadMetrics * entry = reinterpret_cast<_ThreadMetrics *>(write ? src : dest);
+            copyListMember(write ? dest : (uint8_t *) &entry->Id, write ? (uint8_t *) &entry->Id : src, write, &entryOffset,
+                           sizeof(entry->Id));                                                        // INT64U
+            ByteSpan NameSpanStorage(Uint8::from_const_char(entry->Name.data()), entry->Name.size()); // CHAR_STRING
+            ByteSpan * NameSpan = &NameSpanStorage;
+            if (CHIP_NO_ERROR !=
+                (write ? WriteByteSpan(dest + entryOffset, 10, NameSpan) : ReadByteSpan(src + entryOffset, 10, NameSpan)))
+            {
+                ChipLogError(Zcl, "Index %" PRId32 " is invalid. Not enough remaining space", index);
+                return 0;
+            }
+            entryOffset = static_cast<uint16_t>(entryOffset + 10);
+            copyListMember(write ? dest : (uint8_t *) &entry->StackFreeCurrent, write ? (uint8_t *) &entry->StackFreeCurrent : src,
+                           write, &entryOffset, sizeof(entry->StackFreeCurrent)); // INT32U
+            copyListMember(write ? dest : (uint8_t *) &entry->StackFreeMinimum, write ? (uint8_t *) &entry->StackFreeMinimum : src,
+                           write, &entryOffset, sizeof(entry->StackFreeMinimum)); // INT32U
+            copyListMember(write ? dest : (uint8_t *) &entry->StackSize, write ? (uint8_t *) &entry->StackSize : src, write,
+                           &entryOffset, sizeof(entry->StackSize)); // INT32U
             break;
         }
         }
@@ -820,9 +894,21 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
             // Struct _NetworkInterfaceType
             entryLength = 48;
             break;
+        case 0x0005: // ActiveHardwareFaults
+            // uint8_t
+            entryLength = 1;
+            break;
+        case 0x0006: // ActiveRadioFaults
+            // uint8_t
+            entryLength = 1;
+            break;
+        case 0x0007: // ActiveNetworkFaults
+            // uint8_t
+            entryLength = 1;
+            break;
         }
         break;
-    case 0xF004: // Group Key Management Cluster
+    case 0x003F: // Group Key Management Cluster
         switch (attributeId)
         {
         case 0x0000: // groups
@@ -854,6 +940,15 @@ uint16_t emberAfAttributeValueListSize(ClusterId clusterId, AttributeId attribut
         case 0x0004: // TrustedRootCertificates
             // chip::ByteSpan
             return GetByteSpanOffsetFromIndex(buffer, 402, entryCount);
+            break;
+        }
+        break;
+    case 0x0034: // Software Diagnostics Cluster
+        switch (attributeId)
+        {
+        case 0x0000: // ThreadMetrics
+            // Struct _ThreadMetrics
+            entryLength = 30;
             break;
         }
         break;

@@ -157,53 +157,54 @@ private:
     CHIP_ERROR AddCommonTxtEntries(const BaseAdvertisingParams<Derived> & params, CommonTxtEntryStorage & storage,
                                    char ** txtFields, size_t & numTxtFields)
     {
-        Optional<uint32_t> mrpRetryIntervalIdle, mrpRetryIntervalActive;
-        params.GetMRPRetryIntervals(mrpRetryIntervalIdle, mrpRetryIntervalActive);
+        auto optionalMrp = params.GetMRPConfig();
         // TODO: Issue #5833 - MRP retry intervals should be updated on the poll period value change or device type change.
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
         chip::DeviceLayer::ConnectivityManager::SEDPollingConfig sedPollingConfig;
-        sedPollingConfig.Clear();
         ReturnErrorOnFailure(chip::DeviceLayer::ConnectivityMgr().GetSEDPollingConfig(sedPollingConfig));
         // Increment default MRP retry intervals by SED poll period to be on the safe side
         // and avoid unnecessary retransmissions.
-        if (mrpRetryIntervalIdle.HasValue())
+        if (optionalMrp.HasValue())
         {
-            mrpRetryIntervalIdle.SetValue(mrpRetryIntervalIdle.Value() + sedPollingConfig.SlowPollingIntervalMS);
-        }
-        if (mrpRetryIntervalActive.HasValue())
-        {
-            mrpRetryIntervalActive.SetValue(mrpRetryIntervalActive.Value() + sedPollingConfig.FastPollingIntervalMS);
+            auto mrp = optionalMrp.Value();
+            optionalMrp.SetValue(ReliableMessageProtocolConfig(mrp.mIdleRetransTimeout + sedPollingConfig.SlowPollingIntervalMS,
+                                                               mrp.mActiveRetransTimeout + sedPollingConfig.FastPollingIntervalMS));
         }
 #endif
-        if (mrpRetryIntervalIdle.HasValue())
+        if (optionalMrp.HasValue())
         {
-            if (mrpRetryIntervalIdle.Value() > kMaxRetryInterval)
+            auto mrp = optionalMrp.Value();
             {
-                ChipLogProgress(Discovery,
-                                "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
-                mrpRetryIntervalIdle.SetValue(kMaxRetryInterval);
+                if (mrp.mIdleRetransTimeout > kMaxRetryInterval)
+                {
+                    ChipLogProgress(Discovery,
+                                    "MRP retry interval idle value exceeds allowed range of 1 hour, using maximum available");
+                    mrp.mIdleRetransTimeout = kMaxRetryInterval;
+                }
+                size_t writtenCharactersNumber = snprintf(storage.mrpRetryIntervalIdleBuf, sizeof(storage.mrpRetryIntervalIdleBuf),
+                                                          "CRI=%" PRIu32, mrp.mIdleRetransTimeout.count());
+                VerifyOrReturnError((writtenCharactersNumber > 0) &&
+                                        (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalIdleBuf)),
+                                    CHIP_ERROR_INVALID_STRING_LENGTH);
+
+                txtFields[numTxtFields++] = storage.mrpRetryIntervalIdleBuf;
             }
-            size_t writtenCharactersNumber = snprintf(storage.mrpRetryIntervalIdleBuf, sizeof(storage.mrpRetryIntervalIdleBuf),
-                                                      "CRI=%" PRIu32, mrpRetryIntervalIdle.Value());
-            VerifyOrReturnError((writtenCharactersNumber > 0) &&
-                                    (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalIdleBuf)),
-                                CHIP_ERROR_INVALID_STRING_LENGTH);
-            txtFields[numTxtFields++] = storage.mrpRetryIntervalIdleBuf;
-        }
-        if (mrpRetryIntervalActive.HasValue())
-        {
-            if (mrpRetryIntervalActive.Value() > kMaxRetryInterval)
+
             {
-                ChipLogProgress(Discovery,
-                                "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
-                mrpRetryIntervalActive.SetValue(kMaxRetryInterval);
+                if (mrp.mActiveRetransTimeout > kMaxRetryInterval)
+                {
+                    ChipLogProgress(Discovery,
+                                    "MRP retry interval active value exceeds allowed range of 1 hour, using maximum available");
+                    mrp.mActiveRetransTimeout = kMaxRetryInterval;
+                }
+                size_t writtenCharactersNumber =
+                    snprintf(storage.mrpRetryIntervalActiveBuf, sizeof(storage.mrpRetryIntervalActiveBuf), "CRA=%" PRIu32,
+                             mrp.mActiveRetransTimeout.count());
+                VerifyOrReturnError((writtenCharactersNumber > 0) &&
+                                        (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalActiveBuf)),
+                                    CHIP_ERROR_INVALID_STRING_LENGTH);
+                txtFields[numTxtFields++] = storage.mrpRetryIntervalActiveBuf;
             }
-            size_t writtenCharactersNumber = snprintf(storage.mrpRetryIntervalActiveBuf, sizeof(storage.mrpRetryIntervalActiveBuf),
-                                                      "CRA=%" PRIu32, mrpRetryIntervalActive.Value());
-            VerifyOrReturnError((writtenCharactersNumber > 0) &&
-                                    (writtenCharactersNumber < sizeof(storage.mrpRetryIntervalActiveBuf)),
-                                CHIP_ERROR_INVALID_STRING_LENGTH);
-            txtFields[numTxtFields++] = storage.mrpRetryIntervalActiveBuf;
         }
         if (params.GetTcpSupported().HasValue())
         {
@@ -723,29 +724,30 @@ FullQName AdvertiserMinMdns::GetCommissioningTxtEntries(const CommissionAdvertis
 bool AdvertiserMinMdns::ShouldAdvertiseOn(const chip::Inet::InterfaceId id, const chip::Inet::IPAddress & addr)
 {
     auto & server = GlobalMinimalMdnsServer::Server();
-    for (unsigned i = 0; i < server.GetEndpointCount(); i++)
-    {
-        const ServerBase::EndpointInfo & info = server.GetEndpoints()[i];
 
-        if (info.udp == nullptr)
+    bool result = false;
+
+    server.ForEachEndPoints([&](auto * info) {
+        if (info->mListenUdp == nullptr)
         {
-            continue;
+            return chip::Loop::Continue;
         }
 
-        if (info.interfaceId != id)
+        if (info->mInterfaceId != id)
         {
-            continue;
+            return chip::Loop::Continue;
         }
 
-        if (info.addressType != addr.Type())
+        if (info->mAddressType != addr.Type())
         {
-            continue;
+            return chip::Loop::Continue;
         }
 
-        return true;
-    }
+        result = true;
+        return chip::Loop::Break;
+    });
 
-    return false;
+    return result;
 }
 
 void AdvertiserMinMdns::AdvertiseRecords()

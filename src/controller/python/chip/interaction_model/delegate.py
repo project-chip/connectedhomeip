@@ -52,6 +52,13 @@ AttributePathIBstruct = Struct(
     "AttributeId" / Int32ul,
 )
 
+# EventPath should not contain padding
+EventPathIBstruct = Struct(
+    "EndpointId" / Int16ul,
+    "ClusterId" / Int32ul,
+    "EventId" / Int32ul,
+)
+
 
 @dataclass
 class AttributePath:
@@ -62,9 +69,23 @@ class AttributePath:
 
 
 @dataclass
+class EventPath:
+    nodeId: int
+    endpointId: int
+    clusterId: int
+    eventId: int
+
+
+@dataclass
 class AttributeReadResult:
     path: AttributePath
     status: int
+    value: 'typing.Any'
+
+
+@dataclass
+class EventReadResult:
+    path: EventPath
     value: 'typing.Any'
 
 
@@ -133,8 +154,6 @@ def _SetCommandStatus(commandHandle: int, val):
 
 def _SetCommandIndexStatus(commandHandle: int, commandIndex: int, status):
     with _commandStatusLock:
-        print("SetCommandIndexStatus commandHandle={} commandIndex={}".format(
-            commandHandle, commandIndex))
         indexDict = _commandIndexStatusDict.get(commandHandle, {})
         indexDict[commandIndex] = status
         _commandIndexStatusDict[commandHandle] = indexDict

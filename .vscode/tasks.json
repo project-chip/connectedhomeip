@@ -167,8 +167,19 @@
                 "base": "$gcc",
                 "fileLocation": [
                     "relative",
-                    "${workspaceFolder}/src/test_driver/mbed/build"
+                    "${workspaceFolder}/src/test_driver/mbed/unit_tests/build"
                 ]
+            }
+        },
+        {
+            "label": "Flash EFR32 board",
+            "type": "shell",
+            "command": "python3",
+            "args": [
+                "${workspaceFolder}/out/${input:exampleTarget}/chip-efr32-*.flash.py"
+            ],
+            "problemMatcher": {
+                "base": "$gcc"
             }
         }
     ],
@@ -229,10 +240,45 @@
                 "android-x64-chip-tool",
                 "android-x86-chip-tool",
                 "efr32-brd4161a-light",
+                "efr32-brd4163a-light",
+                "efr32-brd4164a-light",
+                "efr32-brd4166a-light",
+                "efr32-brd4170a-light",
+                "efr32-brd4186a-light",
+                "efr32-brd4187a-light",
+                "efr32-brd4304a-light",
                 "efr32-brd4161a-light-rpc",
+                "efr32-brd4163a-light-rpc",
+                "efr32-brd4164a-light-rpc",
+                "efr32-brd4166a-light-rpc",
+                "efr32-brd4170a-light-rpc",
+                "efr32-brd4186a-light-rpc",
+                "efr32-brd4187a-light-rpc",
+                "efr32-brd4304a-light-rpc",
                 "efr32-brd4161a-lock",
+                "efr32-brd4163a-lock",
+                "efr32-brd4164a-lock",
+                "efr32-brd4166a-lock",
+                "efr32-brd4170a-lock",
+                "efr32-brd4186a-lock",
+                "efr32-brd4187a-lock",
+                "efr32-brd4304a-lock",
                 "efr32-brd4161a-unit-test",
+                "efr32-brd4163a-unit-test",
+                "efr32-brd4164a-unit-test",
+                "efr32-brd4166a-unit-test",
+                "efr32-brd4170a-unit-test",
+                "efr32-brd4186a-unit-test",
+                "efr32-brd4187a-unit-test",
+                "efr32-brd4304a-unit-test",
                 "efr32-brd4161a-window-covering",
+                "efr32-brd4163a-window-covering",
+                "efr32-brd4164a-window-covering",
+                "efr32-brd4166a-window-covering",
+                "efr32-brd4170a-window-covering",
+                "efr32-brd4186a-window-covering",
+                "efr32-brd4187a-window-covering",
+                "efr32-brd4304a-window-covering",
                 "esp32-c3devkit-all-clusters",
                 "esp32-devkitc-all-clusters",
                 "esp32-devkitc-all-clusters-ipv6only",
@@ -246,6 +292,7 @@
                 "esp32-m5stack-all-clusters-rpc-ipv6only",
                 "infineon-p6-all-clusters",
                 "infineon-p6-lock",
+                "infineon-p6-light",
                 "linux-arm64-all-clusters",
                 "linux-arm64-all-clusters-ipv6only",
                 "linux-arm64-chip-tool",

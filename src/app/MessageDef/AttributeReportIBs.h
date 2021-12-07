@@ -68,6 +68,8 @@ public:
      */
     AttributeReportIB::Builder & CreateAttributeReport();
 
+    AttributeReportIB::Builder & GetAttributeReport() { return mAttributeReport; }
+
     /**
      *  @brief Mark the end of this AttributeReportIBs
      *

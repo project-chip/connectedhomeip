@@ -30,8 +30,10 @@
     MatterEthernetNetworkDiagnosticsPluginServerInitCallback();                                                                    \
     MatterGeneralCommissioningPluginServerInitCallback();                                                                          \
     MatterGeneralDiagnosticsPluginServerInitCallback();                                                                            \
+    MatterIdentifyPluginServerInitCallback();                                                                                      \
     MatterLevelControlPluginServerInitCallback();                                                                                  \
     MatterNetworkCommissioningPluginServerInitCallback();                                                                          \
+    MatterOtaSoftwareUpdateProviderPluginClientInitCallback();                                                                     \
     MatterOccupancySensingPluginServerInitCallback();                                                                              \
     MatterOnOffPluginClientInitCallback();                                                                                         \
     MatterOnOffPluginServerInitCallback();                                                                                         \

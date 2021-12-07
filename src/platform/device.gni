@@ -63,6 +63,9 @@ declare_args() {
   # Enable NFC support
   chip_enable_nfc = false
 
+  # Enable OTA requestor support
+  chip_enable_ota_requestor = false
+
   # Select DNS-SD implementation
   if (chip_device_platform == "linux" || chip_device_platform == "esp32" ||
       chip_device_platform == "mbed" || chip_device_platform == "p6" ||
@@ -76,9 +79,6 @@ declare_args() {
   } else {
     chip_mdns = "none"
   }
-
-  # Enables full cluster-based commissioning for already-on-network devices.
-  chip_use_clusters_for_ip_commissioning = false
 }
 
 _chip_device_layer = "none"

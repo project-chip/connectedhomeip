@@ -51,16 +51,6 @@ template <class>
 class GenericPlatformManagerImpl_POSIX;
 } // namespace Internal
 
-// 48-bit IEEE MAC Address or a 64-bit IEEE MAC Address (e.g. EUI-64).
-constexpr size_t kMaxHardwareAddrSize = 8;
-
-struct NetworkInterface : public app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::Type
-{
-    char Name[Inet::InterfaceId::kMaxIfNameLength];
-    uint8_t MacAddress[kMaxHardwareAddrSize];
-    NetworkInterface * Next; /* Pointer to the next structure.  */
-};
-
 class ConnectivityManager;
 class ConnectivityManagerImpl;
 
@@ -203,49 +193,27 @@ public:
     void ResetThreadNetworkDiagnosticsCounts();
     CHIP_ERROR WriteThreadNetworkDiagnosticAttributeToTlv(AttributeId attributeId, app::AttributeValueEncoder & encoder);
 
-    // General diagnostics methods
-
-    /*
-     * Get the linked list of network interfaces of the current plaform. After usage, each caller of GetNetworkInterfaces
-     * needs to release the network interface list it gets via ReleaseNetworkInterfaces.
-     *
-     */
-    CHIP_ERROR GetNetworkInterfaces(NetworkInterface ** netifpp);
-    void ReleaseNetworkInterfaces(NetworkInterface * netifp);
-
 // Sleepy end device methods
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     CHIP_ERROR GetSEDPollingConfig(SEDPollingConfig & pollingConfig);
+
+    /**
+     * Sets Sleepy End Device polling configuration and posts kSEDPollingIntervalChange event to inform other software
+     * modules about the change.
+     *
+     * @param[in]  pollingConfig  polling intervals configuration to be set
+     */
     CHIP_ERROR SetSEDPollingConfig(const SEDPollingConfig & pollingConfig);
+
+    /**
+     * Requests setting Sleepy End Device fast polling interval on or off.
+     * Every method call with onOff parameter set to true or false results in incrementing or decrementing the fast polling
+     * consumers counter. Fast polling mode is set if the consumers counter is bigger than 0.
+     *
+     * @param[in]  onOff  true if fast polling should be enabled and false otherwise.
+     */
     CHIP_ERROR RequestSEDFastPollingMode(bool onOff);
 #endif
-
-    // Ethernet network diagnostics methods
-    CHIP_ERROR GetEthPHYRate(uint8_t & pHYRate);
-    CHIP_ERROR GetEthFullDuplex(bool & fullDuplex);
-    CHIP_ERROR GetEthCarrierDetect(bool & carrierDetect);
-    CHIP_ERROR GetEthTimeSinceReset(uint64_t & timeSinceReset);
-    CHIP_ERROR GetEthPacketRxCount(uint64_t & packetRxCount);
-    CHIP_ERROR GetEthPacketTxCount(uint64_t & packetTxCount);
-    CHIP_ERROR GetEthTxErrCount(uint64_t & txErrCount);
-    CHIP_ERROR GetEthCollisionCount(uint64_t & collisionCount);
-    CHIP_ERROR GetEthOverrunCount(uint64_t & overrunCount);
-    CHIP_ERROR ResetEthNetworkDiagnosticsCounts();
-
-    // WiFi network diagnostics methods
-    CHIP_ERROR GetWiFiSecurityType(uint8_t & securityType);
-    CHIP_ERROR GetWiFiVersion(uint8_t & wiFiVersion);
-    CHIP_ERROR GetWiFiChannelNumber(uint16_t & channelNumber);
-    CHIP_ERROR GetWiFiRssi(int8_t & rssi);
-    CHIP_ERROR GetWiFiBeaconLostCount(uint32_t & beaconLostCount);
-    CHIP_ERROR GetWiFiBeaconRxCount(uint32_t & beaconRxCount);
-    CHIP_ERROR GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount);
-    CHIP_ERROR GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount);
-    CHIP_ERROR GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount);
-    CHIP_ERROR GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount);
-    CHIP_ERROR GetWiFiCurrentMaxRate(uint64_t & currentMaxRate);
-    CHIP_ERROR GetWiFiOverrunCount(uint64_t & overrunCount);
-    CHIP_ERROR ResetWiFiNetworkDiagnosticsCounts();
 
     // CHIPoBLE service methods
     Ble::BleLayer * GetBleLayer();
@@ -307,15 +275,13 @@ protected:
  */
 struct ConnectivityManager::SEDPollingConfig
 {
-    uint32_t FastPollingIntervalMS; /**< Interval at which the device polls its parent
-                                           when there are active chip exchanges in progress. Only meaningful
-                                           when the device is acting as a sleepy end node. */
+    /** Interval at which the device polls its parent when there are active chip exchanges in progress. Only meaningful when the
+     * device is acting as a sleepy end node.  */
+    System::Clock::Milliseconds32 FastPollingIntervalMS;
 
-    uint32_t SlowPollingIntervalMS; /**< Interval at which the device polls its parent
-                                             when there are NO active chip exchanges in progress. Only meaningful
-                                             when the device is acting as a sleepy end node. */
-
-    void Clear() { memset(this, 0, sizeof(*this)); }
+    /** Interval at which the device polls its parent when there are NO active chip exchanges in progress. Only meaningful when the
+     * device is acting as a sleepy end node. */
+    System::Clock::Milliseconds32 SlowPollingIntervalMS;
 };
 
 /**
@@ -443,131 +409,6 @@ inline void ConnectivityManager::SetWiFiAPIdleTimeout(System::Clock::Timeout val
 inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
 {
     return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
-}
-
-inline CHIP_ERROR ConnectivityManager::GetNetworkInterfaces(NetworkInterface ** netifpp)
-{
-    return static_cast<ImplClass *>(this)->_GetNetworkInterfaces(netifpp);
-}
-
-inline void ConnectivityManager::ReleaseNetworkInterfaces(NetworkInterface * netifp)
-{
-    return static_cast<ImplClass *>(this)->_ReleaseNetworkInterfaces(netifp);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetEthPHYRate(uint8_t & pHYRate)
-{
-    return static_cast<ImplClass *>(this)->_GetEthPHYRate(pHYRate);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetEthFullDuplex(bool & fullDuplex)
-{
-    return static_cast<ImplClass *>(this)->_GetEthFullDuplex(fullDuplex);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetEthCarrierDetect(bool & carrierDetect)
-{
-    return static_cast<ImplClass *>(this)->_GetEthCarrierDetect(carrierDetect);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetEthTimeSinceReset(uint64_t & timeSinceReset)
-{
-    return static_cast<ImplClass *>(this)->_GetEthTimeSinceReset(timeSinceReset);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetEthPacketRxCount(uint64_t & packetRxCount)
-{
-    return static_cast<ImplClass *>(this)->_GetEthPacketRxCount(packetRxCount);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetEthPacketTxCount(uint64_t & packetTxCount)
-{
-    return static_cast<ImplClass *>(this)->_GetEthPacketTxCount(packetTxCount);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetEthTxErrCount(uint64_t & txErrCount)
-{
-    return static_cast<ImplClass *>(this)->_GetEthTxErrCount(txErrCount);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetEthCollisionCount(uint64_t & collisionCount)
-{
-    return static_cast<ImplClass *>(this)->_GetEthCollisionCount(collisionCount);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetEthOverrunCount(uint64_t & overrunCount)
-{
-    return static_cast<ImplClass *>(this)->_GetEthOverrunCount(overrunCount);
-}
-
-inline CHIP_ERROR ConnectivityManager::ResetEthNetworkDiagnosticsCounts()
-{
-    return static_cast<ImplClass *>(this)->_ResetEthNetworkDiagnosticsCounts();
-}
-
-inline CHIP_ERROR ConnectivityManager::GetWiFiSecurityType(uint8_t & securityType)
-{
-    return static_cast<ImplClass *>(this)->_GetWiFiSecurityType(securityType);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetWiFiVersion(uint8_t & wiFiVersion)
-{
-    return static_cast<ImplClass *>(this)->_GetWiFiVersion(wiFiVersion);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetWiFiChannelNumber(uint16_t & channelNumber)
-{
-    return static_cast<ImplClass *>(this)->_GetWiFiChannelNumber(channelNumber);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetWiFiRssi(int8_t & rssi)
-{
-    return static_cast<ImplClass *>(this)->_GetWiFiRssi(rssi);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetWiFiBeaconLostCount(uint32_t & beaconLostCount)
-{
-    return static_cast<ImplClass *>(this)->_GetWiFiBeaconLostCount(beaconLostCount);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetWiFiBeaconRxCount(uint32_t & beaconRxCount)
-{
-    return static_cast<ImplClass *>(this)->_GetWiFiBeaconRxCount(beaconRxCount);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetWiFiPacketMulticastRxCount(uint32_t & packetMulticastRxCount)
-{
-    return static_cast<ImplClass *>(this)->_GetWiFiPacketMulticastRxCount(packetMulticastRxCount);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetWiFiPacketMulticastTxCount(uint32_t & packetMulticastTxCount)
-{
-    return static_cast<ImplClass *>(this)->_GetWiFiPacketMulticastTxCount(packetMulticastTxCount);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetWiFiPacketUnicastRxCount(uint32_t & packetUnicastRxCount)
-{
-    return static_cast<ImplClass *>(this)->_GetWiFiPacketUnicastRxCount(packetUnicastRxCount);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetWiFiPacketUnicastTxCount(uint32_t & packetUnicastTxCount)
-{
-    return static_cast<ImplClass *>(this)->_GetWiFiPacketUnicastTxCount(packetUnicastTxCount);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetWiFiCurrentMaxRate(uint64_t & currentMaxRate)
-{
-    return static_cast<ImplClass *>(this)->_GetWiFiCurrentMaxRate(currentMaxRate);
-}
-
-inline CHIP_ERROR ConnectivityManager::GetWiFiOverrunCount(uint64_t & overrunCount)
-{
-    return static_cast<ImplClass *>(this)->_GetWiFiOverrunCount(overrunCount);
-}
-
-inline CHIP_ERROR ConnectivityManager::ResetWiFiNetworkDiagnosticsCounts()
-{
-    return static_cast<ImplClass *>(this)->_ResetWiFiNetworkDiagnosticsCounts();
 }
 
 inline ConnectivityManager::ThreadMode ConnectivityManager::GetThreadMode()

@@ -34,10 +34,12 @@ namespace PersistedStorage {
 
 KeyValueStoreManagerImpl KeyValueStoreManagerImpl::sInstance;
 
-KeyValueStoreManagerImpl::KeyValueStoreManagerImpl()
+CHIP_ERROR KeyValueStoreManagerImpl::Init()
 {
     cy_rslt_t result = mtb_key_value_store_init(&kvstore_obj);
     init_success     = (CY_RSLT_SUCCESS == result) ? true : false;
+
+    return ConvertCyResultToChip(result);
 }
 
 CHIP_ERROR KeyValueStoreManagerImpl::_Get(const char * key, void * value, size_t value_size, size_t * read_bytes_size,

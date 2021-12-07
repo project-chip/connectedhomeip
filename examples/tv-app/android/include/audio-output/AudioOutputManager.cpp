@@ -42,7 +42,7 @@ CHIP_ERROR AudioOutputManager::Init()
 
 CHIP_ERROR AudioOutputManager::proxyGetListOfAudioOutputInfo(chip::app::AttributeValueEncoder & aEncoder)
 {
-    return aEncoder.EncodeList([](const chip::app::TagBoundEncoder & encoder) -> CHIP_ERROR {
+    return aEncoder.EncodeList([](const auto & encoder) -> CHIP_ERROR {
         // TODO: Insert code here
         int maximumVectorSize = 3;
         char name[]           = "exampleName";

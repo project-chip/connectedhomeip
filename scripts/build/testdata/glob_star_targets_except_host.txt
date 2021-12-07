@@ -4,6 +4,7 @@ android-androidstudio-arm64-chip-tool
 android-androidstudio-x64-chip-tool
 android-androidstudio-x86-chip-tool
 android-arm-chip-tool
+android-arm-chip-tvserver
 android-arm64-chip-test
 android-arm64-chip-tool
 android-arm64-chip-tvserver
@@ -12,6 +13,7 @@ android-x86-chip-tool
 efr32-brd4161a-light
 efr32-brd4161a-light-rpc
 efr32-brd4161a-lock
+efr32-brd4161a-lock-rpc
 efr32-brd4161a-unit-test
 efr32-brd4161a-window-covering
 esp32-c3devkit-all-clusters
@@ -26,6 +28,7 @@ esp32-m5stack-all-clusters-ipv6only
 esp32-m5stack-all-clusters-rpc
 esp32-m5stack-all-clusters-rpc-ipv6only
 infineon-p6-all-clusters
+infineon-p6-light
 infineon-p6-lock
 mbed-CY8CPROTO_062_4343W-all-clusters-release
 mbed-CY8CPROTO_062_4343W-light-release

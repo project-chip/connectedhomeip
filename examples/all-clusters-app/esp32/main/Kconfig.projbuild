@@ -140,3 +140,12 @@ depends on ENABLE_PW_RPC
             about available pin numbers for UART.
 
 endmenu
+
+menu "OTA Options"
+
+    config ENABLE_OTA_REQUESTOR
+        bool "Enable OTA Requestor"
+        default y
+        help
+            Enable this option to enable the OTA Requestor
+endmenu

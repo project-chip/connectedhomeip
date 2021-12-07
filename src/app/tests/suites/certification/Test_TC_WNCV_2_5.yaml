@@ -19,15 +19,21 @@ config:
     endpoint: 1
 
 tests:
+    - label: "Wait for the commissioned device to be retrieved"
+      cluster: "DelayCommands"
+      command: "WaitForCommissionee"
+
     - label: "Reads EndProductType attribute from DUT"
       command: "readAttribute"
       attribute: "EndProductType"
+      PICS: A_ENDPRODUCTTYPE
       response:
           value: 0
 
     - label: "Reads EndProductType attribute constraints from DUT"
       command: "readAttribute"
       attribute: "EndProductType"
+      PICS: A_ENDPRODUCTTYPE
       response:
           constraints:
               type: enum8

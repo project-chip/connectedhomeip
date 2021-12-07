@@ -29,6 +29,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
 #include <protocols/Protocols.h>
+#include <protocols/interaction_model/Constants.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -60,11 +61,13 @@ public:
      *
      *  @param[in]    apExchangeContext    A pointer to the ExchangeContext.
      *  @param[in]    aPayload             A payload that has read request data
+     *  @param[in]    aIsTimedWrite        Whether write is part of a timed interaction.
      *
-     *  @retval #Others If fails to process read request
-     *  @retval #CHIP_NO_ERROR On success.
+     *  @retval Status.  Callers are expected to send a status response if the
+     *  return status is not Status::Success.
      */
-    CHIP_ERROR OnWriteRequest(Messaging::ExchangeContext * apExchangeContext, System::PacketBufferHandle && aPayload);
+    Protocols::InteractionModel::Status OnWriteRequest(Messaging::ExchangeContext * apExchangeContext,
+                                                       System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
 
     bool IsFree() const { return mState == State::Uninitialized; }
 
@@ -84,6 +87,13 @@ public:
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
+    FabricIndex GetAccessingFabricIndex() const;
+
+    /**
+     * Check whether the WriteRequest we are handling is a timed write.
+     */
+    bool IsTimedWrite() const { return mIsTimedRequest; }
+
 private:
     enum class State
     {
@@ -92,11 +102,9 @@ private:
         AddStatus,         // The handler has added status code
         Sending,           // The handler has sent out the write response
     };
-    CHIP_ERROR ProcessWriteRequest(System::PacketBufferHandle && aPayload);
+    Protocols::InteractionModel::Status ProcessWriteRequest(System::PacketBufferHandle && aPayload, bool aIsTimedWrite);
     CHIP_ERROR FinalizeMessage(System::PacketBufferHandle & packet);
     CHIP_ERROR SendWriteResponse();
-    CHIP_ERROR ConstructAttributePath(const AttributePathParams & aAttributePathParams,
-                                      AttributeStatusIB::Builder aAttributeStatusIB);
 
     void MoveToState(const State aTargetState);
     void ClearState();
@@ -109,7 +117,9 @@ private:
     Messaging::ExchangeContext * mpExchangeCtx = nullptr;
     WriteResponseMessage::Builder mWriteResponseBuilder;
     System::PacketBufferTLVWriter mMessageWriter;
-    State mState = State::Uninitialized;
+    State mState           = State::Uninitialized;
+    bool mIsTimedRequest   = false;
+    bool mIsFabricFiltered = false;
 };
 } // namespace app
 } // namespace chip

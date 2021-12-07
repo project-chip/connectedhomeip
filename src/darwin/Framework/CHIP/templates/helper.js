@@ -17,17 +17,20 @@
 
 // Import helpers from zap core
 const zapPath      = '../../../../../third_party/zap/repo/dist/src-electron/';
+const string       = require(zapPath + 'util/string.js')
 const templateUtil = require(zapPath + 'generator/template-util.js')
 const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 
 const ChipTypesHelper = require('../../../../../src/app/zap-templates/common/ChipTypesHelper.js');
 const StringHelper    = require('../../../../../src/app/zap-templates/common/StringHelper.js');
+const appHelper       = require('../../../../../src/app/zap-templates/templates/app/helper.js');
 
 // Ideally those clusters clusters endpoints should be retrieved from the
 // descriptor cluster.
 function asExpectedEndpointForCluster(clusterName)
 {
   switch (clusterName) {
+  case 'AccessControl':
   case 'AdministratorCommissioning':
   case 'Basic':
   case 'Descriptor':
@@ -43,6 +46,7 @@ function asExpectedEndpointForCluster(clusterName)
   case 'TrustedRootCertificates':
   case 'OtaSoftwareUpdateProvider':
   case 'OtaSoftwareUpdateRequestor':
+  case 'PowerSourceConfiguration':
     return 0;
   }
   return 1;
@@ -54,8 +58,10 @@ function asTestValue()
     return '[@"Test" dataUsingEncoding:NSUTF8StringEncoding]';
   } else if (StringHelper.isCharString(this.type)) {
     return '@"Test"';
+  } else if (this.isArray) {
+    return '[NSArray array]';
   } else {
-    return this.min || this.max || 0;
+    return `@(${this.min || this.max || 0})`;
   }
 }
 
@@ -86,7 +92,7 @@ function asObjectiveCNumberType(label, type, asLowerCased)
           case 'uint16_t':
             return 'UnsignedShort';
           case 'uint32_t':
-            return 'UnsignedLong';
+            return 'UnsignedInt';
           case 'uint64_t':
             return 'UnsignedLongLong';
           case 'int8_t':
@@ -94,9 +100,13 @@ function asObjectiveCNumberType(label, type, asLowerCased)
           case 'int16_t':
             return 'Short';
           case 'int32_t':
-            return 'Long';
+            return 'Int';
           case 'int64_t':
             return 'LongLong';
+          case 'float':
+            return 'Float';
+          case 'double':
+            return 'Double';
           default:
             error = label + ': Unhandled underlying type ' + zclType + ' for original type ' + type;
             throw error;
@@ -114,6 +124,90 @@ function asTestIndex(index)
   return index.toString().padStart(6, 0);
 }
 
+async function asObjectiveCClassHelper(type, cluster, options, mutable)
+{
+  let pkgId    = await templateUtil.ensureZclPackageId(this);
+  let isStruct = await zclHelper.isStruct(this.global.db, type, pkgId).then(zclType => zclType != 'unknown');
+
+  if ((this.isList || this.isArray || this.entryType || options.hash.forceList) && !options.hash.forceNotList) {
+    if (mutable) {
+      return 'NSMutableArray';
+    }
+    return 'NSArray';
+  }
+
+  if (StringHelper.isOctetString(type)) {
+    return 'NSData';
+  }
+
+  if (StringHelper.isCharString(type)) {
+    return 'NSString';
+  }
+
+  if (isStruct) {
+    return `CHIP${appHelper.asUpperCamelCase(cluster)}Cluster${appHelper.asUpperCamelCase(type)}`;
+  }
+
+  return 'NSNumber';
+}
+
+async function asObjectiveCClass(type, cluster, options)
+{
+  return asObjectiveCClassHelper.call(this, type, cluster, options, false);
+}
+
+async function asObjectiveCMutableClass(type, cluster, options)
+{
+  return asObjectiveCClassHelper.call(this, type, cluster, options, true);
+}
+
+async function asObjectiveCType(type, cluster, options)
+{
+  let typeStr = await asObjectiveCClass.call(this, type, cluster, options);
+  if (this.isNullable || this.isOptional) {
+    typeStr = `${typeStr} * _Nullable`;
+  } else {
+    typeStr = `${typeStr} * _Nonnull`;
+  }
+
+  return typeStr;
+}
+
+function incrementDepth(depth)
+{
+  return depth + 1;
+}
+
+function asStructPropertyName(prop)
+{
+  prop = appHelper.asLowerCamelCase(prop);
+
+  // If prop is now "description", we need to rename it, because that's
+  // reserved.
+  if (prop == "description") {
+    return "descriptionString";
+  }
+
+  // If prop starts with a sequence of capital letters (which can happen for
+  // output of asLowerCamelCase if the original string started that way,
+  // lowercase all but the last one.
+  return prop.replace(/^([A-Z]+)([A-Z])/, (match, p1, p2) => { return p1.toLowerCase() + p2 });
+}
+
+function asGetterName(prop)
+{
+  let propName = asStructPropertyName(prop);
+  if (propName.match(/^new[A-Z]/) || propName == "count") {
+    return "get" + appHelper.asUpperCamelCase(prop);
+  }
+  return propName;
+}
+
+function commandHasRequiredField(command)
+{
+  return command.arguments.some(arg => !arg.isOptional);
+}
+
 //
 // Module exports
 //
@@ -122,3 +216,10 @@ exports.asObjectiveCNumberType       = asObjectiveCNumberType;
 exports.asExpectedEndpointForCluster = asExpectedEndpointForCluster;
 exports.asTestIndex                  = asTestIndex;
 exports.asTestValue                  = asTestValue;
+exports.asObjectiveCClass            = asObjectiveCClass;
+exports.asObjectiveCMutableClass     = asObjectiveCMutableClass;
+exports.asObjectiveCType             = asObjectiveCType;
+exports.incrementDepth               = incrementDepth;
+exports.asStructPropertyName         = asStructPropertyName;
+exports.asGetterName                 = asGetterName;
+exports.commandHasRequiredField      = commandHasRequiredField;

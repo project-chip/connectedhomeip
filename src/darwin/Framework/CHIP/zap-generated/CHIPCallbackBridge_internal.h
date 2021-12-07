@@ -23,6 +23,137 @@
 #include <app-common/zap-generated/cluster-objects.h>
 #include <app/data-model/DecodableList.h>
 
+typedef void (*CommandSuccessCallback)(void *, const chip::app::DataModel::NullObjectType &);
+using CHIPCommandSuccessCallbackType = CommandSuccessCallback;
+typedef void (*CHIPDefaultSuccessCallbackType)(void *);
+typedef void (*CHIPDefaultFailureCallbackType)(void *, EmberAfStatus);
+
+typedef void (*VendorIdAttributeCallback)(void *, chip::VendorId);
+typedef void (*NullableVendorIdAttributeCallback)(void *, const chip::app::DataModel::Nullable<chip::VendorId> &);
+
+typedef void (*CHIPAccountLoginClusterGetSetupPINResponseCallbackType)(
+    void *, const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType &);
+typedef void (*CHIPApplicationLauncherClusterLaunchAppResponseCallbackType)(
+    void *, const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType &);
+typedef void (*CHIPContentLauncherClusterLaunchContentResponseCallbackType)(
+    void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType &);
+typedef void (*CHIPContentLauncherClusterLaunchURLResponseCallbackType)(
+    void *, const chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType &);
+typedef void (*CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType)(
+    void *, const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetLogRecordResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetPINCodeResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetRFIDCodeResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetUserTypeResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType &);
+typedef void (*CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType)(
+    void *, const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType &);
+typedef void (*CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType)(
+    void *, const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType &);
+typedef void (*CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackType)(
+    void *, const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType &);
+typedef void (*CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType)(
+    void *, const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType &);
+typedef void (*CHIPGroupsClusterAddGroupResponseCallbackType)(
+    void *, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType &);
+typedef void (*CHIPGroupsClusterGetGroupMembershipResponseCallbackType)(
+    void *, const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType &);
+typedef void (*CHIPGroupsClusterRemoveGroupResponseCallbackType)(
+    void *, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType &);
+typedef void (*CHIPGroupsClusterViewGroupResponseCallbackType)(
+    void *, const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType &);
+typedef void (*CHIPIdentifyClusterIdentifyQueryResponseCallbackType)(
+    void *, const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType &);
+typedef void (*CHIPKeypadInputClusterSendKeyResponseCallbackType)(
+    void *, const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType &);
+typedef void (*CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackType)(
+    void *, const chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType &);
+typedef void (*CHIPMediaPlaybackClusterMediaNextResponseCallbackType)(
+    void *, const chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType &);
+typedef void (*CHIPMediaPlaybackClusterMediaPauseResponseCallbackType)(
+    void *, const chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType &);
+typedef void (*CHIPMediaPlaybackClusterMediaPlayResponseCallbackType)(
+    void *, const chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType &);
+typedef void (*CHIPMediaPlaybackClusterMediaPreviousResponseCallbackType)(
+    void *, const chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType &);
+typedef void (*CHIPMediaPlaybackClusterMediaRewindResponseCallbackType)(
+    void *, const chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType &);
+typedef void (*CHIPMediaPlaybackClusterMediaSeekResponseCallbackType)(
+    void *, const chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType &);
+typedef void (*CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackType)(
+    void *, const chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType &);
+typedef void (*CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackType)(
+    void *, const chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType &);
+typedef void (*CHIPMediaPlaybackClusterMediaStartOverResponseCallbackType)(
+    void *, const chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType &);
+typedef void (*CHIPMediaPlaybackClusterMediaStopResponseCallbackType)(
+    void *, const chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterScanNetworksResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType &);
+typedef void (*CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackType)(
+    void *, const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType &);
+typedef void (*CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType)(
+    void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType &);
+typedef void (*CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType)(
+    void *, const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType &);
+typedef void (*CHIPOperationalCredentialsClusterAttestationResponseCallbackType)(
+    void *, const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType &);
+typedef void (*CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType)(
+    void *, const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType &);
+typedef void (*CHIPOperationalCredentialsClusterNOCResponseCallbackType)(
+    void *, const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType &);
+typedef void (*CHIPOperationalCredentialsClusterOpCSRResponseCallbackType)(
+    void *, const chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType &);
+typedef void (*CHIPScenesClusterAddSceneResponseCallbackType)(
+    void *, const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType &);
+typedef void (*CHIPScenesClusterGetSceneMembershipResponseCallbackType)(
+    void *, const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType &);
+typedef void (*CHIPScenesClusterRemoveAllScenesResponseCallbackType)(
+    void *, const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType &);
+typedef void (*CHIPScenesClusterRemoveSceneResponseCallbackType)(
+    void *, const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType &);
+typedef void (*CHIPScenesClusterStoreSceneResponseCallbackType)(
+    void *, const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType &);
+typedef void (*CHIPScenesClusterViewSceneResponseCallbackType)(
+    void *, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType &);
+typedef void (*CHIPTvChannelClusterChangeChannelResponseCallbackType)(
+    void *, const chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType &);
+typedef void (*CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType)(
+    void *, const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType &);
+typedef void (*CHIPTestClusterClusterBooleanResponseCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType &);
+typedef void (*CHIPTestClusterClusterSimpleStructResponseCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType &);
+typedef void (*CHIPTestClusterClusterTestAddArgumentsResponseCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType &);
+typedef void (*CHIPTestClusterClusterTestEnumsResponseCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType &);
+typedef void (*CHIPTestClusterClusterTestListInt8UReverseResponseCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType &);
+typedef void (*CHIPTestClusterClusterTestNullableOptionalResponseCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType &);
+typedef void (*CHIPTestClusterClusterTestSpecificResponseCallbackType)(
+    void *, const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType &);
+
 class CHIPDefaultSuccessCallbackBridge : public CHIPCallbackBridge<DefaultSuccessCallback>
 {
 public:
@@ -31,6 +162,16 @@ public:
         CHIPCallbackBridge<DefaultSuccessCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context);
+};
+
+class CHIPCommandSuccessCallbackBridge : public CHIPCallbackBridge<CommandSuccessCallback>
+{
+public:
+    CHIPCommandSuccessCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                     bool keepAlive = false) :
+        CHIPCallbackBridge<CommandSuccessCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::NullObjectType &);
 };
 
 class CHIPOctetStringAttributeCallbackBridge : public CHIPCallbackBridge<OctetStringAttributeCallback>
@@ -43,6 +184,16 @@ public:
     static void OnSuccessFn(void * context, chip::ByteSpan value);
 };
 
+class CHIPNullableOctetStringAttributeCallbackBridge : public CHIPCallbackBridge<NullableOctetStringAttributeCallback>
+{
+public:
+    CHIPNullableOctetStringAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                   bool keepAlive = false) :
+        CHIPCallbackBridge<NullableOctetStringAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value);
+};
+
 class CHIPCharStringAttributeCallbackBridge : public CHIPCallbackBridge<CharStringAttributeCallback>
 {
 public:
@@ -51,6 +202,16 @@ public:
         CHIPCallbackBridge<CharStringAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, chip::CharSpan value);
+};
+
+class CHIPNullableCharStringAttributeCallbackBridge : public CHIPCallbackBridge<NullableCharStringAttributeCallback>
+{
+public:
+    CHIPNullableCharStringAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                  bool keepAlive = false) :
+        CHIPCallbackBridge<NullableCharStringAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value);
 };
 
 class CHIPBooleanAttributeCallbackBridge : public CHIPCallbackBridge<BooleanAttributeCallback>
@@ -63,6 +224,16 @@ public:
     static void OnSuccessFn(void * context, bool value);
 };
 
+class CHIPNullableBooleanAttributeCallbackBridge : public CHIPCallbackBridge<NullableBooleanAttributeCallback>
+{
+public:
+    CHIPNullableBooleanAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                               bool keepAlive = false) :
+        CHIPCallbackBridge<NullableBooleanAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<bool> & value);
+};
+
 class CHIPInt8uAttributeCallbackBridge : public CHIPCallbackBridge<Int8uAttributeCallback>
 {
 public:
@@ -71,6 +242,16 @@ public:
         CHIPCallbackBridge<Int8uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, uint8_t value);
+};
+
+class CHIPNullableInt8uAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt8uAttributeCallback>
+{
+public:
+    CHIPNullableInt8uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                             bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt8uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint8_t> & value);
 };
 
 class CHIPInt8sAttributeCallbackBridge : public CHIPCallbackBridge<Int8sAttributeCallback>
@@ -83,6 +264,16 @@ public:
     static void OnSuccessFn(void * context, int8_t value);
 };
 
+class CHIPNullableInt8sAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt8sAttributeCallback>
+{
+public:
+    CHIPNullableInt8sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                             bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt8sAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int8_t> & value);
+};
+
 class CHIPInt16uAttributeCallbackBridge : public CHIPCallbackBridge<Int16uAttributeCallback>
 {
 public:
@@ -91,6 +282,16 @@ public:
         CHIPCallbackBridge<Int16uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, uint16_t value);
+};
+
+class CHIPNullableInt16uAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt16uAttributeCallback>
+{
+public:
+    CHIPNullableInt16uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt16uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint16_t> & value);
 };
 
 class CHIPInt16sAttributeCallbackBridge : public CHIPCallbackBridge<Int16sAttributeCallback>
@@ -103,6 +304,16 @@ public:
     static void OnSuccessFn(void * context, int16_t value);
 };
 
+class CHIPNullableInt16sAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt16sAttributeCallback>
+{
+public:
+    CHIPNullableInt16sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt16sAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int16_t> & value);
+};
+
 class CHIPInt32uAttributeCallbackBridge : public CHIPCallbackBridge<Int32uAttributeCallback>
 {
 public:
@@ -111,6 +322,16 @@ public:
         CHIPCallbackBridge<Int32uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, uint32_t value);
+};
+
+class CHIPNullableInt32uAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt32uAttributeCallback>
+{
+public:
+    CHIPNullableInt32uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt32uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint32_t> & value);
 };
 
 class CHIPInt32sAttributeCallbackBridge : public CHIPCallbackBridge<Int32sAttributeCallback>
@@ -123,6 +344,16 @@ public:
     static void OnSuccessFn(void * context, int32_t value);
 };
 
+class CHIPNullableInt32sAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt32sAttributeCallback>
+{
+public:
+    CHIPNullableInt32sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt32sAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int32_t> & value);
+};
+
 class CHIPInt64uAttributeCallbackBridge : public CHIPCallbackBridge<Int64uAttributeCallback>
 {
 public:
@@ -131,6 +362,16 @@ public:
         CHIPCallbackBridge<Int64uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
     static void OnSuccessFn(void * context, uint64_t value);
+};
+
+class CHIPNullableInt64uAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt64uAttributeCallback>
+{
+public:
+    CHIPNullableInt64uAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt64uAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<uint64_t> & value);
 };
 
 class CHIPInt64sAttributeCallbackBridge : public CHIPCallbackBridge<Int64sAttributeCallback>
@@ -143,6 +384,102 @@ public:
     static void OnSuccessFn(void * context, int64_t value);
 };
 
+class CHIPNullableInt64sAttributeCallbackBridge : public CHIPCallbackBridge<NullableInt64sAttributeCallback>
+{
+public:
+    CHIPNullableInt64sAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableInt64sAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<int64_t> & value);
+};
+
+class CHIPFloatAttributeCallbackBridge : public CHIPCallbackBridge<FloatAttributeCallback>
+{
+public:
+    CHIPFloatAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                     bool keepAlive = false) :
+        CHIPCallbackBridge<FloatAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, float value);
+};
+
+class CHIPNullableFloatAttributeCallbackBridge : public CHIPCallbackBridge<NullableFloatAttributeCallback>
+{
+public:
+    CHIPNullableFloatAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                             bool keepAlive = false) :
+        CHIPCallbackBridge<NullableFloatAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<float> & value);
+};
+
+class CHIPDoubleAttributeCallbackBridge : public CHIPCallbackBridge<DoubleAttributeCallback>
+{
+public:
+    CHIPDoubleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                      bool keepAlive = false) :
+        CHIPCallbackBridge<DoubleAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, double value);
+};
+
+class CHIPNullableDoubleAttributeCallbackBridge : public CHIPCallbackBridge<NullableDoubleAttributeCallback>
+{
+public:
+    CHIPNullableDoubleAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                              bool keepAlive = false) :
+        CHIPCallbackBridge<NullableDoubleAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<double> & value);
+};
+
+class CHIPVendorIdAttributeCallbackBridge : public CHIPCallbackBridge<VendorIdAttributeCallback>
+{
+public:
+    CHIPVendorIdAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                        bool keepAlive = false) :
+        CHIPCallbackBridge<VendorIdAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, chip::VendorId value);
+};
+
+class CHIPNullableVendorIdAttributeCallbackBridge : public CHIPCallbackBridge<NullableVendorIdAttributeCallback>
+{
+public:
+    CHIPNullableVendorIdAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                bool keepAlive = false) :
+        CHIPCallbackBridge<NullableVendorIdAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::Nullable<chip::VendorId> & value);
+};
+
+class CHIPAccessControlAclListAttributeCallbackBridge : public CHIPCallbackBridge<AccessControlAclListAttributeCallback>
+{
+public:
+    CHIPAccessControlAclListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                    bool keepAlive = false) :
+        CHIPCallbackBridge<AccessControlAclListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            value);
+};
+
+class CHIPAccessControlExtensionListAttributeCallbackBridge : public CHIPCallbackBridge<AccessControlExtensionListAttributeCallback>
+{
+public:
+    CHIPAccessControlExtensionListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                          bool keepAlive = false) :
+        CHIPCallbackBridge<AccessControlExtensionListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> &
+            value);
+};
+
 class CHIPApplicationLauncherApplicationLauncherListListAttributeCallbackBridge
     : public CHIPCallbackBridge<ApplicationLauncherApplicationLauncherListListAttributeCallback>
 {
@@ -152,7 +489,7 @@ public:
         CHIPCallbackBridge<ApplicationLauncherApplicationLauncherListListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                             keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value);
 };
 
 class CHIPAudioOutputAudioOutputListListAttributeCallbackBridge
@@ -166,7 +503,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPBridgedActionsActionListListAttributeCallbackBridge
@@ -180,7 +517,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPBridgedActionsEndpointListListAttributeCallbackBridge
@@ -194,7 +531,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPContentLauncherAcceptsHeaderListListAttributeCallbackBridge
@@ -205,7 +542,7 @@ public:
                                                                     CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<ContentLauncherAcceptsHeaderListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
 };
 
 class CHIPContentLauncherSupportedStreamingTypesListAttributeCallbackBridge
@@ -217,9 +554,9 @@ public:
         CHIPCallbackBridge<ContentLauncherSupportedStreamingTypesListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                         keepAlive){};
 
-    static void
-    OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & list);
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value);
 };
 
 class CHIPDescriptorDeviceListListAttributeCallbackBridge : public CHIPCallbackBridge<DescriptorDeviceListListAttributeCallback>
@@ -231,7 +568,7 @@ public:
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & list);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & value);
 };
 
 class CHIPDescriptorServerListListAttributeCallbackBridge : public CHIPCallbackBridge<DescriptorServerListListAttributeCallback>
@@ -241,7 +578,7 @@ public:
                                                         bool keepAlive = false) :
         CHIPCallbackBridge<DescriptorServerListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value);
 };
 
 class CHIPDescriptorClientListListAttributeCallbackBridge : public CHIPCallbackBridge<DescriptorClientListListAttributeCallback>
@@ -251,7 +588,7 @@ public:
                                                         bool keepAlive = false) :
         CHIPCallbackBridge<DescriptorClientListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value);
 };
 
 class CHIPDescriptorPartsListListAttributeCallbackBridge : public CHIPCallbackBridge<DescriptorPartsListListAttributeCallback>
@@ -261,7 +598,7 @@ public:
                                                        bool keepAlive = false) :
         CHIPCallbackBridge<DescriptorPartsListListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value);
 };
 
 class CHIPFixedLabelLabelListListAttributeCallbackBridge : public CHIPCallbackBridge<FixedLabelLabelListListAttributeCallback>
@@ -273,7 +610,7 @@ public:
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & list);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value);
 };
 
 class CHIPGeneralCommissioningBasicCommissioningInfoListListAttributeCallbackBridge
@@ -288,7 +625,7 @@ public:
     static void
     OnSuccessFn(void * context,
                 const chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & list);
+                    chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & value);
 };
 
 class CHIPGeneralDiagnosticsNetworkInterfacesListAttributeCallbackBridge
@@ -302,7 +639,43 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & list);
+                                chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & value);
+};
+
+class CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsActiveHardwareFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                          CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
+};
+
+class CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsActiveRadioFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                       CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
+};
+
+class CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>
+{
+public:
+    CHIPGeneralDiagnosticsActiveNetworkFaultsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                         CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
 };
 
 class CHIPGroupKeyManagementGroupsListAttributeCallbackBridge
@@ -316,7 +689,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPGroupKeyManagementGroupKeysListAttributeCallbackBridge
@@ -330,7 +703,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPMediaInputMediaInputListListAttributeCallbackBridge
@@ -343,7 +716,7 @@ public:
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & value);
 };
 
 class CHIPModeSelectSupportedModesListAttributeCallbackBridge
@@ -357,7 +730,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPOperationalCredentialsFabricsListListAttributeCallbackBridge
@@ -371,7 +744,7 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list);
+                                chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & value);
 };
 
 class CHIPOperationalCredentialsTrustedRootCertificatesListAttributeCallbackBridge
@@ -383,7 +756,7 @@ public:
         CHIPCallbackBridge<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>(queue, handler, action, OnSuccessFn,
                                                                                                keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
 };
 
 class CHIPPowerSourceActiveBatteryFaultsListAttributeCallbackBridge
@@ -394,7 +767,32 @@ public:
                                                                   CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<PowerSourceActiveBatteryFaultsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
+};
+
+class CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge
+    : public CHIPCallbackBridge<PowerSourceConfigurationSourcesListAttributeCallback>
+{
+public:
+    CHIPPowerSourceConfigurationSourcesListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                   CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<PowerSourceConfigurationSourcesListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
+};
+
+class CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge
+    : public CHIPCallbackBridge<SoftwareDiagnosticsThreadMetricsListAttributeCallback>
+{
+public:
+    CHIPSoftwareDiagnosticsThreadMetricsListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                    CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<SoftwareDiagnosticsThreadMetricsListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+            value);
 };
 
 class CHIPTvChannelTvChannelListListAttributeCallbackBridge : public CHIPCallbackBridge<TvChannelTvChannelListListAttributeCallback>
@@ -406,7 +804,7 @@ public:
 
     static void OnSuccessFn(
         void * context,
-        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list);
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value);
 };
 
 class CHIPTargetNavigatorTargetNavigatorListListAttributeCallbackBridge
@@ -420,7 +818,7 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & list);
+                                chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & value);
 };
 
 class CHIPTestClusterListInt8uListAttributeCallbackBridge : public CHIPCallbackBridge<TestClusterListInt8uListAttributeCallback>
@@ -430,7 +828,7 @@ public:
                                                         bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterListInt8uListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value);
 };
 
 class CHIPTestClusterListOctetStringListAttributeCallbackBridge
@@ -441,7 +839,7 @@ public:
                                                               CHIPActionBlock action, bool keepAlive = false) :
         CHIPCallbackBridge<TestClusterListOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list);
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
 };
 
 class CHIPTestClusterListStructOctetStringListAttributeCallbackBridge
@@ -455,7 +853,7 @@ public:
     static void OnSuccessFn(
         void * context,
         const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
-            list);
+            value);
 };
 
 class CHIPTestClusterListNullablesAndOptionalsStructListAttributeCallbackBridge
@@ -469,7 +867,18 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & list);
+                                chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & value);
+};
+
+class CHIPTestClusterListLongOctetStringListAttributeCallbackBridge
+    : public CHIPCallbackBridge<TestClusterListLongOctetStringListAttributeCallback>
+{
+public:
+    CHIPTestClusterListLongOctetStringListAttributeCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                                  CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<TestClusterListLongOctetStringListAttributeCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+
+    static void OnSuccessFn(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsNeighborTableListListAttributeCallbackBridge
@@ -483,7 +892,7 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & list);
+                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsRouteTableListListAttributeCallbackBridge
@@ -497,7 +906,7 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & list);
+                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsSecurityPolicyListAttributeCallbackBridge
@@ -511,7 +920,7 @@ public:
 
     static void OnSuccessFn(void * context,
                             const chip::app::DataModel::DecodableList<
-                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & list);
+                                chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallbackBridge
@@ -528,7 +937,7 @@ public:
     static void
     OnSuccessFn(void * context,
                 const chip::app::DataModel::DecodableList<
-                    chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & list);
+                    chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value);
 };
 
 class CHIPThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallbackBridge
@@ -542,847 +951,775 @@ public:
 
     static void
     OnSuccessFn(void * context,
-                const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & list);
+                const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value);
 };
 
 class CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge
-    : public CHIPCallbackBridge<AccountLoginClusterGetSetupPINResponseCallback>
+    : public CHIPCallbackBridge<CHIPAccountLoginClusterGetSetupPINResponseCallbackType>
 {
 public:
     CHIPAccountLoginClusterGetSetupPINResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<AccountLoginClusterGetSetupPINResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPAccountLoginClusterGetSetupPINResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::CharSpan setupPIN);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::AccountLogin::Commands::GetSetupPINResponse::DecodableType & data);
 };
 
 class CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge
-    : public CHIPCallbackBridge<ApplicationLauncherClusterLaunchAppResponseCallback>
+    : public CHIPCallbackBridge<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>
 {
 public:
     CHIPApplicationLauncherClusterLaunchAppResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ApplicationLauncherClusterLaunchAppResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPApplicationLauncherClusterLaunchAppResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, chip::CharSpan data);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::ApplicationLauncher::Commands::LaunchAppResponse::DecodableType & data);
 };
 
 class CHIPContentLauncherClusterLaunchContentResponseCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherClusterLaunchContentResponseCallback>
+    : public CHIPCallbackBridge<CHIPContentLauncherClusterLaunchContentResponseCallbackType>
 {
 public:
     CHIPContentLauncherClusterLaunchContentResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                   CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherClusterLaunchContentResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPContentLauncherClusterLaunchContentResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                        keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::CharSpan data, uint8_t contentLaunchStatus);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::ContentLauncher::Commands::LaunchContentResponse::DecodableType & data);
 };
 
 class CHIPContentLauncherClusterLaunchURLResponseCallbackBridge
-    : public CHIPCallbackBridge<ContentLauncherClusterLaunchURLResponseCallback>
+    : public CHIPCallbackBridge<CHIPContentLauncherClusterLaunchURLResponseCallbackType>
 {
 public:
     CHIPContentLauncherClusterLaunchURLResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ContentLauncherClusterLaunchURLResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPContentLauncherClusterLaunchURLResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::CharSpan data, uint8_t contentLaunchStatus);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::ContentLauncher::Commands::LaunchURLResponse::DecodableType & data);
 };
 
 class CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge
-    : public CHIPCallbackBridge<DiagnosticLogsClusterRetrieveLogsResponseCallback>
+    : public CHIPCallbackBridge<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType>
 {
 public:
     CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DiagnosticLogsClusterRetrieveLogsResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPDiagnosticLogsClusterRetrieveLogsResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, chip::ByteSpan content, uint32_t timeStamp, uint32_t timeSinceBoot);
-};
-
-class CHIPDoorLockClusterClearAllPinsResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterClearAllPinsResponseCallback>
-{
-public:
-    CHIPDoorLockClusterClearAllPinsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterClearAllPinsResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge
-    : public CHIPCallbackBridge<DoorLockClusterClearAllRfidsResponseCallback>
-{
-public:
-    CHIPDoorLockClusterClearAllRfidsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterClearAllRfidsResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<DoorLockClusterClearHolidayScheduleResponseCallback>
-{
-public:
-    CHIPDoorLockClusterClearHolidayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterClearHolidayScheduleResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterClearPinResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterClearPinResponseCallback>
-{
-public:
-    CHIPDoorLockClusterClearPinResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterClearPinResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterClearRfidResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterClearRfidResponseCallback>
-{
-public:
-    CHIPDoorLockClusterClearRfidResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                       bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterClearRfidResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<DoorLockClusterClearWeekdayScheduleResponseCallback>
-{
-public:
-    CHIPDoorLockClusterClearWeekdayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterClearWeekdayScheduleResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<DoorLockClusterClearYeardayScheduleResponseCallback>
-{
-public:
-    CHIPDoorLockClusterClearYeardayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterClearYeardayScheduleResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DiagnosticLogs::Commands::RetrieveLogsResponse::DecodableType & data);
 };
 
 class CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<DoorLockClusterGetHolidayScheduleResponseCallback>
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>
 {
 public:
     CHIPDoorLockClusterGetHolidayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterGetHolidayScheduleResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPDoorLockClusterGetHolidayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t scheduleId, uint8_t status, uint32_t localStartTime, uint32_t localEndTime,
-                            uint8_t operatingModeDuringHoliday);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetHolidayScheduleResponse::DecodableType & data);
 };
 
-class CHIPDoorLockClusterGetLogRecordResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterGetLogRecordResponseCallback>
+class CHIPDoorLockClusterGetLogRecordResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetLogRecordResponseCallbackType>
 {
 public:
     CHIPDoorLockClusterGetLogRecordResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterGetLogRecordResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPDoorLockClusterGetLogRecordResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint16_t logEntryId, uint32_t timestamp, uint8_t eventType, uint8_t source,
-                            uint8_t eventIdOrAlarmCode, uint16_t userId, chip::ByteSpan pin);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetLogRecordResponse::DecodableType & data);
 };
 
-class CHIPDoorLockClusterGetPinResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterGetPinResponseCallback>
+class CHIPDoorLockClusterGetPINCodeResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetPINCodeResponseCallbackType>
 {
 public:
-    CHIPDoorLockClusterGetPinResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterGetPinResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPDoorLockClusterGetPINCodeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                        bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterGetPINCodeResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan pin);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetPINCodeResponse::DecodableType & data);
 };
 
-class CHIPDoorLockClusterGetRfidResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterGetRfidResponseCallback>
+class CHIPDoorLockClusterGetRFIDCodeResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetRFIDCodeResponseCallbackType>
 {
 public:
-    CHIPDoorLockClusterGetRfidResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterGetRfidResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+    CHIPDoorLockClusterGetRFIDCodeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
+                                                         bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPDoorLockClusterGetRFIDCodeResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType, chip::ByteSpan rfid);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetRFIDCodeResponse::DecodableType & data);
 };
 
-class CHIPDoorLockClusterGetUserTypeResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterGetUserTypeResponseCallback>
+class CHIPDoorLockClusterGetUserTypeResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetUserTypeResponseCallbackType>
 {
 public:
     CHIPDoorLockClusterGetUserTypeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                          bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterGetUserTypeResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPDoorLockClusterGetUserTypeResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint16_t userId, uint8_t userType);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetUserTypeResponse::DecodableType & data);
 };
 
-class CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<DoorLockClusterGetWeekdayScheduleResponseCallback>
+class CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>
 {
 public:
-    CHIPDoorLockClusterGetWeekdayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterGetWeekdayScheduleResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPDoorLockClusterGetWeekDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t scheduleId, uint16_t userId, uint8_t status, uint8_t daysMask,
-                            uint8_t startHour, uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetWeekDayScheduleResponse::DecodableType & data);
 };
 
-class CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<DoorLockClusterGetYeardayScheduleResponseCallback>
+class CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>
 {
 public:
-    CHIPDoorLockClusterGetYeardayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+    CHIPDoorLockClusterGetYearDayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterGetYeardayScheduleResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPDoorLockClusterGetYearDayScheduleResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t scheduleId, uint16_t userId, uint8_t status, uint32_t localStartTime,
-                            uint32_t localEndTime);
-};
-
-class CHIPDoorLockClusterLockDoorResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterLockDoorResponseCallback>
-{
-public:
-    CHIPDoorLockClusterLockDoorResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterLockDoorResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<DoorLockClusterSetHolidayScheduleResponseCallback>
-{
-public:
-    CHIPDoorLockClusterSetHolidayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterSetHolidayScheduleResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterSetPinResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterSetPinResponseCallback>
-{
-public:
-    CHIPDoorLockClusterSetPinResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                    bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterSetPinResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterSetRfidResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterSetRfidResponseCallback>
-{
-public:
-    CHIPDoorLockClusterSetRfidResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterSetRfidResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterSetUserTypeResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterSetUserTypeResponseCallback>
-{
-public:
-    CHIPDoorLockClusterSetUserTypeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterSetUserTypeResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<DoorLockClusterSetWeekdayScheduleResponseCallback>
-{
-public:
-    CHIPDoorLockClusterSetWeekdayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterSetWeekdayScheduleResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge
-    : public CHIPCallbackBridge<DoorLockClusterSetYeardayScheduleResponseCallback>
-{
-public:
-    CHIPDoorLockClusterSetYeardayScheduleResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterSetYeardayScheduleResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterUnlockDoorResponseCallbackBridge : public CHIPCallbackBridge<DoorLockClusterUnlockDoorResponseCallback>
-{
-public:
-    CHIPDoorLockClusterUnlockDoorResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
-                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterUnlockDoorResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
-};
-
-class CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge
-    : public CHIPCallbackBridge<DoorLockClusterUnlockWithTimeoutResponseCallback>
-{
-public:
-    CHIPDoorLockClusterUnlockWithTimeoutResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
-                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<DoorLockClusterUnlockWithTimeoutResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
-
-    static void OnSuccessFn(void * context, uint8_t status);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::DoorLock::Commands::GetYearDayScheduleResponse::DecodableType & data);
 };
 
 class CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge
-    : public CHIPCallbackBridge<GeneralCommissioningClusterArmFailSafeResponseCallback>
+    : public CHIPCallbackBridge<CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType>
 {
 public:
     CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralCommissioningClusterArmFailSafeResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
+        CHIPCallbackBridge<CHIPGeneralCommissioningClusterArmFailSafeResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::GeneralCommissioning::Commands::ArmFailSafeResponse::DecodableType & data);
 };
 
 class CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge
-    : public CHIPCallbackBridge<GeneralCommissioningClusterCommissioningCompleteResponseCallback>
+    : public CHIPCallbackBridge<CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackType>
 {
 public:
     CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralCommissioningClusterCommissioningCompleteResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                             keepAlive){};
+        CHIPCallbackBridge<CHIPGeneralCommissioningClusterCommissioningCompleteResponseCallbackType>(queue, handler, action,
+                                                                                                     OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::GeneralCommissioning::Commands::CommissioningCompleteResponse::DecodableType & data);
 };
 
 class CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge
-    : public CHIPCallbackBridge<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback>
+    : public CHIPCallbackBridge<CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>
 {
 public:
     CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GeneralCommissioningClusterSetRegulatoryConfigResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
+        CHIPCallbackBridge<CHIPGeneralCommissioningClusterSetRegulatoryConfigResponseCallbackType>(queue, handler, action,
+                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::GeneralCommissioning::Commands::SetRegulatoryConfigResponse::DecodableType & data);
 };
 
-class CHIPGroupsClusterAddGroupResponseCallbackBridge : public CHIPCallbackBridge<GroupsClusterAddGroupResponseCallback>
+class CHIPGroupsClusterAddGroupResponseCallbackBridge : public CHIPCallbackBridge<CHIPGroupsClusterAddGroupResponseCallbackType>
 {
 public:
     CHIPGroupsClusterAddGroupResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<GroupsClusterAddGroupResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPGroupsClusterAddGroupResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint16_t groupId);
+    static void OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::AddGroupResponse::DecodableType & data);
 };
 
 class CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge
-    : public CHIPCallbackBridge<GroupsClusterGetGroupMembershipResponseCallback>
+    : public CHIPCallbackBridge<CHIPGroupsClusterGetGroupMembershipResponseCallbackType>
 {
 public:
     CHIPGroupsClusterGetGroupMembershipResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<GroupsClusterGetGroupMembershipResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPGroupsClusterGetGroupMembershipResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t capacity, uint8_t groupCount,
-                            /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::Groups::Commands::GetGroupMembershipResponse::DecodableType & data);
 };
 
-class CHIPGroupsClusterRemoveGroupResponseCallbackBridge : public CHIPCallbackBridge<GroupsClusterRemoveGroupResponseCallback>
+class CHIPGroupsClusterRemoveGroupResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPGroupsClusterRemoveGroupResponseCallbackType>
 {
 public:
     CHIPGroupsClusterRemoveGroupResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<GroupsClusterRemoveGroupResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPGroupsClusterRemoveGroupResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint16_t groupId);
+    static void OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::RemoveGroupResponse::DecodableType & data);
 };
 
-class CHIPGroupsClusterViewGroupResponseCallbackBridge : public CHIPCallbackBridge<GroupsClusterViewGroupResponseCallback>
+class CHIPGroupsClusterViewGroupResponseCallbackBridge : public CHIPCallbackBridge<CHIPGroupsClusterViewGroupResponseCallbackType>
 {
 public:
     CHIPGroupsClusterViewGroupResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<GroupsClusterViewGroupResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPGroupsClusterViewGroupResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint16_t groupId, chip::CharSpan groupName);
+    static void OnSuccessFn(void * context, const chip::app::Clusters::Groups::Commands::ViewGroupResponse::DecodableType & data);
 };
 
 class CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge
-    : public CHIPCallbackBridge<IdentifyClusterIdentifyQueryResponseCallback>
+    : public CHIPCallbackBridge<CHIPIdentifyClusterIdentifyQueryResponseCallbackType>
 {
 public:
     CHIPIdentifyClusterIdentifyQueryResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<IdentifyClusterIdentifyQueryResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPIdentifyClusterIdentifyQueryResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint16_t timeout);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::Identify::Commands::IdentifyQueryResponse::DecodableType & data);
 };
 
-class CHIPKeypadInputClusterSendKeyResponseCallbackBridge : public CHIPCallbackBridge<KeypadInputClusterSendKeyResponseCallback>
+class CHIPKeypadInputClusterSendKeyResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPKeypadInputClusterSendKeyResponseCallbackType>
 {
 public:
     CHIPKeypadInputClusterSendKeyResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<KeypadInputClusterSendKeyResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPKeypadInputClusterSendKeyResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::KeypadInput::Commands::SendKeyResponse::DecodableType & data);
 };
 
 class CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackClusterMediaFastForwardResponseCallback>
+    : public CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackType>
 {
 public:
     CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackClusterMediaFastForwardResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaFastForwardResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t mediaPlaybackStatus);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::MediaPlayback::Commands::MediaFastForwardResponse::DecodableType & data);
 };
 
 class CHIPMediaPlaybackClusterMediaNextResponseCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackClusterMediaNextResponseCallback>
+    : public CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaNextResponseCallbackType>
 {
 public:
     CHIPMediaPlaybackClusterMediaNextResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                             bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackClusterMediaNextResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaNextResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t mediaPlaybackStatus);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::MediaPlayback::Commands::MediaNextResponse::DecodableType & data);
 };
 
 class CHIPMediaPlaybackClusterMediaPauseResponseCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackClusterMediaPauseResponseCallback>
+    : public CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaPauseResponseCallbackType>
 {
 public:
     CHIPMediaPlaybackClusterMediaPauseResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackClusterMediaPauseResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaPauseResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t mediaPlaybackStatus);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::MediaPlayback::Commands::MediaPauseResponse::DecodableType & data);
 };
 
 class CHIPMediaPlaybackClusterMediaPlayResponseCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackClusterMediaPlayResponseCallback>
+    : public CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaPlayResponseCallbackType>
 {
 public:
     CHIPMediaPlaybackClusterMediaPlayResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                             bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackClusterMediaPlayResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaPlayResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t mediaPlaybackStatus);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::MediaPlayback::Commands::MediaPlayResponse::DecodableType & data);
 };
 
 class CHIPMediaPlaybackClusterMediaPreviousResponseCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackClusterMediaPreviousResponseCallback>
+    : public CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaPreviousResponseCallbackType>
 {
 public:
     CHIPMediaPlaybackClusterMediaPreviousResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                 CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackClusterMediaPreviousResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaPreviousResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                      keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t mediaPlaybackStatus);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::MediaPlayback::Commands::MediaPreviousResponse::DecodableType & data);
 };
 
 class CHIPMediaPlaybackClusterMediaRewindResponseCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackClusterMediaRewindResponseCallback>
+    : public CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaRewindResponseCallbackType>
 {
 public:
     CHIPMediaPlaybackClusterMediaRewindResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackClusterMediaRewindResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaRewindResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t mediaPlaybackStatus);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::MediaPlayback::Commands::MediaRewindResponse::DecodableType & data);
 };
 
 class CHIPMediaPlaybackClusterMediaSeekResponseCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackClusterMediaSeekResponseCallback>
+    : public CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaSeekResponseCallbackType>
 {
 public:
     CHIPMediaPlaybackClusterMediaSeekResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                             bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackClusterMediaSeekResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaSeekResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t mediaPlaybackStatus);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::MediaPlayback::Commands::MediaSeekResponse::DecodableType & data);
 };
 
 class CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackClusterMediaSkipBackwardResponseCallback>
+    : public CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackType>
 {
 public:
     CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                     CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackClusterMediaSkipBackwardResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaSkipBackwardResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                          keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t mediaPlaybackStatus);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::MediaPlayback::Commands::MediaSkipBackwardResponse::DecodableType & data);
 };
 
 class CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackClusterMediaSkipForwardResponseCallback>
+    : public CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackType>
 {
 public:
     CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackClusterMediaSkipForwardResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaSkipForwardResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t mediaPlaybackStatus);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::MediaPlayback::Commands::MediaSkipForwardResponse::DecodableType & data);
 };
 
 class CHIPMediaPlaybackClusterMediaStartOverResponseCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackClusterMediaStartOverResponseCallback>
+    : public CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaStartOverResponseCallbackType>
 {
 public:
     CHIPMediaPlaybackClusterMediaStartOverResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackClusterMediaStartOverResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaStartOverResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t mediaPlaybackStatus);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::MediaPlayback::Commands::MediaStartOverResponse::DecodableType & data);
 };
 
 class CHIPMediaPlaybackClusterMediaStopResponseCallbackBridge
-    : public CHIPCallbackBridge<MediaPlaybackClusterMediaStopResponseCallback>
+    : public CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaStopResponseCallbackType>
 {
 public:
     CHIPMediaPlaybackClusterMediaStopResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                             bool keepAlive = false) :
-        CHIPCallbackBridge<MediaPlaybackClusterMediaStopResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPMediaPlaybackClusterMediaStopResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t mediaPlaybackStatus);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::MediaPlayback::Commands::MediaStopResponse::DecodableType & data);
 };
 
 class CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningClusterAddThreadNetworkResponseCallback>
+    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackType>
 {
 public:
     CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningClusterAddThreadNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+        CHIPCallbackBridge<CHIPNetworkCommissioningClusterAddThreadNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                                keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::NetworkCommissioning::Commands::AddThreadNetworkResponse::DecodableType & data);
 };
 
 class CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningClusterAddWiFiNetworkResponseCallback>
+    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackType>
 {
 public:
     CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningClusterAddWiFiNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+        CHIPCallbackBridge<CHIPNetworkCommissioningClusterAddWiFiNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::NetworkCommissioning::Commands::AddWiFiNetworkResponse::DecodableType & data);
 };
 
 class CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningClusterDisableNetworkResponseCallback>
+    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackType>
 {
 public:
     CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                         CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningClusterDisableNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                      keepAlive){};
+        CHIPCallbackBridge<CHIPNetworkCommissioningClusterDisableNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                              keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::NetworkCommissioning::Commands::DisableNetworkResponse::DecodableType & data);
 };
 
 class CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningClusterEnableNetworkResponseCallback>
+    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackType>
 {
 public:
     CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningClusterEnableNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+        CHIPCallbackBridge<CHIPNetworkCommissioningClusterEnableNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::NetworkCommissioning::Commands::EnableNetworkResponse::DecodableType & data);
 };
 
 class CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningClusterRemoveNetworkResponseCallback>
+    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackType>
 {
 public:
     CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningClusterRemoveNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+        CHIPCallbackBridge<CHIPNetworkCommissioningClusterRemoveNetworkResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::NetworkCommissioning::Commands::RemoveNetworkResponse::DecodableType & data);
 };
 
 class CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningClusterScanNetworksResponseCallback>
+    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterScanNetworksResponseCallbackType>
 {
 public:
     CHIPNetworkCommissioningClusterScanNetworksResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                       CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningClusterScanNetworksResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                    keepAlive){};
+        CHIPCallbackBridge<CHIPNetworkCommissioningClusterScanNetworksResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                            keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText,
-                            /* TYPE WARNING: array array defaults to */ uint8_t * wifiScanResults,
-                            /* TYPE WARNING: array array defaults to */ uint8_t * threadScanResults);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::NetworkCommissioning::Commands::ScanNetworksResponse::DecodableType & data);
 };
 
 class CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback>
+    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackType>
 {
 public:
     CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningClusterUpdateThreadNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                           keepAlive){};
+        CHIPCallbackBridge<CHIPNetworkCommissioningClusterUpdateThreadNetworkResponseCallbackType>(queue, handler, action,
+                                                                                                   OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::NetworkCommissioning::Commands::UpdateThreadNetworkResponse::DecodableType & data);
 };
 
 class CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge
-    : public CHIPCallbackBridge<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>
+    : public CHIPCallbackBridge<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackType>
 {
 public:
     CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                            CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<NetworkCommissioningClusterUpdateWiFiNetworkResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                         keepAlive){};
+        CHIPCallbackBridge<CHIPNetworkCommissioningClusterUpdateWiFiNetworkResponseCallbackType>(queue, handler, action,
+                                                                                                 OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t errorCode, chip::CharSpan debugText);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::NetworkCommissioning::Commands::UpdateWiFiNetworkResponse::DecodableType & data);
 };
 
 class CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge
-    : public CHIPCallbackBridge<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback>
+    : public CHIPCallbackBridge<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>
 {
 public:
     CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                           CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OtaSoftwareUpdateProviderClusterApplyUpdateResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                        keepAlive){};
+        CHIPCallbackBridge<CHIPOtaSoftwareUpdateProviderClusterApplyUpdateResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                                keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t action, uint32_t delayedActionTime);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::ApplyUpdateResponse::DecodableType & data);
 };
 
 class CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge
-    : public CHIPCallbackBridge<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback>
+    : public CHIPCallbackBridge<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>
 {
 public:
     CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                          CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OtaSoftwareUpdateProviderClusterQueryImageResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                       keepAlive){};
+        CHIPCallbackBridge<CHIPOtaSoftwareUpdateProviderClusterQueryImageResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                               keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint32_t delayedActionTime, chip::CharSpan imageURI,
-                            uint32_t softwareVersion, chip::CharSpan softwareVersionString, chip::ByteSpan updateToken,
-                            bool userConsentNeeded, chip::ByteSpan metadataForRequestor);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::OtaSoftwareUpdateProvider::Commands::QueryImageResponse::DecodableType & data);
 };
 
 class CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge
-    : public CHIPCallbackBridge<OperationalCredentialsClusterAttestationResponseCallback>
+    : public CHIPCallbackBridge<CHIPOperationalCredentialsClusterAttestationResponseCallbackType>
 {
 public:
     CHIPOperationalCredentialsClusterAttestationResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                        CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OperationalCredentialsClusterAttestationResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                     keepAlive){};
+        CHIPCallbackBridge<CHIPOperationalCredentialsClusterAttestationResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                             keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::ByteSpan AttestationElements, chip::ByteSpan Signature);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::OperationalCredentials::Commands::AttestationResponse::DecodableType & data);
 };
 
 class CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge
-    : public CHIPCallbackBridge<OperationalCredentialsClusterCertificateChainResponseCallback>
+    : public CHIPCallbackBridge<CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType>
 {
 public:
     CHIPOperationalCredentialsClusterCertificateChainResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                             CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OperationalCredentialsClusterCertificateChainResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                          keepAlive){};
+        CHIPCallbackBridge<CHIPOperationalCredentialsClusterCertificateChainResponseCallbackType>(queue, handler, action,
+                                                                                                  OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::ByteSpan Certificate);
+    static void
+    OnSuccessFn(void * context,
+                const chip::app::Clusters::OperationalCredentials::Commands::CertificateChainResponse::DecodableType & data);
 };
 
 class CHIPOperationalCredentialsClusterNOCResponseCallbackBridge
-    : public CHIPCallbackBridge<OperationalCredentialsClusterNOCResponseCallback>
+    : public CHIPCallbackBridge<CHIPOperationalCredentialsClusterNOCResponseCallbackType>
 {
 public:
     CHIPOperationalCredentialsClusterNOCResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OperationalCredentialsClusterNOCResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPOperationalCredentialsClusterNOCResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                     keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t StatusCode, uint8_t FabricIndex, chip::CharSpan DebugText);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::OperationalCredentials::Commands::NOCResponse::DecodableType & data);
 };
 
 class CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge
-    : public CHIPCallbackBridge<OperationalCredentialsClusterOpCSRResponseCallback>
+    : public CHIPCallbackBridge<CHIPOperationalCredentialsClusterOpCSRResponseCallbackType>
 {
 public:
     CHIPOperationalCredentialsClusterOpCSRResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<OperationalCredentialsClusterOpCSRResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPOperationalCredentialsClusterOpCSRResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::ByteSpan NOCSRElements, chip::ByteSpan AttestationSignature);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::OperationalCredentials::Commands::OpCSRResponse::DecodableType & data);
 };
 
-class CHIPScenesClusterAddSceneResponseCallbackBridge : public CHIPCallbackBridge<ScenesClusterAddSceneResponseCallback>
+class CHIPScenesClusterAddSceneResponseCallbackBridge : public CHIPCallbackBridge<CHIPScenesClusterAddSceneResponseCallbackType>
 {
 public:
     CHIPScenesClusterAddSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                     bool keepAlive = false) :
-        CHIPCallbackBridge<ScenesClusterAddSceneResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPScenesClusterAddSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
+    static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::AddSceneResponse::DecodableType & data);
 };
 
 class CHIPScenesClusterGetSceneMembershipResponseCallbackBridge
-    : public CHIPCallbackBridge<ScenesClusterGetSceneMembershipResponseCallback>
+    : public CHIPCallbackBridge<CHIPScenesClusterGetSceneMembershipResponseCallbackType>
 {
 public:
     CHIPScenesClusterGetSceneMembershipResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                               CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<ScenesClusterGetSceneMembershipResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPScenesClusterGetSceneMembershipResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                    keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
-                            /* TYPE WARNING: array array defaults to */ uint8_t * sceneList);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::Scenes::Commands::GetSceneMembershipResponse::DecodableType & data);
 };
 
 class CHIPScenesClusterRemoveAllScenesResponseCallbackBridge
-    : public CHIPCallbackBridge<ScenesClusterRemoveAllScenesResponseCallback>
+    : public CHIPCallbackBridge<CHIPScenesClusterRemoveAllScenesResponseCallbackType>
 {
 public:
     CHIPScenesClusterRemoveAllScenesResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                            bool keepAlive = false) :
-        CHIPCallbackBridge<ScenesClusterRemoveAllScenesResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPScenesClusterRemoveAllScenesResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint16_t groupId);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::Scenes::Commands::RemoveAllScenesResponse::DecodableType & data);
 };
 
-class CHIPScenesClusterRemoveSceneResponseCallbackBridge : public CHIPCallbackBridge<ScenesClusterRemoveSceneResponseCallback>
+class CHIPScenesClusterRemoveSceneResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPScenesClusterRemoveSceneResponseCallbackType>
 {
 public:
     CHIPScenesClusterRemoveSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                        bool keepAlive = false) :
-        CHIPCallbackBridge<ScenesClusterRemoveSceneResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPScenesClusterRemoveSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
+    static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::RemoveSceneResponse::DecodableType & data);
 };
 
-class CHIPScenesClusterStoreSceneResponseCallbackBridge : public CHIPCallbackBridge<ScenesClusterStoreSceneResponseCallback>
+class CHIPScenesClusterStoreSceneResponseCallbackBridge : public CHIPCallbackBridge<CHIPScenesClusterStoreSceneResponseCallbackType>
 {
 public:
     CHIPScenesClusterStoreSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                       bool keepAlive = false) :
-        CHIPCallbackBridge<ScenesClusterStoreSceneResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPScenesClusterStoreSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId);
+    static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::StoreSceneResponse::DecodableType & data);
 };
 
-class CHIPScenesClusterViewSceneResponseCallbackBridge : public CHIPCallbackBridge<ScenesClusterViewSceneResponseCallback>
+class CHIPScenesClusterViewSceneResponseCallbackBridge : public CHIPCallbackBridge<CHIPScenesClusterViewSceneResponseCallbackType>
 {
 public:
     CHIPScenesClusterViewSceneResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                      bool keepAlive = false) :
-        CHIPCallbackBridge<ScenesClusterViewSceneResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPScenesClusterViewSceneResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
-                            chip::CharSpan sceneName, /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
+    static void OnSuccessFn(void * context, const chip::app::Clusters::Scenes::Commands::ViewSceneResponse::DecodableType & data);
 };
 
 class CHIPTvChannelClusterChangeChannelResponseCallbackBridge
-    : public CHIPCallbackBridge<TvChannelClusterChangeChannelResponseCallback>
+    : public CHIPCallbackBridge<CHIPTvChannelClusterChangeChannelResponseCallbackType>
 {
 public:
     CHIPTvChannelClusterChangeChannelResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                             bool keepAlive = false) :
-        CHIPCallbackBridge<TvChannelClusterChangeChannelResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPTvChannelClusterChangeChannelResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, /* TYPE WARNING: array array defaults to */ uint8_t * ChannelMatch, uint8_t ErrorType);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::TvChannel::Commands::ChangeChannelResponse::DecodableType & data);
 };
 
 class CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge
-    : public CHIPCallbackBridge<TargetNavigatorClusterNavigateTargetResponseCallback>
+    : public CHIPCallbackBridge<CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType>
 {
 public:
     CHIPTargetNavigatorClusterNavigateTargetResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                    CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TargetNavigatorClusterNavigateTargetResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPTargetNavigatorClusterNavigateTargetResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                         keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t status, chip::CharSpan data);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::TargetNavigator::Commands::NavigateTargetResponse::DecodableType & data);
 };
 
-class CHIPTestClusterClusterBooleanResponseCallbackBridge : public CHIPCallbackBridge<TestClusterClusterBooleanResponseCallback>
+class CHIPTestClusterClusterBooleanResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPTestClusterClusterBooleanResponseCallbackType>
 {
 public:
     CHIPTestClusterClusterBooleanResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                         bool keepAlive = false) :
-        CHIPCallbackBridge<TestClusterClusterBooleanResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPTestClusterClusterBooleanResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, bool value);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::TestCluster::Commands::BooleanResponse::DecodableType & data);
+};
+
+class CHIPTestClusterClusterSimpleStructResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPTestClusterClusterSimpleStructResponseCallbackType>
+{
+public:
+    CHIPTestClusterClusterSimpleStructResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
+                                                             CHIPActionBlock action, bool keepAlive = false) :
+        CHIPCallbackBridge<CHIPTestClusterClusterSimpleStructResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
+
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::TestCluster::Commands::SimpleStructResponse::DecodableType & data);
 };
 
 class CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge
-    : public CHIPCallbackBridge<TestClusterClusterTestAddArgumentsResponseCallback>
+    : public CHIPCallbackBridge<CHIPTestClusterClusterTestAddArgumentsResponseCallbackType>
 {
 public:
     CHIPTestClusterClusterTestAddArgumentsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                  CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TestClusterClusterTestAddArgumentsResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPTestClusterClusterTestAddArgumentsResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                       keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t returnValue);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::TestCluster::Commands::TestAddArgumentsResponse::DecodableType & data);
 };
 
-class CHIPTestClusterClusterTestEnumsResponseCallbackBridge : public CHIPCallbackBridge<TestClusterClusterTestEnumsResponseCallback>
+class CHIPTestClusterClusterTestEnumsResponseCallbackBridge
+    : public CHIPCallbackBridge<CHIPTestClusterClusterTestEnumsResponseCallbackType>
 {
 public:
     CHIPTestClusterClusterTestEnumsResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler, CHIPActionBlock action,
                                                           bool keepAlive = false) :
-        CHIPCallbackBridge<TestClusterClusterTestEnumsResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPTestClusterClusterTestEnumsResponseCallbackType>(queue, handler, action, OnSuccessFn, keepAlive){};
 
-    static void OnSuccessFn(void * context, chip::VendorId arg1, uint8_t arg2);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::TestCluster::Commands::TestEnumsResponse::DecodableType & data);
 };
 
 class CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge
-    : public CHIPCallbackBridge<TestClusterClusterTestListInt8UReverseResponseCallback>
+    : public CHIPCallbackBridge<CHIPTestClusterClusterTestListInt8UReverseResponseCallbackType>
 {
 public:
     CHIPTestClusterClusterTestListInt8UReverseResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TestClusterClusterTestListInt8UReverseResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
+        CHIPCallbackBridge<CHIPTestClusterClusterTestListInt8UReverseResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context, /* TYPE WARNING: array array defaults to */ uint8_t * arg1);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::TestCluster::Commands::TestListInt8UReverseResponse::DecodableType & data);
 };
 
 class CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge
-    : public CHIPCallbackBridge<TestClusterClusterTestNullableOptionalResponseCallback>
+    : public CHIPCallbackBridge<CHIPTestClusterClusterTestNullableOptionalResponseCallbackType>
 {
 public:
     CHIPTestClusterClusterTestNullableOptionalResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                                      CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TestClusterClusterTestNullableOptionalResponseCallback>(queue, handler, action, OnSuccessFn,
-                                                                                   keepAlive){};
+        CHIPCallbackBridge<CHIPTestClusterClusterTestNullableOptionalResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                           keepAlive){};
 
-    static void OnSuccessFn(void * context, bool wasPresent, bool wasNull, uint8_t value, uint8_t originalValue);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::TestCluster::Commands::TestNullableOptionalResponse::DecodableType & data);
 };
 
 class CHIPTestClusterClusterTestSpecificResponseCallbackBridge
-    : public CHIPCallbackBridge<TestClusterClusterTestSpecificResponseCallback>
+    : public CHIPCallbackBridge<CHIPTestClusterClusterTestSpecificResponseCallbackType>
 {
 public:
     CHIPTestClusterClusterTestSpecificResponseCallbackBridge(dispatch_queue_t queue, ResponseHandler handler,
                                                              CHIPActionBlock action, bool keepAlive = false) :
-        CHIPCallbackBridge<TestClusterClusterTestSpecificResponseCallback>(queue, handler, action, OnSuccessFn, keepAlive){};
+        CHIPCallbackBridge<CHIPTestClusterClusterTestSpecificResponseCallbackType>(queue, handler, action, OnSuccessFn,
+                                                                                   keepAlive){};
 
-    static void OnSuccessFn(void * context, uint8_t returnValue);
+    static void OnSuccessFn(void * context,
+                            const chip::app::Clusters::TestCluster::Commands::TestSpecificResponse::DecodableType & data);
 };

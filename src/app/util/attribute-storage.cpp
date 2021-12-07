@@ -40,9 +40,11 @@
  ******************************************************************************/
 
 #include "app/util/common.h"
+#include <app/InteractionModelEngine.h>
 #include <app/reporting/reporting.h>
 #include <app/util/af.h>
 #include <app/util/attribute-storage.h>
+#include <lib/support/CodeUtils.h>
 #include <lib/support/logging/CHIPLogging.h>
 
 #include <app-common/zap-generated/attribute-type.h>
@@ -66,6 +68,8 @@ EmberAfDefinedEndpoint emAfEndpoints[MAX_ENDPOINT_COUNT];
 
 uint8_t attributeData[ACTUAL_ATTRIBUTE_SIZE];
 
+namespace {
+
 #if (!defined(ATTRIBUTE_SINGLETONS_SIZE)) || (ATTRIBUTE_SINGLETONS_SIZE == 0)
 #define ACTUAL_SINGLETONS_SIZE 1
 #else
@@ -78,25 +82,20 @@ uint16_t emberEndpointCount = 0;
 // If we have attributes that are more than 2 bytes, then
 // we need this data block for the defaults
 #if (defined(GENERATED_DEFAULTS) && GENERATED_DEFAULTS_COUNT)
-const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
+constexpr const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
 #endif // GENERATED_DEFAULTS
 
 #if (defined(GENERATED_MIN_MAX_DEFAULTS) && GENERATED_MIN_MAX_DEFAULT_COUNT)
-const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
+constexpr const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
 #endif // GENERATED_MIN_MAX_DEFAULTS
 
 #ifdef GENERATED_FUNCTION_ARRAYS
 GENERATED_FUNCTION_ARRAYS
 #endif
 
-const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;
-const EmberAfCluster generatedClusters[]                  = GENERATED_CLUSTERS;
-const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
-
-const EmberAfManufacturerCodeEntry clusterManufacturerCodes[]   = GENERATED_CLUSTER_MANUFACTURER_CODES;
-const uint16_t clusterManufacturerCodeCount                     = GENERATED_CLUSTER_MANUFACTURER_CODE_COUNT;
-const EmberAfManufacturerCodeEntry attributeManufacturerCodes[] = GENERATED_ATTRIBUTE_MANUFACTURER_CODES;
-const uint16_t attributeManufacturerCodeCount                   = GENERATED_ATTRIBUTE_MANUFACTURER_CODE_COUNT;
+constexpr const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;
+constexpr const EmberAfCluster generatedClusters[]                  = GENERATED_CLUSTERS;
+constexpr const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
 
 #if !defined(EMBER_SCRIPTED_TEST)
 #define endpointNumber(x) fixedEndpoints[x]
@@ -107,7 +106,6 @@ const uint16_t attributeManufacturerCodeCount                   = GENERATED_ATTR
 #define endpointNetworkIndex(x) fixedNetworks[x]
 #endif
 
-namespace {
 app::AttributeAccessInterface * gAttributeAccessOverrides = nullptr;
 } // anonymous namespace
 
@@ -143,7 +141,7 @@ void emberAfEndpointConfigure(void)
         emAfEndpoints[ep].bitmask       = EMBER_AF_ENDPOINT_ENABLED;
     }
 
-#ifdef DYNAMIC_ENDPOINT_COUNT
+#if CHIP_DEVICE_CONFIG_DYNAMIC_ENDPOINT_COUNT
     if (MAX_ENDPOINT_COUNT > FIXED_ENDPOINT_COUNT)
     {
         // This is assuming that EMBER_AF_ENDPOINT_DISABLED is 0
@@ -490,80 +488,32 @@ static EmberAfStatus typeSensitiveMemCopy(ClusterId clusterId, uint8_t * dest, u
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-// Returns the manufacturer code or ::EMBER_AF_NULL_MANUFACTURER_CODE if none
-// could be found.
-static uint16_t getManufacturerCode(EmberAfManufacturerCodeEntry * codes, uint16_t codeTableSize, uint16_t tableIndex)
-{
-    uint16_t i;
-    for (i = 0; i < codeTableSize; i++)
-    {
-        if (codes->index == tableIndex)
-        {
-            return codes->manufacturerCode;
-        }
-        codes++;
-    }
-    return EMBER_AF_NULL_MANUFACTURER_CODE;
-}
-
-// This function basically wraps getManufacturerCode with the parameters
-// associating an attributes metadata with its code.
-uint16_t emberAfGetMfgCode(EmberAfAttributeMetadata * metadata)
-{
-    return getManufacturerCode((EmberAfManufacturerCodeEntry *) attributeManufacturerCodes, attributeManufacturerCodeCount,
-                               static_cast<uint16_t>((metadata - generatedAttributes)));
-}
-
-uint16_t emAfGetManufacturerCodeForAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * attMetaData)
-{
-    return (emberAfClusterIsManufacturerSpecific(cluster) ? emAfGetManufacturerCodeForCluster(cluster)
-                                                          : emberAfGetMfgCode(attMetaData));
-}
-
-uint16_t emAfGetManufacturerCodeForCluster(EmberAfCluster * cluster)
-{
-    return getManufacturerCode((EmberAfManufacturerCodeEntry *) clusterManufacturerCodes, clusterManufacturerCodeCount,
-                               static_cast<uint16_t>(cluster - generatedClusters));
-}
-
 /**
- * @brief Matches a cluster based on cluster id, direction and manufacturer code.
+ * @brief Matches a cluster based on cluster id and direction.
+ *
  *   This function assumes that the passed cluster's endpoint already
  *   matches the endpoint of the EmberAfAttributeSearchRecord.
  *
- * Cluster's match if:
+ * Clusters match if:
  *   1. Cluster ids match AND
  *   2. Cluster directions match as defined by cluster->mask
- *        and attRecord->clusterMask AND
- *   3. If the clusters are mf specific, their mfg codes match.
+ *        and attRecord->clusterMask
  */
 bool emAfMatchCluster(EmberAfCluster * cluster, EmberAfAttributeSearchRecord * attRecord)
 {
-    return (cluster->clusterId == attRecord->clusterId && cluster->mask & attRecord->clusterMask &&
-            (!emberAfClusterIsManufacturerSpecific(cluster) ||
-             (emAfGetManufacturerCodeForCluster(cluster) == attRecord->manufacturerCode)));
+    return (cluster->clusterId == attRecord->clusterId && cluster->mask & attRecord->clusterMask);
 }
 
 /**
- * @brief Matches an attribute based on attribute id and manufacturer code.
+ * @brief Matches an attribute based on attribute id.
  *   This function assumes that the passed cluster already matches the
- *   clusterId, direction and mf specificity of the passed
- *   EmberAfAttributeSearchRecord.
+ *   clusterId and direction of the passed EmberAfAttributeSearchRecord.
  *
- * Note: If both the attribute and cluster are manufacturer specific,
- *   the cluster's mf code gets precedence.
- *
- * Attributes match if:
- *   1. Att ids match AND
- *      a. cluster IS mf specific OR
- *      b. both stored and saught attributes are NOT mf specific OR
- *      c. stored att IS mf specific AND mfg codes match.
+ * Attributes match if attr ids match.
  */
 bool emAfMatchAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * am, EmberAfAttributeSearchRecord * attRecord)
 {
-    return (am->attributeId == attRecord->attributeId &&
-            (emberAfClusterIsManufacturerSpecific(cluster) ||
-             (emAfGetManufacturerCodeForAttribute(cluster, am) == attRecord->manufacturerCode)));
+    return (am->attributeId == attRecord->attributeId);
 }
 
 // When reading non-string attributes, this function returns an error when destination
@@ -624,8 +574,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     src = buffer;
                                     dst = attributeLocation;
                                     if (!emberAfAttributeWriteAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                             emAfGetManufacturerCodeForAttribute(cluster, am),
-                                                                             am->attributeId))
+                                                                             EMBER_AF_NULL_MANUFACTURER_CODE, am->attributeId))
                                     {
                                         return EMBER_ZCL_STATUS_NOT_AUTHORIZED;
                                     }
@@ -640,8 +589,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                     src = attributeLocation;
                                     dst = buffer;
                                     if (!emberAfAttributeReadAccessCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                            emAfGetManufacturerCodeForAttribute(cluster, am),
-                                                                            am->attributeId))
+                                                                            EMBER_AF_NULL_MANUFACTURER_CODE, am->attributeId))
                                     {
                                         return EMBER_ZCL_STATUS_NOT_AUTHORIZED;
                                     }
@@ -650,13 +598,12 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                 // Is the attribute externally stored?
                                 if (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE)
                                 {
-                                    return (write ? emberAfExternalAttributeWriteCallback(
-                                                        attRecord->endpoint, attRecord->clusterId, am,
-                                                        emAfGetManufacturerCodeForAttribute(cluster, am), buffer, index)
-                                                  : emberAfExternalAttributeReadCallback(
-                                                        attRecord->endpoint, attRecord->clusterId, am,
-                                                        emAfGetManufacturerCodeForAttribute(cluster, am), buffer,
-                                                        emberAfAttributeSize(am), index));
+                                    return (write ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                          am, EMBER_AF_NULL_MANUFACTURER_CODE,
+                                                                                          buffer, index)
+                                                  : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                         am, EMBER_AF_NULL_MANUFACTURER_CODE,
+                                                                                         buffer, emberAfAttributeSize(am), index));
                                 }
                                 else
                                 {
@@ -708,7 +655,7 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
 // mask = CLUSTER_MASK_CLIENT -> find client
 // mask = CLUSTER_MASK_SERVER -> find server
 EmberAfCluster * emberAfFindClusterInTypeWithMfgCode(EmberAfEndpointType * endpointType, ClusterId clusterId,
-                                                     EmberAfClusterMask mask, uint16_t manufacturerCode)
+                                                     EmberAfClusterMask mask, uint16_t manufacturerCode, uint8_t * index)
 {
     uint8_t i;
     for (i = 0; i < endpointType->clusterCount; i++)
@@ -716,13 +663,13 @@ EmberAfCluster * emberAfFindClusterInTypeWithMfgCode(EmberAfEndpointType * endpo
         EmberAfCluster * cluster = &(endpointType->cluster[i]);
         if (cluster->clusterId == clusterId &&
             (mask == 0 || (mask == CLUSTER_MASK_CLIENT && emberAfClusterIsClient(cluster)) ||
-             (mask == CLUSTER_MASK_SERVER && emberAfClusterIsServer(cluster))) &&
-            (!emberAfClusterIsManufacturerSpecific(cluster) ||
-             (emAfGetManufacturerCodeForCluster(cluster) == manufacturerCode)
-             // For compatibility with older stack api, we ignore manufacturer code here
-             // if the manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE
-             || manufacturerCode == EMBER_AF_NULL_MANUFACTURER_CODE))
+             (mask == CLUSTER_MASK_SERVER && emberAfClusterIsServer(cluster))))
         {
+            if (index)
+            {
+                *index = i;
+            }
+
             return cluster;
         }
     }
@@ -738,7 +685,7 @@ EmberAfCluster * emberAfFindClusterInType(EmberAfEndpointType * endpointType, Cl
 
 // This code is used during unit tests for clusters that do not involve manufacturer code.
 // Should this code be used in other locations, manufacturerCode should be added.
-uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
+uint8_t emberAfClusterIndexInMatchingEndpoints(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
 {
     uint8_t ep;
     uint8_t index = 0xFF;
@@ -748,6 +695,24 @@ uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClu
         if (emberAfFindClusterInTypeWithMfgCode(endpointType, clusterId, mask, EMBER_AF_NULL_MANUFACTURER_CODE) != NULL)
         {
             index++;
+            if (emAfEndpoints[ep].endpoint == endpoint)
+            {
+                return index;
+            }
+        }
+    }
+    return 0xFF;
+}
+
+uint8_t emberAfClusterIndex(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask)
+{
+    uint8_t ep;
+    uint8_t index = 0xFF;
+    for (ep = 0; ep < emberAfEndpointCount(); ep++)
+    {
+        EmberAfEndpointType * endpointType = emAfEndpoints[ep].endpointType;
+        if (emberAfFindClusterInTypeWithMfgCode(endpointType, clusterId, mask, EMBER_AF_NULL_MANUFACTURER_CODE, &index) != NULL)
+        {
             if (emAfEndpoints[ep].endpoint == endpoint)
             {
                 return index;
@@ -795,6 +760,50 @@ bool emberAfContainsClient(EndpointId endpoint, ClusterId clusterId)
 {
     return (emberAfFindClusterWithMfgCode(endpoint, clusterId, CLUSTER_MASK_CLIENT, EMBER_AF_NULL_MANUFACTURER_CODE) != NULL);
 }
+
+// This will find the first server that has the clusterId given from the index of endpoint, regardless of mfgCode.
+bool emberAfContainsServerFromIndex(uint16_t index, ClusterId clusterId)
+{
+    if (index == 0xFFFF)
+    {
+        return false;
+    }
+    else
+    {
+        return emberAfFindClusterInTypeWithMfgCode(emAfEndpoints[index].endpointType, clusterId, CLUSTER_MASK_SERVER,
+                                                   EMBER_AF_NULL_MANUFACTURER_CODE);
+    }
+}
+
+namespace chip {
+namespace app {
+
+Loop ForAllEndpointsWithServerCluster(ClusterId clusterId, EndpointCallback callback, intptr_t context)
+{
+    uint16_t count = emberAfEndpointCount();
+    for (uint16_t index = 0; index < count; ++index)
+    {
+        if (!emberAfEndpointIndexIsEnabled(index))
+        {
+            continue;
+        }
+
+        if (!emberAfContainsServerFromIndex(index, clusterId))
+        {
+            continue;
+        }
+
+        if (callback(emberAfEndpointFromIndex(index), context) == Loop::Break)
+        {
+            return Loop::Break;
+        }
+    }
+
+    return Loop::Finish;
+}
+
+} // namespace app
+} // namespace chip
 
 // Finds the cluster that matches endpoint, clusterId, direction, and manufacturerCode.
 EmberAfCluster * emberAfFindClusterWithMfgCode(EndpointId endpoint, ClusterId clusterId, EmberAfClusterMask mask,
@@ -970,6 +979,10 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                     (cluster->mask & CLUSTER_MASK_CLIENT ? EMBER_AF_CLIENT_CLUSTER_TICK : EMBER_AF_SERVER_CLUSTER_TICK));
             }
 
+            // Clear out any command handler overrides registered for this
+            // endpoint.
+            chip::app::InteractionModelEngine::GetInstance()->UnregisterCommandHandlers(endpoint);
+
             // Clear out any attribute access overrides registered for this
             // endpoint.
             app::AttributeAccessInterface * prev = nullptr;
@@ -977,7 +990,7 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
             while (cur)
             {
                 app::AttributeAccessInterface * next = cur->GetNext();
-                if (cur->MatchesExactly(endpoint))
+                if (cur->MatchesEndpoint(endpoint))
                 {
                     // Remove it from the list
                     if (prev)
@@ -988,6 +1001,8 @@ bool emberAfEndpointEnableDisable(EndpointId endpoint, bool enable)
                     {
                         gAttributeAccessOverrides = next;
                     }
+
+                    cur->SetNext(nullptr);
 
                     // Do not change prev in this case.
                 }
@@ -1143,6 +1158,19 @@ EmberAfCluster * emberAfGetNthCluster(EndpointId endpoint, uint8_t n, bool serve
     return NULL;
 }
 
+// Returns the cluster id of Nth server or client cluster,
+// depending on server toggle.
+// Returns Optional<ClusterId>::Missing() if cluster does not exist.
+Optional<ClusterId> emberAfGetNthClusterId(EndpointId endpoint, uint8_t n, bool server)
+{
+    EmberAfCluster * cluster = emberAfGetNthCluster(endpoint, n, server);
+    if (cluster == nullptr)
+    {
+        return Optional<ClusterId>::Missing();
+    }
+    return Optional<ClusterId>(cluster->clusterId);
+}
+
 // Returns number of clusters put into the passed cluster list
 // for the given endpoint and client/server polarity
 uint8_t emberAfGetClustersFromEndpoint(EndpointId endpoint, ClusterId * clusterList, uint8_t listLen, bool server)
@@ -1220,7 +1248,7 @@ void emAfLoadAttributeDefaults(EndpointId endpoint, bool writeTokens)
                     record.clusterId        = cluster->clusterId;
                     record.clusterMask      = (emberAfAttributeIsClient(am) ? CLUSTER_MASK_CLIENT : CLUSTER_MASK_SERVER);
                     record.attributeId      = am->attributeId;
-                    record.manufacturerCode = emAfGetManufacturerCodeForAttribute(cluster, am);
+                    record.manufacturerCode = EMBER_AF_NULL_MANUFACTURER_CODE;
                     if ((am->mask & ATTRIBUTE_MASK_MIN_MAX) != 0U)
                     {
                         if (emberAfAttributeSize(am) <= 2)
@@ -1356,4 +1384,37 @@ app::AttributeAccessInterface * findAttributeAccessOverride(EndpointId endpointI
     }
 
     return nullptr;
+}
+
+uint16_t emberAfGetServerAttributeCount(chip::EndpointId endpoint, chip::ClusterId cluster)
+{
+    EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
+    VerifyOrReturnError(clusterObj != nullptr, 0);
+    return clusterObj->attributeCount;
+}
+
+uint16_t emberAfGetServerAttributeIndexByAttributeId(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                     chip::AttributeId attributeId)
+{
+    EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
+    VerifyOrReturnError(clusterObj != nullptr, UINT16_MAX);
+
+    for (uint16_t i = 0; i < clusterObj->attributeCount; i++)
+    {
+        if (clusterObj->attributes[i].attributeId == attributeId)
+        {
+            return i;
+        }
+    }
+    return UINT16_MAX;
+}
+
+Optional<AttributeId> emberAfGetServerAttributeIdByIndex(EndpointId endpoint, ClusterId cluster, uint16_t attributeIndex)
+{
+    EmberAfCluster * clusterObj = emberAfFindCluster(endpoint, cluster, CLUSTER_MASK_SERVER);
+    if (clusterObj == nullptr || clusterObj->attributeCount <= attributeIndex)
+    {
+        return Optional<AttributeId>::Missing();
+    }
+    return Optional<AttributeId>(clusterObj->attributes[attributeIndex].attributeId);
 }

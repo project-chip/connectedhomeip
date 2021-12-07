@@ -59,7 +59,7 @@ public:
     static const Key kConfigKey_MfrDeviceCert;
     static const Key kConfigKey_MfrDeviceICACerts;
     static const Key kConfigKey_MfrDevicePrivateKey;
-    static const Key kConfigKey_ProductRevision;
+    static const Key kConfigKey_HardwareVersion;
     static const Key kConfigKey_ManufacturingDate;
     static const Key kConfigKey_SetupPinCode;
     static const Key kConfigKey_FabricId;
@@ -80,6 +80,8 @@ public:
     static const Key kCounterKey_UpTime;
     static const Key kCounterKey_TotalOperationalHours;
     static const Key kCounterKey_BootReason;
+    static const Key kCounterKey_RegulatoryConfig;
+    static const Key kCounterKey_LocationCapability;
 
     static const char kGroupKeyNamePrefix[];
 
@@ -103,7 +105,6 @@ public:
     static CHIP_ERROR FactoryResetCounters();
     static void RunConfigUnitTest();
 
-protected:
     // NVS Namespace helper functions.
     static CHIP_ERROR EnsureNamespace(const char * ns);
     static CHIP_ERROR ClearNamespace(const char * ns);

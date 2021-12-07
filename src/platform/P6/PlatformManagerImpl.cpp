@@ -26,6 +26,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <platform/P6/DiagnosticDataProviderImpl.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
 
@@ -42,9 +43,14 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
 
+    SetConfigurationMgr(&ConfigurationManagerImpl::GetDefaultInstance());
+    SetDiagnosticDataProvider(&DiagnosticDataProviderImpl::GetDefaultInstance());
+
     // Make sure the LwIP core lock has been initialized
     err = Internal::InitLwIPCoreLock();
     SuccessOrExit(err);
+
+    mStartTime = System::SystemClock().GetMonotonicTimestamp();
 
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
@@ -58,6 +64,31 @@ exit:
 CHIP_ERROR PlatformManagerImpl::InitLwIPCoreLock(void)
 {
     return Internal::InitLwIPCoreLock();
+}
+
+CHIP_ERROR PlatformManagerImpl::_Shutdown()
+{
+    uint64_t upTime = 0;
+
+    if (GetDiagnosticDataProvider().GetUpTime(upTime) == CHIP_NO_ERROR)
+    {
+        uint32_t totalOperationalHours = 0;
+
+        if (ConfigurationMgr().GetTotalOperationalHours(totalOperationalHours) == CHIP_NO_ERROR)
+        {
+            ConfigurationMgr().StoreTotalOperationalHours(totalOperationalHours + static_cast<uint32_t>(upTime / 3600));
+        }
+        else
+        {
+            ChipLogError(DeviceLayer, "Failed to get total operational hours of the Node");
+        }
+    }
+    else
+    {
+        ChipLogError(DeviceLayer, "Failed to get current uptime since the Node’s last reboot");
+    }
+
+    return Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_Shutdown();
 }
 
 } // namespace DeviceLayer

@@ -72,7 +72,6 @@ Server Server::sServer;
 
 CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint16_t unsecureServicePort)
 {
-    mAppDelegate          = delegate;
     mSecuredServicePort   = secureServicePort;
     mUnsecuredServicePort = unsecureServicePort;
 
@@ -94,6 +93,11 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     err = mFabrics.Init(&mServerStorage);
     SuccessOrExit(err);
 
+    // Group data provider must be initialized after mServerStorage
+    err = mGroupsProvider.Init();
+    SuccessOrExit(err);
+    SetGroupDataProvider(&mGroupsProvider);
+
     // Init transport before operations with secure session mgr.
     err = mTransports.Init(
         UdpListenParameters(&DeviceLayer::InetLayer()).SetAddressType(IPAddressType::kIPv6).SetListenPort(mSecuredServicePort)
@@ -112,6 +116,16 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     mBleLayer = DeviceLayer::ConnectivityMgr().GetBleLayer();
 #endif
     SuccessOrExit(err);
+
+    // Enable Group Listening
+    // TODO : Fix this once GroupDataProvider is implemented #Issue 11075
+    // for (iterate through all GroupDataProvider multicast Address)
+    // {
+#ifdef CHIP_ENABLE_GROUP_MESSAGING_TESTS
+    err = mTransports.MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(1, 1234), true);
+    SuccessOrExit(err);
+#endif
+    //}
 
     err = mSessions.Init(&DeviceLayer::SystemLayer(), &mTransports, &mMessageCounterManager);
     SuccessOrExit(err);
@@ -162,11 +176,6 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     app::DnssdServer::Instance().StartServer();
 #endif
 
-    // TODO @pan-apple Use IM protocol ID.
-    // Register to receive unsolicited legacy ZCL messages from the exchange manager.
-    err = mExchangeMgr.RegisterUnsolicitedMessageHandlerForProtocol(Protocols::TempZCL::Id, this);
-    SuccessOrExit(err);
-
     err = mCASEServer.ListenForSessionEstablishment(&mExchangeMgr, &mTransports, chip::DeviceLayer::ConnectivityMgr().GetBleLayer(),
                                                     &mSessions, &mFabrics, &mSessionIDAllocator);
     SuccessOrExit(err);
@@ -190,7 +199,7 @@ void Server::Shutdown()
     mExchangeMgr.Shutdown();
     mSessions.Shutdown();
     mTransports.Close();
-    mCommissioningWindowManager.Cleanup();
+    mCommissioningWindowManager.Shutdown();
     chip::Platform::MemoryShutdown();
 }
 
@@ -257,26 +266,6 @@ exit:
         mFabrics.ReleaseFabricIndex(kMinValidFabricIndex);
     }
     return err;
-}
-
-CHIP_ERROR Server::OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PayloadHeader & payloadHeader,
-                                     System::PacketBufferHandle && buffer)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrReturnError(!buffer.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
-    // TODO: BDX messages will also be possible in the future.
-    HandleDataModelMessage(exchangeContext, std::move(buffer));
-
-    return err;
-}
-
-void Server::OnResponseTimeout(Messaging::ExchangeContext * ec)
-{
-    ChipLogProgress(AppServer, "Failed to receive response");
-    if (mAppDelegate != nullptr)
-    {
-        mAppDelegate->OnReceiveError();
-    }
 }
 
 } // namespace chip

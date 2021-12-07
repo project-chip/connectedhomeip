@@ -17,9 +17,13 @@
 
 #pragma once
 
+#include <app/OperationalDeviceProxy.h>
 #include <app/server/AppDelegate.h>
 #include <app/server/CommissioningWindowManager.h>
+#include <credentials/FabricTable.h>
+#include <credentials/GroupDataProviderImpl.h>
 #include <inet/InetConfig.h>
+#include <lib/support/TestPersistentStorageDelegate.h>
 #include <messaging/ExchangeMgr.h>
 #include <platform/KeyValueStoreManager.h>
 #include <protocols/secure_channel/CASEServer.h>
@@ -27,7 +31,6 @@
 #include <protocols/secure_channel/PASESession.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/user_directed_commissioning/UserDirectedCommissioning.h>
-#include <transport/FabricTable.h>
 #include <transport/SessionManager.h>
 #include <transport/TransportMgr.h>
 #include <transport/TransportMgrBase.h>
@@ -49,7 +52,7 @@ using ServerTransportMgr = chip::TransportMgr<chip::Transport::UDP
 #endif
                                               >;
 
-class Server : public Messaging::ExchangeDelegate
+class Server
 {
 public:
     CHIP_ERROR Init(AppDelegate * delegate = nullptr, uint16_t secureServicePort = CHIP_PORT,
@@ -71,6 +74,13 @@ public:
 
     TransportMgrBase & GetTransportManager() { return mTransports; }
 
+    chip::OperationalDeviceProxy * GetOperationalDeviceProxy() { return mOperationalDeviceProxy; }
+
+    void SetOperationalDeviceProxy(chip::OperationalDeviceProxy * operationalDeviceProxy)
+    {
+        mOperationalDeviceProxy = operationalDeviceProxy;
+    }
+
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * getBleLayerObject() { return mBleLayer; }
 #endif
@@ -82,7 +92,7 @@ public:
     static Server & GetInstance() { return sServer; }
 
 private:
-    Server() : mCommissioningWindowManager(this) {}
+    Server() : mCommissioningWindowManager(this), mGroupsProvider(mGroupsStorage) {}
 
     static Server sServer;
 
@@ -122,13 +132,6 @@ private:
         CHIP_ERROR SyncDelete(FabricIndex fabricIndex, const char * key) override { return SyncDeleteKeyValue(key); };
     };
 
-    // Messaging::ExchangeDelegate
-    CHIP_ERROR OnMessageReceived(Messaging::ExchangeContext * exchangeContext, const PayloadHeader & payloadHeader,
-                                 System::PacketBufferHandle && buffer) override;
-    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
-
-    AppDelegate * mAppDelegate = nullptr;
-
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer = nullptr;
 #endif
@@ -144,9 +147,17 @@ private:
     chip::Protocols::UserDirectedCommissioning::UserDirectedCommissioningClient gUDCClient;
 #endif // CHIP_DEVICE_CONFIG_ENABLE_COMMISSIONER_DISCOVERY_CLIENT
     SecurePairingUsingTestSecret mTestPairing;
-
-    ServerStorageDelegate mServerStorage;
     CommissioningWindowManager mCommissioningWindowManager;
+
+    // Both PersistentStorageDelegate, and GroupDataProvider should be injected by the applications
+    // See: https://github.com/project-chip/connectedhomeip/issues/12276
+    ServerStorageDelegate mServerStorage;
+    // Currently, the GroupDataProvider cannot use KeyValueStoreMgr() due to
+    // (https://github.com/project-chip/connectedhomeip/issues/12174)
+    TestPersistentStorageDelegate mGroupsStorage;
+    Credentials::GroupDataProviderImpl mGroupsProvider;
+
+    chip::OperationalDeviceProxy * mOperationalDeviceProxy = nullptr;
 
     // TODO @ceille: Maybe use OperationalServicePort and CommissionableServicePort
     uint16_t mSecuredServicePort;

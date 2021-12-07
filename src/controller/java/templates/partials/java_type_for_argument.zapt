@@ -1,0 +1,1 @@
+{{#if_is_struct type}}{{else}}, {{#if isOptional}}Optional<{{else if isNullable}}@Nullable {{/if}}{{asJavaBoxedType type}}{{#if isOptional}}>{{/if}}{{/if_is_struct}}

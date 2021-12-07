@@ -29,46 +29,62 @@
 #include <lib/core/PeerId.h>
 #include <lib/dnssd/Constants.h>
 #include <lib/support/BytesToHex.h>
+#include <messaging/ReliableMessageProtocolConfig.h>
 
 namespace chip {
 namespace Dnssd {
 
-constexpr uint32_t kUndefinedRetryInterval = std::numeric_limits<uint32_t>::max();
-
 struct ResolvedNodeData
 {
+    // TODO: use pool to allow dynamic
+    static constexpr int kMaxIPAddresses = 5;
     void LogNodeIdResolved()
     {
 #if CHIP_PROGRESS_LOGGING
         char addrBuffer[Inet::IPAddress::kMaxStringLength];
-        mAddress.ToString(addrBuffer);
+
         // Would be nice to log the interface id, but sorting out how to do so
         // across our differnet InterfaceId implementations is a pain.
-        ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64 " to [%s]:%" PRIu16,
-                        ChipLogValueX64(mPeerId.GetNodeId()), addrBuffer, mPort);
+        ChipLogProgress(Discovery, "Node ID resolved for 0x" ChipLogFormatX64, ChipLogValueX64(mPeerId.GetNodeId()));
+        for (size_t i = 0; i < mNumIPs; ++i)
+        {
+            mAddress[i].ToString(addrBuffer);
+            ChipLogProgress(Discovery, "    Addr %zu: [%s]:%" PRIu16, i, addrBuffer, mPort);
+        }
 #endif // CHIP_PROGRESS_LOGGING
     }
 
-    Optional<uint32_t> GetMrpRetryIntervalIdle() const
+    ReliableMessageProtocolConfig GetMRPConfig() const
     {
-        return mMrpRetryIntervalIdle != kUndefinedRetryInterval ? Optional<uint32_t>{ mMrpRetryIntervalIdle }
-                                                                : Optional<uint32_t>{};
+        return ReliableMessageProtocolConfig(GetMrpRetryIntervalIdle().ValueOr(gDefaultMRPConfig.mIdleRetransTimeout),
+                                             GetMrpRetryIntervalActive().ValueOr(gDefaultMRPConfig.mActiveRetransTimeout));
     }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mMrpRetryIntervalIdle; }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mMrpRetryIntervalActive; }
 
-    Optional<uint32_t> GetMrpRetryIntervalActive() const
+    bool IsDeviceTreatedAsSleepy(const ReliableMessageProtocolConfig * defaultMRPConfig) const
     {
-        return mMrpRetryIntervalActive != kUndefinedRetryInterval ? Optional<uint32_t>{ mMrpRetryIntervalActive }
-                                                                  : Optional<uint32_t>{};
+        // If either retry interval (Idle - CRI, Active - CRA) has a value and that value is greater
+        // than the value passed to this function, then the peer device will be treated as if it is
+        // a Sleepy End Device (SED)
+        if ((mMrpRetryIntervalIdle.HasValue() && (mMrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||
+            (mMrpRetryIntervalActive.HasValue() && (mMrpRetryIntervalActive.Value() > defaultMRPConfig->mActiveRetransTimeout)))
+        {
+            return true;
+        }
+        return false;
     }
 
     PeerId mPeerId;
-    Inet::IPAddress mAddress               = Inet::IPAddress::Any;
-    Inet::InterfaceId mInterfaceId         = Inet::InterfaceId::Null();
+    size_t mNumIPs = 0;
+    Inet::InterfaceId mInterfaceId;
+    Inet::IPAddress mAddress[kMaxIPAddresses];
     uint16_t mPort                         = 0;
     char mHostName[kHostNameMaxLength + 1] = {};
     bool mSupportsTcp                      = false;
-    uint32_t mMrpRetryIntervalIdle         = kUndefinedRetryInterval;
-    uint32_t mMrpRetryIntervalActive       = kUndefinedRetryInterval;
+    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalIdle;
+    Optional<System::Clock::Milliseconds32> mMrpRetryIntervalActive;
+    System::Clock::Timestamp mExpiryTime;
 };
 
 constexpr size_t kMaxDeviceNameLen         = 32;
@@ -93,8 +109,8 @@ struct DiscoveredNodeData
     uint16_t pairingHint;
     char pairingInstruction[kMaxPairingInstructionLen + 1];
     bool supportsTcp;
-    uint32_t mrpRetryIntervalIdle;
-    uint32_t mrpRetryIntervalActive;
+    Optional<System::Clock::Milliseconds32> mrpRetryIntervalIdle;
+    Optional<System::Clock::Milliseconds32> mrpRetryIntervalActive;
     uint16_t port;
     int numIPs;
     Inet::InterfaceId interfaceId[kMaxIPAddresses];
@@ -115,8 +131,8 @@ struct DiscoveredNodeData
         memset(pairingInstruction, 0, sizeof(pairingInstruction));
         pairingHint            = 0;
         supportsTcp            = false;
-        mrpRetryIntervalIdle   = kUndefinedRetryInterval;
-        mrpRetryIntervalActive = kUndefinedRetryInterval;
+        mrpRetryIntervalIdle   = NullOptional;
+        mrpRetryIntervalActive = NullOptional;
         numIPs                 = 0;
         port                   = 0;
         for (int i = 0; i < kMaxIPAddresses; ++i)
@@ -126,17 +142,23 @@ struct DiscoveredNodeData
     }
     DiscoveredNodeData() { Reset(); }
     bool IsHost(const char * host) const { return strcmp(host, hostName) == 0; }
+    bool IsInstanceName(const char * instance) const { return strcmp(instance, instanceName) == 0; }
     bool IsValid() const { return !IsHost("") && ipAddress[0] != chip::Inet::IPAddress::Any; }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalIdle() const { return mrpRetryIntervalIdle; }
+    Optional<System::Clock::Milliseconds32> GetMrpRetryIntervalActive() const { return mrpRetryIntervalActive; }
 
-    Optional<uint32_t> GetMrpRetryIntervalIdle() const
+    bool IsDeviceTreatedAsSleepy(const ReliableMessageProtocolConfig * defaultMRPConfig) const
     {
-        return mrpRetryIntervalIdle != kUndefinedRetryInterval ? Optional<uint32_t>{ mrpRetryIntervalIdle } : Optional<uint32_t>{};
-    }
+        // If either retry interval (Idle - CRI, Active - CRA) has a value and that value is greater
+        // than the value passed to this function, then the peer device will be treated as if it is
+        // a Sleepy End Device (SED)
+        if ((mrpRetryIntervalIdle.HasValue() && (mrpRetryIntervalIdle.Value() > defaultMRPConfig->mIdleRetransTimeout)) ||
+            (mrpRetryIntervalActive.HasValue() && (mrpRetryIntervalActive.Value() > defaultMRPConfig->mActiveRetransTimeout)))
 
-    Optional<uint32_t> GetMrpRetryIntervalActive() const
-    {
-        return mrpRetryIntervalActive != kUndefinedRetryInterval ? Optional<uint32_t>{ mrpRetryIntervalActive }
-                                                                 : Optional<uint32_t>{};
+        {
+            return true;
+        }
+        return false;
     }
 
     void LogDetail() const
@@ -175,11 +197,15 @@ struct DiscoveredNodeData
         }
         if (pairingHint > 0)
         {
-            ChipLogDetail(Discovery, "\tPairing Hint: 0x%x", pairingHint);
+            ChipLogDetail(Discovery, "\tPairing Hint: %u", pairingHint);
         }
         if (!IsHost(""))
         {
             ChipLogDetail(Discovery, "\tHostname: %s", hostName);
+        }
+        if (!IsInstanceName(""))
+        {
+            ChipLogDetail(Discovery, "\tInstance Name: %s", instanceName);
         }
         for (int j = 0; j < numIPs; j++)
         {
@@ -249,6 +275,12 @@ public:
 class Resolver
 {
 public:
+    enum class CacheBypass
+    {
+        On,
+        Off
+    };
+
     virtual ~Resolver() {}
 
     /**
@@ -273,11 +305,15 @@ public:
     /**
      * Requests resolution of the given operational node service.
      *
+     * If `dnssdCacheBypass` is set to `On` it forces resolution of the given node and bypass option
+     * of using DNS-SD cache.
+     *
      * When the operation succeeds or fails, and a resolver delegate has been registered,
      * the result of the operation is passed to the delegate's `OnNodeIdResolved` or
      * `OnNodeIdResolutionFailed` method, respectively.
      */
-    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type) = 0;
+    virtual CHIP_ERROR ResolveNodeId(const PeerId & peerId, Inet::IPAddressType type,
+                                     Resolver::CacheBypass dnssdCacheBypass = CacheBypass::Off) = 0;
 
     /**
      * Finds all commissionable nodes matching the given filter.

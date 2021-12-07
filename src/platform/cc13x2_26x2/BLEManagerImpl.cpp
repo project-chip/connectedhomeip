@@ -430,7 +430,7 @@ void BLEManagerImpl::ConfigureAdvertisements(void)
         /* Default device name is CHIP-<DISCRIMINATOR> */
         deviceDiscriminator = mDeviceIdInfo.GetDeviceDiscriminator();
 
-        localDeviceNameLen = strlen(CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX) + sizeof(deviceDiscriminator);
+        localDeviceNameLen = strlen(CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX) + CHIPOBLE_DEVICE_DESC_LENGTH;
 
         memset(sInstance.mDeviceName, 0, GAP_DEVICE_NAME_LEN);
         snprintf(sInstance.mDeviceName, GAP_DEVICE_NAME_LEN, "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX,
@@ -692,8 +692,6 @@ CHIP_ERROR BLEManagerImpl::CreateEventHandler(void)
  */
 uint8_t BLEManagerImpl::ProcessStackEvent(ICall_Hdr * pMsg)
 {
-    BLEMGR_LOG("BLEMGR: BLE Process Stack Event");
-
     // Always dealloc pMsg unless set otherwise
     uint8_t safeToDealloc = TRUE;
 
@@ -782,8 +780,6 @@ uint8_t BLEManagerImpl::ProcessStackEvent(ICall_Hdr * pMsg)
 void BLEManagerImpl::ProcessEvtHdrMsg(QueuedEvt_t * pMsg)
 {
     bool dealloc = TRUE;
-
-    BLEMGR_LOG("BLEMGR: ProcessEvtHdrMsg");
 
     switch (pMsg->event)
     {
@@ -1391,7 +1387,6 @@ status_t BLEManagerImpl::EnqueueEvtHdrMsg(uint8_t event, void * pData)
     if (sInstance.mFlags.Has(Flags::kBLEStackInitialized))
     {
         QueuedEvt_t * pMsg = (QueuedEvt_t *) ICall_malloc(sizeof(QueuedEvt_t));
-        BLEMGR_LOG("BLEMGR: EnqueueEvtHdrMsg");
 
         // Create dynamic pointer to message.
         if (pMsg)
@@ -1401,8 +1396,6 @@ status_t BLEManagerImpl::EnqueueEvtHdrMsg(uint8_t event, void * pData)
 
             // Enqueue the message.
             success = Util_enqueueMsg(sEventHandlerMsgQueueID, BLEManagerImpl::sSyncEvent, (uint8_t *) pMsg);
-
-            BLEMGR_LOG("BLEMGR: Util_enqueueMsg compelte");
 
             return (success) ? SUCCESS : FAILURE;
         }
@@ -1620,7 +1613,6 @@ void BLEManagerImpl::ClearPendingBLEParamUpdate(uint16_t connHandle)
 void BLEManagerImpl::UpdateBLERPA(void)
 {
     uint8_t * pRpaNew;
-    BLEMGR_LOG("BLEMGR: UpdateBLERPA");
 
     // Read the current RPA.
     pRpaNew = GAP_GetDevAddress(FALSE);
@@ -1633,7 +1625,6 @@ void BLEManagerImpl::UpdateBLERPA(void)
 
 void BLEManagerImpl::EventHandler(void * arg)
 {
-    BLEMGR_LOG("BLEMGR: EventHandler");
     PlatformMgr().LockChipStack();
     sInstance.EventHandler_init();
 
@@ -1657,12 +1648,9 @@ void BLEManagerImpl::EventHandler(void * arg)
             /* Lock CHIP Stack while processing BLE Stack/App events */
             PlatformMgr().LockChipStack();
 
-            BLEMGR_LOG("BLEMGR: EventHandler: Events received");
             // Fetch any available messages that might have been sent from the stack
             if (ICall_fetchServiceMsg(&src, &dest, (void **) &hcipMsg) == ICALL_ERRNO_SUCCESS)
             {
-                BLEMGR_LOG("BLEMGR: EventHandler: Stack Event");
-
                 uint8 safeToDealloc = TRUE;
 
                 if ((src == ICALL_SERVICE_CLASS_BLE) && (dest == BLEManagerImpl::sSelfEntity))
@@ -1686,8 +1674,6 @@ void BLEManagerImpl::EventHandler(void * arg)
             // If RTOS queue is not empty, process CHIP messages.
             if (events & QUEUE_EVT)
             {
-                BLEMGR_LOG("BLEMGR: EventHandler: App Event");
-
                 QueuedEvt_t * pMsg;
                 for (;;)
                 {
@@ -1767,11 +1753,9 @@ void BLEManagerImpl::AdvTimeoutHandler(uintptr_t arg)
 void BLEManagerImpl::ClockHandler(uintptr_t arg)
 {
     ClockEventData_t * pData = (ClockEventData_t *) arg;
-    BLEMGR_LOG("BLEMGR: ClockHandler");
 
     if (pData->event == READ_RPA_EVT)
     {
-        BLEMGR_LOG("BLEMGR: ClockHandler RPA EVT");
         // Start the next period
         Util_startClock(&sInstance.clkRpaRead);
 
@@ -1780,7 +1764,6 @@ void BLEManagerImpl::ClockHandler(uintptr_t arg)
     }
     else if (pData->event == SEND_PARAM_UPDATE_EVT)
     {
-        BLEMGR_LOG("BLEMGR: ClockHandler PARAM UPDATE EVT");
         // Send message to app
         if (sInstance.EnqueueEvtHdrMsg(SEND_PARAM_UPDATE_EVT, pData) != SUCCESS)
         {

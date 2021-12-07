@@ -29,15 +29,12 @@ jobs:
 
         env:
             BUILD_TYPE: gn_linux
-            GH_EVENT_PR: ${{ github.event_name == 'pull_request' && github.event.number || 0 }}
-            GH_EVENT_HASH: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-            GH_EVENT_PARENT: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
 
         runs-on: ubuntu-latest
         if: github.actor != 'restyled-io[bot]'
 
         container:
-            image: connectedhomeip/chip-build:0.5.25
+            image: connectedhomeip/chip-build:0.5.33
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
 
@@ -46,6 +43,13 @@ jobs:
               uses: actions/checkout@v2
               with:
                   submodules: true
+
+            - name: Set up environment for size reports
+              if: ${{ !env.ACT }}
+              env:
+                  GH_CONTEXT: ${{ toJson(github) }}
+              run: scripts/tools/memory/gh_sizes_environment.py "${GH_CONTEXT}"
+
             - name: Bootstrap
               timeout-minutes: 10
               run: scripts/build/gn_bootstrap.sh
@@ -123,6 +127,7 @@ jobs:
                     linux debug ota-requestor-app \
                     out/ota_requestor_debug/chip-ota-requestor-app \
                     /tmp/bloat_reports/
+
             - name: Uploading Size Reports
               uses: actions/upload-artifact@v2
               if: ${{ !env.ACT }}

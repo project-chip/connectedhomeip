@@ -20,15 +20,28 @@
 
 CHIP_ERROR TestCommand::RunCommand()
 {
-    return mController.GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+    if (mPICSFilePath.HasValue())
+    {
+        PICS.SetValue(PICSBooleanReader::Read(mPICSFilePath.Value()));
+    }
+
+    NextTest();
+
+    return CHIP_NO_ERROR;
 }
 
-void TestCommand::OnDeviceConnectedFn(void * context, chip::Controller::Device * device)
+CHIP_ERROR TestCommand::WaitForCommissionee()
+{
+    return CurrentCommissioner().GetConnectedDevice(mNodeId, &mOnDeviceConnectedCallback, &mOnDeviceConnectionFailureCallback);
+}
+
+void TestCommand::OnDeviceConnectedFn(void * context, chip::OperationalDeviceProxy * device)
 {
     ChipLogProgress(chipTool, " **** Test Setup: Device Connected\n");
     auto * command = static_cast<TestCommand *>(context);
     VerifyOrReturn(command != nullptr, ChipLogError(chipTool, "Device connected, but cannot run the test, as the context is null"));
-    command->mDevice = device;
+    command->mDevices[command->GetIdentity()] = device;
+
     command->NextTest();
 }
 
@@ -55,7 +68,14 @@ CHIP_ERROR TestCommand::Wait(chip::System::Clock::Timeout duration)
 CHIP_ERROR TestCommand::Log(const char * message)
 {
     ChipLogDetail(chipTool, "%s", message);
-    WaitForMs(0);
+    ReturnErrorOnFailure(ContinueOnChipMainThread());
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR TestCommand::UserPrompt(const char * message)
+{
+    ChipLogDetail(chipTool, "USER_PROMPT: %s", message);
+    ReturnErrorOnFailure(ContinueOnChipMainThread());
     return CHIP_NO_ERROR;
 }
 
@@ -87,6 +107,30 @@ bool TestCommand::CheckConstraintFormat(const char * itemName, const char * curr
     return true;
 }
 
+bool TestCommand::CheckConstraintStartsWith(const char * itemName, const chip::Span<const char> current, const char * expected)
+{
+    std::string value(current.data(), current.size());
+    if (value.rfind(expected, 0) != 0)
+    {
+        Exit(std::string(itemName) + " (\"" + value + "\") does not starts with: \"" + std::string(expected) + "\"");
+        return false;
+    }
+
+    return true;
+}
+
+bool TestCommand::CheckConstraintEndsWith(const char * itemName, const chip::Span<const char> current, const char * expected)
+{
+    std::string value(current.data(), current.size());
+    if (value.find(expected, value.size() - strlen(expected)) == std::string::npos)
+    {
+        Exit(std::string(itemName) + " (\"" + value + "\") does not ends with: \"" + std::string(expected) + "\"");
+        return false;
+    }
+
+    return true;
+}
+
 bool TestCommand::CheckConstraintMinLength(const char * itemName, uint64_t current, uint64_t expected)
 {
     if (current < expected)
@@ -109,38 +153,44 @@ bool TestCommand::CheckConstraintMaxLength(const char * itemName, uint64_t curre
     return true;
 }
 
-bool TestCommand::CheckValueAsList(const char * itemName, uint64_t current, uint64_t expected)
+bool TestCommand::CheckValueAsString(const char * itemName, chip::ByteSpan current, chip::ByteSpan expected)
 {
-    if (current != expected)
+    if (!current.data_equal(expected))
     {
-        Exit(std::string(itemName) + " count mismatch: " + std::to_string(current) + " != " + std::to_string(expected));
+        Exit(std::string(itemName) + " value mismatch, expecting " +
+             std::string(chip::Uint8::to_const_char(expected.data()), expected.size()));
         return false;
     }
 
     return true;
 }
 
-bool TestCommand::CheckValueAsString(const char * itemName, const chip::ByteSpan current, const char * expected)
+bool TestCommand::CheckValueAsString(const char * itemName, chip::CharSpan current, chip::CharSpan expected)
 {
-    const chip::ByteSpan expectedArgument = chip::ByteSpan(chip::Uint8::from_const_char(expected), strlen(expected));
-
-    if (!current.data_equal(expectedArgument))
+    if (!current.data_equal(expected))
     {
-        Exit(std::string(itemName) + " value mismatch, expecting " + std::string(expected));
+        Exit(std::string(itemName) + " value mismatch, expected '" + std::string(expected.data(), expected.size()) + "' but got '" +
+             std::string(current.data(), current.size()) + "'");
         return false;
     }
 
     return true;
 }
 
-bool TestCommand::CheckValueAsString(const char * itemName, const chip::CharSpan current, const char * expected)
+bool TestCommand::ShouldSkip(const char * expression)
 {
-    const chip::CharSpan expectedArgument(expected, strlen(expected));
-    if (!current.data_equal(expectedArgument))
+    // If there is no PICS configuration file, considers that nothing should be skipped.
+    if (!PICS.HasValue())
     {
-        Exit(std::string(itemName) + " value mismatch, expecting " + std::string(expected));
         return false;
     }
 
-    return true;
+    std::map<std::string, bool> pics(PICS.Value());
+    bool shouldSkip = !PICSBooleanExpressionParser::Eval(expression, pics);
+    if (shouldSkip)
+    {
+        ChipLogProgress(chipTool, " **** Skipping: %s == false\n", expression);
+        ContinueOnChipMainThread();
+    }
+    return shouldSkip;
 }

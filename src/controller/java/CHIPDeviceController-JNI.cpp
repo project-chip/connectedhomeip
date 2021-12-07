@@ -146,10 +146,6 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
 
     ChipLogProgress(Controller, "newDeviceController() called");
 
-    // sSystemLayer and sInetLayer are in platform/android to share with app server
-    err = DeviceLayer::PlatformMgr().InitChipStack();
-    SuccessOrExit(err);
-
     wrapper = AndroidDeviceControllerWrapper::AllocateNew(sJVM, self, kLocalDeviceId, &DeviceLayer::SystemLayer(),
                                                           &DeviceLayer::InetLayer(), &err);
     SuccessOrExit(err);
@@ -189,18 +185,19 @@ JNI_METHOD(void, pairDevice)
 
     ChipLogProgress(Controller, "pairDevice() called with device ID, connection object, and pincode");
 
-    RendezvousParameters params = RendezvousParameters()
-                                      .SetSetupPINCode(pinCode)
+    RendezvousParameters rendezvousParams = RendezvousParameters()
+                                                .SetSetupPINCode(pinCode)
 #if CONFIG_NETWORK_LAYER_BLE
-                                      .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
+                                                .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
 #endif
-                                      .SetPeerAddress(Transport::PeerAddress::BLE());
+                                                .SetPeerAddress(Transport::PeerAddress::BLE());
+    CommissioningParameters commissioningParams = CommissioningParameters();
     if (csrNonce != nullptr)
     {
         JniByteArray jniCsrNonce(env, csrNonce);
-        params.SetCSRNonce(jniCsrNonce.byteSpan());
+        commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
-    err = wrapper->Controller()->PairDevice(deviceId, params);
+    err = wrapper->Controller()->PairDevice(deviceId, rendezvousParams, commissioningParams);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -225,16 +222,17 @@ JNI_METHOD(void, pairDeviceWithAddress)
                    ChipLogError(Controller, "Failed to parse IP address."),
                    JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, CHIP_ERROR_INVALID_ARGUMENT));
 
-    RendezvousParameters params = RendezvousParameters()
-                                      .SetDiscriminator(discriminator)
-                                      .SetSetupPINCode(pinCode)
-                                      .SetPeerAddress(Transport::PeerAddress::UDP(addr, port));
+    RendezvousParameters rendezvousParams = RendezvousParameters()
+                                                .SetDiscriminator(discriminator)
+                                                .SetSetupPINCode(pinCode)
+                                                .SetPeerAddress(Transport::PeerAddress::UDP(addr, port));
+    CommissioningParameters commissioningParams = CommissioningParameters();
     if (csrNonce != nullptr)
     {
         JniByteArray jniCsrNonce(env, csrNonce);
-        params.SetCSRNonce(jniCsrNonce.byteSpan());
+        commissioningParams.SetCSRNonce(jniCsrNonce.byteSpan());
     }
-    err = wrapper->Controller()->PairDevice(deviceId, params);
+    err = wrapper->Controller()->PairDevice(deviceId, rendezvousParams, commissioningParams);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -277,6 +275,31 @@ JNI_METHOD(void, stopDevicePairing)(JNIEnv * env, jobject self, jlong handle, jl
     }
 }
 
+JNI_METHOD(jlong, getDeviceBeingCommissionedPointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId)
+{
+    chip::DeviceLayer::StackLock lock;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    CommissioneeDeviceProxy * commissioneeDevice = nullptr;
+    err = wrapper->Controller()->GetDeviceBeingCommissioned(static_cast<NodeId>(nodeId), &commissioneeDevice);
+
+    if (commissioneeDevice == nullptr)
+    {
+        ChipLogError(Controller, "Commissionee device was nullptr");
+        err = CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to get commissionee device: %s", ErrorStr(err));
+        JniReferences::GetInstance().ThrowError(env, sChipDeviceControllerExceptionCls, err);
+        return 0;
+    }
+
+    return reinterpret_cast<jlong>(commissioneeDevice);
+}
+
 JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong handle, jlong nodeId, jlong callbackHandle)
 {
     chip::DeviceLayer::StackLock lock;
@@ -284,6 +307,7 @@ JNI_METHOD(void, getConnectedDevicePointer)(JNIEnv * env, jobject self, jlong ha
 
     GetConnectedDeviceCallback * connectedDeviceCallback = reinterpret_cast<GetConnectedDeviceCallback *>(callbackHandle);
     VerifyOrReturn(connectedDeviceCallback != nullptr, ChipLogError(Controller, "GetConnectedDeviceCallback handle is nullptr"));
+    wrapper->Controller()->GetCompressedFabricId();
     wrapper->Controller()->GetConnectedDevice(nodeId, &connectedDeviceCallback->mOnSuccess, &connectedDeviceCallback->mOnFailure);
 }
 
@@ -293,14 +317,14 @@ JNI_METHOD(void, disconnectDevice)(JNIEnv * env, jobject self, jlong handle, jlo
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "disconnectDevice() called with deviceId");
-    wrapper->Controller()->ReleaseDeviceById(deviceId);
+    wrapper->Controller()->ReleaseOperationalDevice(deviceId);
 }
 
 JNI_METHOD(jboolean, isActive)(JNIEnv * env, jobject self, jlong handle)
 {
     chip::DeviceLayer::StackLock lock;
 
-    Device * chipDevice = reinterpret_cast<Device *>(handle);
+    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(handle);
     return chipDevice->IsActive();
 }
 
@@ -308,7 +332,7 @@ JNI_METHOD(void, shutdownSubscriptions)(JNIEnv * env, jobject self, jlong handle
 {
     chip::DeviceLayer::StackLock lock;
 
-    Device * device = reinterpret_cast<Device *>(devicePtr);
+    DeviceProxy * device = reinterpret_cast<DeviceProxy *>(devicePtr);
     device->ShutdownSubscriptions();
 }
 
@@ -366,15 +390,15 @@ JNI_METHOD(jboolean, openPairingWindow)(JNIEnv * env, jobject self, jlong handle
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::SetupPayload setupPayload;
 
-    Device * chipDevice = reinterpret_cast<Device *>(devicePtr);
+    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (chipDevice == nullptr)
     {
         ChipLogProgress(Controller, "Could not cast device pointer to Device object");
         return false;
     }
 
-    err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::CommissioningWindowOption::kOriginalSetupCode,
-                                        setupPayload);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, 0, 0, 0, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -394,15 +418,15 @@ JNI_METHOD(jboolean, openPairingWindowWithPIN)
     setupPayload.discriminator = discriminator;
     setupPayload.setUpPINCode  = setupPinCode;
 
-    Device * chipDevice = reinterpret_cast<Device *>(devicePtr);
+    DeviceProxy * chipDevice = reinterpret_cast<DeviceProxy *>(devicePtr);
     if (chipDevice == nullptr)
     {
         ChipLogProgress(Controller, "Could not cast device pointer to Device object");
         return false;
     }
 
-    err = chipDevice->OpenPairingWindow(duration, chip::Controller::Device::CommissioningWindowOption::kTokenWithRandomPIN,
-                                        setupPayload);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    err = wrapper->Controller()->OpenCommissioningWindow(chipDevice->GetDeviceId(), duration, 1000, discriminator, 1, setupPayload);
 
     if (err != CHIP_NO_ERROR)
     {
@@ -431,8 +455,7 @@ JNI_METHOD(jobject, computePaseVerifier)
 {
     chip::DeviceLayer::StackLock lock;
 
-    Device * chipDevice = nullptr;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     jobject params;
     jbyteArray verifierBytes;
     uint32_t passcodeId;
@@ -441,10 +464,8 @@ JNI_METHOD(jobject, computePaseVerifier)
 
     ChipLogProgress(Controller, "computePaseVerifier() called");
 
-    chipDevice = reinterpret_cast<Device *>(devicePtr);
-    VerifyOrExit(chipDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    err = chipDevice->ComputePASEVerifier(iterations, setupPincode, jniSalt.byteSpan(), verifier, passcodeId);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+    err = wrapper->Controller()->ComputePASEVerifier(iterations, setupPincode, jniSalt.byteSpan(), verifier, passcodeId);
     SuccessOrExit(err);
 
     uint8_t serializedVerifier[sizeof(verifier.mW0) + sizeof(verifier.mL)];

@@ -43,45 +43,29 @@ typedef void (*ContentLauncherClusterLaunchContentResponseCallback)(void * conte
 typedef void (*ContentLauncherClusterLaunchURLResponseCallback)(void * context, chip::CharSpan data, uint8_t contentLaunchStatus);
 typedef void (*DiagnosticLogsClusterRetrieveLogsResponseCallback)(void * context, uint8_t status, chip::ByteSpan content,
                                                                   uint32_t timeStamp, uint32_t timeSinceBoot);
-typedef void (*DoorLockClusterClearAllPinsResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterClearAllRfidsResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterClearHolidayScheduleResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterClearPinResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterClearRfidResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterClearWeekdayScheduleResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterClearYeardayScheduleResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterGetHolidayScheduleResponseCallback)(void * context, uint8_t scheduleId, uint8_t status,
+typedef void (*DoorLockClusterGetHolidayScheduleResponseCallback)(void * context, uint8_t holidayIndex, uint8_t status,
                                                                   uint32_t localStartTime, uint32_t localEndTime,
-                                                                  uint8_t operatingModeDuringHoliday);
+                                                                  uint8_t operatingMode);
 typedef void (*DoorLockClusterGetLogRecordResponseCallback)(void * context, uint16_t logEntryId, uint32_t timestamp,
                                                             uint8_t eventType, uint8_t source, uint8_t eventIdOrAlarmCode,
                                                             uint16_t userId, chip::ByteSpan pin);
-typedef void (*DoorLockClusterGetPinResponseCallback)(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType,
-                                                      chip::ByteSpan pin);
-typedef void (*DoorLockClusterGetRfidResponseCallback)(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType,
-                                                       chip::ByteSpan rfid);
+typedef void (*DoorLockClusterGetPINCodeResponseCallback)(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType,
+                                                          chip::ByteSpan pin);
+typedef void (*DoorLockClusterGetRFIDCodeResponseCallback)(void * context, uint16_t userId, uint8_t userStatus, uint8_t userType,
+                                                           chip::ByteSpan rfidCode);
 typedef void (*DoorLockClusterGetUserTypeResponseCallback)(void * context, uint16_t userId, uint8_t userType);
-typedef void (*DoorLockClusterGetWeekdayScheduleResponseCallback)(void * context, uint8_t scheduleId, uint16_t userId,
+typedef void (*DoorLockClusterGetWeekDayScheduleResponseCallback)(void * context, uint8_t weekDayIndex, uint16_t userIndex,
                                                                   uint8_t status, uint8_t daysMask, uint8_t startHour,
                                                                   uint8_t startMinute, uint8_t endHour, uint8_t endMinute);
-typedef void (*DoorLockClusterGetYeardayScheduleResponseCallback)(void * context, uint8_t scheduleId, uint16_t userId,
+typedef void (*DoorLockClusterGetYearDayScheduleResponseCallback)(void * context, uint8_t yearDayIndex, uint16_t userIndex,
                                                                   uint8_t status, uint32_t localStartTime, uint32_t localEndTime);
-typedef void (*DoorLockClusterLockDoorResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterSetHolidayScheduleResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterSetPinResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterSetRfidResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterSetUserTypeResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterSetWeekdayScheduleResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterSetYeardayScheduleResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterUnlockDoorResponseCallback)(void * context, uint8_t status);
-typedef void (*DoorLockClusterUnlockWithTimeoutResponseCallback)(void * context, uint8_t status);
 typedef void (*GeneralCommissioningClusterArmFailSafeResponseCallback)(void * context, uint8_t errorCode, chip::CharSpan debugText);
 typedef void (*GeneralCommissioningClusterCommissioningCompleteResponseCallback)(void * context, uint8_t errorCode,
                                                                                  chip::CharSpan debugText);
 typedef void (*GeneralCommissioningClusterSetRegulatoryConfigResponseCallback)(void * context, uint8_t errorCode,
                                                                                chip::CharSpan debugText);
 typedef void (*GroupsClusterAddGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId);
-typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, uint8_t capacity, uint8_t groupCount,
+typedef void (*GroupsClusterGetGroupMembershipResponseCallback)(void * context, uint8_t capacity,
                                                                 /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
 typedef void (*GroupsClusterRemoveGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId);
 typedef void (*GroupsClusterViewGroupResponseCallback)(void * context, uint8_t status, uint16_t groupId, chip::CharSpan groupName);
@@ -143,6 +127,7 @@ typedef void (*TvChannelClusterChangeChannelResponseCallback)(void * context,
                                                               uint8_t ErrorType);
 typedef void (*TargetNavigatorClusterNavigateTargetResponseCallback)(void * context, uint8_t status, chip::CharSpan data);
 typedef void (*TestClusterClusterBooleanResponseCallback)(void * context, bool value);
+typedef void (*TestClusterClusterSimpleStructResponseCallback)(void * context, SimpleStruct arg1);
 typedef void (*TestClusterClusterTestAddArgumentsResponseCallback)(void * context, uint8_t returnValue);
 typedef void (*TestClusterClusterTestEnumsResponseCallback)(void * context, chip::VendorId arg1, uint8_t arg2);
 typedef void (*TestClusterClusterTestListInt8UReverseResponseCallback)(void * context,
@@ -152,6 +137,17 @@ typedef void (*TestClusterClusterTestNullableOptionalResponseCallback)(void * co
 typedef void (*TestClusterClusterTestSpecificResponseCallback)(void * context, uint8_t returnValue);
 
 // List specific responses
+void AccessControlClusterAclListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
+                                                chip::Callback::Cancelable * onFailureCallback);
+typedef void (*AccessControlAclListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+        data);
+void AccessControlClusterExtensionListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
+                                                      chip::Callback::Cancelable * onFailureCallback);
+typedef void (*AccessControlExtensionListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & data);
 void ApplicationLauncherClusterApplicationLauncherListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                           chip::Callback::Cancelable * onSuccessCallback,
                                                                           chip::Callback::Cancelable * onFailureCallback);
@@ -222,6 +218,21 @@ typedef void (*GeneralDiagnosticsNetworkInterfacesListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & data);
+void GeneralDiagnosticsClusterActiveHardwareFaultsListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                      chip::Callback::Cancelable * onSuccessCallback,
+                                                                      chip::Callback::Cancelable * onFailureCallback);
+typedef void (*GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & data);
+void GeneralDiagnosticsClusterActiveRadioFaultsListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                   chip::Callback::Cancelable * onSuccessCallback,
+                                                                   chip::Callback::Cancelable * onFailureCallback);
+typedef void (*GeneralDiagnosticsActiveRadioFaultsListAttributeCallback)(void * context,
+                                                                         const chip::app::DataModel::DecodableList<uint8_t> & data);
+void GeneralDiagnosticsClusterActiveNetworkFaultsListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                     chip::Callback::Cancelable * onSuccessCallback,
+                                                                     chip::Callback::Cancelable * onFailureCallback);
+typedef void (*GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<uint8_t> & data);
 void GroupKeyManagementClusterGroupsListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                         chip::Callback::Cancelable * onFailureCallback);
 typedef void (*GroupKeyManagementGroupsListAttributeCallback)(
@@ -260,6 +271,18 @@ void PowerSourceClusterActiveBatteryFaultsListAttributeFilter(chip::TLV::TLVRead
                                                               chip::Callback::Cancelable * onFailureCallback);
 typedef void (*PowerSourceActiveBatteryFaultsListAttributeCallback)(void * context,
                                                                     const chip::app::DataModel::DecodableList<uint8_t> & data);
+void PowerSourceConfigurationClusterSourcesListAttributeFilter(chip::TLV::TLVReader * data,
+                                                               chip::Callback::Cancelable * onSuccessCallback,
+                                                               chip::Callback::Cancelable * onFailureCallback);
+typedef void (*PowerSourceConfigurationSourcesListAttributeCallback)(void * context,
+                                                                     const chip::app::DataModel::DecodableList<uint8_t> & data);
+void SoftwareDiagnosticsClusterThreadMetricsListAttributeFilter(chip::TLV::TLVReader * data,
+                                                                chip::Callback::Cancelable * onSuccessCallback,
+                                                                chip::Callback::Cancelable * onFailureCallback);
+typedef void (*SoftwareDiagnosticsThreadMetricsListAttributeCallback)(
+    void * context,
+    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+        data);
 void TvChannelClusterTvChannelListListAttributeFilter(chip::TLV::TLVReader * data, chip::Callback::Cancelable * onSuccessCallback,
                                                       chip::Callback::Cancelable * onFailureCallback);
 typedef void (*TvChannelTvChannelListListAttributeCallback)(
@@ -295,6 +318,11 @@ typedef void (*TestClusterListNullablesAndOptionalsStructListAttributeCallback)(
     void * context,
     const chip::app::DataModel::DecodableList<
         chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & data);
+void TestClusterClusterListLongOctetStringListAttributeFilter(chip::TLV::TLVReader * data,
+                                                              chip::Callback::Cancelable * onSuccessCallback,
+                                                              chip::Callback::Cancelable * onFailureCallback);
+typedef void (*TestClusterListLongOctetStringListAttributeCallback)(
+    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & data);
 void ThreadNetworkDiagnosticsClusterNeighborTableListListAttributeFilter(chip::TLV::TLVReader * data,
                                                                          chip::Callback::Cancelable * onSuccessCallback,
                                                                          chip::Callback::Cancelable * onFailureCallback);

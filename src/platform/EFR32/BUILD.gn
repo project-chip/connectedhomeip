@@ -26,6 +26,7 @@ if (chip_enable_openthread) {
 static_library("EFR32") {
   sources = [
     "../FreeRTOS/SystemTimeSupport.cpp",
+    "../SingletonConfigurationManager.cpp",
     "BLEManagerImpl.cpp",
     "BLEManagerImpl.h",
     "BlePlatformConfig.h",
@@ -39,6 +40,8 @@ static_library("EFR32") {
     "ConnectivityManagerImpl.h",
     "DeviceNetworkProvisioningDelegateImpl.cpp",
     "DeviceNetworkProvisioningDelegateImpl.h",
+    "DiagnosticDataProviderImpl.cpp",
+    "DiagnosticDataProviderImpl.h",
     "EFR32Config.cpp",
     "EFR32Config.h",
     "InetPlatformConfig.h",

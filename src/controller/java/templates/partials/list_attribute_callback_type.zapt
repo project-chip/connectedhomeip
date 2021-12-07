@@ -1,0 +1,30 @@
+{{#if isStruct}}
+{{> @partial-block }}{{asUpperCamelCase name}}Attribute
+{{else}}
+  {{#if isNullable}}
+  @Nullable
+  {{/if}}
+  {{#if isOptional}}
+  Optional<
+  {{/if}}
+  {{#if isArray}}
+  {{! TODO Implement a real type for arrays. }}
+  Object
+  {{else if isStruct}}
+  {{! TODO Implement a real type for structs. }}
+  Object
+  {{else if (isOctetString type)}}
+  byte[]
+  {{else if (isCharString type)}}
+  String
+  {{else}}
+  {{! NOTE: asJavaBasicTypeForZclType ends up sniffing for isArray on the
+      context.  Since we want the type of our _entry_, force isArray to
+      false. }}
+  {{~#*inline "asJavaBasicTypeForEntry"}}{{asJavaBasicTypeForZclType type true}}{{/inline~}}
+  {{> asJavaBasicTypeForEntry isArray=false}}
+  {{/if}}
+  {{#if isOptional}}
+  >
+  {{/if}}
+{{/if}}

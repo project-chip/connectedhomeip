@@ -52,8 +52,6 @@ public class ChipDeviceController {
   /**
    * Pair a device connected through BLE.
    *
-   * <p>TODO(#7985): Annotate csrNonce as Nullable.
-   *
    * @param bleServer the BluetoothGatt representing the BLE connection to the device
    * @param connId the BluetoothGatt Id representing the BLE connection to the device
    * @param deviceId the node ID to assign to the device
@@ -98,6 +96,14 @@ public class ChipDeviceController {
 
   public void unpairDevice(long deviceId) {
     unpairDevice(deviceControllerPtr, deviceId);
+  }
+
+  /**
+   * Returns a pointer to a device currently being commissioned. This should be used before the
+   * device is operationally available.
+   */
+  public long getDeviceBeingCommissionedPointer(long nodeId) {
+    return getDeviceBeingCommissionedPointer(deviceControllerPtr, nodeId);
   }
 
   /**
@@ -250,6 +256,8 @@ public class ChipDeviceController {
       @Nullable byte[] csrNonce);
 
   private native void unpairDevice(long deviceControllerPtr, long deviceId);
+
+  private native long getDeviceBeingCommissionedPointer(long deviceControllerPtr, long nodeId);
 
   private native void getConnectedDevicePointer(
       long deviceControllerPtr, long deviceId, long callbackHandle);

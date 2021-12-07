@@ -19,7 +19,7 @@
 #import "CHIPDevice_Internal.h"
 #import "CHIPError_Internal.h"
 
-void CHIPDeviceConnectionBridge::OnConnected(void * context, chip::Controller::Device * device)
+void CHIPDeviceConnectionBridge::OnConnected(void * context, chip::OperationalDeviceProxy * device)
 {
     auto * object = static_cast<CHIPDeviceConnectionBridge *>(context);
     CHIPDevice * chipDevice = [[CHIPDevice alloc] initWithDevice:device];

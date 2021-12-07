@@ -59,6 +59,18 @@ class IPAddress;
 class IPPrefix;
 
 /**
+ * Data type describing interface type.
+ */
+enum class InterfaceType
+{
+    Unknown  = 0,
+    WiFi     = 1,
+    Ethernet = 2,
+    Cellular = 3,
+    Thread   = 4,
+};
+
+/**
  * Indicator for system network interfaces.
  */
 class InterfaceId
@@ -136,6 +148,39 @@ public:
      *  On LwIP, this function must be called with the LwIP stack lock acquired.
      */
     static CHIP_ERROR InterfaceNameToId(const char * intfName, InterfaceId & intfId);
+
+    /**
+     *  Get the interface identifier for the specified IP address. If the
+     *  interface identifier cannot be derived it is set to the default InterfaceId.
+     *
+     *  @note
+     *    This function fetches the first interface (from the configured list
+     *    of interfaces) that matches the specified IP address.
+     */
+    static InterfaceId FromIPAddress(const IPAddress & addr);
+
+    /**
+     *  Check if there is a prefix match between the specified IPv6 address and any of
+     *  the locally configured IPv6 addresses.
+     *
+     *  @param[in]    addr    The IPv6 address to check for the prefix-match.
+     *  @return true if a successful match is found, otherwise false.
+     */
+    static bool MatchLocalIPv6Subnet(const IPAddress & addr);
+
+    /**
+     *  Get the link local IPv6 address.
+     *
+     *  @param[out]   llAddr  The link local IPv6 address for the link.
+     *
+     *  @retval    #CHIP_ERROR_NOT_IMPLEMENTED      If IPv6 is not supported.
+     *  @retval    #CHIP_ERROR_INVALID_ARGUMENT     If the link local address
+     *                                              is nullptr.
+     *  @retval    #INET_ERROR_ADDRESS_NOT_FOUND    If the link does not have
+     *                                              any address configured.
+     *  @retval    #CHIP_NO_ERROR                   On success.
+     */
+    CHIP_ERROR GetLinkLocalAddr(IPAddress * llAddr);
 
 private:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -265,6 +310,22 @@ public:
      *          if not, or if the iterator is positioned beyond the end of the list.
      */
     bool HasBroadcastAddress();
+
+    /**
+     * Get the interface type of the current network interface.
+     *
+     * @param[out]   type       Object to save the interface type.
+     */
+    CHIP_ERROR GetInterfaceType(InterfaceType & type);
+
+    /**
+     * Get the hardware address of the current network interface
+     *
+     * @param[out]   addressBuffer       Region of memory to write the hardware address.
+     * @param[out]   addressSize         Size of the address saved to a buffer.
+     * @param[in]    addressBufferSize   Maximum size of a buffer to save data.
+     */
+    CHIP_ERROR GetHardwareAddress(uint8_t * addressBuffer, uint8_t & addressSize, uint8_t addressBufferSize);
 
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP

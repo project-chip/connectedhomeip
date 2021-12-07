@@ -6,11 +6,16 @@
 #import "CHIPCluster_internal.h"
 #import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
+#import "CHIPListUtils_internal.h"
 
 #import "zap-generated/tests/CHIPClustersTest.h"
 #import "zap-generated/CHIPTestClustersObjc.h"
 
+#include <type_traits>
+
+using chip::Callback::Callback;
 using chip::Callback::Cancelable;
+using namespace chip::app::Clusters;
 
 {{#chip_client_clusters}}
 
@@ -27,28 +32,28 @@ using chip::Callback::Cancelable;
 
 {{#chip_server_cluster_attributes}}
 {{#unless isWritableAttribute}}
-{{#unless isList}}
-{{#unless isStruct}}
 {{#*inline "attribute"}}Attribute{{asUpperCamelCase name}}{{/inline}}
 {{#*inline "callbackName"}}DefaultSuccess{{/inline}}
-{{#*inline "callbackParams"}},
-  {{#if (isOctetString type)}}
-    [self asByteSpan:value]
-  {{else if (isCharString type)}}
-    [self asCharSpan:value]
-  {{else}}
-    value
-  {{/if}}
-{{/inline}}
-- (void)write{{>attribute}}WithValue:({{asObjectiveCBasicType type}})value responseHandler:(ResponseHandler)responseHandler
+- (void)write{{>attribute}}WithValue:({{asObjectiveCType type parent.name}})value completionHandler:(StatusCompletion)completionHandler
 {
-    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue, responseHandler, ^(Cancelable * success, Cancelable * failure) {
-        return self.cppCluster.Write{{>attribute}}(success, failure{{>callbackParams}});
+    new CHIP{{>callbackName}}CallbackBridge(self.callbackQueue,
+      {{! For now, don't change the bridge API; instead just use an adapter
+          to invoke our completion handler. This is not great from a
+          type-safety perspective, of course. }}
+      ^(NSError * _Nullable error, id _Nullable ignored) {
+        completionHandler(error);
+      },
+      ^(Cancelable * success, Cancelable * failure) {
+        ListFreer listFreer;
+        using TypeInfo = {{asUpperCamelCase parent.name}}::Attributes::{{asUpperCamelCase name}}::TypeInfo;
+        TypeInfo::Type cppValue;
+        {{>encode_value target="cppValue" source="value" cluster=parent.name errorCode="return CHIP_ERROR_INVALID_ARGUMENT;" depth=0}}
+        auto successFn = Callback<CHIP{{>callbackName}}CallbackType>::FromCancelable(success);
+        auto failureFn = Callback<CHIPDefaultFailureCallbackType>::FromCancelable(failure);
+        return self.cppCluster.WriteAttribute<TypeInfo>(cppValue, successFn->mContext, successFn->mCall, failureFn->mCall);
     });
 }
 
-{{/unless}}
-{{/unless}}
 {{/unless}}
 {{/chip_server_cluster_attributes}}
 
