@@ -594,12 +594,12 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                 // Is the attribute externally stored?
                                 if (am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE)
                                 {
-                                    return (write ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                          am, EMBER_AF_NULL_MANUFACTURER_CODE,
-                                                                                          buffer)
-                                                  : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
-                                                                                         am, EMBER_AF_NULL_MANUFACTURER_CODE,
-                                                                                         buffer, emberAfAttributeSize(am)));
+                                    return (write
+                                                ? emberAfExternalAttributeWriteCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                        am, EMBER_AF_NULL_MANUFACTURER_CODE, buffer)
+                                                : emberAfExternalAttributeReadCallback(attRecord->endpoint, attRecord->clusterId,
+                                                                                       am, EMBER_AF_NULL_MANUFACTURER_CODE, buffer,
+                                                                                       emberAfAttributeSize(am)));
                                 }
                                 else
                                 {
