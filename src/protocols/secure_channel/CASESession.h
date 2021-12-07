@@ -144,10 +144,6 @@ public:
      */
     virtual CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
 
-    const char * GetI2RSessionInfo() const override { return "Sigma I2R Key"; }
-
-    const char * GetR2ISessionInfo() const override { return "Sigma R2I Key"; }
-
     /**
      * @brief Serialize the CASESession to the given cachableSession data structure for secure pairing
      **/
