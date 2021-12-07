@@ -185,7 +185,16 @@ CHIP_ERROR LogValue(const char * label, size_t indent, chip::CharSpan value)
 
 CHIP_ERROR LogValue(const char * label, size_t indent, chip::ByteSpan value)
 {
-    ChipLogProgress(chipTool, "%s%s: %zu", IndentStr(indent).c_str(), label, value.size());
+    char buffer[CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE];
+    if (CHIP_NO_ERROR ==
+        chip::Encoding::BytesToUppercaseHexString(value.data(), value.size(), &buffer[0], CHIP_CONFIG_LOG_MESSAGE_MAX_SIZE))
+    {
+        ChipLogProgress(chipTool, "%s%s: %s", IndentStr(indent).c_str(), label, buffer);
+    }
+    else
+    {
+        ChipLogProgress(chipTool, "%s%s: %zu", IndentStr(indent).c_str(), label, value.size());
+    }
     return CHIP_NO_ERROR;
 }
 
@@ -2251,25 +2260,9 @@ static void OnBooleanAttributeReport(void * context, bool value)
     ChipLogProgress(chipTool, "Boolean attribute Response: %d", value);
 }
 
-static void OnBooleanAttributeResponse(void * context, bool value)
-{
-    OnBooleanAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnInt8uAttributeReport(void * context, uint8_t value)
 {
     ChipLogProgress(chipTool, "Int8u attribute Response: %" PRIu8, value);
-}
-
-static void OnInt8uAttributeResponse(void * context, uint8_t value)
-{
-    OnInt8uAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt16uAttributeReport(void * context, uint16_t value)
@@ -2277,25 +2270,9 @@ static void OnInt16uAttributeReport(void * context, uint16_t value)
     ChipLogProgress(chipTool, "Int16u attribute Response: %" PRIu16, value);
 }
 
-static void OnInt16uAttributeResponse(void * context, uint16_t value)
-{
-    OnInt16uAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnInt32uAttributeReport(void * context, uint32_t value)
 {
     ChipLogProgress(chipTool, "Int32u attribute Response: %" PRIu32, value);
-}
-
-static void OnInt32uAttributeResponse(void * context, uint32_t value)
-{
-    OnInt32uAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt64uAttributeReport(void * context, uint64_t value)
@@ -2303,25 +2280,9 @@ static void OnInt64uAttributeReport(void * context, uint64_t value)
     ChipLogProgress(chipTool, "Int64u attribute Response: %" PRIu64, value);
 }
 
-static void OnInt64uAttributeResponse(void * context, uint64_t value)
-{
-    OnInt64uAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnInt8sAttributeReport(void * context, int8_t value)
 {
     ChipLogProgress(chipTool, "Int8s attribute Response: %" PRId8, value);
-}
-
-static void OnInt8sAttributeResponse(void * context, int8_t value)
-{
-    OnInt8sAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt16sAttributeReport(void * context, int16_t value)
@@ -2329,25 +2290,9 @@ static void OnInt16sAttributeReport(void * context, int16_t value)
     ChipLogProgress(chipTool, "Int16s attribute Response: %" PRId16, value);
 }
 
-static void OnInt16sAttributeResponse(void * context, int16_t value)
-{
-    OnInt16sAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnInt32sAttributeReport(void * context, int32_t value)
 {
     ChipLogProgress(chipTool, "Int32s attribute Response: %" PRId32, value);
-}
-
-static void OnInt32sAttributeResponse(void * context, int32_t value)
-{
-    OnInt32sAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnInt64sAttributeReport(void * context, int64_t value)
@@ -2355,38 +2300,14 @@ static void OnInt64sAttributeReport(void * context, int64_t value)
     ChipLogProgress(chipTool, "Int64s attribute Response: %" PRId64, value);
 }
 
-static void OnInt64sAttributeResponse(void * context, int64_t value)
-{
-    OnInt64sAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnFloatAttributeReport(void * context, float value)
 {
     ChipLogProgress(chipTool, "Float attribute Response: %f", value);
 }
 
-static void OnFloatAttributeResponse(void * context, float value)
-{
-    OnFloatAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnDoubleAttributeReport(void * context, double value)
 {
     ChipLogProgress(chipTool, "Double attribute Response: %f", value);
-}
-
-static void OnDoubleAttributeResponse(void * context, double value)
-{
-    OnDoubleAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
 }
 
 static void OnOctetStringAttributeReport(void * context, const chip::ByteSpan value)
@@ -2403,412 +2324,17 @@ static void OnOctetStringAttributeReport(void * context, const chip::ByteSpan va
     }
 }
 
-static void OnOctetStringAttributeResponse(void * context, const chip::ByteSpan value)
-{
-    OnOctetStringAttributeReport(context, value);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
 static void OnCharStringAttributeReport(void * context, const chip::CharSpan value)
 {
     ChipLogProgress(chipTool, "CharString attribute Response: %.*s", static_cast<int>(value.size()), value.data());
 }
 
-static void OnCharStringAttributeResponse(void * context, const chip::CharSpan value)
+template <typename T>
+static void OnGeneralAttributeResponse(void * context, const char * label, T value)
 {
-    OnCharStringAttributeReport(context, value);
+    CHIP_ERROR err = LogValue(label, 0, value);
 
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(CHIP_NO_ERROR);
-}
-
-static void OnAccessControlAclListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
-        list)
-{
-    CHIP_ERROR err = LogValue("OnAccessControlAclListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnAccessControlExtensionListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnAccessControlExtensionListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void
-OnApplicationLauncherApplicationLauncherListListAttributeResponse(void * context,
-                                                                  const chip::app::DataModel::DecodableList<uint16_t> & list)
-{
-    CHIP_ERROR err = LogValue("OnApplicationLauncherApplicationLauncherListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnAudioOutputAudioOutputListListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnAudioOutputAudioOutputListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnBridgedActionsActionListListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnBridgedActionsActionListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnBridgedActionsEndpointListListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
-        list)
-{
-    CHIP_ERROR err = LogValue("OnBridgedActionsEndpointListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void
-OnContentLauncherAcceptsHeaderListListAttributeResponse(void * context,
-                                                        const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
-{
-    CHIP_ERROR err = LogValue("OnContentLauncherAcceptsHeaderListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnContentLauncherSupportedStreamingTypesListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & list)
-{
-    CHIP_ERROR err = LogValue("OnContentLauncherSupportedStreamingTypesListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnDescriptorDeviceListListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnDescriptorDeviceListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnDescriptorServerListListAttributeResponse(void * context,
-                                                        const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
-{
-    CHIP_ERROR err = LogValue("OnDescriptorServerListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnDescriptorClientListListAttributeResponse(void * context,
-                                                        const chip::app::DataModel::DecodableList<chip::ClusterId> & list)
-{
-    CHIP_ERROR err = LogValue("OnDescriptorClientListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnDescriptorPartsListListAttributeResponse(void * context,
-                                                       const chip::app::DataModel::DecodableList<chip::EndpointId> & list)
-{
-    CHIP_ERROR err = LogValue("OnDescriptorPartsListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnFixedLabelLabelListListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnFixedLabelLabelListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnGeneralCommissioningBasicCommissioningInfoListListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnGeneralCommissioningBasicCommissioningInfoListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnGeneralDiagnosticsActiveHardwareFaultsListAttributeResponse(void * context,
-                                                                          const chip::app::DataModel::DecodableList<uint8_t> & list)
-{
-    CHIP_ERROR err = LogValue("OnGeneralDiagnosticsActiveHardwareFaultsListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnGeneralDiagnosticsActiveRadioFaultsListAttributeResponse(void * context,
-                                                                       const chip::app::DataModel::DecodableList<uint8_t> & list)
-{
-    CHIP_ERROR err = LogValue("OnGeneralDiagnosticsActiveRadioFaultsListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnGeneralDiagnosticsActiveNetworkFaultsListAttributeResponse(void * context,
-                                                                         const chip::app::DataModel::DecodableList<uint8_t> & list)
-{
-    CHIP_ERROR err = LogValue("OnGeneralDiagnosticsActiveNetworkFaultsListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnGroupKeyManagementGroupsListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnGroupKeyManagementGroupsListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnGroupKeyManagementGroupKeysListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnGroupKeyManagementGroupKeysListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnMediaInputMediaInputListListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnMediaInputMediaInputListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnModeSelectSupportedModesListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnModeSelectSupportedModesListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnOperationalCredentialsFabricsListListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnOperationalCredentialsFabricsListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse(
-    void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
-{
-    CHIP_ERROR err = LogValue("OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnPowerSourceActiveBatteryFaultsListAttributeResponse(void * context,
-                                                                  const chip::app::DataModel::DecodableList<uint8_t> & list)
-{
-    CHIP_ERROR err = LogValue("OnPowerSourceActiveBatteryFaultsListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnPowerSourceConfigurationSourcesListAttributeResponse(void * context,
-                                                                   const chip::app::DataModel::DecodableList<uint8_t> & list)
-{
-    CHIP_ERROR err = LogValue("OnPowerSourceConfigurationSourcesListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnSoftwareDiagnosticsThreadMetricsListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
-        list)
-{
-    CHIP_ERROR err = LogValue("OnSoftwareDiagnosticsThreadMetricsListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnTvChannelTvChannelListListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnTvChannelTvChannelListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnTargetNavigatorTargetNavigatorListListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnTargetNavigatorTargetNavigatorListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnTestClusterListInt8uListAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & list)
-{
-    CHIP_ERROR err = LogValue("OnTestClusterListInt8uListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnTestClusterListOctetStringListAttributeResponse(void * context,
-                                                              const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
-{
-    CHIP_ERROR err = LogValue("OnTestClusterListOctetStringListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnTestClusterListStructOctetStringListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnTestClusterListStructOctetStringListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnTestClusterListNullablesAndOptionalsStructListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnTestClusterListNullablesAndOptionalsStructListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnTestClusterListLongOctetStringListAttributeResponse(void * context,
-                                                                  const chip::app::DataModel::DecodableList<chip::ByteSpan> & list)
-{
-    CHIP_ERROR err = LogValue("OnTestClusterListLongOctetStringListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> &
-        list)
-{
-    CHIP_ERROR err = LogValue("OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeResponse(
-    void * context,
-    const chip::app::DataModel::DecodableList<
-        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & list)
-{
-    CHIP_ERROR err = LogValue("OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
-    command->SetCommandExitStatus(err);
-}
-
-static void OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeResponse(
-    void * context, const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & list)
-{
-    CHIP_ERROR err = LogValue("OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeResponse", 0, list);
-
-    ModelCommand * command = static_cast<ModelCommand *>(context);
+    auto * command = static_cast<ModelCommand *>(context);
     command->SetCommandExitStatus(err);
 }
 
@@ -4113,11 +3639,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadAccessControlAcl()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadAccessControlAcl() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -4125,14 +3647,17 @@ public:
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeAcl(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Acl::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<AccessControlAclListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<AccessControlAclListAttributeCallback>(OnAccessControlAclListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::AccessControlEntry::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "AccessControl.Acl response", value);
+    }
 };
 
 /*
@@ -4147,11 +3672,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadAccessControlExtension()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadAccessControlExtension() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -4159,15 +3680,17 @@ public:
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeExtension(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::Extension::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<AccessControlExtensionListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<AccessControlExtensionListAttributeCallback>(OnAccessControlExtensionListAttributeResponse,
-                                                                                  this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AccessControl::Structs::ExtensionEntry::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "AccessControl.Extension response", value);
+    }
 };
 
 /*
@@ -4182,11 +3705,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadAccessControlClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadAccessControlClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -4194,14 +3713,14 @@ public:
 
         chip::Controller::AccessControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::AccessControl::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "AccessControl.ClusterRevision response", value);
+    }
 };
 
 /*----------------------------------------------------------------------------*\
@@ -4276,11 +3795,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadAccountLoginClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadAccountLoginClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -4288,14 +3803,14 @@ public:
 
         chip::Controller::AccountLoginCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::AccountLogin::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "AccountLogin.ClusterRevision response", value);
+    }
 };
 
 class ReportAccountLoginClusterRevision : public ModelCommand
@@ -4447,11 +3962,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadAdministratorCommissioningClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadAdministratorCommissioningClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -4459,14 +3970,14 @@ public:
 
         chip::Controller::AdministratorCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::AdministratorCommissioning::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "AdministratorCommissioning.ClusterRevision response", value);
+    }
 };
 
 class ReportAdministratorCommissioningClusterRevision : public ModelCommand
@@ -4575,11 +4086,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationBasicVendorName()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadApplicationBasicVendorName() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -4587,14 +4094,14 @@ public:
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeVendorName(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorName::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationBasic.VendorName response", value);
+    }
 };
 
 class ReportApplicationBasicVendorName : public ModelCommand
@@ -4661,11 +4168,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationBasicVendorId()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadApplicationBasicVendorId() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -4673,14 +4176,14 @@ public:
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeVendorId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::VendorId::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationBasic.VendorId response", value);
+    }
 };
 
 class ReportApplicationBasicVendorId : public ModelCommand
@@ -4747,11 +4250,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationBasicApplicationName()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadApplicationBasicApplicationName() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -4759,14 +4258,14 @@ public:
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeApplicationName(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationName::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationBasic.ApplicationName response", value);
+    }
 };
 
 class ReportApplicationBasicApplicationName : public ModelCommand
@@ -4833,11 +4332,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationBasicProductId()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadApplicationBasicProductId() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -4845,14 +4340,14 @@ public:
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeProductId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ProductId::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationBasic.ProductId response", value);
+    }
 };
 
 class ReportApplicationBasicProductId : public ModelCommand
@@ -4919,11 +4414,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationBasicApplicationId()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadApplicationBasicApplicationId() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -4931,14 +4422,14 @@ public:
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeApplicationId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationId::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationBasic.ApplicationId response", value);
+    }
 };
 
 class ReportApplicationBasicApplicationId : public ModelCommand
@@ -5005,11 +4496,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationBasicCatalogVendorId()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadApplicationBasicCatalogVendorId() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -5017,14 +4504,14 @@ public:
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCatalogVendorId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::CatalogVendorId::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationBasic.CatalogVendorId response", value);
+    }
 };
 
 class ReportApplicationBasicCatalogVendorId : public ModelCommand
@@ -5091,11 +4578,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationBasicApplicationStatus()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadApplicationBasicApplicationStatus() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -5103,14 +4586,14 @@ public:
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeApplicationStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ApplicationStatus::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationBasic.ApplicationStatus response", value);
+    }
 };
 
 class ReportApplicationBasicApplicationStatus : public ModelCommand
@@ -5178,11 +4661,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationBasicClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadApplicationBasicClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -5190,14 +4669,14 @@ public:
 
         chip::Controller::ApplicationBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationBasic::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationBasic.ClusterRevision response", value);
+    }
 };
 
 class ReportApplicationBasicClusterRevision : public ModelCommand
@@ -5303,11 +4782,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationLauncherApplicationLauncherList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadApplicationLauncherApplicationLauncherList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -5315,15 +4790,14 @@ public:
 
         chip::Controller::ApplicationLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeApplicationLauncherList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationLauncherList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<ApplicationLauncherApplicationLauncherListListAttributeCallback>(
-            OnApplicationLauncherApplicationLauncherListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationLauncher.ApplicationLauncherList response", value);
+    }
 };
 
 /*
@@ -5338,11 +4812,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationLauncherCatalogVendorId()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadApplicationLauncherCatalogVendorId() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -5350,14 +4820,14 @@ public:
 
         chip::Controller::ApplicationLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCatalogVendorId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::CatalogVendorId::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationLauncher.CatalogVendorId response", value);
+    }
 };
 
 class ReportApplicationLauncherCatalogVendorId : public ModelCommand
@@ -5424,11 +4894,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationLauncherApplicationId()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadApplicationLauncherApplicationId() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -5436,14 +4902,14 @@ public:
 
         chip::Controller::ApplicationLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeApplicationId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ApplicationId::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationLauncher.ApplicationId response", value);
+    }
 };
 
 class ReportApplicationLauncherApplicationId : public ModelCommand
@@ -5510,11 +4976,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadApplicationLauncherClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadApplicationLauncherClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -5522,14 +4984,14 @@ public:
 
         chip::Controller::ApplicationLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ApplicationLauncher::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ApplicationLauncher.ClusterRevision response", value);
+    }
 };
 
 class ReportApplicationLauncherClusterRevision : public ModelCommand
@@ -5658,11 +5120,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadAudioOutputAudioOutputList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadAudioOutputAudioOutputList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -5670,15 +5128,17 @@ public:
 
         chip::Controller::AudioOutputCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeAudioOutputList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::AudioOutputList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<AudioOutputAudioOutputListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<AudioOutputAudioOutputListListAttributeCallback>(
-            OnAudioOutputAudioOutputListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::AudioOutput::Structs::AudioOutputInfo::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "AudioOutput.AudioOutputList response", value);
+    }
 };
 
 /*
@@ -5693,11 +5153,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadAudioOutputCurrentAudioOutput()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadAudioOutputCurrentAudioOutput() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -5705,14 +5161,14 @@ public:
 
         chip::Controller::AudioOutputCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentAudioOutput(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::CurrentAudioOutput::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "AudioOutput.CurrentAudioOutput response", value);
+    }
 };
 
 class ReportAudioOutputCurrentAudioOutput : public ModelCommand
@@ -5780,11 +5236,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadAudioOutputClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadAudioOutputClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -5792,14 +5244,14 @@ public:
 
         chip::Controller::AudioOutputCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::AudioOutput::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "AudioOutput.ClusterRevision response", value);
+    }
 };
 
 class ReportAudioOutputClusterRevision : public ModelCommand
@@ -5925,11 +5377,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBarrierControlBarrierMovingState()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBarrierControlBarrierMovingState() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -5937,14 +5385,14 @@ public:
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBarrierMovingState(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BarrierControl::Attributes::BarrierMovingState::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BarrierControl.BarrierMovingState response", value);
+    }
 };
 
 class ReportBarrierControlBarrierMovingState : public ModelCommand
@@ -6012,11 +5460,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBarrierControlBarrierSafetyStatus()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBarrierControlBarrierSafetyStatus() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -6024,14 +5468,14 @@ public:
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBarrierSafetyStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BarrierControl::Attributes::BarrierSafetyStatus::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "BarrierControl.BarrierSafetyStatus response", value);
+    }
 };
 
 class ReportBarrierControlBarrierSafetyStatus : public ModelCommand
@@ -6099,11 +5543,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBarrierControlBarrierCapabilities()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBarrierControlBarrierCapabilities() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -6111,14 +5551,14 @@ public:
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBarrierCapabilities(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BarrierControl::Attributes::BarrierCapabilities::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BarrierControl.BarrierCapabilities response", value);
+    }
 };
 
 class ReportBarrierControlBarrierCapabilities : public ModelCommand
@@ -6186,11 +5626,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBarrierControlBarrierPosition()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBarrierControlBarrierPosition() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -6198,14 +5634,14 @@ public:
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBarrierPosition(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BarrierControl::Attributes::BarrierPosition::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BarrierControl.BarrierPosition response", value);
+    }
 };
 
 class ReportBarrierControlBarrierPosition : public ModelCommand
@@ -6272,11 +5708,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBarrierControlClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBarrierControlClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -6284,14 +5716,14 @@ public:
 
         chip::Controller::BarrierControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BarrierControl::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "BarrierControl.ClusterRevision response", value);
+    }
 };
 
 class ReportBarrierControlClusterRevision : public ModelCommand
@@ -6407,11 +5839,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicInteractionModelVersion()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicInteractionModelVersion() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -6419,14 +5847,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInteractionModelVersion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::InteractionModelVersion::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.InteractionModelVersion response", value);
+    }
 };
 
 class ReportBasicInteractionModelVersion : public ModelCommand
@@ -6494,11 +5922,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicVendorName()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicVendorName() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -6506,14 +5930,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeVendorName(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::VendorName::TypeInfo>(this, OnAttributeResponse,
+                                                                                                   OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.VendorName response", value);
+    }
 };
 
 class ReportBasicVendorName : public ModelCommand
@@ -6580,11 +6004,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicVendorID()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicVendorID() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -6592,14 +6012,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeVendorID(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::VendorID::TypeInfo>(this, OnAttributeResponse,
+                                                                                                 OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.VendorID response", value);
+    }
 };
 
 class ReportBasicVendorID : public ModelCommand
@@ -6666,11 +6086,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicProductName()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicProductName() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -6678,14 +6094,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeProductName(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductName::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.ProductName response", value);
+    }
 };
 
 class ReportBasicProductName : public ModelCommand
@@ -6752,11 +6168,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicProductID()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicProductID() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -6764,14 +6176,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeProductID(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductID::TypeInfo>(this, OnAttributeResponse,
+                                                                                                  OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.ProductID response", value);
+    }
 };
 
 class ReportBasicProductID : public ModelCommand
@@ -6838,11 +6250,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicNodeLabel()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicNodeLabel() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -6850,14 +6258,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNodeLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::NodeLabel::TypeInfo>(this, OnAttributeResponse,
+                                                                                                  OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.NodeLabel response", value);
+    }
 };
 
 class WriteBasicNodeLabel : public ModelCommand
@@ -6950,11 +6358,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicLocation()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicLocation() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -6962,14 +6366,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeLocation(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Location::TypeInfo>(this, OnAttributeResponse,
+                                                                                                 OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.Location response", value);
+    }
 };
 
 class WriteBasicLocation : public ModelCommand
@@ -7062,11 +6466,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicHardwareVersion()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicHardwareVersion() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -7074,14 +6474,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeHardwareVersion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::HardwareVersion::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.HardwareVersion response", value);
+    }
 };
 
 class ReportBasicHardwareVersion : public ModelCommand
@@ -7148,11 +6548,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicHardwareVersionString()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicHardwareVersionString() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -7160,14 +6556,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeHardwareVersionString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::HardwareVersionString::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.HardwareVersionString response", value);
+    }
 };
 
 class ReportBasicHardwareVersionString : public ModelCommand
@@ -7235,11 +6631,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicSoftwareVersion()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicSoftwareVersion() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -7247,14 +6639,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSoftwareVersion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersion::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.SoftwareVersion response", value);
+    }
 };
 
 class ReportBasicSoftwareVersion : public ModelCommand
@@ -7321,11 +6713,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicSoftwareVersionString()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicSoftwareVersionString() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -7333,14 +6721,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSoftwareVersionString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::SoftwareVersionString::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.SoftwareVersionString response", value);
+    }
 };
 
 class ReportBasicSoftwareVersionString : public ModelCommand
@@ -7408,11 +6796,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicManufacturingDate()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicManufacturingDate() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -7420,14 +6804,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeManufacturingDate(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ManufacturingDate::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.ManufacturingDate response", value);
+    }
 };
 
 class ReportBasicManufacturingDate : public ModelCommand
@@ -7495,11 +6879,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicPartNumber()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicPartNumber() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -7507,14 +6887,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePartNumber(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::PartNumber::TypeInfo>(this, OnAttributeResponse,
+                                                                                                   OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.PartNumber response", value);
+    }
 };
 
 class ReportBasicPartNumber : public ModelCommand
@@ -7581,11 +6961,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicProductURL()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicProductURL() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -7593,14 +6969,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeProductURL(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductURL::TypeInfo>(this, OnAttributeResponse,
+                                                                                                   OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.ProductURL response", value);
+    }
 };
 
 class ReportBasicProductURL : public ModelCommand
@@ -7667,11 +7043,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicProductLabel()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicProductLabel() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -7679,14 +7051,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeProductLabel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ProductLabel::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.ProductLabel response", value);
+    }
 };
 
 class ReportBasicProductLabel : public ModelCommand
@@ -7753,11 +7125,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicSerialNumber()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicSerialNumber() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -7765,14 +7133,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSerialNumber(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::SerialNumber::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.SerialNumber response", value);
+    }
 };
 
 class ReportBasicSerialNumber : public ModelCommand
@@ -7839,11 +7207,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicLocalConfigDisabled()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicLocalConfigDisabled() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -7851,14 +7215,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeLocalConfigDisabled(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::LocalConfigDisabled::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.LocalConfigDisabled response", value);
+    }
 };
 
 class WriteBasicLocalConfigDisabled : public ModelCommand
@@ -7952,11 +7316,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicReachable()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicReachable() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -7964,14 +7324,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeReachable(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::Reachable::TypeInfo>(this, OnAttributeResponse,
+                                                                                                  OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.Reachable response", value);
+    }
 };
 
 class ReportBasicReachable : public ModelCommand
@@ -8038,11 +7398,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicUniqueID()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicUniqueID() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -8050,14 +7406,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeUniqueID(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::UniqueID::TypeInfo>(this, OnAttributeResponse,
+                                                                                                 OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.UniqueID response", value);
+    }
 };
 
 /*
@@ -8072,11 +7428,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBasicClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBasicClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -8084,14 +7436,14 @@ public:
 
         chip::Controller::BasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Basic::Attributes::ClusterRevision::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Basic.ClusterRevision response", value);
+    }
 };
 
 class ReportBasicClusterRevision : public ModelCommand
@@ -8170,11 +7522,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBinaryInputBasicOutOfService()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBinaryInputBasicOutOfService() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -8182,14 +7530,14 @@ public:
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOutOfService(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::OutOfService::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "BinaryInputBasic.OutOfService response", value);
+    }
 };
 
 class WriteBinaryInputBasicOutOfService : public ModelCommand
@@ -8282,11 +7630,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBinaryInputBasicPresentValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBinaryInputBasicPresentValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -8294,14 +7638,14 @@ public:
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePresentValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::PresentValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "BinaryInputBasic.PresentValue response", value);
+    }
 };
 
 class WriteBinaryInputBasicPresentValue : public ModelCommand
@@ -8394,11 +7738,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBinaryInputBasicStatusFlags()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBinaryInputBasicStatusFlags() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -8406,14 +7746,14 @@ public:
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeStatusFlags(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::StatusFlags::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "BinaryInputBasic.StatusFlags response", value);
+    }
 };
 
 class ReportBinaryInputBasicStatusFlags : public ModelCommand
@@ -8480,11 +7820,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBinaryInputBasicClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBinaryInputBasicClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -8492,14 +7828,14 @@ public:
 
         chip::Controller::BinaryInputBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BinaryInputBasic::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "BinaryInputBasic.ClusterRevision response", value);
+    }
 };
 
 class ReportBinaryInputBasicClusterRevision : public ModelCommand
@@ -8631,11 +7967,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBindingClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBindingClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -8643,14 +7975,14 @@ public:
 
         chip::Controller::BindingCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Binding::Attributes::ClusterRevision::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Binding.ClusterRevision response", value);
+    }
 };
 
 class ReportBindingClusterRevision : public ModelCommand
@@ -8727,11 +8059,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBooleanStateStateValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBooleanStateStateValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -8739,14 +8067,14 @@ public:
 
         chip::Controller::BooleanStateCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeStateValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::StateValue::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "BooleanState.StateValue response", value);
+    }
 };
 
 class ReportBooleanStateStateValue : public ModelCommand
@@ -8813,11 +8141,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBooleanStateClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBooleanStateClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -8825,14 +8149,14 @@ public:
 
         chip::Controller::BooleanStateCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BooleanState::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "BooleanState.ClusterRevision response", value);
+    }
 };
 
 class ReportBooleanStateClusterRevision : public ModelCommand
@@ -9228,11 +8552,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBridgedActionsActionList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBridgedActionsActionList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -9240,15 +8560,17 @@ public:
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeActionList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedActions::Attributes::ActionList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BridgedActionsActionListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BridgedActionsActionListListAttributeCallback>(OnBridgedActionsActionListListAttributeResponse,
-                                                                                    this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::ActionStruct::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "BridgedActions.ActionList response", value);
+    }
 };
 
 /*
@@ -9263,11 +8585,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBridgedActionsEndpointList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBridgedActionsEndpointList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -9275,15 +8593,17 @@ public:
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeEndpointList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedActions::Attributes::EndpointList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BridgedActionsEndpointListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BridgedActionsEndpointListListAttributeCallback>(
-            OnBridgedActionsEndpointListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::BridgedActions::Structs::EndpointListStruct::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "BridgedActions.EndpointList response", value);
+    }
 };
 
 /*
@@ -9298,11 +8618,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBridgedActionsSetupUrl()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBridgedActionsSetupUrl() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -9310,14 +8626,14 @@ public:
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSetupUrl(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedActions::Attributes::SetupUrl::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "BridgedActions.SetupUrl response", value);
+    }
 };
 
 class ReportBridgedActionsSetupUrl : public ModelCommand
@@ -9384,11 +8700,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBridgedActionsClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBridgedActionsClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -9396,14 +8708,14 @@ public:
 
         chip::Controller::BridgedActionsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedActions::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "BridgedActions.ClusterRevision response", value);
+    }
 };
 
 class ReportBridgedActionsClusterRevision : public ModelCommand
@@ -9479,11 +8791,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadBridgedDeviceBasicClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadBridgedDeviceBasicClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -9491,14 +8799,14 @@ public:
 
         chip::Controller::BridgedDeviceBasicCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::BridgedDeviceBasic::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "BridgedDeviceBasic.ClusterRevision response", value);
+    }
 };
 
 class ReportBridgedDeviceBasicClusterRevision : public ModelCommand
@@ -10187,11 +9495,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlCurrentHue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlCurrentHue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -10199,14 +9503,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentHue::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.CurrentHue response", value);
+    }
 };
 
 class ReportColorControlCurrentHue : public ModelCommand
@@ -10273,11 +9577,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlCurrentSaturation()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlCurrentSaturation() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -10285,14 +9585,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentSaturation(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentSaturation::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.CurrentSaturation response", value);
+    }
 };
 
 class ReportColorControlCurrentSaturation : public ModelCommand
@@ -10360,11 +9660,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlRemainingTime()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlRemainingTime() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -10372,14 +9668,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRemainingTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::RemainingTime::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.RemainingTime response", value);
+    }
 };
 
 class ReportColorControlRemainingTime : public ModelCommand
@@ -10446,11 +9742,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlCurrentX()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlCurrentX() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -10458,14 +9750,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentX(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentX::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.CurrentX response", value);
+    }
 };
 
 class ReportColorControlCurrentX : public ModelCommand
@@ -10532,11 +9824,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlCurrentY()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlCurrentY() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -10544,14 +9832,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentY(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CurrentY::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.CurrentY response", value);
+    }
 };
 
 class ReportColorControlCurrentY : public ModelCommand
@@ -10618,11 +9906,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlDriftCompensation()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlDriftCompensation() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -10630,14 +9914,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeDriftCompensation(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::DriftCompensation::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.DriftCompensation response", value);
+    }
 };
 
 class ReportColorControlDriftCompensation : public ModelCommand
@@ -10705,11 +9989,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlCompensationText()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlCompensationText() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -10717,14 +9997,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCompensationText(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CompensationText::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.CompensationText response", value);
+    }
 };
 
 class ReportColorControlCompensationText : public ModelCommand
@@ -10791,11 +10071,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorTemperature()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorTemperature() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -10803,14 +10079,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTemperature::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorTemperature response", value);
+    }
 };
 
 class ReportColorControlColorTemperature : public ModelCommand
@@ -10877,11 +10153,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorMode()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorMode() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -10889,14 +10161,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorMode::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorMode response", value);
+    }
 };
 
 class ReportColorControlColorMode : public ModelCommand
@@ -10963,11 +10235,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorControlOptions()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorControlOptions() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -10975,14 +10243,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorControlOptions(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorControlOptions::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorControlOptions response", value);
+    }
 };
 
 class WriteColorControlColorControlOptions : public ModelCommand
@@ -11076,11 +10344,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlNumberOfPrimaries()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlNumberOfPrimaries() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -11088,14 +10352,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNumberOfPrimaries(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::NumberOfPrimaries::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.NumberOfPrimaries response", value);
+    }
 };
 
 class ReportColorControlNumberOfPrimaries : public ModelCommand
@@ -11163,11 +10427,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary1X()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary1X() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -11175,14 +10435,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary1X(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1X::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary1X response", value);
+    }
 };
 
 class ReportColorControlPrimary1X : public ModelCommand
@@ -11249,11 +10509,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary1Y()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary1Y() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -11261,14 +10517,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary1Y(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1Y::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary1Y response", value);
+    }
 };
 
 class ReportColorControlPrimary1Y : public ModelCommand
@@ -11335,11 +10591,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary1Intensity()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary1Intensity() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -11347,14 +10599,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary1Intensity(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary1Intensity::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary1Intensity response", value);
+    }
 };
 
 class ReportColorControlPrimary1Intensity : public ModelCommand
@@ -11422,11 +10674,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary2X()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary2X() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -11434,14 +10682,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary2X(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2X::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary2X response", value);
+    }
 };
 
 class ReportColorControlPrimary2X : public ModelCommand
@@ -11508,11 +10756,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary2Y()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary2Y() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -11520,14 +10764,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary2Y(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2Y::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary2Y response", value);
+    }
 };
 
 class ReportColorControlPrimary2Y : public ModelCommand
@@ -11594,11 +10838,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary2Intensity()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary2Intensity() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -11606,14 +10846,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary2Intensity(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary2Intensity::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary2Intensity response", value);
+    }
 };
 
 class ReportColorControlPrimary2Intensity : public ModelCommand
@@ -11681,11 +10921,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary3X()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary3X() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -11693,14 +10929,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary3X(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3X::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary3X response", value);
+    }
 };
 
 class ReportColorControlPrimary3X : public ModelCommand
@@ -11767,11 +11003,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary3Y()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary3Y() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -11779,14 +11011,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary3Y(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3Y::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary3Y response", value);
+    }
 };
 
 class ReportColorControlPrimary3Y : public ModelCommand
@@ -11853,11 +11085,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary3Intensity()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary3Intensity() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -11865,14 +11093,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary3Intensity(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary3Intensity::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary3Intensity response", value);
+    }
 };
 
 class ReportColorControlPrimary3Intensity : public ModelCommand
@@ -11940,11 +11168,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary4X()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary4X() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -11952,14 +11176,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary4X(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4X::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary4X response", value);
+    }
 };
 
 class ReportColorControlPrimary4X : public ModelCommand
@@ -12026,11 +11250,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary4Y()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary4Y() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -12038,14 +11258,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary4Y(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4Y::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary4Y response", value);
+    }
 };
 
 class ReportColorControlPrimary4Y : public ModelCommand
@@ -12112,11 +11332,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary4Intensity()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary4Intensity() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -12124,14 +11340,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary4Intensity(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary4Intensity::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary4Intensity response", value);
+    }
 };
 
 class ReportColorControlPrimary4Intensity : public ModelCommand
@@ -12199,11 +11415,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary5X()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary5X() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -12211,14 +11423,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary5X(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5X::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary5X response", value);
+    }
 };
 
 class ReportColorControlPrimary5X : public ModelCommand
@@ -12285,11 +11497,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary5Y()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary5Y() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -12297,14 +11505,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary5Y(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5Y::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary5Y response", value);
+    }
 };
 
 class ReportColorControlPrimary5Y : public ModelCommand
@@ -12371,11 +11579,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary5Intensity()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary5Intensity() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -12383,14 +11587,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary5Intensity(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary5Intensity::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary5Intensity response", value);
+    }
 };
 
 class ReportColorControlPrimary5Intensity : public ModelCommand
@@ -12458,11 +11662,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary6X()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary6X() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -12470,14 +11670,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary6X(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6X::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary6X response", value);
+    }
 };
 
 class ReportColorControlPrimary6X : public ModelCommand
@@ -12544,11 +11744,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary6Y()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary6Y() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -12556,14 +11752,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary6Y(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6Y::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary6Y response", value);
+    }
 };
 
 class ReportColorControlPrimary6Y : public ModelCommand
@@ -12630,11 +11826,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlPrimary6Intensity()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlPrimary6Intensity() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -12642,14 +11834,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePrimary6Intensity(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::Primary6Intensity::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.Primary6Intensity response", value);
+    }
 };
 
 class ReportColorControlPrimary6Intensity : public ModelCommand
@@ -12717,11 +11909,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlWhitePointX()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlWhitePointX() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -12729,14 +11917,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeWhitePointX(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointX::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.WhitePointX response", value);
+    }
 };
 
 class WriteColorControlWhitePointX : public ModelCommand
@@ -12829,11 +12017,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlWhitePointY()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlWhitePointY() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -12841,14 +12025,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeWhitePointY(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::WhitePointY::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.WhitePointY response", value);
+    }
 };
 
 class WriteColorControlWhitePointY : public ModelCommand
@@ -12941,11 +12125,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorPointRX()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorPointRX() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -12953,14 +12133,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorPointRX(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRX::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointRX response", value);
+    }
 };
 
 class WriteColorControlColorPointRX : public ModelCommand
@@ -13053,11 +12233,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorPointRY()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorPointRY() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13065,14 +12241,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorPointRY(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRY::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointRY response", value);
+    }
 };
 
 class WriteColorControlColorPointRY : public ModelCommand
@@ -13165,11 +12341,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorPointRIntensity()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorPointRIntensity() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13177,14 +12349,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorPointRIntensity(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointRIntensity::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointRIntensity response", value);
+    }
 };
 
 class WriteColorControlColorPointRIntensity : public ModelCommand
@@ -13278,11 +12450,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorPointGX()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorPointGX() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13290,14 +12458,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorPointGX(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGX::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointGX response", value);
+    }
 };
 
 class WriteColorControlColorPointGX : public ModelCommand
@@ -13390,11 +12558,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorPointGY()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorPointGY() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13402,14 +12566,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorPointGY(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGY::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointGY response", value);
+    }
 };
 
 class WriteColorControlColorPointGY : public ModelCommand
@@ -13502,11 +12666,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorPointGIntensity()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorPointGIntensity() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13514,14 +12674,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorPointGIntensity(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointGIntensity::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointGIntensity response", value);
+    }
 };
 
 class WriteColorControlColorPointGIntensity : public ModelCommand
@@ -13615,11 +12775,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorPointBX()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorPointBX() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13627,14 +12783,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorPointBX(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBX::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointBX response", value);
+    }
 };
 
 class WriteColorControlColorPointBX : public ModelCommand
@@ -13727,11 +12883,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorPointBY()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorPointBY() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13739,14 +12891,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorPointBY(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBY::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointBY response", value);
+    }
 };
 
 class WriteColorControlColorPointBY : public ModelCommand
@@ -13839,11 +12991,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorPointBIntensity()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorPointBIntensity() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13851,14 +12999,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorPointBIntensity(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorPointBIntensity::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorPointBIntensity response", value);
+    }
 };
 
 class WriteColorControlColorPointBIntensity : public ModelCommand
@@ -13952,11 +13100,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlEnhancedCurrentHue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlEnhancedCurrentHue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -13964,14 +13108,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeEnhancedCurrentHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedCurrentHue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.EnhancedCurrentHue response", value);
+    }
 };
 
 class ReportColorControlEnhancedCurrentHue : public ModelCommand
@@ -14039,11 +13183,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlEnhancedColorMode()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlEnhancedColorMode() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14051,14 +13191,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeEnhancedColorMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::EnhancedColorMode::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.EnhancedColorMode response", value);
+    }
 };
 
 class ReportColorControlEnhancedColorMode : public ModelCommand
@@ -14126,11 +13266,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorLoopActive()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorLoopActive() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14138,14 +13274,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorLoopActive(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopActive::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorLoopActive response", value);
+    }
 };
 
 class ReportColorControlColorLoopActive : public ModelCommand
@@ -14212,11 +13348,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorLoopDirection()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorLoopDirection() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14224,14 +13356,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorLoopDirection(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopDirection::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorLoopDirection response", value);
+    }
 };
 
 class ReportColorControlColorLoopDirection : public ModelCommand
@@ -14299,11 +13431,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorLoopTime()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorLoopTime() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14311,14 +13439,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorLoopTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopTime::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorLoopTime response", value);
+    }
 };
 
 class ReportColorControlColorLoopTime : public ModelCommand
@@ -14385,11 +13513,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorLoopStartEnhancedHue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorLoopStartEnhancedHue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14397,14 +13521,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorLoopStartEnhancedHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStartEnhancedHue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorLoopStartEnhancedHue response", value);
+    }
 };
 
 class ReportColorControlColorLoopStartEnhancedHue : public ModelCommand
@@ -14472,11 +13596,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorLoopStoredEnhancedHue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorLoopStoredEnhancedHue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14484,14 +13604,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorLoopStoredEnhancedHue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorLoopStoredEnhancedHue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorLoopStoredEnhancedHue response", value);
+    }
 };
 
 class ReportColorControlColorLoopStoredEnhancedHue : public ModelCommand
@@ -14559,11 +13679,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorCapabilities()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorCapabilities() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14571,14 +13687,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorCapabilities(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorCapabilities::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorCapabilities response", value);
+    }
 };
 
 class ReportColorControlColorCapabilities : public ModelCommand
@@ -14646,11 +13762,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorTempPhysicalMin()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorTempPhysicalMin() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14658,14 +13770,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorTempPhysicalMin(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMin::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorTempPhysicalMin response", value);
+    }
 };
 
 class ReportColorControlColorTempPhysicalMin : public ModelCommand
@@ -14733,11 +13845,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlColorTempPhysicalMax()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlColorTempPhysicalMax() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14745,14 +13853,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeColorTempPhysicalMax(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ColorTempPhysicalMax::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ColorTempPhysicalMax response", value);
+    }
 };
 
 class ReportColorControlColorTempPhysicalMax : public ModelCommand
@@ -14820,11 +13928,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlCoupleColorTempToLevelMinMireds()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlCoupleColorTempToLevelMinMireds() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14832,14 +13936,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCoupleColorTempToLevelMinMireds(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::CoupleColorTempToLevelMinMireds::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.CoupleColorTempToLevelMinMireds response", value);
+    }
 };
 
 class ReportColorControlCoupleColorTempToLevelMinMireds : public ModelCommand
@@ -14907,11 +14011,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlStartUpColorTemperatureMireds()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlStartUpColorTemperatureMireds() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -14919,14 +14019,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeStartUpColorTemperatureMireds(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::StartUpColorTemperatureMireds::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.StartUpColorTemperatureMireds response", value);
+    }
 };
 
 class WriteColorControlStartUpColorTemperatureMireds : public ModelCommand
@@ -15020,11 +14120,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadColorControlClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadColorControlClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15032,14 +14128,14 @@ public:
 
         chip::Controller::ColorControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ColorControl::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ColorControl.ClusterRevision response", value);
+    }
 };
 
 class ReportColorControlClusterRevision : public ModelCommand
@@ -15169,11 +14265,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadContentLauncherAcceptsHeaderList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadContentLauncherAcceptsHeaderList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15181,15 +14273,14 @@ public:
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeAcceptsHeaderList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::AcceptsHeaderList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<ContentLauncherAcceptsHeaderListListAttributeCallback>(
-            OnContentLauncherAcceptsHeaderListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+    {
+        OnGeneralAttributeResponse(context, "ContentLauncher.AcceptsHeaderList response", value);
+    }
 };
 
 /*
@@ -15204,11 +14295,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadContentLauncherSupportedStreamingTypes()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadContentLauncherSupportedStreamingTypes() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15216,15 +14303,16 @@ public:
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSupportedStreamingTypes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::SupportedStreamingTypes::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<ContentLauncherSupportedStreamingTypesListAttributeCallback>(
-            OnContentLauncherSupportedStreamingTypesListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ContentLauncher::ContentLaunchStreamingType> & value)
+    {
+        OnGeneralAttributeResponse(context, "ContentLauncher.SupportedStreamingTypes response", value);
+    }
 };
 
 /*
@@ -15239,11 +14327,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadContentLauncherClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadContentLauncherClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15251,14 +14335,14 @@ public:
 
         chip::Controller::ContentLauncherCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ContentLauncher::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ContentLauncher.ClusterRevision response", value);
+    }
 };
 
 class ReportContentLauncherClusterRevision : public ModelCommand
@@ -15338,11 +14422,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadDescriptorDeviceList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadDescriptorDeviceList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15350,14 +14430,16 @@ public:
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeDeviceList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::DeviceList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<DescriptorDeviceListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DescriptorDeviceListListAttributeCallback>(OnDescriptorDeviceListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::Descriptor::Structs::DeviceType::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "Descriptor.DeviceList response", value);
+    }
 };
 
 /*
@@ -15372,11 +14454,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadDescriptorServerList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadDescriptorServerList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15384,14 +14462,14 @@ public:
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeServerList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::ServerList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<DescriptorServerListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DescriptorServerListListAttributeCallback>(OnDescriptorServerListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
+    {
+        OnGeneralAttributeResponse(context, "Descriptor.ServerList response", value);
+    }
 };
 
 /*
@@ -15406,11 +14484,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadDescriptorClientList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadDescriptorClientList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15418,14 +14492,14 @@ public:
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClientList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::ClientList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<DescriptorClientListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DescriptorClientListListAttributeCallback>(OnDescriptorClientListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::ClusterId> & value)
+    {
+        OnGeneralAttributeResponse(context, "Descriptor.ClientList response", value);
+    }
 };
 
 /*
@@ -15440,11 +14514,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadDescriptorPartsList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadDescriptorPartsList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15452,14 +14522,14 @@ public:
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePartsList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::PartsList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<DescriptorPartsListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DescriptorPartsListListAttributeCallback>(OnDescriptorPartsListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::EndpointId> & value)
+    {
+        OnGeneralAttributeResponse(context, "Descriptor.PartsList response", value);
+    }
 };
 
 /*
@@ -15474,11 +14544,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadDescriptorClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadDescriptorClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -15486,14 +14552,14 @@ public:
 
         chip::Controller::DescriptorCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Descriptor::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Descriptor.ClusterRevision response", value);
+    }
 };
 
 class ReportDescriptorClusterRevision : public ModelCommand
@@ -16207,11 +15273,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadDoorLockActuatorEnabled()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadDoorLockActuatorEnabled() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -16219,14 +15281,14 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeActuatorEnabled(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::ActuatorEnabled::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.ActuatorEnabled response", value);
+    }
 };
 
 class ReportDoorLockActuatorEnabled : public ModelCommand
@@ -16293,11 +15355,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadDoorLockClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadDoorLockClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -16305,14 +15363,14 @@ public:
 
         chip::Controller::DoorLockCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::DoorLock::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "DoorLock.ClusterRevision response", value);
+    }
 };
 
 class ReportDoorLockClusterRevision : public ModelCommand
@@ -16399,11 +15457,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementMeasurementType()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadElectricalMeasurementMeasurementType() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -16411,14 +15465,14 @@ public:
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMeasurementType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::MeasurementType::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.MeasurementType response", value);
+    }
 };
 
 class ReportElectricalMeasurementMeasurementType : public ModelCommand
@@ -16485,11 +15539,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementTotalActivePower()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadElectricalMeasurementTotalActivePower() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -16497,14 +15547,14 @@ public:
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTotalActivePower(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::TotalActivePower::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.TotalActivePower response", value);
+    }
 };
 
 class ReportElectricalMeasurementTotalActivePower : public ModelCommand
@@ -16571,11 +15621,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementRmsVoltage()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadElectricalMeasurementRmsVoltage() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -16583,14 +15629,14 @@ public:
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRmsVoltage(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltage::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.RmsVoltage response", value);
+    }
 };
 
 class ReportElectricalMeasurementRmsVoltage : public ModelCommand
@@ -16657,11 +15703,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementRmsVoltageMin()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadElectricalMeasurementRmsVoltageMin() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -16669,14 +15711,14 @@ public:
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRmsVoltageMin(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageMin::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.RmsVoltageMin response", value);
+    }
 };
 
 class ReportElectricalMeasurementRmsVoltageMin : public ModelCommand
@@ -16743,11 +15785,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementRmsVoltageMax()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadElectricalMeasurementRmsVoltageMax() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -16755,14 +15793,14 @@ public:
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRmsVoltageMax(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::RmsVoltageMax::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.RmsVoltageMax response", value);
+    }
 };
 
 class ReportElectricalMeasurementRmsVoltageMax : public ModelCommand
@@ -16829,11 +15867,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementRmsCurrent()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadElectricalMeasurementRmsCurrent() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -16841,14 +15875,14 @@ public:
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRmsCurrent(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrent::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.RmsCurrent response", value);
+    }
 };
 
 class ReportElectricalMeasurementRmsCurrent : public ModelCommand
@@ -16915,11 +15949,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementRmsCurrentMin()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadElectricalMeasurementRmsCurrentMin() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -16927,14 +15957,14 @@ public:
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRmsCurrentMin(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentMin::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.RmsCurrentMin response", value);
+    }
 };
 
 class ReportElectricalMeasurementRmsCurrentMin : public ModelCommand
@@ -17001,11 +16031,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementRmsCurrentMax()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadElectricalMeasurementRmsCurrentMax() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -17013,14 +16039,14 @@ public:
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRmsCurrentMax(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::RmsCurrentMax::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.RmsCurrentMax response", value);
+    }
 };
 
 class ReportElectricalMeasurementRmsCurrentMax : public ModelCommand
@@ -17087,11 +16113,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementActivePower()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadElectricalMeasurementActivePower() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -17099,14 +16121,14 @@ public:
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeActivePower(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePower::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.ActivePower response", value);
+    }
 };
 
 class ReportElectricalMeasurementActivePower : public ModelCommand
@@ -17173,11 +16195,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementActivePowerMin()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadElectricalMeasurementActivePowerMin() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -17185,14 +16203,14 @@ public:
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeActivePowerMin(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerMin::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.ActivePowerMin response", value);
+    }
 };
 
 class ReportElectricalMeasurementActivePowerMin : public ModelCommand
@@ -17259,11 +16277,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementActivePowerMax()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadElectricalMeasurementActivePowerMax() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -17271,14 +16285,14 @@ public:
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeActivePowerMax(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ActivePowerMax::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.ActivePowerMax response", value);
+    }
 };
 
 class ReportElectricalMeasurementActivePowerMax : public ModelCommand
@@ -17345,11 +16359,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadElectricalMeasurementClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadElectricalMeasurementClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -17357,14 +16367,14 @@ public:
 
         chip::Controller::ElectricalMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ElectricalMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ElectricalMeasurement.ClusterRevision response", value);
+    }
 };
 
 class ReportElectricalMeasurementClusterRevision : public ModelCommand
@@ -17471,11 +16481,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadEthernetNetworkDiagnosticsPHYRate()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadEthernetNetworkDiagnosticsPHYRate() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -17483,14 +16489,14 @@ public:
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePHYRate(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::PHYRate::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.PHYRate response", value);
+    }
 };
 
 class ReportEthernetNetworkDiagnosticsPHYRate : public ModelCommand
@@ -17557,11 +16563,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadEthernetNetworkDiagnosticsFullDuplex()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadEthernetNetworkDiagnosticsFullDuplex() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -17569,14 +16571,14 @@ public:
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFullDuplex(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::FullDuplex::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.FullDuplex response", value);
+    }
 };
 
 class ReportEthernetNetworkDiagnosticsFullDuplex : public ModelCommand
@@ -17643,11 +16645,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadEthernetNetworkDiagnosticsPacketRxCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadEthernetNetworkDiagnosticsPacketRxCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -17655,14 +16653,14 @@ public:
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePacketRxCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::PacketRxCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.PacketRxCount response", value);
+    }
 };
 
 class ReportEthernetNetworkDiagnosticsPacketRxCount : public ModelCommand
@@ -17729,11 +16727,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadEthernetNetworkDiagnosticsPacketTxCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadEthernetNetworkDiagnosticsPacketTxCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -17741,14 +16735,14 @@ public:
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePacketTxCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::PacketTxCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.PacketTxCount response", value);
+    }
 };
 
 class ReportEthernetNetworkDiagnosticsPacketTxCount : public ModelCommand
@@ -17815,11 +16809,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadEthernetNetworkDiagnosticsTxErrCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadEthernetNetworkDiagnosticsTxErrCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -17827,14 +16817,14 @@ public:
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxErrCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::TxErrCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.TxErrCount response", value);
+    }
 };
 
 class ReportEthernetNetworkDiagnosticsTxErrCount : public ModelCommand
@@ -17901,11 +16891,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadEthernetNetworkDiagnosticsCollisionCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadEthernetNetworkDiagnosticsCollisionCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -17913,14 +16899,14 @@ public:
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCollisionCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::CollisionCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.CollisionCount response", value);
+    }
 };
 
 class ReportEthernetNetworkDiagnosticsCollisionCount : public ModelCommand
@@ -17987,11 +16973,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadEthernetNetworkDiagnosticsOverrunCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadEthernetNetworkDiagnosticsOverrunCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -17999,14 +16981,14 @@ public:
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOverrunCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::OverrunCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.OverrunCount response", value);
+    }
 };
 
 class ReportEthernetNetworkDiagnosticsOverrunCount : public ModelCommand
@@ -18073,11 +17055,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadEthernetNetworkDiagnosticsCarrierDetect()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadEthernetNetworkDiagnosticsCarrierDetect() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -18085,14 +17063,14 @@ public:
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCarrierDetect(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::CarrierDetect::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.CarrierDetect response", value);
+    }
 };
 
 class ReportEthernetNetworkDiagnosticsCarrierDetect : public ModelCommand
@@ -18159,11 +17137,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadEthernetNetworkDiagnosticsTimeSinceReset()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadEthernetNetworkDiagnosticsTimeSinceReset() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -18171,14 +17145,14 @@ public:
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTimeSinceReset(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::TimeSinceReset::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.TimeSinceReset response", value);
+    }
 };
 
 class ReportEthernetNetworkDiagnosticsTimeSinceReset : public ModelCommand
@@ -18245,11 +17219,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadEthernetNetworkDiagnosticsFeatureMap()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadEthernetNetworkDiagnosticsFeatureMap() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -18257,14 +17227,14 @@ public:
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::FeatureMap::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.FeatureMap response", value);
+    }
 };
 
 /*
@@ -18279,11 +17249,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadEthernetNetworkDiagnosticsClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadEthernetNetworkDiagnosticsClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -18291,14 +17257,14 @@ public:
 
         chip::Controller::EthernetNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::EthernetNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "EthernetNetworkDiagnostics.ClusterRevision response", value);
+    }
 };
 
 class ReportEthernetNetworkDiagnosticsClusterRevision : public ModelCommand
@@ -18375,11 +17341,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadFixedLabelLabelList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadFixedLabelLabelList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -18387,14 +17349,16 @@ public:
 
         chip::Controller::FixedLabelCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeLabelList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::FixedLabel::Attributes::LabelList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<FixedLabelLabelListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<FixedLabelLabelListListAttributeCallback>(OnFixedLabelLabelListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::FixedLabel::Structs::LabelStruct::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "FixedLabel.LabelList response", value);
+    }
 };
 
 /*
@@ -18409,11 +17373,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadFixedLabelClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadFixedLabelClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -18421,14 +17381,14 @@ public:
 
         chip::Controller::FixedLabelCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::FixedLabel::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "FixedLabel.ClusterRevision response", value);
+    }
 };
 
 class ReportFixedLabelClusterRevision : public ModelCommand
@@ -18508,11 +17468,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadFlowMeasurementMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadFlowMeasurementMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -18520,14 +17476,14 @@ public:
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "FlowMeasurement.MeasuredValue response", value);
+    }
 };
 
 class ReportFlowMeasurementMeasuredValue : public ModelCommand
@@ -18594,11 +17550,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadFlowMeasurementMinMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadFlowMeasurementMinMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -18606,14 +17558,14 @@ public:
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "FlowMeasurement.MinMeasuredValue response", value);
+    }
 };
 
 class ReportFlowMeasurementMinMeasuredValue : public ModelCommand
@@ -18680,11 +17632,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadFlowMeasurementMaxMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadFlowMeasurementMaxMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -18692,14 +17640,14 @@ public:
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "FlowMeasurement.MaxMeasuredValue response", value);
+    }
 };
 
 class ReportFlowMeasurementMaxMeasuredValue : public ModelCommand
@@ -18766,11 +17714,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadFlowMeasurementTolerance()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadFlowMeasurementTolerance() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -18778,14 +17722,14 @@ public:
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTolerance(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::Tolerance::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "FlowMeasurement.Tolerance response", value);
+    }
 };
 
 class ReportFlowMeasurementTolerance : public ModelCommand
@@ -18852,11 +17796,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadFlowMeasurementClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadFlowMeasurementClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -18864,14 +17804,14 @@ public:
 
         chip::Controller::FlowMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::FlowMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "FlowMeasurement.ClusterRevision response", value);
+    }
 };
 
 class ReportFlowMeasurementClusterRevision : public ModelCommand
@@ -19028,11 +17968,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralCommissioningBreadcrumb()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralCommissioningBreadcrumb() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19040,14 +17976,14 @@ public:
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBreadcrumb(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralCommissioning::Attributes::Breadcrumb::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralCommissioning.Breadcrumb response", value);
+    }
 };
 
 class WriteGeneralCommissioningBreadcrumb : public ModelCommand
@@ -19140,11 +18076,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralCommissioningBasicCommissioningInfoList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralCommissioningBasicCommissioningInfoList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19152,15 +18084,17 @@ public:
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBasicCommissioningInfoList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralCommissioning::Attributes::BasicCommissioningInfoList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<GeneralCommissioningBasicCommissioningInfoListListAttributeCallback>(
-            OnGeneralCommissioningBasicCommissioningInfoListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void
+    OnAttributeResponse(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::GeneralCommissioning::Structs::BasicCommissioningInfoType::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralCommissioning.BasicCommissioningInfoList response", value);
+    }
 };
 
 /*
@@ -19175,11 +18109,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralCommissioningRegulatoryConfig()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralCommissioningRegulatoryConfig() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19187,14 +18117,14 @@ public:
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRegulatoryConfig(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralCommissioning::Attributes::RegulatoryConfig::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralCommissioning.RegulatoryConfig response", value);
+    }
 };
 
 /*
@@ -19209,11 +18139,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralCommissioningLocationCapability()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralCommissioningLocationCapability() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19221,14 +18147,14 @@ public:
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeLocationCapability(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralCommissioning::Attributes::LocationCapability::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralCommissioning.LocationCapability response", value);
+    }
 };
 
 /*
@@ -19243,11 +18169,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralCommissioningClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralCommissioningClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19255,14 +18177,14 @@ public:
 
         chip::Controller::GeneralCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralCommissioning::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralCommissioning.ClusterRevision response", value);
+    }
 };
 
 class ReportGeneralCommissioningClusterRevision : public ModelCommand
@@ -19346,11 +18268,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralDiagnosticsNetworkInterfaces()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralDiagnosticsNetworkInterfaces() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19358,15 +18276,17 @@ public:
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNetworkInterfaces(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::NetworkInterfaces::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<GeneralDiagnosticsNetworkInterfacesListAttributeCallback>(
-            OnGeneralDiagnosticsNetworkInterfacesListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void
+    OnAttributeResponse(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::GeneralDiagnostics::Structs::NetworkInterfaceType::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.NetworkInterfaces response", value);
+    }
 };
 
 /*
@@ -19381,11 +18301,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralDiagnosticsRebootCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralDiagnosticsRebootCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19393,14 +18309,14 @@ public:
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRebootCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::RebootCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.RebootCount response", value);
+    }
 };
 
 class ReportGeneralDiagnosticsRebootCount : public ModelCommand
@@ -19467,11 +18383,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralDiagnosticsUpTime()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralDiagnosticsUpTime() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19479,14 +18391,14 @@ public:
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeUpTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::UpTime::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.UpTime response", value);
+    }
 };
 
 class ReportGeneralDiagnosticsUpTime : public ModelCommand
@@ -19553,11 +18465,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralDiagnosticsTotalOperationalHours()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralDiagnosticsTotalOperationalHours() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19565,14 +18473,14 @@ public:
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTotalOperationalHours(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::TotalOperationalHours::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.TotalOperationalHours response", value);
+    }
 };
 
 class ReportGeneralDiagnosticsTotalOperationalHours : public ModelCommand
@@ -19640,11 +18548,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralDiagnosticsBootReasons()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralDiagnosticsBootReasons() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19652,14 +18556,14 @@ public:
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBootReasons(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::BootReasons::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.BootReasons response", value);
+    }
 };
 
 class ReportGeneralDiagnosticsBootReasons : public ModelCommand
@@ -19726,11 +18630,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralDiagnosticsActiveHardwareFaults()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralDiagnosticsActiveHardwareFaults() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19738,15 +18638,14 @@ public:
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeActiveHardwareFaults(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveHardwareFaults::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<GeneralDiagnosticsActiveHardwareFaultsListAttributeCallback>(
-            OnGeneralDiagnosticsActiveHardwareFaultsListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.ActiveHardwareFaults response", value);
+    }
 };
 
 /*
@@ -19761,11 +18660,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralDiagnosticsActiveRadioFaults()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralDiagnosticsActiveRadioFaults() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19773,15 +18668,14 @@ public:
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeActiveRadioFaults(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveRadioFaults::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<GeneralDiagnosticsActiveRadioFaultsListAttributeCallback>(
-            OnGeneralDiagnosticsActiveRadioFaultsListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.ActiveRadioFaults response", value);
+    }
 };
 
 /*
@@ -19796,11 +18690,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralDiagnosticsActiveNetworkFaults()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralDiagnosticsActiveNetworkFaults() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19808,15 +18698,14 @@ public:
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeActiveNetworkFaults(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::ActiveNetworkFaults::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<GeneralDiagnosticsActiveNetworkFaultsListAttributeCallback>(
-            OnGeneralDiagnosticsActiveNetworkFaultsListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.ActiveNetworkFaults response", value);
+    }
 };
 
 /*
@@ -19831,11 +18720,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGeneralDiagnosticsClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGeneralDiagnosticsClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19843,14 +18728,14 @@ public:
 
         chip::Controller::GeneralDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GeneralDiagnostics::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "GeneralDiagnostics.ClusterRevision response", value);
+    }
 };
 
 class ReportGeneralDiagnosticsClusterRevision : public ModelCommand
@@ -19928,11 +18813,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGroupKeyManagementGroups()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGroupKeyManagementGroups() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19940,15 +18821,17 @@ public:
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeGroups(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::Groups::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<GroupKeyManagementGroupsListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<GroupKeyManagementGroupsListAttributeCallback>(OnGroupKeyManagementGroupsListAttributeResponse,
-                                                                                    this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupState::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "GroupKeyManagement.Groups response", value);
+    }
 };
 
 /*
@@ -19963,11 +18846,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGroupKeyManagementGroupKeys()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGroupKeyManagementGroupKeys() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -19975,15 +18854,17 @@ public:
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeGroupKeys(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::GroupKeys::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<GroupKeyManagementGroupKeysListAttributeCallback>(
-            OnGroupKeyManagementGroupKeysListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::GroupKeyManagement::Structs::GroupKey::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "GroupKeyManagement.GroupKeys response", value);
+    }
 };
 
 /*
@@ -19998,11 +18879,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGroupKeyManagementClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGroupKeyManagementClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -20010,14 +18887,14 @@ public:
 
         chip::Controller::GroupKeyManagementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::GroupKeyManagement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "GroupKeyManagement.ClusterRevision response", value);
+    }
 };
 
 class ReportGroupKeyManagementClusterRevision : public ModelCommand
@@ -20242,11 +19119,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGroupsNameSupport()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGroupsNameSupport() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -20254,14 +19127,14 @@ public:
 
         chip::Controller::GroupsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNameSupport(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Groups::Attributes::NameSupport::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Groups.NameSupport response", value);
+    }
 };
 
 class ReportGroupsNameSupport : public ModelCommand
@@ -20328,11 +19201,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadGroupsClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadGroupsClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -20340,14 +19209,14 @@ public:
 
         chip::Controller::GroupsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Groups::Attributes::ClusterRevision::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Groups.ClusterRevision response", value);
+    }
 };
 
 class ReportGroupsClusterRevision : public ModelCommand
@@ -20499,11 +19368,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadIdentifyIdentifyTime()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadIdentifyIdentifyTime() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -20511,14 +19376,14 @@ public:
 
         chip::Controller::IdentifyCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeIdentifyTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Identify::Attributes::IdentifyTime::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Identify.IdentifyTime response", value);
+    }
 };
 
 class WriteIdentifyIdentifyTime : public ModelCommand
@@ -20611,11 +19476,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadIdentifyIdentifyType()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadIdentifyIdentifyType() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -20623,14 +19484,14 @@ public:
 
         chip::Controller::IdentifyCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeIdentifyType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Identify::Attributes::IdentifyType::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Identify.IdentifyType response", value);
+    }
 };
 
 class ReportIdentifyIdentifyType : public ModelCommand
@@ -20697,11 +19558,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadIdentifyClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadIdentifyClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -20709,14 +19566,14 @@ public:
 
         chip::Controller::IdentifyCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Identify::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Identify.ClusterRevision response", value);
+    }
 };
 
 class ReportIdentifyClusterRevision : public ModelCommand
@@ -20797,11 +19654,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadIlluminanceMeasurementMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadIlluminanceMeasurementMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -20809,14 +19662,14 @@ public:
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::MeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.MeasuredValue response", value);
+    }
 };
 
 class ReportIlluminanceMeasurementMeasuredValue : public ModelCommand
@@ -20883,11 +19736,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadIlluminanceMeasurementMinMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadIlluminanceMeasurementMinMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -20895,14 +19744,14 @@ public:
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.MinMeasuredValue response", value);
+    }
 };
 
 class ReportIlluminanceMeasurementMinMeasuredValue : public ModelCommand
@@ -20969,11 +19818,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadIlluminanceMeasurementMaxMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadIlluminanceMeasurementMaxMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -20981,14 +19826,14 @@ public:
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.MaxMeasuredValue response", value);
+    }
 };
 
 class ReportIlluminanceMeasurementMaxMeasuredValue : public ModelCommand
@@ -21055,11 +19900,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadIlluminanceMeasurementTolerance()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadIlluminanceMeasurementTolerance() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -21067,14 +19908,14 @@ public:
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTolerance(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::Tolerance::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.Tolerance response", value);
+    }
 };
 
 class ReportIlluminanceMeasurementTolerance : public ModelCommand
@@ -21141,11 +19982,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadIlluminanceMeasurementLightSensorType()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadIlluminanceMeasurementLightSensorType() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -21153,14 +19990,14 @@ public:
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeLightSensorType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::LightSensorType::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.LightSensorType response", value);
+    }
 };
 
 class ReportIlluminanceMeasurementLightSensorType : public ModelCommand
@@ -21227,11 +20064,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadIlluminanceMeasurementClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadIlluminanceMeasurementClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -21239,14 +20072,14 @@ public:
 
         chip::Controller::IlluminanceMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::IlluminanceMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "IlluminanceMeasurement.ClusterRevision response", value);
+    }
 };
 
 class ReportIlluminanceMeasurementClusterRevision : public ModelCommand
@@ -21348,11 +20181,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadKeypadInputClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadKeypadInputClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -21360,14 +20189,14 @@ public:
 
         chip::Controller::KeypadInputCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::KeypadInput::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "KeypadInput.ClusterRevision response", value);
+    }
 };
 
 class ReportKeypadInputClusterRevision : public ModelCommand
@@ -21672,11 +20501,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlCurrentLevel()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlCurrentLevel() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -21684,14 +20509,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentLevel::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.CurrentLevel response", value);
+    }
 };
 
 class ReportLevelControlCurrentLevel : public ModelCommand
@@ -21758,11 +20583,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlRemainingTime()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlRemainingTime() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -21770,14 +20591,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRemainingTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::RemainingTime::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.RemainingTime response", value);
+    }
 };
 
 class ReportLevelControlRemainingTime : public ModelCommand
@@ -21844,11 +20665,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlMinLevel()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlMinLevel() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -21856,14 +20673,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MinLevel::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.MinLevel response", value);
+    }
 };
 
 class ReportLevelControlMinLevel : public ModelCommand
@@ -21930,11 +20747,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlMaxLevel()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlMaxLevel() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -21942,14 +20755,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MaxLevel::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.MaxLevel response", value);
+    }
 };
 
 class ReportLevelControlMaxLevel : public ModelCommand
@@ -22016,11 +20829,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlCurrentFrequency()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlCurrentFrequency() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -22028,14 +20837,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentFrequency(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::CurrentFrequency::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.CurrentFrequency response", value);
+    }
 };
 
 class ReportLevelControlCurrentFrequency : public ModelCommand
@@ -22102,11 +20911,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlMinFrequency()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlMinFrequency() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -22114,14 +20919,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinFrequency(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MinFrequency::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.MinFrequency response", value);
+    }
 };
 
 class ReportLevelControlMinFrequency : public ModelCommand
@@ -22188,11 +20993,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlMaxFrequency()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlMaxFrequency() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -22200,14 +21001,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxFrequency(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::MaxFrequency::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.MaxFrequency response", value);
+    }
 };
 
 class ReportLevelControlMaxFrequency : public ModelCommand
@@ -22274,11 +21075,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlOptions()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlOptions() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -22286,14 +21083,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOptions(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::Options::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.Options response", value);
+    }
 };
 
 class WriteLevelControlOptions : public ModelCommand
@@ -22386,11 +21183,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlOnOffTransitionTime()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlOnOffTransitionTime() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -22398,14 +21191,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOnOffTransitionTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnOffTransitionTime::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.OnOffTransitionTime response", value);
+    }
 };
 
 class WriteLevelControlOnOffTransitionTime : public ModelCommand
@@ -22499,11 +21292,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlOnLevel()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlOnLevel() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -22511,14 +21300,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOnLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnLevel::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.OnLevel response", value);
+    }
 };
 
 class WriteLevelControlOnLevel : public ModelCommand
@@ -22611,11 +21400,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlOnTransitionTime()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlOnTransitionTime() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -22623,14 +21408,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOnTransitionTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OnTransitionTime::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.OnTransitionTime response", value);
+    }
 };
 
 class WriteLevelControlOnTransitionTime : public ModelCommand
@@ -22723,11 +21508,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlOffTransitionTime()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlOffTransitionTime() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -22735,14 +21516,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOffTransitionTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::OffTransitionTime::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.OffTransitionTime response", value);
+    }
 };
 
 class WriteLevelControlOffTransitionTime : public ModelCommand
@@ -22836,11 +21617,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlDefaultMoveRate()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlDefaultMoveRate() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -22848,14 +21625,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeDefaultMoveRate(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::DefaultMoveRate::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.DefaultMoveRate response", value);
+    }
 };
 
 class WriteLevelControlDefaultMoveRate : public ModelCommand
@@ -22948,11 +21725,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlStartUpCurrentLevel()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlStartUpCurrentLevel() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -22960,14 +21733,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeStartUpCurrentLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::StartUpCurrentLevel::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.StartUpCurrentLevel response", value);
+    }
 };
 
 class WriteLevelControlStartUpCurrentLevel : public ModelCommand
@@ -23061,11 +21834,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLevelControlClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLevelControlClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -23073,14 +21842,14 @@ public:
 
         chip::Controller::LevelControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LevelControl::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "LevelControl.ClusterRevision response", value);
+    }
 };
 
 class ReportLevelControlClusterRevision : public ModelCommand
@@ -23177,11 +21946,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadLowPowerClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadLowPowerClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -23189,14 +21954,14 @@ public:
 
         chip::Controller::LowPowerCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::LowPower::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "LowPower.ClusterRevision response", value);
+    }
 };
 
 class ReportLowPowerClusterRevision : public ModelCommand
@@ -23367,11 +22132,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaInputMediaInputList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadMediaInputMediaInputList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -23379,15 +22140,16 @@ public:
 
         chip::Controller::MediaInputCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMediaInputList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::MediaInputList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<MediaInputMediaInputListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<MediaInputMediaInputListListAttributeCallback>(OnMediaInputMediaInputListListAttributeResponse,
-                                                                                    this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::MediaInput::Structs::MediaInputInfo::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "MediaInput.MediaInputList response", value);
+    }
 };
 
 /*
@@ -23402,11 +22164,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaInputCurrentMediaInput()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadMediaInputCurrentMediaInput() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -23414,14 +22172,14 @@ public:
 
         chip::Controller::MediaInputCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentMediaInput(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::CurrentMediaInput::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "MediaInput.CurrentMediaInput response", value);
+    }
 };
 
 class ReportMediaInputCurrentMediaInput : public ModelCommand
@@ -23489,11 +22247,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaInputClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadMediaInputClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -23501,14 +22255,14 @@ public:
 
         chip::Controller::MediaInputCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::MediaInput::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "MediaInput.ClusterRevision response", value);
+    }
 };
 
 class ReportMediaInputClusterRevision : public ModelCommand
@@ -23835,11 +22589,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaPlaybackPlaybackState()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadMediaPlaybackPlaybackState() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -23847,14 +22597,14 @@ public:
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePlaybackState(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackState::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "MediaPlayback.PlaybackState response", value);
+    }
 };
 
 class ReportMediaPlaybackPlaybackState : public ModelCommand
@@ -23921,11 +22671,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaPlaybackStartTime()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadMediaPlaybackStartTime() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -23933,14 +22679,14 @@ public:
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeStartTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::StartTime::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "MediaPlayback.StartTime response", value);
+    }
 };
 
 class ReportMediaPlaybackStartTime : public ModelCommand
@@ -24007,11 +22753,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaPlaybackDuration()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadMediaPlaybackDuration() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -24019,14 +22761,14 @@ public:
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeDuration(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::Duration::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "MediaPlayback.Duration response", value);
+    }
 };
 
 class ReportMediaPlaybackDuration : public ModelCommand
@@ -24093,11 +22835,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaPlaybackPositionUpdatedAt()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadMediaPlaybackPositionUpdatedAt() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -24105,14 +22843,14 @@ public:
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePositionUpdatedAt(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PositionUpdatedAt::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "MediaPlayback.PositionUpdatedAt response", value);
+    }
 };
 
 class ReportMediaPlaybackPositionUpdatedAt : public ModelCommand
@@ -24180,11 +22918,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaPlaybackPosition()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadMediaPlaybackPosition() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -24192,14 +22926,14 @@ public:
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePosition(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::Position::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "MediaPlayback.Position response", value);
+    }
 };
 
 class ReportMediaPlaybackPosition : public ModelCommand
@@ -24266,11 +23000,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaPlaybackPlaybackSpeed()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadMediaPlaybackPlaybackSpeed() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -24278,14 +23008,14 @@ public:
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePlaybackSpeed(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::PlaybackSpeed::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "MediaPlayback.PlaybackSpeed response", value);
+    }
 };
 
 class ReportMediaPlaybackPlaybackSpeed : public ModelCommand
@@ -24352,11 +23082,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaPlaybackSeekRangeEnd()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadMediaPlaybackSeekRangeEnd() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -24364,14 +23090,14 @@ public:
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSeekRangeEnd(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeEnd::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "MediaPlayback.SeekRangeEnd response", value);
+    }
 };
 
 class ReportMediaPlaybackSeekRangeEnd : public ModelCommand
@@ -24438,11 +23164,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaPlaybackSeekRangeStart()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadMediaPlaybackSeekRangeStart() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -24450,14 +23172,14 @@ public:
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSeekRangeStart(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::SeekRangeStart::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "MediaPlayback.SeekRangeStart response", value);
+    }
 };
 
 class ReportMediaPlaybackSeekRangeStart : public ModelCommand
@@ -24524,11 +23246,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadMediaPlaybackClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadMediaPlaybackClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -24536,14 +23254,14 @@ public:
 
         chip::Controller::MediaPlaybackCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::MediaPlayback::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "MediaPlayback.ClusterRevision response", value);
+    }
 };
 
 class ReportMediaPlaybackClusterRevision : public ModelCommand
@@ -24649,11 +23367,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadModeSelectCurrentMode()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadModeSelectCurrentMode() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -24661,14 +23375,14 @@ public:
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::CurrentMode::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ModeSelect.CurrentMode response", value);
+    }
 };
 
 class ReportModeSelectCurrentMode : public ModelCommand
@@ -24735,11 +23449,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadModeSelectSupportedModes()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadModeSelectSupportedModes() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -24747,15 +23457,17 @@ public:
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSupportedModes(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::SupportedModes::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<ModeSelectSupportedModesListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<ModeSelectSupportedModesListAttributeCallback>(OnModeSelectSupportedModesListAttributeResponse,
-                                                                                    this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ModeSelect::Structs::ModeOptionStruct::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "ModeSelect.SupportedModes response", value);
+    }
 };
 
 /*
@@ -24770,11 +23482,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadModeSelectOnMode()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadModeSelectOnMode() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -24782,14 +23490,14 @@ public:
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOnMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::OnMode::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ModeSelect.OnMode response", value);
+    }
 };
 
 class WriteModeSelectOnMode : public ModelCommand
@@ -24882,11 +23590,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadModeSelectStartUpMode()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadModeSelectStartUpMode() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -24894,14 +23598,14 @@ public:
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeStartUpMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::StartUpMode::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ModeSelect.StartUpMode response", value);
+    }
 };
 
 class ReportModeSelectStartUpMode : public ModelCommand
@@ -24968,11 +23672,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadModeSelectDescription()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadModeSelectDescription() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -24980,14 +23680,14 @@ public:
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeDescription(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::Description::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "ModeSelect.Description response", value);
+    }
 };
 
 class ReportModeSelectDescription : public ModelCommand
@@ -25054,11 +23754,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadModeSelectClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadModeSelectClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -25066,14 +23762,14 @@ public:
 
         chip::Controller::ModeSelectCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ModeSelect::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ModeSelect.ClusterRevision response", value);
+    }
 };
 
 class ReportModeSelectClusterRevision : public ModelCommand
@@ -25368,11 +24064,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadNetworkCommissioningFeatureMap()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadNetworkCommissioningFeatureMap() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -25380,14 +24072,14 @@ public:
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::FeatureMap::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.FeatureMap response", value);
+    }
 };
 
 class ReportNetworkCommissioningFeatureMap : public ModelCommand
@@ -25454,11 +24146,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadNetworkCommissioningClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadNetworkCommissioningClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -25466,14 +24154,14 @@ public:
 
         chip::Controller::NetworkCommissioningCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::NetworkCommissioning::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "NetworkCommissioning.ClusterRevision response", value);
+    }
 };
 
 class ReportNetworkCommissioningClusterRevision : public ModelCommand
@@ -25633,11 +24321,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOtaSoftwareUpdateProviderClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOtaSoftwareUpdateProviderClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -25645,14 +24329,14 @@ public:
 
         chip::Controller::OtaSoftwareUpdateProviderCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OtaSoftwareUpdateProvider::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateProvider.ClusterRevision response", value);
+    }
 };
 
 class ReportOtaSoftwareUpdateProviderClusterRevision : public ModelCommand
@@ -25760,11 +24444,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOtaSoftwareUpdateRequestorDefaultOtaProvider()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOtaSoftwareUpdateRequestorDefaultOtaProvider() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -25772,14 +24452,14 @@ public:
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeDefaultOtaProvider(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::DefaultOtaProvider::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<OctetStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::ByteSpan value)
+    {
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.DefaultOtaProvider response", value);
+    }
 };
 
 class WriteOtaSoftwareUpdateRequestorDefaultOtaProvider : public ModelCommand
@@ -25873,11 +24553,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOtaSoftwareUpdateRequestorUpdatePossible()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOtaSoftwareUpdateRequestorUpdatePossible() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -25885,14 +24561,14 @@ public:
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeUpdatePossible(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::UpdatePossible::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.UpdatePossible response", value);
+    }
 };
 
 class ReportOtaSoftwareUpdateRequestorUpdatePossible : public ModelCommand
@@ -25959,11 +24635,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOtaSoftwareUpdateRequestorClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOtaSoftwareUpdateRequestorClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -25971,14 +24643,14 @@ public:
 
         chip::Controller::OtaSoftwareUpdateRequestorCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OtaSoftwareUpdateRequestor::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "OtaSoftwareUpdateRequestor.ClusterRevision response", value);
+    }
 };
 
 class ReportOtaSoftwareUpdateRequestorClusterRevision : public ModelCommand
@@ -26057,11 +24729,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOccupancySensingOccupancy()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOccupancySensingOccupancy() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -26069,14 +24737,14 @@ public:
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOccupancy(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::Occupancy::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "OccupancySensing.Occupancy response", value);
+    }
 };
 
 class ReportOccupancySensingOccupancy : public ModelCommand
@@ -26143,11 +24811,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOccupancySensingOccupancySensorType()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOccupancySensingOccupancySensorType() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -26155,14 +24819,14 @@ public:
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOccupancySensorType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorType::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "OccupancySensing.OccupancySensorType response", value);
+    }
 };
 
 class ReportOccupancySensingOccupancySensorType : public ModelCommand
@@ -26230,11 +24894,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOccupancySensingOccupancySensorTypeBitmap()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOccupancySensingOccupancySensorTypeBitmap() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -26242,14 +24902,14 @@ public:
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOccupancySensorTypeBitmap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::OccupancySensorTypeBitmap::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "OccupancySensing.OccupancySensorTypeBitmap response", value);
+    }
 };
 
 class ReportOccupancySensingOccupancySensorTypeBitmap : public ModelCommand
@@ -26317,11 +24977,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOccupancySensingClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOccupancySensingClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -26329,14 +24985,14 @@ public:
 
         chip::Controller::OccupancySensingCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OccupancySensing::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "OccupancySensing.ClusterRevision response", value);
+    }
 };
 
 class ReportOccupancySensingClusterRevision : public ModelCommand
@@ -26558,11 +25214,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffOnOff()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOnOffOnOff() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -26570,14 +25222,14 @@ public:
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOnOff(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnOff::TypeInfo>(this, OnAttributeResponse,
+                                                                                              OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "OnOff.OnOff response", value);
+    }
 };
 
 class ReportOnOffOnOff : public ModelCommand
@@ -26644,11 +25296,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffGlobalSceneControl()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOnOffGlobalSceneControl() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -26656,14 +25304,14 @@ public:
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeGlobalSceneControl(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::GlobalSceneControl::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "OnOff.GlobalSceneControl response", value);
+    }
 };
 
 class ReportOnOffGlobalSceneControl : public ModelCommand
@@ -26731,11 +25379,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffOnTime()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOnOffOnTime() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -26743,14 +25387,14 @@ public:
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOnTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OnTime::TypeInfo>(this, OnAttributeResponse,
+                                                                                               OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "OnOff.OnTime response", value);
+    }
 };
 
 class WriteOnOffOnTime : public ModelCommand
@@ -26843,11 +25487,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffOffWaitTime()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOnOffOffWaitTime() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -26855,14 +25495,14 @@ public:
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOffWaitTime(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::OffWaitTime::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "OnOff.OffWaitTime response", value);
+    }
 };
 
 class WriteOnOffOffWaitTime : public ModelCommand
@@ -26955,11 +25595,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffStartUpOnOff()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOnOffStartUpOnOff() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -26967,14 +25603,14 @@ public:
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeStartUpOnOff(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::StartUpOnOff::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "OnOff.StartUpOnOff response", value);
+    }
 };
 
 class WriteOnOffStartUpOnOff : public ModelCommand
@@ -27067,11 +25703,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffFeatureMap()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOnOffFeatureMap() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -27079,14 +25711,14 @@ public:
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::FeatureMap::TypeInfo>(this, OnAttributeResponse,
+                                                                                                   OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "OnOff.FeatureMap response", value);
+    }
 };
 
 class ReportOnOffFeatureMap : public ModelCommand
@@ -27153,11 +25785,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOnOffClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -27165,14 +25793,14 @@ public:
 
         chip::Controller::OnOffCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OnOff::Attributes::ClusterRevision::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "OnOff.ClusterRevision response", value);
+    }
 };
 
 class ReportOnOffClusterRevision : public ModelCommand
@@ -27250,11 +25878,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffSwitchConfigurationSwitchType()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOnOffSwitchConfigurationSwitchType() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -27262,14 +25886,14 @@ public:
 
         chip::Controller::OnOffSwitchConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSwitchType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchType::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "OnOffSwitchConfiguration.SwitchType response", value);
+    }
 };
 
 class ReportOnOffSwitchConfigurationSwitchType : public ModelCommand
@@ -27336,11 +25960,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffSwitchConfigurationSwitchActions()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOnOffSwitchConfigurationSwitchActions() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -27348,14 +25968,14 @@ public:
 
         chip::Controller::OnOffSwitchConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSwitchActions(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::SwitchActions::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "OnOffSwitchConfiguration.SwitchActions response", value);
+    }
 };
 
 class WriteOnOffSwitchConfigurationSwitchActions : public ModelCommand
@@ -27448,11 +26068,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOnOffSwitchConfigurationClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOnOffSwitchConfigurationClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -27460,14 +26076,14 @@ public:
 
         chip::Controller::OnOffSwitchConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OnOffSwitchConfiguration::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "OnOffSwitchConfiguration.ClusterRevision response", value);
+    }
 };
 
 class ReportOnOffSwitchConfigurationClusterRevision : public ModelCommand
@@ -27778,11 +26394,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOperationalCredentialsFabricsList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOperationalCredentialsFabricsList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -27790,15 +26402,17 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFabricsList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::FabricsList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OperationalCredentialsFabricsListListAttributeCallback>(
-            OnOperationalCredentialsFabricsListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void
+    OnAttributeResponse(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::OperationalCredentials::Structs::FabricDescriptor::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "OperationalCredentials.FabricsList response", value);
+    }
 };
 
 /*
@@ -27813,11 +26427,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOperationalCredentialsSupportedFabrics()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOperationalCredentialsSupportedFabrics() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -27825,14 +26435,14 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSupportedFabrics(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::SupportedFabrics::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "OperationalCredentials.SupportedFabrics response", value);
+    }
 };
 
 class ReportOperationalCredentialsSupportedFabrics : public ModelCommand
@@ -27899,11 +26509,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOperationalCredentialsCommissionedFabrics()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOperationalCredentialsCommissionedFabrics() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -27911,14 +26517,14 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCommissionedFabrics(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::CommissionedFabrics::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "OperationalCredentials.CommissionedFabrics response", value);
+    }
 };
 
 class ReportOperationalCredentialsCommissionedFabrics : public ModelCommand
@@ -27986,11 +26592,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOperationalCredentialsTrustedRootCertificates()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOperationalCredentialsTrustedRootCertificates() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -27998,15 +26600,14 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTrustedRootCertificates(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::TrustedRootCertificates::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OperationalCredentialsTrustedRootCertificatesListAttributeCallback>(
-            OnOperationalCredentialsTrustedRootCertificatesListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+    {
+        OnGeneralAttributeResponse(context, "OperationalCredentials.TrustedRootCertificates response", value);
+    }
 };
 
 /*
@@ -28021,11 +26622,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOperationalCredentialsCurrentFabricIndex()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOperationalCredentialsCurrentFabricIndex() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -28033,14 +26630,14 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentFabricIndex(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::CurrentFabricIndex::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::FabricIndex value)
+    {
+        OnGeneralAttributeResponse(context, "OperationalCredentials.CurrentFabricIndex response", value);
+    }
 };
 
 class ReportOperationalCredentialsCurrentFabricIndex : public ModelCommand
@@ -28108,11 +26705,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadOperationalCredentialsClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadOperationalCredentialsClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -28120,14 +26713,14 @@ public:
 
         chip::Controller::OperationalCredentialsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::OperationalCredentials::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "OperationalCredentials.ClusterRevision response", value);
+    }
 };
 
 class ReportOperationalCredentialsClusterRevision : public ModelCommand
@@ -28213,11 +26806,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceStatus()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPowerSourceStatus() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -28225,14 +26814,14 @@ public:
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::Status::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSource.Status response", value);
+    }
 };
 
 class ReportPowerSourceStatus : public ModelCommand
@@ -28299,11 +26888,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceOrder()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPowerSourceOrder() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -28311,14 +26896,14 @@ public:
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOrder(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::Order::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSource.Order response", value);
+    }
 };
 
 class ReportPowerSourceOrder : public ModelCommand
@@ -28385,11 +26970,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceDescription()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPowerSourceDescription() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -28397,14 +26978,14 @@ public:
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeDescription(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::Description::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSource.Description response", value);
+    }
 };
 
 class ReportPowerSourceDescription : public ModelCommand
@@ -28471,11 +27052,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceBatteryVoltage()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPowerSourceBatteryVoltage() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -28483,14 +27060,14 @@ public:
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBatteryVoltage(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryVoltage::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSource.BatteryVoltage response", value);
+    }
 };
 
 class ReportPowerSourceBatteryVoltage : public ModelCommand
@@ -28557,11 +27134,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceBatteryPercentRemaining()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPowerSourceBatteryPercentRemaining() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -28569,14 +27142,14 @@ public:
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBatteryPercentRemaining(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryPercentRemaining::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSource.BatteryPercentRemaining response", value);
+    }
 };
 
 class ReportPowerSourceBatteryPercentRemaining : public ModelCommand
@@ -28644,11 +27217,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceBatteryTimeRemaining()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPowerSourceBatteryTimeRemaining() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -28656,14 +27225,14 @@ public:
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBatteryTimeRemaining(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryTimeRemaining::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSource.BatteryTimeRemaining response", value);
+    }
 };
 
 class ReportPowerSourceBatteryTimeRemaining : public ModelCommand
@@ -28731,11 +27300,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceBatteryChargeLevel()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPowerSourceBatteryChargeLevel() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -28743,14 +27308,14 @@ public:
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBatteryChargeLevel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeLevel::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSource.BatteryChargeLevel response", value);
+    }
 };
 
 class ReportPowerSourceBatteryChargeLevel : public ModelCommand
@@ -28818,11 +27383,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceActiveBatteryFaults()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPowerSourceActiveBatteryFaults() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -28830,15 +27391,14 @@ public:
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeActiveBatteryFaults(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::ActiveBatteryFaults::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<PowerSourceActiveBatteryFaultsListAttributeCallback>(
-            OnPowerSourceActiveBatteryFaultsListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSource.ActiveBatteryFaults response", value);
+    }
 };
 
 /*
@@ -28853,11 +27413,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceBatteryChargeState()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPowerSourceBatteryChargeState() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -28865,14 +27421,14 @@ public:
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBatteryChargeState(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::BatteryChargeState::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSource.BatteryChargeState response", value);
+    }
 };
 
 class ReportPowerSourceBatteryChargeState : public ModelCommand
@@ -28940,11 +27496,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceFeatureMap()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPowerSourceFeatureMap() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -28952,14 +27504,14 @@ public:
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::FeatureMap::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSource.FeatureMap response", value);
+    }
 };
 
 class ReportPowerSourceFeatureMap : public ModelCommand
@@ -29026,11 +27578,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPowerSourceClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -29038,14 +27586,14 @@ public:
 
         chip::Controller::PowerSourceCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSource::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSource.ClusterRevision response", value);
+    }
 };
 
 class ReportPowerSourceClusterRevision : public ModelCommand
@@ -29122,11 +27670,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceConfigurationSources()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPowerSourceConfigurationSources() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -29134,15 +27678,14 @@ public:
 
         chip::Controller::PowerSourceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSources(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSourceConfiguration::Attributes::Sources::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<PowerSourceConfigurationSourcesListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<PowerSourceConfigurationSourcesListAttributeCallback>(
-            OnPowerSourceConfigurationSourcesListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSourceConfiguration.Sources response", value);
+    }
 };
 
 /*
@@ -29157,11 +27700,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPowerSourceConfigurationClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPowerSourceConfigurationClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -29169,14 +27708,14 @@ public:
 
         chip::Controller::PowerSourceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PowerSourceConfiguration::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PowerSourceConfiguration.ClusterRevision response", value);
+    }
 };
 
 /*----------------------------------------------------------------------------*\
@@ -29203,11 +27742,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPressureMeasurementMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPressureMeasurementMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -29215,14 +27750,14 @@ public:
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PressureMeasurement.MeasuredValue response", value);
+    }
 };
 
 class ReportPressureMeasurementMeasuredValue : public ModelCommand
@@ -29289,11 +27824,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPressureMeasurementMinMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPressureMeasurementMinMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -29301,14 +27832,14 @@ public:
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PressureMeasurement.MinMeasuredValue response", value);
+    }
 };
 
 class ReportPressureMeasurementMinMeasuredValue : public ModelCommand
@@ -29375,11 +27906,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPressureMeasurementMaxMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPressureMeasurementMaxMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -29387,14 +27914,14 @@ public:
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PressureMeasurement.MaxMeasuredValue response", value);
+    }
 };
 
 class ReportPressureMeasurementMaxMeasuredValue : public ModelCommand
@@ -29461,11 +27988,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPressureMeasurementClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPressureMeasurementClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -29473,14 +27996,14 @@ public:
 
         chip::Controller::PressureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PressureMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PressureMeasurement.ClusterRevision response", value);
+    }
 };
 
 class ReportPressureMeasurementClusterRevision : public ModelCommand
@@ -29581,11 +28104,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlMaxPressure()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlMaxPressure() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -29593,14 +28112,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxPressure(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxPressure::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxPressure response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlMaxPressure : public ModelCommand
@@ -29667,11 +28186,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlMaxSpeed()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlMaxSpeed() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -29679,14 +28194,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxSpeed(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxSpeed::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxSpeed response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlMaxSpeed : public ModelCommand
@@ -29753,11 +28268,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlMaxFlow()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlMaxFlow() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -29765,14 +28276,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxFlow(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxFlow::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxFlow response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlMaxFlow : public ModelCommand
@@ -29839,11 +28350,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlMinConstPressure()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlMinConstPressure() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -29851,14 +28358,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinConstPressure(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstPressure::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MinConstPressure response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlMinConstPressure : public ModelCommand
@@ -29925,11 +28432,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlMaxConstPressure()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlMaxConstPressure() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -29937,14 +28440,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxConstPressure(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstPressure::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxConstPressure response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlMaxConstPressure : public ModelCommand
@@ -30011,11 +28514,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlMinCompPressure()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlMinCompPressure() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -30023,14 +28522,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinCompPressure(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinCompPressure::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MinCompPressure response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlMinCompPressure : public ModelCommand
@@ -30097,11 +28596,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlMaxCompPressure()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlMaxCompPressure() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -30109,14 +28604,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxCompPressure(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxCompPressure::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxCompPressure response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlMaxCompPressure : public ModelCommand
@@ -30183,11 +28678,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlMinConstSpeed()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlMinConstSpeed() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -30195,14 +28686,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinConstSpeed(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstSpeed::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MinConstSpeed response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlMinConstSpeed : public ModelCommand
@@ -30269,11 +28760,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlMaxConstSpeed()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlMaxConstSpeed() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -30281,14 +28768,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxConstSpeed(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstSpeed::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxConstSpeed response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlMaxConstSpeed : public ModelCommand
@@ -30355,11 +28842,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlMinConstFlow()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlMinConstFlow() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -30367,14 +28850,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinConstFlow(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstFlow::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MinConstFlow response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlMinConstFlow : public ModelCommand
@@ -30441,11 +28924,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlMaxConstFlow()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlMaxConstFlow() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -30453,14 +28932,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxConstFlow(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstFlow::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxConstFlow response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlMaxConstFlow : public ModelCommand
@@ -30527,11 +29006,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlMinConstTemp()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlMinConstTemp() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -30539,14 +29014,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinConstTemp(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MinConstTemp::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MinConstTemp response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlMinConstTemp : public ModelCommand
@@ -30613,11 +29088,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlMaxConstTemp()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlMaxConstTemp() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -30625,14 +29096,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxConstTemp(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::MaxConstTemp::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.MaxConstTemp response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlMaxConstTemp : public ModelCommand
@@ -30699,11 +29170,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlPumpStatus()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlPumpStatus() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -30711,14 +29178,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePumpStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::PumpStatus::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.PumpStatus response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlPumpStatus : public ModelCommand
@@ -30785,11 +29252,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlEffectiveOperationMode()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlEffectiveOperationMode() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -30797,14 +29260,15 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeEffectiveOperationMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster
+            .ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveOperationMode::TypeInfo>(
+                this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.EffectiveOperationMode response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlEffectiveOperationMode : public ModelCommand
@@ -30872,11 +29336,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlEffectiveControlMode()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlEffectiveControlMode() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -30884,14 +29344,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeEffectiveControlMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::EffectiveControlMode::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.EffectiveControlMode response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlEffectiveControlMode : public ModelCommand
@@ -30959,11 +29419,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlCapacity()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlCapacity() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -30971,14 +29427,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCapacity(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Capacity::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.Capacity response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlCapacity : public ModelCommand
@@ -31045,11 +29501,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlSpeed()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlSpeed() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -31057,14 +29509,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSpeed(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Speed::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.Speed response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlSpeed : public ModelCommand
@@ -31131,11 +29583,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlLifetimeRunningHours()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlLifetimeRunningHours() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -31143,14 +29591,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeLifetimeRunningHours(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeRunningHours::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.LifetimeRunningHours response", value);
+    }
 };
 
 class WritePumpConfigurationAndControlLifetimeRunningHours : public ModelCommand
@@ -31244,11 +29692,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlPower()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlPower() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -31256,14 +29700,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePower(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::Power::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.Power response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlPower : public ModelCommand
@@ -31330,11 +29774,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlLifetimeEnergyConsumed()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlLifetimeEnergyConsumed() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -31342,14 +29782,15 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeLifetimeEnergyConsumed(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster
+            .ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::LifetimeEnergyConsumed::TypeInfo>(
+                this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.LifetimeEnergyConsumed response", value);
+    }
 };
 
 class WritePumpConfigurationAndControlLifetimeEnergyConsumed : public ModelCommand
@@ -31444,11 +29885,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlOperationMode()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlOperationMode() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -31456,14 +29893,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOperationMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::OperationMode::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.OperationMode response", value);
+    }
 };
 
 class WritePumpConfigurationAndControlOperationMode : public ModelCommand
@@ -31556,11 +29993,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlControlMode()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlControlMode() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -31568,14 +30001,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeControlMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ControlMode::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.ControlMode response", value);
+    }
 };
 
 class WritePumpConfigurationAndControlControlMode : public ModelCommand
@@ -31668,11 +30101,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlAlarmMask()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlAlarmMask() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -31680,14 +30109,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeAlarmMask(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::AlarmMask::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.AlarmMask response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlAlarmMask : public ModelCommand
@@ -31754,11 +30183,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlFeatureMap()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlFeatureMap() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -31766,14 +30191,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::FeatureMap::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.FeatureMap response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlFeatureMap : public ModelCommand
@@ -31840,11 +30265,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadPumpConfigurationAndControlClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadPumpConfigurationAndControlClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -31852,14 +30273,14 @@ public:
 
         chip::Controller::PumpConfigurationAndControlCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::PumpConfigurationAndControl::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "PumpConfigurationAndControl.ClusterRevision response", value);
+    }
 };
 
 class ReportPumpConfigurationAndControlClusterRevision : public ModelCommand
@@ -31939,11 +30360,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadRelativeHumidityMeasurementMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadRelativeHumidityMeasurementMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -31951,14 +30368,14 @@ public:
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "RelativeHumidityMeasurement.MeasuredValue response", value);
+    }
 };
 
 class ReportRelativeHumidityMeasurementMeasuredValue : public ModelCommand
@@ -32025,11 +30442,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadRelativeHumidityMeasurementMinMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadRelativeHumidityMeasurementMinMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -32037,14 +30450,14 @@ public:
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "RelativeHumidityMeasurement.MinMeasuredValue response", value);
+    }
 };
 
 class ReportRelativeHumidityMeasurementMinMeasuredValue : public ModelCommand
@@ -32111,11 +30524,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadRelativeHumidityMeasurementMaxMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadRelativeHumidityMeasurementMaxMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -32123,14 +30532,14 @@ public:
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "RelativeHumidityMeasurement.MaxMeasuredValue response", value);
+    }
 };
 
 class ReportRelativeHumidityMeasurementMaxMeasuredValue : public ModelCommand
@@ -32197,11 +30606,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadRelativeHumidityMeasurementTolerance()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadRelativeHumidityMeasurementTolerance() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -32209,14 +30614,14 @@ public:
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTolerance(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::Tolerance::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "RelativeHumidityMeasurement.Tolerance response", value);
+    }
 };
 
 class ReportRelativeHumidityMeasurementTolerance : public ModelCommand
@@ -32283,11 +30688,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadRelativeHumidityMeasurementClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadRelativeHumidityMeasurementClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -32295,14 +30696,14 @@ public:
 
         chip::Controller::RelativeHumidityMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::RelativeHumidityMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "RelativeHumidityMeasurement.ClusterRevision response", value);
+    }
 };
 
 class ReportRelativeHumidityMeasurementClusterRevision : public ModelCommand
@@ -32567,11 +30968,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadScenesSceneCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadScenesSceneCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -32579,14 +30976,14 @@ public:
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSceneCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Scenes::Attributes::SceneCount::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Scenes.SceneCount response", value);
+    }
 };
 
 class ReportScenesSceneCount : public ModelCommand
@@ -32653,11 +31050,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadScenesCurrentScene()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadScenesCurrentScene() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -32665,14 +31058,14 @@ public:
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentScene(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Scenes::Attributes::CurrentScene::TypeInfo>(this, OnAttributeResponse,
+                                                                                                      OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Scenes.CurrentScene response", value);
+    }
 };
 
 class ReportScenesCurrentScene : public ModelCommand
@@ -32739,11 +31132,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadScenesCurrentGroup()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadScenesCurrentGroup() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -32751,14 +31140,14 @@ public:
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentGroup(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Scenes::Attributes::CurrentGroup::TypeInfo>(this, OnAttributeResponse,
+                                                                                                      OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Scenes.CurrentGroup response", value);
+    }
 };
 
 class ReportScenesCurrentGroup : public ModelCommand
@@ -32825,11 +31214,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadScenesSceneValid()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadScenesSceneValid() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -32837,14 +31222,14 @@ public:
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSceneValid(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Scenes::Attributes::SceneValid::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "Scenes.SceneValid response", value);
+    }
 };
 
 class ReportScenesSceneValid : public ModelCommand
@@ -32911,11 +31296,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadScenesNameSupport()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadScenesNameSupport() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -32923,14 +31304,14 @@ public:
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNameSupport(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Scenes::Attributes::NameSupport::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Scenes.NameSupport response", value);
+    }
 };
 
 class ReportScenesNameSupport : public ModelCommand
@@ -32997,11 +31378,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadScenesClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadScenesClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -33009,14 +31386,14 @@ public:
 
         chip::Controller::ScenesCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Scenes::Attributes::ClusterRevision::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Scenes.ClusterRevision response", value);
+    }
 };
 
 class ReportScenesClusterRevision : public ModelCommand
@@ -33118,11 +31495,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadSoftwareDiagnosticsThreadMetrics()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadSoftwareDiagnosticsThreadMetrics() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -33130,15 +31503,17 @@ public:
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeThreadMetrics(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::ThreadMetrics::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<SoftwareDiagnosticsThreadMetricsListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<SoftwareDiagnosticsThreadMetricsListAttributeCallback>(
-            OnSoftwareDiagnosticsThreadMetricsListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::SoftwareDiagnostics::Structs::ThreadMetrics::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.ThreadMetrics response", value);
+    }
 };
 
 /*
@@ -33153,11 +31528,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadSoftwareDiagnosticsCurrentHeapFree()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadSoftwareDiagnosticsCurrentHeapFree() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -33165,14 +31536,14 @@ public:
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentHeapFree(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapFree::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.CurrentHeapFree response", value);
+    }
 };
 
 class ReportSoftwareDiagnosticsCurrentHeapFree : public ModelCommand
@@ -33239,11 +31610,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadSoftwareDiagnosticsCurrentHeapUsed()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadSoftwareDiagnosticsCurrentHeapUsed() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -33251,14 +31618,14 @@ public:
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentHeapUsed(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapUsed::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.CurrentHeapUsed response", value);
+    }
 };
 
 class ReportSoftwareDiagnosticsCurrentHeapUsed : public ModelCommand
@@ -33325,11 +31692,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadSoftwareDiagnosticsCurrentHeapHighWatermark()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadSoftwareDiagnosticsCurrentHeapHighWatermark() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -33337,14 +31700,14 @@ public:
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentHeapHighWatermark(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::CurrentHeapHighWatermark::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.CurrentHeapHighWatermark response", value);
+    }
 };
 
 class ReportSoftwareDiagnosticsCurrentHeapHighWatermark : public ModelCommand
@@ -33412,11 +31775,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadSoftwareDiagnosticsFeatureMap()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadSoftwareDiagnosticsFeatureMap() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -33424,14 +31783,14 @@ public:
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::FeatureMap::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.FeatureMap response", value);
+    }
 };
 
 /*
@@ -33446,11 +31805,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadSoftwareDiagnosticsClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadSoftwareDiagnosticsClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -33458,14 +31813,14 @@ public:
 
         chip::Controller::SoftwareDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::SoftwareDiagnostics::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "SoftwareDiagnostics.ClusterRevision response", value);
+    }
 };
 
 class ReportSoftwareDiagnosticsClusterRevision : public ModelCommand
@@ -33545,11 +31900,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadSwitchNumberOfPositions()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadSwitchNumberOfPositions() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -33557,14 +31908,14 @@ public:
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNumberOfPositions(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::NumberOfPositions::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Switch.NumberOfPositions response", value);
+    }
 };
 
 class ReportSwitchNumberOfPositions : public ModelCommand
@@ -33632,11 +31983,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadSwitchCurrentPosition()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadSwitchCurrentPosition() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -33644,14 +31991,14 @@ public:
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentPosition(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::CurrentPosition::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Switch.CurrentPosition response", value);
+    }
 };
 
 class ReportSwitchCurrentPosition : public ModelCommand
@@ -33718,11 +32065,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadSwitchMultiPressMax()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadSwitchMultiPressMax() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -33730,14 +32073,14 @@ public:
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMultiPressMax(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::MultiPressMax::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Switch.MultiPressMax response", value);
+    }
 };
 
 class ReportSwitchMultiPressMax : public ModelCommand
@@ -33804,11 +32147,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadSwitchFeatureMap()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadSwitchFeatureMap() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -33816,14 +32155,14 @@ public:
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::FeatureMap::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "Switch.FeatureMap response", value);
+    }
 };
 
 class ReportSwitchFeatureMap : public ModelCommand
@@ -33890,11 +32229,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadSwitchClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadSwitchClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -33902,14 +32237,14 @@ public:
 
         chip::Controller::SwitchCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Switch::Attributes::ClusterRevision::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Switch.ClusterRevision response", value);
+    }
 };
 
 class ReportSwitchClusterRevision : public ModelCommand
@@ -34064,11 +32399,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTvChannelTvChannelList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTvChannelTvChannelList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -34076,15 +32407,16 @@ public:
 
         chip::Controller::TvChannelCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTvChannelList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelList::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<TvChannelTvChannelListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<TvChannelTvChannelListListAttributeCallback>(OnTvChannelTvChannelListListAttributeResponse,
-                                                                                  this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TvChannel::Structs::TvChannelInfo::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "TvChannel.TvChannelList response", value);
+    }
 };
 
 /*
@@ -34099,11 +32431,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTvChannelTvChannelLineup()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTvChannelTvChannelLineup() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -34111,14 +32439,14 @@ public:
 
         chip::Controller::TvChannelCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTvChannelLineup(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::TvChannelLineup::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<OctetStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::ByteSpan value)
+    {
+        OnGeneralAttributeResponse(context, "TvChannel.TvChannelLineup response", value);
+    }
 };
 
 class ReportTvChannelTvChannelLineup : public ModelCommand
@@ -34185,11 +32513,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTvChannelCurrentTvChannel()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTvChannelCurrentTvChannel() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -34197,14 +32521,14 @@ public:
 
         chip::Controller::TvChannelCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentTvChannel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::CurrentTvChannel::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<OctetStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::ByteSpan value)
+    {
+        OnGeneralAttributeResponse(context, "TvChannel.CurrentTvChannel response", value);
+    }
 };
 
 class ReportTvChannelCurrentTvChannel : public ModelCommand
@@ -34271,11 +32595,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTvChannelClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTvChannelClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -34283,14 +32603,14 @@ public:
 
         chip::Controller::TvChannelCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TvChannel::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TvChannel.ClusterRevision response", value);
+    }
 };
 
 class ReportTvChannelClusterRevision : public ModelCommand
@@ -34393,11 +32713,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTargetNavigatorTargetNavigatorList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTargetNavigatorTargetNavigatorList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -34405,15 +32721,17 @@ public:
 
         chip::Controller::TargetNavigatorCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTargetNavigatorList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::TargetNavigatorList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<TargetNavigatorTargetNavigatorListListAttributeCallback>(
-            OnTargetNavigatorTargetNavigatorListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void
+    OnAttributeResponse(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::TargetNavigator::Structs::NavigateTargetTargetInfo::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "TargetNavigator.TargetNavigatorList response", value);
+    }
 };
 
 /*
@@ -34428,11 +32746,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTargetNavigatorClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTargetNavigatorClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -34440,14 +32754,14 @@ public:
 
         chip::Controller::TargetNavigatorCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TargetNavigator::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TargetNavigator.ClusterRevision response", value);
+    }
 };
 
 class ReportTargetNavigatorClusterRevision : public ModelCommand
@@ -34527,11 +32841,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTemperatureMeasurementMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTemperatureMeasurementMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -34539,14 +32849,14 @@ public:
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::MeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TemperatureMeasurement.MeasuredValue response", value);
+    }
 };
 
 class ReportTemperatureMeasurementMeasuredValue : public ModelCommand
@@ -34613,11 +32923,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTemperatureMeasurementMinMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTemperatureMeasurementMinMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -34625,14 +32931,14 @@ public:
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::MinMeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TemperatureMeasurement.MinMeasuredValue response", value);
+    }
 };
 
 class ReportTemperatureMeasurementMinMeasuredValue : public ModelCommand
@@ -34699,11 +33005,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTemperatureMeasurementMaxMeasuredValue()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTemperatureMeasurementMaxMeasuredValue() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -34711,14 +33013,14 @@ public:
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxMeasuredValue(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::MaxMeasuredValue::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TemperatureMeasurement.MaxMeasuredValue response", value);
+    }
 };
 
 class ReportTemperatureMeasurementMaxMeasuredValue : public ModelCommand
@@ -34785,11 +33087,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTemperatureMeasurementTolerance()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTemperatureMeasurementTolerance() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -34797,14 +33095,14 @@ public:
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTolerance(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::Tolerance::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TemperatureMeasurement.Tolerance response", value);
+    }
 };
 
 class ReportTemperatureMeasurementTolerance : public ModelCommand
@@ -34871,11 +33169,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTemperatureMeasurementClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTemperatureMeasurementClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -34883,14 +33177,14 @@ public:
 
         chip::Controller::TemperatureMeasurementCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TemperatureMeasurement::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TemperatureMeasurement.ClusterRevision response", value);
+    }
 };
 
 class ReportTemperatureMeasurementClusterRevision : public ModelCommand
@@ -35451,11 +33745,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterBoolean()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterBoolean() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -35463,14 +33753,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBoolean(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Boolean::TypeInfo>(this, OnAttributeResponse,
+                                                                                                      OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Boolean response", value);
+    }
 };
 
 class WriteTestClusterBoolean : public ModelCommand
@@ -35563,11 +33853,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterBitmap8()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterBitmap8() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -35575,14 +33861,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBitmap8(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap8::TypeInfo>(this, OnAttributeResponse,
+                                                                                                      OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Bitmap8 response", value);
+    }
 };
 
 class WriteTestClusterBitmap8 : public ModelCommand
@@ -35675,11 +33961,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterBitmap16()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterBitmap16() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -35687,14 +33969,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBitmap16(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap16::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Bitmap16 response", value);
+    }
 };
 
 class WriteTestClusterBitmap16 : public ModelCommand
@@ -35787,11 +34069,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterBitmap32()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterBitmap32() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -35799,14 +34077,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBitmap32(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap32::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Bitmap32 response", value);
+    }
 };
 
 class WriteTestClusterBitmap32 : public ModelCommand
@@ -35899,11 +34177,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterBitmap64()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterBitmap64() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -35911,14 +34185,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBitmap64(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Bitmap64::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Bitmap64 response", value);
+    }
 };
 
 class WriteTestClusterBitmap64 : public ModelCommand
@@ -36011,11 +34285,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt8u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt8u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -36023,14 +34293,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt8u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8u::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int8u response", value);
+    }
 };
 
 class WriteTestClusterInt8u : public ModelCommand
@@ -36123,11 +34393,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt16u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt16u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -36135,14 +34401,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt16u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16u::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int16u response", value);
+    }
 };
 
 class WriteTestClusterInt16u : public ModelCommand
@@ -36235,11 +34501,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt24u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt24u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -36247,14 +34509,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt24u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int24u::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int24u response", value);
+    }
 };
 
 class WriteTestClusterInt24u : public ModelCommand
@@ -36347,11 +34609,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt32u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt32u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -36359,14 +34617,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt32u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32u::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int32u response", value);
+    }
 };
 
 class WriteTestClusterInt32u : public ModelCommand
@@ -36459,11 +34717,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt40u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt40u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -36471,14 +34725,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt40u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int40u::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int40u response", value);
+    }
 };
 
 class WriteTestClusterInt40u : public ModelCommand
@@ -36571,11 +34825,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt48u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt48u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -36583,14 +34833,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt48u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int48u::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int48u response", value);
+    }
 };
 
 class WriteTestClusterInt48u : public ModelCommand
@@ -36683,11 +34933,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt56u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt56u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -36695,14 +34941,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt56u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int56u::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int56u response", value);
+    }
 };
 
 class WriteTestClusterInt56u : public ModelCommand
@@ -36795,11 +35041,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt64u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt64u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -36807,14 +35049,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt64u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64u::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int64u response", value);
+    }
 };
 
 class WriteTestClusterInt64u : public ModelCommand
@@ -36907,11 +35149,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt8s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt8s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -36919,14 +35157,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt8s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int8s::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int8_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int8s response", value);
+    }
 };
 
 class WriteTestClusterInt8s : public ModelCommand
@@ -37019,11 +35257,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt16s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt16s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -37031,14 +35265,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt16s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int16s::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int16s response", value);
+    }
 };
 
 class WriteTestClusterInt16s : public ModelCommand
@@ -37131,11 +35365,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt24s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt24s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -37143,14 +35373,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt24s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int24s::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int32_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int24s response", value);
+    }
 };
 
 class WriteTestClusterInt24s : public ModelCommand
@@ -37243,11 +35473,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt32s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt32s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -37255,14 +35481,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt32s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int32s::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int32_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int32s response", value);
+    }
 };
 
 class WriteTestClusterInt32s : public ModelCommand
@@ -37355,11 +35581,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt40s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt40s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -37367,14 +35589,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt40s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int40s::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int64_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int40s response", value);
+    }
 };
 
 class WriteTestClusterInt40s : public ModelCommand
@@ -37467,11 +35689,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt48s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt48s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -37479,14 +35697,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt48s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int48s::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int64_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int48s response", value);
+    }
 };
 
 class WriteTestClusterInt48s : public ModelCommand
@@ -37579,11 +35797,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt56s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt56s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -37591,14 +35805,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt56s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int56s::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int64_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int56s response", value);
+    }
 };
 
 class WriteTestClusterInt56s : public ModelCommand
@@ -37691,11 +35905,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterInt64s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterInt64s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -37703,14 +35913,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInt64s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Int64s::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int64_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Int64s response", value);
+    }
 };
 
 class WriteTestClusterInt64s : public ModelCommand
@@ -37803,11 +36013,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterEnum8()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterEnum8() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -37815,14 +36021,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeEnum8(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum8::TypeInfo>(this, OnAttributeResponse,
+                                                                                                    OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Enum8 response", value);
+    }
 };
 
 class WriteTestClusterEnum8 : public ModelCommand
@@ -37915,11 +36121,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterEnum16()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterEnum16() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -37927,14 +36129,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeEnum16(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Enum16::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Enum16 response", value);
+    }
 };
 
 class WriteTestClusterEnum16 : public ModelCommand
@@ -38027,11 +36229,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterFloatSingle()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterFloatSingle() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -38039,14 +36237,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFloatSingle(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatSingle::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<FloatAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<FloatAttributeCallback>(OnFloatAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, float value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.FloatSingle response", value);
+    }
 };
 
 class WriteTestClusterFloatSingle : public ModelCommand
@@ -38139,11 +36337,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterFloatDouble()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterFloatDouble() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -38151,14 +36345,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFloatDouble(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::FloatDouble::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<DoubleAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DoubleAttributeCallback>(OnDoubleAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, double value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.FloatDouble response", value);
+    }
 };
 
 class WriteTestClusterFloatDouble : public ModelCommand
@@ -38251,11 +36445,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterOctetString()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterOctetString() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -38263,14 +36453,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOctetString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::OctetString::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<OctetStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::ByteSpan value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.OctetString response", value);
+    }
 };
 
 class WriteTestClusterOctetString : public ModelCommand
@@ -38363,11 +36553,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterListInt8u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterListInt8u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -38375,14 +36561,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeListInt8u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListInt8u::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<TestClusterListInt8uListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<TestClusterListInt8uListAttributeCallback>(OnTestClusterListInt8uListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.ListInt8u response", value);
+    }
 };
 
 /*
@@ -38397,11 +36583,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterListOctetString()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterListOctetString() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -38409,15 +36591,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeListOctetString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListOctetString::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<TestClusterListOctetStringListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<TestClusterListOctetStringListAttributeCallback>(
-            OnTestClusterListOctetStringListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.ListOctetString response", value);
+    }
 };
 
 /*
@@ -38432,11 +36613,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterListStructOctetString()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterListStructOctetString() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -38444,15 +36621,17 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeListStructOctetString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListStructOctetString::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<TestClusterListStructOctetStringListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<TestClusterListStructOctetStringListAttributeCallback>(
-            OnTestClusterListStructOctetStringListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::TestCluster::Structs::TestListStructOctet::DecodableType> &
+            value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.ListStructOctetString response", value);
+    }
 };
 
 /*
@@ -38467,11 +36646,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterLongOctetString()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterLongOctetString() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -38479,14 +36654,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeLongOctetString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongOctetString::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<OctetStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::ByteSpan value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.LongOctetString response", value);
+    }
 };
 
 class WriteTestClusterLongOctetString : public ModelCommand
@@ -38579,11 +36754,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterCharString()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterCharString() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -38591,14 +36762,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCharString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::CharString::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.CharString response", value);
+    }
 };
 
 class WriteTestClusterCharString : public ModelCommand
@@ -38691,11 +36862,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterLongCharString()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterLongCharString() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -38703,14 +36870,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeLongCharString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::LongCharString::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.LongCharString response", value);
+    }
 };
 
 class WriteTestClusterLongCharString : public ModelCommand
@@ -38803,11 +36970,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterEpochUs()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterEpochUs() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -38815,14 +36978,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeEpochUs(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochUs::TypeInfo>(this, OnAttributeResponse,
+                                                                                                      OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.EpochUs response", value);
+    }
 };
 
 class WriteTestClusterEpochUs : public ModelCommand
@@ -38915,11 +37078,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterEpochS()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterEpochS() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -38927,14 +37086,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeEpochS(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::EpochS::TypeInfo>(this, OnAttributeResponse,
+                                                                                                     OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.EpochS response", value);
+    }
 };
 
 class WriteTestClusterEpochS : public ModelCommand
@@ -39027,11 +37186,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterVendorId()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterVendorId() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -39039,14 +37194,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeVendorId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::VendorId::TypeInfo>(this, OnAttributeResponse,
+                                                                                                       OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::VendorId value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.VendorId response", value);
+    }
 };
 
 class WriteTestClusterVendorId : public ModelCommand
@@ -39139,11 +37294,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterListNullablesAndOptionalsStruct()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterListNullablesAndOptionalsStruct() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -39151,15 +37302,17 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeListNullablesAndOptionalsStruct(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListNullablesAndOptionalsStruct::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<TestClusterListNullablesAndOptionalsStructListAttributeCallback>(
-            OnTestClusterListNullablesAndOptionalsStructListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void
+    OnAttributeResponse(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::TestCluster::Structs::NullablesAndOptionalsStruct::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.ListNullablesAndOptionalsStruct response", value);
+    }
 };
 
 /*
@@ -39174,11 +37327,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterRangeRestrictedInt8u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterRangeRestrictedInt8u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -39186,14 +37335,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRangeRestrictedInt8u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8u::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.RangeRestrictedInt8u response", value);
+    }
 };
 
 class WriteTestClusterRangeRestrictedInt8u : public ModelCommand
@@ -39287,11 +37436,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterRangeRestrictedInt8s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterRangeRestrictedInt8s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -39299,14 +37444,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRangeRestrictedInt8s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt8s::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int8_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.RangeRestrictedInt8s response", value);
+    }
 };
 
 class WriteTestClusterRangeRestrictedInt8s : public ModelCommand
@@ -39400,11 +37545,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterRangeRestrictedInt16u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterRangeRestrictedInt16u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -39412,14 +37553,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRangeRestrictedInt16u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16u::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.RangeRestrictedInt16u response", value);
+    }
 };
 
 class WriteTestClusterRangeRestrictedInt16u : public ModelCommand
@@ -39513,11 +37654,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterRangeRestrictedInt16s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterRangeRestrictedInt16s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -39525,14 +37662,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRangeRestrictedInt16s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::RangeRestrictedInt16s::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.RangeRestrictedInt16s response", value);
+    }
 };
 
 class WriteTestClusterRangeRestrictedInt16s : public ModelCommand
@@ -39626,11 +37763,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterListLongOctetString()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterListLongOctetString() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -39638,15 +37771,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeListLongOctetString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ListLongOctetString::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<TestClusterListLongOctetStringListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<TestClusterListLongOctetStringListAttributeCallback>(
-            OnTestClusterListLongOctetStringListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::DecodableList<chip::ByteSpan> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.ListLongOctetString response", value);
+    }
 };
 
 /*
@@ -39661,11 +37793,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterTimedWriteBoolean()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterTimedWriteBoolean() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -39673,14 +37801,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTimedWriteBoolean(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::TimedWriteBoolean::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.TimedWriteBoolean response", value);
+    }
 };
 
 class WriteTestClusterTimedWriteBoolean : public ModelCommand
@@ -39721,11 +37849,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterUnsupported()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterUnsupported() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -39733,14 +37857,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeUnsupported(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::Unsupported::TypeInfo>(this, OnAttributeResponse,
+                                                                                                          OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, bool value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.Unsupported response", value);
+    }
 };
 
 class WriteTestClusterUnsupported : public ModelCommand
@@ -39833,11 +37957,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableBoolean()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableBoolean() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -39845,14 +37965,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableBoolean(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBoolean::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<BooleanAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<BooleanAttributeCallback>(OnBooleanAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<bool> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableBoolean response", value);
+    }
 };
 
 class WriteTestClusterNullableBoolean : public ModelCommand
@@ -39945,11 +38065,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableBitmap8()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableBitmap8() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -39957,14 +38073,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableBitmap8(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap8::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableBitmap8 response", value);
+    }
 };
 
 class WriteTestClusterNullableBitmap8 : public ModelCommand
@@ -40057,11 +38173,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableBitmap16()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableBitmap16() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -40069,14 +38181,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableBitmap16(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap16::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableBitmap16 response", value);
+    }
 };
 
 class WriteTestClusterNullableBitmap16 : public ModelCommand
@@ -40169,11 +38281,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableBitmap32()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableBitmap32() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -40181,14 +38289,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableBitmap32(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap32::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableBitmap32 response", value);
+    }
 };
 
 class WriteTestClusterNullableBitmap32 : public ModelCommand
@@ -40281,11 +38389,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableBitmap64()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableBitmap64() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -40293,14 +38397,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableBitmap64(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableBitmap64::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableBitmap64 response", value);
+    }
 };
 
 class WriteTestClusterNullableBitmap64 : public ModelCommand
@@ -40393,11 +38497,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt8u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt8u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -40405,14 +38505,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt8u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8u::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt8u response", value);
+    }
 };
 
 class WriteTestClusterNullableInt8u : public ModelCommand
@@ -40505,11 +38605,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt16u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt16u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -40517,14 +38613,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt16u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16u::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt16u response", value);
+    }
 };
 
 class WriteTestClusterNullableInt16u : public ModelCommand
@@ -40617,11 +38713,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt24u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt24u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -40629,14 +38721,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt24u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt24u::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt24u response", value);
+    }
 };
 
 class WriteTestClusterNullableInt24u : public ModelCommand
@@ -40729,11 +38821,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt32u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt32u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -40741,14 +38829,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt32u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32u::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint32_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt32u response", value);
+    }
 };
 
 class WriteTestClusterNullableInt32u : public ModelCommand
@@ -40841,11 +38929,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt40u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt40u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -40853,14 +38937,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt40u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt40u::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt40u response", value);
+    }
 };
 
 class WriteTestClusterNullableInt40u : public ModelCommand
@@ -40953,11 +39037,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt48u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt48u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -40965,14 +39045,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt48u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt48u::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt48u response", value);
+    }
 };
 
 class WriteTestClusterNullableInt48u : public ModelCommand
@@ -41065,11 +39145,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt56u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt56u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -41077,14 +39153,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt56u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt56u::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt56u response", value);
+    }
 };
 
 class WriteTestClusterNullableInt56u : public ModelCommand
@@ -41177,11 +39253,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt64u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt64u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -41189,14 +39261,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt64u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64u::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint64_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt64u response", value);
+    }
 };
 
 class WriteTestClusterNullableInt64u : public ModelCommand
@@ -41289,11 +39361,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt8s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt8s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -41301,14 +39369,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt8s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt8s::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt8s response", value);
+    }
 };
 
 class WriteTestClusterNullableInt8s : public ModelCommand
@@ -41401,11 +39469,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt16s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt16s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -41413,14 +39477,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt16s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt16s::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt16s response", value);
+    }
 };
 
 class WriteTestClusterNullableInt16s : public ModelCommand
@@ -41513,11 +39577,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt24s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt24s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -41525,14 +39585,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt24s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt24s::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int32_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt24s response", value);
+    }
 };
 
 class WriteTestClusterNullableInt24s : public ModelCommand
@@ -41625,11 +39685,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt32s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt32s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -41637,14 +39693,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt32s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt32s::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32sAttributeCallback>(OnInt32sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int32_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt32s response", value);
+    }
 };
 
 class WriteTestClusterNullableInt32s : public ModelCommand
@@ -41737,11 +39793,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt40s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt40s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -41749,14 +39801,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt40s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt40s::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt40s response", value);
+    }
 };
 
 class WriteTestClusterNullableInt40s : public ModelCommand
@@ -41849,11 +39901,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt48s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt48s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -41861,14 +39909,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt48s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt48s::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt48s response", value);
+    }
 };
 
 class WriteTestClusterNullableInt48s : public ModelCommand
@@ -41961,11 +40009,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt56s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt56s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -41973,14 +40017,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt56s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt56s::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt56s response", value);
+    }
 };
 
 class WriteTestClusterNullableInt56s : public ModelCommand
@@ -42073,11 +40117,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableInt64s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableInt64s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -42085,14 +40125,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableInt64s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableInt64s::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64sAttributeCallback>(OnInt64sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int64_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableInt64s response", value);
+    }
 };
 
 class WriteTestClusterNullableInt64s : public ModelCommand
@@ -42185,11 +40225,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableEnum8()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableEnum8() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -42197,14 +40233,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableEnum8(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum8::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableEnum8 response", value);
+    }
 };
 
 class WriteTestClusterNullableEnum8 : public ModelCommand
@@ -42297,11 +40333,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableEnum16()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableEnum16() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -42309,14 +40341,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableEnum16(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableEnum16::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableEnum16 response", value);
+    }
 };
 
 class WriteTestClusterNullableEnum16 : public ModelCommand
@@ -42409,11 +40441,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableFloatSingle()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableFloatSingle() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -42421,14 +40449,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableFloatSingle(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatSingle::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<FloatAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<FloatAttributeCallback>(OnFloatAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<float> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableFloatSingle response", value);
+    }
 };
 
 class WriteTestClusterNullableFloatSingle : public ModelCommand
@@ -42522,11 +40550,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableFloatDouble()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableFloatDouble() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -42534,14 +40558,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableFloatDouble(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableFloatDouble::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<DoubleAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<DoubleAttributeCallback>(OnDoubleAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<double> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableFloatDouble response", value);
+    }
 };
 
 class WriteTestClusterNullableFloatDouble : public ModelCommand
@@ -42635,11 +40659,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableOctetString()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableOctetString() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -42647,14 +40667,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableOctetString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableOctetString::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<OctetStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::ByteSpan> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableOctetString response", value);
+    }
 };
 
 class WriteTestClusterNullableOctetString : public ModelCommand
@@ -42748,11 +40768,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableCharString()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableCharString() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -42760,14 +40776,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableCharString(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableCharString::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<chip::CharSpan> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableCharString response", value);
+    }
 };
 
 class WriteTestClusterNullableCharString : public ModelCommand
@@ -42861,11 +40877,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableRangeRestrictedInt8u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableRangeRestrictedInt8u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -42873,14 +40885,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableRangeRestrictedInt8u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8u::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableRangeRestrictedInt8u response", value);
+    }
 };
 
 class WriteTestClusterNullableRangeRestrictedInt8u : public ModelCommand
@@ -42974,11 +40986,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableRangeRestrictedInt8s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableRangeRestrictedInt8s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -42986,14 +40994,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableRangeRestrictedInt8s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt8s::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int8_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableRangeRestrictedInt8s response", value);
+    }
 };
 
 class WriteTestClusterNullableRangeRestrictedInt8s : public ModelCommand
@@ -43087,11 +41095,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableRangeRestrictedInt16u()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableRangeRestrictedInt16u() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -43099,14 +41103,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableRangeRestrictedInt16u(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16u::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<uint16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableRangeRestrictedInt16u response", value);
+    }
 };
 
 class WriteTestClusterNullableRangeRestrictedInt16u : public ModelCommand
@@ -43200,11 +41204,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterNullableRangeRestrictedInt16s()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterNullableRangeRestrictedInt16s() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -43212,14 +41212,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNullableRangeRestrictedInt16s(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::NullableRangeRestrictedInt16s::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, const chip::app::DataModel::Nullable<int16_t> & value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.NullableRangeRestrictedInt16s response", value);
+    }
 };
 
 class WriteTestClusterNullableRangeRestrictedInt16s : public ModelCommand
@@ -43313,11 +41313,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadTestClusterClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadTestClusterClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -43325,14 +41321,14 @@ public:
 
         chip::Controller::TestClusterCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::TestCluster::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "TestCluster.ClusterRevision response", value);
+    }
 };
 
 class ReportTestClusterClusterRevision : public ModelCommand
@@ -43555,11 +41551,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatLocalTemperature()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatLocalTemperature() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -43567,14 +41559,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeLocalTemperature(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::LocalTemperature::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.LocalTemperature response", value);
+    }
 };
 
 class ReportThermostatLocalTemperature : public ModelCommand
@@ -43641,11 +41633,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatAbsMinHeatSetpointLimit()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatAbsMinHeatSetpointLimit() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -43653,14 +41641,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeAbsMinHeatSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinHeatSetpointLimit::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.AbsMinHeatSetpointLimit response", value);
+    }
 };
 
 class ReportThermostatAbsMinHeatSetpointLimit : public ModelCommand
@@ -43728,11 +41716,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatAbsMaxHeatSetpointLimit()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatAbsMaxHeatSetpointLimit() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -43740,14 +41724,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeAbsMaxHeatSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxHeatSetpointLimit::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.AbsMaxHeatSetpointLimit response", value);
+    }
 };
 
 class ReportThermostatAbsMaxHeatSetpointLimit : public ModelCommand
@@ -43815,11 +41799,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatAbsMinCoolSetpointLimit()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatAbsMinCoolSetpointLimit() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -43827,14 +41807,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeAbsMinCoolSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMinCoolSetpointLimit::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.AbsMinCoolSetpointLimit response", value);
+    }
 };
 
 class ReportThermostatAbsMinCoolSetpointLimit : public ModelCommand
@@ -43902,11 +41882,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatAbsMaxCoolSetpointLimit()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatAbsMaxCoolSetpointLimit() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -43914,14 +41890,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeAbsMaxCoolSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::AbsMaxCoolSetpointLimit::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.AbsMaxCoolSetpointLimit response", value);
+    }
 };
 
 class ReportThermostatAbsMaxCoolSetpointLimit : public ModelCommand
@@ -43989,11 +41965,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatOccupiedCoolingSetpoint()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatOccupiedCoolingSetpoint() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -44001,14 +41973,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOccupiedCoolingSetpoint(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedCoolingSetpoint::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.OccupiedCoolingSetpoint response", value);
+    }
 };
 
 class WriteThermostatOccupiedCoolingSetpoint : public ModelCommand
@@ -44102,11 +42074,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatOccupiedHeatingSetpoint()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatOccupiedHeatingSetpoint() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -44114,14 +42082,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOccupiedHeatingSetpoint(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::OccupiedHeatingSetpoint::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.OccupiedHeatingSetpoint response", value);
+    }
 };
 
 class WriteThermostatOccupiedHeatingSetpoint : public ModelCommand
@@ -44215,11 +42183,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatMinHeatSetpointLimit()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatMinHeatSetpointLimit() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -44227,14 +42191,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinHeatSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinHeatSetpointLimit::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.MinHeatSetpointLimit response", value);
+    }
 };
 
 class WriteThermostatMinHeatSetpointLimit : public ModelCommand
@@ -44328,11 +42292,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatMaxHeatSetpointLimit()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatMaxHeatSetpointLimit() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -44340,14 +42300,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxHeatSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxHeatSetpointLimit::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.MaxHeatSetpointLimit response", value);
+    }
 };
 
 class WriteThermostatMaxHeatSetpointLimit : public ModelCommand
@@ -44441,11 +42401,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatMinCoolSetpointLimit()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatMinCoolSetpointLimit() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -44453,14 +42409,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinCoolSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinCoolSetpointLimit::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.MinCoolSetpointLimit response", value);
+    }
 };
 
 class WriteThermostatMinCoolSetpointLimit : public ModelCommand
@@ -44554,11 +42510,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatMaxCoolSetpointLimit()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatMaxCoolSetpointLimit() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -44566,14 +42518,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMaxCoolSetpointLimit(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MaxCoolSetpointLimit::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16sAttributeCallback>(OnInt16sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.MaxCoolSetpointLimit response", value);
+    }
 };
 
 class WriteThermostatMaxCoolSetpointLimit : public ModelCommand
@@ -44667,11 +42619,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatMinSetpointDeadBand()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatMinSetpointDeadBand() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -44679,14 +42627,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMinSetpointDeadBand(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::MinSetpointDeadBand::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.MinSetpointDeadBand response", value);
+    }
 };
 
 class WriteThermostatMinSetpointDeadBand : public ModelCommand
@@ -44780,11 +42728,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatControlSequenceOfOperation()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatControlSequenceOfOperation() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -44792,14 +42736,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeControlSequenceOfOperation(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ControlSequenceOfOperation::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.ControlSequenceOfOperation response", value);
+    }
 };
 
 class WriteThermostatControlSequenceOfOperation : public ModelCommand
@@ -44893,11 +42837,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatSystemMode()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatSystemMode() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -44905,14 +42845,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSystemMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::SystemMode::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.SystemMode response", value);
+    }
 };
 
 class WriteThermostatSystemMode : public ModelCommand
@@ -45005,11 +42945,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatStartOfWeek()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatStartOfWeek() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -45017,14 +42953,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeStartOfWeek(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::StartOfWeek::TypeInfo>(this, OnAttributeResponse,
+                                                                                                         OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.StartOfWeek response", value);
+    }
 };
 
 class ReportThermostatStartOfWeek : public ModelCommand
@@ -45091,11 +43027,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatNumberOfWeeklyTransitions()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatNumberOfWeeklyTransitions() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -45103,14 +43035,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNumberOfWeeklyTransitions(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfWeeklyTransitions::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.NumberOfWeeklyTransitions response", value);
+    }
 };
 
 class ReportThermostatNumberOfWeeklyTransitions : public ModelCommand
@@ -45178,11 +43110,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatNumberOfDailyTransitions()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatNumberOfDailyTransitions() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -45190,14 +43118,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNumberOfDailyTransitions(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::NumberOfDailyTransitions::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.NumberOfDailyTransitions response", value);
+    }
 };
 
 class ReportThermostatNumberOfDailyTransitions : public ModelCommand
@@ -45265,11 +43193,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatFeatureMap()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatFeatureMap() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -45277,14 +43201,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::FeatureMap::TypeInfo>(this, OnAttributeResponse,
+                                                                                                        OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.FeatureMap response", value);
+    }
 };
 
 class ReportThermostatFeatureMap : public ModelCommand
@@ -45351,11 +43275,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -45363,14 +43283,14 @@ public:
 
         chip::Controller::ThermostatCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::Thermostat::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "Thermostat.ClusterRevision response", value);
+    }
 };
 
 class ReportThermostatClusterRevision : public ModelCommand
@@ -45449,11 +43369,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatUserInterfaceConfigurationTemperatureDisplayMode() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -45461,14 +43377,15 @@ public:
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTemperatureDisplayMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster
+            .ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::TemperatureDisplayMode::TypeInfo>(
+                this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThermostatUserInterfaceConfiguration.TemperatureDisplayMode response", value);
+    }
 };
 
 class WriteThermostatUserInterfaceConfigurationTemperatureDisplayMode : public ModelCommand
@@ -45563,11 +43480,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatUserInterfaceConfigurationKeypadLockout()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatUserInterfaceConfigurationKeypadLockout() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -45575,14 +43488,15 @@ public:
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeKeypadLockout(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster
+            .ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::KeypadLockout::TypeInfo>(
+                this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThermostatUserInterfaceConfiguration.KeypadLockout response", value);
+    }
 };
 
 class WriteThermostatUserInterfaceConfigurationKeypadLockout : public ModelCommand
@@ -45676,11 +43590,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatUserInterfaceConfigurationScheduleProgrammingVisibility() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -45688,14 +43598,15 @@ public:
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeScheduleProgrammingVisibility(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<
+            chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ScheduleProgrammingVisibility::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThermostatUserInterfaceConfiguration.ScheduleProgrammingVisibility response", value);
+    }
 };
 
 class WriteThermostatUserInterfaceConfigurationScheduleProgrammingVisibility : public ModelCommand
@@ -45790,11 +43701,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThermostatUserInterfaceConfigurationClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThermostatUserInterfaceConfigurationClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -45802,14 +43709,15 @@ public:
 
         chip::Controller::ThermostatUserInterfaceConfigurationCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster
+            .ReadAttribute<chip::app::Clusters::ThermostatUserInterfaceConfiguration::Attributes::ClusterRevision::TypeInfo>(
+                this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThermostatUserInterfaceConfiguration.ClusterRevision response", value);
+    }
 };
 
 class ReportThermostatUserInterfaceConfigurationClusterRevision : public ModelCommand
@@ -45970,11 +43878,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsChannel()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsChannel() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -45982,14 +43886,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeChannel(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Channel::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.Channel response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsChannel : public ModelCommand
@@ -46056,11 +43960,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRoutingRole()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRoutingRole() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -46068,14 +43968,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRoutingRole(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RoutingRole::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RoutingRole response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRoutingRole : public ModelCommand
@@ -46142,11 +44042,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsNetworkName()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsNetworkName() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -46154,14 +44050,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNetworkName(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::NetworkName::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<OctetStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::ByteSpan value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.NetworkName response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsNetworkName : public ModelCommand
@@ -46228,11 +44124,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsPanId()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsPanId() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -46240,14 +44132,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePanId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::PanId::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.PanId response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsPanId : public ModelCommand
@@ -46314,11 +44206,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsExtendedPanId()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsExtendedPanId() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -46326,14 +44214,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeExtendedPanId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ExtendedPanId::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ExtendedPanId response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsExtendedPanId : public ModelCommand
@@ -46400,11 +44288,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsMeshLocalPrefix()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsMeshLocalPrefix() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -46412,14 +44296,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMeshLocalPrefix(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::MeshLocalPrefix::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<OctetStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::ByteSpan value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.MeshLocalPrefix response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsMeshLocalPrefix : public ModelCommand
@@ -46486,11 +44370,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsOverrunCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsOverrunCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -46498,14 +44378,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOverrunCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OverrunCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.OverrunCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsOverrunCount : public ModelCommand
@@ -46572,11 +44452,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsNeighborTableList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsNeighborTableList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -46584,15 +44460,17 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeNeighborTableList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::NeighborTableList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<ThreadNetworkDiagnosticsNeighborTableListListAttributeCallback>(
-            OnThreadNetworkDiagnosticsNeighborTableListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void
+    OnAttributeResponse(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::ThreadNetworkDiagnostics::Structs::NeighborTable::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.NeighborTableList response", value);
+    }
 };
 
 /*
@@ -46607,11 +44485,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRouteTableList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRouteTableList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -46619,15 +44493,16 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRouteTableList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RouteTableList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<ThreadNetworkDiagnosticsRouteTableListListAttributeCallback>(
-            OnThreadNetworkDiagnosticsRouteTableListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context,
+                                    const chip::app::DataModel::DecodableList<
+                                        chip::app::Clusters::ThreadNetworkDiagnostics::Structs::RouteTable::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RouteTableList response", value);
+    }
 };
 
 /*
@@ -46642,11 +44517,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsPartitionId()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsPartitionId() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -46654,14 +44525,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePartitionId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::PartitionId::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.PartitionId response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsPartitionId : public ModelCommand
@@ -46728,11 +44599,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsWeighting()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsWeighting() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -46740,14 +44607,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeWeighting(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Weighting::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.Weighting response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsWeighting : public ModelCommand
@@ -46814,11 +44681,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsDataVersion()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsDataVersion() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -46826,14 +44689,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeDataVersion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::DataVersion::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.DataVersion response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsDataVersion : public ModelCommand
@@ -46900,11 +44763,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsStableDataVersion()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsStableDataVersion() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -46912,14 +44771,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeStableDataVersion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::StableDataVersion::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.StableDataVersion response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsStableDataVersion : public ModelCommand
@@ -46987,11 +44846,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsLeaderRouterId()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsLeaderRouterId() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -46999,14 +44854,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeLeaderRouterId(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::LeaderRouterId::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.LeaderRouterId response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsLeaderRouterId : public ModelCommand
@@ -47073,11 +44928,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsDetachedRoleCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsDetachedRoleCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -47085,14 +44936,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeDetachedRoleCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::DetachedRoleCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.DetachedRoleCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsDetachedRoleCount : public ModelCommand
@@ -47160,11 +45011,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsChildRoleCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsChildRoleCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -47172,14 +45019,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeChildRoleCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ChildRoleCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ChildRoleCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsChildRoleCount : public ModelCommand
@@ -47246,11 +45093,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRouterRoleCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRouterRoleCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -47258,14 +45101,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRouterRoleCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RouterRoleCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RouterRoleCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRouterRoleCount : public ModelCommand
@@ -47332,11 +45175,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsLeaderRoleCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsLeaderRoleCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -47344,14 +45183,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeLeaderRoleCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::LeaderRoleCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.LeaderRoleCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsLeaderRoleCount : public ModelCommand
@@ -47418,11 +45257,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsAttachAttemptCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsAttachAttemptCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -47430,14 +45265,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeAttachAttemptCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::AttachAttemptCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.AttachAttemptCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsAttachAttemptCount : public ModelCommand
@@ -47505,11 +45340,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsPartitionIdChangeCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsPartitionIdChangeCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -47517,14 +45348,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePartitionIdChangeCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::PartitionIdChangeCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.PartitionIdChangeCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsPartitionIdChangeCount : public ModelCommand
@@ -47592,11 +45423,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -47604,14 +45431,15 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBetterPartitionAttachAttemptCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster
+            .ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::BetterPartitionAttachAttemptCount::TypeInfo>(
+                this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.BetterPartitionAttachAttemptCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsBetterPartitionAttachAttemptCount : public ModelCommand
@@ -47679,11 +45507,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsParentChangeCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsParentChangeCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -47691,14 +45515,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeParentChangeCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ParentChangeCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ParentChangeCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsParentChangeCount : public ModelCommand
@@ -47766,11 +45590,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxTotalCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxTotalCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -47778,14 +45598,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxTotalCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxTotalCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxTotalCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxTotalCount : public ModelCommand
@@ -47852,11 +45672,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxUnicastCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxUnicastCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -47864,14 +45680,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxUnicastCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxUnicastCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxUnicastCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxUnicastCount : public ModelCommand
@@ -47938,11 +45754,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxBroadcastCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxBroadcastCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -47950,14 +45762,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxBroadcastCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxBroadcastCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxBroadcastCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxBroadcastCount : public ModelCommand
@@ -48024,11 +45836,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxAckRequestedCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxAckRequestedCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -48036,14 +45844,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxAckRequestedCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxAckRequestedCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxAckRequestedCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxAckRequestedCount : public ModelCommand
@@ -48111,11 +45919,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxAckedCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxAckedCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -48123,14 +45927,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxAckedCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxAckedCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxAckedCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxAckedCount : public ModelCommand
@@ -48197,11 +46001,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxNoAckRequestedCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxNoAckRequestedCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -48209,14 +46009,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxNoAckRequestedCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxNoAckRequestedCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxNoAckRequestedCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxNoAckRequestedCount : public ModelCommand
@@ -48284,11 +46084,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxDataCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxDataCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -48296,14 +46092,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxDataCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxDataCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxDataCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxDataCount : public ModelCommand
@@ -48370,11 +46166,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxDataPollCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxDataPollCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -48382,14 +46174,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxDataPollCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxDataPollCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxDataPollCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxDataPollCount : public ModelCommand
@@ -48456,11 +46248,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxBeaconCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxBeaconCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -48468,14 +46256,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxBeaconCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxBeaconCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxBeaconCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxBeaconCount : public ModelCommand
@@ -48542,11 +46330,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxBeaconRequestCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxBeaconRequestCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -48554,14 +46338,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxBeaconRequestCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxBeaconRequestCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxBeaconRequestCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxBeaconRequestCount : public ModelCommand
@@ -48629,11 +46413,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxOtherCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxOtherCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -48641,14 +46421,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxOtherCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxOtherCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxOtherCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxOtherCount : public ModelCommand
@@ -48715,11 +46495,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxRetryCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxRetryCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -48727,14 +46503,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxRetryCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxRetryCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxRetryCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxRetryCount : public ModelCommand
@@ -48801,11 +46577,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -48813,14 +46585,15 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxDirectMaxRetryExpiryCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster
+            .ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxDirectMaxRetryExpiryCount::TypeInfo>(
+                this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxDirectMaxRetryExpiryCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxDirectMaxRetryExpiryCount : public ModelCommand
@@ -48888,11 +46661,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -48900,14 +46669,15 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxIndirectMaxRetryExpiryCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster
+            .ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxIndirectMaxRetryExpiryCount::TypeInfo>(
+                this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxIndirectMaxRetryExpiryCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxIndirectMaxRetryExpiryCount : public ModelCommand
@@ -48975,11 +46745,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxErrCcaCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxErrCcaCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -48987,14 +46753,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxErrCcaCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxErrCcaCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxErrCcaCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxErrCcaCount : public ModelCommand
@@ -49061,11 +46827,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxErrAbortCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxErrAbortCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -49073,14 +46835,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxErrAbortCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxErrAbortCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxErrAbortCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxErrAbortCount : public ModelCommand
@@ -49147,11 +46909,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsTxErrBusyChannelCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsTxErrBusyChannelCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -49159,14 +46917,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTxErrBusyChannelCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::TxErrBusyChannelCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.TxErrBusyChannelCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsTxErrBusyChannelCount : public ModelCommand
@@ -49234,11 +46992,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxTotalCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxTotalCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -49246,14 +47000,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxTotalCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxTotalCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxTotalCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxTotalCount : public ModelCommand
@@ -49320,11 +47074,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxUnicastCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxUnicastCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -49332,14 +47082,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxUnicastCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxUnicastCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxUnicastCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxUnicastCount : public ModelCommand
@@ -49406,11 +47156,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxBroadcastCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxBroadcastCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -49418,14 +47164,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxBroadcastCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxBroadcastCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxBroadcastCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxBroadcastCount : public ModelCommand
@@ -49492,11 +47238,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxDataCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxDataCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -49504,14 +47246,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxDataCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxDataCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxDataCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxDataCount : public ModelCommand
@@ -49578,11 +47320,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxDataPollCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxDataPollCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -49590,14 +47328,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxDataPollCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxDataPollCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxDataPollCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxDataPollCount : public ModelCommand
@@ -49664,11 +47402,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxBeaconCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxBeaconCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -49676,14 +47410,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxBeaconCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxBeaconCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxBeaconCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxBeaconCount : public ModelCommand
@@ -49750,11 +47484,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxBeaconRequestCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxBeaconRequestCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -49762,14 +47492,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxBeaconRequestCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxBeaconRequestCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxBeaconRequestCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxBeaconRequestCount : public ModelCommand
@@ -49837,11 +47567,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxOtherCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxOtherCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -49849,14 +47575,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxOtherCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxOtherCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxOtherCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxOtherCount : public ModelCommand
@@ -49923,11 +47649,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxAddressFilteredCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxAddressFilteredCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -49935,14 +47657,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxAddressFilteredCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxAddressFilteredCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxAddressFilteredCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxAddressFilteredCount : public ModelCommand
@@ -50010,11 +47732,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxDestAddrFilteredCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -50022,14 +47740,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxDestAddrFilteredCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxDestAddrFilteredCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxDestAddrFilteredCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxDestAddrFilteredCount : public ModelCommand
@@ -50097,11 +47815,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxDuplicatedCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxDuplicatedCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -50109,14 +47823,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxDuplicatedCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxDuplicatedCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxDuplicatedCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxDuplicatedCount : public ModelCommand
@@ -50184,11 +47898,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxErrNoFrameCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxErrNoFrameCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -50196,14 +47906,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxErrNoFrameCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrNoFrameCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxErrNoFrameCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxErrNoFrameCount : public ModelCommand
@@ -50271,11 +47981,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxErrUnknownNeighborCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -50283,14 +47989,15 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxErrUnknownNeighborCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster
+            .ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrUnknownNeighborCount::TypeInfo>(
+                this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxErrUnknownNeighborCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxErrUnknownNeighborCount : public ModelCommand
@@ -50358,11 +48065,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -50370,14 +48073,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxErrInvalidSrcAddrCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrInvalidSrcAddrCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxErrInvalidSrcAddrCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxErrInvalidSrcAddrCount : public ModelCommand
@@ -50445,11 +48148,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxErrSecCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxErrSecCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -50457,14 +48156,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxErrSecCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrSecCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxErrSecCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxErrSecCount : public ModelCommand
@@ -50531,11 +48230,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxErrFcsCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxErrFcsCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -50543,14 +48238,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxErrFcsCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrFcsCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxErrFcsCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxErrFcsCount : public ModelCommand
@@ -50617,11 +48312,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsRxErrOtherCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsRxErrOtherCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -50629,14 +48320,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRxErrOtherCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::RxErrOtherCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.RxErrOtherCount response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsRxErrOtherCount : public ModelCommand
@@ -50703,11 +48394,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsActiveTimestamp()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsActiveTimestamp() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -50715,14 +48402,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeActiveTimestamp(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveTimestamp::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ActiveTimestamp response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsActiveTimestamp : public ModelCommand
@@ -50789,11 +48476,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsPendingTimestamp()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsPendingTimestamp() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -50801,14 +48484,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePendingTimestamp(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::PendingTimestamp::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.PendingTimestamp response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsPendingTimestamp : public ModelCommand
@@ -50875,11 +48558,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsDelay()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsDelay() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -50887,14 +48566,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeDelay(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::Delay::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.Delay response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsDelay : public ModelCommand
@@ -50961,11 +48640,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsSecurityPolicy()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsSecurityPolicy() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -50973,15 +48648,17 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSecurityPolicy(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::SecurityPolicy::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<ThreadNetworkDiagnosticsSecurityPolicyListAttributeCallback>(
-            OnThreadNetworkDiagnosticsSecurityPolicyListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void
+    OnAttributeResponse(void * context,
+                        const chip::app::DataModel::DecodableList<
+                            chip::app::Clusters::ThreadNetworkDiagnostics::Structs::SecurityPolicy::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.SecurityPolicy response", value);
+    }
 };
 
 /*
@@ -50996,11 +48673,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsChannelMask()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsChannelMask() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -51008,14 +48681,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeChannelMask(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ChannelMask::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<OctetStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::ByteSpan value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ChannelMask response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsChannelMask : public ModelCommand
@@ -51082,11 +48755,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsOperationalDatasetComponents()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsOperationalDatasetComponents() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -51094,15 +48763,18 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOperationalDatasetComponents(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster
+            .ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::OperationalDatasetComponents::TypeInfo>(
+                this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<ThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeCallback>(
-            OnThreadNetworkDiagnosticsOperationalDatasetComponentsListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<
+            chip::app::Clusters::ThreadNetworkDiagnostics::Structs::OperationalDatasetComponents::DecodableType> & value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.OperationalDatasetComponents response", value);
+    }
 };
 
 /*
@@ -51117,11 +48789,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsActiveNetworkFaultsList()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsActiveNetworkFaultsList() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -51129,15 +48797,16 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeActiveNetworkFaultsList(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ActiveNetworkFaultsList::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<ThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeCallback>(
-            OnThreadNetworkDiagnosticsActiveNetworkFaultsListListAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(
+        void * context,
+        const chip::app::DataModel::DecodableList<chip::app::Clusters::ThreadNetworkDiagnostics::NetworkFault> & value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ActiveNetworkFaultsList response", value);
+    }
 };
 
 /*
@@ -51152,11 +48821,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsFeatureMap()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsFeatureMap() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -51164,14 +48829,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::FeatureMap::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.FeatureMap response", value);
+    }
 };
 
 /*
@@ -51186,11 +48851,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadThreadNetworkDiagnosticsClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadThreadNetworkDiagnosticsClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -51198,14 +48859,14 @@ public:
 
         chip::Controller::ThreadNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::ThreadNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "ThreadNetworkDiagnostics.ClusterRevision response", value);
+    }
 };
 
 class ReportThreadNetworkDiagnosticsClusterRevision : public ModelCommand
@@ -51282,11 +48943,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWakeOnLanWakeOnLanMacAddress()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWakeOnLanWakeOnLanMacAddress() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -51294,14 +48951,14 @@ public:
 
         chip::Controller::WakeOnLanCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeWakeOnLanMacAddress(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WakeOnLan::Attributes::WakeOnLanMacAddress::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<CharStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<CharStringAttributeCallback>(OnCharStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::CharSpan value)
+    {
+        OnGeneralAttributeResponse(context, "WakeOnLan.WakeOnLanMacAddress response", value);
+    }
 };
 
 class ReportWakeOnLanWakeOnLanMacAddress : public ModelCommand
@@ -51369,11 +49026,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWakeOnLanClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWakeOnLanClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -51381,14 +49034,14 @@ public:
 
         chip::Controller::WakeOnLanCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WakeOnLan::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WakeOnLan.ClusterRevision response", value);
+    }
 };
 
 class ReportWakeOnLanClusterRevision : public ModelCommand
@@ -51499,11 +49152,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsBssid()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsBssid() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -51511,14 +49160,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBssid(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::Bssid::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<OctetStringAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<OctetStringAttributeCallback>(OnOctetStringAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, chip::ByteSpan value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.Bssid response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsBssid : public ModelCommand
@@ -51585,11 +49234,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsSecurityType()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsSecurityType() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -51597,14 +49242,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSecurityType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::SecurityType::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.SecurityType response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsSecurityType : public ModelCommand
@@ -51671,11 +49316,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsWiFiVersion()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsWiFiVersion() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -51683,14 +49324,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeWiFiVersion(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::WiFiVersion::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.WiFiVersion response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsWiFiVersion : public ModelCommand
@@ -51757,11 +49398,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsChannelNumber()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsChannelNumber() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -51769,14 +49406,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeChannelNumber(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::ChannelNumber::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.ChannelNumber response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsChannelNumber : public ModelCommand
@@ -51843,11 +49480,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsRssi()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsRssi() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -51855,14 +49488,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeRssi(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::Rssi::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8sAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8sAttributeCallback>(OnInt8sAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, int8_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.Rssi response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsRssi : public ModelCommand
@@ -51929,11 +49562,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsBeaconLostCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsBeaconLostCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -51941,14 +49570,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBeaconLostCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::BeaconLostCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.BeaconLostCount response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsBeaconLostCount : public ModelCommand
@@ -52015,11 +49644,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsBeaconRxCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsBeaconRxCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -52027,14 +49652,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeBeaconRxCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::BeaconRxCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.BeaconRxCount response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsBeaconRxCount : public ModelCommand
@@ -52101,11 +49726,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsPacketMulticastRxCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsPacketMulticastRxCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -52113,14 +49734,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePacketMulticastRxCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::PacketMulticastRxCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.PacketMulticastRxCount response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsPacketMulticastRxCount : public ModelCommand
@@ -52188,11 +49809,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsPacketMulticastTxCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsPacketMulticastTxCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -52200,14 +49817,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePacketMulticastTxCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::PacketMulticastTxCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.PacketMulticastTxCount response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsPacketMulticastTxCount : public ModelCommand
@@ -52275,11 +49892,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsPacketUnicastRxCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsPacketUnicastRxCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -52287,14 +49900,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePacketUnicastRxCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::PacketUnicastRxCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.PacketUnicastRxCount response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsPacketUnicastRxCount : public ModelCommand
@@ -52362,11 +49975,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsPacketUnicastTxCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsPacketUnicastTxCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -52374,14 +49983,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributePacketUnicastTxCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::PacketUnicastTxCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.PacketUnicastTxCount response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsPacketUnicastTxCount : public ModelCommand
@@ -52449,11 +50058,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsCurrentMaxRate()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsCurrentMaxRate() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -52461,14 +50066,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentMaxRate(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::CurrentMaxRate::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.CurrentMaxRate response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsCurrentMaxRate : public ModelCommand
@@ -52535,11 +50140,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsOverrunCount()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsOverrunCount() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -52547,14 +50148,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOverrunCount(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::OverrunCount::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int64uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int64uAttributeCallback>(OnInt64uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint64_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.OverrunCount response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsOverrunCount : public ModelCommand
@@ -52621,11 +50222,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsFeatureMap()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsFeatureMap() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -52633,14 +50230,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::FeatureMap::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.FeatureMap response", value);
+    }
 };
 
 /*
@@ -52655,11 +50252,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWiFiNetworkDiagnosticsClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWiFiNetworkDiagnosticsClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -52667,14 +50260,14 @@ public:
 
         chip::Controller::WiFiNetworkDiagnosticsCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WiFiNetworkDiagnostics::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WiFiNetworkDiagnostics.ClusterRevision response", value);
+    }
 };
 
 class ReportWiFiNetworkDiagnosticsClusterRevision : public ModelCommand
@@ -52934,11 +50527,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringType()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringType() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -52946,14 +50535,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Type::TypeInfo>(this, OnAttributeResponse,
+                                                                                                      OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.Type response", value);
+    }
 };
 
 class ReportWindowCoveringType : public ModelCommand
@@ -53020,11 +50609,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringCurrentPositionLift()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringCurrentPositionLift() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -53032,14 +50617,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentPositionLift(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLift::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionLift response", value);
+    }
 };
 
 class ReportWindowCoveringCurrentPositionLift : public ModelCommand
@@ -53107,11 +50692,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringCurrentPositionTilt()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringCurrentPositionTilt() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -53119,14 +50700,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentPositionTilt(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTilt::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionTilt response", value);
+    }
 };
 
 class ReportWindowCoveringCurrentPositionTilt : public ModelCommand
@@ -53194,11 +50775,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringConfigStatus()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringConfigStatus() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -53206,14 +50783,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeConfigStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::ConfigStatus::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.ConfigStatus response", value);
+    }
 };
 
 class ReportWindowCoveringConfigStatus : public ModelCommand
@@ -53280,11 +50857,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringCurrentPositionLiftPercentage()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringCurrentPositionLiftPercentage() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -53292,14 +50865,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentPositionLiftPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercentage::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionLiftPercentage response", value);
+    }
 };
 
 class ReportWindowCoveringCurrentPositionLiftPercentage : public ModelCommand
@@ -53367,11 +50940,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringCurrentPositionTiltPercentage()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringCurrentPositionTiltPercentage() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -53379,14 +50948,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentPositionTiltPercentage(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercentage::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionTiltPercentage response", value);
+    }
 };
 
 class ReportWindowCoveringCurrentPositionTiltPercentage : public ModelCommand
@@ -53454,11 +51023,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringOperationalStatus()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringOperationalStatus() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -53466,14 +51031,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeOperationalStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::OperationalStatus::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.OperationalStatus response", value);
+    }
 };
 
 class ReportWindowCoveringOperationalStatus : public ModelCommand
@@ -53541,11 +51106,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringTargetPositionLiftPercent100ths()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringTargetPositionLiftPercent100ths() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -53553,14 +51114,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTargetPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionLiftPercent100ths::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.TargetPositionLiftPercent100ths response", value);
+    }
 };
 
 class ReportWindowCoveringTargetPositionLiftPercent100ths : public ModelCommand
@@ -53628,11 +51189,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringTargetPositionTiltPercent100ths()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringTargetPositionTiltPercent100ths() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -53640,14 +51197,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeTargetPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::TargetPositionTiltPercent100ths::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.TargetPositionTiltPercent100ths response", value);
+    }
 };
 
 class ReportWindowCoveringTargetPositionTiltPercent100ths : public ModelCommand
@@ -53715,11 +51272,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringEndProductType()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringEndProductType() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -53727,14 +51280,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeEndProductType(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::EndProductType::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.EndProductType response", value);
+    }
 };
 
 class ReportWindowCoveringEndProductType : public ModelCommand
@@ -53801,11 +51354,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringCurrentPositionLiftPercent100ths()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringCurrentPositionLiftPercent100ths() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -53813,14 +51362,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentPositionLiftPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionLiftPercent100ths::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionLiftPercent100ths response", value);
+    }
 };
 
 class ReportWindowCoveringCurrentPositionLiftPercent100ths : public ModelCommand
@@ -53888,11 +51437,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringCurrentPositionTiltPercent100ths()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringCurrentPositionTiltPercent100ths() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -53900,14 +51445,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeCurrentPositionTiltPercent100ths(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::CurrentPositionTiltPercent100ths::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.CurrentPositionTiltPercent100ths response", value);
+    }
 };
 
 class ReportWindowCoveringCurrentPositionTiltPercent100ths : public ModelCommand
@@ -53975,11 +51520,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringInstalledOpenLimitLift()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringInstalledOpenLimitLift() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -53987,14 +51528,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInstalledOpenLimitLift(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitLift::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.InstalledOpenLimitLift response", value);
+    }
 };
 
 class ReportWindowCoveringInstalledOpenLimitLift : public ModelCommand
@@ -54062,11 +51603,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringInstalledClosedLimitLift()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringInstalledClosedLimitLift() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -54074,14 +51611,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInstalledClosedLimitLift(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitLift::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.InstalledClosedLimitLift response", value);
+    }
 };
 
 class ReportWindowCoveringInstalledClosedLimitLift : public ModelCommand
@@ -54149,11 +51686,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringInstalledOpenLimitTilt()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringInstalledOpenLimitTilt() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -54161,14 +51694,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInstalledOpenLimitTilt(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledOpenLimitTilt::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.InstalledOpenLimitTilt response", value);
+    }
 };
 
 class ReportWindowCoveringInstalledOpenLimitTilt : public ModelCommand
@@ -54236,11 +51769,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringInstalledClosedLimitTilt()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringInstalledClosedLimitTilt() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -54248,14 +51777,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeInstalledClosedLimitTilt(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::InstalledClosedLimitTilt::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.InstalledClosedLimitTilt response", value);
+    }
 };
 
 class ReportWindowCoveringInstalledClosedLimitTilt : public ModelCommand
@@ -54323,11 +51852,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringMode()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringMode() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -54335,14 +51860,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeMode(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::Mode::TypeInfo>(this, OnAttributeResponse,
+                                                                                                      OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int8uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int8uAttributeCallback>(OnInt8uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.Mode response", value);
+    }
 };
 
 class WriteWindowCoveringMode : public ModelCommand
@@ -54435,11 +51960,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringSafetyStatus()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringSafetyStatus() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -54447,14 +51968,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeSafetyStatus(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::SafetyStatus::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.SafetyStatus response", value);
+    }
 };
 
 class ReportWindowCoveringSafetyStatus : public ModelCommand
@@ -54521,11 +52042,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringFeatureMap()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringFeatureMap() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -54533,14 +52050,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeFeatureMap(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::FeatureMap::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int32uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int32uAttributeCallback>(OnInt32uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint32_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.FeatureMap response", value);
+    }
 };
 
 class ReportWindowCoveringFeatureMap : public ModelCommand
@@ -54607,11 +52124,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    ~ReadWindowCoveringClusterRevision()
-    {
-        delete onSuccessCallback;
-        delete onFailureCallback;
-    }
+    ~ReadWindowCoveringClusterRevision() {}
 
     CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
     {
@@ -54619,14 +52132,14 @@ public:
 
         chip::Controller::WindowCoveringCluster cluster;
         cluster.Associate(device, endpointId);
-        return cluster.ReadAttributeClusterRevision(onSuccessCallback->Cancel(), onFailureCallback->Cancel());
+        return cluster.ReadAttribute<chip::app::Clusters::WindowCovering::Attributes::ClusterRevision::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
     }
 
-private:
-    chip::Callback::Callback<Int16uAttributeCallback> * onSuccessCallback =
-        new chip::Callback::Callback<Int16uAttributeCallback>(OnInt16uAttributeResponse, this);
-    chip::Callback::Callback<DefaultFailureCallback> * onFailureCallback =
-        new chip::Callback::Callback<DefaultFailureCallback>(OnDefaultFailureResponse, this);
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "WindowCovering.ClusterRevision response", value);
+    }
 };
 
 class ReportWindowCoveringClusterRevision : public ModelCommand
