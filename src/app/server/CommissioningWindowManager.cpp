@@ -259,7 +259,7 @@ CHIP_ERROR CommissioningWindowManager::OpenEnhancedCommissioningWindow(uint16_t 
 
 void CommissioningWindowManager::CloseCommissioningWindow()
 {
-    if (mCommissioningWindowOpen)
+    if (mWindowStatus != app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen)
     {
         ChipLogProgress(AppServer, "Closing pairing window");
         Cleanup();
@@ -276,7 +276,15 @@ CHIP_ERROR CommissioningWindowManager::StartAdvertisement()
     {
         mAppDelegate->OnPairingWindowOpened();
     }
-    mCommissioningWindowOpen = true;
+
+    if (mUseECM)
+    {
+        mWindowStatus = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kEnhancedWindowOpen;
+    }
+    else
+    {
+        mWindowStatus = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kBasicWindowOpen;
+    }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(true);
@@ -292,7 +300,7 @@ CHIP_ERROR CommissioningWindowManager::StopAdvertisement()
     mServer->GetExchangeManager().UnregisterUnsolicitedMessageHandlerForType(Protocols::SecureChannel::MsgType::PBKDFParamRequest);
     mPairingSession.Clear();
 
-    mCommissioningWindowOpen = false;
+    mWindowStatus = app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SED
     DeviceLayer::ConnectivityMgr().RequestSEDFastPollingMode(false);

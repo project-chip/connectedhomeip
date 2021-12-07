@@ -24,12 +24,23 @@ limitations under the License.
      <item name="WindowNotOpen" value="0x03"/>
   </enum>
 
+  <enum name="CommissioningWindowStatus" type="ENUM8">
+    <cluster code="0x003c"/>
+     <item name="WindowNotOpen" value="0x00"/>
+     <item name="EnhancedWindowOpen" value="0x01"/>
+     <item name="BasicWindowOpen" value="0x02"/>
+  </enum>
+
   <cluster>
     <name>AdministratorCommissioning</name>
     <domain>General</domain>
     <code>0x003c</code>
     <define>ADMINISTRATOR_COMMISSIONING_CLUSTER</define>
     <description>Commands to trigger a Node to allow a new Administrator to commission it.</description>
+
+    <attribute side="server" code="0x0000" define="WINDOW_STATUS" type="INT8U" writable="false" optional="false">WindowStatus</attribute>
+    <attribute side="server" code="0x0001" define="ADMIN_FABRIC_INDEX" type="fabric_idx" writable="false" optional="false">AdminFabricIndex</attribute>
+    <attribute side="server" code="0x0002" define="ADMIN_VENDOR_ID" type="INT16U" writable="false" optional="false">AdminVendorId</attribute>
 
     <command source="client" code="0x00" name="OpenCommissioningWindow" optional="false">
       <description>This command is used by a current Administrator to instruct a Node to go into commissioning mode using enhanced commissioning method.</description>

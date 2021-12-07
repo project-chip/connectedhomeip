@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <app-common/zap-generated/cluster-objects.h>
 #include <app/server/AppDelegate.h>
 #include <protocols/secure_channel/RendezvousParameters.h>
 #include <protocols/secure_channel/SessionIDAllocator.h>
@@ -58,7 +59,7 @@ public:
 
     void CloseCommissioningWindow();
 
-    bool IsCommissioningWindowOpen() { return mCommissioningWindowOpen; }
+    app::Clusters::AdministratorCommissioning::CommissioningWindowStatus CommissioningWindowStatus() const { return mWindowStatus; }
 
     //////////// SessionEstablishmentDelegate Implementation ///////////////
     void OnSessionEstablishmentError(CHIP_ERROR error) override;
@@ -84,8 +85,10 @@ private:
     AppDelegate * mAppDelegate = nullptr;
     Server * mServer           = nullptr;
 
-    bool mCommissioningWindowOpen = false;
-    bool mIsBLE                   = true;
+    app::Clusters::AdministratorCommissioning::CommissioningWindowStatus mWindowStatus =
+        app::Clusters::AdministratorCommissioning::CommissioningWindowStatus::kWindowNotOpen;
+
+    bool mIsBLE = true;
 
     bool mOriginalDiscriminatorCached = false;
     uint16_t mOriginalDiscriminator   = 0;

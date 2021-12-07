@@ -571,6 +571,9 @@
 // Client attributes
 
 // Server attributes
+#define ZCL_WINDOW_STATUS_ATTRIBUTE_ID (0x0000)
+#define ZCL_ADMIN_FABRIC_INDEX_ATTRIBUTE_ID (0x0001)
+#define ZCL_ADMIN_VENDOR_ID_ATTRIBUTE_ID (0x0002)
 
 // Attribute ids for cluster: Operational Credentials
 
