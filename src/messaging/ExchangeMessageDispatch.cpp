@@ -28,6 +28,7 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include <errno.h>
 #include <inttypes.h>
 #include <memory>
 
