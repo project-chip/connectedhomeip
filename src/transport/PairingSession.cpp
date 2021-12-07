@@ -16,13 +16,6 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file defines a common interface to access various types of secure
- *      pairing sessions (e.g. PASE, CASE)
- *
- */
-
 #include <transport/PairingSession.h>
 
 #include <lib/core/CHIPTLVTypes.h>

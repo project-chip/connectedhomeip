@@ -172,10 +172,6 @@ public:
      */
     CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override;
 
-    const char * GetI2RSessionInfo() const override { return kSpake2pI2RSessionInfo; }
-
-    const char * GetR2ISessionInfo() const override { return kSpake2pR2ISessionInfo; }
-
     /** @brief Serialize the Pairing Session to a string.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
@@ -372,10 +368,6 @@ public:
         memcpy(serializable.mKe, kTestSecret, secretLen);
         return CHIP_NO_ERROR;
     }
-
-    const char * GetI2RSessionInfo() const override { return "i2r"; }
-
-    const char * GetR2ISessionInfo() const override { return "r2i"; }
 
 private:
     const char * kTestSecret = CHIP_CONFIG_TEST_SHARED_SECRET_VALUE;

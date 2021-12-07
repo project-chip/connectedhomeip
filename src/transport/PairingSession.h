@@ -97,9 +97,11 @@ public:
 
     void SetMRPConfig(const ReliableMessageProtocolConfig & config) { mMRPConfig = config; }
 
-    virtual const char * GetI2RSessionInfo() const = 0;
-
-    virtual const char * GetR2ISessionInfo() const = 0;
+    /**
+     * Encode the provided MRP parameters using the provided TLV tag.
+     */
+    static CHIP_ERROR EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,
+                                          System::PacketBufferTLVWriter & tlvWriter);
 
 protected:
     void SetSecureSessionType(Transport::SecureSession::Type secureSessionType) { mSecureSessionType = secureSessionType; }
@@ -160,9 +162,16 @@ protected:
         return err;
     }
 
-    static CHIP_ERROR EncodeMRPParameters(TLV::Tag tag, const ReliableMessageProtocolConfig & mrpConfig,
-                                          System::PacketBufferTLVWriter & tlvWriter);
-
+    /**
+     * Try to decode the next element (pointed by the TLV reader) as MRP parameters.
+     * If the MRP parameters are found, mMRPConfig is updated with the devoded values.
+     *
+     * MRP parameters are optional. So, if the TLV reader is not pointing to the MRP parameters,
+     * the function is a noop.
+     *
+     * If the parameters are present, but TLV reader fails to correctly parse it, the function will
+     * return the corresponding error.
+     */
     CHIP_ERROR DecodeMRPParametersIfPresent(System::PacketBufferTLVReader & tlvReader);
 
     // TODO: remove Clear, we should create a new instance instead reset the old instance.
