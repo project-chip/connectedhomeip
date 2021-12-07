@@ -525,7 +525,7 @@ CHIP_ERROR BLEManagerImpl::HasFlag(BLEManagerImpl::Flags flag, bool & has)
 CHIP_ERROR BLEManagerImpl::SetFlag(BLEManagerImpl::Flags flag, bool isSet)
 {
     chip::DeviceLayer::StackUnlock unlock;
-    jlong jFlag      = static_cast<jlong>(flag);
+    jlong jFlag     = static_cast<jlong>(flag);
     jboolean jIsSet = static_cast<jboolean>(isSet);
 
     VerifyOrReturnLogError(mBLEManagerObject != nullptr, CHIP_ERROR_INCORRECT_STATE);
