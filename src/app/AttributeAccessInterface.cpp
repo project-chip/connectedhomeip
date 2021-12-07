@@ -69,6 +69,7 @@ CHIP_ERROR AttributeValueEncoder::EncodeEmptyList()
             // Put an empty array before encoding the first array element for list chunking.
             AttributeReportBuilder builder;
 
+            mPath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
             ReturnErrorOnFailure(builder.PrepareAttribute(mAttributeReportIBsBuilder, mPath, mDataVersion));
             ReturnErrorOnFailure(builder.EncodeValue(mAttributeReportIBsBuilder, DataModel::List<uint8_t>()));
 
@@ -82,6 +83,9 @@ CHIP_ERROR AttributeValueEncoder::EncodeEmptyList()
     // revert partial data.
     mEncodeState.mAllowPartialData = true;
 
+    // For all elements in the list, a report with append operation will be generated. This will not be changed during encoding
+    // of each report since the users cannot access mPath.
+    mPath.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
     return CHIP_NO_ERROR;
 }
 

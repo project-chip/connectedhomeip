@@ -147,15 +147,24 @@ public:
     {}
 
     /**
-     * Encode builds a single AttributeReportIB in AttributeReportIBs.
-     * When we are encoding a single element in the list, the actual path in the report contains a null list index as "append"
-     * operation.
+     * Encode a single value.  This value will not be chunked; it will either be
+     * entirely encoded or fail to be encoded.  Consumers are allowed to make
+     * either one call to Encode or one call to EncodeList to handle a read.
      */
     template <typename... Ts>
     CHIP_ERROR Encode(Ts &&... aArgs)
     {
         mTriedEncode = true;
         return EncodeAttributeReportIB(std::forward<Ts>(aArgs)...);
+    }
+
+    /**
+     * Encode an explicit null value.
+     */
+    CHIP_ERROR EncodeNull()
+    {
+        // Doesn't matter what type Nullable we use here.
+        return Encode(DataModel::Nullable<uint8_t>());
     }
 
     /**
@@ -181,11 +190,7 @@ public:
         // EmptyList acts as the beginning of the whole array type attribute report.
         // An empty list is encoded iff both mCurrentEncodingListIndex and mEncodeState.mCurrentEncodingListIndex are invalid
         // values. After encoding the empty list, mEncodeState.mCurrentEncodingListIndex and mCurrentEncodingListIndex are set to 0.
-        mPath.mListOp = ConcreteDataAttributePath::ListOperation::ReplaceAll;
         ReturnErrorOnFailure(EncodeEmptyList());
-        // For all elements in the list, a report with append operation will be generated. This will not be changed during encoding
-        // of each report since the users cannot access mPath.
-        mPath.mListOp = ConcreteDataAttributePath::ListOperation::AppendItem;
         ReturnErrorOnFailure(aCallback(ListEncodeHelper(*this)));
         // The Encode procedure finished without any error, clear the state.
         mEncodeState = AttributeEncodeState();
@@ -239,12 +244,16 @@ private:
     }
 
     /**
-     * Actual logic for encoding a single AttributeReportIB in AttributeReportIBs.
+     * Builds a single AttributeReportIB in AttributeReportIBs.  The caller is
+     * responsible for setting up mPath correctly.
+     *
+     * In particular, when we are encoding a single element in the list, mPath
+     * must indicate a null list index to represent an "append" operation.
+     * operation.
      */
     template <typename... Ts>
     CHIP_ERROR EncodeAttributeReportIB(Ts &&... aArgs)
     {
-        mTriedEncode = true;
         AttributeReportBuilder builder;
 
         ReturnErrorOnFailure(builder.PrepareAttribute(mAttributeReportIBsBuilder, mPath, mDataVersion));
@@ -258,6 +267,10 @@ private:
      *
      * If internal state indicates we have already encoded the empty list, this function will encode nothing, set
      * mCurrentEncodingListIndex to 0 and return CHIP_NO_ERROR.
+     *
+     * In all cases this function guarantees that mPath.mListOp is AppendItem
+     * after it returns, because at that point we will be encoding the list
+     * items.
      */
     CHIP_ERROR EncodeEmptyList();
 
