@@ -364,7 +364,8 @@ CHIP_ERROR AccessControlAttribute::ReadAcl(AttributeValueEncoder & aEncoder)
         {
             ReturnErrorOnFailure(encoder.Encode(codec));
         }
-        return err;
+        ReturnErrorCodeIf(err != CHIP_NO_ERROR && err != CHIP_ERROR_SENTINEL, err);
+        return CHIP_NO_ERROR;
     });
 }
 
