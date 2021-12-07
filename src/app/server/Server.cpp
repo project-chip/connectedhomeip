@@ -121,7 +121,7 @@ CHIP_ERROR Server::Init(AppDelegate * delegate, uint16_t secureServicePort, uint
     // TODO : Fix this once GroupDataProvider is implemented #Issue 11075
     // for (iterate through all GroupDataProvider multicast Address)
     // {
-#ifdef TEST_SUITE_GROUP
+#ifdef CHIP_ENABLE_GROUP_MESSAGING_TESTS
     err = mTransports.MulticastGroupJoinLeave(Transport::PeerAddress::Multicast(1, 1234), true);
     SuccessOrExit(err);
 #endif
