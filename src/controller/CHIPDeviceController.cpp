@@ -893,6 +893,11 @@ CHIP_ERROR DeviceCommissioner::Commission(NodeId remoteDeviceId, CommissioningPa
         ChipLogError(Controller, "Commissioning already in progress - not restarting");
         return CHIP_ERROR_INCORRECT_STATE;
     }
+    if (!params.HasWifiCredentials() && !params.HasThreadOperationalDataset() && !mIsIPRendezvous)
+    {
+        ChipLogError(Controller, "Network commissioning parameters are required for BLE auto commissioning.");
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     // If the CSRNonce is passed in, using that else using a random one..
     // TODO(cecille): Once the commissioning stages are separated, this can be removed from the device and moved down into the
     // approprirate commissioning step.
