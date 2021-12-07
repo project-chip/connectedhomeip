@@ -3874,6 +3874,9 @@ private:
 | * RevokeCommissioning                                               |   0x02 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
+| * WindowStatus                                                      | 0x0000 |
+| * AdminFabricIndex                                                  | 0x0001 |
+| * AdminVendorId                                                     | 0x0002 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
@@ -3948,6 +3951,96 @@ public:
 
 private:
     chip::app::Clusters::AdministratorCommissioning::Commands::RevokeCommissioning::Type mRequest;
+};
+
+/*
+ * Attribute WindowStatus
+ */
+class ReadAdministratorCommissioningWindowStatus : public ModelCommand
+{
+public:
+    ReadAdministratorCommissioningWindowStatus() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "window-status");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAdministratorCommissioningWindowStatus() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003C) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AdministratorCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::AdministratorCommissioning::Attributes::WindowStatus::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint8_t value)
+    {
+        OnGeneralAttributeResponse(context, "AdministratorCommissioning.WindowStatus response", value);
+    }
+};
+
+/*
+ * Attribute AdminFabricIndex
+ */
+class ReadAdministratorCommissioningAdminFabricIndex : public ModelCommand
+{
+public:
+    ReadAdministratorCommissioningAdminFabricIndex() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "admin-fabric-index");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAdministratorCommissioningAdminFabricIndex() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003C) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AdministratorCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::AdministratorCommissioning::Attributes::AdminFabricIndex::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, chip::FabricIndex value)
+    {
+        OnGeneralAttributeResponse(context, "AdministratorCommissioning.AdminFabricIndex response", value);
+    }
+};
+
+/*
+ * Attribute AdminVendorId
+ */
+class ReadAdministratorCommissioningAdminVendorId : public ModelCommand
+{
+public:
+    ReadAdministratorCommissioningAdminVendorId() : ModelCommand("read")
+    {
+        AddArgument("attr-name", "admin-vendor-id");
+        ModelCommand::AddArguments();
+    }
+
+    ~ReadAdministratorCommissioningAdminVendorId() {}
+
+    CHIP_ERROR SendCommand(ChipDevice * device, uint8_t endpointId) override
+    {
+        ChipLogProgress(chipTool, "Sending cluster (0x003C) command (0x00) on endpoint %" PRIu8, endpointId);
+
+        chip::Controller::AdministratorCommissioningCluster cluster;
+        cluster.Associate(device, endpointId);
+        return cluster.ReadAttribute<chip::app::Clusters::AdministratorCommissioning::Attributes::AdminVendorId::TypeInfo>(
+            this, OnAttributeResponse, OnDefaultFailure);
+    }
+
+    static void OnAttributeResponse(void * context, uint16_t value)
+    {
+        OnGeneralAttributeResponse(context, "AdministratorCommissioning.AdminVendorId response", value);
+    }
 };
 
 /*
@@ -52230,6 +52323,9 @@ void registerClusterAdministratorCommissioning(Commands & commands)
         make_unique<AdministratorCommissioningOpenBasicCommissioningWindow>(), //
         make_unique<AdministratorCommissioningOpenCommissioningWindow>(),      //
         make_unique<AdministratorCommissioningRevokeCommissioning>(),          //
+        make_unique<ReadAdministratorCommissioningWindowStatus>(),             //
+        make_unique<ReadAdministratorCommissioningAdminFabricIndex>(),         //
+        make_unique<ReadAdministratorCommissioningAdminVendorId>(),            //
         make_unique<ReadAdministratorCommissioningClusterRevision>(),          //
         make_unique<ReportAdministratorCommissioningClusterRevision>(),        //
     };

@@ -1659,6 +1659,27 @@ EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
 } // namespace Attributes
 } // namespace Switch
 
+namespace AdministratorCommissioning {
+namespace Attributes {
+
+namespace WindowStatus {
+EmberAfStatus Get(chip::EndpointId endpoint, uint8_t * value); // int8u
+EmberAfStatus Set(chip::EndpointId endpoint, uint8_t value);
+} // namespace WindowStatus
+
+namespace AdminFabricIndex {
+EmberAfStatus Get(chip::EndpointId endpoint, chip::FabricIndex * value); // fabric_idx
+EmberAfStatus Set(chip::EndpointId endpoint, chip::FabricIndex value);
+} // namespace AdminFabricIndex
+
+namespace AdminVendorId {
+EmberAfStatus Get(chip::EndpointId endpoint, uint16_t * value); // int16u
+EmberAfStatus Set(chip::EndpointId endpoint, uint16_t value);
+} // namespace AdminVendorId
+
+} // namespace Attributes
+} // namespace AdministratorCommissioning
+
 namespace OperationalCredentials {
 namespace Attributes {
 

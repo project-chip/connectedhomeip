@@ -10220,6 +10220,11 @@ class AdministratorCommissioning(Cluster):
     id: typing.ClassVar[int] = 0x003C
 
     class Enums:
+        class CommissioningWindowStatus(IntEnum):
+            kWindowNotOpen = 0x00
+            kEnhancedWindowOpen = 0x01
+            kBasicWindowOpen = 0x02
+
         class StatusCode(IntEnum):
             kBusy = 0x01
             kPAKEParameterError = 0x02
@@ -10283,6 +10288,54 @@ class AdministratorCommissioning(Cluster):
 
 
     class Attributes:
+        @dataclass
+        class WindowStatus(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000000
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class AdminFabricIndex(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000001
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
+        @dataclass
+        class AdminVendorId(ClusterAttributeDescriptor):
+            @ChipUtility.classproperty
+            def cluster_id(cls) -> int:
+                return 0x003C
+
+            @ChipUtility.classproperty
+            def attribute_id(cls) -> int:
+                return 0x00000002
+
+            @ChipUtility.classproperty
+            def attribute_type(cls) -> ClusterObjectFieldDescriptor:
+                return ClusterObjectFieldDescriptor(Type=uint)
+
+            value: 'uint' = 0
+
         @dataclass
         class FeatureMap(ClusterAttributeDescriptor):
             @ChipUtility.classproperty
