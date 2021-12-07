@@ -31,8 +31,8 @@
 #include <transport/PairingSession.h>
 
 #include <lib/support/UnitTestRegistration.h>
-#include <system/SystemClock.h>
 #include <stdarg.h>
+#include <system/SystemClock.h>
 
 using namespace chip;
 using namespace chip::System::Clock;
@@ -40,10 +40,7 @@ using namespace chip::System::Clock;
 class TestPairingSession : public PairingSession
 {
 public:
-    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override
-    {
-        return CHIP_NO_ERROR;
-    }
+    CHIP_ERROR DeriveSecureSession(CryptoContext & session, CryptoContext::SessionRole role) override { return CHIP_NO_ERROR; }
 
     CHIP_ERROR DecodeMRPParametersIfPresent(System::PacketBufferTLVReader & tlvReader)
     {
@@ -64,7 +61,7 @@ void PairingSessionEncodeDecodeMRPParams(nlTestSuite * inSuite, void * inContext
     TLV::TLVType outerContainerType = TLV::kTLVType_NotSpecified;
     NL_TEST_ASSERT(inSuite, writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, outerContainerType) == CHIP_NO_ERROR);
 
-    CHIP_ERROR err =  PairingSession::EncodeMRPParameters(TLV::ContextTag(1), config, writer);
+    CHIP_ERROR err = PairingSession::EncodeMRPParameters(TLV::ContextTag(1), config, writer);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, writer.EndContainer(outerContainerType) == CHIP_NO_ERROR);
